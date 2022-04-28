@@ -4,6 +4,11 @@ load(
 )
 
 sxt_cc_component(
+    name = "allocator_aware",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "unit_test",
     with_test = False,
     deps = [

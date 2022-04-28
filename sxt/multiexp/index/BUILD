@@ -35,6 +35,7 @@ sxt_cc_component(
         "//sxt/base/type:polymorphic_allocator",
     ],
     test_deps = [
+        "//sxt/base/test:allocator_aware",
         "//sxt/base/test:unit_test",
     ],
 )
