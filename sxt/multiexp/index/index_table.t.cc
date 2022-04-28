@@ -43,6 +43,21 @@ TEST_CASE("index_table manages a table of 64-bit index values") {
     REQUIRE(hdr1.data() == hdr2.data());
   }
 
+  SECTION("we can copy-assign an index table") {
+    index_table tbl1{{1}, {2, 3}};
+    index_table tbl2{{1}, {7, 9, 13}, {5, 11}};
+    tbl1 = tbl2;
+    REQUIRE(tbl1 == tbl2);
+  }
+
+  SECTION("we can move-assign an index table") {
+    index_table tbl1{{1}, {2, 3}};
+    index_table tbl2{{1}, {7, 9, 13}, {5, 11}};
+    index_table tbl3{tbl2};
+    tbl1 = std::move(tbl2);
+    REQUIRE(tbl1 == tbl3);
+  }
+
   SECTION("we can compare index tables") {
     index_table tbl1{{1}, {7, 9, 13}, {5, 2}};
     index_table tbl2{{1}, {7, 9, 13}, {5, 11}};

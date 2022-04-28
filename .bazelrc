@@ -1,6 +1,9 @@
 build --cxxopt -std=c++17
 build --config=cuda
 
+build:asan --copt -fsanitize=address
+build:asan --linkopt -fsanitize=address
+
 build:cuda --crosstool_top=@local_config_cuda//crosstool:toolchain
 build:cuda --define=using_cuda=true --define=using_cuda_nvcc=true --define=using_cuda_clang=false
 

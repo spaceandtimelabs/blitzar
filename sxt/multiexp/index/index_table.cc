@@ -69,9 +69,12 @@ index_table& index_table::operator=(const index_table& rhs) noexcept {
   if (this == &rhs) {
     return *this;
   }
+  if (capacity_ < rhs.capacity_) {
+    this->reset();
+    capacity_ = rhs.capacity_;
+    data_ = alloc_.allocate(capacity_);
+  }
   num_rows_ = rhs.num_rows_;
-  capacity_ = rhs.capacity_;
-  data_ = alloc_.allocate(capacity_);
   auto hdr = this->header();
   auto hdr_p = rhs.header();
 
@@ -91,6 +94,8 @@ index_table& index_table::operator=(index_table&& rhs) noexcept {
   if(this->get_allocator() != rhs.get_allocator()) {
     return this->operator=(rhs);
   }
+
+  this->reset();
 
   num_rows_ = rhs.num_rows_;
   capacity_ = rhs.capacity_;
