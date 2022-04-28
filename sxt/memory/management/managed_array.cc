@@ -1,7 +1,6 @@
 #include "sxt/memory/management/managed_array.h"
 
 #include <cstring>
-#include <utility>
 
 namespace sxt::memmg {
 //--------------------------------------------------------------------------------------------------

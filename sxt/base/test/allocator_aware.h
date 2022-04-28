@@ -6,6 +6,7 @@
 #include <memory_resource>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace sxt::bastst {
 //--------------------------------------------------------------------------------------------------
@@ -100,6 +101,13 @@ void exercise_allocare_aware_operations(const T& obj) noexcept {
     T t4{obj, &r1};
     t4 = std::move(t1);
     detail::check_equality(t4, obj);
+  }
+
+  // composition
+  {
+    std::pmr::vector<T> v{&r1};
+    v.emplace_back(obj);
+    detail::check_equality(v[0], obj);
   }
 }
 } // namespace sxt::bastst
