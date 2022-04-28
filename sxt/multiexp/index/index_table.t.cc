@@ -50,6 +50,6 @@ TEST_CASE("index_table manages a table of 64-bit index values") {
 
   SECTION("verify allocator-aware operations") {
     index_table tbl{{1}, {2, 3}, {4}};
-    bastst::exercise_allocare_aware_operations(tbl);
+    bastst::exercise_allocator_aware_operations(tbl);
   }
 }

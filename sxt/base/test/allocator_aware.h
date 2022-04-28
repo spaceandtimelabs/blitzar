@@ -31,13 +31,13 @@ void check_equality(const Tx&...) noexcept {
 
 
 //--------------------------------------------------------------------------------------------------
-// exercise_allocare_aware_operations
+// exercise_allocator_aware_operations
 //--------------------------------------------------------------------------------------------------
 /**
  * walk through standard allocator aware operations and check correctness
  */
 template <class T>
-void exercise_allocare_aware_operations(const T& obj) noexcept {
+void exercise_allocator_aware_operations(const T& obj) noexcept {
   std::pmr::monotonic_buffer_resource r1;
 
   // default construction

@@ -33,6 +33,6 @@ TEST_CASE(
 
   SECTION("verify allocator aware operations") {
     managed_array<int> arr{1, 2, 3};
-    bastst::exercise_allocare_aware_operations(arr);
+    bastst::exercise_allocator_aware_operations(arr);
   }
 }

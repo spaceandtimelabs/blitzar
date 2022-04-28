@@ -13,6 +13,6 @@ class driver;
 // partition_inputs
 //--------------------------------------------------------------------------------------------------
 void partition_inputs(memmg::managed_array<void>& inputs,
-                      mtxi::index_table& product_table, const driver& drv,
+                      mtxi::index_table& products, const driver& drv,
                       size_t partition_size) noexcept;
 } // namespace sxt::mtxpmp
