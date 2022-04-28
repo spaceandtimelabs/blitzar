@@ -98,6 +98,8 @@ class managed_array {
    managed_array& operator=(managed_array&&) noexcept = default;
 
    // conversion
+   operator managed_array<void> &() & noexcept { return data_; }
+
    operator managed_array<void> &&() && noexcept { return std::move(data_); }
 
    // accessors

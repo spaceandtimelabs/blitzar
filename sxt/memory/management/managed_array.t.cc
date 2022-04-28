@@ -16,12 +16,19 @@ TEST_CASE(
     REQUIRE(arr[2] == 3);
   }
 
-  SECTION("we can assign a managed array to a void array") {
+  SECTION("we can move-assign a managed array to a void array") {
     managed_array<int> arr1{1, 2, 3};
     auto data = arr1.data();
     managed_array<void> arr2 = std::move(arr1);
     REQUIRE(arr1.data() == nullptr);
     REQUIRE(arr2.data() == data);
+  }
+
+  SECTION("we can operate on an array through the void interface") {
+    managed_array<int> arr1{1, 2, 3};
+    managed_array<void>& arr2 = arr1;
+    arr2.reset();
+    REQUIRE(arr1.empty());
   }
 
   SECTION("verify allocator aware operations") {
