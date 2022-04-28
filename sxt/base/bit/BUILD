@@ -4,6 +4,21 @@ load(
 )
 
 sxt_cc_component(
+    name = "iteration",
+    deps = [
+        ":count",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
+    name = "count",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "load",
     with_test = False,
     deps = [

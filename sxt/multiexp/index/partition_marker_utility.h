@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
+#include "sxt/base/bit/count.h"
 #include "sxt/base/container/span.h"
 
 namespace sxt::mtxi {

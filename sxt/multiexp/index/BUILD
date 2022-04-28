@@ -6,6 +6,7 @@ load(
 sxt_cc_component(
     name = "partition_marker_utility",
     deps = [
+        "//sxt/base/bit:count",
         "//sxt/base/container:span",
     ],
     test_deps = [
