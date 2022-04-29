@@ -40,6 +40,9 @@ sxt_cc_component(
         "//sxt/multiexp/index:reindex",
     ],
     test_deps = [
+        ":test_driver",
         "//sxt/base/test:unit_test",
+        "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/index:index_table",
     ],
 )
