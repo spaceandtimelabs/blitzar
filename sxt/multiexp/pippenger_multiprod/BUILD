@@ -36,6 +36,8 @@ sxt_cc_component(
         ":driver",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/index:index_table",
+        "//sxt/multiexp/index:partition",
+        "//sxt/multiexp/index:reindex",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",

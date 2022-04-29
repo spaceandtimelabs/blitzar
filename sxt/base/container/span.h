@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <type_traits>
 
 #include "sxt/base/macro/cuda_callable.h"
 
@@ -26,6 +27,11 @@ class span {
 
    template <size_t N>
    CUDA_CALLABLE span(T (&arr)[N]) noexcept : size_{N}, data_{arr} {}
+
+   template <class Dummy = int,
+             std::enable_if_t<std::is_const_v<T>, Dummy>* = nullptr>
+   CUDA_CALLABLE span(span<std::remove_const_t<T>> other) noexcept
+       : size_{other.size()}, data_{other.data()} {}
 
    CUDA_CALLABLE
    T* data() const noexcept { return data_; }
