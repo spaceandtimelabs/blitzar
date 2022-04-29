@@ -50,6 +50,8 @@ class managed_array<void> {
 
    size_t size() const noexcept { return size_; }
 
+   size_t num_bytes() const noexcept { return num_bytes_; }
+
    bool empty() const noexcept { return size_ == 0; }
 
    // methods
@@ -74,7 +76,11 @@ class managed_array {
 
   managed_array(allocator_type alloc) noexcept : data_{alloc} {}
 
-  managed_array(T* data, size_t size, allocator_type alloc = {})
+  explicit managed_array(size_t size, allocator_type alloc = {}) noexcept
+      : data_{static_cast<void*>(alloc.allocate(size * sizeof(T))), size,
+              size * sizeof(T), alloc} {}
+
+  managed_array(T* data, size_t size, allocator_type alloc = {}) noexcept
       : data_{static_cast<void*>(data), size, size * sizeof(T), alloc} {}
 
   managed_array(std::initializer_list<T> values, allocator_type alloc = {})
@@ -110,6 +116,8 @@ class managed_array {
   const T* data() const noexcept { return static_cast<const T*>(data_.data()); }
 
   size_t size() const noexcept { return data_.size(); }
+
+  size_t num_bytes() const noexcept { return data_.num_bytes(); }
 
   bool empty() const noexcept { return data_.empty(); }
 
@@ -154,15 +162,5 @@ template <class T1, class T2>
 auto operator!=(const managed_array<T1>& lhs, const managed_array<T2>& rhs) noexcept
     -> decltype(*lhs.data() == *rhs.data()) {
   return !(lhs == rhs);
-}
-
-//--------------------------------------------------------------------------------------------------
-// allocate_managed_array
-//--------------------------------------------------------------------------------------------------
-template <class T>
-managed_array<T> allocate_managed_array(
-    size_t n, bast::polymorphic_allocator alloc = {}) noexcept {
-  auto data = reinterpret_cast<T*>(alloc.allocate(n * sizeof(T)));
-  return managed_array<T>{data, n, alloc};
 }
 } // namespace sxt::memmg

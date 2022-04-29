@@ -44,6 +44,7 @@ cuda_library(
     ],
     copts = [
         '--device-c',
+        '-std=c++17',
     ],
     srcs = [
         "multi_exp_gpu.cu",
@@ -53,6 +54,8 @@ cuda_library(
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/constant:zero",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:device_resource",
     ],
 )
 
@@ -64,6 +67,7 @@ cc_binary(
     deps = [
         ":multi_exp_cpu",
         ":multi_exp_gpu",
+        "//sxt/memory/management:managed_array",
         "//sxt/curve21/type:element_p3",
     ],
     visibility = ["//visibility:public"],

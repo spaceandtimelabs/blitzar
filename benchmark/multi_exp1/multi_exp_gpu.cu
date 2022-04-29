@@ -4,6 +4,8 @@
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/device_resource.h"
 
 namespace sxt {
 constexpr int num_threads_v = 128;
@@ -48,14 +50,13 @@ __global__ static void multi_exp_kernel(c21t::element_p3* res, int n) {
 // multi_exp_gpu
 //--------------------------------------------------------------------------------------------------
 void multi_exp_gpu(c21t::element_p3* res, int m, int n) noexcept {
-  c21t::element_p3* device_elements;
-  cudaMalloc(&device_elements, m * sizeof(c21t::element_p3));
+  memmg::managed_array<c21t::element_p3> device_elements(
+      m, memr::get_device_resource());
 
-  multi_exp_kernel<<<m, num_threads_v>>>(device_elements, n);
+  multi_exp_kernel<<<m, num_threads_v>>>(device_elements.data(), n);
 
-  cudaMemcpy(res, device_elements, m * sizeof(c21t::element_p3),
+  cudaMemcpy(res, device_elements.data(), device_elements.num_bytes(),
              cudaMemcpyDeviceToHost);
-  cudaFree(device_elements);
 }
 } // namespace sxt
 
