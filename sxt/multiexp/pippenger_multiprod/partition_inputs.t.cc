@@ -1,7 +1,8 @@
+#include "sxt/multiexp/pippenger_multiprod/partition_inputs.h"
+
 #include "sxt/base/test/unit_test.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/index/index_table.h"
-#include "sxt/multiexp/pippenger_multiprod/partition_inputs.h"
 #include "sxt/multiexp/pippenger_multiprod/test_driver.h"
 using namespace sxt;
 using namespace sxt::mtxpmp;

@@ -14,11 +14,8 @@ http_archive(
 
 git_repository(
   name = "build_bazel_rules_cuda",
-  commit = "6df14407099e07d422a4a009f27de9e4b47c411c",
-  remote = "https://github.com/rnburn/rules_cuda.git",
-  # see https://github.com/liuliu/rules_cuda/pull/6
-  # remote = "https://github.com/liuliu/rules_cuda.git",
-  # commit = "503c98dab4491ef9eae9c30d3c88240d28d4e695",
+  remote = "https://github.com/liuliu/rules_cuda.git",
+  commit = "9437a14aee0a84a1e3c76fee3482c502ad8f8f75",
 )
 
 load("@build_bazel_rules_cuda//gpus:cuda_configure.bzl", "cuda_configure")
