@@ -44,7 +44,6 @@ cuda_library(
     ],
     copts = [
         '--device-c',
-        '-std=c++17',
     ],
     srcs = [
         "multi_exp_gpu.cu",
