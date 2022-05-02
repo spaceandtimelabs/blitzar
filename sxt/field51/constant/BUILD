@@ -34,3 +34,11 @@ sxt_cc_component(
         "//sxt/field51/type:element",
     ],
 )
+
+sxt_cc_component(
+    name = "invsqrtamd",
+    with_test = False,
+    deps = [
+        "//sxt/field51/type:element",
+    ],
+)
