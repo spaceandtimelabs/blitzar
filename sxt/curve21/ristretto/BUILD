@@ -4,6 +4,38 @@ load(
 )
 
 sxt_cc_component(
+    name = "byte_conversion",
+    is_cuda = True,
+    deps = [
+        "//sxt/base/macro:cuda_callable",
+    ],
+    impl_deps = [
+        "//sxt/curve21/type:element_p3",
+        "//sxt/field51/type:element",
+
+        "//sxt/curve21/ristretto:sqrt_ratio_m1",
+
+        "//sxt/field51/operation:add",
+        "//sxt/field51/operation:sub",
+        "//sxt/field51/operation:mul",
+        "//sxt/field51/operation:square",
+        "//sxt/field51/operation:cmov",
+        "//sxt/field51/operation:cneg",
+        "//sxt/field51/operation:abs",
+        "//sxt/field51/operation:pow22523",
+
+        "//sxt/field51/constant:one",
+        "//sxt/field51/constant:sqrtm1",
+        "//sxt/field51/constant:invsqrtamd",
+
+        "//sxt/field51/property:sign",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "elligator",
     is_cuda = True,
     deps = [
