@@ -4,9 +4,9 @@
 
 namespace sxt::mtxb {
 //--------------------------------------------------------------------------------------------------
-// exponent_sequence_descriptor
+// exponent_sequence
 //--------------------------------------------------------------------------------------------------
-struct exponent_sequence_descriptor {
+struct exponent_sequence {
   // the number of bytes used to represent an element in the sequence
   // element_nbytes must be a power of 2 and must satisfy
   //    1 <= element_nbytes <= 32

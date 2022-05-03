@@ -8,6 +8,7 @@ sxt_cc_component(
     deps = [
         "//sxt/base/macro:cuda_callable",
     ],
+    is_cuda = True,
     impl_deps = [
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/curve21/random:ristretto_element",

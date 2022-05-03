@@ -8,6 +8,7 @@ namespace sxt::sqcb {
 //--------------------------------------------------------------------------------------------------
 // compute_base_element
 //--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
 void compute_base_element(c21t::element_p3& g, uint64_t index) noexcept {
   // Note: we'll probably substitute a different generator in the future, but
   // this works as a placeholder for now

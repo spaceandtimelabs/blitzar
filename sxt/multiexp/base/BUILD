@@ -4,6 +4,6 @@ load(
 )
 
 sxt_cc_component(
-    name = "exponent_sequence_descriptor",
+    name = "exponent_sequence",
     with_test = False,
 )
