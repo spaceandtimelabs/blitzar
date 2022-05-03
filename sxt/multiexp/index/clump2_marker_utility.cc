@@ -1,0 +1,59 @@
+#include "sxt/multiexp/index/clump2_marker_utility.h"
+
+#include <iostream>
+
+#include <cassert>
+#include <cmath>
+
+#include "sxt/multiexp/index/clump2_descriptor.h"
+
+namespace sxt::mtxi {
+//--------------------------------------------------------------------------------------------------
+// compute_clump2_marker
+//--------------------------------------------------------------------------------------------------
+uint64_t compute_clump2_marker(const clump2_descriptor& descriptor,
+                               uint64_t clump_index, uint64_t index1,
+                               uint64_t index2) noexcept {
+  assert(index1 <= index2);
+  auto part1 = clump_index * descriptor.subset_count;
+  auto part2 =
+      descriptor.size * index1 - index1 * (index1 - 1) / 2 + (index2 - index1);
+  return part1 + part2;
+}
+
+uint64_t compute_clump2_marker(const clump2_descriptor& descriptor,
+                               uint64_t clump_index, uint64_t index) noexcept {
+  return compute_clump2_marker(descriptor, clump_index, index, index);
+}
+
+//--------------------------------------------------------------------------------------------------
+// unpack_clump2_marker
+//--------------------------------------------------------------------------------------------------
+void unpack_clump2_marker(uint64_t& clump_index, uint64_t& index1,
+                          uint64_t& index2, const clump2_descriptor& descriptor,
+                          uint64_t marker) noexcept {
+  clump_index = marker / descriptor.subset_count;
+  marker -= clump_index * descriptor.subset_count;
+
+  // apply quadratic formula
+  //
+  // Note: we make use of the property from IEEE 754 that sqrt is "correctly rounded".
+  // See https://stackoverflow.com/a/48791460/4447365
+  auto b2 = 2 * descriptor.size + 1;
+  auto x = std::sqrt(4 * descriptor.size * descriptor.size +
+                     4 * descriptor.size + 1 - 8 * marker);
+  index1 = static_cast<uint64_t>(b2 - x) / 2;
+  auto u = descriptor.size * index1 - index1 * (index1 - 1) / 2;
+  index2 = marker - u + index1;
+}
+
+//--------------------------------------------------------------------------------------------------
+// consume_clump2_marker
+//--------------------------------------------------------------------------------------------------
+uint64_t consume_clump2_marker(basct::span<uint64_t>& indexes,
+                               const clump2_descriptor& descriptor) noexcept {
+  (void)indexes;
+  (void)descriptor;
+  return 0;
+}
+}  // namespace sxt::mtxi

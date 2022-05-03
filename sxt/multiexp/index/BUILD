@@ -4,10 +4,43 @@ load(
 )
 
 sxt_cc_component(
+    name = "clump2_descriptor",
+    with_test = False,
+)
+
+sxt_cc_component(
+    name = "clump2_descriptor_utility",
+    impl_deps = [
+        ":clump2_descriptor",
+    ],
+    test_deps = [
+        ":clump2_descriptor",
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
+    name = "clump2_marker_utility",
+    deps = [
+        "//sxt/base/container:span",
+    ],
+    impl_deps = [
+        ":clump2_descriptor",
+    ],
+    test_deps = [
+        ":clump2_descriptor",
+        ":clump2_descriptor_utility",
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "partition_marker_utility",
     deps = [
-        "//sxt/base/bit:count",
         "//sxt/base/container:span",
+    ],
+    impl_deps = [
+        "//sxt/base/bit:count",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
