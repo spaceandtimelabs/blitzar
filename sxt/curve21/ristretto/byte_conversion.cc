@@ -24,7 +24,6 @@
 #include "sxt/field51/operation/pow22523.h"
 
 #include "sxt/field51/base/byte_conversion.h"
-#include "sxt/field51/base/reduce.h"
 
 #include "sxt/field51/constant/one.h"
 #include "sxt/field51/constant/sqrtm1.h"
