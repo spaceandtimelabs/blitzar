@@ -100,7 +100,7 @@ void to_bytes(uint8_t s[32], const c21t::element_p3& p) noexcept {
 }
 
 CUDA_CALLABLE
-int is_canonical(const unsigned char *s)
+static int is_canonical(const unsigned char *s)
 {
     unsigned char c;
     unsigned char d;
@@ -122,7 +122,7 @@ int is_canonical(const unsigned char *s)
 // from_bytes
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-int from_bytes(c21t::element_p3& p, uint8_t s[32]) noexcept {
+int from_bytes(c21t::element_p3& p, const uint8_t* s) noexcept {
     f51t::element inv_sqrt;
     f51t::element one;
     f51t::element s_;
