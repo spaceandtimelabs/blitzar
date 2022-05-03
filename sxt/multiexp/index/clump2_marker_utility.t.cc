@@ -1,7 +1,9 @@
 #include "sxt/multiexp/index/clump2_marker_utility.h"
 
 #include <iostream>
+#include <random>
 
+#include "sxt/multiexp/index/random_clump2.h"
 #include "sxt/multiexp/index/clump2_descriptor.h"
 #include "sxt/multiexp/index/clump2_descriptor_utility.h"
 #include "sxt/base/test/unit_test.h"
@@ -89,13 +91,30 @@ TEST_CASE("we can convert between a clumped index set and its marker") {
     REQUIRE(clump_index == 0);
     REQUIRE(index1 == 2);
     REQUIRE(index2 == 2);
-
-    std::cout << marker << std::endl;
-    std::cout << "clump_index = " << clump_index << "\n";
-    std::cout << "index1 = " << index1 << "\n";
-    std::cout << "index2 = " << index2 << "\n";
   }
-  (void)clump_index;
-  (void)index1;
-  (void)index2;
+
+  SECTION("verify we can recover indexes from the marker of a random clump") {
+    std::mt19937 rng{0};
+    for (int i = 0; i < 10; ++i) {
+      random_clump2 clump;
+      generate_random_clump2(clump, rng);
+      init_clump2_descriptor(descriptor, clump.clump_size);
+
+      // 1 subset case
+      marker = compute_clump2_marker(descriptor, clump.clump_index,
+                                     clump.index1, clump.index1);
+      unpack_clump2_marker(clump_index, index1, index2, descriptor, marker);
+      REQUIRE(clump_index == clump.clump_index);
+      REQUIRE(index1 == clump.index1);
+      REQUIRE(index2 == clump.index1);
+
+      // 2 subset case
+      marker = compute_clump2_marker(descriptor, clump.clump_index,
+                                     clump.index1, clump.index2);
+      unpack_clump2_marker(clump_index, index1, index2, descriptor, marker);
+      REQUIRE(clump_index == clump.clump_index);
+      REQUIRE(index1 == clump.index1);
+      REQUIRE(index2 == clump.index2);
+    }
+  }
 }

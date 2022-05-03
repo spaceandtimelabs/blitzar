@@ -30,6 +30,7 @@ sxt_cc_component(
     test_deps = [
         ":clump2_descriptor",
         ":clump2_descriptor_utility",
+        ":random_clump2",
         "//sxt/base/test:unit_test",
     ],
 )
@@ -70,6 +71,14 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:allocator_aware",
         "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
+    name = "random_clump2",
+    with_test = False,
+    deps = [
+        ":clump2_descriptor",
     ],
 )
 
