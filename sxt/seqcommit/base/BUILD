@@ -4,26 +4,27 @@ load(
 )
 
 sxt_cc_component(
-    name = "exponent",
-    with_test = False,
+    name = "base_element",
     deps = [
         "//sxt/base/macro:cuda_callable",
+    ],
+    is_cuda = True,
+    impl_deps = [
         "//sxt/base/num:fast_random_number_generator",
+        "//sxt/curve21/random:ristretto_element",
+        "//sxt/curve21/type:element_p3",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
     ],
 )
 
 sxt_cc_component(
-    name = "ristretto_element",
+    name = "commitment",
     deps = [
         "//sxt/base/macro:cuda_callable",
-        "//sxt/base/num:fast_random_number_generator",
-        "//sxt/field51/random:element",
-        "//sxt/field51/type:element",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/ristretto:point_formation",
     ],
     test_deps = [
-        "//sxt/curve21/property:curve",
         "//sxt/base/test:unit_test",
     ],
 )

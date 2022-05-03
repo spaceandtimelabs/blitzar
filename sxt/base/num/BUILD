@@ -10,7 +10,9 @@ sxt_cc_component(
 sxt_cc_component(
     name = "fast_random_number_generator",
     deps = [
-        "//sxt/base/test:unit_test",
         "//sxt/base/macro:cuda_callable",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
     ],
 )
