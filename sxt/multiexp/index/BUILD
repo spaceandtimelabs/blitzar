@@ -36,6 +36,18 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "marker_transformation",
+    deps = [
+        "//sxt/base/container:span",
+    ],
+    test_deps = [
+        ":index_table",
+        ":partition_marker_utility",
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "partition_marker_utility",
     deps = [
         "//sxt/base/container:span",
@@ -44,20 +56,6 @@ sxt_cc_component(
         "//sxt/base/bit:count",
     ],
     test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-)
-
-sxt_cc_component(
-    name = "partition",
-    deps = [
-        "//sxt/base/container:span",
-    ],
-    impl_deps = [
-        ":partition_marker_utility",
-    ],
-    test_deps = [
-        ":index_table",
         "//sxt/base/test:unit_test",
     ],
 )

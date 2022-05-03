@@ -1,31 +1,36 @@
-#include "sxt/multiexp/index/partition.h"
+#pragma once
 
+#include <cstddef>
+#include <cstdint>
 #include <iterator>
 
-#include "sxt/multiexp/index/partition_marker_utility.h"
+#include "sxt/base/container/span.h"
 
 namespace sxt::mtxi {
 //--------------------------------------------------------------------------------------------------
-// partition_row
+// apply_marker_row_transformation
 //--------------------------------------------------------------------------------------------------
-void partition_row(basct::span<uint64_t>& indexes, uint64_t partition_size) noexcept {
+template <class F>
+void apply_marker_row_transformation(basct::span<uint64_t>& indexes,
+                                     F consumer) noexcept {
   auto out = indexes.begin();
   auto rest = indexes;
   while(!rest.empty()) {
-    *out++ = consume_partition_marker(rest, partition_size);
+    *out++ = consumer(rest);
   }
   indexes = basct::span<uint64_t>{
       indexes.data(), static_cast<size_t>(std::distance(indexes.begin(), out))};
 }
 
 //--------------------------------------------------------------------------------------------------
-// partition_rows
+// apply_marker_transformation
 //--------------------------------------------------------------------------------------------------
-size_t partition_rows(basct::span<basct::span<uint64_t>> rows,
-                     uint64_t partition_size) noexcept {
+template <class F>
+size_t apply_marker_transformation(basct::span<basct::span<uint64_t>> rows,
+                                   F consumer) noexcept {
   size_t count = 0;
   for (auto& row : rows) {
-    partition_row(row, partition_size);
+    apply_marker_row_transformation(row, consumer);
     count += row.size();
   }
   return count;
