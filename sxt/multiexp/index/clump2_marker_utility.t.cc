@@ -118,3 +118,39 @@ TEST_CASE("we can convert between a clumped index set and its marker") {
     }
   }
 }
+
+TEST_CASE("we can consume clump2 markers from a span of indexes") {
+  const uint64_t clump_size = 15;
+  basct::span<uint64_t> values;
+  uint64_t marker;
+  clump2_descriptor descriptor;
+  init_clump2_descriptor(descriptor, clump_size);
+
+  SECTION("we can consume a single marker") {
+    uint64_t data[1] = {0};
+    values = data;
+
+    marker = consume_clump2_marker(values, descriptor);
+    REQUIRE(marker == 0);
+    REQUIRE(values.empty());
+  }
+
+  SECTION("we can consume 2 values belonging to the same clump") {
+    uint64_t data[2] = {0, clump_size-1};
+    values = data;
+    marker = consume_clump2_marker(values, descriptor);
+    REQUIRE(marker == compute_clump2_marker(descriptor, 0, data[0], data[1]));
+    REQUIRE(values.empty());
+  }
+
+  SECTION(
+      "we only consume a single value if the next value belongs to a different "
+      "clump") {
+    uint64_t data[2] = {0, clump_size};
+    values = data;
+    marker = consume_clump2_marker(values, descriptor);
+    REQUIRE(marker == compute_clump2_marker(descriptor, 0, data[0], data[0]));
+    REQUIRE(values.size() == 1);
+    REQUIRE(&values[0] == &data[1]);
+  }
+}

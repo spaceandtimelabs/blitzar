@@ -1,7 +1,5 @@
 #include "sxt/multiexp/index/clump2_marker_utility.h"
 
-#include <iostream>
-
 #include <cassert>
 #include <cmath>
 
@@ -52,8 +50,23 @@ void unpack_clump2_marker(uint64_t& clump_index, uint64_t& index1,
 //--------------------------------------------------------------------------------------------------
 uint64_t consume_clump2_marker(basct::span<uint64_t>& indexes,
                                const clump2_descriptor& descriptor) noexcept {
-  (void)indexes;
-  (void)descriptor;
+  assert(!indexes.empty());
+  auto idx = indexes[0];
+  auto clump_index = idx / descriptor.size;
+  auto clump_first = clump_index * descriptor.size;
+  auto index1 = idx - clump_first;
+  auto index2 = descriptor.size;
+  if (indexes.size() > 1) {
+    assert(indexes[1] > idx);
+    index2 = indexes[1] - clump_first;
+  }
+  if (index2 >= descriptor.size) {
+    indexes = {indexes.data() + 1, indexes.size() - 1};
+    return compute_clump2_marker(descriptor, clump_index, index1, index1);
+  }
+  indexes = {indexes.data() + 2, indexes.size() - 2};
+  return compute_clump2_marker(descriptor, clump_index, index1, index2);
+
   return 0;
 }
 }  // namespace sxt::mtxi
