@@ -24,5 +24,6 @@ sxt_cc_component(
     ],
     test_deps = [
         "//sxt/curve21/property:curve",
+        "//sxt/base/test:unit_test",
     ],
 )

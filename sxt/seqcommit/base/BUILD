@@ -4,11 +4,7 @@ load(
 )
 
 sxt_cc_component(
-    name = "hex",
-)
-
-sxt_cc_component(
-    name = "fast_random_number_generator",
+    name = "commitment",
     deps = [
         "//sxt/base/macro:cuda_callable",
     ],
