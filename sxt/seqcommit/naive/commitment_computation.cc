@@ -369,7 +369,7 @@ static void sc25519_reduce(unsigned char s[32]) {
     s[31] = s11 >> 17;
 }
 
-static void fill_a_i(uint8_t a_i[32], const uint8_t *bytes_row_i_column_k, uint8_t size_row_data) {
+void fill_data(uint8_t a_i[32], const uint8_t *bytes_row_i_column_k, uint8_t size_row_data) noexcept {
   for (int j = 0; j < 32; ++j) {
     if (j < size_row_data) {
       // from (0) to (size_row_data - 1) we are populating a_i[j] with data values
@@ -406,9 +406,9 @@ void compute_commitments(
       sqcb::compute_base_element(g_i, row_i);
 
       // fill a_i, inserting data values at the beginning and padding zeros at the end of a_i
-      fill_a_i(a_i, bytes_row_i_column_k, element_nbytes);
+      fill_data(a_i, bytes_row_i_column_k, element_nbytes);
 
-      c21o::scalar_multiply(h_i, a_i, g_i); // h_i = a_i * g_i 
+      c21o::scalar_multiply(h_i, a_i, g_i); // h_i = a_i * g_i
 
       // aggregate all sum into p_k ==> p_k = p_k + a_i * g_i
       if (row_i == 0) {
