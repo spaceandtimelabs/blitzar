@@ -13,24 +13,24 @@ using namespace sxt;
 using namespace sxt::sqcnv;
 
 TEST_CASE("Test 1 - We can add two commitments together") {
-    const uint64_t numRows = 4;
-    const uint64_t numColumns = 3;
+    const uint64_t num_rows = 4;
+    const uint64_t num_columns = 3;
     const uint8_t element_nbytes = sizeof(int);
 
-    sqcb::commitment commitmentsData[numColumns];
-    mtxb::exponent_sequence sequences[numColumns];
-    basct::span<sqcb::commitment> commitments(commitmentsData, numColumns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, numColumns);
+    sqcb::commitment commitments_data[num_columns];
+    mtxb::exponent_sequence sequences[num_columns];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
 
-    const int query[numColumns][numRows] = {
+    const int query[num_columns][num_rows] = {
         {       2000,     7500,          5000,      1500},
         {       5000,        0,        400000,        10},
         {2000 + 5000, 7500 + 0, 5000 + 400000, 1500 + 10}
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < numColumns; ++i) {
-        sequences[i].n = numRows;
+    for (uint64_t i = 0; i < num_columns; ++i) {
+        sequences[i].n = num_rows;
         sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
@@ -42,31 +42,31 @@ TEST_CASE("Test 1 - We can add two commitments together") {
 
         c21t::element_p3 p, q;
         
-        c21rs::from_bytes(p, commitmentsData[0].data());
+        c21rs::from_bytes(p, commitments_data[0].data());
 
-        c21rs::from_bytes(q, commitmentsData[1].data());
+        c21rs::from_bytes(q, commitments_data[1].data());
 
         c21o::add(p, p, q);
 
         c21rs::to_bytes(commitment_c.data(), p);
 
-        sqcb::commitment &expected_commitment_c = commitmentsData[2];
+        sqcb::commitment &expected_commitment_c = commitments_data[2];
 
         REQUIRE(commitment_c == expected_commitment_c);
     }
 }
 
 TEST_CASE("Test 2 - We can add 3 * g as well as g + g + g") {
-    const uint64_t numRows = 1;
-    const uint64_t numColumns = 4;
+    const uint64_t num_rows = 1;
+    const uint64_t num_columns = 4;
     const uint8_t element_nbytes = sizeof(int);
 
-    sqcb::commitment commitmentsData[numColumns];
-    mtxb::exponent_sequence sequences[numColumns];
-    basct::span<sqcb::commitment> commitments(commitmentsData, numColumns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, numColumns);
+    sqcb::commitment commitments_data[num_columns];
+    mtxb::exponent_sequence sequences[num_columns];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
 
-    const int query[numColumns][numRows] = {
+    const int query[num_columns][num_rows] = {
         {1},// A
         {1},// B
         {1},// C
@@ -74,8 +74,8 @@ TEST_CASE("Test 2 - We can add 3 * g as well as g + g + g") {
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < numColumns; ++i) {
-        sequences[i].n = numRows;
+    for (uint64_t i = 0; i < num_columns; ++i) {
+        sequences[i].n = num_rows;
         sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
@@ -87,11 +87,11 @@ TEST_CASE("Test 2 - We can add 3 * g as well as g + g + g") {
 
         c21t::element_p3 p, q, s;
         
-        c21rs::from_bytes(p, commitmentsData[0].data());
+        c21rs::from_bytes(p, commitments_data[0].data());
 
-        c21rs::from_bytes(q, commitmentsData[1].data());
+        c21rs::from_bytes(q, commitments_data[1].data());
 
-        c21rs::from_bytes(s, commitmentsData[2].data());
+        c21rs::from_bytes(s, commitments_data[2].data());
 
         c21o::add(p, p, q);
 
@@ -99,29 +99,29 @@ TEST_CASE("Test 2 - We can add 3 * g as well as g + g + g") {
 
         c21rs::to_bytes(commitment_c.data(), p);
 
-        sqcb::commitment &expected_commitment_c = commitmentsData[3];
+        sqcb::commitment &expected_commitment_c = commitments_data[3];
 
         REQUIRE(commitment_c == expected_commitment_c);
     }
 }
 
 TEST_CASE("Test 3 - We can add 3 * g as well as g + g + g by using the add function directly") {
-    const uint64_t numRows = 1;
-    const uint64_t numColumns = 1;
+    const uint64_t num_rows = 1;
+    const uint64_t num_columns = 1;
     const uint8_t element_nbytes = sizeof(int);
 
-    sqcb::commitment commitmentsData[numColumns];
-    mtxb::exponent_sequence sequences[numColumns];
-    basct::span<sqcb::commitment> commitments(commitmentsData, numColumns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, numColumns);
+    sqcb::commitment commitments_data[num_columns];
+    mtxb::exponent_sequence sequences[num_columns];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
 
-    const int query[numColumns][numRows] = {
+    const int query[num_columns][num_rows] = {
         {3} // D = A + B + C
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < numColumns; ++i) {
-        sequences[i].n = numRows;
+    for (uint64_t i = 0; i < num_columns; ++i) {
+        sequences[i].n = num_rows;
         sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
@@ -142,31 +142,31 @@ TEST_CASE("Test 3 - We can add 3 * g as well as g + g + g by using the add funct
 
         c21rs::to_bytes(commitment.data(), p);
 
-        sqcb::commitment &expected_commitment = commitmentsData[0];
+        sqcb::commitment &expected_commitment = commitments_data[0];
 
         REQUIRE(commitment == expected_commitment);
     }
 }
 
 TEST_CASE("Test 4 - We can verify the maximum range allowed by the commitment") {
-    const uint64_t numRows = 1;
-    const uint64_t numColumns = 3;
+    const uint64_t num_rows = 1;
+    const uint64_t num_columns = 3;
     const uint8_t element_nbytes = 32;
 
-    sqcb::commitment commitmentsData[numColumns];
-    mtxb::exponent_sequence sequences[numColumns];
-    basct::span<sqcb::commitment> commitments(commitmentsData, numColumns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, numColumns);
+    sqcb::commitment commitments_data[num_columns];
+    mtxb::exponent_sequence sequences[num_columns];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
 
     const unsigned char query[3][32] = {
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,120, }, // A
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,120, },// A
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,120,}, // B
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,240,} // C = A + B
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,240,}  // C = A + B
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < numColumns; ++i) {
-        sequences[i].n = numRows;
+    for (uint64_t i = 0; i < num_columns; ++i) {
+        sequences[i].n = num_rows;
         sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
@@ -178,32 +178,32 @@ TEST_CASE("Test 4 - We can verify the maximum range allowed by the commitment") 
 
         c21t::element_p3 p, q;
         
-        c21rs::from_bytes(p, commitmentsData[0].data());
+        c21rs::from_bytes(p, commitments_data[0].data());
 
-        c21rs::from_bytes(q, commitmentsData[1].data());
+        c21rs::from_bytes(q, commitments_data[1].data());
 
         c21o::add(p, p, q);
 
         c21rs::to_bytes(commitment_c.data(), p);
 
-        sqcb::commitment &expected_commitment_c = commitmentsData[2];
+        sqcb::commitment &expected_commitment_c = commitments_data[2];
 
         REQUIRE(commitment_c == expected_commitment_c);
     }
 }
 
 TEST_CASE("Test 5 - We can multiply and add two commitments together") {
-    const uint64_t numRows = 4;
-    const uint64_t numColumns = 3;
+    const uint64_t num_rows = 4;
+    const uint64_t num_columns = 3;
     const uint8_t element_nbytes = sizeof(int);
     const unsigned int multiplicative_constant = 52;
 
-    sqcb::commitment commitmentsData[numColumns];
-    mtxb::exponent_sequence sequences[numColumns];
-    basct::span<sqcb::commitment> commitments(commitmentsData, numColumns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, numColumns);
+    sqcb::commitment commitments_data[num_columns];
+    mtxb::exponent_sequence sequences[num_columns];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
 
-    const int query[numColumns][numRows] = {
+    const int query[num_columns][num_rows] = {
         {       2000,     7500,          5000,      1500},
         {       5000,        0,        400000,        10},
         {
@@ -215,8 +215,8 @@ TEST_CASE("Test 5 - We can multiply and add two commitments together") {
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < numColumns; ++i) {
-        sequences[i].n = numRows;
+    for (uint64_t i = 0; i < num_columns; ++i) {
+        sequences[i].n = num_rows;
         sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
@@ -228,9 +228,9 @@ TEST_CASE("Test 5 - We can multiply and add two commitments together") {
 
         c21t::element_p3 p, q;
         
-        c21rs::from_bytes(p, commitmentsData[0].data());
+        c21rs::from_bytes(p, commitments_data[0].data());
 
-        c21rs::from_bytes(q, commitmentsData[1].data());
+        c21rs::from_bytes(q, commitments_data[1].data());
 
         uint8_t a_i[32];
 
@@ -242,37 +242,37 @@ TEST_CASE("Test 5 - We can multiply and add two commitments together") {
 
         c21rs::to_bytes(commitment_c.data(), p);
 
-        sqcb::commitment &expected_commitment_c = commitmentsData[2];
+        sqcb::commitment &expected_commitment_c = commitments_data[2];
 
         REQUIRE(commitment_c == expected_commitment_c);
     }
 }
 
 TEST_CASE("Test 6 - We can add two negative values together and generate valid commitments") {
-    const uint64_t numRows = 1;
-    const uint64_t numColumns = 3;
+    const uint64_t num_rows = 1;
+    const uint64_t num_columns = 3;
 
-    sqcb::commitment commitmentsData[numColumns];
-    mtxb::exponent_sequence sequences[numColumns];
-    basct::span<sqcb::commitment> commitments(commitmentsData, numColumns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, numColumns);
+    sqcb::commitment commitments_data[num_columns];
+    mtxb::exponent_sequence sequences[num_columns];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
 
-    const char query[2][numRows] = {
+    const char query[2][num_rows] = {
         {-128}, // (signed binary char 10000000) === (-128 decimal)
         {-128}, // --> (unsigned binary char 10000000) === (128 decimal)
     };
 
     int result = 256;
 
-    sequences[0].n = numRows;
+    sequences[0].n = num_rows;
     sequences[0].data = (const uint8_t *) query[0];
     sequences[0].element_nbytes = sizeof(query[0]);
 
-    sequences[1].n = numRows;
+    sequences[1].n = num_rows;
     sequences[1].data = (const uint8_t *) query[1];
     sequences[1].element_nbytes = sizeof(query[1]);
 
-    sequences[2].n = numRows;
+    sequences[2].n = num_rows;
     sequences[2].data = (const uint8_t *) &result;
     sequences[2].element_nbytes = sizeof(result);  
 
@@ -283,15 +283,15 @@ TEST_CASE("Test 6 - We can add two negative values together and generate valid c
 
         c21t::element_p3 p, q;
         
-        c21rs::from_bytes(p, commitmentsData[0].data());
+        c21rs::from_bytes(p, commitments_data[0].data());
 
-        c21rs::from_bytes(q, commitmentsData[1].data());
+        c21rs::from_bytes(q, commitments_data[1].data());
 
         c21o::add(p, p, q);
 
         c21rs::to_bytes(commitment_c.data(), p);
 
-        sqcb::commitment &expected_commitment_c = commitmentsData[2];
+        sqcb::commitment &expected_commitment_c = commitments_data[2];
 
         REQUIRE(commitment_c == expected_commitment_c);
     }

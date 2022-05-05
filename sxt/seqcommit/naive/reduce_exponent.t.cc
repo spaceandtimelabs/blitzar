@@ -35,7 +35,6 @@ TEST_CASE("Test 2 - We can verify that reduce change input array A when A >= p")
     }
 }
 
-
 TEST_CASE("Test 3 - We can verify that reduce change input array A when A >= p") {
     // p = 2^252 + 27742317777372353535851937790883648493 (decimal)
     // s = p + 103 (decimal)
