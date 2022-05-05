@@ -19,6 +19,7 @@ sxt_cc_component(
         "//sxt/base/container:span",
     ],
     impl_deps = [
+        ":reduce_exponent",
         "//sxt/seqcommit/base:commitment",
         "//sxt/seqcommit/base:base_element",
         "//sxt/multiexp/base:exponent_sequence",
@@ -26,7 +27,6 @@ sxt_cc_component(
         "//sxt/curve21/ristretto:byte_conversion",
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/curve21/operation:add",
-        "//sxt/seqcommit/naive:reduce_exponent",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",

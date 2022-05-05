@@ -1,6 +1,6 @@
 #pragma once
 
-#include <inttypes.h>
+#include <cstdint>
 
 #include "sxt/base/container/span.h"
 
@@ -16,5 +16,5 @@ void fill_data(uint8_t a_i[32], const uint8_t *bytes_row_i_column_k, uint8_t siz
 //--------------------------------------------------------------------------------------------------
 void compute_commitments(
     basct::span<sqcb::commitment> commitments,
-    const basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept;
+    basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept;
 }  // namespace sxt::sqcnv

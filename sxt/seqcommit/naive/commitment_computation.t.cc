@@ -13,9 +13,9 @@ using namespace sxt;
 using namespace sxt::sqcnv;
 
 TEST_CASE("Test 1 - We can add two commitments together") {
-    const uint64_t numRows = (uint64_t) 4;
-    const uint64_t numColumns = (uint64_t) 3;
-    const uint8_t element_nbytes = (uint8_t) sizeof(int);
+    const uint64_t numRows = 4;
+    const uint64_t numColumns = 3;
+    const uint8_t element_nbytes = sizeof(int);
 
     sqcb::commitment commitmentsData[numColumns];
     mtxb::exponent_sequence sequences[numColumns];
@@ -57,9 +57,9 @@ TEST_CASE("Test 1 - We can add two commitments together") {
 }
 
 TEST_CASE("Test 2 - We can add 3 * g as well as g + g + g") {
-    const uint64_t numRows = (uint64_t) 1;
-    const uint64_t numColumns = (uint64_t) 4;
-    const uint8_t element_nbytes = (uint8_t) sizeof(int);
+    const uint64_t numRows = 1;
+    const uint64_t numColumns = 4;
+    const uint8_t element_nbytes = sizeof(int);
 
     sqcb::commitment commitmentsData[numColumns];
     mtxb::exponent_sequence sequences[numColumns];
@@ -106,9 +106,9 @@ TEST_CASE("Test 2 - We can add 3 * g as well as g + g + g") {
 }
 
 TEST_CASE("Test 3 - We can add 3 * g as well as g + g + g by using the add function directly") {
-    const uint64_t numRows = (uint64_t) 1;
-    const uint64_t numColumns = (uint64_t) 1;
-    const uint8_t element_nbytes = (uint8_t) sizeof(int);
+    const uint64_t numRows = 1;
+    const uint64_t numColumns = 1;
+    const uint8_t element_nbytes = sizeof(int);
 
     sqcb::commitment commitmentsData[numColumns];
     mtxb::exponent_sequence sequences[numColumns];
@@ -149,9 +149,9 @@ TEST_CASE("Test 3 - We can add 3 * g as well as g + g + g by using the add funct
 }
 
 TEST_CASE("Test 4 - We can verify the maximum range allowed by the commitment") {
-    const uint64_t numRows = (uint64_t) 1;
-    const uint64_t numColumns = (uint64_t) 3;
-    const uint8_t element_nbytes = (uint8_t) 32;
+    const uint64_t numRows = 1;
+    const uint64_t numColumns = 3;
+    const uint8_t element_nbytes = 32;
 
     sqcb::commitment commitmentsData[numColumns];
     mtxb::exponent_sequence sequences[numColumns];
@@ -193,10 +193,10 @@ TEST_CASE("Test 4 - We can verify the maximum range allowed by the commitment") 
 }
 
 TEST_CASE("Test 5 - We can multiply and add two commitments together") {
-    const uint64_t numRows = (uint64_t) 4;
-    const uint64_t numColumns = (uint64_t) 3;
+    const uint64_t numRows = 4;
+    const uint64_t numColumns = 3;
+    const uint8_t element_nbytes = sizeof(int);
     const unsigned int multiplicative_constant = 52;
-    const uint8_t element_nbytes = (uint8_t) sizeof(int);
 
     sqcb::commitment commitmentsData[numColumns];
     mtxb::exponent_sequence sequences[numColumns];
@@ -249,8 +249,8 @@ TEST_CASE("Test 5 - We can multiply and add two commitments together") {
 }
 
 TEST_CASE("Test 6 - We can add two negative values together and generate valid commitments") {
-    const uint64_t numRows = (uint64_t) 1;
-    const uint64_t numColumns = (uint64_t) 3;
+    const uint64_t numRows = 1;
+    const uint64_t numColumns = 3;
 
     sqcb::commitment commitmentsData[numColumns];
     mtxb::exponent_sequence sequences[numColumns];

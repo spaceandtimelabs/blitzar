@@ -1,8 +1,29 @@
+/**
+ * Adopted from libsodium
+ * 
+ * Modifications: the reduce_exponent function
+ *   was modified to meet our demands.
+ *   In the original libsodium version,
+ *   64 bytes were received in the input array.
+ *   Since our code only uses at maximum 32 bytes arrays,
+ *   we changed lines 35 to 46 from the original, related
+ *   with bytes 32 to 63, so that those positions were
+ *   disregarded.
+ * 
+ * Copyright (c) 2013-2022
+ * Frank Denis <j at pureftpd dot org>
+ *
+ * See third_party/license/libsodium.LICENSE
+ */
 #include "sxt/seqcommit/naive/reduce_exponent.h"
 
 #include "sxt/base/bit/load.h"
 
 namespace sxt::sqcnv {
+
+//--------------------------------------------------------------------------------------------------
+// reduce_exponent
+//--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 void reduce_exponent(unsigned char s[32]) noexcept {
     int64_t s0  = 2097151 & basbt::load_3(s);

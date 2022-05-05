@@ -13,6 +13,9 @@
 
 namespace sxt::sqcnv {
 
+//--------------------------------------------------------------------------------------------------
+// fill_data
+//--------------------------------------------------------------------------------------------------
 void fill_data(uint8_t a_i[32], const uint8_t *bytes_row_i_column_k, uint8_t size_row_data) noexcept {
   for (int j = 0; j < 32; ++j) {
     if (j < size_row_data) {
@@ -24,7 +27,9 @@ void fill_data(uint8_t a_i[32], const uint8_t *bytes_row_i_column_k, uint8_t siz
     }
   }
 
-  reduce_exponent(a_i); // a_i = a_i % (2^252 + 27742317777372353535851937790883648493)
+  if (a_i[31] > 127) {
+    reduce_exponent(a_i); // a_i = a_i % (2^252 + 27742317777372353535851937790883648493)
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -32,7 +37,7 @@ void fill_data(uint8_t a_i[32], const uint8_t *bytes_row_i_column_k, uint8_t siz
 //--------------------------------------------------------------------------------------------------
 void compute_commitments(
     basct::span<sqcb::commitment> commitments,
-    const basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept {
+    basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept {
 
   assert(commitments.size() == value_sequences.size());
 
