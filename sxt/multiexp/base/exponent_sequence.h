@@ -18,6 +18,6 @@ struct exponent_sequence {
   // pointer to the data for the sequence of elements where there are n elements
   // in the sequence and each element enocodes a number of element_nbytes bytes
   // represented in the little endian format
-  const void* data;
+  const uint8_t* data;
 };
 }  // namespace sxt::mtxb

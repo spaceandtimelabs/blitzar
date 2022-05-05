@@ -12,7 +12,7 @@
 using namespace sxt;
 using namespace sxt::sqcnv;
 
-TEST_CASE("Test 1 - We can add two commits together") {
+TEST_CASE("Test 1 - We can add two commitments together") {
     const uint64_t numRows = (uint64_t) 4;
     const uint64_t numColumns = (uint64_t) 3;
     const uint8_t element_nbytes = (uint8_t) sizeof(int);
@@ -31,7 +31,7 @@ TEST_CASE("Test 1 - We can add two commits together") {
     // populating sequence object
     for (uint64_t i = 0; i < numColumns; ++i) {
         sequences[i].n = numRows;
-        sequences[i].data = (const void*) query[i];
+        sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
 
@@ -76,7 +76,7 @@ TEST_CASE("Test 2 - We can add 3 * g as well as g + g + g") {
     // populating sequence object
     for (uint64_t i = 0; i < numColumns; ++i) {
         sequences[i].n = numRows;
-        sequences[i].data = (const void*) query[i];
+        sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
 
@@ -122,7 +122,7 @@ TEST_CASE("Test 3 - We can add 3 * g as well as g + g + g by using the add funct
     // populating sequence object
     for (uint64_t i = 0; i < numColumns; ++i) {
         sequences[i].n = numRows;
-        sequences[i].data = (const void*) query[i];
+        sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
 
@@ -167,7 +167,7 @@ TEST_CASE("Test 4 - We can verify the maximum range allowed by the commitment") 
     // populating sequence object
     for (uint64_t i = 0; i < numColumns; ++i) {
         sequences[i].n = numRows;
-        sequences[i].data = (const void*) query[i];
+        sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
 
@@ -192,7 +192,7 @@ TEST_CASE("Test 4 - We can verify the maximum range allowed by the commitment") 
     }
 }
 
-TEST_CASE("Test 5 - We can multiply and add two commits together") {
+TEST_CASE("Test 5 - We can multiply and add two commitments together") {
     const uint64_t numRows = (uint64_t) 4;
     const uint64_t numColumns = (uint64_t) 3;
     const unsigned int multiplicative_constant = 52;
@@ -206,7 +206,7 @@ TEST_CASE("Test 5 - We can multiply and add two commits together") {
     const int query[numColumns][numRows] = {
         {       2000,     7500,          5000,      1500},
         {       5000,        0,        400000,        10},
-        {   
+        {
             multiplicative_constant * 2000 + 5000,
             multiplicative_constant * 7500 + 0,
             multiplicative_constant * 5000 + 400000,
@@ -217,7 +217,7 @@ TEST_CASE("Test 5 - We can multiply and add two commits together") {
     // populating sequence object
     for (uint64_t i = 0; i < numColumns; ++i) {
         sequences[i].n = numRows;
-        sequences[i].data = (const void*) query[i];
+        sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
 
@@ -237,6 +237,55 @@ TEST_CASE("Test 5 - We can multiply and add two commits together") {
         sqcnv::fill_data(a_i, (const uint8_t *) &multiplicative_constant, sizeof(multiplicative_constant));
 
         c21o::scalar_multiply(p, a_i, p); // h_i = a_i * g_i
+
+        c21o::add(p, p, q);
+
+        c21rs::to_bytes(commitment_c.data(), p);
+
+        sqcb::commitment &expected_commitment_c = commitmentsData[2];
+
+        REQUIRE(commitment_c == expected_commitment_c);
+    }
+}
+
+TEST_CASE("Test 6 - We can add two negative values together and generate valid commitments") {
+    const uint64_t numRows = (uint64_t) 1;
+    const uint64_t numColumns = (uint64_t) 3;
+
+    sqcb::commitment commitmentsData[numColumns];
+    mtxb::exponent_sequence sequences[numColumns];
+    basct::span<sqcb::commitment> commitments(commitmentsData, numColumns);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, numColumns);
+
+    const char query[2][numRows] = {
+        {-128}, // (signed binary char 10000000) === (-128 decimal)
+        {-128}, // --> (unsigned binary char 10000000) === (128 decimal)
+    };
+
+    int result = 256;
+
+    sequences[0].n = numRows;
+    sequences[0].data = (const uint8_t *) query[0];
+    sequences[0].element_nbytes = sizeof(query[0]);
+
+    sequences[1].n = numRows;
+    sequences[1].data = (const uint8_t *) query[1];
+    sequences[1].element_nbytes = sizeof(query[1]);
+
+    sequences[2].n = numRows;
+    sequences[2].data = (const uint8_t *) &result;
+    sequences[2].element_nbytes = sizeof(result);  
+
+    SECTION("Verifying if addion property holds (-|c| = -|a| + -|b| ==> commit_c = commit_a + commit_b)") {
+        sqcnv::compute_commitments(commitments, value_sequences);
+        
+        sqcb::commitment commitment_c;
+
+        c21t::element_p3 p, q;
+        
+        c21rs::from_bytes(p, commitmentsData[0].data());
+
+        c21rs::from_bytes(q, commitmentsData[1].data());
 
         c21o::add(p, p, q);
 
