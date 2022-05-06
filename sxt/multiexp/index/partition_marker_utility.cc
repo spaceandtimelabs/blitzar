@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include "sxt/base/bit/count.h"
+
 namespace sxt::mtxi {
 //--------------------------------------------------------------------------------------------------
 // consume_partition_marker

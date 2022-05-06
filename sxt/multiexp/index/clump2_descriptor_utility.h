@@ -2,12 +2,12 @@
 
 #include <cstdint>
 
-#include "sxt/base/container/span.h"
-
 namespace sxt::mtxi {
+struct clump2_descriptor;
+
 //--------------------------------------------------------------------------------------------------
-// consume_partition_marker
+// init_clump2_descriptor
 //--------------------------------------------------------------------------------------------------
-uint64_t consume_partition_marker(basct::span<uint64_t>& indexes,
-                                  uint64_t partition_size) noexcept;
+void init_clump2_descriptor(clump2_descriptor& descriptor,
+                            uint64_t clump_size) noexcept;
 }  // namespace sxt::mtxi
