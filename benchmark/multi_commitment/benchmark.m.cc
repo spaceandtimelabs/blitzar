@@ -13,9 +13,9 @@
 using namespace sxt;
 
 using bench_fn = void(*)(
+    memmg::managed_array<sqcb::commitment> &commitments_per_col,
     uint64_t rows, uint64_t cols, uint64_t element_nbytes,
-    memmg::managed_array<uint8_t> &data_table,
-    memmg::managed_array<sqcb::commitment> &commitments_per_col) noexcept;
+    const memmg::managed_array<uint8_t> &data_table) noexcept;
 
 struct Params {
     int status;
@@ -106,7 +106,7 @@ static void pre_initialize(bench_fn func) {
 
     populate_table(data_table_fake);
 
-    func(1, 1, 1, data_table_fake, commitments_per_col_fake);
+    func(commitments_per_col_fake, 1, 1, 1, data_table_fake);
 }
 
 int main(int argc, char* argv[]) {
@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
 
     p.trigger_timer();
     
-    p.func(p.rows, p.cols, p.element_nbytes, data_table, commitments_per_col);
+    p.func(commitments_per_col, p.rows, p.cols, p.element_nbytes, data_table);
 
     p.stop_timer();
 

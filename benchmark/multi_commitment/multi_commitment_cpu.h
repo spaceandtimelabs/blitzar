@@ -9,8 +9,8 @@ namespace sxt {
 // multi_commitment_cpu
 //--------------------------------------------------------------------------------------------------
 void multi_commitment_cpu(
+    memmg::managed_array<sqcb::commitment> &commitments_per_col,
     uint64_t rows, uint64_t cols, uint64_t element_nbytes,
-    memmg::managed_array<uint8_t> &data_table,
-    memmg::managed_array<sqcb::commitment> &commitments_per_col) noexcept;
+    const memmg::managed_array<uint8_t> &data_table) noexcept;
 
 } // namespace sxt
