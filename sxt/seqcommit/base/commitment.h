@@ -34,7 +34,9 @@ bool operator==(const commitment& lhs, const commitment& rhs) noexcept;
 //--------------------------------------------------------------------------------------------------
 // operator!=
 //--------------------------------------------------------------------------------------------------
-bool operator!=(const commitment& lhs, const commitment& rhs) noexcept;
+bool operator!=(const commitment& lhs, const commitment& rhs) noexcept {
+  return !(lhs == rhs);
+}
 
 //--------------------------------------------------------------------------------------------------
 // opeator<<

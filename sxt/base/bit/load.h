@@ -1,12 +1,3 @@
-/**
- * Adopted from libsodium
- *
- * Copyright (c) 2013-2022
- * Frank Denis <j at pureftpd dot org>
- *
- * See third_party/license/libsodium.LICENSE
- */
-
 #pragma once
 
 #include <cstring>
