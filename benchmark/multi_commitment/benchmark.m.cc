@@ -5,11 +5,9 @@
 #include <memory>
 #include <string_view>
 
-#include "sxt/base/container/span.h"
-#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/seqcommit/base/commitment.h"
-#include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "benchmark/multi_commitment/multi_commitment_cpu.h"
 
 using namespace sxt;
@@ -88,16 +86,9 @@ struct Params {
 static void print_result(uint64_t cols, memmg::managed_array<sqcb::commitment> &commitments_per_col) {
     std::cout << "===== result\n";
 
-    // print the 32 bytes commiment results of each column
+    // print the 32 bytes commitment results of each column
     for (size_t c = 0; c < cols; ++c) {
-        std::cout << "commitment " << c << " = ";
-
-        // print the commit of column c
-        for (size_t j = 0; j < 32; ++j) {
-            std::cout << std::setfill('0') << std::setw(3) << (unsigned int) commitments_per_col[c].data()[j] << " ";
-        }
-
-        std::cout << std::endl;
+        std::cout << "commitment " << c << " = " << commitments_per_col[c] << std::endl;
     }
 }
 
@@ -105,7 +96,7 @@ static void populate_table(memmg::managed_array<uint8_t> &data_table) {
     basn::fast_random_number_generator generator(data_table.size(), data_table.size());
 
     for (size_t i = 0; i < data_table.size(); ++i) {
-        data_table[i] = (uint8_t) (i % 256);
+        data_table[i] = (uint8_t) (generator() % 256);
     }
 }
 

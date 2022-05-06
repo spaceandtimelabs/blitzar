@@ -16,17 +16,19 @@ void multi_commitment_cpu(
     memmg::managed_array<uint8_t> &data_table,
     memmg::managed_array<sqcb::commitment> &commitments_per_col) noexcept {
 
+    memmg::managed_array<mtxb::exponent_sequence> data_cols(cols);
+
     for (size_t c = 0; c < cols; ++c) {
-        mtxb::exponent_sequence data_col;
+        auto &data_col = data_cols[c];
 
         data_col.n = rows;
         data_col.element_nbytes = element_nbytes;
         data_col.data = (data_table.data() + c * rows * element_nbytes);
-
-        basct::cspan<mtxb::exponent_sequence> value_sequences(&data_col, 1);
-        basct::span<sqcb::commitment> commitments(commitments_per_col.data() + c, 1);
-
-        sqcnv::compute_commitments(commitments, value_sequences);
     }
+
+    basct::span<sqcb::commitment> commitments(commitments_per_col.data(), cols);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(data_cols.data(), cols);
+
+    sqcnv::compute_commitments(commitments, value_sequences);
 }
 } // namespace sxt

@@ -24,9 +24,7 @@ cc_binary(
     ],
     deps = [
         ":multi_commitment_cpu",
-        "//sxt/base/container:span",
         "//sxt/seqcommit/base:commitment",
-        "//sxt/multiexp/base:exponent_sequence",
         "//sxt/memory/management:managed_array",
         "//sxt/base/num:fast_random_number_generator"
     ],
