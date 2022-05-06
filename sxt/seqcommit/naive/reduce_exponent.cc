@@ -24,6 +24,10 @@ namespace sxt::sqcnv {
 //--------------------------------------------------------------------------------------------------
 // reduce_exponent
 //--------------------------------------------------------------------------------------------------
+/**
+ * Modified from libsodium's sc25519_reduce which reduces a 64-byte array by
+ * reading s[32] to s[63] out as zero.
+ */
 CUDA_CALLABLE
 void reduce_exponent(unsigned char s[32]) noexcept {
     int64_t s0  = 2097151 & basbt::load_3(s);

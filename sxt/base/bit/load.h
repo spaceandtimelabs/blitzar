@@ -26,6 +26,9 @@ inline uint64_t load64_le(const uint8_t src[8]) noexcept {
   return res;
 }
 
+//--------------------------------------------------------------------------------------------------
+// load_3
+//--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 inline uint64_t load_3(const unsigned char *in) {
     uint64_t result;
@@ -37,6 +40,9 @@ inline uint64_t load_3(const unsigned char *in) {
     return result;
 }
 
+//--------------------------------------------------------------------------------------------------
+// load_4
+//--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 inline uint64_t load_4(const unsigned char *in) {
     uint64_t result;
@@ -48,5 +54,4 @@ inline uint64_t load_4(const unsigned char *in) {
 
     return result;
 }
-
 } // namespace sxt::basbt
