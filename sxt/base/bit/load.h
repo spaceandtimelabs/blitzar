@@ -1,3 +1,11 @@
+/**
+ * Adopted from libsodium
+ *
+ * Copyright (c) 2013-2022
+ * Frank Denis <j at pureftpd dot org>
+ *
+ * See third_party/license/libsodium.LICENSE
+ */
 #pragma once
 
 #include <cstring>
@@ -16,5 +24,34 @@ inline uint64_t load64_le(const uint8_t src[8]) noexcept {
   std::memcpy(static_cast<void*>(&res), static_cast<const void*>(src),
               sizeof(res));
   return res;
+}
+
+//--------------------------------------------------------------------------------------------------
+// load_3
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+inline uint64_t load_3(const unsigned char *in) {
+    uint64_t result;
+
+    result = (uint64_t) in[0];
+    result |= ((uint64_t) in[1]) << 8;
+    result |= ((uint64_t) in[2]) << 16;
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+// load_4
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+inline uint64_t load_4(const unsigned char *in) {
+    uint64_t result;
+
+    result = (uint64_t) in[0];
+    result |= ((uint64_t) in[1]) << 8;
+    result |= ((uint64_t) in[2]) << 16;
+    result |= ((uint64_t) in[3]) << 24;
+
+    return result;
 }
 } // namespace sxt::basbt
