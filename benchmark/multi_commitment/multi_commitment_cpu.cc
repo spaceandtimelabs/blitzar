@@ -1,7 +1,5 @@
 #include "benchmark/multi_commitment/multi_commitment_cpu.h"
 
-#include <cstdio>
-
 #include "sxt/base/container/span.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/seqcommit/base/commitment.h"

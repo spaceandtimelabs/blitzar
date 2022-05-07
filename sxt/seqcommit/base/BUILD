@@ -21,6 +21,7 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "commitment",
+    is_cuda = True,
     deps = [
         "//sxt/base/macro:cuda_callable",
     ],

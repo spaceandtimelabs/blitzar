@@ -12,7 +12,6 @@ namespace sxt::sqcb {
 //--------------------------------------------------------------------------------------------------
 class commitment {
  public:
-   CUDA_CALLABLE
    commitment() noexcept = default;
 
    commitment(std::initializer_list<uint8_t> values) noexcept;

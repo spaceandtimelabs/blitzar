@@ -9,6 +9,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "benchmark/multi_commitment/multi_commitment_cpu.h"
+#include "benchmark/multi_commitment/multi_commitment_gpu.h"
 
 using namespace sxt;
 
@@ -57,12 +58,13 @@ struct Params {
 
     void select_backend_fn(const std::string_view backend) noexcept {
         if (backend == "cpu") {
-            func = multi_commitment_cpu;
+            func = (bench_fn) multi_commitment_cpu;
             return;
         }
 
         if (backend == "gpu") {
-            // return multi_commitment_gpu;
+            func = (bench_fn) multi_commitment_gpu;
+            return;
         }
 
         std::cerr << "invalid backend: " << backend << "\n";

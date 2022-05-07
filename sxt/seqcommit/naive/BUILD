@@ -5,6 +5,7 @@ load(
 
 sxt_cc_component(
     name = "reduce_exponent",
+    is_cuda = True,
     impl_deps = [
         "//sxt/base/bit:load",
     ],
@@ -18,6 +19,7 @@ sxt_cc_component(
     deps = [
         "//sxt/base/container:span",
     ],
+    is_cuda = True,
     impl_deps = [
         ":reduce_exponent",
         "//sxt/seqcommit/base:commitment",
