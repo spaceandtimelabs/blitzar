@@ -22,7 +22,7 @@ Headers may appear in this diff, but no commitment result array should appear. I
 
 ## Results
 
-| Cols x Rows | Word Size | Table Size (MB) | CPU Duration (s) | CPU Throughput (bytes / s) | GPU Duration (s) | GPU Throughput (bytes / s) | Duration Speedup (GPU / CPU) |
+| Cols x Rows | Word Size | Table Size (MB) | CPU Duration (s) | CPU Throughput (bytes / s) | GPU Duration (s) | GPU Throughput (bytes / s) | Speedup (CPU / GPU)          |
 | ----------- | --------- | --------------- | ---------------- | -------------------------- | ---------------- | -------------------------- | ---------------------------- |
 | 10x10       | 32        | 0.003           | 0.009            | 3.69E+05                   | 0.029228         | 1.09E+05                   | 0.30x                        |
 | 10x100      | 32        | 0.031           | 0.082            | 3.89E+05                   | 0.269627         | 1.19E+05                   | 0.30x                        |
@@ -35,4 +35,4 @@ Headers may appear in this diff, but no commitment result array should appear. I
 | 1000x10     | 32        | 0.305           | 0.824            | 3.88E+05                   | 0.03293          | 9.72E+06                   | 25.02x                       |
 | 1000x100    | 32        | 3.052           | 8.254            | 3.88E+05                   | 0.324776         | 9.85E+06                   | 25.41x                       |
 | 1000x1000   | 32        | 30.518          | 82.066           | 3.90E+05                   | 3.183036         | 1.01E+07                   | 25.78x                       |
-| 1000x1000   | 32        | 3051.758        | \-               | \-                         | 317.945872       | 1.01E+07                   | \-                           |
+| 1000x10000  | 32        | 3051.758        | \-               | \-                         | 317.945872       | 1.01E+07                   | \-                           |
