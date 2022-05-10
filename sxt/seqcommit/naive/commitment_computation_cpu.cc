@@ -1,4 +1,4 @@
-#include "sxt/seqcommit/naive/commitment_computation.h"
+#include "sxt/seqcommit/naive/commitment_computation_cpu.h"
 
 #include <cassert>
 

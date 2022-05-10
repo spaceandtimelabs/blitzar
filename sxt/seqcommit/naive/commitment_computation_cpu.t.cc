@@ -1,4 +1,4 @@
-#include "sxt/seqcommit/naive/commitment_computation.h"
+#include "sxt/seqcommit/naive/commitment_computation_cpu.h"
 
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/base/test/unit_test.h"

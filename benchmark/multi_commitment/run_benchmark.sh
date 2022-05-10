@@ -1,6 +1,6 @@
 #!/bin/bash
-
-EXEC_CMD="bazel run -c opt //benchmark/multi_commitment:benchmark"
+# NSYS="nvprof --profile-child-processes "
+EXEC_CMD="${NSYS} bazel run -c opt //benchmark/multi_commitment:benchmark -- "
 
 ############################################
 
@@ -16,6 +16,12 @@ results_dir="benchmark/multi_commitment/.results/"
 
 word_sizes=("4")
 
+cols=("1000")
+rows=("1000")
+
+# cols=("1000")
+# rows=("1000")
+
 cols=("10" "100" "1000")
 rows=("10" "100" "1000")
 
@@ -26,7 +32,7 @@ for ws in ${word_sizes[@]}; do
     for c in ${cols[@]}; do
         for r in ${rows[@]}; do
             curr_benchmark_file="${results_dir}/${ws}_${c}_${r}.${backend}.out"
-            ${EXEC_CMD} -- ${backend} ${c} ${r} ${ws} ${verbose} > ${curr_benchmark_file}
+            ${EXEC_CMD} ${backend} ${c} ${r} ${ws} ${verbose} > ${curr_benchmark_file}
         done
     done
 done
