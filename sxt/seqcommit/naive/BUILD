@@ -43,18 +43,9 @@ sxt_cc_component(
     ],
 )
 
-cuda_library(
+sxt_cc_component(
     name = "commitment_computation_gpu",
-    hdrs = [
-        "commitment_computation_gpu.h",
-    ],
-    copts = [
-        '--device-c',
-    ],
-    srcs = [
-        "commitment_computation_gpu.cu",
-    ],
-    visibility = ["//visibility:public"],
+    is_cuda = True,
     deps = [
         ":fill_data",
         "//sxt/base/device:cuda_utility",
@@ -71,5 +62,8 @@ cuda_library(
         "//sxt/curve21/operation:add",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:device_resource",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
     ],
 )

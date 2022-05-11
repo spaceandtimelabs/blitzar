@@ -1,4 +1,6 @@
-#include "sxt/seqcommit/naive/commitment_computation_cpu.h"
+#include "sxt/seqcommit/naive/commitment_computation_gpu.h"
+
+#include "sxt/base/test/unit_test.h"
 
 #include "sxt/seqcommit/naive/fill_data.h"
 #include "sxt/curve21/type/element_p3.h"
@@ -15,29 +17,29 @@ using namespace sxt::sqcnv;
 
 TEST_CASE("Test 1 - We can add two commitments together") {
     const uint64_t num_rows = 4;
-    const uint64_t num_columns = 3;
+    const uint64_t num_commitments = 3;
     const uint8_t element_nbytes = sizeof(int);
 
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
+    sqcb::commitment commitments_data[num_commitments];
+    mtxb::exponent_sequence sequences[num_commitments];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_commitments);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_commitments);
 
-    const int query[num_columns][num_rows] = {
+    const int query[num_commitments][num_rows] = {
         {       2000,     7500,          5000,      1500},
         {       5000,        0,        400000,        10},
         {2000 + 5000, 7500 + 0, 5000 + 400000, 1500 + 10}
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < num_columns; ++i) {
+    for (uint64_t i = 0; i < num_commitments; ++i) {
         sequences[i].n = num_rows;
         sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
 
     SECTION("Verifying if addion property holds (c = a + b ==> commit_c = commit_a + commit_b)") {
-        sqcnv::compute_commitments_cpu(commitments, value_sequences);
+        sqcnv::compute_commitments_gpu(commitments, value_sequences);
         
         sqcb::commitment commitment_c;
 
@@ -59,15 +61,15 @@ TEST_CASE("Test 1 - We can add two commitments together") {
 
 TEST_CASE("Test 2 - We can add 3 * g as well as g + g + g") {
     const uint64_t num_rows = 1;
-    const uint64_t num_columns = 4;
+    const uint64_t num_commitments = 4;
     const uint8_t element_nbytes = sizeof(int);
 
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
+    sqcb::commitment commitments_data[num_commitments];
+    mtxb::exponent_sequence sequences[num_commitments];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_commitments);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_commitments);
 
-    const int query[num_columns][num_rows] = {
+    const int query[num_commitments][num_rows] = {
         {1},// A
         {1},// B
         {1},// C
@@ -75,14 +77,14 @@ TEST_CASE("Test 2 - We can add 3 * g as well as g + g + g") {
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < num_columns; ++i) {
+    for (uint64_t i = 0; i < num_commitments; ++i) {
         sequences[i].n = num_rows;
         sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
 
     SECTION("Verifying if addion property holds (3 = 1 + 1 + 1 ==> commit(3) = commit(1) + commit(1) + commit(1))") {
-        sqcnv::compute_commitments_cpu(commitments, value_sequences);
+        sqcnv::compute_commitments_gpu(commitments, value_sequences);
         
         sqcb::commitment commitment_c;
 
@@ -108,20 +110,20 @@ TEST_CASE("Test 2 - We can add 3 * g as well as g + g + g") {
 
 TEST_CASE("Test 3 - We can add 3 * g as well as g + g + g by using the add function directly") {
     const uint64_t num_rows = 1;
-    const uint64_t num_columns = 1;
+    const uint64_t num_commitments = 1;
     const uint8_t element_nbytes = sizeof(int);
 
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
+    sqcb::commitment commitments_data[num_commitments];
+    mtxb::exponent_sequence sequences[num_commitments];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_commitments);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_commitments);
 
-    const int query[num_columns][num_rows] = {
+    const int query[num_commitments][num_rows] = {
         {3} // D = A + B + C
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < num_columns; ++i) {
+    for (uint64_t i = 0; i < num_commitments; ++i) {
         sequences[i].n = num_rows;
         sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
@@ -133,7 +135,7 @@ TEST_CASE("Test 3 - We can add 3 * g as well as g + g + g by using the add funct
 
         sqcb::compute_base_element(g_i, 0);
 
-        sqcnv::compute_commitments_cpu(commitments, value_sequences);
+        sqcnv::compute_commitments_gpu(commitments, value_sequences);
 
         c21o::add(p, g_i, g_i);
 
@@ -151,13 +153,13 @@ TEST_CASE("Test 3 - We can add 3 * g as well as g + g + g by using the add funct
 
 TEST_CASE("Test 4 - We can verify the maximum range allowed by the commitment (regarding the fill_data function)") {
     const uint64_t num_rows = 1;
-    const uint64_t num_columns = 3;
+    const uint64_t num_commitments = 3;
     const uint8_t element_nbytes = 32;
 
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
+    sqcb::commitment commitments_data[num_commitments];
+    mtxb::exponent_sequence sequences[num_commitments];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_commitments);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_commitments);
 
     const unsigned char query[3][32] = {
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,120, },// A
@@ -166,14 +168,14 @@ TEST_CASE("Test 4 - We can verify the maximum range allowed by the commitment (r
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < num_columns; ++i) {
+    for (uint64_t i = 0; i < num_commitments; ++i) {
         sequences[i].n = num_rows;
         sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
 
     SECTION("Verifying for C = A + B >= p (p = 2^252 + 27742317777372353535851937790883648493)") {
-        sqcnv::compute_commitments_cpu(commitments, value_sequences);
+        sqcnv::compute_commitments_gpu(commitments, value_sequences);
         
         sqcb::commitment commitment_c;
 
@@ -195,16 +197,16 @@ TEST_CASE("Test 4 - We can verify the maximum range allowed by the commitment (r
 
 TEST_CASE("Test 5 - We can multiply and add two commitments together") {
     const uint64_t num_rows = 4;
-    const uint64_t num_columns = 3;
+    const uint64_t num_commitments = 3;
     const uint8_t element_nbytes = sizeof(int);
     const unsigned int multiplicative_constant = 52;
 
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
+    sqcb::commitment commitments_data[num_commitments];
+    mtxb::exponent_sequence sequences[num_commitments];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_commitments);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_commitments);
 
-    const int query[num_columns][num_rows] = {
+    const int query[num_commitments][num_rows] = {
         {       2000,     7500,          5000,      1500},
         {       5000,        0,        400000,        10},
         {
@@ -216,14 +218,14 @@ TEST_CASE("Test 5 - We can multiply and add two commitments together") {
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < num_columns; ++i) {
+    for (uint64_t i = 0; i < num_commitments; ++i) {
         sequences[i].n = num_rows;
         sequences[i].data = (const uint8_t *) query[i];
         sequences[i].element_nbytes = element_nbytes;
     }
 
     SECTION("Verifying if multiplication and addion property holds (c = 52 * a + b ==> commit_c = 52 * commit_a + commit_b)") {
-        sqcnv::compute_commitments_cpu(commitments, value_sequences);
+        sqcnv::compute_commitments_gpu(commitments, value_sequences);
         
         sqcb::commitment commitment_c;
 
@@ -251,12 +253,12 @@ TEST_CASE("Test 5 - We can multiply and add two commitments together") {
 
 TEST_CASE("Test 6 - We can add two negative values together and generate valid commitments") {
     const uint64_t num_rows = 1;
-    const uint64_t num_columns = 3;
+    const uint64_t num_commitments = 3;
 
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
+    sqcb::commitment commitments_data[num_commitments];
+    mtxb::exponent_sequence sequences[num_commitments];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_commitments);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_commitments);
 
     const int result = 256;
     
@@ -278,7 +280,7 @@ TEST_CASE("Test 6 - We can add two negative values together and generate valid c
     sequences[2].element_nbytes = sizeof(result);  
 
     SECTION("Verifying if addion property holds (-|c| = -|a| + -|b| ==> commit_c = commit_a + commit_b)") {
-        sqcnv::compute_commitments_cpu(commitments, value_sequences);
+        sqcnv::compute_commitments_gpu(commitments, value_sequences);
         
         sqcb::commitment commitment_c;
 
@@ -300,13 +302,13 @@ TEST_CASE("Test 6 - We can add two negative values together and generate valid c
 
 TEST_CASE("Test 7 - We can verify the maximum range allowed by the commitment (regarding the reduction function)") {
     const uint64_t num_rows = 1;
-    const uint64_t num_columns = 3;
+    const uint64_t num_commitments = 3;
     const uint8_t element_nbytes = 32;
 
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
+    sqcb::commitment commitments_data[num_commitments];
+    mtxb::exponent_sequence sequences[num_commitments];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_commitments);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_commitments);
 
     // p = 2^252 + 27742317777372353535851937790883648493 (decimal)
     // A = p (decimal)
@@ -322,14 +324,14 @@ TEST_CASE("Test 7 - We can verify the maximum range allowed by the commitment (r
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < num_columns; ++i) {
+    for (uint64_t i = 0; i < num_commitments; ++i) {
         sequences[i].n = num_rows;
         sequences[i].data = (const uint8_t *) query[i].data();
         sequences[i].element_nbytes = element_nbytes;
     }
 
     SECTION("Verifying for C = A + B > p (p = 2^252 + 27742317777372353535851937790883648493)") {
-        sqcnv::compute_commitments_cpu(commitments, value_sequences);
+        sqcnv::compute_commitments_gpu(commitments, value_sequences);
         
         sqcb::commitment commitment_c;
 
@@ -387,7 +389,7 @@ TEST_CASE("Test 8 - We can verify that adding columns with different word size a
     sequences[3].element_nbytes = sizeof(unsigned long long);
 
     SECTION("Verifying that D = A + B + C implies in commit(D) = commit(A) + commit(B) + commit(C)") {
-        sqcnv::compute_commitments_cpu(commitments, value_sequences);
+        sqcnv::compute_commitments_gpu(commitments, value_sequences);
         
         sqcb::commitment commitment_c;
 
