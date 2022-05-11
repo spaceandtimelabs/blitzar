@@ -1,7 +1,11 @@
 #include "sxt/seqcommit/naive/commitment_computation_gpu.h"
 
+#include <vector>
 #include <cassert>
 
+#include "sxt/base/device/cuda_utility.h"
+#include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
@@ -9,33 +13,14 @@
 #include "sxt/curve21/ristretto/byte_conversion.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/operation/add.h"
-#include "sxt/seqcommit/naive/reduce_exponent.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/curve21/constant/zero.h"
-
-#include <iostream>
+#include "sxt/seqcommit/naive/fill_data.h"
 
 namespace sxt::sqcnv {
 
-constexpr int block_size = 32;
-
-//--------------------------------------------------------------------------------------------------
-// get_num_blocks
-//--------------------------------------------------------------------------------------------------
-static uint64_t get_num_blocks(uint64_t size) {
-    return (size + block_size - 1) / block_size;
-}
-
-//--------------------------------------------------------------------------------------------------
-// handle_cuda_error
-//--------------------------------------------------------------------------------------------------
-static void handle_cuda_error(cudaError_t cuda_err) {
-    if (cuda_err != cudaSuccess) {
-        std::cerr << "CUDA ERROR while executing the kernel: " << std::string(cudaGetErrorString(cuda_err)) << std::endl;
-        std::abort();
-    }
-}
+constexpr int block_size = 64;
 
 //--------------------------------------------------------------------------------------------------
 // get_value_sequence_size
@@ -46,39 +31,21 @@ static void get_value_sequence_size(uint64_t &sequence_size, uint64_t &total_num
     total_num_blocks = 0;
     
     for (size_t c = 0; c < value_sequences.size(); ++c) {
-        auto &data_col = value_sequences[c];
+        auto &data_commitment = value_sequences[c];
 
-        assert(data_col.n != 0);
-        assert(data_col.element_nbytes < 0 || data_col.element_nbytes > 32);
+        assert(data_commitment.n > 0 && data_commitment.element_nbytes <= 32);
 
-        biggest_n = max(biggest_n, data_col.n);
-        total_num_blocks += get_num_blocks(data_col.n);
-        sequence_size += data_col.n * data_col.element_nbytes;
+        biggest_n = max(biggest_n, data_commitment.n);
+        total_num_blocks += basdv::get_num_blocks(block_size, data_commitment.n);
+        sequence_size += data_commitment.n * data_commitment.element_nbytes;
     }
 }
 
 //--------------------------------------------------------------------------------------------------
-// fill_data_gpu
+// compute_commitments_kernel
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void fill_data_gpu(uint8_t a_i[32], const uint8_t *bytes_row_i_column_k, uint8_t size_row_data) noexcept {
-    #pragma unroll
-    for (int j = 0; j < 32; ++j) {
-        // from (0) to (size_row_data - 1) we are populating a_i[j] with data values
-        // padding zeros from (size_row_data) to (31)
-        a_i[j] = (j < size_row_data) ? bytes_row_i_column_k[j] : 0;
-    }
-
-    if (a_i[31] > 127) {
-        reduce_exponent(a_i); // a_i = a_i % (2^252 + 27742317777372353535851937790883648493)
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-// compute_col_commitments_kernel
-//--------------------------------------------------------------------------------------------------
-__global__ void compute_col_commitments_kernel(
-    c21t::element_p3 *partial_commitments, mtxb::exponent_sequence value_sequence, c21t::element_p3 *random_buffer) {
+__global__ static void compute_commitments_kernel(
+    c21t::element_p3 *partial_commitments, mtxb::exponent_sequence value_sequence) {
     
     extern __shared__ c21t::element_p3 reduction[];
 
@@ -94,10 +61,12 @@ __global__ void compute_col_commitments_kernel(
 
     uint8_t a_i[32];
     
-    c21t::element_p3 g_i = random_buffer[row_i];
+    c21t::element_p3 g_i;
+
+    sqcb::compute_base_element(g_i, row_i);
 
     // fill a_i, inserting data values at the beginning and padding zeros at the end of a_i
-    fill_data_gpu(a_i, value_sequence.data + row_i * element_nbytes, element_nbytes);
+    fill_data(a_i, value_sequence.data + row_i * element_nbytes, element_nbytes);
 
     c21o::scalar_multiply(reduction[tid], a_i, g_i); // h_i = a_i * g_i
 
@@ -120,7 +89,7 @@ __global__ void compute_col_commitments_kernel(
 //--------------------------------------------------------------------------------------------------
 // commitment_reduction_kernel
 //--------------------------------------------------------------------------------------------------
-__global__ void commitment_reduction_kernel(sqcb::commitment *final_commitment, c21t::element_p3 *partial_commitments, int n) {
+__global__ static void commitment_reduction_kernel(sqcb::commitment *final_commitment, c21t::element_p3 *partial_commitments, int n) {
     extern __shared__ c21t::element_p3 reduction[];
 
     int tid = threadIdx.x;
@@ -147,74 +116,56 @@ __global__ void commitment_reduction_kernel(sqcb::commitment *final_commitment, 
 }
 
 //--------------------------------------------------------------------------------------------------
-// generate_random_vals_kernel
+// launch_commitment_kernels
 //--------------------------------------------------------------------------------------------------
-__global__ void generate_random_vals_kernel(uint64_t n, c21t::element_p3 *random_buffer) {
-    int idx = threadIdx.x + blockIdx.x * blockDim.x;
-
-    if (idx < n) {
-        c21t::element_p3 g_i;
-
-        sqcb::compute_base_element(g_i, idx);
-
-        random_buffer[idx] = g_i;
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-// launch_kernels
-//--------------------------------------------------------------------------------------------------
-static void launch_kernels(
+static void launch_commitment_kernels(
     memmg::managed_array<sqcb::commitment> &commitments_device,
     basct::cspan<mtxb::exponent_sequence> value_sequences) {
     
-    uint64_t num_cols = commitments_device.size();
+    uint64_t num_commitments = commitments_device.size();
     uint64_t sequence_size, total_num_blocks, biggest_n;
 
     get_value_sequence_size(sequence_size, total_num_blocks, biggest_n, value_sequences);
 
-    memmg::managed_array<cudaStream_t> streams(num_cols);
-    memmg::managed_array<c21t::element_p3> random_values(biggest_n, memr::get_device_resource());
+    const int num_streams = min(10000, (int) num_commitments);
+    std::vector<basdv::stream> streams(num_streams);
+
     memmg::managed_array<uint8_t> data_table_device(sequence_size, memr::get_device_resource());
     memmg::managed_array<c21t::element_p3> partial_commitments_device(total_num_blocks, memr::get_device_resource());
-
-    generate_random_vals_kernel<<<get_num_blocks(biggest_n), block_size>>>(biggest_n, random_values.data());
-    cudaDeviceSynchronize();
 
     uint8_t *data_table_device_ptr = data_table_device.data();
     c21t::element_p3 *partial_commitments_device_ptr = partial_commitments_device.data();
 
-    for (int curr_col = 0; curr_col < num_cols; ++curr_col) {
-        auto &curr_stream = streams[curr_col];
+    for (int commitment_index = 0; commitment_index < num_commitments; ++commitment_index) {
+        int stream_index = (int) ((commitment_index / (float) num_commitments) * num_streams);
+        auto curr_stream = streams[stream_index].getStream();
 
-        handle_cuda_error(cudaStreamCreate(&curr_stream));
-        
-        mtxb::exponent_sequence data_col_device;
-        auto data_col_host = value_sequences[curr_col];
-        uint64_t curr_col_size = data_col_host.n * data_col_host.element_nbytes;
+        mtxb::exponent_sequence data_commitment_device;
+        auto data_commitment_host = value_sequences[commitment_index];
+        uint64_t commitment_index_size = data_commitment_host.n * data_commitment_host.element_nbytes;
 
-        data_col_device.n = data_col_host.n;
-        data_col_device.element_nbytes = data_col_host.element_nbytes;
-        data_col_device.data = data_table_device_ptr;
+        data_commitment_device.n = data_commitment_host.n;
+        data_commitment_device.element_nbytes = data_commitment_host.element_nbytes;
+        data_commitment_device.data = data_table_device_ptr;
 
-        handle_cuda_error(cudaMemcpyAsync(data_table_device_ptr, data_col_host.data, curr_col_size, cudaMemcpyHostToDevice, curr_stream));
-
-        uint64_t num_blocks = get_num_blocks(data_col_device.n);
+        basdv::copy_async_host_to_device(data_table_device_ptr, data_commitment_host.data, commitment_index_size, curr_stream);
+    
         uint64_t shared_mem_size = block_size * sizeof(c21t::element_p3);
 
-        compute_col_commitments_kernel<<<num_blocks, block_size, shared_mem_size, curr_stream>>>(partial_commitments_device_ptr, data_col_device, random_values.data());
+        uint64_t num_blocks = basdv::get_num_blocks(block_size, data_commitment_device.n);
 
-        commitment_reduction_kernel<<<1, block_size, shared_mem_size, curr_stream>>>(&commitments_device[curr_col], partial_commitments_device_ptr, (int) num_blocks);
+        compute_commitments_kernel<<<num_blocks, block_size, shared_mem_size, curr_stream>>>(
+            partial_commitments_device_ptr, data_commitment_device
+        );
 
-        data_table_device_ptr += curr_col_size;
+        commitment_reduction_kernel<<<1, block_size, shared_mem_size, curr_stream>>>(&commitments_device[commitment_index], partial_commitments_device_ptr, (int) num_blocks);
+
+        data_table_device_ptr += commitment_index_size;
         partial_commitments_device_ptr += num_blocks;
     }
 
-    // synchronize all kernels
-    for (size_t c = 0; c < num_cols; ++c) {
-        handle_cuda_error(cudaStreamSynchronize(streams[c]));
-        handle_cuda_error(cudaStreamDestroy(streams[c]));
-    }
+    // synchronize all streams
+    basdv::synchronize_all();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -226,12 +177,12 @@ void compute_commitments_gpu(
     
     assert(commitments.size() == value_sequences.size());
 
-    uint64_t num_cols = commitments.size();
+    uint64_t num_commitments = commitments.size();
 
-    memmg::managed_array<sqcb::commitment> commitments_device(num_cols, memr::get_device_resource());
+    memmg::managed_array<sqcb::commitment> commitments_device(num_commitments, memr::get_device_resource());
 
-    launch_kernels(commitments_device, value_sequences);
+    launch_commitment_kernels(commitments_device, value_sequences);
 
-    handle_cuda_error(cudaMemcpy(commitments.data(), commitments_device.data(), commitments_device.num_bytes(), cudaMemcpyDeviceToHost));
+    basdv::copy_device_to_host(commitments.data(), commitments_device.data(), commitments_device.num_bytes());
 }
 } // namespace sxt

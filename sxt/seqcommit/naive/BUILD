@@ -13,12 +13,23 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "fill_data",
+    is_cuda = True,
+    impl_deps = [
+        ":reduce_exponent",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "commitment_computation_cpu",
     deps = [
         "//sxt/base/container:span",
     ],
     impl_deps = [
-        ":reduce_exponent",
+        ":fill_data",
         "//sxt/seqcommit/base:commitment",
         "//sxt/seqcommit/base:base_element",
         "//sxt/multiexp/base:exponent_sequence",
@@ -38,14 +49,17 @@ cuda_library(
         "commitment_computation_gpu.h",
     ],
     copts = [
-        '--device-c', '-fopenmp'
+        '--device-c',
     ],
     srcs = [
         "commitment_computation_gpu.cu",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":reduce_exponent",
+        ":fill_data",
+        "//sxt/base/device:cuda_utility",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
         "//sxt/curve21/constant:zero",
         "//sxt/base/container:span",
         "//sxt/seqcommit/base:commitment",

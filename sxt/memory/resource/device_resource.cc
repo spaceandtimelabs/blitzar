@@ -11,9 +11,9 @@ namespace sxt::memr {
 //--------------------------------------------------------------------------------------------------
 void* device_resource::do_allocate(size_t bytes, size_t /*alignment*/) noexcept {
   void* res;
-  auto rcode = cudaMalloc(&res, bytes);
+  auto rcode = cudaMallocManaged(&res, bytes);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaMalloc failed: " << rcode << "\n";
+    std::cerr << "cudaMallocManaged failed: " << rcode << "\n";
     std::abort();
   }
   return res;

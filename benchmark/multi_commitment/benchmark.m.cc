@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <memory>
+#include <string>
 #include <string_view>
 
 #include "sxt/base/container/span.h"
@@ -24,8 +25,9 @@ struct Params {
     bool verbose;
     bench_fn func;
     uint64_t cols, rows;
+    std::string backend_str;
     uint64_t element_nbytes;
-
+    
     std::chrono::steady_clock::time_point begin_time;
     std::chrono::steady_clock::time_point end_time;
     
@@ -48,7 +50,7 @@ struct Params {
             verbose = true;
         }
 
-        if (cols < 0 || rows < 0 || element_nbytes > 32 || element_nbytes < 0) {
+        if (cols <= 0 || rows <= 0 || element_nbytes > 32 || element_nbytes < 0) {
             std::cerr << "Restriction: 1 <= cols, 1 <= rows, 1 <= element_nbytes <= 32\n";
             status = -1;
         }
@@ -56,12 +58,14 @@ struct Params {
 
     void select_backend_fn(const std::string_view backend) noexcept {
         if (backend == "cpu") {
-            func = (bench_fn) sqcnv::compute_commitments;
+            backend_str = "cpu";
+            func = sqcnv::compute_commitments_cpu;
             return;
         }
 
         if (backend == "gpu") {
-            func = (bench_fn) sqcnv::compute_commitments_gpu;
+            backend_str = "gpu";
+            func = sqcnv::compute_commitments_gpu;
             return;
         }
 
@@ -165,16 +169,20 @@ int main(int argc, char* argv[]) {
 
     p.stop_timer();
 
+    long long int table_size = (p.cols * p.rows * p.element_nbytes) / 1024 / 1024;
     double duration_compute = p.elapsed_time();
     double data_throughput = p.rows * p.cols / duration_compute;
 
-    std::cout << "===== benchmark results\n";
-    std::cout << "rows = " << p.rows << std::endl;
-    std::cout << "cols = " << p.cols << std::endl;
-    std::cout << "element_nbytes = " << p.element_nbytes << std::endl;
-    std::cout << "populate duration (s): " << std::fixed << duration_populate << "\n";
-    std::cout << "compute duration (s): " << std::fixed << duration_compute << "\n";
-    std::cout << "throughput (exponentiations / s): " << std::scientific << data_throughput << "\n";
+    std::cout << "===== benchmark results" << std::endl;
+    std::cout << "rows : " << p.rows << std::endl;
+    std::cout << "cols : " << p.cols << std::endl;
+    std::cout << "element_nbytes : " << p.element_nbytes << std::endl;
+    std::cout << "table_size (MB) : " << table_size << std::endl;
+    std::cout << "num_exponentations : " << (p.cols * p.rows) << std::endl;
+    std::cout << "populate duration (s) : " << std::fixed << duration_populate << std::endl;
+    std::cout << "compute duration (s) : " << std::fixed << duration_compute << std::endl;
+    std::cout << "throughput (exponentiations / s): " << std::scientific << data_throughput << std::endl;
+    std::cout << "backend : " << p.backend_str << std::endl;
 
     if (p.verbose) print_result(p.cols, commitments_per_col);
     

@@ -12,11 +12,15 @@ In each run of the below table, we changed the number of rows and columns of the
 
 To run the entire benchmark, execute:
 
-> ./benchmark/multi_commitment/run_benchmark.sh <cpu | gpu>
+> ./benchmark/multi_commitment/benchmark.sh <cpu | gpu>
 
 To compare cpu with gpu results, execute:
 
-> ./benchmark/multi_commitment/diff_cpu_gpu.sh
+> ./benchmark/multi_commitment/benchmark.sh valid_gpu
+
+To compare generate results spreadsheet, execute:
+
+> ./benchmark/multi_commitment/benchmark.sh spreadsheet
 
 Headers may appear in this diff, but no commitment result array should appear. If some commitment array appears, then gpu and cpu results are mismatching.
 

@@ -16,6 +16,6 @@ cc_binary(
     ],
     visibility = ["//visibility:public"],
     linkopts = [
-        '-x', 'cuda', '-fopenmp', '-lgomp'
+        '-x', 'cuda',
     ],
 )
