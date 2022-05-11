@@ -1,37 +1,30 @@
 #pragma once
 
-#include <cuda_runtime.h>
+#include <cstddef>
 
-#include "sxt/base/device/cuda_utility.h"
+struct CUstream_st;
+typedef CUstream_st* cudaStream_t;
 
 namespace sxt::basdv {
+//--------------------------------------------------------------------------------------------------
+// async_memcpy_host_to_device
+//--------------------------------------------------------------------------------------------------
+void async_memcpy_host_to_device(void* dst, const void* src, size_t count) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// copy_host_to_device
+// memcpy_device_to_host
 //--------------------------------------------------------------------------------------------------
-void copy_host_to_device(void* dst, const void* src, size_t count) noexcept {
-    handle_cuda_error(cudaMemcpyAsync(dst, src, count, cudaMemcpyHostToDevice));
-}
+void memcpy_device_to_host(void* dst, const void* src, size_t count) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// copy_device_to_host
+// async_memcpy_host_to_device
 //--------------------------------------------------------------------------------------------------
-void copy_device_to_host(void* dst, const void* src, size_t count) noexcept {
-    handle_cuda_error(cudaMemcpy(dst, src, count, cudaMemcpyDeviceToHost));
-}
+void async_memcpy_host_to_device(void* dst, const void* src, size_t count,
+                                 cudaStream_t stream) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// copy_async_host_to_device
+// async_memcpy_device_to_host
 //--------------------------------------------------------------------------------------------------
-void copy_async_host_to_device(void* dst, const void* src, size_t count, cudaStream_t stream) noexcept {
-    handle_cuda_error(cudaMemcpyAsync(dst, src, count, cudaMemcpyHostToDevice, stream));
-}
-
-//--------------------------------------------------------------------------------------------------
-// copy_async_device_to_host
-//--------------------------------------------------------------------------------------------------
-void copy_async_device_to_host(void* dst, const void* src, size_t count, cudaStream_t stream) noexcept {
-    handle_cuda_error(cudaMemcpyAsync(dst, src, count, cudaMemcpyDeviceToHost, stream));
-}
-
+void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
+                               cudaStream_t stream) noexcept;
 }  // namespace sxt::basdv

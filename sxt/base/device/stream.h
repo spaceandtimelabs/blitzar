@@ -1,19 +1,18 @@
 #pragma once
 
-#include "sxt/base/device/cuda_utility.h"
+struct CUstream_st;
+typedef CUstream_st* cudaStream_t;
 
 namespace sxt::basdv {
-
+//--------------------------------------------------------------------------------------------------
+// stream
+//--------------------------------------------------------------------------------------------------
 class stream {
 public:
     // constructor
-    stream() noexcept {
-        basdv::handle_cuda_error(cudaStreamCreate(&stream_));
-    }
+    stream() noexcept;
 
-    ~stream() noexcept {
-        basdv::handle_cuda_error(cudaStreamDestroy(stream_));
-    }
+    ~stream() noexcept;
 
     /* Prohibits from receiving another stream */
     stream(const stream& other) = delete;
@@ -24,9 +23,7 @@ public:
 
     stream& operator=(const stream&) = delete;
 
-    cudaStream_t getStream() {
-        return stream_;
-    }
+    cudaStream_t raw_stream() noexcept { return stream_; }
 
 private:
     cudaStream_t stream_;

@@ -48,9 +48,9 @@ sxt_cc_component(
     is_cuda = True,
     deps = [
         ":fill_data",
-        "//sxt/base/device:cuda_utility",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
+        "//sxt/base/num:divide_up",
         "//sxt/curve21/constant:zero",
         "//sxt/base/container:span",
         "//sxt/seqcommit/base:commitment",
