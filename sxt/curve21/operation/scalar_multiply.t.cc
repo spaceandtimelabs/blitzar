@@ -22,7 +22,7 @@ TEST_CASE("we can multiply elements by a scalar") {
 
   SECTION("verify multiply by 1") {
     unsigned char a[32] = {1};
-    scalar_multiply(res, a, g);
+    scalar_multiply255(res, a, g);
     REQUIRE(res.X == f51t::element{1987682947780000, 773294264508247,
                                    919172218267419, 891376861726595,
                                    2032146878734994});
@@ -39,7 +39,7 @@ TEST_CASE("we can multiply elements by a scalar") {
 
   SECTION("verify multiply by 2") {
     unsigned char a[32] = {2};
-    scalar_multiply(res, a, g);
+    scalar_multiply255(res, a, g);
     REQUIRE(res.X == f51t::element{1002030577009317, 413985402962749,
                                    1107992705352421, 1701819753420419,
                                    8688124941616});
@@ -68,10 +68,10 @@ TEST_CASE("we can multiply elements by a scalar") {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 250,
     };
     REQUIRE(a3[31] > 127);
-    scalar_multiply(res, a1, g);
+    scalar_multiply255(res, a1, g);
     auto expected_res = res;
 
-    scalar_multiply(res, a2, g);
+    scalar_multiply255(res, a2, g);
     c21o::add(expected_res, expected_res, res);
 
     scalar_multiply(res, basct::span<uint8_t>{a3, 32}, g);

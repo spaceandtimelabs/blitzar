@@ -18,7 +18,7 @@ namespace sxt::c21t { struct element_p3; }
 
 namespace sxt::c21o {
 //--------------------------------------------------------------------------------------------------
-// scalar_multiply
+// scalar_multiply255
 //--------------------------------------------------------------------------------------------------
 /*
  h = a * p
@@ -30,8 +30,8 @@ namespace sxt::c21o {
  p is public
  */
 CUDA_CALLABLE
-void scalar_multiply(c21t::element_p3& h, const unsigned char* a,
-                     const c21t::element_p3& p) noexcept;
+void scalar_multiply255(c21t::element_p3& h, const unsigned char* a,
+                        const c21t::element_p3& p) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // scalar_multiply

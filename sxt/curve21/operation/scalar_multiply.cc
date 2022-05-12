@@ -32,10 +32,10 @@ static void fill_exponent(uint8_t a[32], basct::cspan<uint8_t> data) noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
-// scalar_multiply
+// scalar_multiply255
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void scalar_multiply(c21t::element_p3& h, const unsigned char* a,
+void scalar_multiply255(c21t::element_p3& h, const unsigned char* a,
                      const c21t::element_p3& p) noexcept {
   c21t::element_p1p1 r;
   c21t::element_p2 s;
@@ -129,6 +129,6 @@ void scalar_multiply(c21t::element_p3& h, basct::cspan<uint8_t> a,
   assert(a.size() <= 32);
   uint8_t a_p[32];
   fill_exponent(a_p, a);
-  scalar_multiply(h, a_p, p);
+  scalar_multiply255(h, a_p, p);
 }
 } // namespace sxt::c21o
