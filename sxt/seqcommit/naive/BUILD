@@ -2,34 +2,11 @@ load("//bazel:sxt_component.bzl", "sxt_cc_component")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 
 sxt_cc_component(
-    name = "reduce_exponent",
-    is_cuda = True,
-    impl_deps = [
-        "//sxt/base/bit:load",
-    ],
-    test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-)
-
-sxt_cc_component(
-    name = "fill_data",
-    is_cuda = True,
-    impl_deps = [
-        ":reduce_exponent",
-    ],
-    test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-)
-
-sxt_cc_component(
     name = "commitment_computation_cpu",
     deps = [
         "//sxt/base/container:span",
     ],
     impl_deps = [
-        ":fill_data",
         "//sxt/seqcommit/base:commitment",
         "//sxt/seqcommit/base:base_element",
         "//sxt/multiexp/base:exponent_sequence",
@@ -47,7 +24,6 @@ sxt_cc_component(
     name = "commitment_computation_gpu",
     is_cuda = True,
     deps = [
-        ":fill_data",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/num:divide_up",

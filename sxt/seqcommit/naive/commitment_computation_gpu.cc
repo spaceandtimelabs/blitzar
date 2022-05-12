@@ -16,7 +16,6 @@
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/seqcommit/base/base_element.h"
 #include "sxt/seqcommit/base/commitment.h"
-#include "sxt/seqcommit/naive/fill_data.h"
 
 namespace sxt::sqcnv {
 
@@ -61,17 +60,13 @@ __global__ static void compute_commitments_kernel(
 
   uint8_t element_nbytes = value_sequence.element_nbytes;
 
-  uint8_t a_i[32];
-
   c21t::element_p3 g_i;
 
   sqcb::compute_base_element(g_i, row_i);
 
-  // fill a_i, inserting data values at the beginning and padding zeros at the
-  // end of a_i
-  fill_data(a_i, value_sequence.data + row_i * element_nbytes, element_nbytes);
-
-  c21o::scalar_multiply(reduction[tid], a_i, g_i);  // h_i = a_i * g_i
+  basct::cspan<uint8_t> exponent{value_sequence.data + row_i * element_nbytes,
+                                 element_nbytes};
+  c21o::scalar_multiply(reduction[tid], exponent, g_i);  // h_i = a_i * g_i
 
   __syncthreads();
 

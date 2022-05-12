@@ -1,15 +1,36 @@
 #include "sxt/curve21/operation/scalar_multiply.h"
 
+#include <cassert>
+
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/cmov.h"
 #include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/reduce_exponent.h"
 #include "sxt/curve21/type/conversion_utility.h"
 #include "sxt/curve21/type/element_cached.h"
 #include "sxt/curve21/type/element_p1p1.h"
 #include "sxt/curve21/type/element_p3.h"
 
 namespace sxt::c21o {
+//--------------------------------------------------------------------------------------------------
+// fill_exponent
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+static void fill_exponent(uint8_t a[32], basct::cspan<uint8_t> data) noexcept {
+  size_t i = 0;
+  for (; i < data.size(); ++i) {
+    a[i] = data[i];
+  }
+  for (; i < 32; ++i) {
+    a[i] = 0;
+  }
+  if (a[31] > 127) {
+    reduce_exponent(
+        a);  // a_i = a_i % (2^252 + 27742317777372353535851937790883648493)
+  }
+}
+
 //--------------------------------------------------------------------------------------------------
 // scalar_multiply
 //--------------------------------------------------------------------------------------------------
@@ -93,5 +114,21 @@ void scalar_multiply(c21t::element_p3& h, const unsigned char* a,
   add(r, h, t);
 
   c21t::to_element_p3(h, r);
+}
+
+//--------------------------------------------------------------------------------------------------
+// scalar_multiply
+//--------------------------------------------------------------------------------------------------
+/*
+ h = a * p
+ where a = a[0]+256*a[1]+...+256^31 a[31]
+ */
+CUDA_CALLABLE
+void scalar_multiply(c21t::element_p3& h, basct::cspan<uint8_t> a,
+                     const c21t::element_p3& p) noexcept {
+  assert(a.size() <= 32);
+  uint8_t a_p[32];
+  fill_exponent(a_p, a);
+  scalar_multiply(h, a_p, p);
 }
 } // namespace sxt::c21o

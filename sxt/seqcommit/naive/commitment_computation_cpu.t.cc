@@ -1,6 +1,5 @@
 #include "sxt/seqcommit/naive/commitment_computation_cpu.h"
 
-#include "sxt/seqcommit/naive/fill_data.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/seqcommit/base/commitment.h"
@@ -222,7 +221,7 @@ TEST_CASE("Test 5 - We can multiply and add two commitments together") {
         sequences[i].element_nbytes = element_nbytes;
     }
 
-    SECTION("Verifying if multiplication and addion property holds (c = 52 * a + b ==> commit_c = 52 * commit_a + commit_b)") {
+    SECTION("Verifying if multiplication and addition property holds (c = 52 * a + b ==> commit_c = 52 * commit_a + commit_b)") {
         sqcnv::compute_commitments_cpu(commitments, value_sequences);
         
         sqcb::commitment commitment_c;
@@ -233,11 +232,8 @@ TEST_CASE("Test 5 - We can multiply and add two commitments together") {
 
         c21rs::from_bytes(q, commitments_data[1].data());
 
-        uint8_t a_i[32];
-
-        sqcnv::fill_data(a_i, (const uint8_t *) &multiplicative_constant, sizeof(multiplicative_constant));
-
-        c21o::scalar_multiply(p, a_i, p); // h_i = a_i * g_i
+        c21o::scalar_multiply(p, multiplicative_constant,
+                              p);  // h_i = a_i * g_i
 
         c21o::add(p, p, q);
 

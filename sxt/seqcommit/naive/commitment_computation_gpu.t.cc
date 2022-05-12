@@ -2,7 +2,6 @@
 
 #include "sxt/base/test/unit_test.h"
 
-#include "sxt/seqcommit/naive/fill_data.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/seqcommit/base/commitment.h"
@@ -235,11 +234,7 @@ TEST_CASE("Test 5 - We can multiply and add two commitments together") {
 
         c21rs::from_bytes(q, commitments_data[1].data());
 
-        uint8_t a_i[32];
-
-        sqcnv::fill_data(a_i, (const uint8_t *) &multiplicative_constant, sizeof(multiplicative_constant));
-
-        c21o::scalar_multiply(p, a_i, p); // h_i = a_i * g_i
+        c21o::scalar_multiply(p, multiplicative_constant, p); // h_i = a_i * g_i
 
         c21o::add(p, p, q);
 

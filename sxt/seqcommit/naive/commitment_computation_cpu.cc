@@ -9,7 +9,6 @@
 #include "sxt/curve21/ristretto/byte_conversion.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/operation/add.h"
-#include "sxt/seqcommit/naive/fill_data.h"
 
 namespace sxt::sqcnv {
 
@@ -28,7 +27,6 @@ void compute_commitments_cpu(
         const mtxb::exponent_sequence &column_k_data = value_sequences[colum_k];
 
         for (size_t row_i = 0; row_i < column_k_data.n; row_i++) {
-            uint8_t a_i[32];
             c21t::element_p3 g_i;
             c21t::element_p3 h_i;
             uint8_t element_nbytes = column_k_data.element_nbytes;
@@ -36,10 +34,10 @@ void compute_commitments_cpu(
 
             sqcb::compute_base_element(g_i, row_i);
 
-            // fill a_i, inserting data values at the beginning and padding zeros at the end of a_i
-            fill_data(a_i, bytes_row_i_column_k, element_nbytes);
-
-            c21o::scalar_multiply(h_i, a_i, g_i); // h_i = a_i * g_i
+            c21o::scalar_multiply(
+                h_i,
+                basct::cspan<uint8_t>{bytes_row_i_column_k, element_nbytes},
+                g_i);  // h_i = a_i * g_i
 
             // aggregate all sum into p_k ==> p_k = p_k + a_i * g_i
             if (row_i == 0) {
