@@ -30,7 +30,7 @@ class span {
 
    template <class Dummy = int,
              std::enable_if_t<std::is_const_v<T>, Dummy>* = nullptr>
-   CUDA_CALLABLE span(span<std::remove_const_t<T>> other) noexcept
+   CUDA_CALLABLE span(const span<std::remove_const_t<T>> &other) noexcept
        : size_{other.size()}, data_{other.data()} {}
 
    CUDA_CALLABLE

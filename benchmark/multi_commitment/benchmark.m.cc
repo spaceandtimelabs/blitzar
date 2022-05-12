@@ -3,28 +3,31 @@
 #include <iostream>
 #include <iomanip>
 #include <memory>
+#include <string>
 #include <string_view>
 
+#include "sxt/base/container/span.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/base/num/fast_random_number_generator.h"
-#include "benchmark/multi_commitment/multi_commitment_cpu.h"
+#include "sxt/seqcommit/naive/commitment_computation_cpu.h"
+#include "sxt/seqcommit/naive/commitment_computation_gpu.h"
 
 using namespace sxt;
 
 using bench_fn = void(*)(
-    memmg::managed_array<sqcb::commitment> &commitments_per_col,
-    uint64_t rows, uint64_t cols, uint64_t element_nbytes,
-    const memmg::managed_array<uint8_t> &data_table) noexcept;
+    basct::span<sqcb::commitment> commitments,
+    basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept;
 
 struct Params {
     int status;
     bool verbose;
     bench_fn func;
     uint64_t cols, rows;
+    std::string backend_str;
     uint64_t element_nbytes;
-    uint64_t table_size;
-
+    
     std::chrono::steady_clock::time_point begin_time;
     std::chrono::steady_clock::time_point end_time;
     
@@ -47,22 +50,23 @@ struct Params {
             verbose = true;
         }
 
-        if (cols < 0 || rows < 0 || element_nbytes > 32 || element_nbytes < 0) {
+        if (cols <= 0 || rows <= 0 || element_nbytes > 32 || element_nbytes < 0) {
             std::cerr << "Restriction: 1 <= cols, 1 <= rows, 1 <= element_nbytes <= 32\n";
             status = -1;
         }
-
-        table_size = cols * rows * element_nbytes;
     }
 
     void select_backend_fn(const std::string_view backend) noexcept {
         if (backend == "cpu") {
-            func = multi_commitment_cpu;
+            backend_str = "cpu";
+            func = sqcnv::compute_commitments_cpu;
             return;
         }
 
         if (backend == "gpu") {
-            // return multi_commitment_gpu;
+            backend_str = "gpu";
+            func = sqcnv::compute_commitments_gpu;
+            return;
         }
 
         std::cerr << "invalid backend: " << backend << "\n";
@@ -83,6 +87,9 @@ struct Params {
     }
 };
 
+//--------------------------------------------------------------------------------------------------
+// print_result
+//--------------------------------------------------------------------------------------------------
 static void print_result(uint64_t cols, memmg::managed_array<sqcb::commitment> &commitments_per_col) {
     std::cout << "===== result\n";
 
@@ -92,23 +99,47 @@ static void print_result(uint64_t cols, memmg::managed_array<sqcb::commitment> &
     }
 }
 
-static void populate_table(memmg::managed_array<uint8_t> &data_table) {
+//--------------------------------------------------------------------------------------------------
+// populate_table
+//--------------------------------------------------------------------------------------------------
+static void populate_table(
+    uint64_t cols, uint64_t rows, uint8_t element_nbytes,
+    memmg::managed_array<uint8_t> &data_table, 
+    memmg::managed_array<mtxb::exponent_sequence> &data_cols) {
+
     basn::fast_random_number_generator generator(data_table.size(), data_table.size());
 
     for (size_t i = 0; i < data_table.size(); ++i) {
         data_table[i] = (uint8_t) (generator() % 256);
     }
+
+    for (size_t c = 0; c < cols; ++c) {
+        auto &data_col = data_cols[c];
+
+        data_col.n = rows;
+        data_col.element_nbytes = element_nbytes;
+        data_col.data = (data_table.data() + c * rows * element_nbytes);
+    }
 }
 
+//--------------------------------------------------------------------------------------------------
+// pre_initialize
+//--------------------------------------------------------------------------------------------------
 static void pre_initialize(bench_fn func) {
     memmg::managed_array<uint8_t> data_table_fake(1); // 1 col, 1 row, 1 bytes per data
     memmg::managed_array<sqcb::commitment> commitments_per_col_fake(1);
+    memmg::managed_array<mtxb::exponent_sequence> data_cols_fake(1);
+    basct::span<sqcb::commitment> commitments_fake(commitments_per_col_fake.data(), 1);
+    basct::cspan<mtxb::exponent_sequence> value_sequences_fake(data_cols_fake.data(), 1);
 
-    populate_table(data_table_fake);
+    populate_table(1, 1, 1, data_table_fake, data_cols_fake);
 
-    func(commitments_per_col_fake, 1, 1, 1, data_table_fake);
+    func(commitments_fake, value_sequences_fake);
 }
 
+//--------------------------------------------------------------------------------------------------
+// main
+//--------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
     Params p(argc, argv);
 
@@ -117,10 +148,13 @@ int main(int argc, char* argv[]) {
     p.trigger_timer();
 
     // populate data section
-    memmg::managed_array<uint8_t> data_table(p.table_size);
+    memmg::managed_array<uint8_t> data_table(p.rows * p.cols * p.element_nbytes);
     memmg::managed_array<sqcb::commitment> commitments_per_col(p.cols);
+    memmg::managed_array<mtxb::exponent_sequence> data_cols(p.cols);
+    basct::span<sqcb::commitment> commitments(commitments_per_col.data(), p.cols);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(data_cols.data(), p.cols);
 
-    populate_table(data_table);
+    populate_table(p.cols, p.rows, p.element_nbytes, data_table, data_cols);
     
     p.stop_timer();
 
@@ -131,20 +165,24 @@ int main(int argc, char* argv[]) {
 
     p.trigger_timer();
     
-    p.func(commitments_per_col, p.rows, p.cols, p.element_nbytes, data_table);
+    p.func(commitments, value_sequences);
 
     p.stop_timer();
 
+    long long int table_size = (p.cols * p.rows * p.element_nbytes) / 1024 / 1024;
     double duration_compute = p.elapsed_time();
-    double data_throughput = p.table_size / duration_compute;
+    double data_throughput = p.rows * p.cols / duration_compute;
 
-    std::cout << "===== benchmark results\n";
-    std::cout << "rows = " << p.rows << std::endl;
-    std::cout << "cols = " << p.cols << std::endl;
-    std::cout << "element_nbytes = " << p.element_nbytes << std::endl;
-    std::cout << "populate duration (s): " << std::fixed << duration_populate << "\n";
-    std::cout << "compute duration (s): " << std::fixed << duration_compute << "\n";
-    std::cout << "data throughput (bytes / s): " << std::scientific << data_throughput << "\n";
+    std::cout << "===== benchmark results" << std::endl;
+    std::cout << "rows : " << p.rows << std::endl;
+    std::cout << "cols : " << p.cols << std::endl;
+    std::cout << "element_nbytes : " << p.element_nbytes << std::endl;
+    std::cout << "table_size (MB) : " << table_size << std::endl;
+    std::cout << "num_exponentations : " << (p.cols * p.rows) << std::endl;
+    std::cout << "populate duration (s) : " << std::fixed << duration_populate << std::endl;
+    std::cout << "compute duration (s) : " << std::fixed << duration_compute << std::endl;
+    std::cout << "throughput (exponentiations / s): " << std::scientific << data_throughput << std::endl;
+    std::cout << "backend : " << p.backend_str << std::endl;
 
     if (p.verbose) print_result(p.cols, commitments_per_col);
     

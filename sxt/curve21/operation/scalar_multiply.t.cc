@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/type/element_p3.h"
 using namespace sxt;
@@ -21,7 +22,7 @@ TEST_CASE("we can multiply elements by a scalar") {
 
   SECTION("verify multiply by 1") {
     unsigned char a[32] = {1};
-    scalar_multiply(res, a, g);
+    scalar_multiply255(res, a, g);
     REQUIRE(res.X == f51t::element{1987682947780000, 773294264508247,
                                    919172218267419, 891376861726595,
                                    2032146878734994});
@@ -38,7 +39,7 @@ TEST_CASE("we can multiply elements by a scalar") {
 
   SECTION("verify multiply by 2") {
     unsigned char a[32] = {2};
-    scalar_multiply(res, a, g);
+    scalar_multiply255(res, a, g);
     REQUIRE(res.X == f51t::element{1002030577009317, 413985402962749,
                                    1107992705352421, 1701819753420419,
                                    8688124941616});
@@ -51,5 +52,29 @@ TEST_CASE("we can multiply elements by a scalar") {
     REQUIRE(res.T == f51t::element{1263134504727466, 2180639216875652,
                                    658647461258916, 1312984564731448,
                                    533598071106974});
+  }
+
+  SECTION("verify we can multiply by an exponent with a[31] > 127") {
+    uint8_t a1[32] = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 125,
+    };
+    uint8_t a2[32] = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 125,
+    };
+    uint8_t a3[32] = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 250,
+    };
+    REQUIRE(a3[31] > 127);
+    scalar_multiply255(res, a1, g);
+    auto expected_res = res;
+
+    scalar_multiply255(res, a2, g);
+    c21o::add(expected_res, expected_res, res);
+
+    scalar_multiply(res, basct::span<uint8_t>{a3, 32}, g);
+    REQUIRE(res == expected_res);
   }
 }

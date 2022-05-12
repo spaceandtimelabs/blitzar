@@ -15,11 +15,11 @@
  *
  * See third_party/license/libsodium.LICENSE
  */
-#include "sxt/seqcommit/naive/reduce_exponent.h"
+#include "sxt/curve21/operation/reduce_exponent.h"
 
 #include "sxt/base/bit/load.h"
 
-namespace sxt::sqcnv {
+namespace sxt::c21o {
 
 //--------------------------------------------------------------------------------------------------
 // reduce_exponent

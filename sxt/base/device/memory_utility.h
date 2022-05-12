@@ -1,44 +1,30 @@
 #pragma once
 
-#include <cstdint>
-#include <initializer_list>
-#include <iosfwd>
+#include <cstddef>
 
-#include "sxt/base/macro/cuda_callable.h"
+struct CUstream_st;
+typedef CUstream_st* cudaStream_t;
 
-namespace sxt::sqcb {
+namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
-// commitment
+// async_memcpy_host_to_device
 //--------------------------------------------------------------------------------------------------
-class commitment {
- public:
-   commitment() noexcept = default;
-
-   commitment(std::initializer_list<uint8_t> values) noexcept;
-
-   CUDA_CALLABLE
-   uint8_t* data() noexcept { return data_; }
-
-   CUDA_CALLABLE
-   const uint8_t* data() const noexcept { return data_; }
- private:
-  uint8_t data_[32];
-};
+void async_memcpy_host_to_device(void* dst, const void* src, size_t count) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// operator==
+// memcpy_device_to_host
 //--------------------------------------------------------------------------------------------------
-bool operator==(const commitment& lhs, const commitment& rhs) noexcept;
+void memcpy_device_to_host(void* dst, const void* src, size_t count) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// operator!=
+// async_memcpy_host_to_device
 //--------------------------------------------------------------------------------------------------
-inline bool operator!=(const commitment& lhs, const commitment& rhs) noexcept {
-  return !(lhs == rhs);
-}
+void async_memcpy_host_to_device(void* dst, const void* src, size_t count,
+                                 cudaStream_t stream) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// opeator<<
+// async_memcpy_device_to_host
 //--------------------------------------------------------------------------------------------------
-std::ostream& operator<<(std::ostream& out, const commitment& c) noexcept;
-} // namespace sxt::sqcb
+void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
+                               cudaStream_t stream) noexcept;
+}  // namespace sxt::basdv

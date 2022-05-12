@@ -8,13 +8,17 @@
  */
 #pragma once
 
+#include <cstdint>
+#include <type_traits>
+
+#include "sxt/base/container/span.h"
 #include "sxt/base/macro/cuda_callable.h"
 
 namespace sxt::c21t { struct element_p3; }
 
 namespace sxt::c21o {
 //--------------------------------------------------------------------------------------------------
-// scalar_multiply
+// scalar_multiply255
 //--------------------------------------------------------------------------------------------------
 /*
  h = a * p
@@ -26,6 +30,25 @@ namespace sxt::c21o {
  p is public
  */
 CUDA_CALLABLE
-void scalar_multiply(c21t::element_p3& h, const unsigned char* a,
-                     const c21t::element_p3& p) noexcept;
+void scalar_multiply255(c21t::element_p3& h, const unsigned char* a,
+                        const c21t::element_p3& p) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// scalar_multiply
+//--------------------------------------------------------------------------------------------------
+/*
+ h = a * p
+ where a = a[0]+256*a[1]+...+256^31 a[31]
+ */
+CUDA_CALLABLE
+void scalar_multiply(c21t::element_p3& h, basct::cspan<uint8_t> a,
+                      const c21t::element_p3& p) noexcept;
+
+template <class T, std::enable_if_t<std::is_integral_v<T> &&
+                                    std::is_unsigned_v<T>>* = nullptr>
+void scalar_multiply(c21t::element_p3& h, T a,
+                     const c21t::element_p3& p) noexcept {
+  scalar_multiply(
+      h, basct::cspan<uint8_t>{reinterpret_cast<uint8_t*>(&a), sizeof(a)}, p);
+}
 }  // namespace sxt::c21o

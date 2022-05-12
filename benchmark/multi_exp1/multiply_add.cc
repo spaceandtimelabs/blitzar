@@ -23,7 +23,7 @@ void multiply_add(c21t::element_p3& res, int mi, int i) noexcept {
   unsigned char a[32];
   c21rn::generate_random_exponent(a, rng);
   c21t::element_p3 e;
-  c21o::scalar_multiply(e, a, g);
+  c21o::scalar_multiply255(e, a, g);
   c21o::add(res, res, e);
 }
 } // namespace sxt
