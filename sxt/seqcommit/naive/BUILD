@@ -1,5 +1,4 @@
 load("//bazel:sxt_component.bzl", "sxt_cc_component")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 
 sxt_cc_component(
     name = "commitment_computation_cpu",
@@ -16,6 +15,7 @@ sxt_cc_component(
         "//sxt/curve21/operation:add",
     ],
     test_deps = [
+        "//sxt/seqcommit/test:test_commitment_computation",
         "//sxt/base/test:unit_test",
     ],
 )
@@ -40,6 +40,7 @@ sxt_cc_component(
         "//sxt/memory/resource:device_resource",
     ],
     test_deps = [
+        "//sxt/seqcommit/test:test_commitment_computation",
         "//sxt/base/test:unit_test",
     ],
 )
