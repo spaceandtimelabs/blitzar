@@ -1,15 +1,74 @@
 #include "sxt/seqcommit/cbindings/pedersen.h"
 
+#include "sxt/base/container/span.h"
+#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/seqcommit/naive/commitment_computation_cpu.h"
+#include "sxt/seqcommit/naive/commitment_computation_gpu.h"
+
+using bench_fn = void(*)(
+    sxt::basct::span<sxt::sqcb::commitment> commitments,
+    sxt::basct::cspan<sxt::mtxb::exponent_sequence> value_sequences) noexcept;
+
+using span_value_sequences = sxt::basct::cspan<sxt::mtxb::exponent_sequence>;
+
+bench_fn backend_func = nullptr;
+
 int sxt_init(const sxt_config* config) {
-  (void)config;
+  if (config->backend == SXT_BACKEND_CPU) {
+    backend_func = sxt::sqcnv::compute_commitments_cpu;
+    return 0;
+  } else if (config->backend == SXT_BACKEND_GPU) {
+    backend_func = sxt::sqcnv::compute_commitments_gpu;
+    return 0;
+  }
+
+  return 1;
+}
+
+static int valid_descriptor(const sxt_sequence_descriptor *descriptor) {
+  // verify if data pointers are valid
+  if (descriptor->dense.n == 0 || descriptor->dense.data == nullptr) return 1;
+
+  // verify if word size is inside the correct range (1 to 32)
+  if (descriptor->dense.element_nbytes == 0 || descriptor->dense.element_nbytes > 32) return 1;
+
+  return 0;
+}
+
+static int valid_sequence_descriptor(uint32_t num_sequences, const sxt_sequence_descriptor* descriptors) {
+  // invalid pointers
+  if (descriptors == nullptr || num_sequences == 0) return 1;
+
+  // verify if sequence type is already implemented
+  if (descriptors->sequence_type != SXT_DENSE_SEQUENCE_TYPE) return 1;
+
+  // verify if each descriptor is inside the ranges
+  for (uint32_t commit_index = 0; commit_index < num_sequences; ++commit_index) {
+    if (valid_descriptor(descriptors + commit_index)) return 1;
+  }
+
   return 0;
 }
 
 int sxt_compute_pedersen_commitments(
     sxt_commitment* commitments, uint32_t num_sequences,
     const sxt_sequence_descriptor* descriptors) {
-  (void)commitments;
-  (void)num_sequences;
-  (void)descriptors;
+
+  // backend not initialized (sxt_init not called correctly)
+  if (backend_func == nullptr) return 1;
+
+  // verify if input is valid
+  if (commitments == nullptr
+        || valid_sequence_descriptor(num_sequences, descriptors)) return 1;
+
+  sxt::basct::span<sxt::sqcb::commitment> commitments_result(
+            (sxt::sqcb::commitment *) commitments, num_sequences);
+
+  const span_value_sequences value_sequences(
+      (sxt::mtxb::exponent_sequence *) &(descriptors->dense), num_sequences);
+
+  backend_func(commitments_result, value_sequences);
+
   return 0;
 }
