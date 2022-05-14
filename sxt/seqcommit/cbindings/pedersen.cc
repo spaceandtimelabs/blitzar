@@ -3,6 +3,7 @@
 #include "sxt/base/container/span.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/memory/management/managed_array.h"
 #include "sxt/seqcommit/naive/commitment_computation_cpu.h"
 #include "sxt/seqcommit/naive/commitment_computation_gpu.h"
 
@@ -15,6 +16,8 @@ using span_value_sequences = sxt::basct::cspan<sxt::mtxb::exponent_sequence>;
 bench_fn backend_func = nullptr;
 
 int sxt_init(const sxt_config* config) {
+  if (config == nullptr) return 1;
+
   if (config->backend == SXT_BACKEND_CPU) {
     backend_func = sxt::sqcnv::compute_commitments_cpu;
     return 0;
@@ -40,11 +43,11 @@ static int valid_sequence_descriptor(uint32_t num_sequences, const sxt_sequence_
   // invalid pointers
   if (descriptors == nullptr || num_sequences == 0) return 1;
 
-  // verify if sequence type is already implemented
-  if (descriptors->sequence_type != SXT_DENSE_SEQUENCE_TYPE) return 1;
-
   // verify if each descriptor is inside the ranges
   for (uint32_t commit_index = 0; commit_index < num_sequences; ++commit_index) {
+    // verify if sequence type is already implemented
+    if (descriptors->sequence_type != SXT_DENSE_SEQUENCE_TYPE) return 1;
+
     if (valid_descriptor(descriptors + commit_index)) return 1;
   }
 
@@ -65,8 +68,15 @@ int sxt_compute_pedersen_commitments(
   sxt::basct::span<sxt::sqcb::commitment> commitments_result(
             (sxt::sqcb::commitment *) commitments, num_sequences);
 
-  const span_value_sequences value_sequences(
-      (sxt::mtxb::exponent_sequence *) &(descriptors->dense), num_sequences);
+  sxt::memmg::managed_array<sxt::mtxb::exponent_sequence> sequences(num_sequences);
+
+  // populating sequence object
+  for (uint64_t i = 0; i < num_sequences; ++i) {
+    sequences[i] = *((sxt::mtxb::exponent_sequence *) &descriptors[i].dense);
+  }
+
+  sxt::basct::cspan<sxt::mtxb::exponent_sequence> value_sequences(sequences.data(),
+                                                        num_sequences);
 
   backend_func(commitments_result, value_sequences);
 
