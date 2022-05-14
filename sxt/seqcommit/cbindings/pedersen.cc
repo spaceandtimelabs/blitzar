@@ -1,5 +1,8 @@
 #include "sxt/seqcommit/cbindings/pedersen.h"
 
+#include <iostream>
+#include <cuda_runtime.h>
+
 #include "sxt/base/container/span.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
@@ -15,6 +18,27 @@ using span_value_sequences = sxt::basct::cspan<sxt::mtxb::exponent_sequence>;
 
 bench_fn backend_func = nullptr;
 
+//--------------------------------------------------------------------------------------------------
+// pre_initialize
+//--------------------------------------------------------------------------------------------------
+static void pre_initialize_gpu(bench_fn func) {
+  sxt::memmg::managed_array<uint8_t> data_table_fake(1); // 1 col, 1 row, 1 bytes per data
+  sxt::memmg::managed_array<sxt::sqcb::commitment> commitments_per_col_fake(1);
+  sxt::memmg::managed_array<sxt::mtxb::exponent_sequence> data_cols_fake(1);
+  sxt::basct::span<sxt::sqcb::commitment> commitments_fake(commitments_per_col_fake.data(), 1);
+  sxt::basct::cspan<sxt::mtxb::exponent_sequence> value_sequences_fake(data_cols_fake.data(), 1);
+
+  data_table_fake[0] = 1;
+
+  auto &data_col = data_cols_fake[0];
+
+  data_col.n = 1;
+  data_col.element_nbytes = 1;
+  data_col.data = data_table_fake.data();
+
+  func(commitments_fake, value_sequences_fake);
+}
+
 int sxt_init(const sxt_config* config) {
   if (config == nullptr) return 1;
 
@@ -22,7 +46,27 @@ int sxt_init(const sxt_config* config) {
     backend_func = sxt::sqcnv::compute_commitments_cpu;
     return 0;
   } else if (config->backend == SXT_BACKEND_GPU) {
-    backend_func = sxt::sqcnv::compute_commitments_gpu;
+    int nDevices;
+
+    auto rcode = cudaGetDeviceCount(&nDevices);
+
+    if (rcode != cudaSuccess) {
+      nDevices = 0; 
+
+      std::cout << "cudaGetDeviceCount failed: " << cudaGetErrorString(rcode)
+                << "\n";
+    }
+
+    if (nDevices > 0) {
+      backend_func = sxt::sqcnv::compute_commitments_gpu;
+
+      pre_initialize_gpu(backend_func);
+    } else {
+      backend_func = sxt::sqcnv::compute_commitments_cpu;
+
+      std::cout << "WARN: Using 'compute_commitments_cpu'. " << std::endl;
+    }
+
     return 0;
   }
 
@@ -65,14 +109,20 @@ int sxt_compute_pedersen_commitments(
   if (commitments == nullptr
         || valid_sequence_descriptor(num_sequences, descriptors)) return 1;
 
+  static_assert(sizeof(sxt::sqcb::commitment) == 
+      sizeof(sxt_commitment), "types must be ABI compatible");
+
   sxt::basct::span<sxt::sqcb::commitment> commitments_result(
-            (sxt::sqcb::commitment *) commitments, num_sequences);
+            reinterpret_cast<sxt::sqcb::commitment *>(commitments), num_sequences);
 
   sxt::memmg::managed_array<sxt::mtxb::exponent_sequence> sequences(num_sequences);
 
+  static_assert(sizeof(sxt::mtxb:: exponent_sequence) == 
+      sizeof(sxt_dense_sequence_descriptor), "types must be ABI compatible");
+
   // populating sequence object
   for (uint64_t i = 0; i < num_sequences; ++i) {
-    sequences[i] = *((sxt::mtxb::exponent_sequence *) &descriptors[i].dense);
+    sequences[i] = *(reinterpret_cast<const sxt::mtxb::exponent_sequence *>(&descriptors[i].dense));
   }
 
   sxt::basct::cspan<sxt::mtxb::exponent_sequence> value_sequences(sequences.data(),

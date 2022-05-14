@@ -57,6 +57,12 @@ TEST_CASE("run pedersen tests") {
         REQUIRE(sxt_init(&config) == 0);
     }
 
+    SECTION("initialize library with GPU backend will not error out") {
+        const sxt_config config = {SXT_BACKEND_GPU};
+
+        REQUIRE(sxt_init(&config) == 0);
+    }
+
     SECTION("incorrect input to the library initialization will error out") {
         REQUIRE(sxt_init(NULL) != 0);
 
