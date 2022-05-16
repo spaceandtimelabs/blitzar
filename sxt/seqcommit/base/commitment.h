@@ -22,7 +22,7 @@ class commitment {
    CUDA_CALLABLE
    const uint8_t* data() const noexcept { return data_; }
  private:
-  uint8_t data_[32];
+  uint8_t data_[32] = {};
 };
 
 //--------------------------------------------------------------------------------------------------

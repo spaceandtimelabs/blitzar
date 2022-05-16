@@ -31,7 +31,6 @@ struct sxt_dense_sequence_descriptor {
   const uint8_t* data;
 };
 
-
 struct sxt_sequence_descriptor {
   // specifies the type of sequence (e.g. SXT_DENSE_SEQUENCE_TYPE, SXT_SPARSE_SEQUENCE_TYPE, etc).
   uint8_t sequence_type;
@@ -51,6 +50,11 @@ struct sxt_commitment {
 };
 
 // Initialize the exponentiation library. This can only be called once.
+// Input parameters:
+//    config
+//      specifies which backend should be used in the computations (gpu or cpu)
+// Return values:
+//    0 on success; otherwise a nonzero error code
 int sxt_init(const sxt_config* config);
 
 // Compute the pedersen commitments for sequences of values

@@ -34,10 +34,10 @@ static void get_value_sequence_size(
   for (size_t c = 0; c < value_sequences.size(); ++c) {
     auto &data_commitment = value_sequences[c];
 
-    assert(data_commitment.n > 0 && data_commitment.element_nbytes <= 32);
+    assert(data_commitment.element_nbytes > 0 && data_commitment.element_nbytes <= 32);
 
     biggest_n = max(biggest_n, data_commitment.n);
-    total_num_blocks += basn::divide_up(block_size, data_commitment.n);
+    total_num_blocks += basn::divide_up(data_commitment.n, block_size);
     sequence_size += data_commitment.n * data_commitment.element_nbytes;
   }
 }
@@ -127,6 +127,8 @@ static void launch_commitment_kernels(
   get_value_sequence_size(sequence_size, total_num_blocks, biggest_n,
                           value_sequences);
 
+  if (sequence_size == 0) return;
+
   const int num_streams = min(10000, (int)num_commitments);
   std::vector<basdv::stream> streams(num_streams);
 
@@ -141,39 +143,40 @@ static void launch_commitment_kernels(
 
   for (int commitment_index = 0; commitment_index < num_commitments;
        ++commitment_index) {
-    int stream_index =
-        (int)((commitment_index / (float)num_commitments) * num_streams);
-    auto curr_stream = streams[stream_index].raw_stream();
+    auto data_commitment = value_sequences[commitment_index];
 
-    mtxb::exponent_sequence data_commitment_device;
-    auto data_commitment_host = value_sequences[commitment_index];
-    uint64_t commitment_index_size =
-        data_commitment_host.n * data_commitment_host.element_nbytes;
+    if (data_commitment.n > 0) {
+      uint64_t commitment_index_size =
+        data_commitment.n * data_commitment.element_nbytes;
 
-    data_commitment_device.n = data_commitment_host.n;
-    data_commitment_device.element_nbytes = data_commitment_host.element_nbytes;
-    data_commitment_device.data = data_table_device_ptr;
+      uint64_t shared_mem_size = block_size * sizeof(c21t::element_p3);
 
-    basdv::async_memcpy_host_to_device(data_table_device_ptr,
-                                       data_commitment_host.data,
-                                       commitment_index_size, curr_stream);
+      uint64_t num_blocks =
+          basn::divide_up(data_commitment.n, block_size);
+          
+      int stream_index =
+          static_cast<int>((commitment_index / static_cast<float>(num_commitments)) * num_streams);
 
-    uint64_t shared_mem_size = block_size * sizeof(c21t::element_p3);
+      auto curr_stream = streams[stream_index].raw_stream();
+      
+      basdv::async_memcpy_host_to_device(data_table_device_ptr,
+                                        data_commitment.data,
+                                        commitment_index_size, curr_stream);
 
-    uint64_t num_blocks =
-        basn::divide_up(block_size, data_commitment_device.n);
+      data_commitment.data = data_table_device_ptr;
 
-    compute_commitments_kernel<<<num_blocks, block_size, shared_mem_size,
-                                 curr_stream>>>(partial_commitments_device_ptr,
-                                                data_commitment_device);
+      compute_commitments_kernel<<<num_blocks, block_size, shared_mem_size,
+                                  curr_stream>>>(partial_commitments_device_ptr,
+                                                  data_commitment);
 
-    commitment_reduction_kernel<<<1, block_size, shared_mem_size,
-                                  curr_stream>>>(
-        &commitments_device[commitment_index], partial_commitments_device_ptr,
-        (int)num_blocks);
+      commitment_reduction_kernel<<<1, block_size, shared_mem_size,
+                                    curr_stream>>>(
+          &commitments_device[commitment_index], partial_commitments_device_ptr,
+          static_cast<int>(num_blocks));
 
-    data_table_device_ptr += commitment_index_size;
-    partial_commitments_device_ptr += num_blocks;
+      data_table_device_ptr += commitment_index_size;
+      partial_commitments_device_ptr += num_blocks;
+    }
   }
 
   // synchronize all streams
@@ -188,10 +191,8 @@ void compute_commitments_gpu(
     basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept {
   assert(commitments.size() == value_sequences.size());
 
-  uint64_t num_commitments = commitments.size();
-
   memmg::managed_array<sqcb::commitment> commitments_device(
-      num_commitments, memr::get_device_resource());
+       commitments.size(), memr::get_device_resource());
 
   launch_commitment_kernels(commitments_device, value_sequences);
 
