@@ -129,6 +129,9 @@ TEST_CASE("run pedersen tests") {
         {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor3},
     };
     
+    std::array<uint8_t, 32> res_array;
+    std::array<uint8_t, 32> req_array = {};
+    
     SECTION("zero length commitments will not error out on cpu") {
         const sxt_config config = {SXT_BACKEND_CPU};
 
@@ -141,9 +144,6 @@ TEST_CASE("run pedersen tests") {
         );
 
         REQUIRE(ret == 0);
-
-        std::array<uint8_t, 32> res_array;
-        std::array<uint8_t, 32> req_array = {0};
 
         std::copy(commitments[1].ristretto_bytes,
                 commitments[1].ristretto_bytes + 32, res_array.data());
@@ -163,9 +163,6 @@ TEST_CASE("run pedersen tests") {
         );
 
         REQUIRE(ret == 0);
-
-        std::array<uint8_t, 32> res_array;
-        std::array<uint8_t, 32> req_array = {0};
 
         std::copy(commitments[1].ristretto_bytes,
             commitments[1].ristretto_bytes + 32, res_array.data());

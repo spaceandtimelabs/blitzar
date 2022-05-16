@@ -9,9 +9,9 @@ using namespace sxt;
 using namespace sxt::sqcnv;
 
 TEST_CASE("run computation tests") {
-  int nDevices;
+  int num_devices;
 
-  auto rcode = cudaGetDeviceCount(&nDevices);
+  auto rcode = cudaGetDeviceCount(&num_devices);
 
   if (rcode == cudaSuccess) {
     sqctst::test_commitment_computation_function(compute_commitments_gpu);

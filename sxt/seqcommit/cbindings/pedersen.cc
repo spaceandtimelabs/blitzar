@@ -48,18 +48,18 @@ int sxt_init(const sxt_config* config) {
     backend_func = sqcnv::compute_commitments_cpu;
     return 0;
   } else if (config->backend == SXT_BACKEND_GPU) {
-    int nDevices;
+    int num_devices;
 
-    auto rcode = cudaGetDeviceCount(&nDevices);
+    auto rcode = cudaGetDeviceCount(&num_devices);
 
     if (rcode != cudaSuccess) {
-      nDevices = 0; 
+      num_devices = 0; 
 
       std::cout << "cudaGetDeviceCount failed: " << cudaGetErrorString(rcode)
                 << "\n";
     }
 
-    if (nDevices > 0) {
+    if (num_devices > 0) {
       backend_func = sqcnv::compute_commitments_gpu;
 
       pre_initialize_gpu(backend_func);
