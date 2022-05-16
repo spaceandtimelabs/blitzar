@@ -1,5 +1,8 @@
 #include "sxt/seqcommit/cbindings/pedersen.h"
 
+#include <array>
+#include <algorithm>
+
 #include "sxt/base/test/unit_test.h"
 
 TEST_CASE("run pedersen tests") {
@@ -99,7 +102,7 @@ TEST_CASE("run pedersen tests") {
         REQUIRE(ret != 0);
     }
 
-    SECTION("zero sequences will error out") {
+    SECTION("zero sequences will not error out") {
         const sxt_config config = {SXT_BACKEND_CPU};
 
         REQUIRE(sxt_init(&config) == 0);
@@ -110,7 +113,64 @@ TEST_CASE("run pedersen tests") {
             valid_descriptors
         );
 
-        REQUIRE(ret != 0);
+        REQUIRE(ret == 0);
+    }
+
+    const uint8_t zero_length_num_bytes = 4;
+    uint8_t zero_length_data_bytes[zero_length_num_bytes * n1];
+    sxt_dense_sequence_descriptor zero_length_seq_descriptor = {
+        zero_length_num_bytes, // number bytes
+        0, // number rows
+        zero_length_data_bytes // data pointer
+    };
+    const sxt_sequence_descriptor invalid_descriptors[num_sequences] = {
+        {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor1},
+        {SXT_DENSE_SEQUENCE_TYPE, zero_length_seq_descriptor},
+        {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor3},
+    };
+    
+    SECTION("zero length commitments will not error out on cpu") {
+        const sxt_config config = {SXT_BACKEND_CPU};
+
+        REQUIRE(sxt_init(&config) == 0);
+
+        int ret = sxt_compute_pedersen_commitments(
+            commitments,
+            num_sequences,
+            invalid_descriptors
+        );
+
+        REQUIRE(ret == 0);
+
+        std::array<uint8_t, 32> res_array;
+        std::array<uint8_t, 32> req_array = {0};
+
+        std::copy(commitments[1].ristretto_bytes,
+                commitments[1].ristretto_bytes + 32, res_array.data());
+
+        REQUIRE(res_array == req_array);
+    }
+
+    SECTION("zero length commitments will not error out on gpu") {
+        const sxt_config config = {SXT_BACKEND_GPU};
+
+        REQUIRE(sxt_init(&config) == 0);
+
+        int ret = sxt_compute_pedersen_commitments(
+            commitments,
+            num_sequences,
+            invalid_descriptors
+        );
+
+        REQUIRE(ret == 0);
+
+        std::array<uint8_t, 32> res_array;
+        std::array<uint8_t, 32> req_array = {0};
+
+        std::copy(commitments[1].ristretto_bytes,
+            commitments[1].ristretto_bytes + 32, res_array.data());
+
+        REQUIRE(res_array == req_array);
     }
 
     SECTION("descriptor with invalid type will error out") {
