@@ -14,6 +14,7 @@ cuda_dlink(
 cc_binary(
     name = "libproofs-gpu.so",
     linkshared = 1,
+    visibility = ["//visibility:public"],
     deps = [
         ":pedersen_device",
         "//sxt/seqcommit/cbindings:pedersen",

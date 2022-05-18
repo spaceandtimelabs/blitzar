@@ -9,7 +9,15 @@ load(
 )
 
 sxt_cc_component(
+    name = "pedersen_capi",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "pedersen",
+    deps = [
+        ":pedersen_capi",
+    ],
     impl_deps = [
         "//sxt/base/container:span",
         "//sxt/seqcommit/base:commitment",

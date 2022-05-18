@@ -23,9 +23,6 @@ def sxt_cc_component(
         ],
         alwayslink = alwayslink,
         linkstatic = 1,
-        # linkopts = [
-        #     '-x', 'cuda',
-        # ],
         deps = deps + impl_deps + [
           "@local_config_cuda//cuda:cuda",
         ],
