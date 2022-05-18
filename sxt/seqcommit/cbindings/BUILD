@@ -18,15 +18,8 @@ sxt_cc_component(
         "//sxt/seqcommit/naive:commitment_computation_cpu",
         "//sxt/seqcommit/naive:commitment_computation_gpu",
     ],
-    # alwayslink = 1,
+    alwayslink = 1,
     test_deps = [
         "//sxt/base/test:unit_test",
-    ],
-)
-
-cuda_dlink(
-    name = "pedersen_device",
-    deps = [
-        ":pedersen",
     ],
 )

@@ -26,6 +26,7 @@ def dlink_action(ctx, linking_context):
   args = [
       '-x', 'cuda',
       '-dlink',
+      '-fPIC',
       '-o', outfile.path
   ]
   inputs = []
