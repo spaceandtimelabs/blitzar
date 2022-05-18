@@ -1,5 +1,10 @@
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 
+load(
+    "//bazel:cuda_dlink.bzl",
+    "cuda_dlink",
+)
+
 def sxt_cc_component(
     name, is_cuda=False, with_test=True, alwayslink = False, test_deps=[], deps=[], impl_deps = [], **kwargs):
   if is_cuda:
@@ -18,9 +23,9 @@ def sxt_cc_component(
         ],
         alwayslink = alwayslink,
         linkstatic = 1,
-        linkopts = [
-            '-x', 'cuda',
-        ],
+        # linkopts = [
+        #     '-x', 'cuda',
+        # ],
         deps = deps + impl_deps + [
           "@local_config_cuda//cuda:cuda",
         ],
@@ -44,18 +49,22 @@ def sxt_cc_component(
         ],
         **kwargs)
   if with_test:
-    linkopts = []
-    if is_cuda:
-      linkopts += ['-x', 'cuda']
+    deps_p = [
+            ":" + name,
+    ] + deps + test_deps
+    device_test_name = name + '-device.t'
+    cuda_dlink(
+        name = device_test_name,
+        deps = deps_p,
+    )
     native.cc_test(
         name = name + ".t",
         srcs = [
             name + ".t.cc",
         ],
-        deps = [
-            ":" + name,
-        ] + deps + test_deps,
-        linkopts = linkopts,
+        deps = deps_p + [
+            ':' + device_test_name,
+        ],
         visibility = ["//visibility:public"],
         **kwargs,
     )

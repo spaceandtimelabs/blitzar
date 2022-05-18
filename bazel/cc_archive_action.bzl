@@ -21,6 +21,7 @@ def make_linking_context(ctx, cc_toolchain, feature_configuration, output_file):
       libraries = depset(direct = [
           cc_common.create_library_to_link(
               actions = ctx.actions,
+              alwayslink = True,
               feature_configuration = feature_configuration,
               cc_toolchain = cc_toolchain,
               static_library = output_file,
