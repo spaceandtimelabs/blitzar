@@ -1,7 +1,7 @@
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 
 def sxt_cc_component(
-    name, is_cuda=False, with_test=True, test_deps=[], deps=[], impl_deps = [], **kwargs):
+    name, is_cuda=False, with_test=True, alwayslink = False, test_deps=[], deps=[], impl_deps = [], **kwargs):
   if is_cuda:
     cuda_library(
         name = name,
@@ -16,10 +16,10 @@ def sxt_cc_component(
             '-x',
             'cuda',
         ],
+        alwayslink = alwayslink,
         linkstatic = 1,
         linkopts = [
-            '-x',
-            'cuda',
+            '-x', 'cuda',
         ],
         deps = deps + impl_deps + [
           "@local_config_cuda//cuda:cuda",
@@ -36,9 +36,17 @@ def sxt_cc_component(
             name + ".cc",
         ],
         deps = deps + impl_deps,
+        linkstatic = 1,
+        alwayslink = alwayslink,
         visibility = ["//visibility:public"],
+        linkopts = [
+            "-lm",
+        ],
         **kwargs)
   if with_test:
+    linkopts = []
+    if is_cuda:
+      linkopts += ['-x', 'cuda']
     native.cc_test(
         name = name + ".t",
         srcs = [
@@ -47,6 +55,7 @@ def sxt_cc_component(
         deps = [
             ":" + name,
         ] + deps + test_deps,
+        linkopts = linkopts,
         visibility = ["//visibility:public"],
         **kwargs,
     )
