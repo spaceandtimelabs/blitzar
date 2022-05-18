@@ -4,7 +4,6 @@ load("@rules_cc//cc:action_names.bzl",
      )
 load("@rules_cc//cc:toolchain_utils.bzl", "find_cpp_toolchain")
 load("//bazel:cc_archive_action.bzl", "sxt_cc_archive_action")
-# load("//bazel:cuda_dlink_action.bzl", "cuda_dlink_action")
 
 def get_cc_info_deps(deps):
   return cc_common.merge_cc_infos(
@@ -77,12 +76,6 @@ cuda_dlink = rule(
     implementation = _cuda_dlink_impl,
     attrs = {
         "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
-        "_driver": attr.label(
-            default = Label("@local_config_cuda//crosstool:crosstool_wrapper_driver_is_not_gcc"),
-            # executable = True,
-            # cfg = "exec",
-        ),
-        # "_cuda_toolchain": attr.label(default = Label("@local_config_cuda//crosstool:toolchain")),
         "deps" : attr.label_list(),
     },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
