@@ -9,3 +9,5 @@
 .env
 .npmrc
 node_modules/
+
+*.so
