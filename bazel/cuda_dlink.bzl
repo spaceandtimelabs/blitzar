@@ -31,12 +31,6 @@ def dlink_action(ctx, linking_context):
   inputs = []
   for linker_inputs in linking_context.linker_inputs.to_list():
     for lib in linker_inputs.libraries:
-      if lib.static_library:
-        args.append(lib.static_library.path)
-        inputs.append(lib.static_library)
-      if lib.objects:
-        args += [ f.path for f in lib.objects ]
-        inputs += lib.objects
       if lib.pic_objects:
         args += [ f.path for f in lib.pic_objects ]
         inputs += lib.pic_objects
