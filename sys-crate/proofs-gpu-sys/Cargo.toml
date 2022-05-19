@@ -1,0 +1,9 @@
+[package]
+name = "proofs_gpu"
+version = "0.1.0"
+edition = "2021"
+links = "proofs-gpu"
+
+[dependencies]
+cty="0.2.2"
+curve25519-dalek="3.2.1"
