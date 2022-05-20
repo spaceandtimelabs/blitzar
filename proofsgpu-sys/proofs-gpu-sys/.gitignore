@@ -1,0 +1,6 @@
+# Ignore rust files
+/target
+/Cargo.lock
+
+*.so
+src/proofsgpulib/

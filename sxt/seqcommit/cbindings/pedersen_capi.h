@@ -36,7 +36,7 @@ struct sxt_sequence_descriptor {
   uint8_t sequence_type;
 
   union {
-    sxt_dense_sequence_descriptor dense;
+    struct sxt_dense_sequence_descriptor dense;
 
     // Note: we may also in the future want to support sparse sequences where
     // the majority of elements are zero and the nonzero elements in the
@@ -55,7 +55,7 @@ struct sxt_commitment {
 //      specifies which backend should be used in the computations (gpu or cpu)
 // Return values:
 //    0 on success; otherwise a nonzero error code
-int sxt_init(const sxt_config* config);
+int sxt_init(const struct sxt_config* config);
 
 // Compute the pedersen commitments for sequences of values
 //
@@ -82,8 +82,8 @@ int sxt_init(const sxt_config* config);
 //
 //     g: uint64_t -> ristretto255
 int sxt_compute_pedersen_commitments(
-    sxt_commitment* commitments, uint32_t num_sequences,
-    const sxt_sequence_descriptor* descriptors);
+    struct sxt_commitment* commitments, uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors);
 
 #ifdef __cplusplus
 } // extern "C"
