@@ -1,5 +1,0 @@
-# Ignore rust files
-/target
-/Cargo.lock
-
-*.so

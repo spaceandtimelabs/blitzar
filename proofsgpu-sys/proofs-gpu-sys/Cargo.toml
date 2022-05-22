@@ -1,8 +1,0 @@
-[package]
-name = "proofs_gpu"
-version = "1.2.3"
-edition = "2021"
-links = "proofs-gpu"
-
-[build-dependencies]
-bindgen = "0.53.1"
