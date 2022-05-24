@@ -25,6 +25,8 @@ sxt_cc_component(
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/seqcommit/naive:commitment_computation_cpu",
         "//sxt/seqcommit/naive:commitment_computation_gpu",
+        "@local_config_cuda//cuda:cuda_headers",
+        "@local_config_cuda//cuda:cudart_static",
     ],
     alwayslink = 1,
     test_deps = [

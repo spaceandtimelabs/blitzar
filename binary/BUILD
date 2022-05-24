@@ -15,8 +15,12 @@ cc_binary(
     name = "libproofs-gpu.so",
     linkshared = 1,
     visibility = ["//visibility:public"],
+    linkopts = [
+        "-Wl,--version-script=$(location :libproofs-gpu-export-map.ld)",
+    ],
     deps = [
         ":pedersen_device",
+        ":libproofs-gpu-export-map.ld",
         "//sxt/seqcommit/cbindings:pedersen",
     ],
 )

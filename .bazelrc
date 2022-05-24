@@ -1,5 +1,6 @@
 build --cxxopt -std=c++17
 build --config=cuda
+build --experimental_cc_implementation_deps
 
 build --copt -fPIC
 

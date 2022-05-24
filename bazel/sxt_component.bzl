@@ -24,7 +24,8 @@ def sxt_cc_component(
         alwayslink = alwayslink,
         linkstatic = 1,
         deps = deps + impl_deps + [
-          "@local_config_cuda//cuda:cuda",
+          "@local_config_cuda//cuda:cuda_headers",
+          "@local_config_cuda//cuda:cudart_static",
         ],
         visibility = ["//visibility:public"],
         **kwargs)
@@ -37,8 +38,9 @@ def sxt_cc_component(
         srcs = [
             name + ".cc",
         ],
-        deps = deps + impl_deps,
         linkstatic = 1,
+        implementation_deps = impl_deps,
+        deps = deps,
         alwayslink = alwayslink,
         visibility = ["//visibility:public"],
         linkopts = [
