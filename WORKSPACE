@@ -12,10 +12,9 @@ http_archive(
   ],
 )
 
-git_repository(
+local_repository(
   name = "build_bazel_rules_cuda",
-  remote = "https://github.com/rnburn/rules_cuda.git",
-  commit = "61d39a10015f42eb09a534f6992c704f5f78bbca",
+  path = "third_party/rules_cuda",
 )
 
 load("@build_bazel_rules_cuda//gpus:cuda_configure.bzl", "cuda_configure")
