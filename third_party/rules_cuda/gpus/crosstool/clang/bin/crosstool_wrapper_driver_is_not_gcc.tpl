@@ -49,6 +49,7 @@ import tempfile
 
 # Template values set by cuda_autoconf.
 CPU_COMPILER = ('%{cpu_compiler}')
+CPU_CXX_COMPILER = ('%{cpu_cxx_compiler}')
 GCC_HOST_COMPILER_PATH = ('%{gcc_host_compiler_path}')
 
 NVCC_PATH = '%{nvcc_path}'
@@ -326,6 +327,41 @@ def LinkNvcc(argv, log=False):
   cmd = [NVCC_PATH] + args
   return subprocess.call(cmd)
 
+def SanitizeFlagfile(in_path, out_fd):
+  with open(in_path, "r") as in_fp:
+    for line in in_fp:
+      if line != "-lstdc++\n":
+        os.write(out_fd, bytearray(line, 'utf8'))
+
+def RewriteStaticLinkArgs(argv):
+  prev_argv = list(argv)
+  argv = []
+  for arg in prev_argv:
+    if arg == "-lstdc++":
+      pass
+    elif arg.startswith("-Wl,@"):
+      # tempfile.mkstemp will write to the out-of-sandbox tempdir
+      # unless the user has explicitly set environment variables
+      # before starting Bazel. But here in $PWD is the Bazel sandbox,
+      # which will be deleted automatically after the compiler exits.
+      (flagfile_fd, flagfile_path) = tempfile.mkstemp(
+          dir='./', suffix=".linker-params")
+      with ClosingFileDescriptor(flagfile_fd):
+        SanitizeFlagfile(arg[len("-Wl,@"):], flagfile_fd)
+      argv.append("-Wl,@" + flagfile_path)
+    elif arg.startswith("@"):
+      # tempfile.mkstemp will write to the out-of-sandbox tempdir
+      # unless the user has explicitly set environment variables
+      # before starting Bazel. But here in $PWD is the Bazel sandbox,
+      # which will be deleted automatically after the compiler exits.
+      (flagfile_fd, flagfile_path) = tempfile.mkstemp(
+          dir='./', suffix=".linker-params")
+      with ClosingFileDescriptor(flagfile_fd):
+        SanitizeFlagfile(arg[len("@"):], flagfile_fd)
+      argv.append("@" + flagfile_path)
+    else:
+      argv.append(arg)
+  return argv
 
 def main():
   parser = ArgumentParser()
@@ -333,6 +369,7 @@ def main():
   parser.add_argument('--cuda_log', action='store_true')
   parser.add_argument('--device-c', dest='device_c', action='store_true')
   normalized_args = NormalizeArgs(sys.argv[1:])
+
   args, leftover = parser.parse_known_args(normalized_args)
 
   if args.x and args.x[0] == 'cuda':
@@ -352,7 +389,12 @@ def main():
   cpu_compiler_flags = [flag for flag in sys.argv[1:]
                              if not flag.startswith(('--cuda_log'))]
 
-  return subprocess.call([CPU_COMPILER] + cpu_compiler_flags)
+  compiler = CPU_COMPILER
+  if '-static-libstdc++' in normalized_args:
+    compiler = CPU_CXX_COMPILER
+    cpu_compiler_flags = RewriteStaticLinkArgs(cpu_compiler_flags)
+
+  return subprocess.call([compiler] + cpu_compiler_flags)
 
 if __name__ == '__main__':
   sys.exit(main())

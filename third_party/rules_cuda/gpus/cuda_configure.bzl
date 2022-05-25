@@ -26,6 +26,7 @@
 
 load(
     "@bazel_tools//tools/cpp:lib_cc_configure.bzl",
+    "auto_configure_warning",
     "escape_string",
     "get_env_var",
 )
@@ -50,6 +51,9 @@ load(
     "realpath",
     "which",
 )
+load("@bazel_tools//tools/cpp:unix_cc_configure.bzl", 
+     "find_cc",
+)
 
 _GCC_HOST_COMPILER_PATH = "GCC_HOST_COMPILER_PATH"
 _GCC_HOST_COMPILER_PREFIX = "GCC_HOST_COMPILER_PREFIX"
@@ -62,6 +66,37 @@ _CUDNN_INSTALL_PATH = "CUDNN_INSTALL_PATH"
 _TF_CUDA_COMPUTE_CAPABILITIES = "TF_CUDA_COMPUTE_CAPABILITIES"
 _TF_CUDA_CONFIG_REPO = "TF_CUDA_CONFIG_REPO"
 _PYTHON_BIN_PATH = "PYTHON_BIN_PATH"
+
+def _is_clang(repository_ctx, cc):
+    return "clang" in repository_ctx.execute([cc, "-v"]).stderr
+
+def _find_generic(repository_ctx, name, env_name, overriden_tools, warn = False, silent = False):
+    """Find a generic C++ toolchain tool. Doesn't %-escape the result."""
+
+    if name in overriden_tools:
+        return overriden_tools[name]
+
+    result = name
+    env_value = repository_ctx.os.environ.get(env_name)
+    env_value_with_paren = ""
+    if env_value != None:
+        env_value = env_value.strip()
+        if env_value:
+            result = env_value
+            env_value_with_paren = " (%s)" % env_value
+    if result.startswith("/"):
+        # Absolute path, maybe we should make this suported by our which function.
+        return result
+    result = repository_ctx.which(result)
+    if result == None:
+        msg = ("Cannot find %s or %s%s; either correct your path or set the %s" +
+               " environment variable") % (name, env_name, env_value_with_paren, env_name)
+        if warn:
+            if not silent:
+                auto_configure_warning(msg)
+        else:
+            auto_configure_fail(msg)
+    return result
 
 def to_list_of_strings(elements):
     """Convert the list of ["a", "b", "c"] into '"a", "b", "c"'.
@@ -204,32 +239,18 @@ def _get_win_cuda_defines(repository_ctx):
         ),
     }
 
-# TODO(dzc): Once these functions have been factored out of Bazel's
-# cc_configure.bzl, load them from @bazel_tools instead.
-# BEGIN cc_configure common functions.
-def find_cc(repository_ctx):
-    """Find the C++ compiler."""
-    if is_windows(repository_ctx):
-        return _get_msvc_compiler(repository_ctx)
-
-    if _use_cuda_clang(repository_ctx):
-        target_cc_name = "clang"
-        cc_path_envvar = _CLANG_CUDA_COMPILER_PATH
-    else:
-        target_cc_name = "gcc"
-        cc_path_envvar = _GCC_HOST_COMPILER_PATH
-    cc_name = target_cc_name
-
-    cc_name_from_env = get_host_environ(repository_ctx, cc_path_envvar)
-    if cc_name_from_env:
-        cc_name = cc_name_from_env
-    if cc_name.startswith("/"):
-        # Absolute path, maybe we should make this supported by our which function.
-        return cc_name
-    cc = which(repository_ctx, cc_name)
-    if cc == None:
-        fail(("Cannot find {}, either correct your path or set the {}" +
-              " environment variable").format(target_cc_name, cc_path_envvar))
+# Find a good path for the C++ compiler, by hooking into Bazel's C compiler
+# detection. Uses `$CXX` if found, otherwise defaults to `g++` because Bazel
+# defaults to `gcc`.
+def _find_cxx(repository_ctx, overriden_tools):
+    cc = _find_generic(repository_ctx, "g++", "CXX", overriden_tools)
+    if _is_clang(repository_ctx, cc):
+        # If clang is run through a symlink with -no-canonical-prefixes, it does
+        # not find its own include directory, which includes the headers for
+        # libc++. Resolving the potential symlink here prevents this.
+        result = repository_ctx.execute(["readlink", "-f", cc])
+        if result.return_code == 0:
+            return result.stdout.strip()
     return cc
 
 _INC_DIR_MARKER_BEGIN = "#include <...>"
@@ -1147,8 +1168,11 @@ def _create_local_cuda_repository(repository_ctx):
     tf_sysroot = _tf_sysroot(repository_ctx)
 
     # Set up crosstool/
-    cc = find_cc(repository_ctx)
+    cc = find_cc(repository_ctx, {})
+    cc = str(cc)
     cc_fullpath = cc
+
+    cxx = _find_cxx(repository_ctx, {})
 
     host_compiler_includes = get_cxx_inc_directories(
         repository_ctx,
@@ -1225,6 +1249,7 @@ def _create_local_cuda_repository(repository_ctx):
 
         wrapper_defines = {
             "%{cpu_compiler}": str(cc),
+            "%{cpu_cxx_compiler}": str(cxx),
             "%{cuda_version}": cuda_config.cuda_version,
             "%{nvcc_path}": nvcc_path,
             "%{gcc_host_compiler_path}": str(cc),
@@ -1287,6 +1312,7 @@ def _create_local_cuda_repository(repository_ctx):
             "cudnn_version": cuda_config.cudnn_version,
             "cuda_compute_capabilities": cuda_config.compute_capabilities,
             "cpu_compiler": str(cc),
+            "cpu_cxx_compiler": str(cxx),
         }),
     )
 

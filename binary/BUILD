@@ -17,6 +17,8 @@ cc_binary(
     visibility = ["//visibility:public"],
     linkopts = [
         "-Wl,--version-script=$(location :libproofs-gpu-export-map.ld)",
+        '-static-libstdc++',
+        '-static-libgcc',
     ],
     deps = [
         ":pedersen_device",
