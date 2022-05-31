@@ -1,9 +1,9 @@
-#include "sxt/seqcommit/base/base_element.h"
+#include "sxt/seqcommit/generator/base_element.h"
 
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/base/test/unit_test.h"
 using namespace sxt;
-using namespace sxt::sqcb;
+using namespace sxt::sqcgn;
 
 TEST_CASE("we can deterministically generate base elements for a given row index") {
   c21t::element_p3 p1, p2;

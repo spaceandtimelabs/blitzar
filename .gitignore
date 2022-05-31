@@ -10,7 +10,11 @@
 .npmrc
 node_modules/
 
+# Ignore artifact files
 *.so
 *.zip
 *.tar
 dist/
+
+# Ignore vscode files
+.vscode/

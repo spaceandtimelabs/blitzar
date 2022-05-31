@@ -46,7 +46,7 @@ mod tests {
         ];
 
         let mut cbinding_commitments: Vec<proofs_gpu::
-                sxt_commitment> = Vec::with_capacity(num_commitments);
+            sxt_ristretto_element> = Vec::with_capacity(num_commitments);
         let mut cbinding_descriptors: Vec<proofs_gpu::
                 sxt_sequence_descriptor> = Vec::with_capacity(num_commitments);
 

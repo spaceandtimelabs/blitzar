@@ -7,7 +7,7 @@ sxt_cc_component(
     ],
     impl_deps = [
         "//sxt/seqcommit/base:commitment",
-        "//sxt/seqcommit/base:base_element",
+        "//sxt/seqcommit/generator:base_element",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/constant:zero",
@@ -16,7 +16,7 @@ sxt_cc_component(
         "//sxt/curve21/operation:add",
     ],
     test_deps = [
-        "//sxt/seqcommit/test:test_commitment_computation",
+        "//sxt/seqcommit/test:test_pedersen",
         "//sxt/base/test:unit_test",
     ],
 )
@@ -31,17 +31,17 @@ sxt_cc_component(
         "//sxt/curve21/constant:zero",
         "//sxt/base/container:span",
         "//sxt/seqcommit/base:commitment",
-        "//sxt/seqcommit/base:base_element",
+        "//sxt/seqcommit/generator:base_element",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/ristretto:byte_conversion",
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/curve21/operation:add",
         "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:device_resource"
     ],
     test_deps = [
-        "//sxt/seqcommit/test:test_commitment_computation",
+        "//sxt/seqcommit/test:test_pedersen",
         "//sxt/base/test:unit_test",
     ],
 )

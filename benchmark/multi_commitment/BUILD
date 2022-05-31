@@ -11,8 +11,8 @@ cc_binary(
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/memory/management:managed_array",
         "//sxt/base/num:fast_random_number_generator",
-        "//sxt/seqcommit/naive:commitment_computation_cpu",
-        "//sxt/seqcommit/naive:commitment_computation_gpu"
+        "//sxt/seqcommit/cbindings:pedersen_cpu_backend",
+        "//sxt/seqcommit/cbindings:pedersen_gpu_backend"
     ],
     visibility = ["//visibility:public"],
     linkopts = [

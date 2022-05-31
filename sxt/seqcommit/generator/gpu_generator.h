@@ -4,16 +4,16 @@
 
 #include "sxt/base/container/span.h"
 
-namespace sxt::mtxb { struct exponent_sequence; }
 namespace sxt::sqcb { class commitment; }
 
-namespace sxt::sqcnv {
+namespace sxt::sqcgn {
 
 //--------------------------------------------------------------------------------------------------
-// compute_commitments_cpu
+// cpu_get_generators
 //--------------------------------------------------------------------------------------------------
-void compute_commitments_cpu(
-    basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept;
+void gpu_get_generators(
+    basct::span<sqcb::commitment> generators,
+    uint64_t offset_generators
+) noexcept;
 
-}  // namespace sxt::sqcnv
+} // namespace sxt::sqcgn

@@ -1,22 +1,21 @@
-#include "sxt/seqcommit/test/test_commitment_computation.h"
+#include "sxt/seqcommit/test/test_pedersen.h"
 
-#include "sxt/curve21/type/element_p3.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/type/element_p3.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/curve21/ristretto/byte_conversion.h"
 #include "sxt/curve21/operation/add.h"
-#include "sxt/seqcommit/base/base_element.h"
+#include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
 
 namespace sxt::sqctst {
 //--------------------------------------------------------------------------------------------------
-// test_commitment_computation_function
+// test_pedersen_compute_commitment
 //--------------------------------------------------------------------------------------------------
-void test_commitment_computation_function(
-    basf::function_ref<void(basct::span<sqcb::commitment>,
-                            basct::cspan<mtxb::exponent_sequence>)>
-        f) {
+void test_pedersen_compute_commitment(
+  basf::function_ref<void(basct::span<sqcb::commitment>,
+        basct::cspan<mtxb::exponent_sequence>)> f) {
   SECTION("we can add two commitments together") {
     const uint64_t num_rows = 4;
     const uint64_t num_columns = 3;
@@ -140,7 +139,7 @@ void test_commitment_computation_function(
         c21t::element_p3 p;
         c21t::element_p3 g_i;
 
-        sqcb::compute_base_element(g_i, 0);
+        sqcgn::compute_base_element(g_i, 0);
 
         f(commitments, value_sequences);
 
@@ -439,4 +438,5 @@ void test_commitment_computation_function(
     }
   }
 }
+
 }  // namespace sxt::sqctst

@@ -1,5 +1,6 @@
 #include "sxt/seqcommit/cbindings/pedersen.h"
 
+#include <memory>
 #include <iostream>
 #include <cuda_runtime.h>
 
@@ -7,64 +8,52 @@
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/memory/management/managed_array.h"
-#include "sxt/seqcommit/naive/commitment_computation_cpu.h"
-#include "sxt/seqcommit/naive/commitment_computation_gpu.h"
+#include "sxt/seqcommit/cbindings/pedersen_backend.h"
+#include "sxt/seqcommit/cbindings/pedersen_cpu_backend.h"
+#include "sxt/seqcommit/cbindings/pedersen_gpu_backend.h"
 
 using namespace sxt;
 
-using bench_fn = void(*)(
-    basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept;
-
-using span_value_sequences = basct::cspan<mtxb::exponent_sequence>;
-
-static bench_fn backend_func = nullptr;
+//--------------------------------------------------------------------------------------------------
+// backend
+//--------------------------------------------------------------------------------------------------
+static sqccb::pedersen_backend* backend = nullptr;
 
 //--------------------------------------------------------------------------------------------------
-// pre_initialize
+// get_num_devices
 //--------------------------------------------------------------------------------------------------
-static void pre_initialize_gpu(bench_fn func) {
-  memmg::managed_array<uint8_t> data_table_fake(1); // 1 col, 1 row, 1 bytes per data
-  memmg::managed_array<sqcb::commitment> commitments_per_col_fake(1);
-  memmg::managed_array<mtxb::exponent_sequence> data_cols_fake(1);
-  basct::span<sqcb::commitment> commitments_fake(commitments_per_col_fake.data(), 1);
-  basct::cspan<mtxb::exponent_sequence> value_sequences_fake(data_cols_fake.data(), 1);
+static int get_num_devices() {
+  int num_devices;
 
-  data_table_fake[0] = 1;
+  auto rcode = cudaGetDeviceCount(&num_devices);
 
-  auto &data_col = data_cols_fake[0];
+  if (rcode != cudaSuccess) {
+    num_devices = 0; 
 
-  data_col.n = 1;
-  data_col.element_nbytes = 1;
-  data_col.data = data_table_fake.data();
+    std::cout << "cudaGetDeviceCount failed: " << cudaGetErrorString(rcode)
+              << "\n";
+  }
 
-  func(commitments_fake, value_sequences_fake);
+  return num_devices;
 }
 
+//--------------------------------------------------------------------------------------------------
+// sxt_init
+//--------------------------------------------------------------------------------------------------
 int sxt_init(const sxt_config* config) {
-  if (config == nullptr) return 1;
+  if (config == nullptr) exit(1);
+  if (backend != nullptr) exit(1);
 
   if (config->backend == SXT_BACKEND_CPU) {
-    backend_func = sqcnv::compute_commitments_cpu;
+    backend = sqccb::get_pedersen_cpu_backend();
     return 0;
   } else if (config->backend == SXT_BACKEND_GPU) {
-    int num_devices;
-
-    auto rcode = cudaGetDeviceCount(&num_devices);
-
-    if (rcode != cudaSuccess) {
-      num_devices = 0; 
-
-      std::cout << "cudaGetDeviceCount failed: " << cudaGetErrorString(rcode)
-                << "\n";
-    }
+    int num_devices = get_num_devices();
 
     if (num_devices > 0) {
-      backend_func = sqcnv::compute_commitments_gpu;
-
-      pre_initialize_gpu(backend_func);
+      backend = sqccb::get_pedersen_gpu_backend();
     } else {
-      backend_func = sqcnv::compute_commitments_cpu;
+      backend = sqccb::get_pedersen_cpu_backend();
 
       std::cout << "WARN: Using 'compute_commitments_cpu'. " << std::endl;
     }
@@ -75,8 +64,11 @@ int sxt_init(const sxt_config* config) {
   return 1;
 }
 
-static int valid_descriptor(const sxt_sequence_descriptor *descriptor) {
-  // verify if data pointers are valid
+//--------------------------------------------------------------------------------------------------
+// validate_descriptor
+//--------------------------------------------------------------------------------------------------
+static int validate_descriptor(const sxt_sequence_descriptor *descriptor) {
+  // verify if data pointers are validate
   if (descriptor->dense.n > 0 && descriptor->dense.data == nullptr) return 1;
 
   // verify if word size is inside the correct range (1 to 32)
@@ -85,7 +77,10 @@ static int valid_descriptor(const sxt_sequence_descriptor *descriptor) {
   return 0;
 }
 
-static int valid_sequence_descriptor(uint32_t num_sequences, const sxt_sequence_descriptor* descriptors) {
+//--------------------------------------------------------------------------------------------------
+// validate_sequence_descriptor
+//--------------------------------------------------------------------------------------------------
+static int validate_sequence_descriptor(uint32_t num_sequences, const sxt_sequence_descriptor* descriptors) {
   // invalid pointers
   if (descriptors == nullptr) return 1;
 
@@ -94,27 +89,30 @@ static int valid_sequence_descriptor(uint32_t num_sequences, const sxt_sequence_
     // verify if sequence type is already implemented
     if (descriptors->sequence_type != SXT_DENSE_SEQUENCE_TYPE) return 1;
 
-    if (valid_descriptor(descriptors + commit_index)) return 1;
+    if (validate_descriptor(descriptors + commit_index)) return 1;
   }
 
   return 0;
 }
 
+//--------------------------------------------------------------------------------------------------
+// sxt_compute_pedersen_commitments
+//--------------------------------------------------------------------------------------------------
 int sxt_compute_pedersen_commitments(
-    sxt_commitment* commitments, uint32_t num_sequences,
+    sxt_ristretto_element* commitments, uint32_t num_sequences,
     const sxt_sequence_descriptor* descriptors) {
 
   if (num_sequences == 0) return 0;
 
   // backend not initialized (sxt_init not called correctly)
-  if (backend_func == nullptr) return 1;
+  if (backend == nullptr) return 1;
 
-  // verify if input is valid
+  // verify if input is validate
   if (commitments == nullptr
-        || valid_sequence_descriptor(num_sequences, descriptors)) return 1;
+        || validate_sequence_descriptor(num_sequences, descriptors)) return 1;
 
   static_assert(sizeof(sqcb::commitment) == 
-      sizeof(sxt_commitment), "types must be ABI compatible");
+      sizeof(sxt_ristretto_element), "types must be ABI compatible");
 
   basct::span<sqcb::commitment> commitments_result(
             reinterpret_cast<sqcb::commitment *>(commitments), num_sequences);
@@ -132,7 +130,33 @@ int sxt_compute_pedersen_commitments(
   basct::cspan<mtxb::exponent_sequence> value_sequences(sequences.data(),
                                                         num_sequences);
   
-  backend_func(commitments_result, value_sequences);
+  backend->compute_commitments(commitments_result, value_sequences);
+
+  return 0;
+}
+
+//--------------------------------------------------------------------------------------------------
+// sxt_get_generators
+//--------------------------------------------------------------------------------------------------
+int sxt_get_generators(
+    struct sxt_ristretto_element* generators,
+    uint64_t num_generators,
+    uint64_t offset_generators) {
+
+  // if no generator specified, then ignore the function call
+  if (num_generators == 0) return 0;
+
+  // at least one generator to be computed, but null array pointer
+  if (num_generators > 0 && generators == nullptr) return 1;
+
+  // backend not initialized (sxt_init not called correctly)
+  if (backend == nullptr) return 1;
+
+  basct::span<sqcb::commitment> generators_result(
+    reinterpret_cast<sqcb::commitment *>(generators), num_generators
+  );
+
+  backend->get_generators(generators_result, offset_generators);
 
   return 0;
 }

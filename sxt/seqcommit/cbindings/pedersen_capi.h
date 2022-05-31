@@ -11,11 +11,12 @@ extern "C" {
 #define SXT_BACKEND_CPU 1
 #define SXT_BACKEND_GPU 2
 
+/** config struct to hold the chosen backend **/
 struct sxt_config {
   int backend;
 };
 
-// describes a dense sequence of values
+/** describes a dense sequence of values **/
 struct sxt_dense_sequence_descriptor {
   // the number of bytes used to represent an element in the sequence
   // element_nbytes must be a power of 2 and must satisfy
@@ -44,46 +45,73 @@ struct sxt_sequence_descriptor {
   };
 };
 
-struct sxt_commitment {
+struct sxt_ristretto_element {
   // encodes an element of the ristretto255 group
   uint8_t ristretto_bytes[32];
 };
 
-// Initialize the exponentiation library. This can only be called once.
-// Input parameters:
-//    config
-//      specifies which backend should be used in the computations (gpu or cpu)
-// Return values:
-//    0 on success; otherwise a nonzero error code
-int sxt_init(const struct sxt_config* config);
+/**
+ * @brief Initialize the library. This should only be called once.
+ * 
+ * @param config [in] specifies which backend should be used in the computations (gpu or cpu)
+ * @return int 
+ */
+int sxt_init(
+  const struct sxt_config* config
+);
 
-// Compute the pedersen commitments for sequences of values
-//
-// Input parameters:
-//  num_sequences
-//      specifies the number of sequences
-//  descriptors
-//      an array of length num_sequences that specifies each sequence
-// Output parameters:
-//  commitments
-//      an array of length num_sequences that provides the values of the
-//      computed commitments for each sequence
-// Return values:
-//    0 on success; otherwise a nonzero error code
-//
-// Denote an element of a sequence by a_ij where i represents the sequence index
-// and j represents the element index. Let * represent the operator for the
-// ristretto255 group. Then res[i] encodes the ristretto255 group value
-//
-//    Prod_{j=1 to n_i} g_j ^ a_ij
-//
-//  where n_i represents the number of elements in sequence i and g_j is a group
-//  element determined by a prespecified function
-//
-//     g: uint64_t -> ristretto255
+/**
+ * @brief Compute the pedersen commitments for sequences of values
+ * 
+ * Denote an element of a sequence by a_ij where i represents the sequence index
+ * and j represents the element index. Let * represent the operator for the
+ * ristretto255 group. Then res[i] encodes the ristretto255 group value
+ * 
+ *     Prod_{j=1 to n_i} g_j ^ a_ij
+ * 
+ * where n_i represents the number of elements in sequence i and g_j is a group
+ * element determined by a prespecified function
+ * 
+ *     g: uint64_t -> ristretto255
+ * 
+ * @param commitments [out] an array of length num_sequences that provides the values of the
+ *                         computed commitments for each sequence
+ * 
+ * @param num_sequences [in] specifies the number of sequences
+ * @param descriptors   [in] an array of length num_sequences that specifies each sequence
+ * 
+ * @return 0 on success; otherwise a nonzero error code
+ */
 int sxt_compute_pedersen_commitments(
-    struct sxt_commitment* commitments, uint32_t num_sequences,
-    const struct sxt_sequence_descriptor* descriptors);
+    struct sxt_ristretto_element* commitments,
+    uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors
+);
+
+/**
+ * @brief Gets the pre-specified random generated elements used for the Pedersen commitments
+ * 
+ * sxt_get_generators(generators, num_generators, offset_generators) → 
+ *     generators[0] = generate_random_ristretto(0 + offset_generators)
+ *     generators[1] = generate_random_ristretto(1 + offset_generators)
+ *     generators[2] = generate_random_ristretto(2 + offset_generators)
+ *       .
+ *       .
+ *       .
+ *     generators[num_generators - 1] = generate_random_ristretto(num_generators - 1 + offset_generators)
+ * 
+ * @param generators [out] sxt_element_p3 pointer where the results must be written into
+ * 
+ * @param num_generators     [in] the total number of random generated elements to be computed
+ * @param offset_generators  [in] the offset that shifts the first element computed from `0` to `offset_generators`
+ * 
+ * @return 0 on success; otherwise a nonzero error code
+ */
+int sxt_get_generators(
+    struct sxt_ristretto_element* generators,
+    uint64_t offset_generators,
+    uint64_t num_generators
+);
 
 #ifdef __cplusplus
 } // extern "C"

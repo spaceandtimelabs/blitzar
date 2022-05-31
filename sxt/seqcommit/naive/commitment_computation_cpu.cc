@@ -5,7 +5,7 @@
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/seqcommit/base/base_element.h"
+#include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/ristretto/byte_conversion.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
@@ -16,7 +16,6 @@ namespace sxt::sqcnv {
 //--------------------------------------------------------------------------------------------------
 // compute_commitments_cpu
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
 void compute_commitments_cpu(
     basct::span<sqcb::commitment> commitments,
     basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept {
@@ -33,7 +32,7 @@ void compute_commitments_cpu(
             uint8_t element_nbytes = column_k_data.element_nbytes;
             const uint8_t *bytes_row_i_column_k = column_k_data.data + row_i * element_nbytes;
 
-            sqcb::compute_base_element(g_i, row_i);
+            sqcgn::compute_base_element(g_i, row_i);
 
             c21o::scalar_multiply(
                 h_i,
@@ -47,4 +46,5 @@ void compute_commitments_cpu(
         c21rs::to_bytes(commitments[colum_k].data(), p_k);
     }
 }
+
 }  // namespace sxt::sqcnv

@@ -14,7 +14,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/seqcommit/base/base_element.h"
+#include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/seqcommit/base/commitment.h"
 
 namespace sxt::sqcnv {
@@ -62,7 +62,7 @@ __global__ static void compute_commitments_kernel(
 
   c21t::element_p3 g_i;
 
-  sqcb::compute_base_element(g_i, row_i);
+  sqcgn::compute_base_element(g_i, row_i);
 
   basct::cspan<uint8_t> exponent{value_sequence.data + row_i * element_nbytes,
                                  element_nbytes};
@@ -199,4 +199,5 @@ void compute_commitments_gpu(
   basdv::memcpy_device_to_host(commitments.data(), commitments_device.data(),
                              commitments_device.num_bytes());
 }
+
 }  // namespace sxt::sqcnv

@@ -4,10 +4,16 @@
 #include <algorithm>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/type/element_p3.h"
+#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/seqcommit/generator/base_element.h"
+#include "sxt/curve21/ristretto/byte_conversion.h"
+#include "sxt/curve21/operation/scalar_multiply.h"
 
-TEST_CASE("run pedersen tests") {
+TEST_CASE("run compute pedersen commitment tests") {
     const uint32_t num_sequences = 3;
-    sxt_commitment commitments[num_sequences];
+    sxt_ristretto_element commitments[num_sequences];
 
     const uint64_t n1 = 3;
     const uint8_t n1_num_bytes = 1;
@@ -52,33 +58,27 @@ TEST_CASE("run pedersen tests") {
         REQUIRE(ret != 0);
     }
 
-    SECTION("multiple calls to the library initialization will not error out") {
-        const sxt_config config = {SXT_BACKEND_CPU};
-
-        REQUIRE(sxt_init(&config) == 0);
-
-        REQUIRE(sxt_init(&config) == 0);
-    }
-
-    SECTION("initialize library with GPU backend will not error out") {
-        const sxt_config config = {SXT_BACKEND_GPU};
-
-        REQUIRE(sxt_init(&config) == 0);
-    }
-
     SECTION("incorrect input to the library initialization will error out") {
-        REQUIRE(sxt_init(NULL) != 0);
-
         const sxt_config config = {SXT_BACKEND_CPU + SXT_BACKEND_GPU};
 
         REQUIRE(sxt_init(&config) != 0);
     }
 
-    SECTION("null commitment pointers will error out") {
-        const sxt_config config = {SXT_BACKEND_CPU};
+    SECTION("correct library initialization and input will not error out") {
+        const sxt_config config = {SXT_BACKEND_GPU};
 
         REQUIRE(sxt_init(&config) == 0);
 
+        int ret = sxt_compute_pedersen_commitments(
+            commitments,
+            num_sequences,
+            valid_descriptors
+        );
+
+        REQUIRE(ret == 0);
+    }
+
+    SECTION("null commitment pointers will error out") {
         int ret = sxt_compute_pedersen_commitments(
             nullptr,
             num_sequences,
@@ -89,10 +89,6 @@ TEST_CASE("run pedersen tests") {
     }
 
     SECTION("null value_sequences will error out") {
-        const sxt_config config = {SXT_BACKEND_CPU};
-
-        REQUIRE(sxt_init(&config) == 0);
-
         int ret = sxt_compute_pedersen_commitments(
             commitments,
             num_sequences,
@@ -103,10 +99,6 @@ TEST_CASE("run pedersen tests") {
     }
 
     SECTION("zero sequences will not error out") {
-        const sxt_config config = {SXT_BACKEND_CPU};
-
-        REQUIRE(sxt_init(&config) == 0);
-
         int ret = sxt_compute_pedersen_commitments(
             commitments,
             0,
@@ -133,10 +125,6 @@ TEST_CASE("run pedersen tests") {
     std::array<uint8_t, 32> req_array = {};
     
     SECTION("zero length commitments will not error out on cpu") {
-        const sxt_config config = {SXT_BACKEND_CPU};
-
-        REQUIRE(sxt_init(&config) == 0);
-
         int ret = sxt_compute_pedersen_commitments(
             commitments,
             num_sequences,
@@ -152,10 +140,6 @@ TEST_CASE("run pedersen tests") {
     }
 
     SECTION("zero length commitments will not error out on gpu") {
-        const sxt_config config = {SXT_BACKEND_GPU};
-
-        REQUIRE(sxt_init(&config) == 0);
-
         int ret = sxt_compute_pedersen_commitments(
             commitments,
             num_sequences,
@@ -171,15 +155,11 @@ TEST_CASE("run pedersen tests") {
     }
 
     SECTION("descriptor with invalid type will error out") {
-        const sxt_config config = {SXT_BACKEND_CPU};
-
         const sxt_sequence_descriptor invalid_descriptors[num_sequences] = {
             {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor1},
             {SXT_DENSE_SEQUENCE_TYPE + SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor2},
             {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor3},
         };
-
-        REQUIRE(sxt_init(&config) == 0);
 
         int ret = sxt_compute_pedersen_commitments(
             commitments,
@@ -191,8 +171,6 @@ TEST_CASE("run pedersen tests") {
     }
 
     SECTION("out of range (< 1 or > 32) element_nbytes will error out") {
-        const sxt_config config = {SXT_BACKEND_CPU};
-        
         const uint8_t invalid_num_bytes1 = 0;
         uint8_t invalid_data_bytes1[invalid_num_bytes1 * n1];
         sxt_dense_sequence_descriptor invalid_seq_descriptor1 = {
@@ -215,8 +193,6 @@ TEST_CASE("run pedersen tests") {
             {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor3},
         };
 
-        REQUIRE(sxt_init(&config) == 0);
-
         int ret = sxt_compute_pedersen_commitments(
             commitments,
             num_sequences,
@@ -227,8 +203,6 @@ TEST_CASE("run pedersen tests") {
     }
 
     SECTION("null element data pointer will error out") {
-        const sxt_config config = {SXT_BACKEND_CPU};
-        
         sxt_dense_sequence_descriptor invalid_seq_descriptor1 = {
             n1_num_bytes, // number bytes
             n1, // number rows
@@ -241,8 +215,6 @@ TEST_CASE("run pedersen tests") {
             {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor3},
         };
 
-        REQUIRE(sxt_init(&config) == 0);
-
         int ret = sxt_compute_pedersen_commitments(
             commitments,
             num_sequences,
@@ -252,17 +224,133 @@ TEST_CASE("run pedersen tests") {
         REQUIRE(ret != 0);
     }
 
-    SECTION("correct library initialization and input will not error out") {
-        const sxt_config config = {SXT_BACKEND_CPU};
+    SECTION("We can multiply and add two commitments together") {
+        const uint64_t num_rows = 4;
+        const uint64_t num_sequences = 3;
+        const uint8_t element_nbytes = sizeof(int);
+        const unsigned int multiplicative_constant = 52;
 
-        REQUIRE(sxt_init(&config) == 0);
+        sxt_ristretto_element commitments_data[num_sequences];
 
-        int ret = sxt_compute_pedersen_commitments(
-            commitments,
-            num_sequences,
-            valid_descriptors
+        const int query[num_sequences][num_rows] = {
+            {2000, 7500, 5000, 1500},
+            {5000, 0, 400000, 10},
+            {
+                multiplicative_constant * 2000 + 5000,
+                multiplicative_constant * 7500 + 0,
+                multiplicative_constant * 5000 + 400000,
+                multiplicative_constant * 1500 + 10
+            }
+        };
+
+        sxt_sequence_descriptor valid_descriptors[num_sequences];
+
+        // populating sequence object
+        for (uint64_t i = 0; i < num_sequences; ++i) {
+            sxt_dense_sequence_descriptor local_descriptor = {
+                element_nbytes, num_rows, (const uint8_t *) query[i]
+            };
+
+            valid_descriptors[i] = {SXT_DENSE_SEQUENCE_TYPE, local_descriptor};
+        }
+
+        SECTION("c = 52 * a + b ==> commit_c = 52 * commit_a + commit_b") {
+            int ret = sxt_compute_pedersen_commitments(
+                commitments_data,
+                num_sequences,
+                valid_descriptors
+            );
+
+            REQUIRE(ret == 0);
+
+            sxt::sqcb::commitment commitment_c;
+
+            sxt::c21t::element_p3 p, q;
+
+            sxt::c21rs::from_bytes(p, commitments_data[0].ristretto_bytes);
+
+            sxt::c21rs::from_bytes(q, commitments_data[1].ristretto_bytes);
+
+            sxt::c21o::scalar_multiply(p, multiplicative_constant,
+                                    p);  // h_i = a_i * g_i
+
+            sxt::c21o::add(p, p, q);
+
+            sxt::c21rs::to_bytes(commitment_c.data(), p);
+
+            sxt::sqcb::commitment &expected_commitment_c =
+                reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[2];
+
+            REQUIRE(commitment_c == expected_commitment_c);
+        }
+    }
+}
+
+TEST_CASE("run get pedersen generator tests") {
+    SECTION("zero generators will not error out") {
+        uint64_t offset = 0;
+        uint64_t num_generators = 0;
+
+        int ret = sxt_get_generators(
+            nullptr,
+            num_generators,
+            offset
         );
 
         REQUIRE(ret == 0);
+    }
+
+    SECTION("non zero generators will not error out") {
+        uint64_t offset = 0;
+        uint64_t num_generators = 3;
+        sxt_ristretto_element generators[num_generators];
+
+        int ret = sxt_get_generators(
+            generators,
+            num_generators,
+            offset
+        );
+
+        REQUIRE(ret == 0);
+    }
+
+    SECTION("non zero generators and nullptr will error out") {
+        uint64_t offset = 0;
+        uint64_t num_generators = 3;
+
+        int ret = sxt_get_generators(
+            nullptr,
+            num_generators,
+            offset
+        );
+
+        REQUIRE(ret == 1);
+    }
+
+    SECTION("we can verify that computed generators are correct when offset is non zero") {
+      sxt::c21t::element_p3 expected_g_0, expected_g_1;
+      uint64_t num_generators = 2;
+      uint64_t offset_generators = 15;
+      sxt::sqcgn::compute_base_element(expected_g_0, 0 + offset_generators);
+      sxt::sqcgn::compute_base_element(expected_g_1, 1 + offset_generators);
+
+      sxt_ristretto_element generators[num_generators];
+
+      int ret = sxt_get_generators(
+        generators,
+        num_generators,
+        offset_generators
+      );
+
+      REQUIRE(ret == 0);
+
+      sxt::sqcb::commitment expected_commit_0, expected_commit_1;
+      sxt::c21rs::to_bytes(expected_commit_0.data(), expected_g_0);
+      sxt::c21rs::to_bytes(expected_commit_1.data(), expected_g_1);
+
+      REQUIRE(reinterpret_cast<sxt::sqcb::commitment *>(generators)[0]
+                 == expected_commit_0);
+      REQUIRE(reinterpret_cast<sxt::sqcb::commitment *>(generators)[1]
+                 == expected_commit_1);
     }
 }

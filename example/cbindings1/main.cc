@@ -22,7 +22,7 @@ int main() {
   const sxt_sequence_descriptor descriptors[num_sequences] = {
       {SXT_DENSE_SEQUENCE_TYPE, descriptor1},
   };
-  sxt_commitment commitments[num_sequences];
+  sxt_ristretto_element commitments[num_sequences];
   auto rcode =
       sxt_compute_pedersen_commitments(commitments, num_sequences, descriptors);
   if (rcode != 0) {

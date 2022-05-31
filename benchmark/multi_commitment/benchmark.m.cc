@@ -11,27 +11,24 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/base/num/fast_random_number_generator.h"
-#include "sxt/seqcommit/naive/commitment_computation_cpu.h"
-#include "sxt/seqcommit/naive/commitment_computation_gpu.h"
+#include "sxt/seqcommit/cbindings/pedersen_backend.h"
+#include "sxt/seqcommit/cbindings/pedersen_cpu_backend.h"
+#include "sxt/seqcommit/cbindings/pedersen_gpu_backend.h"
 
 using namespace sxt;
 
-using bench_fn = void(*)(
-    basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept;
-
-struct Params {
+struct params {
     int status;
     bool verbose;
-    bench_fn func;
     uint64_t cols, rows;
     std::string backend_str;
     uint64_t element_nbytes;
+    std::unique_ptr<sqccb::pedersen_backend> backend;
     
     std::chrono::steady_clock::time_point begin_time;
     std::chrono::steady_clock::time_point end_time;
     
-    Params(int argc, char* argv[]) {
+    params(int argc, char* argv[]) {
         status = 0;
 
         if (argc < 5) {
@@ -56,20 +53,20 @@ struct Params {
         }
     }
 
-    void select_backend_fn(const std::string_view backend) noexcept {
-        if (backend == "cpu") {
+    void select_backend_fn(const std::string_view backend_view) noexcept {
+        if (backend_view == "cpu") {
             backend_str = "cpu";
-            func = sqcnv::compute_commitments_cpu;
+            backend = std::make_unique<sqccb::pedersen_cpu_backend>();
             return;
         }
 
-        if (backend == "gpu") {
+        if (backend_view == "gpu") {
             backend_str = "gpu";
-            func = sqcnv::compute_commitments_gpu;
+            backend = std::make_unique<sqccb::pedersen_gpu_backend>();
             return;
         }
 
-        std::cerr << "invalid backend: " << backend << "\n";
+        std::cerr << "invalid backend: " << backend_view << "\n";
 
         status = -1;
     }
@@ -123,25 +120,10 @@ static void populate_table(
 }
 
 //--------------------------------------------------------------------------------------------------
-// pre_initialize
-//--------------------------------------------------------------------------------------------------
-static void pre_initialize(bench_fn func) {
-    memmg::managed_array<uint8_t> data_table_fake(1); // 1 col, 1 row, 1 bytes per data
-    memmg::managed_array<sqcb::commitment> commitments_per_col_fake(1);
-    memmg::managed_array<mtxb::exponent_sequence> data_cols_fake(1);
-    basct::span<sqcb::commitment> commitments_fake(commitments_per_col_fake.data(), 1);
-    basct::cspan<mtxb::exponent_sequence> value_sequences_fake(data_cols_fake.data(), 1);
-
-    populate_table(1, 1, 1, data_table_fake, data_cols_fake);
-
-    func(commitments_fake, value_sequences_fake);
-}
-
-//--------------------------------------------------------------------------------------------------
 // main
 //--------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-    Params p(argc, argv);
+    params p(argc, argv);
 
     if (p.status != 0) return -1;
 
@@ -160,12 +142,9 @@ int main(int argc, char* argv[]) {
 
     double duration_populate = p.elapsed_time();
 
-    // invoke f with small values to avoid measuring one-time initialization costs
-    pre_initialize(p.func);
-
     p.trigger_timer();
     
-    p.func(commitments, value_sequences);
+    p.backend->compute_commitments(commitments, value_sequences);
 
     p.stop_timer();
 

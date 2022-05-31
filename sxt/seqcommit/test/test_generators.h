@@ -4,14 +4,13 @@
 #include "sxt/base/functional/function_ref.h"
 
 namespace sxt::sqcb { class commitment; }
-namespace sxt::mtxb { struct exponent_sequence; }
 
 namespace sxt::sqctst {
 //--------------------------------------------------------------------------------------------------
-// test_commitment_computation_function
+// test_pedersen_function
 //--------------------------------------------------------------------------------------------------
-void test_commitment_computation_function(
-    basf::function_ref<void(basct::span<sqcb::commitment>,
-                            basct::cspan<mtxb::exponent_sequence>)>
-        f);
+void test_pedersen_get_generators(
+    basf::function_ref<void(basct::span<sqcb::commitment> generators,
+        uint64_t offset_generators)> f
+);
 }  // namespace sxt::sqctst
