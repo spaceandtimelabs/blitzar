@@ -18,7 +18,7 @@ namespace sxt::sqcnv {
 //--------------------------------------------------------------------------------------------------
 void compute_commitments_cpu(
     basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept {
+    basct::cspan<mtxb::exponent_sequence> value_sequences, basct::cspan<sqcb::commitment> generators) noexcept {
 
     assert(commitments.size() == value_sequences.size());
 
@@ -32,7 +32,11 @@ void compute_commitments_cpu(
             uint8_t element_nbytes = column_k_data.element_nbytes;
             const uint8_t *bytes_row_i_column_k = column_k_data.data + row_i * element_nbytes;
 
-            sqcgn::compute_base_element(g_i, row_i);
+            if (generators.empty()) {
+                sqcgn::compute_base_element(g_i, row_i);
+            } else {
+                c21rs::from_bytes(g_i, generators[row_i].data());
+            }
 
             c21o::scalar_multiply(
                 h_i,

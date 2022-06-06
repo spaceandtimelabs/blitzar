@@ -18,6 +18,7 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "reduce",
+    is_cuda = True,
     deps = [
         "//sxt/base/type:int",
         "//sxt/base/macro:cuda_callable",

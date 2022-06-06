@@ -80,6 +80,7 @@ sxt_cc_component(
         "//sxt/seqcommit/base:commitment",
         "//sxt/curve21/ristretto:byte_conversion",
         "//sxt/seqcommit/generator:base_element",
-        "//sxt/curve21/operation:scalar_multiply"
+        "//sxt/curve21/operation:scalar_multiply",
+        "//sxt/curve21/constant:zero"
     ],
 )

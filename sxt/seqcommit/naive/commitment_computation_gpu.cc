@@ -16,6 +16,7 @@
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/seqcommit/base/commitment.h"
+#include "sxt/memory/resource/managed_device_resource.h"
 
 namespace sxt::sqcnv {
 
@@ -47,7 +48,8 @@ static void get_value_sequence_size(
 //--------------------------------------------------------------------------------------------------
 __global__ static void compute_commitments_kernel(
     c21t::element_p3 *partial_commitments,
-    mtxb::exponent_sequence value_sequence) {
+    mtxb::exponent_sequence value_sequence,
+    sqcb::commitment *generators) {
   extern __shared__ c21t::element_p3 reduction[];
 
   int tid = threadIdx.x;
@@ -62,7 +64,11 @@ __global__ static void compute_commitments_kernel(
 
   c21t::element_p3 g_i;
 
-  sqcgn::compute_base_element(g_i, row_i);
+  if (generators == nullptr) {
+    sqcgn::compute_base_element(g_i, row_i);
+  } else {
+    c21rs::from_bytes(g_i, generators[row_i].data());
+  }
 
   basct::cspan<uint8_t> exponent{value_sequence.data + row_i * element_nbytes,
                                  element_nbytes};
@@ -120,62 +126,134 @@ __global__ static void commitment_reduction_kernel(
 //--------------------------------------------------------------------------------------------------
 static void launch_commitment_kernels(
     memmg::managed_array<sqcb::commitment> &commitments_device,
-    basct::cspan<mtxb::exponent_sequence> value_sequences) {
+    basct::cspan<mtxb::exponent_sequence> value_sequences,
+    basct::cspan<sqcb::commitment> generators) {
+
   uint64_t num_commitments = commitments_device.size();
   uint64_t sequence_size, total_num_blocks, biggest_n;
 
-  get_value_sequence_size(sequence_size, total_num_blocks, biggest_n,
-                          value_sequences);
+  // Gets some information about the `value_sequences`,
+  // such as the longest sequence, the total amount
+  // of bytes in the whole `value_sequences`,
+  // and the total `num_blocks` that will be generated
+  // throughout the entire commitment processing.
+  // Each sequence j has a num_blocks[i]. Then num_blocks
+  // is the sum of all the num_blocks[i] of each sequence j.
+  get_value_sequence_size(
+    sequence_size,
+    total_num_blocks,
+    biggest_n,
+    value_sequences
+  );
 
   if (sequence_size == 0) return;
 
-  const int num_streams = min(10000, (int)num_commitments);
+  const int MAX_NUM_THREADS = 10000;
+  const int num_streams = min(MAX_NUM_THREADS, static_cast<int>(num_commitments));
   std::vector<basdv::stream> streams(num_streams);
 
-  memmg::managed_array<uint8_t> data_table_device(sequence_size,
-                                                  memr::get_device_resource());
+  // allocates memory in the device for the data_table
+  memmg::managed_array<uint8_t> data_table_device(
+    sequence_size,
+    memr::get_device_resource()
+  );
+
+  // allocates memory in the device for the partial commitments
   memmg::managed_array<c21t::element_p3> partial_commitments_device(
-      total_num_blocks, memr::get_device_resource());
+      total_num_blocks,
+      memr::get_device_resource()
+  );
 
-  uint8_t *data_table_device_ptr = data_table_device.data();
-  c21t::element_p3 *partial_commitments_device_ptr =
-      partial_commitments_device.data();
+  // allocates memory in the device for the generators
+  memmg::managed_array<sqcb::commitment> generators_device(
+      min(biggest_n, generators.size()),
+      memr::get_managed_device_resource()
+  );
 
-  for (int commitment_index = 0; commitment_index < num_commitments;
-       ++commitment_index) {
-    auto data_commitment = value_sequences[commitment_index];
+  sqcb::commitment *gens_dev_ptr = nullptr;
 
-    if (data_commitment.n > 0) {
-      uint64_t commitment_index_size =
-        data_commitment.n * data_commitment.element_nbytes;
+  // In the case that some generator data
+  // was given, copy this data from host
+  // memory to device memory.
+  if (generators.size() > 0) {
+    gens_dev_ptr = generators_device.data();
 
-      uint64_t shared_mem_size = block_size * sizeof(c21t::element_p3);
+    assert(generators.size() >= biggest_n);
 
-      uint64_t num_blocks =
-          basn::divide_up(data_commitment.n, block_size);
-          
-      int stream_index =
-          static_cast<int>((commitment_index / static_cast<float>(num_commitments)) * num_streams);
+    // we are assuming that we always have: generators.size() >= biggest_n
+    basdv::memcpy_host_to_device(
+      gens_dev_ptr,
+      generators.data(),
+      biggest_n * sizeof(sqcb::commitment)
+    );
+  }
+
+  uint8_t *data_table_dev_ptr = data_table_device.data();
+
+  c21t::element_p3 *partial_commits_dev_ptr = partial_commitments_device.data();
+
+  // each cuda stream computes asynchronously one commitment
+  for (int commit_index = 0; commit_index < num_commitments; ++commit_index) {
+    auto data_commit = value_sequences[commit_index];
+
+    // we only process if there is at least one row. Otherwise, commitment is zero
+    if (data_commit.n > 0) {
+      uint64_t commit_index_size = data_commit.n * data_commit.element_nbytes;
+
+      uint64_t shared_mem = block_size * sizeof(c21t::element_p3);
+
+      uint64_t num_blocks = basn::divide_up(data_commit.n, block_size);
+      
+      int stream_index = static_cast<int>(
+        (commit_index / static_cast<float>(num_commitments)) * num_streams
+      );
 
       auto curr_stream = streams[stream_index].raw_stream();
       
-      basdv::async_memcpy_host_to_device(data_table_device_ptr,
-                                        data_commitment.data,
-                                        commitment_index_size, curr_stream);
+      // We asynchronously move the current
+      // sequence to the device memory, using
+      // for that the current cuda stream.
+      basdv::async_memcpy_host_to_device(
+        data_table_dev_ptr,
+        data_commit.data,
+        commit_index_size,
+        curr_stream
+      );
 
-      data_commitment.data = data_table_device_ptr;
+      data_commit.data = data_table_dev_ptr;
 
-      compute_commitments_kernel<<<num_blocks, block_size, shared_mem_size,
-                                  curr_stream>>>(partial_commitments_device_ptr,
-                                                  data_commitment);
+      // We split the current sequence into multiple cuda blocks.
+      // Each block is responsible for computing the 
+      // commitment related to the current sequence subset
+      // that was assigned to the block. Because
+      // the commitments of each block must be summed
+      // together in a final single result, we add the 
+      // next cuda kernel. We use the current cuda stream
+      // to process this kernel.
+      compute_commitments_kernel<<<num_blocks, block_size, shared_mem, curr_stream>>>(
+          partial_commits_dev_ptr,
+          data_commit,
+          gens_dev_ptr
+      );
 
-      commitment_reduction_kernel<<<1, block_size, shared_mem_size,
-                                    curr_stream>>>(
-          &commitments_device[commitment_index], partial_commitments_device_ptr,
-          static_cast<int>(num_blocks));
+      // This cuda kernel sums the commitments generated
+      // by each cuda block from the previous execution,
+      // storing the result commitment in the
+      // `commitments_device[commit_index]`. We use the current cuda stream
+      // to process this kernel.
+      commitment_reduction_kernel<<<1, block_size, shared_mem, curr_stream>>>(
+          &commitments_device[commit_index],
+          partial_commits_dev_ptr,
+          static_cast<int>(num_blocks)
+      );
 
-      data_table_device_ptr += commitment_index_size;
-      partial_commitments_device_ptr += num_blocks;
+      // We update the device pointers.
+      // We use this scheme instead of 
+      // indexing, because each commitment
+      // sequence can have a different number 
+      // of rows and data types
+      data_table_dev_ptr += commit_index_size;
+      partial_commits_dev_ptr += num_blocks;
     }
   }
 
@@ -188,16 +266,30 @@ static void launch_commitment_kernels(
 //--------------------------------------------------------------------------------------------------
 void compute_commitments_gpu(
     basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept {
+    basct::cspan<mtxb::exponent_sequence> value_sequences, basct::cspan<sqcb::commitment> generators) noexcept {
   assert(commitments.size() == value_sequences.size());
 
+  // allocates memory to commitments in the device
   memmg::managed_array<sqcb::commitment> commitments_device(
-       commitments.size(), memr::get_device_resource());
+       commitments.size(), memr::get_device_resource()
+  );
 
-  launch_commitment_kernels(commitments_device, value_sequences);
+  // compute all the commitments
+  // for each one of the sequences in
+  // `value_sequences` span
+  launch_commitment_kernels(
+    commitments_device,
+    value_sequences,
+    generators
+  );
 
-  basdv::memcpy_device_to_host(commitments.data(), commitments_device.data(),
-                             commitments_device.num_bytes());
+  // bring the commitment results
+  // from the device memory to the host
+  basdv::memcpy_device_to_host(
+    commitments.data(),
+    commitments_device.data(),
+    commitments_device.num_bytes()
+  );
 }
 
 }  // namespace sxt::sqcnv

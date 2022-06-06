@@ -25,6 +25,7 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/seqcommit/generator:base_element",
         "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/constant:zero",
         "//sxt/base/test:unit_test",
         "//sxt/seqcommit/base:commitment",
         "//sxt/curve21/ristretto:byte_conversion"

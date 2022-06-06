@@ -67,12 +67,17 @@ int sxt_init(const sxt_config* config) {
 //--------------------------------------------------------------------------------------------------
 // validate_descriptor
 //--------------------------------------------------------------------------------------------------
-static int validate_descriptor(const sxt_sequence_descriptor *descriptor) {
+static int validate_descriptor(uint64_t &longest_sequence, const sxt_sequence_descriptor *descriptor) {
+  // verify if sequence type is already implemented
+  if (descriptor->sequence_type != SXT_DENSE_SEQUENCE_TYPE) return 1;
+
   // verify if data pointers are validate
   if (descriptor->dense.n > 0 && descriptor->dense.data == nullptr) return 1;
 
   // verify if word size is inside the correct range (1 to 32)
   if (descriptor->dense.element_nbytes == 0 || descriptor->dense.element_nbytes > 32) return 1;
+
+  longest_sequence = std::max(longest_sequence, descriptor->dense.n);
 
   return 0;
 }
@@ -80,36 +85,41 @@ static int validate_descriptor(const sxt_sequence_descriptor *descriptor) {
 //--------------------------------------------------------------------------------------------------
 // validate_sequence_descriptor
 //--------------------------------------------------------------------------------------------------
-static int validate_sequence_descriptor(uint32_t num_sequences, const sxt_sequence_descriptor* descriptors) {
+static int validate_sequence_descriptor(uint64_t &longest_sequence,
+  uint32_t num_sequences, const sxt_sequence_descriptor* descriptors) {
+
+  longest_sequence = 0;
+
   // invalid pointers
   if (descriptors == nullptr) return 1;
 
   // verify if each descriptor is inside the ranges
   for (uint32_t commit_index = 0; commit_index < num_sequences; ++commit_index) {
-    // verify if sequence type is already implemented
-    if (descriptors->sequence_type != SXT_DENSE_SEQUENCE_TYPE) return 1;
-
-    if (validate_descriptor(descriptors + commit_index)) return 1;
+        if (validate_descriptor(longest_sequence, descriptors + commit_index)) return 1;
   }
 
   return 0;
 }
 
 //--------------------------------------------------------------------------------------------------
-// sxt_compute_pedersen_commitments
+// process_compute_pedersen_commitments
 //--------------------------------------------------------------------------------------------------
-int sxt_compute_pedersen_commitments(
-    sxt_ristretto_element* commitments, uint32_t num_sequences,
-    const sxt_sequence_descriptor* descriptors) {
+static int process_compute_pedersen_commitments(
+    struct sxt_ristretto_element* commitments,
+    uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors,
+    struct sxt_ristretto_element* generators) {
 
   if (num_sequences == 0) return 0;
 
   // backend not initialized (sxt_init not called correctly)
   if (backend == nullptr) return 1;
 
+  uint64_t longest_sequence = 0;
+  
   // verify if input is validate
   if (commitments == nullptr
-        || validate_sequence_descriptor(num_sequences, descriptors)) return 1;
+        || validate_sequence_descriptor(longest_sequence, num_sequences, descriptors)) return 1;
 
   static_assert(sizeof(sqcb::commitment) == 
       sizeof(sxt_ristretto_element), "types must be ABI compatible");
@@ -130,9 +140,49 @@ int sxt_compute_pedersen_commitments(
   basct::cspan<mtxb::exponent_sequence> value_sequences(sequences.data(),
                                                         num_sequences);
   
-  backend->compute_commitments(commitments_result, value_sequences);
+  if (generators == nullptr) longest_sequence = 0;
+
+  basct::span<sqcb::commitment> generators_span(
+       reinterpret_cast<sqcb::commitment *>(generators), longest_sequence);
+
+  backend->compute_commitments(commitments_result, value_sequences, generators_span);
 
   return 0;
+}
+
+//--------------------------------------------------------------------------------------------------
+// sxt_compute_pedersen_commitments
+//--------------------------------------------------------------------------------------------------
+int sxt_compute_pedersen_commitments(
+    sxt_ristretto_element* commitments, uint32_t num_sequences,
+    const sxt_sequence_descriptor* descriptors) {
+
+  int ret = process_compute_pedersen_commitments(
+    commitments, num_sequences, descriptors, nullptr
+  );
+
+  return ret;
+}
+
+//--------------------------------------------------------------------------------------------------
+// sxt_compute_pedersen_commitments
+//--------------------------------------------------------------------------------------------------
+int sxt_compute_pedersen_commitments_with_generators(
+    struct sxt_ristretto_element* commitments,
+    uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors,
+    struct sxt_ristretto_element* generators) {
+  
+  // we only verify if generators is null, but we
+  // expect it to have size equal to the longest
+  // row in sequence
+  if (generators == nullptr) return 1;
+
+  int ret = process_compute_pedersen_commitments(
+    commitments, num_sequences, descriptors, generators
+  );
+
+  return ret;
 }
 
 //--------------------------------------------------------------------------------------------------

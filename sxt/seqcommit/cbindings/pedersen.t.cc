@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/seqcommit/base/commitment.h"
@@ -57,6 +58,10 @@ TEST_CASE("run compute pedersen commitment tests") {
 
         REQUIRE(ret != 0);
     }
+
+    ////////////////////////////////////////////////////////////////
+    // sxt_compute_pedersen_commitments
+    ////////////////////////////////////////////////////////////////
 
     SECTION("incorrect input to the library initialization will error out") {
         const sxt_config config = {SXT_BACKEND_CPU + SXT_BACKEND_GPU};
@@ -167,7 +172,7 @@ TEST_CASE("run compute pedersen commitment tests") {
             invalid_descriptors
         );
 
-        REQUIRE(ret == 0);
+        REQUIRE(ret != 0);
     }
 
     SECTION("out of range (< 1 or > 32) element_nbytes will error out") {
@@ -284,6 +289,83 @@ TEST_CASE("run compute pedersen commitment tests") {
             REQUIRE(commitment_c == expected_commitment_c);
         }
     }
+
+    ////////////////////////////////////////////////////////////////
+    // sxt_compute_pedersen_commitments_with_generators
+    ////////////////////////////////////////////////////////////////
+
+    SECTION("We can multiply and add two commitments together using"
+         "the sxt_compute_pedersen_commitments_with_generators function") {
+        const uint64_t num_rows = 4;
+        const uint64_t num_sequences = 1;
+        const uint8_t element_nbytes = sizeof(int);
+
+        sxt_ristretto_element generators_data[num_rows];
+        sxt_ristretto_element commitments_data[num_sequences];
+
+        const int query[num_rows] = {2000, 7500, 5000, 1500};
+        sxt::c21t::element_p3 expected_g = sxt::c21cn::zero_p3_v;
+
+        for (uint64_t i = 0; i < num_rows; ++i) {
+            sxt::c21t::element_p3 g_i;
+            sxt::sqcgn::compute_base_element(g_i, query[i]);
+
+            sxt::c21rs::to_bytes(generators_data[i].ristretto_bytes, g_i);
+            sxt::c21rs::from_bytes(g_i, generators_data[i].ristretto_bytes);
+
+            sxt::c21t::element_p3 h;
+            sxt::c21o::scalar_multiply(
+                h,
+                sxt::basct::cspan<uint8_t>{
+                    reinterpret_cast<const uint8_t*>(query + i), sizeof(int)
+                },
+                g_i
+            );
+
+            sxt::c21o::add(expected_g, expected_g, h);
+        }
+        
+        sxt::sqcb::commitment expected_commitment_c;
+        sxt::c21rs::to_bytes(expected_commitment_c.data(), expected_g);
+
+        sxt_sequence_descriptor valid_descriptors[num_sequences];
+
+        // populating sequence object
+        for (uint64_t i = 0; i < num_sequences; ++i) {
+            sxt_dense_sequence_descriptor local_descriptor = {
+                element_nbytes, num_rows, (const uint8_t *) query
+            };
+
+            valid_descriptors[i] = {SXT_DENSE_SEQUENCE_TYPE, local_descriptor};
+        }
+
+        SECTION("passing null generators will error out") {
+            int ret = sxt_compute_pedersen_commitments_with_generators(
+                commitments_data,
+                num_sequences,
+                valid_descriptors,
+                nullptr
+            );
+
+            REQUIRE(ret != 0);
+        }
+
+        SECTION("passing valid generators will be correct") {
+            int ret = sxt_compute_pedersen_commitments_with_generators(
+                commitments_data,
+                num_sequences,
+                valid_descriptors,
+                generators_data
+            );
+
+            REQUIRE(ret == 0);
+            
+            sxt::sqcb::commitment &commitment_c =
+                reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[0];
+
+            REQUIRE(commitment_c == expected_commitment_c);
+        }
+    }
 }
 
 TEST_CASE("run get pedersen generator tests") {
@@ -324,7 +406,7 @@ TEST_CASE("run get pedersen generator tests") {
             offset
         );
 
-        REQUIRE(ret == 1);
+        REQUIRE(ret != 0);
     }
 
     SECTION("we can verify that computed generators are correct when offset is non zero") {

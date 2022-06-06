@@ -130,6 +130,7 @@ int main(int argc, char* argv[]) {
     p.trigger_timer();
 
     // populate data section
+    basct::span<sqcb::commitment> empty_generators;
     memmg::managed_array<uint8_t> data_table(p.rows * p.cols * p.element_nbytes);
     memmg::managed_array<sqcb::commitment> commitments_per_col(p.cols);
     memmg::managed_array<mtxb::exponent_sequence> data_cols(p.cols);
@@ -144,7 +145,7 @@ int main(int argc, char* argv[]) {
 
     p.trigger_timer();
     
-    p.backend->compute_commitments(commitments, value_sequences);
+    p.backend->compute_commitments(commitments, value_sequences, empty_generators);
 
     p.stop_timer();
 

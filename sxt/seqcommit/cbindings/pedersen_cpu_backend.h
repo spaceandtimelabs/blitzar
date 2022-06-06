@@ -14,7 +14,8 @@ class pedersen_cpu_backend final : public sqccb::pedersen_backend {
 public:
   void compute_commitments(
     basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept override;
+    basct::cspan<mtxb::exponent_sequence> value_sequences,
+    basct::span<sqcb::commitment> generators) noexcept override;
 
   void get_generators(
     basct::span<sqcb::commitment> generators,

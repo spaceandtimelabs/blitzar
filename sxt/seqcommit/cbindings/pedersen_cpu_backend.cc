@@ -11,9 +11,9 @@ namespace sxt::sqccb {
 //--------------------------------------------------------------------------------------------------
 void pedersen_cpu_backend::compute_commitments(
     basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept {
-    
-    sqcnv::compute_commitments_cpu(commitments, value_sequences);
+    basct::cspan<mtxb::exponent_sequence> value_sequences,
+    basct::span<sqcb::commitment> generators) noexcept {
+    sqcnv::compute_commitments_cpu(commitments, value_sequences, generators);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -22,7 +22,6 @@ void pedersen_cpu_backend::compute_commitments(
 void pedersen_cpu_backend::get_generators(
     basct::span<sqcb::commitment> generators,
     uint64_t offset_generators) noexcept {
-
     sqcgn::cpu_get_generators(generators, offset_generators);
 }
 

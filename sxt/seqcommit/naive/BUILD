@@ -38,7 +38,8 @@ sxt_cc_component(
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/curve21/operation:add",
         "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:device_resource"
+        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:managed_device_resource"
     ],
     test_deps = [
         "//sxt/seqcommit/test:test_pedersen",

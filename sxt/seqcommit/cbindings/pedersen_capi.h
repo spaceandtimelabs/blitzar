@@ -51,36 +51,63 @@ struct sxt_ristretto_element {
 };
 
 /**
- * @brief Initialize the library. This should only be called once.
+ * Initialize the library. This should only be called once.
  * 
- * @param config [in] specifies which backend should be used in the computations (gpu or cpu)
- * @return int 
+ * Arguments:
+ * 
+ * - config (in): specifies which backend should be used in the computations (gpu or cpu)
+ *
+ * # Return:
+ * 
+ * - 0 on success; otherwise a nonzero error code
  */
 int sxt_init(
   const struct sxt_config* config
 );
 
 /**
- * @brief Compute the pedersen commitments for sequences of values
+ * Compute the pedersen commitments for sequences of values
  * 
  * Denote an element of a sequence by a_ij where i represents the sequence index
  * and j represents the element index. Let * represent the operator for the
- * ristretto255 group. Then res[i] encodes the ristretto255 group value
+ * ristretto255 group. Then res\[i] encodes the ristretto255 group value
  * 
+ * ```text
  *     Prod_{j=1 to n_i} g_j ^ a_ij
+ * ```
  * 
  * where n_i represents the number of elements in sequence i and g_j is a group
  * element determined by a prespecified function
  * 
+ * ```text
  *     g: uint64_t -> ristretto255
+ * ```
  * 
- * @param commitments [out] an array of length num_sequences that provides the values of the
- *                         computed commitments for each sequence
+ * # Arguments:
  * 
- * @param num_sequences [in] specifies the number of sequences
- * @param descriptors   [in] an array of length num_sequences that specifies each sequence
+ * - commitments   (out): an array of length num_sequences where the computed commitments 
+ *                     of each sequence must be written into
  * 
- * @return 0 on success; otherwise a nonzero error code
+ * - num_sequences (in): specifies the number of sequences
+ * - descriptors   (in): an array of length num_sequences that specifies each sequence
+ * 
+ * # Return:
+ * 
+ * - 0 on success; otherwise a nonzero error code
+ * 
+ * # Invalid input parameters, which generate error code:
+ * 
+ * - backend not initialized or incorrectly initialized
+ * - descriptors == nullptr
+ * - commitments == nullptr
+ * - descriptors\[i].sequence_type != SXT_DENSE_SEQUENCE_TYPE
+ * - descriptor\[i].dense.n > 0 && descriptor\[i].dense.data == nullptr
+ * - descriptor\[i].dense.element_nbytes == 0
+ * - descriptor\[i].dense.element_nbytes > 32
+ * 
+ * # Considerations:
+ * 
+ * - num_sequences equal to 0 will skip the computation
  */
 int sxt_compute_pedersen_commitments(
     struct sxt_ristretto_element* commitments,
@@ -89,23 +116,84 @@ int sxt_compute_pedersen_commitments(
 );
 
 /**
- * @brief Gets the pre-specified random generated elements used for the Pedersen commitments
+ * Compute the pedersen commitments for sequences of values
+ * 
+ * Denote an element of a sequence by a_ij where i represents the sequence index
+ * and j represents the element index. Let * represent the operator for the
+ * ristretto255 group. Then res\[i] encodes the ristretto255 group value
+ * 
+ * ```text
+ *     Prod_{j=1 to n_i} g_j ^ a_ij
+ * ```
+ * 
+ * where n_i represents the number of elements in sequence i and g_j is a group
+ * element determined by the `generators\[i]` user value given as input
+ * 
+ * # Arguments:
+ * 
+ * - commitments   (out): an array of length num_sequences where the computed commitments 
+ *                     of each sequence must be written into
+ * 
+ * - num_sequences (in): specifies the number of sequences
+ * - descriptors   (in): an array of length num_sequences that specifies each sequence
+ * - generators    (in): an array of length `max_num_rows` = `the maximum between all n_i`
+ * 
+ * # Return:
+ * 
+ * - 0 on success; otherwise a nonzero error code
+ * 
+ * # Invalid input parameters, which generate error code:
+ * 
+ * - backend not initialized or incorrectly initialized
+ * - descriptors == nullptr
+ * - commitments == nullptr
+ * - generators == nullptr
+ * - descriptors\[i].sequence_type != SXT_DENSE_SEQUENCE_TYPE
+ * - descriptor\[i].dense.n > 0 && descriptor\[i].dense.data == nullptr
+ * - descriptor\[i].dense.element_nbytes == 0
+ * - descriptor\[i].dense.element_nbytes > 32
+ * 
+ * # Considerations:
+ * 
+ * - num_sequences equal to 0 will skip the computation
+ */
+int sxt_compute_pedersen_commitments_with_generators(
+    struct sxt_ristretto_element* commitments,
+    uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors,
+    struct sxt_ristretto_element* generators
+);
+
+/**
+ * Gets the pre-specified random generated elements used for the Pedersen commitments in the `sxt_compute_pedersen_commitments` function
  * 
  * sxt_get_generators(generators, num_generators, offset_generators) → 
- *     generators[0] = generate_random_ristretto(0 + offset_generators)
- *     generators[1] = generate_random_ristretto(1 + offset_generators)
- *     generators[2] = generate_random_ristretto(2 + offset_generators)
+ *     generators\[0] = generate_random_ristretto(0 + offset_generators)
+ *     generators\[1] = generate_random_ristretto(1 + offset_generators)
+ *     generators\[2] = generate_random_ristretto(2 + offset_generators)
  *       .
  *       .
  *       .
- *     generators[num_generators - 1] = generate_random_ristretto(num_generators - 1 + offset_generators)
+ *     generators\[num_generators - 1] = generate_random_ristretto(num_generators - 1 + offset_generators)
  * 
- * @param generators [out] sxt_element_p3 pointer where the results must be written into
+ * # Arguments:
  * 
- * @param num_generators     [in] the total number of random generated elements to be computed
- * @param offset_generators  [in] the offset that shifts the first element computed from `0` to `offset_generators`
+ * - generators         (out): sxt_element_p3 pointer where the results must be written into
  * 
- * @return 0 on success; otherwise a nonzero error code
+ * - num_generators     (in): the total number of random generated elements to be computed
+ * - offset_generators  (in): the offset that shifts the first element computed from `0` to `offset_generators`
+ * 
+ * # Return:
+ * 
+ * - 0 on success; otherwise a nonzero error code
+ * 
+ * # Invalid input parameters, which generate error code:
+ * 
+ * - num_generators > 0 && generators == nullptr
+ * 
+ * # Considerations:
+ * 
+ * - num_generators equal to 0 will skip the computation
  */
 int sxt_get_generators(
     struct sxt_ristretto_element* generators,

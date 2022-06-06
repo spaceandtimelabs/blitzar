@@ -12,6 +12,11 @@ namespace sxt::basdv {
 void async_memcpy_host_to_device(void* dst, const void* src, size_t count) noexcept;
 
 //--------------------------------------------------------------------------------------------------
+// memcpy_host_to_device
+//--------------------------------------------------------------------------------------------------
+void memcpy_host_to_device(void* dst, const void* src, size_t count) noexcept;
+
+//--------------------------------------------------------------------------------------------------
 // memcpy_device_to_host
 //--------------------------------------------------------------------------------------------------
 void memcpy_device_to_host(void* dst, const void* src, size_t count) noexcept;

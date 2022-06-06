@@ -15,6 +15,8 @@ namespace sxt::sqcnv {
 //--------------------------------------------------------------------------------------------------
 void compute_commitments_gpu(
     basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept;
+    basct::cspan<mtxb::exponent_sequence> value_sequences,
+    basct::cspan<sqcb::commitment> generators
+) noexcept;
 
 } // namespace sxt

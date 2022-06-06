@@ -29,6 +29,7 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "cmov",
+    is_cuda = True,
     deps = [
         "//sxt/field51/type:element",
         "//sxt/base/macro:cuda_callable",
@@ -66,6 +67,7 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "sub",
+    is_cuda = True,
     deps = [
         "//sxt/field51/type:element",
         "//sxt/base/macro:cuda_callable",

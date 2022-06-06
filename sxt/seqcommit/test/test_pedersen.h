@@ -11,8 +11,11 @@ namespace sxt::sqctst {
 // test_pedersen_function
 //--------------------------------------------------------------------------------------------------
 void test_pedersen_compute_commitment(
-    basf::function_ref<void(basct::span<sqcb::commitment>,
-        basct::cspan<mtxb::exponent_sequence>)> f
+    basf::function_ref<void(
+        basct::span<sqcb::commitment>,
+        basct::cspan<mtxb::exponent_sequence>,
+        basct::cspan<sqcb::commitment> generators
+    )> f
 );
 
 }  // namespace sxt::sqctst

@@ -15,7 +15,8 @@ public:
 
   virtual void compute_commitments(
     basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences) noexcept = 0;
+    basct::cspan<mtxb::exponent_sequence> value_sequences,
+    basct::span<sqcb::commitment> generators) noexcept = 0;
 
   virtual void get_generators(
     basct::span<sqcb::commitment> generators,

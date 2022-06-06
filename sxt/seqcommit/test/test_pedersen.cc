@@ -6,6 +6,7 @@
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/curve21/ristretto/byte_conversion.h"
 #include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/constant/zero.h"
 #include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
 
@@ -15,12 +16,13 @@ namespace sxt::sqctst {
 //--------------------------------------------------------------------------------------------------
 void test_pedersen_compute_commitment(
   basf::function_ref<void(basct::span<sqcb::commitment>,
-        basct::cspan<mtxb::exponent_sequence>)> f) {
+        basct::cspan<mtxb::exponent_sequence>, basct::cspan<sqcb::commitment> generators)> f) {
   SECTION("we can add two commitments together") {
     const uint64_t num_rows = 4;
     const uint64_t num_columns = 3;
     const uint8_t element_nbytes = sizeof(int);
 
+    basct::span<sqcb::commitment> empty_generators;
     sqcb::commitment commitments_data[num_columns];
     mtxb::exponent_sequence sequences[num_columns];
     basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
@@ -42,7 +44,7 @@ void test_pedersen_compute_commitment(
     SECTION(
         "addition property holds (c = a + b ==> commit_c = commit_a "
         "+ commit_b)") {
-      f(commitments, value_sequences);
+      f(commitments, value_sequences, empty_generators);
 
       sqcb::commitment commitment_c;
 
@@ -67,6 +69,7 @@ void test_pedersen_compute_commitment(
     const uint64_t num_columns = 4;
     const uint8_t element_nbytes = sizeof(int);
 
+    basct::span<sqcb::commitment> empty_generators;
     sqcb::commitment commitments_data[num_columns];
     mtxb::exponent_sequence sequences[num_columns];
     basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
@@ -88,7 +91,7 @@ void test_pedersen_compute_commitment(
     }
 
     SECTION("3 = 1 + 1 + 1 ==> commit(3) = commit(1) + commit(1) + commit(1)") {
-      f(commitments, value_sequences);
+      f(commitments, value_sequences, empty_generators);
 
       sqcb::commitment commitment_c;
 
@@ -119,6 +122,7 @@ void test_pedersen_compute_commitment(
     const uint64_t num_columns = 1;
     const uint8_t element_nbytes = sizeof(int);
 
+    basct::span<sqcb::commitment> empty_generators;
     sqcb::commitment commitments_data[num_columns];
     mtxb::exponent_sequence sequences[num_columns];
     basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
@@ -141,7 +145,7 @@ void test_pedersen_compute_commitment(
 
         sqcgn::compute_base_element(g_i, 0);
 
-        f(commitments, value_sequences);
+        f(commitments, value_sequences, empty_generators);
 
         c21o::add(p, g_i, g_i);
 
@@ -164,6 +168,7 @@ void test_pedersen_compute_commitment(
     const uint64_t num_columns = 3;
     const uint8_t element_nbytes = 32;
 
+    basct::span<sqcb::commitment> empty_generators;
     sqcb::commitment commitments_data[num_columns];
     mtxb::exponent_sequence sequences[num_columns];
     basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
@@ -184,7 +189,7 @@ void test_pedersen_compute_commitment(
 
     SECTION(
         "C = A + B >= p (p = 2^252 + 27742317777372353535851937790883648493)") {
-      f(commitments, value_sequences);
+      f(commitments, value_sequences, empty_generators);
 
       sqcb::commitment commitment_c;
 
@@ -210,6 +215,7 @@ void test_pedersen_compute_commitment(
     const uint8_t element_nbytes = sizeof(int);
     const unsigned int multiplicative_constant = 52;
 
+    basct::span<sqcb::commitment> empty_generators;
     sqcb::commitment commitments_data[num_columns];
     mtxb::exponent_sequence sequences[num_columns];
     basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
@@ -232,7 +238,7 @@ void test_pedersen_compute_commitment(
     }
 
     SECTION("c = 52 * a + b ==> commit_c = 52 * commit_a + commit_b") {
-      f(commitments, value_sequences);
+      f(commitments, value_sequences, empty_generators);
 
       sqcb::commitment commitment_c;
 
@@ -261,6 +267,7 @@ void test_pedersen_compute_commitment(
     const uint64_t num_rows = 1;
     const uint64_t num_columns = 3;
 
+    basct::span<sqcb::commitment> empty_generators;
     sqcb::commitment commitments_data[num_columns];
     mtxb::exponent_sequence sequences[num_columns];
     basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
@@ -287,7 +294,7 @@ void test_pedersen_compute_commitment(
     sequences[2].element_nbytes = sizeof(result);
 
     SECTION("-|c| = -|a| + -|b| ==> commit_c = commit_a + commit_b") {
-      f(commitments, value_sequences);
+      f(commitments, value_sequences, empty_generators);
 
       sqcb::commitment commitment_c;
 
@@ -314,6 +321,7 @@ void test_pedersen_compute_commitment(
     const uint64_t num_columns = 3;
     const uint8_t element_nbytes = 32;
 
+    basct::span<sqcb::commitment> empty_generators;
     sqcb::commitment commitments_data[num_columns];
     mtxb::exponent_sequence sequences[num_columns];
     basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
@@ -346,7 +354,7 @@ void test_pedersen_compute_commitment(
 
     SECTION(
         "C = A + B > p (p = 2^252 + 27742317777372353535851937790883648493)") {
-      f(commitments, value_sequences);
+      f(commitments, value_sequences, empty_generators);
 
       sqcb::commitment commitment_c;
 
@@ -371,6 +379,7 @@ void test_pedersen_compute_commitment(
       "number of rows") {
     const uint64_t num_commitments = 4;
 
+    basct::span<sqcb::commitment> empty_generators;
     sqcb::commitment commitments_data[num_commitments];
     mtxb::exponent_sequence sequences[num_commitments];
     basct::span<sqcb::commitment> commitments(commitments_data,
@@ -414,7 +423,7 @@ void test_pedersen_compute_commitment(
     SECTION(
         "D = A + B + C implies in commit(D) = commit(A) + commit(B) + "
         "commit(C)") {
-      f(commitments, value_sequences);
+      f(commitments, value_sequences, empty_generators);
 
       sqcb::commitment commitment_c;
 
@@ -437,6 +446,51 @@ void test_pedersen_compute_commitment(
       REQUIRE(commitment_c == expected_commitment_c);
     }
   }
+
+  SECTION(
+      "We can pass generators to the commitment computation") {
+      
+      sqcb::commitment ristretto_gens[4];
+      const int data_values[4] = {1, 2, 3, 4};
+      c21t::element_p3 expected_g = c21cn::zero_p3_v;
+
+      for (int i = 0; i < 4; ++i) {
+        c21t::element_p3 g_i;
+        sqcgn::compute_base_element(g_i, i + 3);
+
+        c21rs::to_bytes(ristretto_gens[i].data(), g_i);
+        c21rs::from_bytes(g_i, ristretto_gens[i].data());
+
+        c21t::element_p3 h;
+        c21o::scalar_multiply(
+          h,
+          basct::cspan<uint8_t>{
+            reinterpret_cast<const uint8_t*>(data_values + i), sizeof(int)
+          },
+          g_i
+        );
+
+        c21o::add(expected_g, expected_g, h);
+      }
+
+      sqcb::commitment expected_commitment;
+      c21rs::to_bytes(expected_commitment.data(), expected_g);
+
+      sqcb::commitment commitments_data[1];
+      mtxb::exponent_sequence sequences[1];
+
+      sequences[0].n = 4;
+      sequences[0].data = reinterpret_cast<const uint8_t*>(data_values);
+      sequences[0].element_nbytes = sizeof(int);
+
+      basct::span<sqcb::commitment> commitments(commitments_data, 1);
+      basct::span<sqcb::commitment> span_generators(ristretto_gens, 4);
+      basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, 1);
+
+      f(commitments, value_sequences, span_generators);
+
+      REQUIRE(expected_commitment == commitments_data[0]);
+    }
 }
 
 }  // namespace sxt::sqctst
