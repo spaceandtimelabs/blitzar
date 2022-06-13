@@ -18,3 +18,9 @@ dist/
 
 # Ignore vscode files
 .vscode/
+
+# Ignore rust files
+rust/proofs-gpu-sys/target
+rust/proofs-gpu-sys/Cargo.lock
+rust/proofs-gpu-sys/*.so*
+rust/proofs-gpu-sys/src/bindings.rs

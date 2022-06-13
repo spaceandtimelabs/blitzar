@@ -1,7 +1,9 @@
 [package]
 name = "proofs_gpu"
-version = "0.0.0" # This version will be automatically substituted
+version = "0.0.0" 
 edition = "2021"
-links = "proofs-gpu"
+
+exclude = ["/target", "/Cargo.lock"]
+include = ["/src", "build.rs", "Cargo.toml", "*.so*"]
 
 [dependencies]
