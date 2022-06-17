@@ -4,13 +4,19 @@
 #include <iomanip>
 #include <memory>
 #include <string>
+#include <cmath>
+#include <random>
+#include <cassert>
+#include <algorithm>
 #include <string_view>
 
 #include "sxt/base/container/span.h"
+#include "sxt/curve21/type/element_p3.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/base/num/fast_random_number_generator.h"
+#include "sxt/seqcommit/generator/base_element.h"
+#include "sxt/curve21/ristretto/byte_conversion.h"
 #include "sxt/seqcommit/cbindings/pedersen_backend.h"
 #include "sxt/seqcommit/cbindings/pedersen_cpu_backend.h"
 #include "sxt/seqcommit/cbindings/pedersen_gpu_backend.h"
@@ -102,12 +108,21 @@ static void print_result(uint64_t cols, memmg::managed_array<sqcb::commitment> &
 static void populate_table(
     uint64_t cols, uint64_t rows, uint8_t element_nbytes,
     memmg::managed_array<uint8_t> &data_table, 
-    memmg::managed_array<mtxb::exponent_sequence> &data_cols) {
-
-    basn::fast_random_number_generator generator(data_table.size(), data_table.size());
-
+    memmg::managed_array<mtxb::exponent_sequence> &data_cols, 
+    memmg::managed_array<sqcb::commitment> &generators) {
+    
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<uint8_t> distribution(0, UINT8_MAX);
+    
+    for (size_t i = 0; i < rows; ++i) {
+        c21t::element_p3 g_i;
+        sqcgn::compute_base_element(g_i, i);
+        c21rs::to_bytes(generators[i].data(), g_i);
+    }
+    
     for (size_t i = 0; i < data_table.size(); ++i) {
-        data_table[i] = (uint8_t) (generator() % 256);
+        data_table[i] = distribution(gen);
     }
 
     for (size_t c = 0; c < cols; ++c) {
@@ -115,7 +130,7 @@ static void populate_table(
 
         data_col.n = rows;
         data_col.element_nbytes = element_nbytes;
-        data_col.data = (data_table.data() + c * rows * element_nbytes);
+        data_col.data = data_table.data() + c * rows * element_nbytes;
     }
 }
 
@@ -127,44 +142,70 @@ int main(int argc, char* argv[]) {
 
     if (p.status != 0) return -1;
 
-    p.trigger_timer();
-
-    // populate data section
-    basct::span<sqcb::commitment> empty_generators;
-    memmg::managed_array<uint8_t> data_table(p.rows * p.cols * p.element_nbytes);
-    memmg::managed_array<sqcb::commitment> commitments_per_col(p.cols);
-    memmg::managed_array<mtxb::exponent_sequence> data_cols(p.cols);
-    basct::span<sqcb::commitment> commitments(commitments_per_col.data(), p.cols);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(data_cols.data(), p.cols);
-
-    populate_table(p.cols, p.rows, p.element_nbytes, data_table, data_cols);
-    
-    p.stop_timer();
-
-    double duration_populate = p.elapsed_time();
-
-    p.trigger_timer();
-    
-    p.backend->compute_commitments(commitments, value_sequences, empty_generators);
-
-    p.stop_timer();
-
     long long int table_size = (p.cols * p.rows * p.element_nbytes) / 1024 / 1024;
-    double duration_compute = p.elapsed_time();
-    double data_throughput = p.rows * p.cols / duration_compute;
 
     std::cout << "===== benchmark results" << std::endl;
+    std::cout << "backend : " << p.backend_str << std::endl;
     std::cout << "rows : " << p.rows << std::endl;
     std::cout << "cols : " << p.cols << std::endl;
     std::cout << "element_nbytes : " << p.element_nbytes << std::endl;
     std::cout << "table_size (MB) : " << table_size << std::endl;
     std::cout << "num_exponentations : " << (p.cols * p.rows) << std::endl;
-    std::cout << "populate duration (s) : " << std::fixed << duration_populate << std::endl;
-    std::cout << "compute duration (s) : " << std::fixed << duration_compute << std::endl;
-    std::cout << "throughput (exponentiations / s): " << std::scientific << data_throughput << std::endl;
-    std::cout << "backend : " << p.backend_str << std::endl;
 
-    if (p.verbose) print_result(p.cols, commitments_per_col);
+    // populate data section
+    memmg::managed_array<sqcb::commitment> generators(p.rows);
+    memmg::managed_array<mtxb::exponent_sequence> data_cols(p.cols);
+    memmg::managed_array<sqcb::commitment> commitments_per_col(p.cols);
+    memmg::managed_array<uint8_t> data_table(p.rows * p.cols * p.element_nbytes);
+    basct::span<sqcb::commitment> commitments(commitments_per_col.data(), p.cols);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(data_cols.data(), p.cols);
+
+    populate_table(p.cols, p.rows, p.element_nbytes, data_table, data_cols, generators);
+
+    for (auto use_generators : {true, false}) {
+        int NUM_SAMPLES = 15;
+        std::vector<double> durations;
+        double mean_duration_compute = 0;
+        
+        for (int i = 0; i < NUM_SAMPLES; ++i) {
+            if (use_generators) {
+                // populate generators
+                basct::span<sqcb::commitment> span_generators(generators.data(), p.rows);
+
+                p.trigger_timer();
+                p.backend->compute_commitments(commitments, value_sequences, span_generators);
+                p.stop_timer();
+            } else {
+                basct::span<sqcb::commitment> empty_generators;
+
+                p.trigger_timer();
+                p.backend->compute_commitments(commitments, value_sequences, empty_generators);
+                p.stop_timer();
+            }
+
+            double duration_compute = p.elapsed_time();
+
+            durations.push_back(duration_compute);
+            mean_duration_compute += duration_compute / NUM_SAMPLES;
+        }
+
+        double std_deviation = 0;
+        
+        for (int i = 0; i < NUM_SAMPLES; ++i) {
+            std_deviation += pow(durations[i] - mean_duration_compute, 2.);
+        }
+
+        std_deviation = sqrt(std_deviation / NUM_SAMPLES);
+
+        double data_throughput = p.rows * p.cols / mean_duration_compute;
+
+        std::cout << "use generators : " << (use_generators ? "yes" : "no") << std::endl;
+        std::cout << "compute duration (s) : " << std::fixed << mean_duration_compute << std::endl;
+        std::cout << "compute std deviation (s) : " << std::fixed << std_deviation << std::endl;
+        std::cout << "throughput (exponentiations / s) : " << std::scientific << data_throughput << std::endl;
+
+        if (p.verbose) print_result(p.cols, commitments_per_col);
+    }
     
     return 0;
 }
