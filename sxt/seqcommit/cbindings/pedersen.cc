@@ -68,16 +68,13 @@ int sxt_init(const sxt_config* config) {
 // validate_descriptor
 //--------------------------------------------------------------------------------------------------
 static int validate_descriptor(uint64_t &longest_sequence, const sxt_sequence_descriptor *descriptor) {
-  // verify if sequence type is already implemented
-  if (descriptor->sequence_type != SXT_DENSE_SEQUENCE_TYPE) return 1;
-
   // verify if data pointers are validate
-  if (descriptor->dense.n > 0 && descriptor->dense.data == nullptr) return 1;
+  if (descriptor->n > 0 && descriptor->data == nullptr) return 1;
 
   // verify if word size is inside the correct range (1 to 32)
-  if (descriptor->dense.element_nbytes == 0 || descriptor->dense.element_nbytes > 32) return 1;
+  if (descriptor->element_nbytes == 0 || descriptor->element_nbytes > 32) return 1;
 
-  longest_sequence = std::max(longest_sequence, descriptor->dense.n);
+  longest_sequence = std::max(longest_sequence, descriptor->n);
 
   return 0;
 }
@@ -129,12 +126,12 @@ static int process_compute_pedersen_commitments(
 
   memmg::managed_array<mtxb::exponent_sequence> sequences(num_sequences);
 
-  static_assert(sizeof(mtxb:: exponent_sequence) == 
-      sizeof(sxt_dense_sequence_descriptor), "types must be ABI compatible");
+  static_assert(sizeof(mtxb::exponent_sequence) == 
+      sizeof(sxt_sequence_descriptor), "types must be ABI compatible");
 
   // populating sequence object
   for (uint64_t i = 0; i < num_sequences; ++i) {
-    sequences[i] = *(reinterpret_cast<const mtxb::exponent_sequence *>(&descriptors[i].dense));
+    sequences[i] = *(reinterpret_cast<const mtxb::exponent_sequence *>(&descriptors[i]));
   }
 
   basct::cspan<mtxb::exponent_sequence> value_sequences(sequences.data(),

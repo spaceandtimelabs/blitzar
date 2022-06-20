@@ -13,15 +13,14 @@ int main() {
   const uint64_t n1 = 3;
   const uint8_t n1_num_bytes = 1;
   uint8_t data_bytes_1[n1_num_bytes * n1] = {1, 2, 3};
-  sxt_dense_sequence_descriptor descriptor1 = {
+  sxt_sequence_descriptor descriptor1 = {
       n1_num_bytes,  // number bytes
       n1,            // number rows
-      data_bytes_1   // data pointer
+      data_bytes_1,   // data pointer
+      nullptr
   };
   const int num_sequences = 1;
-  const sxt_sequence_descriptor descriptors[num_sequences] = {
-      {SXT_DENSE_SEQUENCE_TYPE, descriptor1},
-  };
+  const sxt_sequence_descriptor descriptors[num_sequences] = {descriptor1};
   sxt_ristretto_element commitments[num_sequences];
   auto rcode =
       sxt_compute_pedersen_commitments(commitments, num_sequences, descriptors);

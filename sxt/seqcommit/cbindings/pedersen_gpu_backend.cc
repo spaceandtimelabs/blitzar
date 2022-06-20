@@ -24,6 +24,7 @@ static void pre_initialize_gpu() {
   auto &data_col = dummy_data_cols[0];
 
   data_col.n = 1;
+  data_col.indices = nullptr;
   data_col.element_nbytes = 1;
   data_col.data = dummy_data_table.data();
 

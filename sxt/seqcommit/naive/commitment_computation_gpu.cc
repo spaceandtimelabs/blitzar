@@ -26,11 +26,12 @@ static constexpr uint64_t block_size = 64;
 // get_value_sequence_size
 //--------------------------------------------------------------------------------------------------
 static void get_value_sequence_size(
-    uint64_t &sequence_size, uint64_t &total_num_blocks, uint64_t &biggest_n,
+    uint64_t &sequence_size, uint64_t &total_num_blocks, uint64_t &biggest_n, uint64_t &total_num_indices,
     basct::cspan<mtxb::exponent_sequence> value_sequences) {
   biggest_n = 0;
   sequence_size = 0;
   total_num_blocks = 0;
+  total_num_indices = 0;
 
   for (size_t c = 0; c < value_sequences.size(); ++c) {
     auto &data_commitment = value_sequences[c];
@@ -38,6 +39,7 @@ static void get_value_sequence_size(
     assert(data_commitment.element_nbytes > 0 && data_commitment.element_nbytes <= 32);
 
     biggest_n = max(biggest_n, data_commitment.n);
+    total_num_indices += (data_commitment.indices == nullptr) ? 0 : data_commitment.n;
     total_num_blocks += basn::divide_up(data_commitment.n, block_size);
     sequence_size += data_commitment.n * data_commitment.element_nbytes;
   }
@@ -64,9 +66,18 @@ __global__ static void compute_commitments_kernel(
 
   c21t::element_p3 g_i;
 
+  // verify if default generators should be used
   if (generators == nullptr) {
-    sqcgn::compute_base_element(g_i, row_i);
-  } else {
+    int row_g_i = row_i;
+
+    // verify if sparse representation should be used
+    // otherwise, use the above dense representation
+    if (value_sequence.indices != nullptr) {
+      row_g_i = value_sequence.indices[row_i];
+    }
+
+    sqcgn::compute_base_element(g_i, row_g_i);
+  } else { // otherwise, use the user given generators
     c21rs::from_bytes(g_i, generators[row_i].data());
   }
 
@@ -130,7 +141,7 @@ static void launch_commitment_kernels(
     basct::cspan<sqcb::commitment> generators) {
 
   uint64_t num_commitments = commitments_device.size();
-  uint64_t sequence_size, total_num_blocks, biggest_n;
+  uint64_t sequence_size, total_num_blocks, biggest_n, total_num_indices;
 
   // Gets some information about the `value_sequences`,
   // such as the longest sequence, the total amount
@@ -143,6 +154,7 @@ static void launch_commitment_kernels(
     sequence_size,
     total_num_blocks,
     biggest_n,
+    total_num_indices,
     value_sequences
   );
 
@@ -155,6 +167,12 @@ static void launch_commitment_kernels(
   // allocates memory in the device for the data_table
   memmg::managed_array<uint8_t> data_table_device(
     sequence_size,
+    memr::get_device_resource()
+  );
+
+  // allocates memory in the device for the indices data
+  memmg::managed_array<uint64_t> indices_device(
+    total_num_indices,
     memr::get_device_resource()
   );
 
@@ -188,6 +206,7 @@ static void launch_commitment_kernels(
     );
   }
 
+  uint64_t *indices_dev_ptr = indices_device.data();
   uint8_t *data_table_dev_ptr = data_table_device.data();
 
   c21t::element_p3 *partial_commits_dev_ptr = partial_commitments_device.data();
@@ -221,6 +240,22 @@ static void launch_commitment_kernels(
       );
 
       data_commit.data = data_table_dev_ptr;
+      
+      if (data_commit.indices != nullptr) {
+        // We asynchronously move the current
+        // indices to the device memory, using
+        // for that the current cuda stream.
+        basdv::async_memcpy_host_to_device(
+          indices_dev_ptr,
+          data_commit.indices,
+          data_commit.n * sizeof(data_commit.indices[0]),
+          curr_stream
+        );
+
+        data_commit.indices = indices_dev_ptr;
+
+        indices_dev_ptr += data_commit.n; 
+      }
 
       // We split the current sequence into multiple cuda blocks.
       // Each block is responsible for computing the 

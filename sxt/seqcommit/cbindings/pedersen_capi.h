@@ -6,8 +6,6 @@
 extern "C" {
 #endif
 
-#define SXT_DENSE_SEQUENCE_TYPE 1
-
 #define SXT_BACKEND_CPU 1
 #define SXT_BACKEND_GPU 2
 
@@ -16,11 +14,15 @@ struct sxt_config {
   int backend;
 };
 
-/** describes a dense sequence of values **/
-struct sxt_dense_sequence_descriptor {
+struct sxt_ristretto_element {
+  // encodes an element of the ristretto255 group
+  uint8_t ristretto_bytes[32];
+};
+
+/** describes a sequence of values **/
+struct sxt_sequence_descriptor {
   // the number of bytes used to represent an element in the sequence
-  // element_nbytes must be a power of 2 and must satisfy
-  //    1 <= element_nbytes <= 32
+  // element_nbytes must be a power of 2 and must satisfy 1 <= element_nbytes <= 32
   uint8_t element_nbytes;
 
   // the number of elements in the sequence
@@ -30,24 +32,16 @@ struct sxt_dense_sequence_descriptor {
   // in the sequence and each element enocodes a number of element_nbytes bytes
   // represented in the little endian format
   const uint8_t* data;
-};
 
-struct sxt_sequence_descriptor {
-  // specifies the type of sequence (e.g. SXT_DENSE_SEQUENCE_TYPE, SXT_SPARSE_SEQUENCE_TYPE, etc).
-  uint8_t sequence_type;
-
-  union {
-    struct sxt_dense_sequence_descriptor dense;
-
-    // Note: we may also in the future want to support sparse sequences where
-    // the majority of elements are zero and the nonzero elements in the
-    // sequence are encoded with the pair (index, element)
-  };
-};
-
-struct sxt_ristretto_element {
-  // encodes an element of the ristretto255 group
-  uint8_t ristretto_bytes[32];
+  // when `indices` is nullptr, then the sequence descriptor
+  // represents a dense sequence. In this case, data[i] is
+  // always tied with row i.
+  // If `indices` is not nullptr, then the sequence represents
+  // a sparse sequence such that `indices[i]` holds
+  // the actual row_i in which data[i] is tied with. In case
+  // indices is not nullptr, then `indices` must have
+  // exactly `n` elements.
+  const uint64_t* indices;
 };
 
 /**
@@ -100,10 +94,9 @@ int sxt_init(
  * - backend not initialized or incorrectly initialized
  * - descriptors == nullptr
  * - commitments == nullptr
- * - descriptors\[i].sequence_type != SXT_DENSE_SEQUENCE_TYPE
- * - descriptor\[i].dense.n > 0 && descriptor\[i].dense.data == nullptr
- * - descriptor\[i].dense.element_nbytes == 0
- * - descriptor\[i].dense.element_nbytes > 32
+ * - descriptor\[i].element_nbytes == 0
+ * - descriptor\[i].element_nbytes > 32
+ * - descriptor\[i].n > 0 && descriptor\[i].data == nullptr
  * 
  * # Considerations:
  * 
@@ -148,10 +141,9 @@ int sxt_compute_pedersen_commitments(
  * - descriptors == nullptr
  * - commitments == nullptr
  * - generators == nullptr
- * - descriptors\[i].sequence_type != SXT_DENSE_SEQUENCE_TYPE
- * - descriptor\[i].dense.n > 0 && descriptor\[i].dense.data == nullptr
- * - descriptor\[i].dense.element_nbytes == 0
- * - descriptor\[i].dense.element_nbytes > 32
+ * - descriptor\[i].element_nbytes == 0
+ * - descriptor\[i].element_nbytes > 32
+ * - descriptor\[i].n > 0 && descriptor\[i].data == nullptr
  * 
  * # Considerations:
  * 

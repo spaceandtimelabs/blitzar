@@ -19,34 +19,37 @@ TEST_CASE("run compute pedersen commitment tests") {
     const uint64_t n1 = 3;
     const uint8_t n1_num_bytes = 1;
     uint8_t data_bytes_1[n1_num_bytes * n1];
-    sxt_dense_sequence_descriptor valid_seq_descriptor1 = {
+    sxt_sequence_descriptor valid_seq_descriptor1 = {
         n1_num_bytes, // number bytes
         n1, // number rows
-        data_bytes_1 // data pointer
+        data_bytes_1, // data pointer
+        nullptr
     };
 
     const uint64_t n2 = 2;
     const uint8_t n2_num_bytes = 4;
     uint8_t data_bytes_2[n2_num_bytes * n1];
-    sxt_dense_sequence_descriptor valid_seq_descriptor2 = {
+    sxt_sequence_descriptor valid_seq_descriptor2 = {
         n2_num_bytes,
         n2, // number rows
-        data_bytes_2 // data pointer
+        data_bytes_2, // data pointer
+        nullptr
     };
 
     const uint64_t n3 = 1;
     const uint8_t n3_num_bytes = 32;
     uint8_t data_bytes_3[n3_num_bytes * n1];
-    sxt_dense_sequence_descriptor valid_seq_descriptor3 = {
+    sxt_sequence_descriptor valid_seq_descriptor3 = {
         n3_num_bytes, // number bytes
         n3, // number rows
-        data_bytes_3 // data pointer
+        data_bytes_3, // data pointer
+        nullptr
     };
 
     const sxt_sequence_descriptor valid_descriptors[num_sequences] = {
-        {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor1},
-        {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor2},
-        {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor3},
+        valid_seq_descriptor1,
+        valid_seq_descriptor2,
+        valid_seq_descriptor3,
     };
 
     SECTION("non initialized library will error out") {
@@ -115,15 +118,16 @@ TEST_CASE("run compute pedersen commitment tests") {
 
     const uint8_t zero_length_num_bytes = 4;
     uint8_t zero_length_data_bytes[zero_length_num_bytes * n1];
-    sxt_dense_sequence_descriptor zero_length_seq_descriptor = {
+    sxt_sequence_descriptor zero_length_seq_descriptor = {
         zero_length_num_bytes, // number bytes
         0, // number rows
-        zero_length_data_bytes // data pointer
+        zero_length_data_bytes, // data pointer
+        nullptr
     };
     const sxt_sequence_descriptor invalid_descriptors[num_sequences] = {
-        {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor1},
-        {SXT_DENSE_SEQUENCE_TYPE, zero_length_seq_descriptor},
-        {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor3},
+        valid_seq_descriptor1,
+        zero_length_seq_descriptor,
+        valid_seq_descriptor3,
     };
     
     std::array<uint8_t, 32> res_array;
@@ -159,43 +163,29 @@ TEST_CASE("run compute pedersen commitment tests") {
         REQUIRE(res_array == req_array);
     }
 
-    SECTION("descriptor with invalid type will error out") {
-        const sxt_sequence_descriptor invalid_descriptors[num_sequences] = {
-            {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor1},
-            {SXT_DENSE_SEQUENCE_TYPE + SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor2},
-            {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor3},
-        };
-
-        int ret = sxt_compute_pedersen_commitments(
-            commitments,
-            num_sequences,
-            invalid_descriptors
-        );
-
-        REQUIRE(ret != 0);
-    }
-
     SECTION("out of range (< 1 or > 32) element_nbytes will error out") {
         const uint8_t invalid_num_bytes1 = 0;
         uint8_t invalid_data_bytes1[invalid_num_bytes1 * n1];
-        sxt_dense_sequence_descriptor invalid_seq_descriptor1 = {
+        sxt_sequence_descriptor invalid_seq_descriptor1 = {
             invalid_num_bytes1, // number bytes
             n1, // number rows
-            invalid_data_bytes1 // data pointer
+            invalid_data_bytes1, // data pointer
+            nullptr
         };
 
         const uint8_t invalid_num_bytes12 = 33;
         uint8_t data_bytes_2[invalid_num_bytes12 * n1];
-        sxt_dense_sequence_descriptor invalid_seq_descriptor2 = {
+        sxt_sequence_descriptor invalid_seq_descriptor2 = {
             invalid_num_bytes12, // number bytes
             n1, // number rows
-            data_bytes_2 // data pointer
+            data_bytes_2, // data pointer
+            nullptr
         };
         
         const sxt_sequence_descriptor invalid_descriptors[num_sequences] = {
-            {SXT_DENSE_SEQUENCE_TYPE, invalid_seq_descriptor1},
-            {SXT_DENSE_SEQUENCE_TYPE, invalid_seq_descriptor2},
-            {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor3},
+            invalid_seq_descriptor1,
+            invalid_seq_descriptor2,
+            valid_seq_descriptor3,
         };
 
         int ret = sxt_compute_pedersen_commitments(
@@ -208,16 +198,16 @@ TEST_CASE("run compute pedersen commitment tests") {
     }
 
     SECTION("null element data pointer will error out") {
-        sxt_dense_sequence_descriptor invalid_seq_descriptor1 = {
+        sxt_sequence_descriptor invalid_seq_descriptor1 = {
             n1_num_bytes, // number bytes
             n1, // number rows
             nullptr // null data pointer
         };
 
         const sxt_sequence_descriptor invalid_descriptors[num_sequences] = {
-            {SXT_DENSE_SEQUENCE_TYPE, invalid_seq_descriptor1},
-            {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor2},
-            {SXT_DENSE_SEQUENCE_TYPE, valid_seq_descriptor3},
+            invalid_seq_descriptor1,
+            valid_seq_descriptor2,
+            valid_seq_descriptor3,
         };
 
         int ret = sxt_compute_pedersen_commitments(
@@ -252,11 +242,11 @@ TEST_CASE("run compute pedersen commitment tests") {
 
         // populating sequence object
         for (uint64_t i = 0; i < num_sequences; ++i) {
-            sxt_dense_sequence_descriptor local_descriptor = {
-                element_nbytes, num_rows, (const uint8_t *) query[i]
+            sxt_sequence_descriptor descriptor = {
+                element_nbytes, num_rows, reinterpret_cast<const uint8_t *>(query[i]), nullptr
             };
 
-            valid_descriptors[i] = {SXT_DENSE_SEQUENCE_TYPE, local_descriptor};
+            valid_descriptors[i] = descriptor;
         }
 
         SECTION("c = 52 * a + b ==> commit_c = 52 * commit_a + commit_b") {
@@ -286,7 +276,114 @@ TEST_CASE("run compute pedersen commitment tests") {
             sxt::sqcb::commitment &expected_commitment_c =
                 reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[2];
 
+            // verify that result is not null
+            REQUIRE(sxt::sqcb::commitment() != commitment_c);
+
             REQUIRE(commitment_c == expected_commitment_c);
+        }
+    }
+
+    SECTION("We can compute sparse commitments") {
+        const uint64_t num_sequences = 2;
+        const uint8_t element_nbytes = sizeof(int);
+
+        sxt_ristretto_element commitments_data[num_sequences];
+
+        const int dense_data[11] = {
+            1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0
+        };
+
+        const int sparse_data[5] = {
+            1, 2, 3, 4, 9
+        };
+
+        const uint64_t sparse_indices[5] = {
+            0, 2, 4, 5, 9
+        };
+
+        sxt_sequence_descriptor dense_descriptor = {
+            element_nbytes, 11, reinterpret_cast<const uint8_t *>(dense_data), nullptr
+        };
+
+        sxt_sequence_descriptor sparse_descriptor = {
+            element_nbytes, 5, reinterpret_cast<const uint8_t *>(sparse_data), sparse_indices
+        };
+
+        sxt_sequence_descriptor descriptors[num_sequences] = {
+            dense_descriptor, sparse_descriptor
+        };
+
+        SECTION("sparse_commitments == dense_commitment") {
+            int ret = sxt_compute_pedersen_commitments(
+                commitments_data,
+                num_sequences,
+                descriptors
+            );
+
+            REQUIRE(ret == 0);
+
+            sxt::sqcb::commitment &dense_commitment =
+                reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[0];
+
+            sxt::sqcb::commitment &sparse_commitment =
+                reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[1];
+
+            // verify that result is not null
+            REQUIRE(sxt::sqcb::commitment() != dense_commitment);
+
+            REQUIRE(dense_commitment == sparse_commitment);
+        }
+    }
+
+    SECTION("We can compute dense commitments as sparse commitments") {
+        const uint64_t num_sequences = 2;
+        const uint8_t element_nbytes = sizeof(int);
+
+        sxt_ristretto_element commitments_data[num_sequences];
+
+        const int dense_data[11] = {
+            1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0
+        };
+
+        const int sparse_data[11] = {
+            1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0
+        };
+
+        const uint64_t sparse_indices[11] = {
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+        };
+
+        sxt_sequence_descriptor dense_descriptor = {
+            element_nbytes, 11, reinterpret_cast<const uint8_t *>(dense_data), nullptr
+        };
+
+        sxt_sequence_descriptor sparse_descriptor = {
+            element_nbytes, 11, reinterpret_cast<const uint8_t *>(sparse_data), sparse_indices
+        };
+
+        sxt_sequence_descriptor descriptors[num_sequences] = {
+            dense_descriptor, sparse_descriptor
+        };
+
+        SECTION("dense_commitment == dense_commitment as sparse") {
+            int ret = sxt_compute_pedersen_commitments(
+                commitments_data,
+                num_sequences,
+                descriptors
+            );
+
+            REQUIRE(ret == 0);
+
+            sxt::sqcb::commitment &dense_commitment =
+                reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[0];
+
+            sxt::sqcb::commitment &sparse_commitment =
+                reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[1];
+
+            // verify that result is not null
+            REQUIRE(sxt::sqcb::commitment() != dense_commitment);
+            
+            REQUIRE(dense_commitment == sparse_commitment);
         }
     }
 
@@ -332,11 +429,11 @@ TEST_CASE("run compute pedersen commitment tests") {
 
         // populating sequence object
         for (uint64_t i = 0; i < num_sequences; ++i) {
-            sxt_dense_sequence_descriptor local_descriptor = {
-                element_nbytes, num_rows, (const uint8_t *) query
+            sxt_sequence_descriptor descriptor = {
+                element_nbytes, num_rows, reinterpret_cast<const uint8_t *>(query), nullptr
             };
 
-            valid_descriptors[i] = {SXT_DENSE_SEQUENCE_TYPE, local_descriptor};
+            valid_descriptors[i] = descriptor;
         }
 
         SECTION("passing null generators will error out") {

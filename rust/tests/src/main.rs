@@ -2,6 +2,8 @@ extern crate proofs_gpu;
 
 #[cfg(test)]
 mod tests {
+    use std::ptr;
+    
     #[test]
     fn compute_commitments_works() {
         let config: proofs_gpu::sxt_config = proofs_gpu::sxt_config {
@@ -55,18 +57,14 @@ mod tests {
             cbinding_descriptors.set_len(num_commitments);
             
             for i in 0..num_commitments {
-                let descriptor = proofs_gpu::sxt_dense_sequence_descriptor {
+                let descriptor = proofs_gpu::sxt_sequence_descriptor {
                     element_nbytes: n1_num_bytes,  // number bytes
                     n: n1,            // number rows
-                    data: data_bytes[i].as_mut_ptr() as *const u8   // data pointer
+                    data: data_bytes[i].as_mut_ptr() as *const u8,   // data pointer
+                    indices: ptr::null()
                 };
 
-                cbinding_descriptors[i] = proofs_gpu::sxt_sequence_descriptor {
-                    sequence_type: proofs_gpu::SXT_DENSE_SEQUENCE_TYPE as u8,
-                    __bindgen_anon_1: proofs_gpu::sxt_sequence_descriptor__bindgen_ty_1 {
-                        dense: descriptor
-                    }
-                };
+                cbinding_descriptors[i] = descriptor;
             }
 
             let ret_compute = proofs_gpu::sxt_compute_pedersen_commitments(

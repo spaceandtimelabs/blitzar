@@ -22,9 +22,9 @@ void compute_commitments_cpu(
 
     assert(commitments.size() == value_sequences.size());
 
-    for (size_t colum_k = 0; colum_k < commitments.size(); ++colum_k) {
+    for (size_t sequence_k = 0; sequence_k < commitments.size(); ++sequence_k) {
         c21t::element_p3 p_k = c21cn::zero_p3_v;
-        const mtxb::exponent_sequence &column_k_data = value_sequences[colum_k];
+        const mtxb::exponent_sequence &column_k_data = value_sequences[sequence_k];
 
         for (size_t row_i = 0; row_i < column_k_data.n; row_i++) {
             c21t::element_p3 g_i;
@@ -32,9 +32,18 @@ void compute_commitments_cpu(
             uint8_t element_nbytes = column_k_data.element_nbytes;
             const uint8_t *bytes_row_i_column_k = column_k_data.data + row_i * element_nbytes;
 
+            // verify if default generators should be used
+            // otherwise, use the above dense representation
             if (generators.empty()) {
-                sqcgn::compute_base_element(g_i, row_i);
-            } else {
+                size_t row_g_i = row_i;
+
+                // verify if sparse representation should be used
+                if (column_k_data.indices != nullptr) {
+                    row_g_i = column_k_data.indices[row_i];
+                }
+
+                sqcgn::compute_base_element(g_i, row_g_i);
+            } else { // otherwise, use the user given generators
                 c21rs::from_bytes(g_i, generators[row_i].data());
             }
 
@@ -47,7 +56,7 @@ void compute_commitments_cpu(
             c21o::add(p_k, p_k, h_i);
         }
 
-        c21rs::to_bytes(commitments[colum_k].data(), p_k);
+        c21rs::to_bytes(commitments[sequence_k].data(), p_k);
     }
 }
 

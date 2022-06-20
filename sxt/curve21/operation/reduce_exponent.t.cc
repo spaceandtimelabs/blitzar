@@ -21,7 +21,7 @@ TEST_CASE(
       "27742317777372353535851937790883648493)") {
     std::array<unsigned long long, 4> expected_s = s;
 
-    reduce_exponent((unsigned char *)s.data());
+    reduce_exponent(reinterpret_cast<unsigned char *>(s.data()));
 
     REQUIRE(s == expected_s);
   }
@@ -39,7 +39,7 @@ TEST_CASE(
   SECTION(
       "Verifying for A mod p == 0 holds (p = 2^252 + "
       "27742317777372353535851937790883648493)") {
-    reduce_exponent((unsigned char *)s.data());
+    reduce_exponent(reinterpret_cast<unsigned char *>(s.data()));
 
     REQUIRE(s == std::array<unsigned long long, 4>({0, 0, 0, 0}));
   }
@@ -57,7 +57,7 @@ TEST_CASE(
   SECTION(
       "Verifying for A mod p == 103 holds (p = 2^252 + "
       "27742317777372353535851937790883648493)") {
-    reduce_exponent((unsigned char *)s.data());
+    reduce_exponent(reinterpret_cast<unsigned char *>(s.data()));
 
     REQUIRE(s == std::array<unsigned long long, 4>({103, 0, 0, 0}));
   }
@@ -82,7 +82,7 @@ TEST_CASE(
   SECTION(
       "Verifying for A mod p holds (p = 2^252 + "
       "27742317777372353535851937790883648493)") {
-    reduce_exponent((unsigned char *)s.data());
+    reduce_exponent(reinterpret_cast<unsigned char *>(s.data()));
 
     REQUIRE(s == expected_s);
   }

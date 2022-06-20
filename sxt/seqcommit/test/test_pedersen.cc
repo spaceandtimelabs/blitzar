@@ -19,25 +19,25 @@ void test_pedersen_compute_commitment(
         basct::cspan<mtxb::exponent_sequence>, basct::cspan<sqcb::commitment> generators)> f) {
   SECTION("we can add two commitments together") {
     const uint64_t num_rows = 4;
-    const uint64_t num_columns = 3;
+    const uint64_t num_sequences = 3;
     const uint8_t element_nbytes = sizeof(int);
 
     basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
+    sqcb::commitment commitments_data[num_sequences];
+    mtxb::exponent_sequence sequences[num_sequences];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
     basct::cspan<mtxb::exponent_sequence> value_sequences(sequences,
-                                                          num_columns);
+                                                          num_sequences);
 
-    const int query[num_columns][num_rows] = {
+    const int query[num_sequences][num_rows] = {
         {2000, 7500, 5000, 1500},
         {5000, 0, 400000, 10},
         {2000 + 5000, 7500 + 0, 5000 + 400000, 1500 + 10}};
 
     // populating sequence object
-    for (uint64_t i = 0; i < num_columns; ++i) {
+    for (uint64_t i = 0; i < num_sequences; ++i) {
       sequences[i].n = num_rows;
-      sequences[i].data = (const uint8_t *)query[i];
+      sequences[i].data = reinterpret_cast<const uint8_t *>(query[i]);
       sequences[i].element_nbytes = element_nbytes;
     }
 
@@ -60,23 +60,26 @@ void test_pedersen_compute_commitment(
 
       sqcb::commitment &expected_commitment_c = commitments_data[2];
 
+      // verify that result is not null
+      REQUIRE(sxt::sqcb::commitment() != commitment_c);
+
       REQUIRE(commitment_c == expected_commitment_c);
     }
   }
 
   SECTION("We can add 3 * g as well as g + g + g") {
     const uint64_t num_rows = 1;
-    const uint64_t num_columns = 4;
+    const uint64_t num_sequences = 4;
     const uint8_t element_nbytes = sizeof(int);
 
     basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
+    sqcb::commitment commitments_data[num_sequences];
+    mtxb::exponent_sequence sequences[num_sequences];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
     basct::cspan<mtxb::exponent_sequence> value_sequences(sequences,
-                                                          num_columns);
+                                                          num_sequences);
 
-    const int query[num_columns][num_rows] = {
+    const int query[num_sequences][num_rows] = {
         {1},  // A
         {1},  // B
         {1},  // C
@@ -84,9 +87,9 @@ void test_pedersen_compute_commitment(
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < num_columns; ++i) {
+    for (uint64_t i = 0; i < num_sequences; ++i) {
       sequences[i].n = num_rows;
-      sequences[i].data = (const uint8_t *)query[i];
+      sequences[i].data = reinterpret_cast<const uint8_t *>(query[i]);
       sequences[i].element_nbytes = element_nbytes;
     }
 
@@ -111,6 +114,9 @@ void test_pedersen_compute_commitment(
 
       sqcb::commitment &expected_commitment_c = commitments_data[3];
 
+      // verify that result is not null
+      REQUIRE(sxt::sqcb::commitment() != commitment_c);
+
       REQUIRE(commitment_c == expected_commitment_c);
     }
   }
@@ -119,23 +125,23 @@ void test_pedersen_compute_commitment(
       "We can add 3 * g as well as g + g + g by using the add function "
       "directly") {
     const uint64_t num_rows = 1;
-    const uint64_t num_columns = 1;
+    const uint64_t num_sequences = 1;
     const uint8_t element_nbytes = sizeof(int);
 
     basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
+    sqcb::commitment commitments_data[num_sequences];
+    mtxb::exponent_sequence sequences[num_sequences];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_sequences);
 
-    const int query[num_columns][num_rows] = {
+    const int query[num_sequences][num_rows] = {
         {3} // D = A + B + C
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < num_columns; ++i) {
+    for (uint64_t i = 0; i < num_sequences; ++i) {
         sequences[i].n = num_rows;
-        sequences[i].data = (const uint8_t *) query[i];
+        sequences[i].data = reinterpret_cast<const uint8_t *>(query[i]);
         sequences[i].element_nbytes = element_nbytes;
     }
 
@@ -157,6 +163,9 @@ void test_pedersen_compute_commitment(
 
         sqcb::commitment &expected_commitment = commitments_data[0];
 
+        // verify that result is not null
+        REQUIRE(sxt::sqcb::commitment() != commitment);
+
         REQUIRE(commitment == expected_commitment);
     }
   }
@@ -165,14 +174,14 @@ void test_pedersen_compute_commitment(
       "We can verify the maximum range allowed by the commitment (regarding "
       "the fill_data function)") {
     const uint64_t num_rows = 1;
-    const uint64_t num_columns = 3;
+    const uint64_t num_sequences = 3;
     const uint8_t element_nbytes = 32;
 
     basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_columns);
+    sqcb::commitment commitments_data[num_sequences];
+    mtxb::exponent_sequence sequences[num_sequences];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_sequences);
 
     const unsigned char query[3][32] = {
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,120, },// A
@@ -181,9 +190,9 @@ void test_pedersen_compute_commitment(
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < num_columns; ++i) {
+    for (uint64_t i = 0; i < num_sequences; ++i) {
         sequences[i].n = num_rows;
-        sequences[i].data = (const uint8_t *) query[i];
+        sequences[i].data = reinterpret_cast<const uint8_t *>(query[i]);
         sequences[i].element_nbytes = element_nbytes;
     }
 
@@ -205,24 +214,27 @@ void test_pedersen_compute_commitment(
 
       sqcb::commitment &expected_commitment_c = commitments_data[2];
 
+      // verify that result is not null
+      REQUIRE(sxt::sqcb::commitment() != commitment_c);
+
       REQUIRE(commitment_c == expected_commitment_c);
     }
   }
 
   SECTION("We can multiply and add two commitments together") {
     const uint64_t num_rows = 4;
-    const uint64_t num_columns = 3;
+    const uint64_t num_sequences = 3;
     const uint8_t element_nbytes = sizeof(int);
     const unsigned int multiplicative_constant = 52;
 
     basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
+    sqcb::commitment commitments_data[num_sequences];
+    mtxb::exponent_sequence sequences[num_sequences];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
     basct::cspan<mtxb::exponent_sequence> value_sequences(sequences,
-                                                          num_columns);
+                                                          num_sequences);
 
-    const int query[num_columns][num_rows] = {
+    const int query[num_sequences][num_rows] = {
         {2000, 7500, 5000, 1500},
         {5000, 0, 400000, 10},
         {multiplicative_constant * 2000 + 5000,
@@ -231,9 +243,9 @@ void test_pedersen_compute_commitment(
          multiplicative_constant * 1500 + 10}};
 
     // populating sequence object
-    for (uint64_t i = 0; i < num_columns; ++i) {
+    for (uint64_t i = 0; i < num_sequences; ++i) {
       sequences[i].n = num_rows;
-      sequences[i].data = (const uint8_t *)query[i];
+      sequences[i].data = reinterpret_cast<const uint8_t *>(query[i]);
       sequences[i].element_nbytes = element_nbytes;
     }
 
@@ -257,6 +269,9 @@ void test_pedersen_compute_commitment(
 
       sqcb::commitment &expected_commitment_c = commitments_data[2];
 
+      // verify that result is not null
+      REQUIRE(sxt::sqcb::commitment() != commitment_c);
+
       REQUIRE(commitment_c == expected_commitment_c);
     }
   }
@@ -265,14 +280,14 @@ void test_pedersen_compute_commitment(
       "We can add two negative values together and generate valid "
       "commitments") {
     const uint64_t num_rows = 1;
-    const uint64_t num_columns = 3;
+    const uint64_t num_sequences = 3;
 
     basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
+    sqcb::commitment commitments_data[num_sequences];
+    mtxb::exponent_sequence sequences[num_sequences];
+    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
     basct::cspan<mtxb::exponent_sequence> value_sequences(sequences,
-                                                          num_columns);
+                                                          num_sequences);
 
     const int result = 256;
 
@@ -282,15 +297,15 @@ void test_pedersen_compute_commitment(
     };
 
     sequences[0].n = num_rows;
-    sequences[0].data = (const uint8_t *)query[0];
+    sequences[0].data = reinterpret_cast<const uint8_t *>(query[0]);
     sequences[0].element_nbytes = sizeof(query[0]);
 
     sequences[1].n = num_rows;
-    sequences[1].data = (const uint8_t *)query[1];
+    sequences[1].data = reinterpret_cast<const uint8_t *>(query[1]);
     sequences[1].element_nbytes = sizeof(query[1]);
 
     sequences[2].n = num_rows;
-    sequences[2].data = (const uint8_t *)&result;
+    sequences[2].data = reinterpret_cast<const uint8_t *>(&result);
     sequences[2].element_nbytes = sizeof(result);
 
     SECTION("-|c| = -|a| + -|b| ==> commit_c = commit_a + commit_b") {
@@ -310,6 +325,9 @@ void test_pedersen_compute_commitment(
 
       sqcb::commitment &expected_commitment_c = commitments_data[2];
 
+      // verify that result is not null
+      REQUIRE(sxt::sqcb::commitment() != commitment_c);
+
       REQUIRE(commitment_c == expected_commitment_c);
     }
   }
@@ -318,42 +336,44 @@ void test_pedersen_compute_commitment(
       "We can verify the maximum range allowed by the commitment "
       "(regarding the reduction function)") {
     const uint64_t num_rows = 1;
-    const uint64_t num_columns = 3;
+    const uint64_t num_sequences = 3;
     const uint8_t element_nbytes = 32;
 
-    basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_columns];
-    mtxb::exponent_sequence sequences[num_columns];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_columns);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences,
-                                                          num_columns);
+    sqcb::commitment commitments_data[num_sequences];
+    mtxb::exponent_sequence sequences[num_sequences];
 
     // p = 2^252 + 27742317777372353535851937790883648493 (decimal)
     // A = p (decimal)
     // B = p (decimal)
     // C = p + p (decimal)
-    std::array<unsigned long long, 4> p = {6346243789798364141ull,
+    std::array<unsigned long long, 4> pval = {6346243789798364141ull,
                                            1503914060200516822ull, 0ull,
                                            1152921504606846976ull};
-    std::array<unsigned long long, 4> p2 = {12692487579596728282ull,
+    std::array<unsigned long long, 4> p2val = {12692487579596728282ull,
                                             3007828120401033644ull, 0ull,
                                             2305843009213693952ull};
 
     const std::array<std::array<unsigned long long, 4>, 3> query = {
-        p,  // A
-        p,  // B
-        p2  // C = A + B
+        pval,  // A
+        pval,  // B
+        p2val  // C = A + B
     };
 
     // populating sequence object
-    for (uint64_t i = 0; i < num_columns; ++i) {
+    for (uint64_t i = 0; i < num_sequences; ++i) {
       sequences[i].n = num_rows;
-      sequences[i].data = (const uint8_t *)query[i].data();
+      sequences[i].data = reinterpret_cast<const uint8_t *>(query[i].data());
       sequences[i].element_nbytes = element_nbytes;
     }
 
+    basct::span<sqcb::commitment> empty_generators(nullptr, 0);
+    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+    basct::cspan<mtxb::exponent_sequence> value_sequences(sequences,
+                                                          num_sequences);
+
     SECTION(
-        "C = A + B > p (p = 2^252 + 27742317777372353535851937790883648493)") {
+      "C = A + B > p (p = 2^252 + 27742317777372353535851937790883648493)") {
+      
       f(commitments, value_sequences, empty_generators);
 
       sqcb::commitment commitment_c;
@@ -369,6 +389,9 @@ void test_pedersen_compute_commitment(
       c21rs::to_bytes(commitment_c.data(), p);
 
       sqcb::commitment &expected_commitment_c = commitments_data[2];
+
+      // verify that result is not null
+      REQUIRE(sxt::sqcb::commitment() == commitment_c);
 
       REQUIRE(commitment_c == expected_commitment_c);
     }
@@ -402,22 +425,22 @@ void test_pedersen_compute_commitment(
     // populating sequence object
     // A = a
     sequences[0].n = 4;
-    sequences[0].data = (const uint8_t *)a.data();
+    sequences[0].data = reinterpret_cast<const uint8_t *>(a.data());
     sequences[0].element_nbytes = sizeof(unsigned long long);
 
     // B = b
     sequences[1].n = 2;
-    sequences[1].data = (const uint8_t *)b.data();
+    sequences[1].data = reinterpret_cast<const uint8_t *>(b.data());
     sequences[1].element_nbytes = sizeof(unsigned int);
 
     // C = c
     sequences[2].n = 3;
-    sequences[2].data = (const uint8_t *)c.data();
+    sequences[2].data = reinterpret_cast<const uint8_t *>(c.data());
     sequences[2].element_nbytes = sizeof(unsigned char);
 
     // D = d
     sequences[3].n = 4;
-    sequences[3].data = (const uint8_t *)d.data();
+    sequences[3].data = reinterpret_cast<const uint8_t *>(d.data());
     sequences[3].element_nbytes = sizeof(unsigned long long);
 
     SECTION(
@@ -443,6 +466,9 @@ void test_pedersen_compute_commitment(
 
       sqcb::commitment &expected_commitment_c = commitments_data[3];
 
+      // verify that result is not null
+      REQUIRE(sxt::sqcb::commitment() != commitment_c);
+      
       REQUIRE(commitment_c == expected_commitment_c);
     }
   }
@@ -489,7 +515,98 @@ void test_pedersen_compute_commitment(
 
       f(commitments, value_sequences, span_generators);
 
+      // verify that result is not null
+      REQUIRE(sxt::sqcb::commitment() != commitments_data[0]);
+
       REQUIRE(expected_commitment == commitments_data[0]);
+    }
+
+    SECTION("We can compute sparse commitments") {
+        const uint64_t num_sequences = 2;
+        const uint8_t element_nbytes = sizeof(int);
+
+        sxt::sqcb::commitment commitments_data[num_sequences];
+
+        const int dense_data[11] = {
+            1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0
+        };
+
+        const int sparse_data[5] = {
+            1, 2, 3, 4, 9
+        };
+
+        const uint64_t sparse_indices[5] = {
+            0, 2, 4, 5, 9
+        };
+
+        mtxb::exponent_sequence dense_descriptor = {
+            element_nbytes, 11, reinterpret_cast<const uint8_t *>(dense_data), nullptr
+        };
+
+        mtxb::exponent_sequence sparse_descriptor = {
+            element_nbytes, 5, reinterpret_cast<const uint8_t *>(sparse_data), sparse_indices
+        };
+
+        mtxb::exponent_sequence sequences[num_sequences] = {
+            dense_descriptor, sparse_descriptor
+        };
+
+        basct::span<sqcb::commitment> span_generators(nullptr, 0);
+        basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+        basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_sequences);
+
+        SECTION("sparse_commitments == dense_commitment") {
+            f(commitments, value_sequences, span_generators);
+
+            // verify that result is not null
+            REQUIRE(sxt::sqcb::commitment() != commitments_data[0]);
+
+            REQUIRE(commitments_data[0] == commitments_data[1]);
+        }
+    }
+
+    SECTION("We can compute dense commitments as sparse commitments") {
+        const uint64_t num_sequences = 2;
+        const uint8_t element_nbytes = sizeof(int);
+
+        sqcb::commitment commitments_data[num_sequences];
+
+        const int dense_data[11] = {
+            1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0
+        };
+
+        const int sparse_data[11] = {
+            1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0
+        };
+
+        const uint64_t sparse_indices[11] = {
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+        };
+
+        mtxb::exponent_sequence dense_descriptor = {
+            element_nbytes, 11, reinterpret_cast<const uint8_t *>(dense_data), nullptr
+        };
+
+        mtxb::exponent_sequence sparse_descriptor = {
+            element_nbytes, 11, reinterpret_cast<const uint8_t *>(sparse_data), sparse_indices
+        };
+
+        mtxb::exponent_sequence sequences[num_sequences] = {
+            dense_descriptor, sparse_descriptor
+        };
+
+        basct::span<sqcb::commitment> span_generators(nullptr, 0);
+        basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+        basct::cspan<mtxb::exponent_sequence> value_sequences(sequences, num_sequences);
+
+        SECTION("sparse_commitments == dense_commitment") {
+            f(commitments, value_sequences, span_generators);
+
+            // verify that result is not null
+            REQUIRE(sxt::sqcb::commitment() != commitments_data[0]);
+
+            REQUIRE(commitments_data[0] == commitments_data[1]);
+        }
     }
 }
 
