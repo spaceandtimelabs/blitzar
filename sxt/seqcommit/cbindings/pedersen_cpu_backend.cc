@@ -1,7 +1,7 @@
 #include "sxt/seqcommit/cbindings/pedersen_cpu_backend.h"
 
 #include "sxt/seqcommit/base/commitment.h"
-#include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/cpu_generator.h"
 #include "sxt/seqcommit/naive/commitment_computation_cpu.h"
 
@@ -11,7 +11,7 @@ namespace sxt::sqccb {
 //--------------------------------------------------------------------------------------------------
 void pedersen_cpu_backend::compute_commitments(
     basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences,
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
     basct::span<sqcb::commitment> generators) noexcept {
     sqcnv::compute_commitments_cpu(commitments, value_sequences, generators);
 }

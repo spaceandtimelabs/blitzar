@@ -4,7 +4,7 @@
 
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/seqcommit/base/commitment.h"
-#include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/ristretto/byte_conversion.h"
@@ -18,19 +18,19 @@ namespace sxt::sqcnv {
 //--------------------------------------------------------------------------------------------------
 void compute_commitments_cpu(
     basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences, basct::cspan<sqcb::commitment> generators) noexcept {
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences, basct::cspan<sqcb::commitment> generators) noexcept {
 
     assert(commitments.size() == value_sequences.size());
 
     for (size_t sequence_k = 0; sequence_k < commitments.size(); ++sequence_k) {
         c21t::element_p3 p_k = c21cn::zero_p3_v;
-        const mtxb::exponent_sequence &column_k_data = value_sequences[sequence_k];
+        const sqcb::indexed_exponent_sequence &column_k_data = value_sequences[sequence_k];
 
-        for (size_t row_i = 0; row_i < column_k_data.n; row_i++) {
+        for (size_t row_i = 0; row_i < column_k_data.exponent_sequence.n; row_i++) {
             c21t::element_p3 g_i;
             c21t::element_p3 h_i;
-            uint8_t element_nbytes = column_k_data.element_nbytes;
-            const uint8_t *bytes_row_i_column_k = column_k_data.data + row_i * element_nbytes;
+            uint8_t element_nbytes = column_k_data.exponent_sequence.element_nbytes;
+            const uint8_t *bytes_row_i_column_k = column_k_data.exponent_sequence.data + row_i * element_nbytes;
 
             // verify if default generators should be used
             // otherwise, use the above dense representation

@@ -13,7 +13,7 @@
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
-#include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/memory/resource/managed_device_resource.h"
@@ -27,7 +27,7 @@ static constexpr uint64_t block_size = 64;
 //--------------------------------------------------------------------------------------------------
 static void get_value_sequence_size(
     uint64_t &sequence_size, uint64_t &total_num_blocks, uint64_t &biggest_n, uint64_t &total_num_indices,
-    basct::cspan<mtxb::exponent_sequence> value_sequences) {
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences) {
   biggest_n = 0;
   sequence_size = 0;
   total_num_blocks = 0;
@@ -36,12 +36,12 @@ static void get_value_sequence_size(
   for (size_t c = 0; c < value_sequences.size(); ++c) {
     auto &data_commitment = value_sequences[c];
 
-    assert(data_commitment.element_nbytes > 0 && data_commitment.element_nbytes <= 32);
+    assert(data_commitment.exponent_sequence.element_nbytes > 0 && data_commitment.exponent_sequence.element_nbytes <= 32);
 
-    biggest_n = max(biggest_n, data_commitment.n);
-    total_num_indices += (data_commitment.indices == nullptr) ? 0 : data_commitment.n;
-    total_num_blocks += basn::divide_up(data_commitment.n, block_size);
-    sequence_size += data_commitment.n * data_commitment.element_nbytes;
+    biggest_n = max(biggest_n, data_commitment.exponent_sequence.n);
+    total_num_indices += (data_commitment.indices == nullptr) ? 0 : data_commitment.exponent_sequence.n;
+    total_num_blocks += basn::divide_up(data_commitment.exponent_sequence.n, block_size);
+    sequence_size += data_commitment.exponent_sequence.n * data_commitment.exponent_sequence.element_nbytes;
   }
 }
 
@@ -50,19 +50,19 @@ static void get_value_sequence_size(
 //--------------------------------------------------------------------------------------------------
 __global__ static void compute_commitments_kernel(
     c21t::element_p3 *partial_commitments,
-    mtxb::exponent_sequence value_sequence,
+    sqcb::indexed_exponent_sequence value_sequence,
     sqcb::commitment *generators) {
   extern __shared__ c21t::element_p3 reduction[];
 
   int tid = threadIdx.x;
-  int n = value_sequence.n;
+  int n = value_sequence.exponent_sequence.n;
   int row_i = threadIdx.x + blockIdx.x * blockDim.x;
 
   partial_commitments[blockIdx.x] = reduction[tid] = c21cn::zero_p3_v;
 
   if (row_i >= n) return;
 
-  uint8_t element_nbytes = value_sequence.element_nbytes;
+  uint8_t element_nbytes = value_sequence.exponent_sequence.element_nbytes;
 
   c21t::element_p3 g_i;
 
@@ -81,8 +81,8 @@ __global__ static void compute_commitments_kernel(
     c21rs::from_bytes(g_i, generators[row_i].data());
   }
 
-  basct::cspan<uint8_t> exponent{value_sequence.data + row_i * element_nbytes,
-                                 element_nbytes};
+  basct::cspan<uint8_t> exponent{value_sequence.exponent_sequence.data +
+             row_i * element_nbytes, element_nbytes};
   c21o::scalar_multiply(reduction[tid], exponent, g_i);  // h_i = a_i * g_i
 
   __syncthreads();
@@ -137,7 +137,7 @@ __global__ static void commitment_reduction_kernel(
 //--------------------------------------------------------------------------------------------------
 static void launch_commitment_kernels(
     memmg::managed_array<sqcb::commitment> &commitments_device,
-    basct::cspan<mtxb::exponent_sequence> value_sequences,
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
     basct::cspan<sqcb::commitment> generators) {
 
   uint64_t num_commitments = commitments_device.size();
@@ -216,12 +216,12 @@ static void launch_commitment_kernels(
     auto data_commit = value_sequences[commit_index];
 
     // we only process if there is at least one row. Otherwise, commitment is zero
-    if (data_commit.n > 0) {
-      uint64_t commit_index_size = data_commit.n * data_commit.element_nbytes;
+    if (data_commit.exponent_sequence.n > 0) {
+      uint64_t commit_index_size = data_commit.exponent_sequence.n * data_commit.exponent_sequence.element_nbytes;
 
       uint64_t shared_mem = block_size * sizeof(c21t::element_p3);
 
-      uint64_t num_blocks = basn::divide_up(data_commit.n, block_size);
+      uint64_t num_blocks = basn::divide_up(data_commit.exponent_sequence.n, block_size);
       
       int stream_index = static_cast<int>(
         (commit_index / static_cast<float>(num_commitments)) * num_streams
@@ -234,12 +234,12 @@ static void launch_commitment_kernels(
       // for that the current cuda stream.
       basdv::async_memcpy_host_to_device(
         data_table_dev_ptr,
-        data_commit.data,
+        data_commit.exponent_sequence.data,
         commit_index_size,
         curr_stream
       );
 
-      data_commit.data = data_table_dev_ptr;
+      data_commit.exponent_sequence.data = data_table_dev_ptr;
       
       if (data_commit.indices != nullptr) {
         // We asynchronously move the current
@@ -248,13 +248,13 @@ static void launch_commitment_kernels(
         basdv::async_memcpy_host_to_device(
           indices_dev_ptr,
           data_commit.indices,
-          data_commit.n * sizeof(data_commit.indices[0]),
+          data_commit.exponent_sequence.n * sizeof(data_commit.indices[0]),
           curr_stream
         );
 
         data_commit.indices = indices_dev_ptr;
 
-        indices_dev_ptr += data_commit.n; 
+        indices_dev_ptr += data_commit.exponent_sequence.n; 
       }
 
       // We split the current sequence into multiple cuda blocks.
@@ -301,7 +301,7 @@ static void launch_commitment_kernels(
 //--------------------------------------------------------------------------------------------------
 void compute_commitments_gpu(
     basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences, basct::cspan<sqcb::commitment> generators) noexcept {
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences, basct::cspan<sqcb::commitment> generators) noexcept {
   assert(commitments.size() == value_sequences.size());
 
   // allocates memory to commitments in the device

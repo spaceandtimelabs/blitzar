@@ -9,7 +9,7 @@ cc_binary(
         "//sxt/base/container:span",
         "//sxt/curve21/type:element_p3",
         "//sxt/seqcommit/base:commitment",
-        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/seqcommit/base:indexed_exponent_sequence",
         "//sxt/memory/management:managed_array",
         "//sxt/seqcommit/generator:base_element",
         "//sxt/curve21/ristretto:byte_conversion",

@@ -4,7 +4,7 @@
 #include "sxt/base/functional/function_ref.h"
 
 namespace sxt::sqcb { class commitment; }
-namespace sxt::mtxb { struct exponent_sequence; }
+namespace sxt::sqcb { struct indexed_exponent_sequence; }
 
 namespace sxt::sqctst {
 //--------------------------------------------------------------------------------------------------
@@ -13,7 +13,7 @@ namespace sxt::sqctst {
 void test_pedersen_compute_commitment(
     basf::function_ref<void(
         basct::span<sqcb::commitment>,
-        basct::cspan<mtxb::exponent_sequence>,
+        basct::cspan<sqcb::indexed_exponent_sequence>,
         basct::cspan<sqcb::commitment> generators
     )> f
 );

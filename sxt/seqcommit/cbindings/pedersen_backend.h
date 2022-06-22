@@ -4,7 +4,7 @@
 
 #include "sxt/base/container/span.h"
 
-namespace sxt::mtxb { struct exponent_sequence; }
+namespace sxt::sqcb { struct indexed_exponent_sequence; }
 namespace sxt::sqcb { class commitment; }
 
 namespace sxt::sqccb {
@@ -15,7 +15,7 @@ public:
 
   virtual void compute_commitments(
     basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences,
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
     basct::span<sqcb::commitment> generators) noexcept = 0;
 
   virtual void get_generators(

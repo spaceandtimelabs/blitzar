@@ -6,7 +6,7 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/seqcommit/base/commitment.h"
-#include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/seqcommit/cbindings/pedersen_backend.h"
 #include "sxt/seqcommit/cbindings/pedersen_cpu_backend.h"
@@ -124,17 +124,17 @@ static int process_compute_pedersen_commitments(
   basct::span<sqcb::commitment> commitments_result(
             reinterpret_cast<sqcb::commitment *>(commitments), num_sequences);
 
-  memmg::managed_array<mtxb::exponent_sequence> sequences(num_sequences);
+  memmg::managed_array<sqcb::indexed_exponent_sequence> sequences(num_sequences);
 
-  static_assert(sizeof(mtxb::exponent_sequence) == 
+  static_assert(sizeof(sqcb::indexed_exponent_sequence) == 
       sizeof(sxt_sequence_descriptor), "types must be ABI compatible");
 
   // populating sequence object
   for (uint64_t i = 0; i < num_sequences; ++i) {
-    sequences[i] = *(reinterpret_cast<const mtxb::exponent_sequence *>(&descriptors[i]));
+    sequences[i] = *(reinterpret_cast<const sqcb::indexed_exponent_sequence *>(&descriptors[i]));
   }
 
-  basct::cspan<mtxb::exponent_sequence> value_sequences(sequences.data(),
+  basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences.data(),
                                                         num_sequences);
   
   if (generators == nullptr) longest_sequence = 0;

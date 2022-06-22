@@ -5,7 +5,7 @@
 #include "sxt/base/container/span.h"
 #include "sxt/seqcommit/cbindings/pedersen_backend.h"
 
-namespace sxt::mtxb { struct exponent_sequence; }
+namespace sxt::sqcb { struct indexed_exponent_sequence; }
 namespace sxt::sqcb { class commitment; }
 
 namespace sxt::sqccb {
@@ -14,7 +14,7 @@ class pedersen_cpu_backend final : public sqccb::pedersen_backend {
 public:
   void compute_commitments(
     basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences,
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
     basct::span<sqcb::commitment> generators) noexcept override;
 
   void get_generators(

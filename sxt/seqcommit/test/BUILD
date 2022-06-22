@@ -8,7 +8,7 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/seqcommit/base:commitment",
         "//sxt/seqcommit/generator:base_element",
-        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/seqcommit/base:indexed_exponent_sequence",
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/ristretto:byte_conversion",
         "//sxt/curve21/operation:scalar_multiply",

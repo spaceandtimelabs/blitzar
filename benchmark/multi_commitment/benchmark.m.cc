@@ -14,7 +14,7 @@
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/memory/management/managed_array.h"
-#include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/curve21/ristretto/byte_conversion.h"
 #include "sxt/seqcommit/cbindings/pedersen_backend.h"
@@ -108,7 +108,7 @@ static void print_result(uint64_t cols, memmg::managed_array<sqcb::commitment> &
 static void populate_table(
     uint64_t cols, uint64_t rows, uint8_t element_nbytes,
     memmg::managed_array<uint8_t> &data_table, 
-    memmg::managed_array<mtxb::exponent_sequence> &data_cols, 
+    memmg::managed_array<sqcb::indexed_exponent_sequence> &data_cols, 
     memmg::managed_array<sqcb::commitment> &generators) {
     
     std::random_device rd;
@@ -128,9 +128,9 @@ static void populate_table(
     for (size_t c = 0; c < cols; ++c) {
         auto &data_col = data_cols[c];
 
-        data_col.n = rows;
-        data_col.element_nbytes = element_nbytes;
-        data_col.data = data_table.data() + c * rows * element_nbytes;
+        data_col.exponent_sequence.n = rows;
+        data_col.exponent_sequence.element_nbytes = element_nbytes;
+        data_col.exponent_sequence.data = data_table.data() + c * rows * element_nbytes;
     }
 }
 
@@ -154,11 +154,11 @@ int main(int argc, char* argv[]) {
 
     // populate data section
     memmg::managed_array<sqcb::commitment> generators(p.rows);
-    memmg::managed_array<mtxb::exponent_sequence> data_cols(p.cols);
+    memmg::managed_array<sqcb::indexed_exponent_sequence> data_cols(p.cols);
     memmg::managed_array<sqcb::commitment> commitments_per_col(p.cols);
     memmg::managed_array<uint8_t> data_table(p.rows * p.cols * p.element_nbytes);
     basct::span<sqcb::commitment> commitments(commitments_per_col.data(), p.cols);
-    basct::cspan<mtxb::exponent_sequence> value_sequences(data_cols.data(), p.cols);
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(data_cols.data(), p.cols);
 
     populate_table(p.cols, p.rows, p.element_nbytes, data_table, data_cols, generators);
 

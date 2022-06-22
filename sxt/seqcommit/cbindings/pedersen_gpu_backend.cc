@@ -1,7 +1,7 @@
 #include "sxt/seqcommit/cbindings/pedersen_gpu_backend.h"
 
 #include "sxt/seqcommit/base/commitment.h"
-#include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/seqcommit/generator/gpu_generator.h"
 #include "sxt/seqcommit/naive/commitment_computation_gpu.h"
@@ -15,18 +15,18 @@ static void pre_initialize_gpu() {
   basct::span<sqcb::commitment> dummy_empty_generators;
   memmg::managed_array<uint8_t> dummy_data_table(1); // 1 col, 1 row, 1 bytes per data
   memmg::managed_array<sqcb::commitment> dummy_commitments_per_col(1);
-  memmg::managed_array<mtxb::exponent_sequence> dummy_data_cols(1);
+  memmg::managed_array<sqcb::indexed_exponent_sequence> dummy_data_cols(1);
   basct::span<sqcb::commitment> dummy_commitments(dummy_commitments_per_col.data(), 1);
-  basct::cspan<mtxb::exponent_sequence> dummy_value_sequences(dummy_data_cols.data(), 1);
+  basct::cspan<sqcb::indexed_exponent_sequence> dummy_value_sequences(dummy_data_cols.data(), 1);
 
   dummy_data_table[0] = 1;
 
   auto &data_col = dummy_data_cols[0];
 
-  data_col.n = 1;
   data_col.indices = nullptr;
-  data_col.element_nbytes = 1;
-  data_col.data = dummy_data_table.data();
+  data_col.exponent_sequence.n = 1;
+  data_col.exponent_sequence.element_nbytes = 1;
+  data_col.exponent_sequence.data = dummy_data_table.data();
 
   // A small dummy computation to avoid the future cost of JIT compiling PTX code
   sqcnv::compute_commitments_gpu(dummy_commitments, dummy_value_sequences, dummy_empty_generators);
@@ -44,7 +44,7 @@ pedersen_gpu_backend::pedersen_gpu_backend() {
 //--------------------------------------------------------------------------------------------------
 void pedersen_gpu_backend::compute_commitments(
     basct::span<sqcb::commitment> commitments,
-    basct::cspan<mtxb::exponent_sequence> value_sequences,
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
     basct::span<sqcb::commitment> generators) noexcept {
     sqcnv::compute_commitments_gpu(commitments, value_sequences, generators);
 }
