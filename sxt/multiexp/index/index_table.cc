@@ -78,8 +78,7 @@ index_table& index_table::operator=(const index_table& rhs) noexcept {
   auto hdr = this->header();
   auto hdr_p = rhs.header();
 
-  auto entry_data =
-      reinterpret_cast<uint64_t*>(data_ + sizeof(header_type) * num_rows_);
+  auto entry_data = this->entry_data();
   for (size_t index = 0; index < num_rows_; ++index) {
     auto& row = hdr[index];
     auto row_p = hdr_p[index];
@@ -106,6 +105,18 @@ index_table& index_table::operator=(index_table&& rhs) noexcept {
   rhs.data_ = nullptr;
 
   return *this;
+}
+
+//--------------------------------------------------------------------------------------------------
+// entry_data
+//--------------------------------------------------------------------------------------------------
+uint64_t* index_table::entry_data() noexcept {
+  return reinterpret_cast<uint64_t*>(data_ + sizeof(header_type) * num_rows_);
+}
+
+const uint64_t* index_table::entry_data() const noexcept {
+  return reinterpret_cast<const uint64_t*>(data_ +
+                                           sizeof(header_type) * num_rows_);
 }
 
 //--------------------------------------------------------------------------------------------------

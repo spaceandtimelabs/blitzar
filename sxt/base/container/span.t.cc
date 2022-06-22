@@ -1,5 +1,7 @@
 #include "sxt/base/container/span.h"
 
+#include <vector>
+
 #include "sxt/base/test/unit_test.h"
 using namespace sxt::basct;
 
@@ -19,5 +21,12 @@ TEST_CASE("span represents a view into a contiguous region of memory") {
     REQUIRE(s[0] == 1);
     REQUIRE(s[1] == 2);
     REQUIRE(s[2] == 3);
+  }
+
+  SECTION("span is implicitly constructible from containers") {
+    std::vector<int> v = {1, 2, 3};
+    span<int> s{v};
+    REQUIRE(s.data() == v.data());
+    REQUIRE(s.size() == v.size());
   }
 }

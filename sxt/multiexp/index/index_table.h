@@ -47,6 +47,11 @@ class index_table {
    // accessors
    allocator_type get_allocator() const noexcept { return alloc_; }
 
+   uint64_t* entry_data() noexcept;
+   const uint64_t* entry_data() const noexcept;
+
+   size_t num_rows() const noexcept { return num_rows_; }
+
    // methods
    bool empty() const noexcept { return num_rows_ == 0; }
 
@@ -60,6 +65,10 @@ class index_table {
    basct::span<const const_header_type> header() const noexcept {
      return basct::span<const const_header_type>{
          reinterpret_cast<const_header_type*>(data_), num_rows_};
+   }
+
+   basct::span<const const_header_type> cheader() const noexcept {
+     return this->header();
    }
 
    void reshape(size_t num_rows, size_t max_entries) noexcept;

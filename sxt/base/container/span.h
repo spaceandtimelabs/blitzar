@@ -33,6 +33,24 @@ class span {
    CUDA_CALLABLE span(const span<std::remove_const_t<T>> &other) noexcept
        : size_{other.size()}, data_{other.data()} {}
 
+   template <
+       class Cont,
+       std::enable_if_t<
+           std::is_convertible_v<decltype(std::declval<Cont&>().data()), T*> &&
+           std::is_convertible_v<decltype(std::declval<Cont&>().size()),
+                                 size_t>>* = nullptr>
+   CUDA_CALLABLE
+   span(Cont& cont) noexcept : size_{cont.size()}, data_{cont.data()} {}
+
+   template <
+       class Cont,
+       std::enable_if_t<
+           std::is_convertible_v<decltype(std::declval<const Cont&>().data()), T*> &&
+           std::is_convertible_v<decltype(std::declval<const Cont&>().size()),
+                                 size_t>>* = nullptr>
+   CUDA_CALLABLE
+   span(const Cont& cont) noexcept : size_{cont.size()}, data_{cont.data()} {}
+
    CUDA_CALLABLE
    T* data() const noexcept { return data_; }
 
