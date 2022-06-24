@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "sxt/base/bit/count.h"
+#include "sxt/multiexp/pippenger/radix_log2.h"
 #include "sxt/multiexp/base/exponent_utility.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger/driver.h"
@@ -41,7 +42,11 @@ static void compute_multiproduct(
   exponent_aggregates aggregates;
   compute_exponent_aggregates(aggregates, exponents);
 
-  size_t radix_log2 = 3;  // TODO: replace with expression of aggregates
+  size_t radix_log2 = std::min(8ul, mtxpi::compute_radix_log2(
+    aggregates.max_exponent,
+    aggregates.term_or_all.size(),
+    aggregates.output_or_all.size()
+  ));
 
   mtxi::index_table table;
   make_multiproduct_term_table(table, aggregates.term_or_all, radix_log2);

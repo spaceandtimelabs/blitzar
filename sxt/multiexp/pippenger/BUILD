@@ -34,6 +34,19 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "radix_log2",
+    impl_deps = [
+        "//sxt/multiexp/base:exponent",
+        "//sxt/base/num:log2p1",
+        "//sxt/base/container:span"
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/multiexp/base:exponent"
+    ],
+)
+
+sxt_cc_component(
     name = "exponent_aggregates_computation",
     deps = [
         "//sxt/base/container:span",
@@ -83,6 +96,7 @@ sxt_cc_component(
         ":exponent_aggregates",
         ":exponent_aggregates_computation",
         ":multiproduct_table",
+        ":radix_log2",
         "//sxt/base/bit:count",
         "//sxt/multiexp/base:exponent_utility",
         "//sxt/multiexp/index:index_table",
