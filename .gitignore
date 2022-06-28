@@ -24,3 +24,9 @@ rust/proofs-gpu-sys/target
 rust/proofs-gpu-sys/Cargo.lock
 rust/proofs-gpu-sys/*.so*
 rust/proofs-gpu-sys/src/bindings.rs
+
+# Ignore benchmark files
+*.pdf
+*.tar.gz
+*.dot
+callgrind.out.*

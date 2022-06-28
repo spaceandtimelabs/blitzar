@@ -1,3 +1,4 @@
+load("//bazel:sxt_benchmark.bzl", "sxt_cc_benchmark")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 
 cc_library(
@@ -33,7 +34,7 @@ cuda_library(
     ],
 )
 
-cc_binary(
+sxt_cc_benchmark(
     name = "benchmark",
     srcs = [
         "benchmark.m.cc",

@@ -1,10 +1,10 @@
 #!/bin/bash
-# NSYS="nvprof --profile-child-processes "
-EXEC_CMD="${NSYS} bazel run -c opt //benchmark/multi_commitment:benchmark -- "
+EXEC_CMD="bazel run -c opt //benchmark/multi_commitment:benchmark_callgrind -- "
 
 ############################################
 
 verbose=0
+num_samples=1
 spreadsheet_dir="benchmark/multi_commitment"
 results_dir="benchmark/multi_commitment/.results"
 curr_final_benchmark_file="${spreadsheet_dir}/spreadsheet.txt"
@@ -27,7 +27,7 @@ results() {
         for ex in ${execs[@]}; do
             c=$(echo $ex | cut -f1 -d-)
             r=$(echo $ex | cut -f2 -d-)
-            curr_benchmark_file="${results_dir}/${ws}_${c}_${r}.${backend}.out"
+            curr_benchmark_file="${results_dir}/${backend}_${c}_${r}_${ws}_${verbose}_${num_samples}.out"
             val=$(read_field 8 ${curr_benchmark_file})
             echo "$val"
         done
@@ -46,34 +46,14 @@ run() {
         for ex in ${execs[@]}; do
             c=$(echo $ex | cut -f1 -d-)
             r=$(echo $ex | cut -f2 -d-)
-            curr_benchmark_file="${results_dir}/${ws}_${c}_${r}.${backend}.out"
-            ${EXEC_CMD} ${backend} ${c} ${r} ${ws} ${verbose} > ${curr_benchmark_file}
+            curr_benchmark_file="${results_dir}/${backend}_${c}_${r}_${ws}_${verbose}_${num_samples}.out"
+            ${EXEC_CMD} ${backend} ${c} ${r} ${ws} ${verbose} ${num_samples} > ${curr_benchmark_file}
+
+            mv *.zip *.tar.gz ${results_dir}/
         done
     done
 
     results $word_sizes $execs $backend
-}
-
-validate_gpu() {
-    word_sizes=$1
-    execs=$2
-    backend=$3
-
-    # Extract the duration time of each benchmark
-    for ws in ${word_sizes[@]}; do
-        for ex in ${execs[@]}; do
-            c=$(echo $ex | cut -f1 -d-)
-            r=$(echo $ex | cut -f2 -d-)
-            cpu_file="${results_dir}/${ws}_${c}_${r}.cpu.out"
-            gpu_file="${results_dir}/${ws}_${c}_${r}.gpu.out"
-
-            if [ -e "$cpu_file" ]; then
-                if [ -e "$gpu_file" ]; then
-                    diff ${cpu_file} ${gpu_file}
-                fi
-            fi
-        done
-    done
 }
 
 spreadsheet() {
@@ -103,7 +83,7 @@ spreadsheet() {
             c=$(echo $ex | cut -f1 -d-)
             r=$(echo $ex | cut -f2 -d-)
 
-            bench_file="${results_dir}/${ws}_${c}_${r}.${backend}.out"
+            bench_file="${results_dir}/${backend}_${c}_${r}_${ws}_${verbose}_${num_samples}.out"
             
             if [ -e "$bench_file" ]; then
                 table_size=$(read_field 6 $bench_file);
@@ -134,6 +114,9 @@ word_sizes=("32")
 
 execs=()
 
+num_rows=("10" "1")
+num_commitments=("10")
+
 # num_rows=("10" "100" "1000")
 # num_commitments=("10" "100" "1000")
 
@@ -144,9 +127,9 @@ for c in ${num_commitments[@]}; do
 done
 
 # edge cases : num_rows too big
-execs+=("1-1" "1-10" "1-100" "1-1000" "1-10000" "1-100000")
+# execs+=("1-1" "1-10" "1-100" "1-1000" "1-10000" "1-100000")
 
 # edge cases : num_commitments too big
-execs+=("10-1" "100-1" "1000-1" "10000-1")
+# execs+=("10-1" "100-1" "1000-1" "10000-1")
 
 $1 $word_sizes $execs $backend # run specified function

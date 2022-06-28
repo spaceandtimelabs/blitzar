@@ -241,7 +241,14 @@ def CompileNvcc(argv, log=False, device_c=False):
   srcs = ' '.join(src_files)
   out = ' -o ' + out_file[0]
 
-  nvccopts = '-D_FORCE_INLINES '
+  # We add this -std=c++17 flag, because
+  # benchmarks could not be compiled without it.
+  # The `build --cxxopt -std=c++17` flag set in the 
+  # `.bazelrc` file was not passed to the compiler.
+  # However, this flag is relevant to some modules.
+  nvccopts = '-std=c++17 '
+
+  nvccopts += '-D_FORCE_INLINES '
   for capability in GetOptionValue(argv, "--cuda-gpu-arch"):
     capability = capability[len('sm_'):]
     nvccopts += r'-gencode=arch=compute_%s,\"code=sm_%s\" ' % (capability,

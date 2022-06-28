@@ -1,3 +1,4 @@
+load("//bazel:sxt_benchmark.bzl", "sxt_cc_benchmark")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 
 cc_library(
@@ -10,7 +11,7 @@ cc_library(
     ],
     copts = [
         '-x', 'cuda',
-        '--device-c',
+        '--device-c'
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
@@ -58,7 +59,7 @@ cuda_library(
     ],
 )
 
-cc_binary(
+sxt_cc_benchmark(
     name = "benchmark",
     srcs = [
         "benchmark.m.cc",
@@ -71,6 +72,6 @@ cc_binary(
     ],
     visibility = ["//visibility:public"],
     linkopts = [
-        '-x', 'cuda',
-    ],
+        '-x', 'cuda'
+    ]
 )

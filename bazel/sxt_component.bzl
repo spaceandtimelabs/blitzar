@@ -5,6 +5,16 @@ load(
     "cuda_dlink",
 )
 
+# We add this -std=c++17 flag, because
+# benchmarks could not be compiled without it.
+# The `build --cxxopt -std=c++17` flag set in the 
+# `.bazelrc` file was not passed to the compiler.
+# However, this flag is relevant to some modules.
+def sxt_copts():
+  return [
+      "-std=c++17",
+  ]
+
 def sxt_cc_component(
     name, is_cuda=False, with_test=True, alwayslink = False, test_deps=[], deps=[], impl_deps = [], **kwargs):
   if is_cuda:
@@ -19,7 +29,7 @@ def sxt_cc_component(
         copts = [
             '--device-c',
             '-x',
-            'cuda',
+            'cuda'
         ],
         alwayslink = alwayslink,
         linkstatic = 1,
@@ -38,13 +48,14 @@ def sxt_cc_component(
         srcs = [
             name + ".cc",
         ],
+        copts = sxt_copts(),
         linkstatic = 1,
         implementation_deps = impl_deps,
         deps = deps,
         alwayslink = alwayslink,
         visibility = ["//visibility:public"],
         linkopts = [
-            "-lm",
+            "-lm"
         ],
         **kwargs)
   if with_test:

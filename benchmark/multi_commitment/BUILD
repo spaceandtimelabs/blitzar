@@ -1,6 +1,6 @@
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//bazel:sxt_benchmark.bzl", "sxt_cc_benchmark")
 
-cc_binary(
+sxt_cc_benchmark(
     name = "benchmark",
     srcs = [
         "benchmark.m.cc",
@@ -18,6 +18,6 @@ cc_binary(
     ],
     visibility = ["//visibility:public"],
     linkopts = [
-        '-x', 'cuda',
+        '-x', 'cuda'
     ],
 )

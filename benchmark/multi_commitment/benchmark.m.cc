@@ -26,6 +26,7 @@ using namespace sxt;
 struct params {
     int status;
     bool verbose;
+    int num_samples = 1;
     uint64_t cols, rows;
     std::string backend_str;
     uint64_t element_nbytes;
@@ -37,8 +38,8 @@ struct params {
     params(int argc, char* argv[]) {
         status = 0;
 
-        if (argc < 5) {
-            std::cerr << "Usage: benchmark <cpu|gpu> <rows> <cols> <element_nbytes> <verbose>\n";
+        if (argc < 7) {
+            std::cerr << "Usage: benchmark <cpu|gpu> <rows> <cols> <element_nbytes> <verbose> <num_samples>\n";
             status = -1;
         }
 
@@ -49,11 +50,13 @@ struct params {
         rows = std::atoi(argv[3]);
         element_nbytes = std::atoi(argv[4]);
         
-        if (argc == 6 && std::string_view{argv[5]} == "1") {
+        if (std::string_view{argv[5]} == "1") {
             verbose = true;
         }
 
-        if (cols <= 0 || rows <= 0 || element_nbytes > 32 || element_nbytes < 0) {
+        num_samples = std::atoi(argv[6]);
+
+        if (cols <= 0 || rows <= 0 || element_nbytes > 32) {
             std::cerr << "Restriction: 1 <= cols, 1 <= rows, 1 <= element_nbytes <= 32\n";
             status = -1;
         }
@@ -163,11 +166,10 @@ int main(int argc, char* argv[]) {
     populate_table(p.cols, p.rows, p.element_nbytes, data_table, data_cols, generators);
 
     for (auto use_generators : {true, false}) {
-        int NUM_SAMPLES = 15;
         std::vector<double> durations;
         double mean_duration_compute = 0;
         
-        for (int i = 0; i < NUM_SAMPLES; ++i) {
+        for (int i = 0; i < p.num_samples; ++i) {
             if (use_generators) {
                 // populate generators
                 basct::span<sqcb::commitment> span_generators(generators.data(), p.rows);
@@ -186,16 +188,16 @@ int main(int argc, char* argv[]) {
             double duration_compute = p.elapsed_time();
 
             durations.push_back(duration_compute);
-            mean_duration_compute += duration_compute / NUM_SAMPLES;
+            mean_duration_compute += duration_compute / p.num_samples;
         }
 
         double std_deviation = 0;
         
-        for (int i = 0; i < NUM_SAMPLES; ++i) {
+        for (int i = 0; i < p.num_samples; ++i) {
             std_deviation += pow(durations[i] - mean_duration_compute, 2.);
         }
 
-        std_deviation = sqrt(std_deviation / NUM_SAMPLES);
+        std_deviation = sqrt(std_deviation / p.num_samples);
 
         double data_throughput = p.rows * p.cols / mean_duration_compute;
 
