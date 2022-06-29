@@ -331,6 +331,8 @@ def LinkNvcc(argv, log=False):
     '--compiler-options',
     '@%s' % args_path
   ] + args
+  # Work around for silencing nvlink warnings
+  args.append('--gpu-architecture=sm_70')
   cmd = [NVCC_PATH] + args
   return subprocess.call(cmd)
 
