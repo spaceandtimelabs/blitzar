@@ -44,8 +44,8 @@ size_t count_nonzero_digits(basct::cspan<uint8_t> e, size_t highest_bit,
 // count_num_digits
 //--------------------------------------------------------------------------------------------------
 size_t count_num_digits(basct::cspan<uint8_t> e, size_t radix_log2) noexcept {
-  auto highest_bit =
+  auto t =
       e.size() * 8 - basbt::count_leading_zeros(e.data(), e.size());
-  return basn::divide_up(highest_bit + 1, radix_log2);
+  return basn::divide_up(t, radix_log2);
 }
 } // namespace sxt::mtxb
