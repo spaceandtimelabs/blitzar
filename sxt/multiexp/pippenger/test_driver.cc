@@ -27,7 +27,7 @@ void test_driver::compute_multiproduct_inputs(
   size_t term_index = 0;
   for(size_t input_index=0; input_index<inputs.size(); ++input_index) {
     for (auto power : powers[input_index]) {
-      terms[term_index++] = (1 << power * radix_log2) * inputs[input_index];
+      terms[term_index++] = (1ull << power * radix_log2) * inputs[input_index];
     }
   }
   inout = std::move(terms);
