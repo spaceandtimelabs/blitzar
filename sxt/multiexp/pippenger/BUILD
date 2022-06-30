@@ -106,5 +106,9 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/multiexp/random:random_multiexponentiation_descriptor",
+        "//sxt/multiexp/random:random_multiexponentiation_generation",
+        "//sxt/multiexp/test:compute_uint64_muladd",
+        "//sxt/multiexp/test:generate_uint64_generators"
     ],
 )
