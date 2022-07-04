@@ -31,3 +31,11 @@ build --action_env CUDNN_INSTALL_PATH="/usr"
 build --action_env TF_CUDA_COMPUTE_CAPABILITIES="7.0"
 build --action_env COMPUTECPP_TOOLKIT_PATH="/usr/local/computecpp"
 build --action_env TMP="/tmp"
+
+# For machines with many cpu cores available, we could not compile
+# the code. Many times (not always) the following error was launched:
+# `ptxas /tmp/tmpfxt_00000017_00000000-0, line 1; fatal : Missing .version...`
+# See https://github.com/bazelbuild/bazel/issues/14410#issuecomment-997843606
+# for more information.
+# To fix the problem, we added the following line:
+build --sandbox_add_mount_pair=.:/tmp
