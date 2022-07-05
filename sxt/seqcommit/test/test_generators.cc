@@ -2,9 +2,9 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/seqcommit/generator/base_element.h"
-#include "sxt/curve21/ristretto/byte_conversion.h"
 
 namespace sxt::sqctst {
 //--------------------------------------------------------------------------------------------------
@@ -27,8 +27,8 @@ void test_pedersen_get_generators(
       f(span_generators, offset_generators);
 
       sqcb::commitment expected_commit_0, expected_commit_1;
-      c21rs::to_bytes(expected_commit_0.data(), expected_g_0);
-      c21rs::to_bytes(expected_commit_1.data(), expected_g_1);
+      rstb::to_bytes(expected_commit_0.data(), expected_g_0);
+      rstb::to_bytes(expected_commit_1.data(), expected_g_1);
 
       REQUIRE(generators[0] == expected_commit_0);
       REQUIRE(generators[1] == expected_commit_1);
@@ -47,8 +47,8 @@ void test_pedersen_get_generators(
       f(span_generators, offset_generators);
 
       sqcb::commitment expected_commit_0, expected_commit_1;
-      c21rs::to_bytes(expected_commit_0.data(), expected_g_0);
-      c21rs::to_bytes(expected_commit_1.data(), expected_g_1);
+      rstb::to_bytes(expected_commit_0.data(), expected_g_0);
+      rstb::to_bytes(expected_commit_1.data(), expected_g_1);
 
       REQUIRE(generators[0] == expected_commit_0);
       REQUIRE(generators[1] == expected_commit_1);

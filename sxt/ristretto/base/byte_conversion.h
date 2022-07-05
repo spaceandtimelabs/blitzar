@@ -2,13 +2,20 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
+#include <stdint.h>
+
+namespace sxt::c21t { struct element_p3; }
 namespace sxt::f51t { class element; }
 
-namespace sxt::c21rs {
+namespace sxt::rstb {
+
 //--------------------------------------------------------------------------------------------------
-// compute_sqrt_ratio_m1
+// byte_conversion
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-int compute_sqrt_ratio_m1(f51t::element& x, const f51t::element& u,
-                          const f51t::element& v) noexcept;
-}  // namespace sxt::c21rs
+void to_bytes(uint8_t s[32], const c21t::element_p3& p) noexcept;
+
+CUDA_CALLABLE
+int from_bytes(c21t::element_p3& p, const uint8_t* s) noexcept;
+
+}  // namespace sxt::rstb

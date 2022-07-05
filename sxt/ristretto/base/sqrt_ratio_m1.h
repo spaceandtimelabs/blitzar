@@ -2,14 +2,13 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::c21t { struct element_p3; }
 namespace sxt::f51t { class element; }
 
-namespace sxt::c21rs {
+namespace sxt::rstb {
 //--------------------------------------------------------------------------------------------------
-// form_ristretto_point
+// compute_sqrt_ratio_m1
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void form_ristretto_point(c21t::element_p3& p, const f51t::element& r0,
-                          const f51t::element& r1) noexcept;
-}  // namespace sxt::c21rs
+int compute_sqrt_ratio_m1(f51t::element& x, const f51t::element& u,
+                          const f51t::element& v) noexcept;
+}  // namespace sxt::rstb

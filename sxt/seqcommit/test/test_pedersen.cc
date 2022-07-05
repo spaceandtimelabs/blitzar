@@ -1,14 +1,14 @@
 #include "sxt/seqcommit/test/test_pedersen.h"
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/constant/zero.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
-#include "sxt/curve21/ristretto/byte_conversion.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/seqcommit/generator/base_element.h"
-#include "sxt/curve21/operation/scalar_multiply.h"
 
 namespace sxt::sqctst {
 //--------------------------------------------------------------------------------------------------
@@ -50,13 +50,13 @@ void test_pedersen_compute_commitment(
 
       c21t::element_p3 p, q;
 
-      c21rs::from_bytes(p, commitments_data[0].data());
+      rstb::from_bytes(p, commitments_data[0].data());
 
-      c21rs::from_bytes(q, commitments_data[1].data());
+      rstb::from_bytes(q, commitments_data[1].data());
 
       c21o::add(p, p, q);
 
-      c21rs::to_bytes(commitment_c.data(), p);
+      rstb::to_bytes(commitment_c.data(), p);
 
       sqcb::commitment &expected_commitment_c = commitments_data[2];
 
@@ -100,17 +100,17 @@ void test_pedersen_compute_commitment(
 
       c21t::element_p3 p, q, s;
 
-      c21rs::from_bytes(p, commitments_data[0].data());
+      rstb::from_bytes(p, commitments_data[0].data());
 
-      c21rs::from_bytes(q, commitments_data[1].data());
+      rstb::from_bytes(q, commitments_data[1].data());
 
-      c21rs::from_bytes(s, commitments_data[2].data());
+      rstb::from_bytes(s, commitments_data[2].data());
 
       c21o::add(p, p, q);
 
       c21o::add(p, p, s);
 
-      c21rs::to_bytes(commitment_c.data(), p);
+      rstb::to_bytes(commitment_c.data(), p);
 
       sqcb::commitment &expected_commitment_c = commitments_data[3];
 
@@ -159,7 +159,7 @@ void test_pedersen_compute_commitment(
 
         sqcb::commitment commitment;
 
-        c21rs::to_bytes(commitment.data(), p);
+        rstb::to_bytes(commitment.data(), p);
 
         sqcb::commitment &expected_commitment = commitments_data[0];
 
@@ -204,13 +204,13 @@ void test_pedersen_compute_commitment(
 
       c21t::element_p3 p, q;
 
-      c21rs::from_bytes(p, commitments_data[0].data());
+      rstb::from_bytes(p, commitments_data[0].data());
 
-      c21rs::from_bytes(q, commitments_data[1].data());
+      rstb::from_bytes(q, commitments_data[1].data());
 
       c21o::add(p, p, q);
 
-      c21rs::to_bytes(commitment_c.data(), p);
+      rstb::to_bytes(commitment_c.data(), p);
 
       sqcb::commitment &expected_commitment_c = commitments_data[2];
 
@@ -256,16 +256,16 @@ void test_pedersen_compute_commitment(
 
       c21t::element_p3 p, q;
 
-      c21rs::from_bytes(p, commitments_data[0].data());
+      rstb::from_bytes(p, commitments_data[0].data());
 
-      c21rs::from_bytes(q, commitments_data[1].data());
+      rstb::from_bytes(q, commitments_data[1].data());
 
       c21o::scalar_multiply(p, multiplicative_constant,
                             p);  // h_i = a_i * g_i
 
       c21o::add(p, p, q);
 
-      c21rs::to_bytes(commitment_c.data(), p);
+      rstb::to_bytes(commitment_c.data(), p);
 
       sqcb::commitment &expected_commitment_c = commitments_data[2];
 
@@ -315,13 +315,13 @@ void test_pedersen_compute_commitment(
 
       c21t::element_p3 p, q;
 
-      c21rs::from_bytes(p, commitments_data[0].data());
+      rstb::from_bytes(p, commitments_data[0].data());
 
-      c21rs::from_bytes(q, commitments_data[1].data());
+      rstb::from_bytes(q, commitments_data[1].data());
 
       c21o::add(p, p, q);
 
-      c21rs::to_bytes(commitment_c.data(), p);
+      rstb::to_bytes(commitment_c.data(), p);
 
       sqcb::commitment &expected_commitment_c = commitments_data[2];
 
@@ -380,13 +380,13 @@ void test_pedersen_compute_commitment(
 
       c21t::element_p3 p, q;
 
-      c21rs::from_bytes(p, commitments_data[0].data());
+      rstb::from_bytes(p, commitments_data[0].data());
 
-      c21rs::from_bytes(q, commitments_data[1].data());
+      rstb::from_bytes(q, commitments_data[1].data());
 
       c21o::add(p, p, q);
 
-      c21rs::to_bytes(commitment_c.data(), p);
+      rstb::to_bytes(commitment_c.data(), p);
 
       sqcb::commitment &expected_commitment_c = commitments_data[2];
 
@@ -452,17 +452,17 @@ void test_pedersen_compute_commitment(
 
       c21t::element_p3 p, q, r;
 
-      c21rs::from_bytes(p, commitments_data[0].data());
+      rstb::from_bytes(p, commitments_data[0].data());
 
-      c21rs::from_bytes(q, commitments_data[1].data());
+      rstb::from_bytes(q, commitments_data[1].data());
 
-      c21rs::from_bytes(r, commitments_data[2].data());
+      rstb::from_bytes(r, commitments_data[2].data());
 
       c21o::add(p, p, q);
 
       c21o::add(p, p, r);
 
-      c21rs::to_bytes(commitment_c.data(), p);
+      rstb::to_bytes(commitment_c.data(), p);
 
       sqcb::commitment &expected_commitment_c = commitments_data[3];
 
@@ -484,8 +484,8 @@ void test_pedersen_compute_commitment(
         c21t::element_p3 g_i;
         sqcgn::compute_base_element(g_i, i + 3);
 
-        c21rs::to_bytes(ristretto_gens[i].data(), g_i);
-        c21rs::from_bytes(g_i, ristretto_gens[i].data());
+        rstb::to_bytes(ristretto_gens[i].data(), g_i);
+        rstb::from_bytes(g_i, ristretto_gens[i].data());
 
         c21t::element_p3 h;
         c21o::scalar_multiply(
@@ -500,7 +500,7 @@ void test_pedersen_compute_commitment(
       }
 
       sqcb::commitment expected_commitment;
-      c21rs::to_bytes(expected_commitment.data(), expected_g);
+      rstb::to_bytes(expected_commitment.data(), expected_g);
 
       sqcb::commitment commitments_data[1];
       sqcb::indexed_exponent_sequence sequences[1];

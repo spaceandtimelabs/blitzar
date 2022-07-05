@@ -7,7 +7,7 @@
  * See third_party/license/libsodium.LICENSE
  */
 
-#include "sxt/curve21/ristretto/sqrt_ratio_m1.h"
+#include "sxt/ristretto/base/sqrt_ratio_m1.h"
 
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/field51/constant/sqrtm1.h"
@@ -20,7 +20,7 @@
 #include "sxt/field51/operation/sub.h"
 #include "sxt/field51/property/zero.h"
 
-namespace sxt::c21rs {
+namespace sxt::rstb {
 //--------------------------------------------------------------------------------------------------
 // compute_sqrt_ratio_m1
 //--------------------------------------------------------------------------------------------------
@@ -59,4 +59,4 @@ int compute_sqrt_ratio_m1(f51t::element& x, const f51t::element& u,
 
     return has_m_root | has_p_root;
 }
-}  // namespace sxt::c21rs
+}  // namespace sxt::rstb

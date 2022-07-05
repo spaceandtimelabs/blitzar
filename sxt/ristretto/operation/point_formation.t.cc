@@ -1,4 +1,4 @@
-#include "sxt/curve21/ristretto/point_formation.h"
+#include "sxt/ristretto/operation/point_formation.h"
 
 #include <iostream>
 
@@ -7,7 +7,7 @@
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/field51/type/element.h"
 using namespace sxt;
-using namespace sxt::c21rs;
+using namespace sxt::rsto;
 
 TEST_CASE("we can form a ristretto point from two field elements") {
   c21t::element_p3 p;

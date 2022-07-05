@@ -2,14 +2,14 @@
 
 #include <cassert>
 
+#include "sxt/curve21/constant/zero.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
-#include "sxt/curve21/constant/zero.h"
-#include "sxt/curve21/ristretto/byte_conversion.h"
-#include "sxt/curve21/operation/scalar_multiply.h"
-#include "sxt/curve21/operation/add.h"
 
 namespace sxt::sqcnv {
 
@@ -44,7 +44,7 @@ void compute_commitments_cpu(
 
                 sqcgn::compute_base_element(g_i, row_g_i);
             } else { // otherwise, use the user given generators
-                c21rs::from_bytes(g_i, generators[row_i].data());
+                rstb::from_bytes(g_i, generators[row_i].data());
             }
 
             c21o::scalar_multiply(
@@ -56,7 +56,7 @@ void compute_commitments_cpu(
             c21o::add(p_k, p_k, h_i);
         }
 
-        c21rs::to_bytes(commitments[sequence_k].data(), p_k);
+        rstb::to_bytes(commitments[sequence_k].data(), p_k);
     }
 }
 

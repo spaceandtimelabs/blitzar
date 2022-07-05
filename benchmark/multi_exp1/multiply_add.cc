@@ -4,7 +4,7 @@
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/random/exponent.h"
-#include "sxt/curve21/random/ristretto_element.h"
+#include "sxt/ristretto/random/element.h"
 #include "sxt/curve21/type/element_p3.h"
 
 namespace sxt {
@@ -18,7 +18,7 @@ void multiply_add(c21t::element_p3& res, int mi, int i) noexcept {
 
   // pretend like g is a random element rather than fixed
   c21t::element_p3 g;
-  c21rn::generate_random_ristretto_element(g, rng);
+  rstrn::generate_random_element(g, rng);
 
   unsigned char a[32];
   c21rn::generate_random_exponent(a, rng);

@@ -9,14 +9,14 @@
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
-#include "sxt/curve21/ristretto/byte_conversion.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
+#include "sxt/memory/resource/managed_device_resource.h"
+#include "sxt/ristretto/base/byte_conversion.h"
+#include "sxt/seqcommit/base/commitment.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
-#include "sxt/seqcommit/base/commitment.h"
-#include "sxt/memory/resource/managed_device_resource.h"
 
 namespace sxt::sqcnv {
 
@@ -78,7 +78,7 @@ __global__ static void compute_commitments_kernel(
 
     sqcgn::compute_base_element(g_i, row_g_i);
   } else { // otherwise, use the user given generators
-    c21rs::from_bytes(g_i, generators[row_i].data());
+    rstb::from_bytes(g_i, generators[row_i].data());
   }
 
   basct::cspan<uint8_t> exponent{value_sequence.exponent_sequence.data +
@@ -128,7 +128,7 @@ __global__ static void commitment_reduction_kernel(
       c21o::add(reduction[0], reduction[0], reduction[i]);
     }
 
-    c21rs::to_bytes(final_commitment->data(), reduction[0]);
+    rstb::to_bytes(final_commitment->data(), reduction[0]);
   }
 }
 

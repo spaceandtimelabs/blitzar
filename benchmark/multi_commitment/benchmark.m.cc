@@ -16,7 +16,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
-#include "sxt/curve21/ristretto/byte_conversion.h"
+#include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/seqcommit/cbindings/pedersen_backend.h"
 #include "sxt/seqcommit/cbindings/pedersen_cpu_backend.h"
 #include "sxt/seqcommit/cbindings/pedersen_gpu_backend.h"
@@ -121,7 +121,7 @@ static void populate_table(
     for (size_t i = 0; i < rows; ++i) {
         c21t::element_p3 g_i;
         sqcgn::compute_base_element(g_i, i);
-        c21rs::to_bytes(generators[i].data(), g_i);
+        rstb::to_bytes(generators[i].data(), g_i);
     }
     
     for (size_t i = 0; i < data_table.size(); ++i) {

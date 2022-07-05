@@ -2,9 +2,9 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/seqcommit/generator/base_element.h"
-#include "sxt/curve21/ristretto/byte_conversion.h"
 
 namespace sxt::sqcgn {
 //--------------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ void cpu_get_generators(
 
     sqcgn::compute_base_element(g_i, row_i + offset_generators);
 
-    c21rs::to_bytes(generators[row_i].data(), g_i);
+    rstb::to_bytes(generators[row_i].data(), g_i);
   }
 }
 

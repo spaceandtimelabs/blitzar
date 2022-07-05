@@ -1,4 +1,4 @@
-#include "sxt/curve21/ristretto/byte_conversion.h"
+#include "sxt/ristretto/base/byte_conversion.h"
 
 #include <array>
 
@@ -7,7 +7,7 @@
 #include "sxt/curve21/type/element_p3.h"
 
 using namespace sxt;
-using namespace sxt::c21rs;
+using namespace sxt::rstb;
 
 TEST_CASE("Testing 1 - point conversion from curve255 to ristretto") {
   c21t::element_p3 p = {

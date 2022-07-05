@@ -78,7 +78,7 @@ sxt_cc_component(
         "//sxt/curve21/operation:add",
         "//sxt/curve21/type:element_p3",
         "//sxt/seqcommit/base:commitment",
-        "//sxt/curve21/ristretto:byte_conversion",
+        "//sxt/ristretto/base:byte_conversion",
         "//sxt/seqcommit/generator:base_element",
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/curve21/constant:zero"

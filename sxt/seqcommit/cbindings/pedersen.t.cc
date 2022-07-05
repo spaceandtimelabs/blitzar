@@ -1,16 +1,16 @@
 #include "sxt/seqcommit/cbindings/pedersen.h"
 
-#include <array>
 #include <algorithm>
+#include <array>
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/seqcommit/base/commitment.h"
 #include "sxt/seqcommit/generator/base_element.h"
-#include "sxt/curve21/ristretto/byte_conversion.h"
-#include "sxt/curve21/operation/scalar_multiply.h"
 
 TEST_CASE("run compute pedersen commitment tests") {
     const uint32_t num_sequences = 3;
@@ -262,16 +262,16 @@ TEST_CASE("run compute pedersen commitment tests") {
 
             sxt::c21t::element_p3 p, q;
 
-            sxt::c21rs::from_bytes(p, commitments_data[0].ristretto_bytes);
+            sxt::rstb::from_bytes(p, commitments_data[0].ristretto_bytes);
 
-            sxt::c21rs::from_bytes(q, commitments_data[1].ristretto_bytes);
+            sxt::rstb::from_bytes(q, commitments_data[1].ristretto_bytes);
 
             sxt::c21o::scalar_multiply(p, multiplicative_constant,
                                     p);  // h_i = a_i * g_i
 
             sxt::c21o::add(p, p, q);
 
-            sxt::c21rs::to_bytes(commitment_c.data(), p);
+            sxt::rstb::to_bytes(commitment_c.data(), p);
 
             sxt::sqcb::commitment &expected_commitment_c =
                 reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[2];
@@ -407,8 +407,8 @@ TEST_CASE("run compute pedersen commitment tests") {
             sxt::c21t::element_p3 g_i;
             sxt::sqcgn::compute_base_element(g_i, query[i]);
 
-            sxt::c21rs::to_bytes(generators_data[i].ristretto_bytes, g_i);
-            sxt::c21rs::from_bytes(g_i, generators_data[i].ristretto_bytes);
+            sxt::rstb::to_bytes(generators_data[i].ristretto_bytes, g_i);
+            sxt::rstb::from_bytes(g_i, generators_data[i].ristretto_bytes);
 
             sxt::c21t::element_p3 h;
             sxt::c21o::scalar_multiply(
@@ -423,7 +423,7 @@ TEST_CASE("run compute pedersen commitment tests") {
         }
         
         sxt::sqcb::commitment expected_commitment_c;
-        sxt::c21rs::to_bytes(expected_commitment_c.data(), expected_g);
+        sxt::rstb::to_bytes(expected_commitment_c.data(), expected_g);
 
         sxt_sequence_descriptor valid_descriptors[num_sequences];
 
@@ -524,8 +524,8 @@ TEST_CASE("run get pedersen generator tests") {
       REQUIRE(ret == 0);
 
       sxt::sqcb::commitment expected_commit_0, expected_commit_1;
-      sxt::c21rs::to_bytes(expected_commit_0.data(), expected_g_0);
-      sxt::c21rs::to_bytes(expected_commit_1.data(), expected_g_1);
+      sxt::rstb::to_bytes(expected_commit_0.data(), expected_g_0);
+      sxt::rstb::to_bytes(expected_commit_1.data(), expected_g_1);
 
       REQUIRE(reinterpret_cast<sxt::sqcb::commitment *>(generators)[0]
                  == expected_commit_0);

@@ -7,9 +7,9 @@
  * See third_party/license/libsodium.LICENSE
  */
 
-#include "sxt/curve21/ristretto/elligator.h"
+#include "sxt/ristretto/operation/elligator.h"
 
-#include "sxt/curve21/ristretto/sqrt_ratio_m1.h"
+#include "sxt/ristretto/base/sqrt_ratio_m1.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/field51/constant/d.h"
 #include "sxt/field51/constant/one.h"
@@ -23,7 +23,7 @@
 #include "sxt/field51/operation/sub.h"
 #include "sxt/field51/type/element.h"
 
-namespace sxt::c21rs {
+namespace sxt::rsto {
 //--------------------------------------------------------------------------------------------------
 // apply_elligator
 //--------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ void apply_elligator(c21t::element_p3& p, const f51t::element& t) noexcept {
     f51o::sub(v, c, v);                           /* v = c-r*d */
     f51o::mul(v, v, rpd);                         /* v = (c-r*d)*(r+d) */
 
-    wasnt_square = 1 - compute_sqrt_ratio_m1(s, u, v);
+    wasnt_square = 1 - rstb::compute_sqrt_ratio_m1(s, u, v);
     f51o::mul(s_prime, s, t);
     f51o::abs(s_prime, s_prime);
     f51o::neg(s_prime, s_prime);     /* s_prime = -|s*t| */
@@ -75,4 +75,4 @@ void apply_elligator(c21t::element_p3& p, const f51t::element& t) noexcept {
     f51o::mul(p.Z, w1, w3);
     f51o::mul(p.T, w0, w2);
 }
-}  // namespace sxt::c21rs
+}  // namespace sxt::rsto

@@ -19,7 +19,7 @@ cc_library(
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/curve21/random:exponent",
-        "//sxt/curve21/random:ristretto_element",
+        "//sxt/ristretto/random:element",
     ],
 )
 

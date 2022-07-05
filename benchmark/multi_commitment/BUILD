@@ -8,11 +8,11 @@ sxt_cc_benchmark(
     deps = [
         "//sxt/base/container:span",
         "//sxt/curve21/type:element_p3",
+        "//sxt/memory/management:managed_array",
+        "//sxt/ristretto/base:byte_conversion",
         "//sxt/seqcommit/base:commitment",
         "//sxt/seqcommit/base:indexed_exponent_sequence",
-        "//sxt/memory/management:managed_array",
         "//sxt/seqcommit/generator:base_element",
-        "//sxt/curve21/ristretto:byte_conversion",
         "//sxt/seqcommit/cbindings:pedersen_cpu_backend",
         "//sxt/seqcommit/cbindings:pedersen_gpu_backend"
     ],

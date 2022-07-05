@@ -1,11 +1,11 @@
-#include "sxt/curve21/ristretto/point_formation.h"
+#include "sxt/ristretto/operation/point_formation.h"
 
 #include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/ristretto/elligator.h"
+#include "sxt/ristretto/operation/elligator.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/field51/type/element.h"
 
-namespace sxt::c21rs {
+namespace sxt::rsto {
 //--------------------------------------------------------------------------------------------------
 // form_ristretto_point
 //--------------------------------------------------------------------------------------------------
@@ -17,4 +17,4 @@ void form_ristretto_point(c21t::element_p3& p, const f51t::element& r0,
   apply_elligator(p, r1);
   c21o::add(p, p, p0);
 }
-}  // namespace sxt::c21rs
+}  // namespace sxt::rsto

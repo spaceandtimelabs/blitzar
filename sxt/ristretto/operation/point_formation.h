@@ -5,10 +5,11 @@
 namespace sxt::c21t { struct element_p3; }
 namespace sxt::f51t { class element; }
 
-namespace sxt::c21rs {
+namespace sxt::rsto {
 //--------------------------------------------------------------------------------------------------
-// apply_elligator
+// form_ristretto_point
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void apply_elligator(c21t::element_p3& p, const f51t::element& t) noexcept;
-}  // namespace sxt::c21rs
+void form_ristretto_point(c21t::element_p3& p, const f51t::element& r0,
+                          const f51t::element& r1) noexcept;
+}  // namespace sxt::rsto

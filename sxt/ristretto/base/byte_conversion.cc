@@ -7,36 +7,29 @@
  * See third_party/license/libsodium.LICENSE
  */
 
-#include "sxt/curve21/ristretto/byte_conversion.h"
-#include "sxt/curve21/ristretto/sqrt_ratio_m1.h"
+#include "sxt/ristretto/base/byte_conversion.h"
 
-#include "sxt/field51/base/byte_conversion.h"
-
+#include "sxt/ristretto/base/sqrt_ratio_m1.h"
 #include "sxt/curve21/type/element_p3.h"
-
-#include "sxt/field51/type/element.h"
-
-#include "sxt/field51/operation/add.h"
-#include "sxt/field51/operation/sub.h"
-#include "sxt/field51/operation/mul.h"
-#include "sxt/field51/operation/square.h"
-#include "sxt/field51/operation/cmov.h"
-#include "sxt/field51/operation/cneg.h"
-#include "sxt/field51/operation/neg.h"
-#include "sxt/field51/operation/abs.h"
-#include "sxt/field51/operation/pow22523.h"
-
 #include "sxt/field51/base/byte_conversion.h"
-
 #include "sxt/field51/constant/d.h"
+#include "sxt/field51/constant/invsqrtamd.h"
 #include "sxt/field51/constant/one.h"
 #include "sxt/field51/constant/sqrtm1.h"
-#include "sxt/field51/constant/invsqrtamd.h"
-
+#include "sxt/field51/operation/abs.h"
+#include "sxt/field51/operation/add.h"
+#include "sxt/field51/operation/cmov.h"
+#include "sxt/field51/operation/cneg.h"
+#include "sxt/field51/operation/mul.h"
+#include "sxt/field51/operation/neg.h"
+#include "sxt/field51/operation/pow22523.h"
+#include "sxt/field51/operation/square.h"
+#include "sxt/field51/operation/sub.h"
 #include "sxt/field51/property/sign.h"
 #include "sxt/field51/property/zero.h"
+#include "sxt/field51/type/element.h"
 
-namespace sxt::c21rs {
+namespace sxt::rstb {
 
 //--------------------------------------------------------------------------------------------------
 // to_bytes
@@ -67,7 +60,7 @@ void to_bytes(uint8_t s[32], const c21t::element_p3& p) noexcept {
     f51o::square(u1_u2u2, u2);           /* u1_u2u2 = u2^2 */
     f51o::mul(u1_u2u2, u1, u1_u2u2); /* u1_u2u2 = u1*u2^2 */
 
-    (void) c21rs::compute_sqrt_ratio_m1(inv_sqrt, one, u1_u2u2);
+    (void) rstb::compute_sqrt_ratio_m1(inv_sqrt, one, u1_u2u2);
 
     f51o::mul(den1, inv_sqrt, u1);   /* den1 = inv_sqrt*u1 */
     f51o::mul(den2, inv_sqrt, u2);   /* den2 = inv_sqrt*u2 */
@@ -156,7 +149,7 @@ int from_bytes(c21t::element_p3& p, const uint8_t* s) noexcept {
     f51o::mul(v_u2u2, v, u2u2);      /* v_u2u2 = v*u2^2 */
 
     one = f51t::element{f51cn::one_v};
-    was_square = c21rs::compute_sqrt_ratio_m1(inv_sqrt, one, v_u2u2);
+    was_square = rstb::compute_sqrt_ratio_m1(inv_sqrt, one, v_u2u2);
 
     f51o::mul(p.X, inv_sqrt, u2);
     f51o::mul(p.Y, inv_sqrt, p.X);
@@ -174,5 +167,4 @@ int from_bytes(c21t::element_p3& p, const uint8_t* s) noexcept {
     return - ((1 - was_square) |
               f51p::is_negative(p.T) | f51p::is_zero(p.Y));
 }
-
-}  // namespace sxt::c21rs
+}  // namespace sxt::rstb

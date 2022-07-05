@@ -1,14 +1,14 @@
 #include "sxt/seqcommit/generator/gpu_generator.h"
 
 #include "sxt/base/container/span.h"
-#include "sxt/curve21/type/element_p3.h"
-#include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/num/divide_up.h"
-#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
-#include "sxt/curve21/ristretto/byte_conversion.h"
+#include "sxt/ristretto/base/byte_conversion.h"
+#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/seqcommit/generator/base_element.h"
 
 namespace sxt::sqcgn {
 
@@ -25,7 +25,7 @@ __global__ static void compute_generators_kernel(sqcb::commitment *generators, u
 
     sqcgn::compute_base_element(g_i, row_i + offset_generators);
 
-    c21rs::to_bytes(generators[row_i].data(), g_i);
+    rstb::to_bytes(generators[row_i].data(), g_i);
   }
 }
 
