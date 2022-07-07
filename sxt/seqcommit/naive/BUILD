@@ -6,7 +6,7 @@ sxt_cc_component(
         "//sxt/base/container:span",
     ],
     impl_deps = [
-        "//sxt/seqcommit/base:commitment",
+        "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",
         "//sxt/seqcommit/base:indexed_exponent_sequence",
         "//sxt/curve21/type:element_p3",
@@ -32,7 +32,7 @@ sxt_cc_component(
         "//sxt/base/device:stream",
         "//sxt/base/num:divide_up",
         "//sxt/curve21/constant:zero",
-        "//sxt/seqcommit/base:commitment",
+        "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",
         "//sxt/seqcommit/base:indexed_exponent_sequence",
         "//sxt/curve21/type:element_p3",

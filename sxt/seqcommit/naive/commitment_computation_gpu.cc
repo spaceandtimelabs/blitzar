@@ -14,7 +14,7 @@
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/managed_device_resource.h"
 #include "sxt/ristretto/base/byte_conversion.h"
-#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
@@ -51,7 +51,7 @@ static void get_value_sequence_size(
 __global__ static void compute_commitments_kernel(
     c21t::element_p3 *partial_commitments,
     sqcb::indexed_exponent_sequence value_sequence,
-    sqcb::commitment *generators) {
+    rstt::compressed_element *generators) {
   extern __shared__ c21t::element_p3 reduction[];
 
   int tid = threadIdx.x;
@@ -105,7 +105,7 @@ __global__ static void compute_commitments_kernel(
 // commitment_reduction_kernel
 //--------------------------------------------------------------------------------------------------
 __global__ static void commitment_reduction_kernel(
-    sqcb::commitment *final_commitment, c21t::element_p3 *partial_commitments,
+    rstt::compressed_element *final_commitment, c21t::element_p3 *partial_commitments,
     uint64_t n) {
   extern __shared__ c21t::element_p3 reduction[];
 
@@ -136,9 +136,9 @@ __global__ static void commitment_reduction_kernel(
 // launch_commitment_kernels
 //--------------------------------------------------------------------------------------------------
 static void launch_commitment_kernels(
-    memmg::managed_array<sqcb::commitment> &commitments_device,
+    memmg::managed_array<rstt::compressed_element> &commitments_device,
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
-    basct::cspan<sqcb::commitment> generators) {
+    basct::cspan<rstt::compressed_element> generators) {
 
   uint64_t num_commitments = commitments_device.size();
   uint64_t sequence_size, total_num_blocks, biggest_n, total_num_indices;
@@ -183,12 +183,12 @@ static void launch_commitment_kernels(
   );
 
   // allocates memory in the device for the generators
-  memmg::managed_array<sqcb::commitment> generators_device(
+  memmg::managed_array<rstt::compressed_element> generators_device(
       min(biggest_n, generators.size()),
       memr::get_managed_device_resource()
   );
 
-  sqcb::commitment *gens_dev_ptr = nullptr;
+  rstt::compressed_element *gens_dev_ptr = nullptr;
 
   // In the case that some generator data
   // was given, copy this data from host
@@ -202,7 +202,7 @@ static void launch_commitment_kernels(
     basdv::memcpy_host_to_device(
       gens_dev_ptr,
       generators.data(),
-      biggest_n * sizeof(sqcb::commitment)
+      biggest_n * sizeof(rstt::compressed_element)
     );
   }
 
@@ -300,12 +300,12 @@ static void launch_commitment_kernels(
 // compute_commitments_gpu
 //--------------------------------------------------------------------------------------------------
 void compute_commitments_gpu(
-    basct::span<sqcb::commitment> commitments,
-    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences, basct::cspan<sqcb::commitment> generators) noexcept {
+    basct::span<rstt::compressed_element> commitments,
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences, basct::cspan<rstt::compressed_element> generators) noexcept {
   assert(commitments.size() == value_sequences.size());
 
   // allocates memory to commitments in the device
-  memmg::managed_array<sqcb::commitment> commitments_device(
+  memmg::managed_array<rstt::compressed_element> commitments_device(
        commitments.size(), memr::get_device_resource()
   );
 

@@ -3,7 +3,7 @@
 #include "sxt/base/container/span.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/ristretto/base/byte_conversion.h"
-#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
 namespace sxt::sqcgn {
@@ -11,7 +11,7 @@ namespace sxt::sqcgn {
 // cpu_get_generators
 //--------------------------------------------------------------------------------------------------
 void cpu_get_generators(
-    basct::span<sqcb::commitment> generators,
+    basct::span<rstt::compressed_element> generators,
     uint64_t offset_generators) noexcept {
 
   uint64_t num_generators = generators.size();

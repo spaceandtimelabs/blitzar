@@ -1,36 +1,36 @@
-#include "sxt/seqcommit/cbindings/pedersen_cpu_backend.h"
+#include "sxt/seqcommit/backend/naive_cpu_backend.h"
 
-#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/cpu_generator.h"
 #include "sxt/seqcommit/naive/commitment_computation_cpu.h"
 
-namespace sxt::sqccb {
+namespace sxt::sqcbck {
 //--------------------------------------------------------------------------------------------------
 // compute_commitments
 //--------------------------------------------------------------------------------------------------
-void pedersen_cpu_backend::compute_commitments(
-    basct::span<sqcb::commitment> commitments,
+void naive_cpu_backend::compute_commitments(
+    basct::span<rstt::compressed_element> commitments,
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
-    basct::span<sqcb::commitment> generators) noexcept {
+    basct::span<rstt::compressed_element> generators) noexcept {
     sqcnv::compute_commitments_cpu(commitments, value_sequences, generators);
 }
 
 //--------------------------------------------------------------------------------------------------
 // get_generators
 //--------------------------------------------------------------------------------------------------
-void pedersen_cpu_backend::get_generators(
-    basct::span<sqcb::commitment> generators,
+void naive_cpu_backend::get_generators(
+    basct::span<rstt::compressed_element> generators,
     uint64_t offset_generators) noexcept {
     sqcgn::cpu_get_generators(generators, offset_generators);
 }
 
 //--------------------------------------------------------------------------------------------------
-// get_pedersen_cpu_backend
+// get_naive_cpu_backend
 //--------------------------------------------------------------------------------------------------
-pedersen_cpu_backend* get_pedersen_cpu_backend() {
+naive_cpu_backend* get_naive_cpu_backend() {
     // see https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
-    static pedersen_cpu_backend* backend = new pedersen_cpu_backend{};
+    static naive_cpu_backend* backend = new naive_cpu_backend{};
     return backend;
 }
 }

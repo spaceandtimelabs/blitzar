@@ -6,7 +6,7 @@ sxt_cc_component(
     deps = [
         "//sxt/base/functional:function_ref",
         "//sxt/base/container:span",
-        "//sxt/seqcommit/base:commitment",
+        "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",
         "//sxt/seqcommit/base:indexed_exponent_sequence",
         "//sxt/curve21/type:element_p3",
@@ -28,6 +28,6 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/constant:zero",
         "//sxt/ristretto/base:byte_conversion",
-        "//sxt/seqcommit/base:commitment",
+        "//sxt/ristretto/type:compressed_element",
     ],
 )

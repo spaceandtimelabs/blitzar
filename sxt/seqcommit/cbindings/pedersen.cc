@@ -5,19 +5,19 @@
 #include <cuda_runtime.h>
 
 #include "sxt/base/container/span.h"
-#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/memory/management/managed_array.h"
-#include "sxt/seqcommit/cbindings/pedersen_backend.h"
-#include "sxt/seqcommit/cbindings/pedersen_cpu_backend.h"
-#include "sxt/seqcommit/cbindings/pedersen_gpu_backend.h"
+#include "sxt/seqcommit/backend/pedersen_backend.h"
+#include "sxt/seqcommit/backend/naive_cpu_backend.h"
+#include "sxt/seqcommit/backend/naive_gpu_backend.h"
 
 using namespace sxt;
 
 //--------------------------------------------------------------------------------------------------
 // backend
 //--------------------------------------------------------------------------------------------------
-static sqccb::pedersen_backend* backend = nullptr;
+static sqcbck::pedersen_backend* backend = nullptr;
 
 //--------------------------------------------------------------------------------------------------
 // get_num_devices
@@ -45,15 +45,15 @@ int sxt_init(const sxt_config* config) {
   if (backend != nullptr) exit(1);
 
   if (config->backend == SXT_BACKEND_CPU) {
-    backend = sqccb::get_pedersen_cpu_backend();
+    backend = sqcbck::get_naive_cpu_backend();
     return 0;
   } else if (config->backend == SXT_BACKEND_GPU) {
     int num_devices = get_num_devices();
 
     if (num_devices > 0) {
-      backend = sqccb::get_pedersen_gpu_backend();
+      backend = sqcbck::get_naive_gpu_backend();
     } else {
-      backend = sqccb::get_pedersen_cpu_backend();
+      backend = sqcbck::get_naive_cpu_backend();
 
       std::cout << "WARN: Using 'compute_commitments_cpu'. " << std::endl;
     }
@@ -118,11 +118,11 @@ static int process_compute_pedersen_commitments(
   if (commitments == nullptr
         || validate_sequence_descriptor(longest_sequence, num_sequences, descriptors)) return 1;
 
-  static_assert(sizeof(sqcb::commitment) == 
+  static_assert(sizeof(rstt::compressed_element) == 
       sizeof(sxt_ristretto_element), "types must be ABI compatible");
 
-  basct::span<sqcb::commitment> commitments_result(
-            reinterpret_cast<sqcb::commitment *>(commitments), num_sequences);
+  basct::span<rstt::compressed_element> commitments_result(
+            reinterpret_cast<rstt::compressed_element *>(commitments), num_sequences);
 
   memmg::managed_array<sqcb::indexed_exponent_sequence> sequences(num_sequences);
 
@@ -139,8 +139,8 @@ static int process_compute_pedersen_commitments(
   
   if (generators == nullptr) longest_sequence = 0;
 
-  basct::span<sqcb::commitment> generators_span(
-       reinterpret_cast<sqcb::commitment *>(generators), longest_sequence);
+  basct::span<rstt::compressed_element> generators_span(
+       reinterpret_cast<rstt::compressed_element *>(generators), longest_sequence);
 
   backend->compute_commitments(commitments_result, value_sequences, generators_span);
 
@@ -199,8 +199,8 @@ int sxt_get_generators(
   // backend not initialized (sxt_init not called correctly)
   if (backend == nullptr) return 1;
 
-  basct::span<sqcb::commitment> generators_result(
-    reinterpret_cast<sqcb::commitment *>(generators), num_generators
+  basct::span<rstt::compressed_element> generators_result(
+    reinterpret_cast<rstt::compressed_element *>(generators), num_generators
   );
 
   backend->get_generators(generators_result, offset_generators);

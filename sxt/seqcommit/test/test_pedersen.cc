@@ -6,7 +6,7 @@
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/ristretto/base/byte_conversion.h"
-#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
@@ -15,17 +15,17 @@ namespace sxt::sqctst {
 // test_pedersen_compute_commitment
 //--------------------------------------------------------------------------------------------------
 void test_pedersen_compute_commitment(
-  basf::function_ref<void(basct::span<sqcb::commitment>,
-        basct::cspan<sqcb::indexed_exponent_sequence>, basct::cspan<sqcb::commitment> generators)> f) {
+  basf::function_ref<void(basct::span<rstt::compressed_element>,
+        basct::cspan<sqcb::indexed_exponent_sequence>, basct::cspan<rstt::compressed_element> generators)> f) {
   SECTION("we can add two commitments together") {
     const uint64_t num_rows = 4;
     const uint64_t num_sequences = 3;
     const uint8_t element_nbytes = sizeof(int);
 
-    basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_sequences];
+    basct::span<rstt::compressed_element> empty_generators;
+    rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+    basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences,
                                                           num_sequences);
 
@@ -46,7 +46,7 @@ void test_pedersen_compute_commitment(
         "+ commit_b)") {
       f(commitments, value_sequences, empty_generators);
 
-      sqcb::commitment commitment_c;
+      rstt::compressed_element commitment_c;
 
       c21t::element_p3 p, q;
 
@@ -58,10 +58,10 @@ void test_pedersen_compute_commitment(
 
       rstb::to_bytes(commitment_c.data(), p);
 
-      sqcb::commitment &expected_commitment_c = commitments_data[2];
+      rstt::compressed_element &expected_commitment_c = commitments_data[2];
 
       // verify that result is not null
-      REQUIRE(sxt::sqcb::commitment() != commitment_c);
+      REQUIRE(sxt::rstt::compressed_element() != commitment_c);
 
       REQUIRE(commitment_c == expected_commitment_c);
     }
@@ -72,10 +72,10 @@ void test_pedersen_compute_commitment(
     const uint64_t num_sequences = 4;
     const uint8_t element_nbytes = sizeof(int);
 
-    basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_sequences];
+    basct::span<rstt::compressed_element> empty_generators;
+    rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+    basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences,
                                                           num_sequences);
 
@@ -96,7 +96,7 @@ void test_pedersen_compute_commitment(
     SECTION("3 = 1 + 1 + 1 ==> commit(3) = commit(1) + commit(1) + commit(1)") {
       f(commitments, value_sequences, empty_generators);
 
-      sqcb::commitment commitment_c;
+      rstt::compressed_element commitment_c;
 
       c21t::element_p3 p, q, s;
 
@@ -112,10 +112,10 @@ void test_pedersen_compute_commitment(
 
       rstb::to_bytes(commitment_c.data(), p);
 
-      sqcb::commitment &expected_commitment_c = commitments_data[3];
+      rstt::compressed_element &expected_commitment_c = commitments_data[3];
 
       // verify that result is not null
-      REQUIRE(sxt::sqcb::commitment() != commitment_c);
+      REQUIRE(sxt::rstt::compressed_element() != commitment_c);
 
       REQUIRE(commitment_c == expected_commitment_c);
     }
@@ -128,10 +128,10 @@ void test_pedersen_compute_commitment(
     const uint64_t num_sequences = 1;
     const uint8_t element_nbytes = sizeof(int);
 
-    basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_sequences];
+    basct::span<rstt::compressed_element> empty_generators;
+    rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+    basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences, num_sequences);
 
     const int query[num_sequences][num_rows] = {
@@ -157,14 +157,14 @@ void test_pedersen_compute_commitment(
 
         c21o::add(p, p, g_i);
 
-        sqcb::commitment commitment;
+        rstt::compressed_element commitment;
 
         rstb::to_bytes(commitment.data(), p);
 
-        sqcb::commitment &expected_commitment = commitments_data[0];
+        rstt::compressed_element &expected_commitment = commitments_data[0];
 
         // verify that result is not null
-        REQUIRE(sxt::sqcb::commitment() != commitment);
+        REQUIRE(sxt::rstt::compressed_element() != commitment);
 
         REQUIRE(commitment == expected_commitment);
     }
@@ -177,10 +177,10 @@ void test_pedersen_compute_commitment(
     const uint64_t num_sequences = 3;
     const uint8_t element_nbytes = 32;
 
-    basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_sequences];
+    basct::span<rstt::compressed_element> empty_generators;
+    rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+    basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences, num_sequences);
 
     const unsigned char query[3][32] = {
@@ -200,7 +200,7 @@ void test_pedersen_compute_commitment(
         "C = A + B >= p (p = 2^252 + 27742317777372353535851937790883648493)") {
       f(commitments, value_sequences, empty_generators);
 
-      sqcb::commitment commitment_c;
+      rstt::compressed_element commitment_c;
 
       c21t::element_p3 p, q;
 
@@ -212,10 +212,10 @@ void test_pedersen_compute_commitment(
 
       rstb::to_bytes(commitment_c.data(), p);
 
-      sqcb::commitment &expected_commitment_c = commitments_data[2];
+      rstt::compressed_element &expected_commitment_c = commitments_data[2];
 
       // verify that result is not null
-      REQUIRE(sxt::sqcb::commitment() != commitment_c);
+      REQUIRE(sxt::rstt::compressed_element() != commitment_c);
 
       REQUIRE(commitment_c == expected_commitment_c);
     }
@@ -227,10 +227,10 @@ void test_pedersen_compute_commitment(
     const uint8_t element_nbytes = sizeof(int);
     const unsigned int multiplicative_constant = 52;
 
-    basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_sequences];
+    basct::span<rstt::compressed_element> empty_generators;
+    rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+    basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences,
                                                           num_sequences);
 
@@ -252,7 +252,7 @@ void test_pedersen_compute_commitment(
     SECTION("c = 52 * a + b ==> commit_c = 52 * commit_a + commit_b") {
       f(commitments, value_sequences, empty_generators);
 
-      sqcb::commitment commitment_c;
+      rstt::compressed_element commitment_c;
 
       c21t::element_p3 p, q;
 
@@ -267,10 +267,10 @@ void test_pedersen_compute_commitment(
 
       rstb::to_bytes(commitment_c.data(), p);
 
-      sqcb::commitment &expected_commitment_c = commitments_data[2];
+      rstt::compressed_element &expected_commitment_c = commitments_data[2];
 
       // verify that result is not null
-      REQUIRE(sxt::sqcb::commitment() != commitment_c);
+      REQUIRE(sxt::rstt::compressed_element() != commitment_c);
 
       REQUIRE(commitment_c == expected_commitment_c);
     }
@@ -282,10 +282,10 @@ void test_pedersen_compute_commitment(
     const uint64_t num_rows = 1;
     const uint64_t num_sequences = 3;
 
-    basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_sequences];
+    basct::span<rstt::compressed_element> empty_generators;
+    rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
-    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+    basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences,
                                                           num_sequences);
 
@@ -311,7 +311,7 @@ void test_pedersen_compute_commitment(
     SECTION("-|c| = -|a| + -|b| ==> commit_c = commit_a + commit_b") {
       f(commitments, value_sequences, empty_generators);
 
-      sqcb::commitment commitment_c;
+      rstt::compressed_element commitment_c;
 
       c21t::element_p3 p, q;
 
@@ -323,10 +323,10 @@ void test_pedersen_compute_commitment(
 
       rstb::to_bytes(commitment_c.data(), p);
 
-      sqcb::commitment &expected_commitment_c = commitments_data[2];
+      rstt::compressed_element &expected_commitment_c = commitments_data[2];
 
       // verify that result is not null
-      REQUIRE(sxt::sqcb::commitment() != commitment_c);
+      REQUIRE(sxt::rstt::compressed_element() != commitment_c);
 
       REQUIRE(commitment_c == expected_commitment_c);
     }
@@ -339,7 +339,7 @@ void test_pedersen_compute_commitment(
     const uint64_t num_sequences = 3;
     const uint8_t element_nbytes = 32;
 
-    sqcb::commitment commitments_data[num_sequences];
+    rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
 
     // p = 2^252 + 27742317777372353535851937790883648493 (decimal)
@@ -366,8 +366,8 @@ void test_pedersen_compute_commitment(
       sequences[i].exponent_sequence.element_nbytes = element_nbytes;
     }
 
-    basct::span<sqcb::commitment> empty_generators(nullptr, 0);
-    basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+    basct::span<rstt::compressed_element> empty_generators(nullptr, 0);
+    basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences,
                                                           num_sequences);
 
@@ -376,7 +376,7 @@ void test_pedersen_compute_commitment(
       
       f(commitments, value_sequences, empty_generators);
 
-      sqcb::commitment commitment_c;
+      rstt::compressed_element commitment_c;
 
       c21t::element_p3 p, q;
 
@@ -388,10 +388,10 @@ void test_pedersen_compute_commitment(
 
       rstb::to_bytes(commitment_c.data(), p);
 
-      sqcb::commitment &expected_commitment_c = commitments_data[2];
+      rstt::compressed_element &expected_commitment_c = commitments_data[2];
 
       // verify that result is not null
-      REQUIRE(sxt::sqcb::commitment() == commitment_c);
+      REQUIRE(sxt::rstt::compressed_element() == commitment_c);
 
       REQUIRE(commitment_c == expected_commitment_c);
     }
@@ -402,10 +402,10 @@ void test_pedersen_compute_commitment(
       "number of rows") {
     const uint64_t num_commitments = 4;
 
-    basct::span<sqcb::commitment> empty_generators;
-    sqcb::commitment commitments_data[num_commitments];
+    basct::span<rstt::compressed_element> empty_generators;
+    rstt::compressed_element commitments_data[num_commitments];
     sqcb::indexed_exponent_sequence sequences[num_commitments];
-    basct::span<sqcb::commitment> commitments(commitments_data,
+    basct::span<rstt::compressed_element> commitments(commitments_data,
                                               num_commitments);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences,
                                                           num_commitments);
@@ -448,7 +448,7 @@ void test_pedersen_compute_commitment(
         "commit(C)") {
       f(commitments, value_sequences, empty_generators);
 
-      sqcb::commitment commitment_c;
+      rstt::compressed_element commitment_c;
 
       c21t::element_p3 p, q, r;
 
@@ -464,10 +464,10 @@ void test_pedersen_compute_commitment(
 
       rstb::to_bytes(commitment_c.data(), p);
 
-      sqcb::commitment &expected_commitment_c = commitments_data[3];
+      rstt::compressed_element &expected_commitment_c = commitments_data[3];
 
       // verify that result is not null
-      REQUIRE(sxt::sqcb::commitment() != commitment_c);
+      REQUIRE(sxt::rstt::compressed_element() != commitment_c);
       
       REQUIRE(commitment_c == expected_commitment_c);
     }
@@ -476,7 +476,7 @@ void test_pedersen_compute_commitment(
   SECTION(
       "We can pass generators to the commitment computation") {
       
-      sqcb::commitment ristretto_gens[4];
+      rstt::compressed_element ristretto_gens[4];
       const int data_values[4] = {1, 2, 3, 4};
       c21t::element_p3 expected_g = c21cn::zero_p3_v;
 
@@ -499,24 +499,24 @@ void test_pedersen_compute_commitment(
         c21o::add(expected_g, expected_g, h);
       }
 
-      sqcb::commitment expected_commitment;
+      rstt::compressed_element expected_commitment;
       rstb::to_bytes(expected_commitment.data(), expected_g);
 
-      sqcb::commitment commitments_data[1];
+      rstt::compressed_element commitments_data[1];
       sqcb::indexed_exponent_sequence sequences[1];
 
       sequences[0].exponent_sequence.n = 4;
       sequences[0].exponent_sequence.data = reinterpret_cast<const uint8_t*>(data_values);
       sequences[0].exponent_sequence.element_nbytes = sizeof(int);
 
-      basct::span<sqcb::commitment> commitments(commitments_data, 1);
-      basct::span<sqcb::commitment> span_generators(ristretto_gens, 4);
+      basct::span<rstt::compressed_element> commitments(commitments_data, 1);
+      basct::span<rstt::compressed_element> span_generators(ristretto_gens, 4);
       basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences, 1);
 
       f(commitments, value_sequences, span_generators);
 
       // verify that result is not null
-      REQUIRE(sxt::sqcb::commitment() != commitments_data[0]);
+      REQUIRE(sxt::rstt::compressed_element() != commitments_data[0]);
 
       REQUIRE(expected_commitment == commitments_data[0]);
     }
@@ -525,7 +525,7 @@ void test_pedersen_compute_commitment(
         const uint64_t num_sequences = 2;
         const uint8_t element_nbytes = sizeof(int);
 
-        sxt::sqcb::commitment commitments_data[num_sequences];
+        sxt::rstt::compressed_element commitments_data[num_sequences];
 
         const int dense_data[11] = {
             1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0
@@ -551,15 +551,15 @@ void test_pedersen_compute_commitment(
             dense_descriptor, sparse_descriptor
         };
 
-        basct::span<sqcb::commitment> span_generators(nullptr, 0);
-        basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+        basct::span<rstt::compressed_element> span_generators(nullptr, 0);
+        basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
         basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences, num_sequences);
 
         SECTION("sparse_commitments == dense_commitment") {
             f(commitments, value_sequences, span_generators);
 
             // verify that result is not null
-            REQUIRE(sxt::sqcb::commitment() != commitments_data[0]);
+            REQUIRE(sxt::rstt::compressed_element() != commitments_data[0]);
 
             REQUIRE(commitments_data[0] == commitments_data[1]);
         }
@@ -569,7 +569,7 @@ void test_pedersen_compute_commitment(
         const uint64_t num_sequences = 2;
         const uint8_t element_nbytes = sizeof(int);
 
-        sqcb::commitment commitments_data[num_sequences];
+        rstt::compressed_element commitments_data[num_sequences];
 
         const int dense_data[11] = {
             1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0
@@ -595,15 +595,15 @@ void test_pedersen_compute_commitment(
             dense_descriptor, sparse_descriptor
         };
 
-        basct::span<sqcb::commitment> span_generators(nullptr, 0);
-        basct::span<sqcb::commitment> commitments(commitments_data, num_sequences);
+        basct::span<rstt::compressed_element> span_generators(nullptr, 0);
+        basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
         basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences, num_sequences);
 
         SECTION("sparse_commitments == dense_commitment") {
             f(commitments, value_sequences, span_generators);
 
             // verify that result is not null
-            REQUIRE(sxt::sqcb::commitment() != commitments_data[0]);
+            REQUIRE(sxt::rstt::compressed_element() != commitments_data[0]);
 
             REQUIRE(commitments_data[0] == commitments_data[1]);
         }

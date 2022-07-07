@@ -10,11 +10,11 @@ sxt_cc_benchmark(
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
         "//sxt/ristretto/base:byte_conversion",
-        "//sxt/seqcommit/base:commitment",
+        "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/base:indexed_exponent_sequence",
         "//sxt/seqcommit/generator:base_element",
-        "//sxt/seqcommit/cbindings:pedersen_cpu_backend",
-        "//sxt/seqcommit/cbindings:pedersen_gpu_backend"
+        "//sxt/seqcommit/backend:naive_cpu_backend",
+        "//sxt/seqcommit/backend:naive_gpu_backend"
     ],
     visibility = ["//visibility:public"],
     linkopts = [

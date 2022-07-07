@@ -12,14 +12,14 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/curve21/type/element_p3.h"
-#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/ristretto/base/byte_conversion.h"
-#include "sxt/seqcommit/cbindings/pedersen_backend.h"
-#include "sxt/seqcommit/cbindings/pedersen_cpu_backend.h"
-#include "sxt/seqcommit/cbindings/pedersen_gpu_backend.h"
+#include "sxt/seqcommit/backend/pedersen_backend.h"
+#include "sxt/seqcommit/backend/naive_cpu_backend.h"
+#include "sxt/seqcommit/backend/naive_gpu_backend.h"
 
 using namespace sxt;
 
@@ -30,7 +30,7 @@ struct params {
     uint64_t cols, rows;
     std::string backend_str;
     uint64_t element_nbytes;
-    std::unique_ptr<sqccb::pedersen_backend> backend;
+    std::unique_ptr<sqcbck::pedersen_backend> backend;
     
     std::chrono::steady_clock::time_point begin_time;
     std::chrono::steady_clock::time_point end_time;
@@ -65,13 +65,13 @@ struct params {
     void select_backend_fn(const std::string_view backend_view) noexcept {
         if (backend_view == "cpu") {
             backend_str = "cpu";
-            backend = std::make_unique<sqccb::pedersen_cpu_backend>();
+            backend = std::make_unique<sqcbck::naive_cpu_backend>();
             return;
         }
 
         if (backend_view == "gpu") {
             backend_str = "gpu";
-            backend = std::make_unique<sqccb::pedersen_gpu_backend>();
+            backend = std::make_unique<sqcbck::naive_gpu_backend>();
             return;
         }
 
@@ -96,7 +96,7 @@ struct params {
 //--------------------------------------------------------------------------------------------------
 // print_result
 //--------------------------------------------------------------------------------------------------
-static void print_result(uint64_t cols, memmg::managed_array<sqcb::commitment> &commitments_per_col) {
+static void print_result(uint64_t cols, memmg::managed_array<rstt::compressed_element> &commitments_per_col) {
     std::cout << "===== result\n";
 
     // print the 32 bytes commitment results of each column
@@ -112,7 +112,7 @@ static void populate_table(
     uint64_t cols, uint64_t rows, uint8_t element_nbytes,
     memmg::managed_array<uint8_t> &data_table, 
     memmg::managed_array<sqcb::indexed_exponent_sequence> &data_cols, 
-    memmg::managed_array<sqcb::commitment> &generators) {
+    memmg::managed_array<rstt::compressed_element> &generators) {
     
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -156,11 +156,11 @@ int main(int argc, char* argv[]) {
     std::cout << "num_exponentations : " << (p.cols * p.rows) << std::endl;
 
     // populate data section
-    memmg::managed_array<sqcb::commitment> generators(p.rows);
+    memmg::managed_array<rstt::compressed_element> generators(p.rows);
     memmg::managed_array<sqcb::indexed_exponent_sequence> data_cols(p.cols);
-    memmg::managed_array<sqcb::commitment> commitments_per_col(p.cols);
+    memmg::managed_array<rstt::compressed_element> commitments_per_col(p.cols);
     memmg::managed_array<uint8_t> data_table(p.rows * p.cols * p.element_nbytes);
-    basct::span<sqcb::commitment> commitments(commitments_per_col.data(), p.cols);
+    basct::span<rstt::compressed_element> commitments(commitments_per_col.data(), p.cols);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(data_cols.data(), p.cols);
 
     populate_table(p.cols, p.rows, p.element_nbytes, data_table, data_cols, generators);
@@ -172,13 +172,13 @@ int main(int argc, char* argv[]) {
         for (int i = 0; i < p.num_samples; ++i) {
             if (use_generators) {
                 // populate generators
-                basct::span<sqcb::commitment> span_generators(generators.data(), p.rows);
+                basct::span<rstt::compressed_element> span_generators(generators.data(), p.rows);
 
                 p.trigger_timer();
                 p.backend->compute_commitments(commitments, value_sequences, span_generators);
                 p.stop_timer();
             } else {
-                basct::span<sqcb::commitment> empty_generators;
+                basct::span<rstt::compressed_element> empty_generators;
 
                 p.trigger_timer();
                 p.backend->compute_commitments(commitments, value_sequences, empty_generators);

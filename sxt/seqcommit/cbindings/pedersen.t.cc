@@ -9,7 +9,7 @@
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/ristretto/base/byte_conversion.h"
-#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
 TEST_CASE("run compute pedersen commitment tests") {
@@ -258,7 +258,7 @@ TEST_CASE("run compute pedersen commitment tests") {
 
             REQUIRE(ret == 0);
 
-            sxt::sqcb::commitment commitment_c;
+            sxt::rstt::compressed_element commitment_c;
 
             sxt::c21t::element_p3 p, q;
 
@@ -273,11 +273,11 @@ TEST_CASE("run compute pedersen commitment tests") {
 
             sxt::rstb::to_bytes(commitment_c.data(), p);
 
-            sxt::sqcb::commitment &expected_commitment_c =
-                reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[2];
+            sxt::rstt::compressed_element &expected_commitment_c =
+                reinterpret_cast<sxt::rstt::compressed_element *>(commitments_data)[2];
 
             // verify that result is not null
-            REQUIRE(sxt::sqcb::commitment() != commitment_c);
+            REQUIRE(sxt::rstt::compressed_element() != commitment_c);
 
             REQUIRE(commitment_c == expected_commitment_c);
         }
@@ -322,14 +322,14 @@ TEST_CASE("run compute pedersen commitment tests") {
 
             REQUIRE(ret == 0);
 
-            sxt::sqcb::commitment &dense_commitment =
-                reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[0];
+            sxt::rstt::compressed_element &dense_commitment =
+                reinterpret_cast<sxt::rstt::compressed_element *>(commitments_data)[0];
 
-            sxt::sqcb::commitment &sparse_commitment =
-                reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[1];
+            sxt::rstt::compressed_element &sparse_commitment =
+                reinterpret_cast<sxt::rstt::compressed_element *>(commitments_data)[1];
 
             // verify that result is not null
-            REQUIRE(sxt::sqcb::commitment() != dense_commitment);
+            REQUIRE(sxt::rstt::compressed_element() != dense_commitment);
 
             REQUIRE(dense_commitment == sparse_commitment);
         }
@@ -374,14 +374,14 @@ TEST_CASE("run compute pedersen commitment tests") {
 
             REQUIRE(ret == 0);
 
-            sxt::sqcb::commitment &dense_commitment =
-                reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[0];
+            sxt::rstt::compressed_element &dense_commitment =
+                reinterpret_cast<sxt::rstt::compressed_element *>(commitments_data)[0];
 
-            sxt::sqcb::commitment &sparse_commitment =
-                reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[1];
+            sxt::rstt::compressed_element &sparse_commitment =
+                reinterpret_cast<sxt::rstt::compressed_element *>(commitments_data)[1];
 
             // verify that result is not null
-            REQUIRE(sxt::sqcb::commitment() != dense_commitment);
+            REQUIRE(sxt::rstt::compressed_element() != dense_commitment);
             
             REQUIRE(dense_commitment == sparse_commitment);
         }
@@ -422,7 +422,7 @@ TEST_CASE("run compute pedersen commitment tests") {
             sxt::c21o::add(expected_g, expected_g, h);
         }
         
-        sxt::sqcb::commitment expected_commitment_c;
+        sxt::rstt::compressed_element expected_commitment_c;
         sxt::rstb::to_bytes(expected_commitment_c.data(), expected_g);
 
         sxt_sequence_descriptor valid_descriptors[num_sequences];
@@ -457,8 +457,8 @@ TEST_CASE("run compute pedersen commitment tests") {
 
             REQUIRE(ret == 0);
             
-            sxt::sqcb::commitment &commitment_c =
-                reinterpret_cast<sxt::sqcb::commitment *>(commitments_data)[0];
+            sxt::rstt::compressed_element &commitment_c =
+                reinterpret_cast<sxt::rstt::compressed_element *>(commitments_data)[0];
 
             REQUIRE(commitment_c == expected_commitment_c);
         }
@@ -523,13 +523,13 @@ TEST_CASE("run get pedersen generator tests") {
 
       REQUIRE(ret == 0);
 
-      sxt::sqcb::commitment expected_commit_0, expected_commit_1;
+      sxt::rstt::compressed_element expected_commit_0, expected_commit_1;
       sxt::rstb::to_bytes(expected_commit_0.data(), expected_g_0);
       sxt::rstb::to_bytes(expected_commit_1.data(), expected_g_1);
 
-      REQUIRE(reinterpret_cast<sxt::sqcb::commitment *>(generators)[0]
+      REQUIRE(reinterpret_cast<sxt::rstt::compressed_element *>(generators)[0]
                  == expected_commit_0);
-      REQUIRE(reinterpret_cast<sxt::sqcb::commitment *>(generators)[1]
+      REQUIRE(reinterpret_cast<sxt::rstt::compressed_element *>(generators)[1]
                  == expected_commit_1);
     }
 }

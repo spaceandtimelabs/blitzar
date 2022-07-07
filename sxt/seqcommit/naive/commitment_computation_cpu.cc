@@ -7,7 +7,7 @@
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/ristretto/base/byte_conversion.h"
-#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
@@ -17,8 +17,8 @@ namespace sxt::sqcnv {
 // compute_commitments_cpu
 //--------------------------------------------------------------------------------------------------
 void compute_commitments_cpu(
-    basct::span<sqcb::commitment> commitments,
-    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences, basct::cspan<sqcb::commitment> generators) noexcept {
+    basct::span<rstt::compressed_element> commitments,
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences, basct::cspan<rstt::compressed_element> generators) noexcept {
 
     assert(commitments.size() == value_sequences.size());
 

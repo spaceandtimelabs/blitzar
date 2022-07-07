@@ -3,7 +3,7 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/ristretto/base/byte_conversion.h"
-#include "sxt/seqcommit/base/commitment.h"
+#include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
 namespace sxt::sqctst {
@@ -11,7 +11,7 @@ namespace sxt::sqctst {
 // test_pedersen_get_generators
 //--------------------------------------------------------------------------------------------------
 void test_pedersen_get_generators(
-    basf::function_ref<void(basct::span<sqcb::commitment> generators,
+    basf::function_ref<void(basct::span<rstt::compressed_element> generators,
         uint64_t offset_generators)> f) {
 
     SECTION("we can verify that computed generators are correct when offset is zero") {
@@ -21,12 +21,12 @@ void test_pedersen_get_generators(
       sqcgn::compute_base_element(expected_g_0, 0 + offset_generators);
       sqcgn::compute_base_element(expected_g_1, 1 + offset_generators);
 
-      sqcb::commitment generators[num_generators];
-      basct::span<sqcb::commitment> span_generators(generators, num_generators);
+      rstt::compressed_element generators[num_generators];
+      basct::span<rstt::compressed_element> span_generators(generators, num_generators);
 
       f(span_generators, offset_generators);
 
-      sqcb::commitment expected_commit_0, expected_commit_1;
+      rstt::compressed_element expected_commit_0, expected_commit_1;
       rstb::to_bytes(expected_commit_0.data(), expected_g_0);
       rstb::to_bytes(expected_commit_1.data(), expected_g_1);
 
@@ -41,12 +41,12 @@ void test_pedersen_get_generators(
       sqcgn::compute_base_element(expected_g_0, 0 + offset_generators);
       sqcgn::compute_base_element(expected_g_1, 1 + offset_generators);
 
-      sqcb::commitment generators[num_generators];
-      basct::span<sqcb::commitment> span_generators(generators, num_generators);
+      rstt::compressed_element generators[num_generators];
+      basct::span<rstt::compressed_element> span_generators(generators, num_generators);
 
       f(span_generators, offset_generators);
 
-      sqcb::commitment expected_commit_0, expected_commit_1;
+      rstt::compressed_element expected_commit_0, expected_commit_1;
       rstb::to_bytes(expected_commit_0.data(), expected_g_0);
       rstb::to_bytes(expected_commit_1.data(), expected_g_1);
 
