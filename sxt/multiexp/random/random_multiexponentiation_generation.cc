@@ -27,8 +27,6 @@ void generate_random_multiexponentiation(
             descriptor.min_exponent_num_bytes, descriptor.max_exponent_num_bytes);
 
         assert(descriptor.min_exponent_num_bytes > 0);
-        assert(descriptor.min_exponent_num_bytes <= 8);
-        assert(descriptor.max_exponent_num_bytes <= 8);
         assert(descriptor.min_sequence_length <= descriptor.max_sequence_length);
         assert(descriptor.min_exponent_num_bytes <= descriptor.max_exponent_num_bytes);
 

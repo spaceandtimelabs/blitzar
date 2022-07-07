@@ -12,7 +12,7 @@ namespace sxt::rstrn {
 // generate_random_element
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void generate_random_element(
+inline void generate_random_element(
     c21t::element_p3& p, basn::fast_random_number_generator& rng) noexcept {
   f51t::element r0, r1;
   f51rn::generate_random_element(r0, rng);
