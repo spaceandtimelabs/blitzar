@@ -13,6 +13,8 @@ sxt_cc_component(
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/curve21/type:element_p3",
         "//sxt/ristretto/random:element",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/ristretto/base:byte_conversion"
     ],
     test_deps = [
         "//sxt/base/test:unit_test",

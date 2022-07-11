@@ -28,18 +28,17 @@ sxt_cc_component(
         "//sxt/seqcommit/base:indexed_exponent_sequence",
         "//sxt/seqcommit/naive:commitment_computation_cpu",
         "//sxt/seqcommit/naive:commitment_computation_gpu",
+        "//sxt/seqcommit/backend:pippenger_cpu_backend",
         "@local_config_cuda//cuda:cuda_headers",
         "@local_config_cuda//cuda:cudart_static"
     ],
     alwayslink = 1,
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/curve21/operation:add",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/ristretto/operation:add",
+        "//sxt/ristretto/random:element",
         "//sxt/ristretto/type:compressed_element",
-        "//sxt/ristretto/base:byte_conversion",
         "//sxt/seqcommit/generator:base_element",
-        "//sxt/curve21/operation:scalar_multiply",
-        "//sxt/curve21/constant:zero"
+        "//sxt/ristretto/operation:scalar_multiply",
     ],
 )

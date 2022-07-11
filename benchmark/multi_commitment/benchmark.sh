@@ -1,10 +1,12 @@
 #!/bin/bash
-EXEC_CMD="bazel run -c opt //benchmark/multi_commitment:benchmark_callgrind -- "
+USE_CALLGRIND="0"
+EXEC_CMD="bazel run -c opt //benchmark/multi_commitment:benchmark -- "
+EXEC_CMD_CALLGRIND="bazel run -c opt //benchmark/multi_commitment:benchmark_callgrind -- "
 
 ############################################
 
-verbose=0
-num_samples=1
+verbose=1
+num_samples=3
 spreadsheet_dir="benchmark/multi_commitment"
 results_dir="benchmark/multi_commitment/.results"
 curr_final_benchmark_file="${spreadsheet_dir}/spreadsheet.txt"
@@ -17,43 +19,30 @@ read_field() {
     echo ${line_arr[1]}
 }
 
-results() {
-    word_sizes=$1
-    execs=$2
-    backend=$3
-
-    # Extract the duration time of each benchmark
-    for ws in ${word_sizes[@]}; do
-        for ex in ${execs[@]}; do
-            c=$(echo $ex | cut -f1 -d-)
-            r=$(echo $ex | cut -f2 -d-)
-            curr_benchmark_file="${results_dir}/${backend}_${c}_${r}_${ws}_${verbose}_${num_samples}.out"
-            val=$(read_field 8 ${curr_benchmark_file})
-            echo "$val"
-        done
-    done
-}
-
 run() {
     word_sizes=$1
     execs=$2
     backend=$3
-
-    mkdir -p ${results_dir}
 
     # Run all the benchmarks
     for ws in ${word_sizes[@]}; do
         for ex in ${execs[@]}; do
             c=$(echo $ex | cut -f1 -d-)
             r=$(echo $ex | cut -f2 -d-)
-            curr_benchmark_file="${results_dir}/${backend}_${c}_${r}_${ws}_${verbose}_${num_samples}.out"
-            ${EXEC_CMD} ${backend} ${c} ${r} ${ws} ${verbose} ${num_samples} > ${curr_benchmark_file}
 
-            mv *.zip *.tar.gz ${results_dir}/
+            base_dir="${results_dir}/${c}_commits/${ws}_wordsize/"
+
+            mkdir -p ${base_dir}
+
+            curr_benchmark_file="${base_dir}/${backend}_${c}_commits_${r}_rows_${ws}_wordsize_${num_samples}_samples.out"
+            ${EXEC_CMD} ${backend} ${c} ${r} ${ws} ${verbose} ${num_samples} > ${curr_benchmark_file}
+            
+            if [ "${USE_CALLGRIND}" == "1" ]; then
+                ${EXEC_CMD_CALLGRIND} ${backend} ${c} ${r} ${ws} ${verbose} ${num_samples}
+                mv -f *.svg ${base_dir}/
+            fi
         done
     done
-
-    results $word_sizes $execs $backend
 }
 
 spreadsheet() {
@@ -62,7 +51,7 @@ spreadsheet() {
     backend=$3
 
     c0="Commitments\t"
-    c1="Data Rows\t"
+    c1="Commitment Length\t"
     c2="Word Size\t"
     c3="Table Size (MB)\t"
     c4="Total Exponentiations\t"
@@ -104,32 +93,81 @@ spreadsheet() {
 }
 
 backend="$2"
+USE_CALLGRIND="$3"
 
-if [ -z "$2" ]
-  then
-    backend="cpu"
-fi
-
-word_sizes=("32")
+word_sizes=("0" "1" "4" "8" "32")
 
 execs=()
 
-num_rows=("10" "1")
-num_commitments=("10")
+# execs+=("1-10")
 
-# num_rows=("10" "100" "1000")
-# num_commitments=("10" "100" "1000")
+############################################
+# Number of Commitments - Small
+############################################
 
-for c in ${num_commitments[@]}; do
-    for r in ${num_rows[@]}; do
-        execs+=("$c-$r")
-    done
-done
+NC="1"
+execs+=(
+    "${NC}-1" "${NC}-10" "${NC}-50" "${NC}-100" "${NC}-250"
+    "${NC}-500" "${NC}-1000" "${NC}-2000" "${NC}-5000"
+    "${NC}-10000" "${NC}-100000"
+)
 
-# edge cases : num_rows too big
-# execs+=("1-1" "1-10" "1-100" "1-1000" "1-10000" "1-100000")
+NC="2"
+execs+=(
+    "${NC}-1" "${NC}-10" "${NC}-50" "${NC}-100" "${NC}-250"
+    "${NC}-500" "${NC}-1000" "${NC}-2000" "${NC}-5000"
+    "${NC}-10000" "${NC}-100000"
+)
 
-# edge cases : num_commitments too big
-# execs+=("10-1" "100-1" "1000-1" "10000-1")
+NC="5"
+execs+=(
+    "${NC}-1" "${NC}-10" "${NC}-50" "${NC}-100" "${NC}-250"
+    "${NC}-500" "${NC}-1000" "${NC}-2000" "${NC}-5000"
+    "${NC}-10000" "${NC}-100000"
+)
+
+############################################
+# Number of Commitments - Medium
+############################################
+
+NC="10"
+execs+=(
+    "${NC}-1" "${NC}-10" "${NC}-50" "${NC}-100" "${NC}-250"
+    "${NC}-500" "${NC}-1000" "${NC}-2000" "${NC}-5000" "${NC}-10000"
+)
+
+NC="50"
+execs+=(
+    "${NC}-1" "${NC}-10" "${NC}-50" "${NC}-100" "${NC}-250"
+    "${NC}-500" "${NC}-1000" "${NC}-2000" "${NC}-5000" "${NC}-10000"
+)
+
+NC="100"
+execs+=(
+    "${NC}-1" "${NC}-10" "${NC}-50" "${NC}-100" "${NC}-250"
+    "${NC}-500" "${NC}-1000" "${NC}-2000" "${NC}-5000"
+)
+
+############################################
+# Number of Commitments - Large
+############################################
+
+NC="250"
+execs+=(
+    "${NC}-1" "${NC}-10" "${NC}-50" "${NC}-100" "${NC}-250"
+    "${NC}-500" "${NC}-1000" "${NC}-2000"
+)
+
+NC="500"
+execs+=(
+    "${NC}-1" "${NC}-10" "${NC}-50" "${NC}-100" "${NC}-250"
+    "${NC}-500" "${NC}-1000"
+)
+
+NC="1000"
+execs+=(
+    "${NC}-1" "${NC}-10" "${NC}-50" "${NC}-100" "${NC}-250"
+    "${NC}-500"
+)
 
 $1 $word_sizes $execs $backend # run specified function

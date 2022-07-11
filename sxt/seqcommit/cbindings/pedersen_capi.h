@@ -6,8 +6,9 @@
 extern "C" {
 #endif
 
-#define SXT_BACKEND_CPU 1
-#define SXT_BACKEND_GPU 2
+#define SXT_NAIVE_BACKEND_CPU 1
+#define SXT_NAIVE_BACKEND_GPU 2
+#define SXT_PIPPENGER_BACKEND_CPU 3
 
 /** config struct to hold the chosen backend **/
 struct sxt_config {
@@ -49,7 +50,8 @@ struct sxt_sequence_descriptor {
  * 
  * Arguments:
  * 
- * - config (in): specifies which backend should be used in the computations (gpu or cpu)
+ * - config (in): specifies which backend should be used in the computations. Those 
+ *   available are: SXT_NAIVE_BACKEND_CPU, SXT_NAIVE_BACKEND_GPU, and SXT_PIPPENGER_BACKEND_CPU
  *
  * # Return:
  * 

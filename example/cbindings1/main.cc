@@ -4,7 +4,7 @@
 #include "sxt/seqcommit/cbindings/pedersen_capi.h"
 
 int main() {
-  const sxt_config config = {SXT_BACKEND_GPU};
+  const sxt_config config = {SXT_NAIVE_BACKEND_GPU};
 
   if (sxt_init(&config) != 0) {
     std::cerr << "sxt_init failed\n";

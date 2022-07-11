@@ -11,6 +11,7 @@
 #include "sxt/seqcommit/backend/pedersen_backend.h"
 #include "sxt/seqcommit/backend/naive_cpu_backend.h"
 #include "sxt/seqcommit/backend/naive_gpu_backend.h"
+#include "sxt/seqcommit/backend/pippenger_cpu_backend.h"
 
 using namespace sxt;
 
@@ -44,10 +45,10 @@ int sxt_init(const sxt_config* config) {
   if (config == nullptr) exit(1);
   if (backend != nullptr) exit(1);
 
-  if (config->backend == SXT_BACKEND_CPU) {
+  if (config->backend == SXT_NAIVE_BACKEND_CPU) {
     backend = sqcbck::get_naive_cpu_backend();
     return 0;
-  } else if (config->backend == SXT_BACKEND_GPU) {
+  } else if (config->backend == SXT_NAIVE_BACKEND_GPU) {
     int num_devices = get_num_devices();
 
     if (num_devices > 0) {
@@ -58,6 +59,9 @@ int sxt_init(const sxt_config* config) {
       std::cout << "WARN: Using 'compute_commitments_cpu'. " << std::endl;
     }
 
+    return 0;
+  } else if (config->backend == SXT_PIPPENGER_BACKEND_CPU) {
+    backend = sqcbck::get_pippenger_cpu_backend();
     return 0;
   }
 
@@ -106,11 +110,11 @@ static int process_compute_pedersen_commitments(
     uint32_t num_sequences,
     const struct sxt_sequence_descriptor* descriptors,
     struct sxt_ristretto_element* generators) {
-
-  if (num_sequences == 0) return 0;
-
+  
   // backend not initialized (sxt_init not called correctly)
   if (backend == nullptr) return 1;
+
+  if (num_sequences == 0) return 0;
 
   uint64_t longest_sequence = 0;
   
@@ -129,15 +133,21 @@ static int process_compute_pedersen_commitments(
   static_assert(sizeof(sqcb::indexed_exponent_sequence) == 
       sizeof(sxt_sequence_descriptor), "types must be ABI compatible");
 
+  bool is_sparse_sequence = false;
+
   // populating sequence object
   for (uint64_t i = 0; i < num_sequences; ++i) {
+    is_sparse_sequence |= (descriptors[i].indices != nullptr);
+    
     sequences[i] = *(reinterpret_cast<const sqcb::indexed_exponent_sequence *>(&descriptors[i]));
   }
 
   basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences.data(),
                                                         num_sequences);
   
-  if (generators == nullptr) longest_sequence = 0;
+  if (generators == nullptr) {
+    longest_sequence = 0;
+  }
 
   basct::span<rstt::compressed_element> generators_span(
        reinterpret_cast<rstt::compressed_element *>(generators), longest_sequence);
@@ -206,4 +216,17 @@ int sxt_get_generators(
   backend->get_generators(generators_result, offset_generators);
 
   return 0;
+}
+
+namespace sxt::sqccb {
+//--------------------------------------------------------------------------------------------------
+// reset_backend_for_testing
+//--------------------------------------------------------------------------------------------------
+int reset_backend_for_testing() {
+  if (backend == nullptr) exit(1);
+
+  backend = nullptr;
+
+  return 0;
+}
 }

@@ -7,7 +7,7 @@ mod tests {
     #[test]
     fn compute_commitments_works() {
         let config: proofs_gpu::sxt_config = proofs_gpu::sxt_config {
-            backend: proofs_gpu::SXT_BACKEND_GPU as i32
+            backend: proofs_gpu::SXT_NAIVE_BACKEND_GPU as i32
         };
 
         unsafe {

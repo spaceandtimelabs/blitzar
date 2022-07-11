@@ -14,7 +14,8 @@ sxt_cc_benchmark(
         "//sxt/seqcommit/base:indexed_exponent_sequence",
         "//sxt/seqcommit/generator:base_element",
         "//sxt/seqcommit/backend:naive_cpu_backend",
-        "//sxt/seqcommit/backend:naive_gpu_backend"
+        "//sxt/seqcommit/backend:naive_gpu_backend",
+        "//sxt/seqcommit/backend:pippenger_cpu_backend"
     ],
     visibility = ["//visibility:public"],
     linkopts = [

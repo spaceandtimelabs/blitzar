@@ -20,6 +20,7 @@
 #include "sxt/seqcommit/backend/pedersen_backend.h"
 #include "sxt/seqcommit/backend/naive_cpu_backend.h"
 #include "sxt/seqcommit/backend/naive_gpu_backend.h"
+#include "sxt/seqcommit/backend/pippenger_cpu_backend.h"
 
 using namespace sxt;
 
@@ -27,9 +28,10 @@ struct params {
     int status;
     bool verbose;
     int num_samples = 1;
-    uint64_t cols, rows;
+    uint64_t commitments, commitment_length;
     std::string backend_str;
     uint64_t element_nbytes;
+    bool is_boolean;
     std::unique_ptr<sqcbck::pedersen_backend> backend;
     
     std::chrono::steady_clock::time_point begin_time;
@@ -39,16 +41,23 @@ struct params {
         status = 0;
 
         if (argc < 7) {
-            std::cerr << "Usage: benchmark <cpu|gpu> <rows> <cols> <element_nbytes> <verbose> <num_samples>\n";
+            std::cerr << "Usage: benchmark <naive-cpu|naive-gpu|pip-cpu>" <<
+                         "<commitment_length> <commitments> <element_nbytes>" <<
+                         "<verbose> <num_samples>\n";
             status = -1;
         }
 
         select_backend_fn(argv[1]);
 
-        verbose = false;
-        cols = std::atoi(argv[2]);
-        rows = std::atoi(argv[3]);
+        verbose = is_boolean = false;
+        commitments = std::atoi(argv[2]);
+        commitment_length = std::atoi(argv[3]);
         element_nbytes = std::atoi(argv[4]);
+
+        if (element_nbytes == 0) {
+            is_boolean = true;
+            element_nbytes = 1;
+        }
         
         if (std::string_view{argv[5]} == "1") {
             verbose = true;
@@ -56,24 +65,32 @@ struct params {
 
         num_samples = std::atoi(argv[6]);
 
-        if (cols <= 0 || rows <= 0 || element_nbytes > 32) {
-            std::cerr << "Restriction: 1 <= cols, 1 <= rows, 1 <= element_nbytes <= 32\n";
+        if (commitments <= 0 || commitment_length <= 0 || element_nbytes > 32) {
+            std::cerr << "Restriction: 1 <= commitments, " << 
+                "1 <= commitment_length, 1 <= element_nbytes <= 32\n";
             status = -1;
         }
     }
 
     void select_backend_fn(const std::string_view backend_view) noexcept {
-        if (backend_view == "cpu") {
-            backend_str = "cpu";
+        if (backend_view == "naive-cpu") {
+            backend_str = "naive-cpu";
             backend = std::make_unique<sqcbck::naive_cpu_backend>();
             return;
         }
 
-        if (backend_view == "gpu") {
-            backend_str = "gpu";
+        if (backend_view == "naive-gpu") {
+            backend_str = "naive-gpu";
             backend = std::make_unique<sqcbck::naive_gpu_backend>();
             return;
         }
+
+        if (backend_view == "pip-cpu") {
+            backend_str = "pip-cpu";
+            backend = std::make_unique<sqcbck::pippenger_cpu_backend>();
+            return;
+        }
+
 
         std::cerr << "invalid backend: " << backend_view << "\n";
 
@@ -89,19 +106,23 @@ struct params {
     }
 
     double elapsed_time() {
-        return std::chrono::duration_cast<std::chrono::microseconds>(end_time - begin_time).count() / 1e6;
+        return std::chrono::duration_cast
+            <std::chrono::microseconds>(end_time - begin_time).count() / 1e6;
     }
 };
 
 //--------------------------------------------------------------------------------------------------
 // print_result
 //--------------------------------------------------------------------------------------------------
-static void print_result(uint64_t cols, memmg::managed_array<rstt::compressed_element> &commitments_per_col) {
+static void print_result(uint64_t commitments,
+    memmg::managed_array<rstt::compressed_element> &commitments_per_sequence) {
+
     std::cout << "===== result\n";
 
-    // print the 32 bytes commitment results of each column
-    for (size_t c = 0; c < cols; ++c) {
-        std::cout << "commitment " << c << " = " << commitments_per_col[c] << std::endl;
+    // print the 32 bytes commitment results of each sequence
+    for (size_t c = 0; c < commitments; ++c) {
+        std::cout << "commitment " << c << " = "
+            << commitments_per_sequence[c] << std::endl;
     }
 }
 
@@ -109,16 +130,23 @@ static void print_result(uint64_t cols, memmg::managed_array<rstt::compressed_el
 // populate_table
 //--------------------------------------------------------------------------------------------------
 static void populate_table(
-    uint64_t cols, uint64_t rows, uint8_t element_nbytes,
+    bool is_boolean,
+    uint64_t commitments, uint64_t commitment_length, uint8_t element_nbytes,
     memmg::managed_array<uint8_t> &data_table, 
-    memmg::managed_array<sqcb::indexed_exponent_sequence> &data_cols, 
+    memmg::managed_array<sqcb::indexed_exponent_sequence> &data_commitments, 
     memmg::managed_array<rstt::compressed_element> &generators) {
     
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<uint8_t> distribution(0, UINT8_MAX);
+    std::uniform_int_distribution<uint8_t> distribution;
+
+    if (is_boolean) {
+        distribution = std::uniform_int_distribution<uint8_t>(0, 1);
+    } else {
+        distribution = std::uniform_int_distribution<uint8_t>(0, UINT8_MAX);
+    }
     
-    for (size_t i = 0; i < rows; ++i) {
+    for (size_t i = 0; i < commitment_length; ++i) {
         c21t::element_p3 g_i;
         sqcgn::compute_base_element(g_i, i);
         rstb::to_bytes(generators[i].data(), g_i);
@@ -128,12 +156,14 @@ static void populate_table(
         data_table[i] = distribution(gen);
     }
 
-    for (size_t c = 0; c < cols; ++c) {
-        auto &data_col = data_cols[c];
+    for (size_t c = 0; c < commitments; ++c) {
+        auto &data_sequence = data_commitments[c];
 
-        data_col.exponent_sequence.n = rows;
-        data_col.exponent_sequence.element_nbytes = element_nbytes;
-        data_col.exponent_sequence.data = data_table.data() + c * rows * element_nbytes;
+        data_sequence.indices = nullptr;
+        data_sequence.exponent_sequence.n = commitment_length;
+        data_sequence.exponent_sequence.element_nbytes = element_nbytes;
+        data_sequence.exponent_sequence.data =
+            data_table.data() + c * commitment_length * element_nbytes;
     }
 }
 
@@ -145,25 +175,37 @@ int main(int argc, char* argv[]) {
 
     if (p.status != 0) return -1;
 
-    long long int table_size = (p.cols * p.rows * p.element_nbytes) / 1024 / 1024;
+    long long int table_size = (p.commitments *
+        p.commitment_length * p.element_nbytes) / 1024 / 1024;
 
     std::cout << "===== benchmark results" << std::endl;
     std::cout << "backend : " << p.backend_str << std::endl;
-    std::cout << "rows : " << p.rows << std::endl;
-    std::cout << "cols : " << p.cols << std::endl;
+    std::cout << "commitment length : " << p.commitment_length << std::endl;
+    std::cout << "number of commitments : " << p.commitments << std::endl;
     std::cout << "element_nbytes : " << p.element_nbytes << std::endl;
+    std::cout << "is boolean : " << p.is_boolean << std::endl;
     std::cout << "table_size (MB) : " << table_size << std::endl;
-    std::cout << "num_exponentations : " << (p.cols * p.rows) << std::endl;
+    std::cout << "num_exponentations : " << (p.commitments * p.commitment_length) << std::endl;
+    std::cout << "********************************************" << std::endl;
 
     // populate data section
-    memmg::managed_array<rstt::compressed_element> generators(p.rows);
-    memmg::managed_array<sqcb::indexed_exponent_sequence> data_cols(p.cols);
-    memmg::managed_array<rstt::compressed_element> commitments_per_col(p.cols);
-    memmg::managed_array<uint8_t> data_table(p.rows * p.cols * p.element_nbytes);
-    basct::span<rstt::compressed_element> commitments(commitments_per_col.data(), p.cols);
-    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(data_cols.data(), p.cols);
+    memmg::managed_array<rstt::compressed_element> generators(p.commitment_length);
+    memmg::managed_array<sqcb::indexed_exponent_sequence> data_commitments(p.commitments);
+    memmg::managed_array<rstt::compressed_element> commitments_per_sequence(p.commitments);
+    memmg::managed_array<uint8_t> data_table(p.commitment_length * p.commitments * p.element_nbytes);
 
-    populate_table(p.cols, p.rows, p.element_nbytes, data_table, data_cols, generators);
+    basct::span<rstt::compressed_element> commitments(commitments_per_sequence.data(), p.commitments);
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(data_commitments.data(), p.commitments);
+
+    populate_table(
+        p.is_boolean,
+        p.commitments,
+        p.commitment_length,
+        p.element_nbytes,
+        data_table,
+        data_commitments,
+        generators
+    );
 
     for (auto use_generators : {true, false}) {
         std::vector<double> durations;
@@ -172,7 +214,8 @@ int main(int argc, char* argv[]) {
         for (int i = 0; i < p.num_samples; ++i) {
             if (use_generators) {
                 // populate generators
-                basct::span<rstt::compressed_element> span_generators(generators.data(), p.rows);
+                basct::span<rstt::compressed_element>
+                    span_generators(generators.data(), p.commitment_length);
 
                 p.trigger_timer();
                 p.backend->compute_commitments(commitments, value_sequences, span_generators);
@@ -199,14 +242,16 @@ int main(int argc, char* argv[]) {
 
         std_deviation = sqrt(std_deviation / p.num_samples);
 
-        double data_throughput = p.rows * p.cols / mean_duration_compute;
+        double data_throughput = p.commitment_length * p.commitments / mean_duration_compute;
 
-        std::cout << "use generators : " << (use_generators ? "yes" : "no") << std::endl;
+        std::cout << "pre-computed generators : " << (use_generators ? "yes" : "no") << std::endl;
         std::cout << "compute duration (s) : " << std::fixed << mean_duration_compute << std::endl;
         std::cout << "compute std deviation (s) : " << std::fixed << std_deviation << std::endl;
         std::cout << "throughput (exponentiations / s) : " << std::scientific << data_throughput << std::endl;
 
-        if (p.verbose) print_result(p.cols, commitments_per_col);
+        if (p.verbose) print_result(p.commitments, commitments_per_sequence);
+
+        std::cout << "********************************************" << std::endl;
     }
     
     return 0;

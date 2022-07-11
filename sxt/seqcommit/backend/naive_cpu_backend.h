@@ -25,6 +25,9 @@ public:
     uint64_t offset_generators) noexcept override;
 };
 
+//--------------------------------------------------------------------------------------------------
+// get_naive_cpu_backend
+//--------------------------------------------------------------------------------------------------
 naive_cpu_backend* get_naive_cpu_backend();
 
 } // namespace sxt::sqcbck
