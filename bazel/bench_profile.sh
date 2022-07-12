@@ -14,7 +14,7 @@ rm -rf $OUTPUT
 echo "#!/bin/bash" >> $OUTPUT
 echo "set -e" >> $OUTPUT
 echo "echo Cleaning callgrind data" >> $OUTPUT
-echo "rm -rf *tar.gz *.zip \$BENCHMARK_NAME.pdf \$BENCHMARK_NAME.svg \$BENCHMARK_NAME.dot callgrind.out.[0-9]*" >> $OUTPUT
+echo "rm -rf *tar.gz *.zip *.pdf *.svg *.dot callgrind.out.[0-9]*" >> $OUTPUT
 echo "BENCHMARK_NAME=\"$BENCHMARK_NAME\$(printf _\"%s\" \"\${@:1}\")\"" >> $OUTPUT
 echo "$VALGRIND --tool=callgrind $BENCHMARK \"\${@:1}\"" >> $OUTPUT
 echo "echo Converting benchmark result to image" >> $OUTPUT

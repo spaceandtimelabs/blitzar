@@ -3,7 +3,7 @@
 /bazel-*
 
 # Ignore benchmark results
-.results/
+.results*/
 
 # Ignore semantic-release files
 .env
@@ -30,3 +30,4 @@ rust/proofs-gpu-sys/src/bindings.rs
 *.tar.gz
 *.dot
 callgrind.out.*
+

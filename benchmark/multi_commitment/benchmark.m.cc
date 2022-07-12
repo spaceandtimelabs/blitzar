@@ -32,6 +32,7 @@ struct params {
     std::string backend_str;
     uint64_t element_nbytes;
     bool is_boolean;
+    bool use_pre_computed_generators;
     std::unique_ptr<sqcbck::pedersen_backend> backend;
     
     std::chrono::steady_clock::time_point begin_time;
@@ -40,10 +41,10 @@ struct params {
     params(int argc, char* argv[]) {
         status = 0;
 
-        if (argc < 7) {
+        if (argc < 8) {
             std::cerr << "Usage: benchmark <naive-cpu|naive-gpu|pip-cpu>" <<
                          "<commitment_length> <commitments> <element_nbytes>" <<
-                         "<verbose> <num_samples>\n";
+                         "<allow_verbose> <num_samples> <use_pre_computed_generators>\n";
             status = -1;
         }
 
@@ -64,6 +65,8 @@ struct params {
         }
 
         num_samples = std::atoi(argv[6]);
+
+        use_pre_computed_generators = std::atoi(argv[7]);
 
         if (commitments <= 0 || commitment_length <= 0 || element_nbytes > 32) {
             std::cerr << "Restriction: 1 <= commitments, " << 
@@ -130,6 +133,7 @@ static void print_result(uint64_t commitments,
 // populate_table
 //--------------------------------------------------------------------------------------------------
 static void populate_table(
+    bool use_pre_computed_generators,
     bool is_boolean,
     uint64_t commitments, uint64_t commitment_length, uint8_t element_nbytes,
     memmg::managed_array<uint8_t> &data_table, 
@@ -146,10 +150,12 @@ static void populate_table(
         distribution = std::uniform_int_distribution<uint8_t>(0, UINT8_MAX);
     }
     
-    for (size_t i = 0; i < commitment_length; ++i) {
-        c21t::element_p3 g_i;
-        sqcgn::compute_base_element(g_i, i);
-        rstb::to_bytes(generators[i].data(), g_i);
+    if (use_pre_computed_generators) {
+        for (size_t i = 0; i < commitment_length; ++i) {
+            c21t::element_p3 g_i;
+            sqcgn::compute_base_element(g_i, i);
+            rstb::to_bytes(generators[i].data(), g_i);
+        }
     }
     
     for (size_t i = 0; i < data_table.size(); ++i) {
@@ -175,8 +181,8 @@ int main(int argc, char* argv[]) {
 
     if (p.status != 0) return -1;
 
-    long long int table_size = (p.commitments *
-        p.commitment_length * p.element_nbytes) / 1024 / 1024;
+    double table_size = (p.commitments *
+        p.commitment_length * p.element_nbytes) / 1024.;
 
     std::cout << "===== benchmark results" << std::endl;
     std::cout << "backend : " << p.backend_str << std::endl;
@@ -189,15 +195,22 @@ int main(int argc, char* argv[]) {
     std::cout << "********************************************" << std::endl;
 
     // populate data section
-    memmg::managed_array<rstt::compressed_element> generators(p.commitment_length);
-    memmg::managed_array<sqcb::indexed_exponent_sequence> data_commitments(p.commitments);
-    memmg::managed_array<rstt::compressed_element> commitments_per_sequence(p.commitments);
-    memmg::managed_array<uint8_t> data_table(p.commitment_length * p.commitments * p.element_nbytes);
+    memmg::managed_array<rstt::compressed_element>
+        generators(p.commitment_length);
+    memmg::managed_array<sqcb::indexed_exponent_sequence>
+        data_commitments(p.commitments);
+    memmg::managed_array<rstt::compressed_element>
+        commitments_per_sequence(p.commitments);
+    memmg::managed_array<uint8_t>
+        data_table(p.commitment_length * p.commitments * p.element_nbytes);
 
-    basct::span<rstt::compressed_element> commitments(commitments_per_sequence.data(), p.commitments);
-    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(data_commitments.data(), p.commitments);
+    basct::span<rstt::compressed_element>
+        commitments(commitments_per_sequence.data(), p.commitments);
+    basct::cspan<sqcb::indexed_exponent_sequence>
+        value_sequences(data_commitments.data(), p.commitments);
 
     populate_table(
+        p.use_pre_computed_generators,
         p.is_boolean,
         p.commitments,
         p.commitment_length,
@@ -207,52 +220,50 @@ int main(int argc, char* argv[]) {
         generators
     );
 
-    for (auto use_generators : {true, false}) {
-        std::vector<double> durations;
-        double mean_duration_compute = 0;
-        
-        for (int i = 0; i < p.num_samples; ++i) {
-            if (use_generators) {
-                // populate generators
-                basct::span<rstt::compressed_element>
-                    span_generators(generators.data(), p.commitment_length);
+    std::vector<double> durations;
+    double mean_duration_compute = 0;
+    
+    for (int i = 0; i < p.num_samples; ++i) {
+        if (p.use_pre_computed_generators) {
+            // populate generators
+            basct::span<rstt::compressed_element>
+                span_generators(generators.data(), p.commitment_length);
 
-                p.trigger_timer();
-                p.backend->compute_commitments(commitments, value_sequences, span_generators);
-                p.stop_timer();
-            } else {
-                basct::span<rstt::compressed_element> empty_generators;
+            p.trigger_timer();
+            p.backend->compute_commitments(commitments, value_sequences, span_generators);
+            p.stop_timer();
+        } else {
+            basct::span<rstt::compressed_element> empty_generators;
 
-                p.trigger_timer();
-                p.backend->compute_commitments(commitments, value_sequences, empty_generators);
-                p.stop_timer();
-            }
-
-            double duration_compute = p.elapsed_time();
-
-            durations.push_back(duration_compute);
-            mean_duration_compute += duration_compute / p.num_samples;
+            p.trigger_timer();
+            p.backend->compute_commitments(commitments, value_sequences, empty_generators);
+            p.stop_timer();
         }
 
-        double std_deviation = 0;
-        
-        for (int i = 0; i < p.num_samples; ++i) {
-            std_deviation += pow(durations[i] - mean_duration_compute, 2.);
-        }
+        double duration_compute = p.elapsed_time();
 
-        std_deviation = sqrt(std_deviation / p.num_samples);
-
-        double data_throughput = p.commitment_length * p.commitments / mean_duration_compute;
-
-        std::cout << "pre-computed generators : " << (use_generators ? "yes" : "no") << std::endl;
-        std::cout << "compute duration (s) : " << std::fixed << mean_duration_compute << std::endl;
-        std::cout << "compute std deviation (s) : " << std::fixed << std_deviation << std::endl;
-        std::cout << "throughput (exponentiations / s) : " << std::scientific << data_throughput << std::endl;
-
-        if (p.verbose) print_result(p.commitments, commitments_per_sequence);
-
-        std::cout << "********************************************" << std::endl;
+        durations.push_back(duration_compute);
+        mean_duration_compute += duration_compute / p.num_samples;
     }
+
+    double std_deviation = 0;
+    
+    for (int i = 0; i < p.num_samples; ++i) {
+        std_deviation += pow(durations[i] - mean_duration_compute, 2.);
+    }
+
+    std_deviation = sqrt(std_deviation / p.num_samples);
+
+    double data_throughput = p.commitment_length * p.commitments / mean_duration_compute;
+
+    std::cout << "pre-computed generators : " << (p.use_pre_computed_generators ? "yes" : "no") << std::endl;
+    std::cout << "compute duration (s) : " << std::fixed << mean_duration_compute << std::endl;
+    std::cout << "compute std deviation (s) : " << std::fixed << std_deviation << std::endl;
+    std::cout << "throughput (exponentiations / s) : " << std::scientific << data_throughput << std::endl;
+
+    if (p.verbose) print_result(p.commitments, commitments_per_sequence);
+
+    std::cout << "********************************************" << std::endl;
     
     return 0;
 }
