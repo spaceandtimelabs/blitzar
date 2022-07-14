@@ -12,6 +12,7 @@ sxt_cc_component(
     name = "managed_array",
     deps = [
         ":managed_array_fwd",
+        "//sxt/base/container:span_void",
         "//sxt/base/type:polymorphic_allocator",
     ],
     test_deps = [

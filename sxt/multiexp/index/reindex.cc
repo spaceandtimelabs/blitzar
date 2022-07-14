@@ -27,14 +27,16 @@ struct comp {
 // init_heap
 //--------------------------------------------------------------------------------------------------
 static void init_heap(std::vector<heap_element>& heap,
-                      basct::span<basct::span<uint64_t>> rows) noexcept {
+                      basct::span<basct::span<uint64_t>> rows,
+                      basf::function_ref<size_t(basct::cspan<uint64_t>)>
+                          offset_functor) noexcept {
   heap.reserve(rows.size());
-  for (size_t index=0; index<rows.size(); ++index) {
-    auto row = rows[index];
+  for (size_t row_index=0; row_index<rows.size(); ++row_index) {
+    auto row = rows[row_index];
     if (row.empty()) {
       continue;
     }
-    heap.emplace_back(row.data(), index);
+    heap.emplace_back(row.data() + offset_functor(row), row_index);
   }
   std::make_heap(heap.begin(), heap.end(), comp{});
 }
@@ -84,14 +86,15 @@ static void pop(uint64_t*& out, size_t& working_index, std::vector<heap_element>
 //--------------------------------------------------------------------------------------------------
 // reindex_rows
 //--------------------------------------------------------------------------------------------------
-void reindex_rows(basct::span<basct::span<uint64_t>> rows,
-                  basct::span<uint64_t>& values) noexcept {
+void reindex_rows(
+    basct::span<basct::span<uint64_t>> rows, basct::span<uint64_t>& values,
+    basf::function_ref<size_t(basct::cspan<uint64_t>)> offset_functor) noexcept {
   if (rows.empty()) {
     values = {};
     return;
   }
   std::vector<heap_element> heap;
-  init_heap(heap, rows);
+  init_heap(heap, rows, offset_functor);
 
   auto out = values.begin();
   pop_first(out, heap, rows);
@@ -101,5 +104,13 @@ void reindex_rows(basct::span<basct::span<uint64_t>> rows,
   }
 
   values = {values.data(), working_index + 1};
+}
+
+void reindex_rows(basct::span<basct::span<uint64_t>> rows,
+                  basct::span<uint64_t>& values) noexcept {
+  auto offset_functor = [](basct::cspan<uint64_t> /*row*/) noexcept {
+    return 0;
+  };
+  reindex_rows(rows, values, offset_functor);
 }
 }  // namespace sxt::mtxi

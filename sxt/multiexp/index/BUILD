@@ -73,6 +73,19 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "index_table_utility",
+    deps = [
+        "//sxt/base/container:span",
+    ],
+    impl_deps = [
+        ":index_table",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "random_clump2",
     with_test = False,
     deps = [
@@ -84,6 +97,23 @@ sxt_cc_component(
     name = "reindex",
     deps = [
         "//sxt/base/container:span",
+        "//sxt/base/functional:function_ref",
+    ],
+    test_deps = [
+        ":index_table",
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
+    name = "transpose",
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/functional:function_ref",
+    ],
+    impl_deps = [
+        ":index_table",
+        ":index_table_utility",
     ],
     test_deps = [
         ":index_table",

@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <utility>
 
+#include "sxt/base/container/span_void.h"
 #include "sxt/base/type/polymorphic_allocator.h"
 #include "sxt/memory/management/managed_array_fwd.h"
 
@@ -107,6 +108,10 @@ class managed_array {
    operator managed_array<void> &() & noexcept { return data_; }
 
    operator managed_array<void> &&() && noexcept { return std::move(data_); }
+
+   operator basct::span_void() noexcept {
+     return basct::span_void{data_.data(), data_.size(), sizeof(T)};
+   }
 
    // accessors
    allocator_type get_allocator() const noexcept {

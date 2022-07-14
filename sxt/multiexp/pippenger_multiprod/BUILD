@@ -4,11 +4,33 @@ load(
 )
 
 sxt_cc_component(
+    name = "active_count",
+    deps = [
+        "//sxt/base/container:span",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
+    name = "active_offset",
+    deps = [
+        "//sxt/base/container:span",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "driver",
     with_test = False,
     deps = [
         "//sxt/base/container:span",
-        "//sxt/memory/management:managed_array_fwd",
+    ],
+    impl_deps = [
+        "//sxt/base/container:span_void",
     ],
 )
 
@@ -20,6 +42,7 @@ sxt_cc_component(
     ],
     impl_deps = [
         "//sxt/base/bit:iteration",
+        "//sxt/base/container:span_void",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/index:clump2_descriptor",
         "//sxt/multiexp/index:clump2_marker_utility",
@@ -32,12 +55,14 @@ sxt_cc_component(
 sxt_cc_component(
     name = "clump_inputs",
     deps = [
-        "//sxt/memory/management:managed_array_fwd",
+        "//sxt/base/container:span",
     ],
     impl_deps = [
+        ":active_offset",
         ":driver",
-        "//sxt/memory/management:managed_array",
-        "//sxt/multiexp/index:index_table",
+        ":prune",
+        ":reduction_stats",
+        "//sxt/base/container:span_void",
         "//sxt/multiexp/index:clump2_descriptor",
         "//sxt/multiexp/index:clump2_descriptor_utility",
         "//sxt/multiexp/index:clump2_marker_utility",
@@ -45,6 +70,7 @@ sxt_cc_component(
         "//sxt/multiexp/index:reindex",
     ],
     test_deps = [
+        ":reduction_stats",
         ":test_driver",
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
@@ -53,22 +79,126 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "partition_inputs",
+    name = "clump_outputs",
     deps = [
-        "//sxt/memory/management:managed_array_fwd",
+        "//sxt/base/container:span",
     ],
     impl_deps = [
+        ":active_offset",
+        "//sxt/multiexp/index:clump2_descriptor",
+        "//sxt/multiexp/index:clump2_descriptor_utility",
+        "//sxt/multiexp/index:clump2_marker_utility",
+        "//sxt/multiexp/index:index_table",
+        "//sxt/multiexp/index:index_table_utility",
+        "//sxt/multiexp/index:marker_transformation",
+        "//sxt/multiexp/index:reindex",
+        "//sxt/multiexp/index:transpose",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/multiexp/index:index_table",
+    ],
+)
+
+sxt_cc_component(
+    name = "multiproduct_params",
+    with_test = False,
+)
+
+sxt_cc_component(
+    name = "multiproduct_params_computation",
+    impl_deps = [
+        ":multiproduct_params",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
+    name = "multiproduct",
+    deps = [
+        "//sxt/base/container:span",
+    ],
+    impl_deps = [
+        ":clump_inputs",
+        ":clump_outputs",
         ":driver",
+        ":multiproduct_params",
+        ":multiproduct_params_computation",
+        ":partition_inputs",
+        ":product_table_normalization",
+        ":prune",
+        ":reduction_stats",
+        "//sxt/base/container:span_void",
+        "//sxt/base/iterator:counting_iterator",
+        "//sxt/multiexp/index:index_table",
+    ],
+    test_deps = [
+        ":multiproduct_params",
+        ":test_driver",
+        "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/index:index_table",
+        "//sxt/multiexp/random:random_multiproduct_descriptor",
+        "//sxt/multiexp/random:random_multiproduct_generation",
+        "//sxt/multiexp/test:add_ints",
+        "//sxt/multiexp/test:int_generation",
+    ],
+)
+
+sxt_cc_component(
+    name = "partition_inputs",
+    deps = [
+        "//sxt/base/container:span",
+    ],
+    impl_deps = [
+        ":active_offset",
+        ":driver",
+        ":prune",
+        ":reduction_stats",
+        "//sxt/base/container:span_void",
         "//sxt/multiexp/index:index_table",
         "//sxt/multiexp/index:partition_marker_utility",
         "//sxt/multiexp/index:marker_transformation",
         "//sxt/multiexp/index:reindex",
     ],
     test_deps = [
+        ":reduction_stats",
         ":test_driver",
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/index:index_table",
     ],
+)
+
+sxt_cc_component(
+    name = "product_table_normalization",
+    impl_deps = [
+        "//sxt/multiexp/index:index_table",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/multiexp/index:index_table",
+    ],
+)
+
+sxt_cc_component(
+    name = "prune",
+    deps = [
+        "//sxt/base/container:span",
+    ],
+    impl_deps = [
+        ":active_count",
+        "//sxt/base/iterator:counting_iterator",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/multiexp/index:index_table",
+    ],
+)
+
+sxt_cc_component(
+    name = "reduction_stats",
+    with_test = False,
 )

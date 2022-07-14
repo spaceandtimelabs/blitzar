@@ -37,4 +37,13 @@ TEST_CASE("we can transform an index table into partition markers") {
     index_table expected_tbl{{7, 9}, {21}};
     REQUIRE(tbl == expected_tbl);
   }
+
+  SECTION("we can use an offset functor to skip over entries") {
+    index_table tbl{{2, 3, 4}, {10}};
+    auto offset_functor = [](basct::cspan<uint64_t> row) noexcept { return 1; };
+    REQUIRE(apply_marker_transformation(tbl.header(), consumer,
+                                        offset_functor) == 2);
+    index_table expected_tbl{{2, 6, 9}, {10}};
+    REQUIRE(tbl == expected_tbl);
+  }
 }

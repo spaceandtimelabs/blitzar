@@ -11,10 +11,10 @@ namespace sxt::mtxi {
 // apply_marker_row_transformation
 //--------------------------------------------------------------------------------------------------
 template <class F>
-void apply_marker_row_transformation(basct::span<uint64_t>& indexes,
-                                     F consumer) noexcept {
-  auto out = indexes.begin();
-  auto rest = indexes;
+void apply_marker_row_transformation(basct::span<uint64_t>& indexes, F consumer,
+                                     size_t offset) noexcept {
+  auto out = indexes.begin() + offset;
+  auto rest = indexes.subspan(offset);
   while(!rest.empty()) {
     *out++ = consumer(rest);
   }
@@ -25,14 +25,25 @@ void apply_marker_row_transformation(basct::span<uint64_t>& indexes,
 //--------------------------------------------------------------------------------------------------
 // apply_marker_transformation
 //--------------------------------------------------------------------------------------------------
-template <class F>
+template <class F, class OffsetFunctor>
 size_t apply_marker_transformation(basct::span<basct::span<uint64_t>> rows,
-                                   F consumer) noexcept {
+                                   F consumer,
+                                   OffsetFunctor offset_functor) noexcept {
   size_t count = 0;
   for (auto& row : rows) {
-    apply_marker_row_transformation(row, consumer);
-    count += row.size();
+    auto offset = offset_functor(row);
+    apply_marker_row_transformation(row, consumer, offset);
+    count += row.size() - offset;
   }
   return count;
 }
+
+template <class F>
+size_t apply_marker_transformation(basct::span<basct::span<uint64_t>> rows,
+                                   F consumer) noexcept {
+  return apply_marker_transformation(
+      rows, consumer,
+      [](basct::cspan<uint64_t> /*row*/) noexcept { return 0; });
+}
+
 }  // namespace sxt::mtxi

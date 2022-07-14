@@ -10,7 +10,7 @@
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/pippenger/test_driver.h"
 #include "sxt/multiexp/test/compute_uint64_muladd.h"
-#include "sxt/multiexp/test/generate_uint64_generators.h"
+#include "sxt/multiexp/test/int_generation.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"
 #include "sxt/multiexp/random/random_multiexponentiation_generation.h"
 
@@ -34,7 +34,7 @@ static void compute_random_test_case(
 
   memmg::managed_array<uint64_t> inout(num_inputs);
 
-  mtxtst::generate_uint64_generators(inout, rng);
+  mtxtst::generate_uint64s(inout, rng);
   
   memmg::managed_array<uint64_t> expected_result(num_sequences);
 

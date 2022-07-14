@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <cstddef>
 #include <type_traits>
 
@@ -56,6 +57,25 @@ class span {
 
    CUDA_CALLABLE
    size_t size() const noexcept { return size_; }
+
+   CUDA_CALLABLE
+   span subspan(size_t offset) const noexcept {
+     assert(offset <= size_);
+     return {
+         data_ + offset,
+         size_ - offset,
+     };
+   }
+
+   CUDA_CALLABLE
+   span subspan(size_t offset, size_t size_p) const noexcept {
+     assert(offset <= size_);
+     assert(offset + size_p <= size_);
+     return {
+         data_ + offset,
+         size_p,
+     };
+   }
 
    CUDA_CALLABLE
    bool empty() const noexcept { return size_ == 0; }

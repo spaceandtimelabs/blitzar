@@ -109,6 +109,6 @@ sxt_cc_component(
         "//sxt/multiexp/random:random_multiexponentiation_descriptor",
         "//sxt/multiexp/random:random_multiexponentiation_generation",
         "//sxt/multiexp/test:compute_uint64_muladd",
-        "//sxt/multiexp/test:generate_uint64_generators"
+        "//sxt/multiexp/test:int_generation"
     ],
 )

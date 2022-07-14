@@ -12,3 +12,8 @@ sxt_cc_component(
     name = "int",
     with_test = False,
 )
+
+sxt_cc_component(
+    name = "remove_cvref",
+    with_test = False,
+)

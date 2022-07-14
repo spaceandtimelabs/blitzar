@@ -4,6 +4,16 @@ load(
 )
 
 sxt_cc_component(
+    name = "add_ints",
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+    ],
+    impl_deps = [
+    ]
+)
+
+sxt_cc_component(
     name = "compute_uint64_muladd",
     with_test = False,
     deps = [
@@ -32,7 +42,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "generate_uint64_generators",
+    name = "int_generation",
     with_test = False,
     deps = [
         "//sxt/base/container:span",
