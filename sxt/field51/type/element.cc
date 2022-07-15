@@ -11,13 +11,11 @@ namespace sxt::f51t {
 //--------------------------------------------------------------------------------------------------
 // print_impl
 //--------------------------------------------------------------------------------------------------
-static std::ostream& print_impl(std::ostream& out,
-                                const std::array<uint8_t, 32>& bytes,
+static std::ostream& print_impl(std::ostream& out, const std::array<uint8_t, 32>& bytes,
                                 int start) noexcept {
   out << std::hex << static_cast<int>(bytes[start]);
   for (int i = start; i-- > 0;) {
-    out << std::hex << std::setw(2) << std::setfill('0')
-        << static_cast<int>(bytes[i]);
+    out << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(bytes[i]);
   }
   out << "_f51";
   return out;

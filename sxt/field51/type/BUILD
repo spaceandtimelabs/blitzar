@@ -5,12 +5,12 @@ load(
 
 sxt_cc_component(
     name = "element",
-    deps = [
-        "//sxt/base/macro:cuda_callable",
-    ],
     impl_deps = [
         "//sxt/field51/base:byte_conversion",
         "//sxt/field51/base:reduce",
+    ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
     ],
 )
 
@@ -18,7 +18,7 @@ sxt_cc_component(
     name = "literal",
     deps = [
         ":element",
-        "//sxt/field51/base:byte_conversion",
         "//sxt/base/num:hex",
+        "//sxt/field51/base:byte_conversion",
     ],
 )

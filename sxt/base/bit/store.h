@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstring>
 #include <cstdint>
+#include <cstring>
 
 #include "sxt/base/macro/cuda_callable.h"
 

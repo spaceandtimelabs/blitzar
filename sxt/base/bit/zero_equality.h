@@ -18,7 +18,7 @@ namespace sxt::basbt {
 // is_zero
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-inline int is_zero(const unsigned char *n, const size_t nlen) noexcept {
+inline int is_zero(const unsigned char* n, const size_t nlen) noexcept {
   size_t i;
   volatile unsigned char d = 0U;
 

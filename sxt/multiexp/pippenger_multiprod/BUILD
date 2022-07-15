@@ -5,41 +5,37 @@ load(
 
 sxt_cc_component(
     name = "active_count",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     test_deps = [
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
     ],
 )
 
 sxt_cc_component(
     name = "active_offset",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     test_deps = [
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
     ],
 )
 
 sxt_cc_component(
     name = "driver",
+    impl_deps = [
+        "//sxt/base/container:span_void",
+    ],
     with_test = False,
     deps = [
         "//sxt/base/container:span",
-    ],
-    impl_deps = [
-        "//sxt/base/container:span_void",
     ],
 )
 
 sxt_cc_component(
     name = "test_driver",
-    with_test = False,
-    deps = [
-        ":driver",
-    ],
     impl_deps = [
         "//sxt/base/bit:iteration",
         "//sxt/base/container:span_void",
@@ -50,13 +46,14 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
+    deps = [
+        ":driver",
+    ],
 )
 
 sxt_cc_component(
     name = "clump_inputs",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         ":active_offset",
         ":driver",
@@ -76,13 +73,13 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/index:index_table",
     ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )
 
 sxt_cc_component(
     name = "clump_outputs",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         ":active_offset",
         "//sxt/multiexp/index:clump2_descriptor",
@@ -97,6 +94,9 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/multiexp/index:index_table",
+    ],
+    deps = [
+        "//sxt/base/container:span",
     ],
 )
 
@@ -117,9 +117,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "multiproduct",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         ":clump_inputs",
         ":clump_outputs",
@@ -145,13 +142,13 @@ sxt_cc_component(
         "//sxt/multiexp/test:add_ints",
         "//sxt/multiexp/test:int_generation",
     ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )
 
 sxt_cc_component(
     name = "partition_inputs",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         ":active_offset",
         ":driver",
@@ -170,6 +167,9 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/index:index_table",
     ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )
 
 sxt_cc_component(
@@ -185,9 +185,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "prune",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         ":active_count",
         "//sxt/base/iterator:counting_iterator",
@@ -195,6 +192,9 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/multiexp/index:index_table",
+    ],
+    deps = [
+        "//sxt/base/container:span",
     ],
 )
 

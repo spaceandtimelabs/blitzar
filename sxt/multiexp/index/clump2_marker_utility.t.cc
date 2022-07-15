@@ -3,10 +3,12 @@
 #include <iostream>
 #include <random>
 
-#include "sxt/multiexp/index/random_clump2.h"
+#include "sxt/base/test/unit_test.h"
+
 #include "sxt/multiexp/index/clump2_descriptor.h"
 #include "sxt/multiexp/index/clump2_descriptor_utility.h"
-#include "sxt/base/test/unit_test.h"
+#include "sxt/multiexp/index/random_clump2.h"
+
 using namespace sxt;
 using namespace sxt::mtxi;
 
@@ -101,16 +103,14 @@ TEST_CASE("we can convert between a clumped index set and its marker") {
       init_clump2_descriptor(descriptor, clump.clump_size);
 
       // 1 subset case
-      marker = compute_clump2_marker(descriptor, clump.clump_index,
-                                     clump.index1, clump.index1);
+      marker = compute_clump2_marker(descriptor, clump.clump_index, clump.index1, clump.index1);
       unpack_clump2_marker(clump_index, index1, index2, descriptor, marker);
       REQUIRE(clump_index == clump.clump_index);
       REQUIRE(index1 == clump.index1);
       REQUIRE(index2 == clump.index1);
 
       // 2 subset case
-      marker = compute_clump2_marker(descriptor, clump.clump_index,
-                                     clump.index1, clump.index2);
+      marker = compute_clump2_marker(descriptor, clump.clump_index, clump.index1, clump.index2);
       unpack_clump2_marker(clump_index, index1, index2, descriptor, marker);
       REQUIRE(clump_index == clump.clump_index);
       REQUIRE(index1 == clump.index1);
@@ -136,16 +136,15 @@ TEST_CASE("we can consume clump2 markers from a span of indexes") {
   }
 
   SECTION("we can consume 2 values belonging to the same clump") {
-    uint64_t data[2] = {0, clump_size-1};
+    uint64_t data[2] = {0, clump_size - 1};
     values = data;
     marker = consume_clump2_marker(values, descriptor);
     REQUIRE(marker == compute_clump2_marker(descriptor, 0, data[0], data[1]));
     REQUIRE(values.empty());
   }
 
-  SECTION(
-      "we only consume a single value if the next value belongs to a different "
-      "clump") {
+  SECTION("we only consume a single value if the next value belongs to a different "
+          "clump") {
     uint64_t data[2] = {0, clump_size};
     values = data;
     marker = consume_clump2_marker(values, descriptor);

@@ -5,24 +5,24 @@ load(
 
 sxt_cc_component(
     name = "byte_conversion",
-    is_cuda = True,
-    deps = [
-        "//sxt/base/macro:cuda_callable",
-    ],
     impl_deps = [
         ":reduce",
         "//sxt/base/bit:load",
         "//sxt/base/bit:store",
+    ],
+    is_cuda = True,
+    deps = [
+        "//sxt/base/macro:cuda_callable",
     ],
 )
 
 sxt_cc_component(
     name = "reduce",
     is_cuda = True,
-    deps = [
-        "//sxt/base/type:int",
-        "//sxt/base/macro:cuda_callable",
-    ],
     test_deps = [
+    ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
+        "//sxt/base/type:int",
     ],
 )

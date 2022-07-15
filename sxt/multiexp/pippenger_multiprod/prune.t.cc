@@ -2,8 +2,10 @@
 
 #include <vector>
 
-#include "sxt/multiexp/index/index_table.h"
 #include "sxt/base/test/unit_test.h"
+
+#include "sxt/multiexp/index/index_table.h"
+
 using namespace sxt;
 using namespace sxt::mtxpmp;
 
@@ -13,8 +15,7 @@ TEST_CASE("we can prune the multi-product table to deactive inputs and outputs")
     std::vector<uint64_t> markers;
     size_t num_inactive_outputs = 0;
     size_t num_inactive_inputs = 0;
-    prune_rows(table.header(), markers, num_inactive_outputs,
-                   num_inactive_inputs);
+    prune_rows(table.header(), markers, num_inactive_outputs, num_inactive_inputs);
 
     mtxi::index_table expected_table;
     REQUIRE(table == expected_table);
@@ -27,8 +28,7 @@ TEST_CASE("we can prune the multi-product table to deactive inputs and outputs")
     std::vector<uint64_t> markers;
     size_t num_inactive_outputs = 1;
     size_t num_inactive_inputs = 1;
-    prune_rows(table.header(), markers, num_inactive_outputs,
-                   num_inactive_inputs);
+    prune_rows(table.header(), markers, num_inactive_outputs, num_inactive_inputs);
 
     mtxi::index_table expected_table{{0, 1, 0}};
     REQUIRE(table == expected_table);
@@ -36,14 +36,12 @@ TEST_CASE("we can prune the multi-product table to deactive inputs and outputs")
     REQUIRE(num_inactive_inputs == 1);
   }
 
-  SECTION(
-      "we handle the case of one output and one deactivation") {
+  SECTION("we handle the case of one output and one deactivation") {
     mtxi::index_table table{{0, 0, 0}};
     std::vector<uint64_t> markers = {99};
     size_t num_inactive_outputs = 0;
     size_t num_inactive_inputs = 0;
-    prune_rows(table.header(), markers, num_inactive_outputs,
-                   num_inactive_inputs);
+    prune_rows(table.header(), markers, num_inactive_outputs, num_inactive_inputs);
 
     mtxi::index_table expected_table{{0, 1, 0}};
     REQUIRE(table == expected_table);
@@ -53,15 +51,13 @@ TEST_CASE("we can prune the multi-product table to deactive inputs and outputs")
     REQUIRE(markers == expected_markers);
   }
 
-  SECTION(
-      "we handle the case of two outputs, one deactivation, and one "
-      "non-deactivation") {
+  SECTION("we handle the case of two outputs, one deactivation, and one "
+          "non-deactivation") {
     mtxi::index_table table{{0, 0, 0, 1}, {1, 0, 0}};
     std::vector<uint64_t> markers = {99, 101};
     size_t num_inactive_outputs = 0;
     size_t num_inactive_inputs = 0;
-    prune_rows(table.header(), markers, num_inactive_outputs,
-                   num_inactive_inputs);
+    prune_rows(table.header(), markers, num_inactive_outputs, num_inactive_inputs);
 
     mtxi::index_table expected_table{{0, 1, 0, 0}, {1, 0, 0}};
     REQUIRE(table == expected_table);
@@ -76,8 +72,7 @@ TEST_CASE("we can prune the multi-product table to deactive inputs and outputs")
     std::vector<uint64_t> markers = {99, 100, 101, 102};
     size_t num_inactive_outputs = 0;
     size_t num_inactive_inputs = 1;
-    prune_rows(table.header(), markers, num_inactive_outputs,
-                   num_inactive_inputs);
+    prune_rows(table.header(), markers, num_inactive_outputs, num_inactive_inputs);
 
     mtxi::index_table expected_table{{0, 4, 0, 1, 2, 3, 0}, {1, 0, 0}};
     REQUIRE(table == expected_table);
@@ -87,14 +82,12 @@ TEST_CASE("we can prune the multi-product table to deactive inputs and outputs")
     REQUIRE(markers == expected_markers);
   }
 
-  SECTION(
-      "we deactive entries that are only in rows with a single active entry") {
+  SECTION("we deactive entries that are only in rows with a single active entry") {
     mtxi::index_table table{{0, 1, 0, 0}, {1, 0, 0}};
     std::vector<uint64_t> markers = {99};
     size_t num_inactive_outputs = 0;
     size_t num_inactive_inputs = 1;
-    prune_rows(table.header(), markers, num_inactive_outputs,
-                   num_inactive_inputs);
+    prune_rows(table.header(), markers, num_inactive_outputs, num_inactive_inputs);
 
     mtxi::index_table expected_table{{0, 2, 0, 1}, {1, 1, 1}};
     REQUIRE(table == expected_table);
@@ -109,8 +102,7 @@ TEST_CASE("we can prune the multi-product table to deactive inputs and outputs")
     std::vector<uint64_t> markers = {101, 102, 103};
     size_t num_inactive_outputs = 0;
     size_t num_inactive_inputs = 0;
-    prune_rows(table.header(), markers, num_inactive_outputs,
-                   num_inactive_inputs);
+    prune_rows(table.header(), markers, num_inactive_outputs, num_inactive_inputs);
 
     mtxi::index_table expected_table{{0, 1, 0, 0, 1}, {1, 0, 0, 1}};
     REQUIRE(table == expected_table);

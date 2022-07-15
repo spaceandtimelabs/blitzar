@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt::basct;
 
 TEST_CASE("span represents a view into a contiguous region of memory") {

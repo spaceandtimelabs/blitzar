@@ -8,8 +8,7 @@ namespace sxt::mtxpmp {
 //--------------------------------------------------------------------------------------------------
 // normalize_product_table
 //--------------------------------------------------------------------------------------------------
-void normalize_product_table(mtxi::index_table& products,
-                             size_t num_entries) noexcept {
+void normalize_product_table(mtxi::index_table& products, size_t num_entries) noexcept {
   size_t num_entries_p = num_entries + products.num_rows() * 2;
   mtxi::index_table products_p{products.num_rows(), num_entries_p};
   auto entry_data = products_p.entry_data();
@@ -24,4 +23,4 @@ void normalize_product_table(mtxi::index_table& products,
   }
   products = std::move(products_p);
 }
-}  // namespace sxt::mtxpmp
+} // namespace sxt::mtxpmp

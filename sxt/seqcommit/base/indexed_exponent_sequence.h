@@ -21,4 +21,4 @@ struct indexed_exponent_sequence {
   // exactly `n` elements.
   const uint64_t* indices = nullptr;
 };
-}  // namespace sxt::sqcb
+} // namespace sxt::sqcb

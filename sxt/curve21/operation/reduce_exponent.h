@@ -11,4 +11,4 @@ namespace sxt::c21o {
 // p = 2^252 + 27742317777372353535851937790883648493
 CUDA_CALLABLE
 void reduce_exponent(unsigned char s[32]) noexcept;
-}  // namespace sxt::c21o
+} // namespace sxt::c21o

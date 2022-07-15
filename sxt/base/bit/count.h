@@ -1,22 +1,18 @@
 #pragma once
 
-#include <cstdint>
 #include <algorithm>
+#include <cstdint>
 
 namespace sxt::basbt {
 //--------------------------------------------------------------------------------------------------
 // count_trailing_zeros
 //--------------------------------------------------------------------------------------------------
-inline int count_trailing_zeros(unsigned long x) noexcept {
-  return __builtin_ctzl(x);
-}
+inline int count_trailing_zeros(unsigned long x) noexcept { return __builtin_ctzl(x); }
 
 //--------------------------------------------------------------------------------------------------
 // count_leading_zeros
 //--------------------------------------------------------------------------------------------------
-inline int count_leading_zeros(unsigned long x) noexcept {
-  return __builtin_clzl(x);
-}
+inline int count_leading_zeros(unsigned long x) noexcept { return __builtin_clzl(x); }
 
 //--------------------------------------------------------------------------------------------------
 // count_leading_zeros

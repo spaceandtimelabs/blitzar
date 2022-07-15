@@ -10,6 +10,7 @@
 
 #include "sxt/base/bit/load.h"
 #include "sxt/base/bit/store.h"
+
 #include "sxt/field51/base/reduce.h"
 
 namespace sxt::f51b {
@@ -54,4 +55,4 @@ void to_bytes(uint8_t s[32], const uint64_t h[5]) noexcept {
   basbt::store64_le(s + 16, t2);
   basbt::store64_le(s + 24, t3);
 }
-}  // namespace sxt::f51b
+} // namespace sxt::f51b

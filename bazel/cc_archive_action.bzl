@@ -16,25 +16,26 @@ load("@rules_cc//cc:action_names.bzl", "CPP_LINK_STATIC_LIBRARY_ACTION_NAME")
 load("@rules_cc//cc:toolchain_utils.bzl", "find_cpp_toolchain")
 
 def make_linking_context(ctx, cc_toolchain, feature_configuration, output_file):
-  linker_input = cc_common.create_linker_input(
-      owner = ctx.label,
-      libraries = depset(direct = [
-          cc_common.create_library_to_link(
-              actions = ctx.actions,
-              alwayslink = True,
-              feature_configuration = feature_configuration,
-              cc_toolchain = cc_toolchain,
-              static_library = output_file,
-          ),
-      ]),
-  )
-  compilation_context = cc_common.create_compilation_context()
-  return cc_common.create_linking_context(
-          linker_inputs = depset(direct = [linker_input]))
+    linker_input = cc_common.create_linker_input(
+        owner = ctx.label,
+        libraries = depset(direct = [
+            cc_common.create_library_to_link(
+                actions = ctx.actions,
+                alwayslink = True,
+                feature_configuration = feature_configuration,
+                cc_toolchain = cc_toolchain,
+                static_library = output_file,
+            ),
+        ]),
+    )
+    compilation_context = cc_common.create_compilation_context()
+    return cc_common.create_linking_context(
+        linker_inputs = depset(direct = [linker_input]),
+    )
 
 def sxt_cc_archive_action(ctx, objs, output_file):
     cc_toolchain = find_cpp_toolchain(ctx)
-    
+
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = cc_toolchain,
@@ -69,7 +70,7 @@ def sxt_cc_archive_action(ctx, objs, output_file):
     args = ctx.actions.args()
     args.add_all(command_line)
     for obj in objs:
-      args.add(obj)
+        args.add(obj)
 
     ctx.actions.run(
         executable = archiver_path,

@@ -11,4 +11,3 @@ struct reduction_stats {
   size_t num_terms;
 };
 } // namespace sxt::mtxpmp
-

@@ -31,3 +31,8 @@ rust/proofs-gpu-sys/src/bindings.rs
 *.dot
 callgrind.out.*
 
+# Ignore python files
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class

@@ -9,9 +9,8 @@ namespace sxt::basn {
 // fast_random_number_generator
 //--------------------------------------------------------------------------------------------------
 class fast_random_number_generator {
- public:
-  CUDA_CALLABLE fast_random_number_generator(uint64_t seed1,
-                                             uint64_t seed2) noexcept
+public:
+  CUDA_CALLABLE fast_random_number_generator(uint64_t seed1, uint64_t seed2) noexcept
       : state_{seed1, seed2} {}
 
   CUDA_CALLABLE
@@ -23,13 +22,14 @@ class fast_random_number_generator {
     auto t = state_a;
     auto s = state_b;
     state_a = s;
-    t ^= t << 23;        // a
-    t ^= t >> 17;        // b
-    t ^= s ^ (s >> 26);  // c
+    t ^= t << 23;       // a
+    t ^= t >> 17;       // b
+    t ^= s ^ (s >> 26); // c
     state_b = t;
     return t + s;
   }
- private:
+
+private:
   uint64_t state_[2];
 };
 } // namespace sxt::basn

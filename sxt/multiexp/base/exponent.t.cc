@@ -3,6 +3,7 @@
 #include <limits>
 
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt::mtxb;
 
 TEST_CASE("we can determine the position of the highest 1 bit") {

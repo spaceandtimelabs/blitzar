@@ -5,31 +5,27 @@ load(
 
 sxt_cc_component(
     name = "add_ints",
+    impl_deps = [
+    ],
     with_test = False,
     deps = [
         "//sxt/base/container:span",
     ],
-    impl_deps = [
-    ]
 )
 
 sxt_cc_component(
     name = "compute_uint64_muladd",
+    impl_deps = [
+        "//sxt/multiexp/base:exponent_sequence",
+    ],
     with_test = False,
     deps = [
         "//sxt/base/container:span",
     ],
-    impl_deps = [
-        "//sxt/multiexp/base:exponent_sequence"
-    ]
 )
 
 sxt_cc_component(
     name = "compute_ristretto_muladd",
-    with_test = False,
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/curve21/type:element_p3",
@@ -37,30 +33,34 @@ sxt_cc_component(
         "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/ristretto/base:byte_conversion",
-        "//sxt/ristretto/type:compressed_element"
-    ]
-)
-
-sxt_cc_component(
-    name = "int_generation",
+        "//sxt/ristretto/type:compressed_element",
+    ],
     with_test = False,
     deps = [
         "//sxt/base/container:span",
     ],
-    impl_deps = []
+)
+
+sxt_cc_component(
+    name = "int_generation",
+    impl_deps = [],
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )
 
 sxt_cc_component(
     name = "generate_ristretto_elements",
-    with_test = False,
-    deps = [
-        "//sxt/base/container:span"
-    ],
     impl_deps = [
         "//sxt/ristretto/type:compressed_element",
         "//sxt/curve21/type:element_p3",
         "//sxt/ristretto/base:byte_conversion",
         "//sxt/base/num:fast_random_number_generator",
-        "//sxt/ristretto/random:element"
-    ]
+        "//sxt/ristretto/random:element",
+    ],
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )

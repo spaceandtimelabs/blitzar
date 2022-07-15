@@ -4,6 +4,7 @@
 
 #include "sxt/base/test/allocator_aware.h"
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt;
 using namespace sxt::mtxi;
 

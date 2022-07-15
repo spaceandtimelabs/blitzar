@@ -1,8 +1,8 @@
 #include "sxt/multiexp/index/index_table.h"
 
-#include <iterator>
 #include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <utility>
 
 namespace sxt::mtxi {
@@ -12,29 +12,24 @@ namespace sxt::mtxi {
 index_table::index_table(const index_table& other) noexcept
     : index_table{other, other.get_allocator()} {}
 
-index_table::index_table(const index_table& other,
-                         allocator_type alloc) noexcept
-    : alloc_{alloc} {
+index_table::index_table(const index_table& other, allocator_type alloc) noexcept : alloc_{alloc} {
   this->operator=(other);
 }
 
 index_table::index_table(index_table&& other) noexcept
     : index_table{std::move(other), other.get_allocator()} {}
 
-index_table::index_table(index_table&& other, allocator_type alloc) noexcept
-    : alloc_{alloc} {
+index_table::index_table(index_table&& other, allocator_type alloc) noexcept : alloc_{alloc} {
   this->operator=(std::move(other));
 }
 
-index_table::index_table(size_t num_rows, size_t max_entries,
-                         allocator_type alloc) noexcept
+index_table::index_table(size_t num_rows, size_t max_entries, allocator_type alloc) noexcept
     : alloc_{alloc} {
   this->reshape(num_rows, max_entries);
 }
 
-index_table::index_table(
-    std::initializer_list<std::initializer_list<uint64_t>> values,
-    allocator_type alloc) noexcept
+index_table::index_table(std::initializer_list<std::initializer_list<uint64_t>> values,
+                         allocator_type alloc) noexcept
     : alloc_{alloc} {
   auto num_rows = values.size();
   size_t entry_count = 0;
@@ -45,8 +40,7 @@ index_table::index_table(
 
   auto hdr = this->header();
   auto rows_p = values.begin();
-  auto entry_data =
-      reinterpret_cast<uint64_t*>(data_ + sizeof(header_type) * num_rows_);
+  auto entry_data = reinterpret_cast<uint64_t*>(data_ + sizeof(header_type) * num_rows_);
   for (size_t index = 0; index < num_rows; ++index) {
     auto& row = hdr[index];
     auto row_p = *(rows_p + index);
@@ -58,9 +52,7 @@ index_table::index_table(
 //--------------------------------------------------------------------------------------------------
 // destructor
 //--------------------------------------------------------------------------------------------------
-index_table::~index_table() noexcept {
-  this->reset();
-}
+index_table::~index_table() noexcept { this->reset(); }
 
 //--------------------------------------------------------------------------------------------------
 // operator=
@@ -90,7 +82,7 @@ index_table& index_table::operator=(const index_table& rhs) noexcept {
 }
 
 index_table& index_table::operator=(index_table&& rhs) noexcept {
-  if(this->get_allocator() != rhs.get_allocator()) {
+  if (this->get_allocator() != rhs.get_allocator()) {
     return this->operator=(rhs);
   }
 
@@ -115,8 +107,7 @@ uint64_t* index_table::entry_data() noexcept {
 }
 
 const uint64_t* index_table::entry_data() const noexcept {
-  return reinterpret_cast<const uint64_t*>(data_ +
-                                           sizeof(header_type) * num_rows_);
+  return reinterpret_cast<const uint64_t*>(data_ + sizeof(header_type) * num_rows_);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -136,8 +127,7 @@ void index_table::reset() noexcept {
 // reshape
 //--------------------------------------------------------------------------------------------------
 void index_table::reshape(size_t num_rows, size_t max_entries) noexcept {
-  auto capacity_p =
-      num_rows * sizeof(basct::span<uint64_t>) + max_entries * sizeof(uint64_t);
+  auto capacity_p = num_rows * sizeof(basct::span<uint64_t>) + max_entries * sizeof(uint64_t);
   if (capacity_p <= capacity_) {
     num_rows_ = num_rows;
     return;
@@ -157,7 +147,7 @@ bool operator==(const index_table& lhs, const index_table& rhs) noexcept {
   if (hdr.size() != hdr_p.size()) {
     return false;
   }
-  for (size_t index=0; index<hdr.size(); ++index) {
+  for (size_t index = 0; index < hdr.size(); ++index) {
     auto row = hdr[index];
     auto row_p = hdr_p[index];
     if (row.size() != row_p.size()) {
@@ -192,4 +182,4 @@ std::ostream& operator<<(std::ostream& out, const index_table& tbl) {
   out << "}";
   return out;
 }
-} // namesapce sxt::mtxi
+} // namespace sxt::mtxi

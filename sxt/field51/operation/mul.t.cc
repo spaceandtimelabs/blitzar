@@ -1,13 +1,15 @@
 #include "sxt/field51/operation/mul.h"
 
 #include "sxt/base/test/unit_test.h"
+
 #include "sxt/field51/type/element.h"
 #include "sxt/field51/type/literal.h"
+
 using namespace sxt::f51o;
 using namespace sxt::f51t;
 
 TEST_CASE("we can multiply finite field elements") {
-  auto e1 = 0x711a90c454965634b0962b2b4479551d887ad8d7f33d62f626648de22323dba0_f51;  
+  auto e1 = 0x711a90c454965634b0962b2b4479551d887ad8d7f33d62f626648de22323dba0_f51;
   auto e2 = 0x48674afb484b050fdcccf508dfb8ce91c364ab4d15584711cba01736e1c59deb_f51;
   element res;
 

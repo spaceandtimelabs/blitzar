@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt::basit;
 
 TEST_CASE("we can use counting_iterator to represent a sequence of integers") {

@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt::mtxpmp;
 
 TEST_CASE("we can compute the offset where the active entries start") {

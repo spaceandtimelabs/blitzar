@@ -3,7 +3,6 @@ load(
     "cuda_dlink",
 )
 
-
 cuda_dlink(
     name = "pedersen_device",
     deps = [
@@ -13,16 +12,16 @@ cuda_dlink(
 
 cc_binary(
     name = "libproofs-gpu.so",
-    linkshared = 1,
-    visibility = ["//visibility:public"],
     linkopts = [
         "-Wl,--version-script=$(location :libproofs-gpu-export-map.ld)",
-        '-static-libstdc++',
-        '-static-libgcc',
+        "-static-libstdc++",
+        "-static-libgcc",
     ],
+    linkshared = 1,
+    visibility = ["//visibility:public"],
     deps = [
-        ":pedersen_device",
         ":libproofs-gpu-export-map.ld",
+        ":pedersen_device",
         "//sxt/seqcommit/cbindings:pedersen",
     ],
 )

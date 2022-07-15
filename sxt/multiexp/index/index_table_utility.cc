@@ -17,4 +17,4 @@ void init_rows(index_table& table, basct::cspan<size_t> sizes) noexcept {
     entry_data += sizes[row_index];
   }
 }
-}  // namespace sxt::mtxi
+} // namespace sxt::mtxi

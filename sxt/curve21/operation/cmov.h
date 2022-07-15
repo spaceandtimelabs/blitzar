@@ -10,15 +10,16 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::c21t { struct element_cached; }
+namespace sxt::c21t {
+struct element_cached;
+}
 
 namespace sxt::c21o {
 //--------------------------------------------------------------------------------------------------
 // cmov
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void cmov(c21t::element_cached& t, const c21t::element_cached& u,
-          unsigned char b) noexcept;
+void cmov(c21t::element_cached& t, const c21t::element_cached& u, unsigned char b) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // cmov8

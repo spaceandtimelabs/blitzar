@@ -26,8 +26,7 @@ static void fill_exponent(uint8_t a[32], basct::cspan<uint8_t> data) noexcept {
     a[i] = 0;
   }
   if (a[31] > 127) {
-    reduce_exponent(
-        a);  // a_i = a_i % (2^252 + 27742317777372353535851937790883648493)
+    reduce_exponent(a); // a_i = a_i % (2^252 + 27742317777372353535851937790883648493)
   }
 }
 
@@ -36,7 +35,7 @@ static void fill_exponent(uint8_t a[32], basct::cspan<uint8_t> data) noexcept {
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 void scalar_multiply255(c21t::element_p3& h, const unsigned char* a,
-                     const c21t::element_p3& p) noexcept {
+                        const c21t::element_p3& p) noexcept {
   c21t::element_p1p1 r;
   c21t::element_p2 s;
   c21t::element_p1p1 t2, t3, t4, t5, t6, t7, t8;

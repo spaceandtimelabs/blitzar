@@ -1,10 +1,9 @@
-
 #include "sxt/memory/resource/managed_device_resource.h"
 
-#include <iostream>
-#include <cstdlib>
-
 #include <cuda_runtime.h>
+
+#include <cstdlib>
+#include <iostream>
 
 namespace sxt::memr {
 //--------------------------------------------------------------------------------------------------
@@ -23,7 +22,8 @@ void* managed_device_resource::do_allocate(size_t bytes, size_t /*alignment*/) n
 //--------------------------------------------------------------------------------------------------
 // do_deallocate
 //--------------------------------------------------------------------------------------------------
-void managed_device_resource::do_deallocate(void* ptr, size_t /*bytes*/, size_t /*alignment*/) noexcept {
+void managed_device_resource::do_deallocate(void* ptr, size_t /*bytes*/,
+                                            size_t /*alignment*/) noexcept {
   auto rcode = cudaFree(ptr);
   if (rcode != cudaSuccess) {
     std::cerr << "cudaFree failed: " << rcode << "\n";
@@ -34,8 +34,7 @@ void managed_device_resource::do_deallocate(void* ptr, size_t /*bytes*/, size_t 
 //--------------------------------------------------------------------------------------------------
 // do_is_equal
 //--------------------------------------------------------------------------------------------------
-bool managed_device_resource::do_is_equal(
-    const std::pmr::memory_resource& other) const noexcept {
+bool managed_device_resource::do_is_equal(const std::pmr::memory_resource& other) const noexcept {
   return this == &other;
 }
 

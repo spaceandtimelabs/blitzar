@@ -9,10 +9,10 @@
 
 #include "sxt/curve21/operation/add.h"
 
-#include "sxt/field51/type/element.h"
 #include "sxt/field51/operation/add.h"
-#include "sxt/field51/operation/sub.h"
 #include "sxt/field51/operation/mul.h"
+#include "sxt/field51/operation/sub.h"
+#include "sxt/field51/type/element.h"
 
 namespace sxt::c21o {
 //--------------------------------------------------------------------------------------------------
@@ -22,8 +22,7 @@ namespace sxt::c21o {
  r = p + q
  */
 CUDA_CALLABLE
-void add(c21t::element_p1p1 &r, const c21t::element_p3 &p,
-         const c21t::element_cached &q) noexcept {
+void add(c21t::element_p1p1& r, const c21t::element_p3& p, const c21t::element_cached& q) noexcept {
   f51t::element t0;
 
   f51o::add(r.X, p.Y, p.X);

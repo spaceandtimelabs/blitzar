@@ -3,7 +3,9 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
+
 #include "sxt/multiexp/index/index_table.h"
+
 using namespace sxt;
 using namespace sxt::mtxi;
 
@@ -51,9 +53,7 @@ TEST_CASE("we can reindex a table") {
 
   SECTION("we can use an offset functor to skip over entries") {
     index_table tbl{{10, 11}, {10, 12}};
-    auto f = [](basct::cspan<uint64_t> row) noexcept {
-      return 1;
-    };
+    auto f = [](basct::cspan<uint64_t> row) noexcept { return 1; };
     reindex_rows(tbl.header(), values, f);
     values_data.resize(values.size());
     index_table expected_tbl{{10, 0}, {10, 1}};

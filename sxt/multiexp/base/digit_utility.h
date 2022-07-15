@@ -8,8 +8,7 @@ namespace sxt::mtxb {
 //--------------------------------------------------------------------------------------------------
 // extract_digit
 //--------------------------------------------------------------------------------------------------
-uint8_t extract_digit(basct::cspan<uint8_t> e, size_t radix_log2,
-                      size_t digit_index) noexcept;
+uint8_t extract_digit(basct::cspan<uint8_t> e, size_t radix_log2, size_t digit_index) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // count_nonzero_digits

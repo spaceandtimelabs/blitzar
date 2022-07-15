@@ -1,47 +1,45 @@
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
 
-#include <vector>
-#include <random>
 #include <iostream>
 #include <memory_resource>
+#include <random>
+#include <vector>
 
 #include "sxt/base/test/unit_test.h"
+
 #include "sxt/memory/management/managed_array.h"
+
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/pippenger/test_driver.h"
-#include "sxt/multiexp/test/compute_uint64_muladd.h"
-#include "sxt/multiexp/test/int_generation.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"
 #include "sxt/multiexp/random/random_multiexponentiation_generation.h"
+#include "sxt/multiexp/test/compute_uint64_muladd.h"
+#include "sxt/multiexp/test/int_generation.h"
 
 using namespace sxt;
 using namespace sxt::mtxpi;
 
-static void compute_random_test_case(
-    std::mt19937 &rng,
-    size_t num_sequences,
-    mtxrn::random_multiexponentiation_descriptor descriptor,
-    const test_driver &drv) {
-  
+static void compute_random_test_case(std::mt19937& rng, size_t num_sequences,
+                                     mtxrn::random_multiexponentiation_descriptor descriptor,
+                                     const test_driver& drv) {
+
   uint64_t num_inputs = 0;
-    
+
   std::pmr::monotonic_buffer_resource resource;
   std::vector<mtxb::exponent_sequence> sequences(num_sequences);
 
-  mtxrn::generate_random_multiexponentiation(
-    num_inputs, sequences, &resource, rng, descriptor
-  );
+  mtxrn::generate_random_multiexponentiation(num_inputs, sequences, &resource, rng, descriptor);
 
   memmg::managed_array<uint64_t> inout(num_inputs);
 
   mtxtst::generate_uint64s(inout, rng);
-  
+
   memmg::managed_array<uint64_t> expected_result(num_sequences);
 
   mtxtst::compute_uint64_muladd(expected_result, inout, sequences);
 
   compute_multiexponentiation(inout, drv, sequences);
-  
+
   REQUIRE(inout == expected_result);
 }
 
@@ -152,83 +150,58 @@ TEST_CASE("we can compute multiexponentiations") {
 
   SECTION("we handle multiple random sequences of varying length") {
     for (size_t i = 0; i < 1000; ++i) {
-      compute_random_test_case(
-        rng,
-        1,
-        {
-          .min_sequence_length = 0,
-          .max_sequence_length = 100,
-          .min_exponent_num_bytes = 1,
-          .max_exponent_num_bytes = 1
-        },
-        drv
-      );
+      compute_random_test_case(rng, 1,
+                               {.min_sequence_length = 0,
+                                .max_sequence_length = 100,
+                                .min_exponent_num_bytes = 1,
+                                .max_exponent_num_bytes = 1},
+                               drv);
     }
   }
 
   SECTION("we handle multiple outputs and random sequences of length 1") {
     for (size_t i = 0; i < 1000; ++i) {
-      compute_random_test_case(
-        rng,
-        i,
-        {
-          .min_sequence_length = 1,
-          .max_sequence_length = 1,
-          .min_exponent_num_bytes = 1,
-          .max_exponent_num_bytes = 1
-        },
-        drv
-      );
+      compute_random_test_case(rng, i,
+                               {.min_sequence_length = 1,
+                                .max_sequence_length = 1,
+                                .min_exponent_num_bytes = 1,
+                                .max_exponent_num_bytes = 1},
+                               drv);
     }
   }
 
   SECTION("we handle multiple outputs and"
           "multiple random sequences of varying length") {
     for (size_t i = 0; i < 100; ++i) {
-      compute_random_test_case(
-        rng,
-        i,
-        {
-          .min_sequence_length = 1,
-          .max_sequence_length = 100,
-          .min_exponent_num_bytes = 1,
-          .max_exponent_num_bytes = 1
-        },
-        drv
-      );
+      compute_random_test_case(rng, i,
+                               {.min_sequence_length = 1,
+                                .max_sequence_length = 100,
+                                .min_exponent_num_bytes = 1,
+                                .max_exponent_num_bytes = 1},
+                               drv);
     }
   }
 
   SECTION("we handle random sequences of length 1 and varying num_bytes") {
     for (size_t i = 0; i < 100; ++i) {
-      compute_random_test_case(
-        rng,
-        1,
-        {
-          .min_sequence_length = 1,
-          .max_sequence_length = 1,
-          .min_exponent_num_bytes = 1,
-          .max_exponent_num_bytes = 8
-        },
-        drv
-      );
+      compute_random_test_case(rng, 1,
+                               {.min_sequence_length = 1,
+                                .max_sequence_length = 1,
+                                .min_exponent_num_bytes = 1,
+                                .max_exponent_num_bytes = 8},
+                               drv);
     }
   }
 
   SECTION("we handle multiple random sequences of"
           "varying length and varying num_bytes") {
     for (size_t i = 0; i < 100; ++i) {
-      compute_random_test_case(
-        rng,
-        1,
-        {
-          .min_sequence_length = 1,
-          .max_sequence_length = 100,
-          .min_exponent_num_bytes = 1,
-          .max_exponent_num_bytes = 8
-        },
-        drv
-      );
+      compute_random_test_case(rng, 1,
+                               {.min_sequence_length = 1,
+                                .max_sequence_length = 100,
+                                .min_exponent_num_bytes = 1,
+                                .max_exponent_num_bytes = 8},
+                               drv);
     }
   }
 
@@ -236,17 +209,12 @@ TEST_CASE("we can compute multiexponentiations") {
           "multiple random sequences of varying"
           "length and varying num_bytes") {
     for (size_t i = 0; i < 100; ++i) {
-      compute_random_test_case(
-        rng,
-        i,
-        {
-          .min_sequence_length = 1,
-          .max_sequence_length = 100,
-          .min_exponent_num_bytes = 1,
-          .max_exponent_num_bytes = 8
-        },
-        drv
-      );
+      compute_random_test_case(rng, i,
+                               {.min_sequence_length = 1,
+                                .max_sequence_length = 100,
+                                .min_exponent_num_bytes = 1,
+                                .max_exponent_num_bytes = 8},
+                               drv);
     }
   }
 }

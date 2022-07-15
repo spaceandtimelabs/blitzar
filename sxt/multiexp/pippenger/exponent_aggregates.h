@@ -15,4 +15,4 @@ struct exponent_aggregates {
   mtxb::exponent max_exponent;
   size_t pop_count;
 };
-}  // namespace sxt::mtxpi
+} // namespace sxt::mtxpi

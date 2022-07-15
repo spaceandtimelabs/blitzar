@@ -20,4 +20,4 @@ struct exponent_sequence {
   // represented in the little endian format
   const uint8_t* data;
 };
-}  // namespace sxt::mtxb
+} // namespace sxt::mtxb

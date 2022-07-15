@@ -2,8 +2,9 @@
 
 #include <cuda_runtime.h>
 
-#include "sxt/seqcommit/test/test_generators.h"
 #include "sxt/base/test/unit_test.h"
+
+#include "sxt/seqcommit/test/test_generators.h"
 
 using namespace sxt;
 using namespace sxt::sqcgn;

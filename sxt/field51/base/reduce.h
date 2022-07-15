@@ -18,4 +18,4 @@ namespace sxt::f51b {
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 void reduce(uint64_t h[5], const uint64_t f[5]) noexcept;
-}  // namespace sxt::f51b
+} // namespace sxt::f51b

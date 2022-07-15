@@ -15,5 +15,4 @@ sxt_cc_component(
         "@com_github_catchorg_catch2//:catch2",
         "@com_github_catchorg_catch2//:catch2_main",
     ],
-
 )

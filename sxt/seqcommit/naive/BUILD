@@ -2,9 +2,6 @@ load("//bazel:sxt_component.bzl", "sxt_cc_component")
 
 sxt_cc_component(
     name = "commitment_computation_cpu",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",
@@ -19,14 +16,13 @@ sxt_cc_component(
         "//sxt/seqcommit/test:test_pedersen",
         "//sxt/base/test:unit_test",
     ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )
 
 sxt_cc_component(
     name = "commitment_computation_gpu",
-    is_cuda = True,
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
@@ -43,8 +39,12 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
         "//sxt/ristretto/base:byte_conversion",
     ],
+    is_cuda = True,
     test_deps = [
         "//sxt/seqcommit/test:test_pedersen",
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
     ],
 )

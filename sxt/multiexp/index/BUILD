@@ -21,9 +21,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "clump2_marker_utility",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         ":clump2_descriptor",
     ],
@@ -33,55 +30,58 @@ sxt_cc_component(
         ":random_clump2",
         "//sxt/base/test:unit_test",
     ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )
 
 sxt_cc_component(
     name = "marker_transformation",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     test_deps = [
         ":index_table",
         ":partition_marker_utility",
         "//sxt/base/test:unit_test",
     ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )
 
 sxt_cc_component(
     name = "partition_marker_utility",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         "//sxt/base/bit:count",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )
 
 sxt_cc_component(
     name = "index_table",
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/base/type:polymorphic_allocator",
-    ],
     test_deps = [
         "//sxt/base/test:allocator_aware",
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/type:polymorphic_allocator",
     ],
 )
 
 sxt_cc_component(
     name = "index_table_utility",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         ":index_table",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
     ],
 )
 
@@ -95,22 +95,18 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "reindex",
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/base/functional:function_ref",
-    ],
     test_deps = [
         ":index_table",
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/functional:function_ref",
     ],
 )
 
 sxt_cc_component(
     name = "transpose",
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/base/functional:function_ref",
-    ],
     impl_deps = [
         ":index_table",
         ":index_table_utility",
@@ -118,5 +114,9 @@ sxt_cc_component(
     test_deps = [
         ":index_table",
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/functional:function_ref",
     ],
 )

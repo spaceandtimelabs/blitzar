@@ -1,6 +1,7 @@
 #include "sxt/field51/type/element.h"
 
 #include <iostream>
+
 using namespace sxt::f51t;
 
 int main() {

@@ -7,21 +7,21 @@ sxt_cc_component(
     name = "driver",
     with_test = False,
     deps = [
-        "//sxt/memory/management:managed_array_fwd",
         "//sxt/base/container:span",
+        "//sxt/memory/management:managed_array_fwd",
     ],
 )
 
 sxt_cc_component(
     name = "test_driver",
-    with_test = False,
-    deps = [
-        ":driver",
-    ],
     impl_deps = [
         "//sxt/base/bit:iteration",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/index:index_table",
+    ],
+    with_test = False,
+    deps = [
+        ":driver",
     ],
 )
 
@@ -38,19 +38,16 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/multiexp/base:exponent",
         "//sxt/base/num:log2p1",
-        "//sxt/base/container:span"
+        "//sxt/base/container:span",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/multiexp/base:exponent"
+        "//sxt/multiexp/base:exponent",
     ],
 )
 
 sxt_cc_component(
     name = "exponent_aggregates_computation",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         ":exponent_aggregates",
         "//sxt/base/bit:count",
@@ -61,13 +58,13 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )
 
 sxt_cc_component(
     name = "multiproduct_table",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         "//sxt/base/bit:count",
         "//sxt/base/bit:iteration",
@@ -83,14 +80,13 @@ sxt_cc_component(
         "//sxt/multiexp/index:index_table",
         "//sxt/base/test:unit_test",
     ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )
 
 sxt_cc_component(
     name = "multiexponentiation",
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/memory/management:managed_array_fwd",
-    ],
     impl_deps = [
         ":driver",
         ":exponent_aggregates",
@@ -109,6 +105,10 @@ sxt_cc_component(
         "//sxt/multiexp/random:random_multiexponentiation_descriptor",
         "//sxt/multiexp/random:random_multiexponentiation_generation",
         "//sxt/multiexp/test:compute_uint64_muladd",
-        "//sxt/multiexp/test:int_generation"
+        "//sxt/multiexp/test:int_generation",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/memory/management:managed_array_fwd",
     ],
 )

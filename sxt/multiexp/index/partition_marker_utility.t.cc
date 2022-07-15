@@ -1,12 +1,12 @@
 #include "sxt/multiexp/index/partition_marker_utility.h"
 
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt;
 using namespace sxt::mtxi;
 
-TEST_CASE(
-    "we can condense a sequences of indexes down to a marker of its partition "
-    "set") {
+TEST_CASE("we can condense a sequences of indexes down to a marker of its partition "
+          "set") {
   SECTION("we correctly handle cases with a single element") {
     uint64_t data[1];
 

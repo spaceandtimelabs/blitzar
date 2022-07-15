@@ -66,4 +66,4 @@ void pow22523(f51t::element& out, const f51t::element& z) noexcept {
   square(t0, t0);
   mul(out, t0, z);
 }
-}  // namespace sxt::f51o
+} // namespace sxt::f51o

@@ -7,8 +7,7 @@ namespace sxt::basf {
 //--------------------------------------------------------------------------------------------------
 // function_ref
 //--------------------------------------------------------------------------------------------------
-template <class Sig>
-class function_ref;
+template <class Sig> class function_ref;
 
 /**
  * Non-owning function reference that can be used as a more performant
@@ -18,25 +17,20 @@ class function_ref;
  *
  * Based off of https://stackoverflow.com/a/39087660/4447365
  */
-template <class R, class... Args>
-class function_ref<R(Args...)> {
+template <class R, class... Args> class function_ref<R(Args...)> {
   void* callable_ = nullptr;
   R (*invoker_)(void*, Args...) = nullptr;
 
-  template <class F>
-  using function_pointer = decltype(std::addressof(std::declval<F&>()));
+  template <class F> using function_pointer = decltype(std::addressof(std::declval<F&>()));
 
-  template <class F>
-  void bind_to(F& f) noexcept {
+  template <class F> void bind_to(F& f) noexcept {
     callable_ = reinterpret_cast<void*>(std::addressof(f));
     invoker_ = [](void* callable_, Args... args) -> R {
-      return (*reinterpret_cast<function_pointer<F>>(callable_))(
-          std::forward<Args>(args)...);
+      return (*reinterpret_cast<function_pointer<F>>(callable_))(std::forward<Args>(args)...);
     };
   }
 
-  template <class R_in, class... Args_in>
-  void bind_to(R_in (*f)(Args_in...)) noexcept {
+  template <class R_in, class... Args_in> void bind_to(R_in (*f)(Args_in...)) noexcept {
     using F = decltype(f);
     if (f == nullptr) {
       return bind_to(nullptr);
@@ -52,16 +46,16 @@ class function_ref<R(Args...)> {
     invoker_ = nullptr;
   }
 
- public:
+public:
   function_ref() noexcept = default;
 
-  template <class F,
-            std::enable_if_t<!std::is_same<
-                function_ref, typename std::decay<F>::type>{}>* = nullptr,
-            std::enable_if_t<std::is_convertible<
-                typename std::result_of<F&(Args...)>::type, R>{}>* = nullptr>
+  template <
+      class F,
+      std::enable_if_t<!std::is_same<function_ref, typename std::decay<F>::type>{}>* = nullptr,
+      std::enable_if_t<std::is_convertible<typename std::result_of<F&(Args...)>::type, R>{}>* =
+          nullptr>
   function_ref(F&& f) {
-    bind_to(f);  // not forward
+    bind_to(f); // not forward
   }
 
   function_ref(std::nullptr_t) {}
@@ -72,10 +66,8 @@ class function_ref<R(Args...)> {
   function_ref& operator=(const function_ref&) noexcept = default;
   function_ref& operator=(function_ref&&) noexcept = default;
 
-  R operator()(Args... args) const {
-    return invoker_(callable_, std::forward<Args>(args)...);
-  }
+  R operator()(Args... args) const { return invoker_(callable_, std::forward<Args>(args)...); }
 
   explicit operator bool() const { return invoker_; }
 };
-}  // namespace sxt::basf
+} // namespace sxt::basf

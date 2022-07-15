@@ -1,7 +1,9 @@
 #include "sxt/multiexp/pippenger_multiprod/product_table_normalization.h"
 
-#include "sxt/multiexp/index/index_table.h"
 #include "sxt/base/test/unit_test.h"
+
+#include "sxt/multiexp/index/index_table.h"
+
 using namespace sxt;
 using namespace sxt::mtxpmp;
 

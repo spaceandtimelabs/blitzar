@@ -7,8 +7,7 @@ namespace sxt::f51o {
  *
  Preconditions: b in {0,1}.
  */
-CUDA_CALLABLE void cmov(f51t::element& f, const f51t::element& g,
-                               unsigned int b) noexcept {
+CUDA_CALLABLE void cmov(f51t::element& f, const f51t::element& g, unsigned int b) noexcept {
   uint64_t mask = (uint64_t)(-(int64_t)b);
   uint64_t f0, f1, f2, f3, f4;
   uint64_t x0, x1, x2, x3, x4;
@@ -37,4 +36,4 @@ CUDA_CALLABLE void cmov(f51t::element& f, const f51t::element& g,
   f[3] = f3 ^ x3;
   f[4] = f4 ^ x4;
 }
-}  // namespace sxt::f51o
+} // namespace sxt::f51o

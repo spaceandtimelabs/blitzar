@@ -41,4 +41,4 @@ void sub(f51t::element& h, const f51t::element& f, const f51t::element& g) noexc
   h[3] = h3;
   h[4] = h4;
 }
-}  // namespace sxt::f51o
+} // namespace sxt::f51o

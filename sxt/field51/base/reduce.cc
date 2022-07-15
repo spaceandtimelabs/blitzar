@@ -79,4 +79,4 @@ void reduce(uint64_t h[5], const uint64_t f[5]) noexcept {
   h[3] = t[3];
   h[4] = t[4];
 }
-}  // namespace sxt::f51b
+} // namespace sxt::f51b

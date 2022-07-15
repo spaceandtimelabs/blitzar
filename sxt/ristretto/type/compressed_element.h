@@ -11,18 +11,18 @@ namespace sxt::rstt {
 // compressed_element
 //--------------------------------------------------------------------------------------------------
 class compressed_element {
- public:
-   compressed_element() noexcept = default;
+public:
+  compressed_element() noexcept = default;
 
-   compressed_element(std::initializer_list<uint8_t> values) noexcept;
+  compressed_element(std::initializer_list<uint8_t> values) noexcept;
 
-   CUDA_CALLABLE
-   uint8_t* data() noexcept { return data_; }
+  CUDA_CALLABLE
+  uint8_t* data() noexcept { return data_; }
 
-   CUDA_CALLABLE
-   const uint8_t* data() const noexcept { return data_; }
+  CUDA_CALLABLE
+  const uint8_t* data() const noexcept { return data_; }
 
- private:
+private:
   uint8_t data_[32] = {};
 };
 
@@ -42,4 +42,4 @@ inline bool operator!=(const compressed_element& lhs, const compressed_element& 
 // opeator<<
 //--------------------------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& out, const compressed_element& c) noexcept;
-} // namesapce sxt::rstt
+} // namespace sxt::rstt

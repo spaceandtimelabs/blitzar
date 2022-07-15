@@ -15,11 +15,11 @@ void generate_random_clump2(random_clump2& clump, std::mt19937& rng) noexcept {
   clump.clump_size = clump_size;
   clump.clump_index = clump_index_dist(rng);
 
-  std::uniform_int_distribution<uint64_t> index1_dist{0, clump_size-1};
+  std::uniform_int_distribution<uint64_t> index1_dist{0, clump_size - 1};
   auto index1 = index1_dist(rng);
   clump.index1 = index1;
 
-  std::uniform_int_distribution<uint64_t> index2_dist{index1, clump_size-1};
+  std::uniform_int_distribution<uint64_t> index2_dist{index1, clump_size - 1};
   clump.index2 = index2_dist(rng);
 }
-}  // namespace sxt::mtxi
+} // namespace sxt::mtxi

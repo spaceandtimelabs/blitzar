@@ -1,6 +1,7 @@
 #include "sxt/base/functional/function_ref.h"
 
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt::basf;
 
 static int f1() noexcept { return 1; }

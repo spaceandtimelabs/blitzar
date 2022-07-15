@@ -14,8 +14,7 @@ namespace sxt::bastst {
 //--------------------------------------------------------------------------------------------------
 namespace detail {
 template <class T>
-auto check_equality(const T& lhs, const T& rhs) noexcept -> decltype(lhs == rhs)
-{
+auto check_equality(const T& lhs, const T& rhs) noexcept -> decltype(lhs == rhs) {
   if (!(lhs == rhs)) {
     std::cerr << "lhs and rhs should be equal\n";
     std::abort();
@@ -23,12 +22,10 @@ auto check_equality(const T& lhs, const T& rhs) noexcept -> decltype(lhs == rhs)
   return true;
 }
 
-template <class... Tx>
-void check_equality(const Tx&...) noexcept {
+template <class... Tx> void check_equality(const Tx&...) noexcept {
   // there's no equality operator so do nothing
 }
 } // namespace detail
-
 
 //--------------------------------------------------------------------------------------------------
 // exercise_allocator_aware_operations
@@ -36,8 +33,7 @@ void check_equality(const Tx&...) noexcept {
 /**
  * walk through standard allocator aware operations and check correctness
  */
-template <class T>
-void exercise_allocator_aware_operations(const T& obj) noexcept {
+template <class T> void exercise_allocator_aware_operations(const T& obj) noexcept {
   std::pmr::monotonic_buffer_resource r1;
 
   // default construction
@@ -87,7 +83,7 @@ void exercise_allocator_aware_operations(const T& obj) noexcept {
   // move-assignment
   {
     T t1{obj};
-    
+
     T t2;
     t2 = std::move(t1);
     detail::check_equality(t2, obj);

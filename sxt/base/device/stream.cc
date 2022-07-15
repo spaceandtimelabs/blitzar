@@ -1,9 +1,9 @@
 #include "sxt/base/device/stream.h"
 
+#include <cuda_runtime.h>
+
 #include <cstdlib>
 #include <iostream>
-
-#include <cuda_runtime.h>
 
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
@@ -12,8 +12,7 @@ namespace sxt::basdv {
 stream::stream() noexcept {
   auto rcode = cudaStreamCreate(&stream_);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaStreamCreate failed: " << cudaGetErrorString(rcode)
-              << "\n";
+    std::cerr << "cudaStreamCreate failed: " << cudaGetErrorString(rcode) << "\n";
     std::abort();
   }
 }
@@ -24,9 +23,8 @@ stream::stream() noexcept {
 stream::~stream() noexcept {
   auto rcode = cudaStreamDestroy(stream_);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaStreamDestroy failed: " << cudaGetErrorString(rcode)
-              << "\n";
+    std::cerr << "cudaStreamDestroy failed: " << cudaGetErrorString(rcode) << "\n";
     std::abort();
   }
 }
-}  // namespace sxt::basdv
+} // namespace sxt::basdv

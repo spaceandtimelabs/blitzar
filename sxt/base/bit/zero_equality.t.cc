@@ -1,6 +1,7 @@
 #include "sxt/base/bit/zero_equality.h"
 
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt::basbt;
 
 TEST_CASE("we can determine if a region of memory is zero") {

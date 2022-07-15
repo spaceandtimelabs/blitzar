@@ -16,4 +16,4 @@ void from_bytes(uint64_t h[5], const uint8_t s[32]) noexcept;
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 void to_bytes(uint8_t s[32], const uint64_t h[5]) noexcept;
-}  // namespace sxt::f51b
+} // namespace sxt::f51b

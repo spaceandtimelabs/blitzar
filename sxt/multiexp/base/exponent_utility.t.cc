@@ -1,7 +1,9 @@
 #include "sxt/multiexp/base/exponent_utility.h"
 
-#include "sxt/multiexp/base/exponent.h"
 #include "sxt/base/test/unit_test.h"
+
+#include "sxt/multiexp/base/exponent.h"
+
 using namespace sxt::mtxb;
 
 TEST_CASE("we can or the bits of exponents") {

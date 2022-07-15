@@ -2,7 +2,9 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::f51t { class element; }
+namespace sxt::f51t {
+class element;
+}
 
 namespace sxt::f51o {
 //--------------------------------------------------------------------------------------------------
@@ -14,4 +16,4 @@ namespace sxt::f51o {
  */
 CUDA_CALLABLE
 void pow22523(f51t::element& out, const f51t::element& z) noexcept;
-}  // namespace sxt::f51o
+} // namespace sxt::f51o

@@ -1,9 +1,9 @@
 #include "sxt/memory/resource/device_resource.h"
 
-#include <iostream>
-#include <cstdlib>
-
 #include <cuda_runtime.h>
+
+#include <cstdlib>
+#include <iostream>
 
 namespace sxt::memr {
 //--------------------------------------------------------------------------------------------------
@@ -33,8 +33,7 @@ void device_resource::do_deallocate(void* ptr, size_t /*bytes*/, size_t /*alignm
 //--------------------------------------------------------------------------------------------------
 // do_is_equal
 //--------------------------------------------------------------------------------------------------
-bool device_resource::do_is_equal(
-    const std::pmr::memory_resource& other) const noexcept {
+bool device_resource::do_is_equal(const std::pmr::memory_resource& other) const noexcept {
   return this == &other;
 }
 

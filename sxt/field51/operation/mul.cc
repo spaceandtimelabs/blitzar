@@ -9,8 +9,9 @@
 
 #include "sxt/field51/operation/mul.h"
 
-#include "sxt/field51/type/element.h"
 #include "sxt/base/type/int.h"
+
+#include "sxt/field51/type/element.h"
 
 namespace sxt::f51o {
 //--------------------------------------------------------------------------------------------------
@@ -77,4 +78,4 @@ void mul(f51t::element& h, const f51t::element& f, const f51t::element& g) noexc
   h[3] = r03;
   h[4] = r04;
 }
-}  // namespace sxt::f51o
+} // namespace sxt::f51o

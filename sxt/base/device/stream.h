@@ -9,24 +9,24 @@ namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 class stream {
 public:
-    // constructor
-    stream() noexcept;
+  // constructor
+  stream() noexcept;
 
-    ~stream() noexcept;
+  ~stream() noexcept;
 
-    /* Prohibits from receiving another stream */
-    stream(const stream& other) = delete;
+  /* Prohibits from receiving another stream */
+  stream(const stream& other) = delete;
 
-    stream(stream&& other) = delete;
+  stream(stream&& other) = delete;
 
-    stream& operator=(stream&&) = delete;
+  stream& operator=(stream&&) = delete;
 
-    stream& operator=(const stream&) = delete;
+  stream& operator=(const stream&) = delete;
 
-    cudaStream_t raw_stream() noexcept { return stream_; }
+  cudaStream_t raw_stream() noexcept { return stream_; }
 
 private:
-    cudaStream_t stream_;
+  cudaStream_t stream_;
 };
 
-}  // namespace sxt::basdv
+} // namespace sxt::basdv

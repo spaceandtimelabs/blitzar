@@ -1,11 +1,13 @@
 #include "benchmark/multi_exp1/multiply_add.h"
 
 #include "sxt/base/num/fast_random_number_generator.h"
+
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/random/exponent.h"
-#include "sxt/ristretto/random/element.h"
 #include "sxt/curve21/type/element_p3.h"
+
+#include "sxt/ristretto/random/element.h"
 
 namespace sxt {
 //--------------------------------------------------------------------------------------------------

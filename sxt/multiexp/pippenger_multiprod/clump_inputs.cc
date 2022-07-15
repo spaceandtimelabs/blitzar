@@ -2,6 +2,7 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/container/span_void.h"
+
 #include "sxt/multiexp/index/clump2_descriptor.h"
 #include "sxt/multiexp/index/clump2_descriptor_utility.h"
 #include "sxt/multiexp/index/clump2_marker_utility.h"
@@ -17,9 +18,8 @@ namespace sxt::mtxpmp {
 // clump_inputs
 //--------------------------------------------------------------------------------------------------
 void clump_inputs(basct::span_void inout, reduction_stats& stats,
-                  basct::span<basct::span<uint64_t>> products,
-                  size_t& num_inactive_outputs, size_t& num_inactive_inputs,
-                  const driver& drv, size_t clump_size) noexcept {
+                  basct::span<basct::span<uint64_t>> products, size_t& num_inactive_outputs,
+                  size_t& num_inactive_inputs, const driver& drv, size_t clump_size) noexcept {
   mtxi::clump2_descriptor clump2_descriptor;
   mtxi::init_clump2_descriptor(clump2_descriptor, clump_size);
   auto num_entries_p = mtxi::apply_marker_transformation(
@@ -31,8 +31,7 @@ void clump_inputs(basct::span_void inout, reduction_stats& stats,
   stats.prev_num_terms = num_entries_p;
   std::vector<uint64_t> markers(num_entries_p);
   basct::span<uint64_t> markers_view{markers};
-  mtxi::reindex_rows(products.subspan(num_inactive_outputs), markers_view,
-                     compute_active_offset);
+  mtxi::reindex_rows(products.subspan(num_inactive_outputs), markers_view, compute_active_offset);
   stats.num_terms = markers_view.size();
   markers.resize(markers_view.size());
   prune_rows(products, markers, num_inactive_outputs, num_inactive_inputs);

@@ -10,13 +10,13 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "managed_array",
+    test_deps = [
+        "//sxt/base/test:allocator_aware",
+        "//sxt/base/test:unit_test",
+    ],
     deps = [
         ":managed_array_fwd",
         "//sxt/base/container:span_void",
         "//sxt/base/type:polymorphic_allocator",
-    ],
-    test_deps = [
-        "//sxt/base/test:allocator_aware",
-        "//sxt/base/test:unit_test",
     ],
 )

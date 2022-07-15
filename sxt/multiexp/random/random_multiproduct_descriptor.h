@@ -13,4 +13,4 @@ struct random_multiproduct_descriptor {
   size_t max_num_sequences = 10;
   size_t max_num_inputs = 10;
 };
-}  // namespace sxt::mtxrn
+} // namespace sxt::mtxrn

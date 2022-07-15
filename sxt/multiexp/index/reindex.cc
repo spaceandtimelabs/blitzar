@@ -26,12 +26,10 @@ struct comp {
 //--------------------------------------------------------------------------------------------------
 // init_heap
 //--------------------------------------------------------------------------------------------------
-static void init_heap(std::vector<heap_element>& heap,
-                      basct::span<basct::span<uint64_t>> rows,
-                      basf::function_ref<size_t(basct::cspan<uint64_t>)>
-                          offset_functor) noexcept {
+static void init_heap(std::vector<heap_element>& heap, basct::span<basct::span<uint64_t>> rows,
+                      basf::function_ref<size_t(basct::cspan<uint64_t>)> offset_functor) noexcept {
   heap.reserve(rows.size());
-  for (size_t row_index=0; row_index<rows.size(); ++row_index) {
+  for (size_t row_index = 0; row_index < rows.size(); ++row_index) {
     auto row = rows[row_index];
     if (row.empty()) {
       continue;
@@ -75,7 +73,7 @@ static void pop(uint64_t*& out, size_t& working_index, std::vector<heap_element>
   std::pop_heap(heap.begin(), heap.end(), comp{});
   auto& ptr = heap.back().first;
   if (*out != *ptr) {
-    *++out = *ptr; 
+    *++out = *ptr;
     *ptr = ++working_index;
   } else {
     *ptr = working_index;
@@ -86,9 +84,8 @@ static void pop(uint64_t*& out, size_t& working_index, std::vector<heap_element>
 //--------------------------------------------------------------------------------------------------
 // reindex_rows
 //--------------------------------------------------------------------------------------------------
-void reindex_rows(
-    basct::span<basct::span<uint64_t>> rows, basct::span<uint64_t>& values,
-    basf::function_ref<size_t(basct::cspan<uint64_t>)> offset_functor) noexcept {
+void reindex_rows(basct::span<basct::span<uint64_t>> rows, basct::span<uint64_t>& values,
+                  basf::function_ref<size_t(basct::cspan<uint64_t>)> offset_functor) noexcept {
   if (rows.empty()) {
     values = {};
     return;
@@ -99,18 +96,15 @@ void reindex_rows(
   auto out = values.begin();
   pop_first(out, heap, rows);
   uint64_t working_index = 0;
-  while(!heap.empty()) {
+  while (!heap.empty()) {
     pop(out, working_index, heap, rows);
   }
 
   values = {values.data(), working_index + 1};
 }
 
-void reindex_rows(basct::span<basct::span<uint64_t>> rows,
-                  basct::span<uint64_t>& values) noexcept {
-  auto offset_functor = [](basct::cspan<uint64_t> /*row*/) noexcept {
-    return 0;
-  };
+void reindex_rows(basct::span<basct::span<uint64_t>> rows, basct::span<uint64_t>& values) noexcept {
+  auto offset_functor = [](basct::cspan<uint64_t> /*row*/) noexcept { return 0; };
   reindex_rows(rows, values, offset_functor);
 }
-}  // namespace sxt::mtxi
+} // namespace sxt::mtxi

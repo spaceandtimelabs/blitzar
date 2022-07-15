@@ -1,6 +1,7 @@
 #include "sxt/base/num/divide_up.h"
 
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt::basn;
 
 TEST_CASE("we can perform division rounded up") {

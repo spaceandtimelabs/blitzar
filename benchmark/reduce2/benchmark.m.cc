@@ -4,12 +4,14 @@
 #include <memory>
 #include <string_view>
 
+#include "sxt/curve21/type/element_p3.h"
+
 #include "benchmark/reduce2/reduce_cpu.h"
 #include "benchmark/reduce2/reduce_gpu.h"
-#include "sxt/curve21/type/element_p3.h"
+
 using namespace sxt;
 
-using bench_fn = void(*)(c21t::element_p3*, int, int) noexcept;
+using bench_fn = void (*)(c21t::element_p3*, int, int) noexcept;
 
 static bench_fn select_backend_fn(const std::string_view backend) noexcept {
   if (backend == "cpu") {
@@ -45,8 +47,7 @@ int main(int argc, char* argv[]) {
   auto t1 = std::chrono::steady_clock::now();
   f(res.get(), m, n);
   auto t2 = std::chrono::steady_clock::now();
-  double duration =
-      std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / 1000.0;
+  double duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / 1000.0;
 
   if (verbose) {
     std::cout << "===== result\n";

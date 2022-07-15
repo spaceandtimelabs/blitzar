@@ -1,7 +1,9 @@
 #include "sxt/multiexp/index/clump2_descriptor_utility.h"
 
 #include "sxt/base/test/unit_test.h"
+
 #include "sxt/multiexp/index/clump2_descriptor.h"
+
 using namespace sxt::mtxi;
 
 TEST_CASE("we can initialize clump2_descriptor") {

@@ -13,8 +13,7 @@ managed_array<void>::managed_array(void* data, size_t size, size_t num_bytes,
 managed_array<void>::managed_array(const managed_array& other) noexcept
     : managed_array{other, other.get_allocator()} {}
 
-managed_array<void>::managed_array(const managed_array& other,
-                                   allocator_type alloc) noexcept
+managed_array<void>::managed_array(const managed_array& other, allocator_type alloc) noexcept
     : alloc_{alloc} {
   this->operator=(other);
 }
@@ -22,8 +21,7 @@ managed_array<void>::managed_array(const managed_array& other,
 managed_array<void>::managed_array(managed_array&& other) noexcept
     : managed_array{std::move(other), other.get_allocator()} {}
 
-managed_array<void>::managed_array(managed_array&& other,
-                                   allocator_type alloc) noexcept
+managed_array<void>::managed_array(managed_array&& other, allocator_type alloc) noexcept
     : alloc_{alloc} {
   this->operator=(std::move(other));
 }
@@ -31,9 +29,7 @@ managed_array<void>::managed_array(managed_array&& other,
 //--------------------------------------------------------------------------------------------------
 // destructor
 //--------------------------------------------------------------------------------------------------
-managed_array<void>::~managed_array() noexcept {
-  this->reset();
-}
+managed_array<void>::~managed_array() noexcept { this->reset(); }
 
 //--------------------------------------------------------------------------------------------------
 // assignment

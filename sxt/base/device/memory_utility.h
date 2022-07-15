@@ -31,5 +31,5 @@ void async_memcpy_host_to_device(void* dst, const void* src, size_t count,
 // async_memcpy_device_to_host
 //--------------------------------------------------------------------------------------------------
 void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
-                               cudaStream_t stream) noexcept;
-}  // namespace sxt::basdv
+                                 cudaStream_t stream) noexcept;
+} // namespace sxt::basdv

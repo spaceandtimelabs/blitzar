@@ -1,6 +1,7 @@
 #include "sxt/ristretto/type/compressed_element.h"
 
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt::rstt;
 
 TEST_CASE("compressed_element is comparable") {

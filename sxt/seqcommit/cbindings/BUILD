@@ -3,11 +3,6 @@ load(
     "sxt_cc_component",
 )
 
-load(
-    "//bazel:cuda_dlink.bzl",
-    "cuda_dlink",
-)
-
 sxt_cc_component(
     name = "pedersen_capi",
     with_test = False,
@@ -15,9 +10,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "pedersen",
-    deps = [
-        ":pedersen_capi",
-    ],
     impl_deps = [
         "//sxt/seqcommit/backend:pedersen_backend",
         "//sxt/seqcommit/backend:naive_cpu_backend",
@@ -30,9 +22,8 @@ sxt_cc_component(
         "//sxt/seqcommit/naive:commitment_computation_gpu",
         "//sxt/seqcommit/backend:pippenger_cpu_backend",
         "@local_config_cuda//cuda:cuda_headers",
-        "@local_config_cuda//cuda:cudart_static"
+        "@local_config_cuda//cuda:cudart_static",
     ],
-    alwayslink = 1,
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/ristretto/operation:add",
@@ -41,4 +32,8 @@ sxt_cc_component(
         "//sxt/seqcommit/generator:base_element",
         "//sxt/ristretto/operation:scalar_multiply",
     ],
+    deps = [
+        ":pedersen_capi",
+    ],
+    alwayslink = 1,
 )

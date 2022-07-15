@@ -34,4 +34,4 @@ constexpr uint8_t to_hex_value(char c) noexcept {
   }
   return static_cast<uint8_t>(-1);
 }
-} // namesape sxt::basn
+} // namespace sxt::basn

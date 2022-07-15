@@ -4,16 +4,16 @@ cuda_library(
     name = "exponentiate_gpu",
     srcs = ["exponentiate_gpu.cu"],
     hdrs = ["exponentiate_gpu.h"],
-    visibility = ["//visibility:public"],
     copts = [
-        '--device-c',
+        "--device-c",
     ],
+    visibility = ["//visibility:public"],
     deps = [
-      "@local_config_cuda//cuda:cuda",
-	    "//sxt/base/num:fast_random_number_generator",
-	    "//sxt/field51/type:element",
-	    "//sxt/curve21/type:element_p3",
-	    "//sxt/curve21/operation:scalar_multiply",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/curve21/operation:scalar_multiply",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/field51/type:element",
+        "@local_config_cuda//cuda",
     ],
 )
 
@@ -23,10 +23,10 @@ cc_library(
     hdrs = ["exponentiate_cpu.h"],
     visibility = ["//visibility:public"],
     deps = [
-	    "//sxt/base/num:fast_random_number_generator",
-	    "//sxt/field51/type:element",
-	    "//sxt/curve21/type:element_p3",
-	    "//sxt/curve21/operation:scalar_multiply",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/curve21/operation:scalar_multiply",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/field51/type:element",
     ],
 )
 
@@ -35,13 +35,14 @@ cc_binary(
     srcs = [
         "main.cc",
     ],
-    deps = [
-      ":exponentiate_cpu",
-      ":exponentiate_gpu",
-	    "//sxt/curve21/type:element_p3",
-    ],
     linkopts = [
-        '-x', 'cuda',
-        '--cudalog',
+        "-x",
+        "cuda",
+        "--cudalog",
+    ],
+    deps = [
+        ":exponentiate_cpu",
+        ":exponentiate_gpu",
+        "//sxt/curve21/type:element_p3",
     ],
 )

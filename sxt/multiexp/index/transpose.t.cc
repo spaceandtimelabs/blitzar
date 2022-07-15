@@ -1,7 +1,9 @@
 #include "sxt/multiexp/index/transpose.h"
 
-#include "sxt/multiexp/index/index_table.h"
 #include "sxt/base/test/unit_test.h"
+
+#include "sxt/multiexp/index/index_table.h"
+
 using namespace sxt;
 using namespace sxt::mtxi;
 
@@ -35,8 +37,7 @@ TEST_CASE("we can transpose an index table") {
   SECTION("we can add padding while transposing") {
     index_table table{{0, 1}, {0, 2, 3}};
     REQUIRE(transpose(table_p, table.cheader(), 4, 2) == 3);
-    REQUIRE(table_p ==
-            index_table{{0, 0, 0, 1}, {0, 0, 0}, {0, 0, 1}, {0, 0, 1}});
+    REQUIRE(table_p == index_table{{0, 0, 0, 1}, {0, 0, 0}, {0, 0, 1}, {0, 0, 1}});
   }
 
   SECTION("we can transpose a table with an empty row") {

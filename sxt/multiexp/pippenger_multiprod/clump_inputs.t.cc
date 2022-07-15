@@ -3,10 +3,13 @@
 #include <cstdint>
 
 #include "sxt/base/test/unit_test.h"
+
 #include "sxt/memory/management/managed_array.h"
+
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger_multiprod/reduction_stats.h"
 #include "sxt/multiexp/pippenger_multiprod/test_driver.h"
+
 using namespace sxt;
 using namespace sxt::mtxpmp;
 
@@ -19,8 +22,8 @@ TEST_CASE("we can clump the inputs of a multiproduct") {
     mtxi::index_table products{{0, 0, 0}};
     size_t num_inactive_outputs = 0;
     size_t num_inactive_inputs = 0;
-    clump_inputs(inputs, stats, products.header(), num_inactive_outputs,
-                 num_inactive_inputs, drv, 2);
+    clump_inputs(inputs, stats, products.header(), num_inactive_outputs, num_inactive_inputs, drv,
+                 2);
 
     memmg::managed_array<uint64_t> expected_inputs{10};
     REQUIRE(inputs == expected_inputs);
@@ -40,8 +43,8 @@ TEST_CASE("we can clump the inputs of a multiproduct") {
     mtxi::index_table products{{0, 0, 0, 1}};
     size_t num_inactive_outputs = 0;
     size_t num_inactive_inputs = 0;
-    clump_inputs(inputs, stats, products.header(), num_inactive_outputs,
-                 num_inactive_inputs, drv, 2);
+    clump_inputs(inputs, stats, products.header(), num_inactive_outputs, num_inactive_inputs, drv,
+                 2);
 
     REQUIRE(inputs[0] == 15);
 
@@ -60,8 +63,8 @@ TEST_CASE("we can clump the inputs of a multiproduct") {
     mtxi::index_table products{{0, 0, 0, 1}, {1, 0, 1}};
     size_t num_inactive_outputs = 0;
     size_t num_inactive_inputs = 0;
-    clump_inputs(inputs, stats, products.header(), num_inactive_outputs,
-                 num_inactive_inputs, drv, 2);
+    clump_inputs(inputs, stats, products.header(), num_inactive_outputs, num_inactive_inputs, drv,
+                 2);
 
     REQUIRE(inputs[0] == 15);
     REQUIRE(inputs[1] == 5);
@@ -76,15 +79,14 @@ TEST_CASE("we can clump the inputs of a multiproduct") {
     REQUIRE(products == expected_products);
   }
 
-  SECTION(
-      "identical sets of two elements within a clump across rows are "
-      "reindexed to the same input") {
+  SECTION("identical sets of two elements within a clump across rows are "
+          "reindexed to the same input") {
     memmg::managed_array<uint64_t> inputs{10, 5, 20, 999, 999};
     mtxi::index_table products{{0, 0, 0, 1}, {0, 0, 0, 1, 2}};
     size_t num_inactive_outputs = 0;
     size_t num_inactive_inputs = 0;
-    clump_inputs(inputs, stats, products.header(), num_inactive_outputs,
-                 num_inactive_inputs, drv, 2);
+    clump_inputs(inputs, stats, products.header(), num_inactive_outputs, num_inactive_inputs, drv,
+                 2);
 
     REQUIRE(inputs[0] == 20);
     REQUIRE(inputs[1] == 15);
@@ -104,8 +106,8 @@ TEST_CASE("we can clump the inputs of a multiproduct") {
     mtxi::index_table products{{0, 0, 0, 1}, {1, 0, 1, 3}, {2, 0, 2}};
     size_t num_inactive_outputs = 0;
     size_t num_inactive_inputs = 0;
-    clump_inputs(inputs, stats, products.header(), num_inactive_outputs,
-                 num_inactive_inputs, drv, 3);
+    clump_inputs(inputs, stats, products.header(), num_inactive_outputs, num_inactive_inputs, drv,
+                 3);
 
     REQUIRE(inputs[0] == 15);
     REQUIRE(inputs[1] == 5);

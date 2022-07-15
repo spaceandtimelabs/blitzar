@@ -1,7 +1,9 @@
 #include "sxt/multiexp/pippenger_multiprod/clump_outputs.h"
 
-#include "sxt/multiexp/index/index_table.h"
 #include "sxt/base/test/unit_test.h"
+
+#include "sxt/multiexp/index/index_table.h"
+
 using namespace sxt;
 using namespace sxt::mtxpmp;
 
@@ -33,19 +35,19 @@ TEST_CASE("we compute a clumped output table") {
 
   SECTION("we clump a table with multiple output clumps") {
     mtxi::index_table table{
-        {0, 0, 0, 2, 3, 4, 5, 6},     // 0
-        {1, 0, 0, 1, 2, 4},           // 1
-        {2, 0, 0, 3, 4, 5, 6, 7},     // 2
-        {3, 0, 1, 2, 3, 4, 6, 7},     // 3
+        {0, 0, 0, 2, 3, 4, 5, 6}, // 0
+        {1, 0, 0, 1, 2, 4},       // 1
+        {2, 0, 0, 3, 4, 5, 6, 7}, // 2
+        {3, 0, 1, 2, 3, 4, 6, 7}, // 3
     };
     REQUIRE(compute_clumped_output_table(table_p, output_clumps, table.cheader(), 8, 4));
     mtxi::index_table expected_table{
-        {0, 0, 0, 2, 4},  // 0
-        {1, 0, 3, 5, 6},  // 1
-        {2, 0, 1},        // 2
-        {3, 0, 0},        // 3
-        {4, 0, 4, 7},     // 4
-        {5, 0, 2, 3, 6},  // 5
+        {0, 0, 0, 2, 4}, // 0
+        {1, 0, 3, 5, 6}, // 1
+        {2, 0, 1},       // 2
+        {3, 0, 0},       // 3
+        {4, 0, 4, 7},    // 4
+        {5, 0, 2, 3, 6}, // 5
     };
     REQUIRE(table_p == expected_table);
     REQUIRE(output_clumps == std::vector<uint64_t>{1, 2, 6, 7, 8, 9});
@@ -68,15 +70,14 @@ TEST_CASE("we can rewrite the multiproduct table after clumping the outputs") {
   }
 
   SECTION("we handle multiple outputs with multiple clumps") {
-    mtxi::index_table table{
-        {0, 0, 0, 1}, {1, 0, 1, 3}, {2, 0, 2, 3, 5}, {3, 1, 0, 0, 1, 4}};
+    mtxi::index_table table{{0, 0, 0, 1}, {1, 0, 1, 3}, {2, 0, 2, 3, 5}, {3, 1, 0, 0, 1, 4}};
     std::vector<size_t> clumps = {1, 2, 6, 7, 8, 9};
     rewrite_multiproducts_with_output_clumps(table.header(), clumps, 4);
     mtxi::index_table expected_table{
-        {0, 0, 0, 1},        // 0
-        {1, 0, 0, 2},        // 1
-        {2, 0, 1, 3, 4},     // 2
-        {3, 1, 0, 2, 4, 5},  // 3
+        {0, 0, 0, 1},       // 0
+        {1, 0, 0, 2},       // 1
+        {2, 0, 1, 3, 4},    // 2
+        {3, 1, 0, 2, 4, 5}, // 3
     };
     REQUIRE(table == expected_table);
   }

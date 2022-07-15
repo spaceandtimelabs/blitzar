@@ -5,6 +5,9 @@ load(
 
 sxt_cc_component(
     name = "conversion_utility",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
     deps = [
         ":element_cached",
         ":element_p1p1",
@@ -15,9 +18,6 @@ sxt_cc_component(
         "//sxt/field51/operation:add",
         "//sxt/field51/operation:mul",
         "//sxt/field51/operation:sub",
-    ],
-    test_deps = [
-        "//sxt/base/test:unit_test",
     ],
 )
 
@@ -47,11 +47,11 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "element_p3",
+    impl_deps = [
+        "//sxt/field51/operation:mul",
+    ],
     with_test = False,
     deps = [
         "//sxt/field51/type:element",
-    ],
-    impl_deps = [
-        "//sxt/field51/operation:mul",
     ],
 )

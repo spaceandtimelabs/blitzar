@@ -5,9 +5,8 @@ load(
 
 sxt_cc_component(
     name = "indexed_exponent_sequence",
+    with_test = False,
     deps = [
         "//sxt/multiexp/base:exponent_sequence",
     ],
-    with_test = False,
 )
-

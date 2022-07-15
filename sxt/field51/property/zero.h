@@ -1,7 +1,8 @@
 #pragma once
 
-#include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/bit/zero_equality.h"
+#include "sxt/base/macro/cuda_callable.h"
+
 #include "sxt/field51/base/byte_conversion.h"
 #include "sxt/field51/type/element.h"
 

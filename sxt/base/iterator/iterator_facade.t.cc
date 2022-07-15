@@ -3,6 +3,7 @@
 #include <type_traits>
 
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt::basit;
 
 namespace {
@@ -13,51 +14,39 @@ struct my_int {
 };
 
 class test_iterator final : public iterator_facade<test_iterator> {
- public:
+public:
   using pointer = const int*;
   using reference = const int&;
 
   explicit test_iterator(int x = 0) noexcept : x_{x} {}
 
-  bool equal_to(const test_iterator& other) const noexcept {
-    return x_ == other.x_;
-  }
+  bool equal_to(const test_iterator& other) const noexcept { return x_ == other.x_; }
 
-  my_int dereference() const noexcept {
-    return my_int{x_};
-  }
+  my_int dereference() const noexcept { return my_int{x_}; }
 
   void advance(ptrdiff_t delta) noexcept { x_ += delta; }
 
-  int distance_to(test_iterator rhs) const noexcept {
-    return rhs.x_ - x_;
-  }
+  int distance_to(test_iterator rhs) const noexcept { return rhs.x_ - x_; }
 
- private:
-   int x_;
+private:
+  int x_;
 };
 } // namespace
 
 namespace std {
-template <>
-struct iterator_traits<test_iterator> : iterator_traits_impl<test_iterator> {};
-}  // namespace std
+template <> struct iterator_traits<test_iterator> : iterator_traits_impl<test_iterator> {};
+} // namespace std
 
 TEST_CASE("iterator_facade can be used to easily create custom iterators") {
   test_iterator iter;
 
   SECTION("we can query with the standard std::iterator_traits") {
-    REQUIRE(std::is_same_v<std::iterator_traits<test_iterator>::difference_type,
-                           int>);
-    REQUIRE(std::is_same_v<std::iterator_traits<test_iterator>::value_type,
-                           my_int>);
-    REQUIRE(std::is_same_v<std::iterator_traits<test_iterator>::reference,
-                           const int&>);
-    REQUIRE(std::is_same_v<std::iterator_traits<test_iterator>::pointer,
-                           const int*>);
-    REQUIRE(
-        std::is_same_v<std::iterator_traits<test_iterator>::iterator_category,
-                       std::random_access_iterator_tag>);
+    REQUIRE(std::is_same_v<std::iterator_traits<test_iterator>::difference_type, int>);
+    REQUIRE(std::is_same_v<std::iterator_traits<test_iterator>::value_type, my_int>);
+    REQUIRE(std::is_same_v<std::iterator_traits<test_iterator>::reference, const int&>);
+    REQUIRE(std::is_same_v<std::iterator_traits<test_iterator>::pointer, const int*>);
+    REQUIRE(std::is_same_v<std::iterator_traits<test_iterator>::iterator_category,
+                           std::random_access_iterator_tag>);
   }
 
   SECTION("we can dereference iterators") {
@@ -66,9 +55,7 @@ TEST_CASE("iterator_facade can be used to easily create custom iterators") {
     REQUIRE(*iter == 10);
   }
 
-  SECTION("we can use the arrow operator with iterators") {
-    REQUIRE(iter->val == 0);
-  }
+  SECTION("we can use the arrow operator with iterators") { REQUIRE(iter->val == 0); }
 
   SECTION("we can increment iterators") {
     iter++;
@@ -121,7 +108,5 @@ TEST_CASE("iterator_facade can be used to easily create custom iterators") {
     REQUIRE(iter2 - iter == 3);
   }
 
-  SECTION("we can use the bracket operator with oterators") {
-    REQUIRE(iter[3] == 3);
-  }
+  SECTION("we can use the bracket operator with oterators") { REQUIRE(iter[3] == 3); }
 }

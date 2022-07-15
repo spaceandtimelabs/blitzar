@@ -3,6 +3,7 @@
 #include <array>
 
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt::mtxb;
 
 TEST_CASE("we can extract digits given a radix that's a power of two") {
@@ -39,7 +40,7 @@ TEST_CASE("we can count the number of non-zero digits in an exponent") {
     uint8_t val[] = {1, 0};
     REQUIRE(count_nonzero_digits(val, 0, 3) == 1);
   }
-  
+
   SECTION("we correctly count exponents with the highest bit at the end") {
     uint8_t val[] = {1, 0b10000000};
     REQUIRE(count_nonzero_digits(val, 15, 3) == 2);

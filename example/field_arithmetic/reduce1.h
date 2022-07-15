@@ -1,6 +1,8 @@
 #pragma once
 
-namespace sxt::f51t { class element; }
+namespace sxt::f51t {
+class element;
+}
 
 namespace sxt {
 //--------------------------------------------------------------------------------------------------

@@ -4,27 +4,28 @@ cuda_library(
     name = "reduce1",
     srcs = ["reduce1.cu"],
     hdrs = ["reduce1.h"],
-    visibility = ["//visibility:public"],
     copts = [
         "--device-c",
     ],
+    visibility = ["//visibility:public"],
     deps = [
-      "@local_config_cuda//cuda:cuda",
-	    "//sxt/field51/type:element",
-	    "//sxt/field51/base:reduce",
-	    "//sxt/field51/operation:add",
-	    "//sxt/field51/operation:mul",
+        "//sxt/field51/base:reduce",
+        "//sxt/field51/operation:add",
+        "//sxt/field51/operation:mul",
+        "//sxt/field51/type:element",
+        "@local_config_cuda//cuda",
     ],
 )
 
 cc_binary(
-  name='reduce',
-  srcs=['reduce.cc'],
-  deps=[
-    ':reduce1',
-	    "//sxt/field51/type:element",
-  ],
-  linkopts = [
-      '-x', 'cuda'
-  ],
+    name = "reduce",
+    srcs = ["reduce.cc"],
+    linkopts = [
+        "-x",
+        "cuda",
+    ],
+    deps = [
+        ":reduce1",
+        "//sxt/field51/type:element",
+    ],
 )

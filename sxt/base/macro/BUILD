@@ -7,4 +7,3 @@ sxt_cc_component(
     name = "cuda_callable",
     with_test = False,
 )
-

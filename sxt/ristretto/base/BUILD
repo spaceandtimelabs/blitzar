@@ -5,10 +5,6 @@ load(
 
 sxt_cc_component(
     name = "byte_conversion",
-    is_cuda = True,
-    deps = [
-        "//sxt/base/macro:cuda_callable",
-    ],
     impl_deps = [
         ":sqrt_ratio_m1",
         "//sxt/curve21/type:element_p3",
@@ -29,17 +25,17 @@ sxt_cc_component(
         "//sxt/field51/property:sign",
         "//sxt/field51/property:zero",
     ],
+    is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
     ],
 )
 
 sxt_cc_component(
     name = "sqrt_ratio_m1",
-    is_cuda = True,
-    deps = [
-        "//sxt/base/macro:cuda_callable",
-    ],
     impl_deps = [
         "//sxt/curve21/type:element_p3",
         "//sxt/field51/constant:sqrtm1",
@@ -52,7 +48,11 @@ sxt_cc_component(
         "//sxt/field51/operation:sub",
         "//sxt/field51/property:zero",
     ],
+    is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
     ],
 )

@@ -5,11 +5,11 @@ load(
 
 sxt_cc_component(
     name = "iteration",
-    deps = [
-        ":count",
-    ],
     test_deps = [
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":count",
     ],
 )
 
@@ -38,10 +38,10 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "zero_equality",
-    deps = [
-        "//sxt/base/macro:cuda_callable",
-    ],
     test_deps = [
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
     ],
 )

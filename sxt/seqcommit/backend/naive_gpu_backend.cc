@@ -1,8 +1,10 @@
 #include "sxt/seqcommit/backend/naive_gpu_backend.h"
 
-#include "sxt/ristretto/type/compressed_element.h"
-#include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/memory/management/managed_array.h"
+
+#include "sxt/ristretto/type/compressed_element.h"
+
+#include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/gpu_generator.h"
 #include "sxt/seqcommit/naive/commitment_computation_gpu.h"
 
@@ -21,7 +23,7 @@ static void pre_initialize_gpu() {
 
   dummy_data_table[0] = 1;
 
-  auto &data_col = dummy_data_cols[0];
+  auto& data_col = dummy_data_cols[0];
 
   data_col.indices = nullptr;
   data_col.exponent_sequence.n = 1;
@@ -35,9 +37,7 @@ static void pre_initialize_gpu() {
 //--------------------------------------------------------------------------------------------------
 // naive_gpu_backend
 //--------------------------------------------------------------------------------------------------
-naive_gpu_backend::naive_gpu_backend() {
-  pre_initialize_gpu();
-}
+naive_gpu_backend::naive_gpu_backend() { pre_initialize_gpu(); }
 
 //--------------------------------------------------------------------------------------------------
 // compute_commitments
@@ -46,24 +46,23 @@ void naive_gpu_backend::compute_commitments(
     basct::span<rstt::compressed_element> commitments,
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
     basct::span<rstt::compressed_element> generators) noexcept {
-    sqcnv::compute_commitments_gpu(commitments, value_sequences, generators);
+  sqcnv::compute_commitments_gpu(commitments, value_sequences, generators);
 }
 
 //--------------------------------------------------------------------------------------------------
 // get_generators
 //--------------------------------------------------------------------------------------------------
-void naive_gpu_backend::get_generators(
-    basct::span<rstt::compressed_element> generators,
-    uint64_t offset_generators) noexcept {
-    sqcgn::gpu_get_generators(generators, offset_generators);
+void naive_gpu_backend::get_generators(basct::span<rstt::compressed_element> generators,
+                                       uint64_t offset_generators) noexcept {
+  sqcgn::gpu_get_generators(generators, offset_generators);
 }
 
 //--------------------------------------------------------------------------------------------------
 // get_naive_gpu_backend
 //--------------------------------------------------------------------------------------------------
 naive_gpu_backend* get_naive_gpu_backend() {
-    // see https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
-    static naive_gpu_backend* backend = new naive_gpu_backend{};
-    return backend;
+  // see https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
+  static naive_gpu_backend* backend = new naive_gpu_backend{};
+  return backend;
 }
-}
+} // namespace sxt::sqcbck

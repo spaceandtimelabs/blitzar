@@ -15,9 +15,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "digit_utility",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         "//sxt/base/bit:count",
         "//sxt/base/num:divide_up",
@@ -25,13 +22,13 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )
 
 sxt_cc_component(
     name = "exponent_utility",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
         ":digit_utility",
         ":exponent",
@@ -39,6 +36,9 @@ sxt_cc_component(
     test_deps = [
         ":exponent",
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
     ],
 )
 

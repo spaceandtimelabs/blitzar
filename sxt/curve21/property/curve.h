@@ -1,6 +1,8 @@
 #pragma once
 
-namespace sxt::c21t { struct element_p3; }
+namespace sxt::c21t {
+struct element_p3;
+}
 
 namespace sxt::c21p {
 //--------------------------------------------------------------------------------------------------

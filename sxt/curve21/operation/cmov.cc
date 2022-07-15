@@ -2,6 +2,7 @@
 
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/type/element_cached.h"
+
 #include "sxt/field51/operation/cmov.h"
 #include "sxt/field51/operation/neg.h"
 
@@ -39,8 +40,7 @@ static inline unsigned char equal(signed char b, signed char c) noexcept {
 // cmov
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void cmov(c21t::element_cached& t, const c21t::element_cached& u,
-          unsigned char b) noexcept {
+void cmov(c21t::element_cached& t, const c21t::element_cached& u, unsigned char b) noexcept {
   f51o::cmov(t.YplusX, u.YplusX, b);
   f51o::cmov(t.YminusX, u.YminusX, b);
   f51o::cmov(t.Z, u.Z, b);
@@ -50,8 +50,7 @@ void cmov(c21t::element_cached& t, const c21t::element_cached& u,
 //--------------------------------------------------------------------------------------------------
 // cmov8
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE void cmov8(c21t::element_cached& t,
-                         const c21t::element_cached cached[8],
+CUDA_CALLABLE void cmov8(c21t::element_cached& t, const c21t::element_cached cached[8],
                          const signed char b) noexcept {
   c21t::element_cached minust;
   const unsigned char bnegative = negative(b);
@@ -73,4 +72,4 @@ CUDA_CALLABLE void cmov8(c21t::element_cached& t,
   f51o::neg(minust.T2d, t.T2d);
   cmov(t, minust, bnegative);
 }
-}  // namespace sxt::c21o
+} // namespace sxt::c21o

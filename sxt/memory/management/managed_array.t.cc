@@ -2,12 +2,12 @@
 
 #include "sxt/base/test/allocator_aware.h"
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt;
 using namespace sxt::memmg;
 
-TEST_CASE(
-    "managed_array is an allocator-aware container manages an array of "
-    "trivially destructible objects") {
+TEST_CASE("managed_array is an allocator-aware container manages an array of "
+          "trivially destructible objects") {
   SECTION("we can construct a managed array from an initializer list") {
     managed_array<int> arr{1, 2, 3};
     REQUIRE(arr.size() == 3);

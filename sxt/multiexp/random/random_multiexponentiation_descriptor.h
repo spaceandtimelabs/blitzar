@@ -12,4 +12,4 @@ struct random_multiexponentiation_descriptor {
   size_t min_exponent_num_bytes = 1;
   size_t max_exponent_num_bytes = 32;
 };
-}  // namespace sxt::mtxrn
+} // namespace sxt::mtxrn

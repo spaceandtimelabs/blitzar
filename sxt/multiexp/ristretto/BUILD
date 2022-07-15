@@ -5,9 +5,6 @@ load(
 
 sxt_cc_component(
     name = "multiexponentiation_cpu_driver",
-    deps = [
-        "//sxt/multiexp/pippenger:driver"
-    ],
     impl_deps = [
         "//sxt/base/bit:count",
         "//sxt/memory/management:managed_array",
@@ -18,7 +15,7 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p1p1",
         "//sxt/curve21/type:conversion_utility",
         "//sxt/ristretto/base:byte_conversion",
-        "//sxt/ristretto/type:compressed_element"
+        "//sxt/ristretto/type:compressed_element",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
@@ -35,6 +32,9 @@ sxt_cc_component(
         "//sxt/ristretto/random:element",
         "//sxt/ristretto/operation:scalar_multiply",
         "//sxt/base/container:span",
-        "//sxt/ristretto/operation:add"
+        "//sxt/ristretto/operation:add",
+    ],
+    deps = [
+        "//sxt/multiexp/pippenger:driver",
     ],
 )

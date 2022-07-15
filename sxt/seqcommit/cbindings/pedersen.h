@@ -9,4 +9,4 @@ namespace sxt::sqccb {
 //--------------------------------------------------------------------------------------------------
 int reset_backend_for_testing();
 
-}  // namespace sxt::sqccb
+} // namespace sxt::sqccb

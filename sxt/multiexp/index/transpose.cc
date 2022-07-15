@@ -11,9 +11,8 @@ namespace sxt::mtxi {
 // transpose
 //--------------------------------------------------------------------------------------------------
 size_t transpose(index_table& table, basct::cspan<basct::cspan<uint64_t>> rows,
-               size_t distinct_entry_count, size_t padding,
-               basf::function_ref<size_t(basct::cspan<uint64_t>)>
-                   offset_functor) noexcept {
+                 size_t distinct_entry_count, size_t padding,
+                 basf::function_ref<size_t(basct::cspan<uint64_t>)> offset_functor) noexcept {
   // count entries
   std::vector<size_t> counts(distinct_entry_count, padding);
   size_t num_entries = distinct_entry_count * padding;
@@ -51,8 +50,8 @@ size_t transpose(index_table& table, basct::cspan<basct::cspan<uint64_t>> rows,
 }
 
 size_t transpose(index_table& table, basct::cspan<basct::cspan<uint64_t>> rows,
-               size_t distinct_entry_count, size_t padding) noexcept {
+                 size_t distinct_entry_count, size_t padding) noexcept {
   return transpose(table, rows, distinct_entry_count, padding,
                    [](basct::cspan<uint64_t> /*row*/) noexcept { return 0; });
 }
-} // namesapce sxt::mtxi
+} // namespace sxt::mtxi

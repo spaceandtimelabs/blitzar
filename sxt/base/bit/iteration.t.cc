@@ -1,6 +1,7 @@
 #include "sxt/base/bit/iteration.h"
 
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt::basbt;
 
 TEST_CASE("we can iterate through the bits that are set in an integer") {

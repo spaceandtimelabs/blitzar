@@ -12,19 +12,17 @@ namespace sxt::mtxrn {
 //--------------------------------------------------------------------------------------------------
 // generate_random_multiproduct
 //--------------------------------------------------------------------------------------------------
-void generate_random_multiproduct(
-    mtxi::index_table& products, size_t& num_inputs, size_t& num_entries,
-    std::mt19937& rng,
-    const random_multiproduct_descriptor& descriptor) noexcept {
+void generate_random_multiproduct(mtxi::index_table& products, size_t& num_inputs,
+                                  size_t& num_entries, std::mt19937& rng,
+                                  const random_multiproduct_descriptor& descriptor) noexcept {
   if (descriptor.max_sequence_length > descriptor.max_num_inputs) {
-    std::cerr
-        << "max_sequence_length must be less than or equal to max_num_inputs\n";
+    std::cerr << "max_sequence_length must be less than or equal to max_num_inputs\n";
     std::abort();
   }
 
   // determine the product table dimensions
-  std::uniform_int_distribution<size_t> num_sequences_dist{
-      descriptor.min_num_sequences, descriptor.max_num_sequences};
+  std::uniform_int_distribution<size_t> num_sequences_dist{descriptor.min_num_sequences,
+                                                           descriptor.max_num_sequences};
   auto num_sequences = num_sequences_dist(rng);
 
   std::vector<size_t> sequence_lengths(num_sequences);
@@ -33,8 +31,7 @@ void generate_random_multiproduct(
       descriptor.max_sequence_length,
   };
   num_entries = 0;
-  for (size_t sequence_index = 0; sequence_index < num_sequences;
-       ++sequence_index) {
+  for (size_t sequence_index = 0; sequence_index < num_sequences; ++sequence_index) {
     auto n = sequence_length_dist(rng);
     sequence_lengths[sequence_index] = n;
     num_entries += n;
@@ -49,8 +46,8 @@ void generate_random_multiproduct(
     row = {entry_data, n};
     uint64_t lower_bound = 0;
     for (size_t index = 0; index < n; ++index) {
-      std::uniform_int_distribution<uint64_t> entry_dist{
-          lower_bound, descriptor.max_num_inputs - n + index};
+      std::uniform_int_distribution<uint64_t> entry_dist{lower_bound,
+                                                         descriptor.max_num_inputs - n + index};
       auto entry = entry_dist(rng);
       *entry_data++ = entry;
       lower_bound = entry + 1;
@@ -63,4 +60,4 @@ void generate_random_multiproduct(
   mtxi::reindex_rows(products.header(), values);
   num_inputs = values.size();
 }
-}  // namespace sxt::mtxrn
+} // namespace sxt::mtxrn

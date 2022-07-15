@@ -10,8 +10,7 @@ namespace sxt::mtxpmp {
 //--------------------------------------------------------------------------------------------------
 void compute_multiproduct_params(multiproduct_params& params, size_t num_outputs,
                                  size_t num_inputs) noexcept {
-  params.partition_size =
-      static_cast<size_t>(std::ceil(std::log2(num_outputs * num_inputs) / 4.0));
+  params.partition_size = static_cast<size_t>(std::ceil(std::log2(num_outputs * num_inputs) / 4.0));
   if (params.partition_size < 3) {
     params.partition_size = 0;
   }
@@ -19,4 +18,4 @@ void compute_multiproduct_params(multiproduct_params& params, size_t num_outputs
   params.input_clump_size = clump_size;
   params.output_clump_size = clump_size;
 }
-}  // namespace sxt::mtxpmp
+} // namespace sxt::mtxpmp

@@ -4,8 +4,6 @@
 
 #include "sxt/field51/operation/mul.h"
 
-#include <iostream>
-
 namespace sxt::c21t {
 //--------------------------------------------------------------------------------------------------
 // operator==
@@ -26,8 +24,7 @@ bool operator==(const element_p3& lhs, const element_p3& rhs) noexcept {
 // operator<<
 //--------------------------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& out, const element_p3& e) noexcept {
-  out << "{ .X=" << e.X << ", .Y=" << e.Y << ", .Z=" << e.Z << ", .T=" << e.T
-      << "}";
+  out << "{ .X=" << e.X << ", .Y=" << e.Y << ", .Z=" << e.Z << ", .T=" << e.T << "}";
   return out;
 }
 } // namespace sxt::c21t
