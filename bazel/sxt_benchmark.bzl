@@ -35,6 +35,13 @@ def sxt_cc_benchmark(
         deps = [],
         copts = [],
         linkopts = []):
+    native.config_setting(
+        name = "define_callgrind",
+        values = {
+            "define": "callgrind=true",
+        },
+    )
+
     native.genrule(
         name = name + "_callgrind",
         srcs = [],
@@ -55,7 +62,10 @@ def sxt_cc_benchmark(
     native.cc_binary(
         name = name,
         srcs = srcs,
-        copts = copts + sxt_copts(),
+        copts = copts + sxt_copts() + select({
+            ":define_callgrind": ["-DSXT_USE_CALLGRIND"],
+            "//conditions:default": [],
+        }),
         deps = deps,
         linkopts = linkopts,
         visibility = visibility,
