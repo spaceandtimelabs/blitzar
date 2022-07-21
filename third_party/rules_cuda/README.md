@@ -57,7 +57,7 @@ cc_binary(
 )
 ```
 
-Note that you need to add `@local_config_cuda//cuda:cuda` explicitly for your target. This is helpful because rather than a sum of `cuda` dependency, you can add specifics if you only use a subset such as `@local_config_cuda//cuda:cudnn`. To see a list of available ones, you can query `bazel query "deps(@local_config_cuda//cuda:cuda)"`
+Note that you need to add `@local_config_cuda//cuda:cuda` explicitly for your target. To see a list of available ones, you can query `bazel query "deps(@local_config_cuda//cuda:cuda)"`
 
 ## Updates Differ from TensorFlow
 

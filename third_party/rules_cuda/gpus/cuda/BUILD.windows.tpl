@@ -134,20 +134,6 @@ cc_import(
 )
 
 cc_import(
-    name = "cudnn",
-    interface_library = "cuda/lib/%{cudnn_lib}",
-    system_provided = 1,
-)
-
-cc_library(
-    name = "cudnn_header",
-    hdrs = [":cudnn-include"],
-    include_prefix = "third_party/gpus/cudnn",
-    strip_include_prefix = "cudnn/include",
-    deps = [":cuda_headers"],
-)
-
-cc_import(
     name = "cufft",
     interface_library = "cuda/lib/%{cufft_lib}",
     system_provided = 1,
@@ -165,7 +151,6 @@ cc_library(
         ":cublas",
         ":cuda_headers",
         ":cudart",
-        ":cudnn",
         ":cufft",
         ":curand",
     ],

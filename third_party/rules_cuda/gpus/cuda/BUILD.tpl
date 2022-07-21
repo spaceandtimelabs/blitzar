@@ -136,21 +136,6 @@ cc_library(
 )
 
 cc_library(
-    name = "cudnn",
-    srcs = ["cuda/lib/%{cudnn_lib}"],
-    data = ["cuda/lib/%{cudnn_lib}"],
-    linkstatic = 1,
-)
-
-cc_library(
-    name = "cudnn_header",
-    hdrs = [":cudnn-include"],
-    include_prefix = "third_party/gpus/cudnn",
-    strip_include_prefix = "cudnn/include",
-    deps = [":cuda_headers"],
-)
-
-cc_library(
     name = "cufft",
     srcs = ["cuda/lib/%{cufft_lib}"],
     data = ["cuda/lib/%{cufft_lib}"],
@@ -170,7 +155,6 @@ cc_library(
         ":cublas",
         ":cuda_headers",
         ":cudart",
-        ":cudnn",
         ":cufft",
         ":curand",
     ],

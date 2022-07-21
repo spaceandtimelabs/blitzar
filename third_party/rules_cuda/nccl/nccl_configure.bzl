@@ -6,7 +6,7 @@
   * `NCCL_INSTALL_PATH` (deprecated): The installation path of the NCCL library.
   * `NCCL_HDR_PATH` (deprecated): The installation path of the NCCL header 
     files.
-  * `TF_CUDA_PATHS`: The base paths to look for CUDA and cuDNN. Default is
+  * `TF_CUDA_PATHS`: The base paths to look for CUDA. Default is
     `/usr/local/cuda,usr/`.
 
 """

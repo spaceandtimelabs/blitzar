@@ -21,7 +21,7 @@ variables. If no valid configuration is found, the script prints to stderr and
 returns an error code.
 
 The list of libraries to find is specified as arguments. Supported libraries are
-CUDA (includes cuBLAS), cuDNN, NCCL, and TensorRT.
+CUDA (includes cuBLAS), NCCL, and TensorRT.
 
 The script takes a list of base directories specified by the TF_CUDA_PATHS
 environment variable as comma-separated glob list. The script looks for headers
@@ -40,7 +40,6 @@ library-specific environment variables:
   ----------------------------------------------------------------
   CUDA      TF_CUDA_VERSION       CUDA_TOOLKIT_PATH
   cuBLAS    TF_CUBLAS_VERSION     CUDA_TOOLKIT_PATH
-  cuDNN     TF_CUDNN_VERSION      CUDNN_INSTALL_PATH
   NCCL      TF_NCCL_VERSION       NCCL_INSTALL_PATH, NCCL_HDR_PATH
   TensorRT  TF_TENSORRT_VERSION   TENSORRT_INSTALL_PATH
 
@@ -163,8 +162,7 @@ def _get_default_cuda_paths(cuda_version):
             "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v%s\\" %
             cuda_version)
     ]
-  return ["/usr/local/cuda-%s" % cuda_version, "/usr/local/cuda", "/usr",
-         "/usr/local/cudnn"] + _get_ld_config_paths()
+  return ["/usr/local/cuda-%s" % cuda_version, "/usr/local/cuda", "/usr"] + _get_ld_config_paths()
 
 
 def _header_paths():
@@ -431,29 +429,6 @@ def _find_cufft_config(base_paths, required_version, cuda_version):
   }
 
 
-def _find_cudnn_config(base_paths, required_version):
-
-  def get_header_version(path):
-    version = [
-        _get_header_version(path, name)
-        for name in ("CUDNN_MAJOR", "CUDNN_MINOR", "CUDNN_PATCHLEVEL")]
-    return ".".join(version) if version[0] else None
-
-  header_path, header_version = _find_header(base_paths,
-                                             ("cudnn.h", "cudnn_version.h"),
-                                             required_version,
-                                             get_header_version)
-  cudnn_version = header_version.split(".")[0]
-
-  library_path = _find_library(base_paths, "cudnn", cudnn_version)
-
-  return {
-      "cudnn_version": cudnn_version,
-      "cudnn_include_dir": os.path.dirname(header_path),
-      "cudnn_library_dir": os.path.dirname(library_path),
-  }
-
-
 def _find_cusparse_config(base_paths, required_version, cuda_version):
 
   if _at_least_version(cuda_version, "11.0"):
@@ -550,7 +525,7 @@ def _list_from_env(env_name, default=[]):
 def _get_legacy_path(env_name, default=[]):
   """Returns a path specified by a legacy environment variable.
 
-  CUDNN_INSTALL_PATH, NCCL_INSTALL_PATH, TENSORRT_INSTALL_PATH set to
+  NCCL_INSTALL_PATH, TENSORRT_INSTALL_PATH set to
   '/usr/lib/x86_64-linux-gnu' would previously find both library and header
   paths. Detect those and return '/usr', otherwise forward to _list_from_env().
   """
@@ -617,11 +592,6 @@ def find_cuda_config():
     cusparse_version = os.environ.get("TF_CUSPARSE_VERSION", "")
     result.update(
         _find_cusparse_config(cusparse_paths, cusparse_version, cuda_version))
-
-  if "cudnn" in libraries:
-    cudnn_paths = _get_legacy_path("CUDNN_INSTALL_PATH", base_paths)
-    cudnn_version = os.environ.get("TF_CUDNN_VERSION", "")
-    result.update(_find_cudnn_config(cudnn_paths, cudnn_version))
 
   if "nccl" in libraries:
     nccl_paths = _get_legacy_path("NCCL_INSTALL_PATH", base_paths)
