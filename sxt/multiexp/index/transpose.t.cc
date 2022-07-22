@@ -1,7 +1,6 @@
 #include "sxt/multiexp/index/transpose.h"
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/multiexp/index/index_table.h"
 
 using namespace sxt;

@@ -4,10 +4,9 @@
 #include <memory>
 #include <string_view>
 
-#include "sxt/curve21/type/element_p3.h"
-
 #include "benchmark/reduce2/reduce_cpu.h"
 #include "benchmark/reduce2/reduce_gpu.h"
+#include "sxt/curve21/type/element_p3.h"
 
 using namespace sxt;
 

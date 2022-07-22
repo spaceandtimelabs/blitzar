@@ -10,7 +10,6 @@
 #include "sxt/field51/operation/square.h"
 
 #include "sxt/base/type/int.h"
-
 #include "sxt/field51/type/element.h"
 
 namespace sxt::f51o {

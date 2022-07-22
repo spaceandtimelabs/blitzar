@@ -2,7 +2,6 @@
 
 #include "sxt/base/bit/count.h"
 #include "sxt/base/bit/iteration.h"
-
 #include "sxt/multiexp/base/digit_utility.h"
 #include "sxt/multiexp/base/exponent.h"
 #include "sxt/multiexp/base/exponent_sequence.h"

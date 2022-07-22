@@ -4,13 +4,10 @@
 #include <cstring>
 
 #include "sxt/memory/management/managed_array.h"
-
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
 #include "sxt/multiexp/ristretto/multiexponentiation_cpu_driver.h"
-
 #include "sxt/ristretto/type/compressed_element.h"
-
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/cpu_generator.h"
 #include "sxt/seqcommit/naive/commitment_computation_cpu.h"

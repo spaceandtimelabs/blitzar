@@ -2,7 +2,6 @@
 
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/type/compressed_element.h"
 

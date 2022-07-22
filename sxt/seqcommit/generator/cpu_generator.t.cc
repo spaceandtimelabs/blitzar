@@ -1,7 +1,6 @@
 #include "sxt/seqcommit/generator/cpu_generator.h"
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/seqcommit/test/test_generators.h"
 
 using namespace sxt;

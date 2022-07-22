@@ -6,19 +6,15 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/num/divide_up.h"
-
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/managed_device_resource.h"
-
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/type/compressed_element.h"
-
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
 

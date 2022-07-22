@@ -1,9 +1,8 @@
 #include <iostream>
 #include <memory>
 
-#include "sxt/field51/type/element.h"
-
 #include "example/field_arithmetic/reduce1.h"
+#include "sxt/field51/type/element.h"
 
 using namespace sxt;
 

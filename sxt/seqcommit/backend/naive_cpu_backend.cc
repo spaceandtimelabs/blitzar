@@ -1,7 +1,6 @@
 #include "sxt/seqcommit/backend/naive_cpu_backend.h"
 
 #include "sxt/ristretto/type/compressed_element.h"
-
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/cpu_generator.h"
 #include "sxt/seqcommit/naive/commitment_computation_cpu.h"

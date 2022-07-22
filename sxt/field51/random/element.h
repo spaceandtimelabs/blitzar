@@ -2,7 +2,6 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/fast_random_number_generator.h"
-
 #include "sxt/field51/base/byte_conversion.h"
 #include "sxt/field51/type/element.h"
 

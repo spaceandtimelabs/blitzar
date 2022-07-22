@@ -1,9 +1,8 @@
 #include <iostream>
 
-#include "sxt/curve21/type/element_p3.h"
-
 #include "example/exponentiation1/exponentiate_cpu.h"
 #include "example/exponentiation1/exponentiate_gpu.h"
+#include "sxt/curve21/type/element_p3.h"
 
 using namespace sxt;
 

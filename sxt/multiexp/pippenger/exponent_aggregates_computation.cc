@@ -3,7 +3,6 @@
 #include <algorithm>
 
 #include "sxt/base/bit/count.h"
-
 #include "sxt/multiexp/base/exponent.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/base/exponent_utility.h"

@@ -1,7 +1,6 @@
 #include "sxt/multiexp/pippenger_multiprod/clump_outputs.h"
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/multiexp/index/index_table.h"
 
 using namespace sxt;

@@ -3,15 +3,11 @@
 #include "sxt/base/container/span.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/num/divide_up.h"
-
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
-
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/type/compressed_element.h"
-
 #include "sxt/seqcommit/generator/base_element.h"
 
 namespace sxt::sqcgn {

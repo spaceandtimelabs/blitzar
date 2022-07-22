@@ -6,7 +6,6 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/num/log2p1.h"
-
 #include "sxt/multiexp/base/exponent.h"
 
 namespace sxt::mtxpi {

@@ -10,7 +10,6 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
-
 #include "sxt/field51/type/element.h"
 
 namespace sxt::f51o {

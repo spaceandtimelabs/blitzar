@@ -8,7 +8,6 @@
 
 #include "sxt/base/container/span_void.h"
 #include "sxt/base/iterator/counting_iterator.h"
-
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger_multiprod/clump_inputs.h"
 #include "sxt/multiexp/pippenger_multiprod/clump_outputs.h"

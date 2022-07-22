@@ -10,7 +10,6 @@
 #include "sxt/ristretto/base/byte_conversion.h"
 
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/field51/base/byte_conversion.h"
 #include "sxt/field51/constant/d.h"
 #include "sxt/field51/constant/invsqrtamd.h"
@@ -28,7 +27,6 @@
 #include "sxt/field51/property/sign.h"
 #include "sxt/field51/property/zero.h"
 #include "sxt/field51/type/element.h"
-
 #include "sxt/ristretto/base/sqrt_ratio_m1.h"
 
 namespace sxt::rstb {

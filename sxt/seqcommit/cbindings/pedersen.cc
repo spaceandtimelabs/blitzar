@@ -6,11 +6,8 @@
 #include <memory>
 
 #include "sxt/base/container/span.h"
-
 #include "sxt/memory/management/managed_array.h"
-
 #include "sxt/ristretto/type/compressed_element.h"
-
 #include "sxt/seqcommit/backend/naive_cpu_backend.h"
 #include "sxt/seqcommit/backend/naive_gpu_backend.h"
 #include "sxt/seqcommit/backend/pedersen_backend.h"

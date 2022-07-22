@@ -1,12 +1,9 @@
 #include "sxt/seqcommit/test/test_generators.h"
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/type/compressed_element.h"
-
 #include "sxt/seqcommit/generator/base_element.h"
 
 namespace sxt::sqctst {

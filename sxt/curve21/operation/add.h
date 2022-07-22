@@ -1,7 +1,6 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
-
 #include "sxt/curve21/type/conversion_utility.h"
 #include "sxt/curve21/type/element_cached.h"
 #include "sxt/curve21/type/element_p1p1.h"

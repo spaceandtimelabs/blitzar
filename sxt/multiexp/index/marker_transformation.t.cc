@@ -1,7 +1,6 @@
 #include "sxt/multiexp/index/marker_transformation.h"
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/index/partition_marker_utility.h"
 

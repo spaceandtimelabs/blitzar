@@ -4,13 +4,10 @@
 
 #include "sxt/base/bit/iteration.h"
 #include "sxt/base/container/span_void.h"
-
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/memory/management/managed_array.h"
-
 #include "sxt/multiexp/index/clump2_descriptor.h"
 #include "sxt/multiexp/index/clump2_marker_utility.h"
 

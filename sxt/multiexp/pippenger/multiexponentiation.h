@@ -1,7 +1,6 @@
 #pragma once
 
 #include "sxt/base/container/span.h"
-
 #include "sxt/memory/management/managed_array_fwd.h"
 
 namespace sxt::mtxb {

@@ -1,9 +1,7 @@
 #include "sxt/multiexp/test/generate_curve21_elements.h"
 
 #include "sxt/base/num/fast_random_number_generator.h"
-
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/ristretto/random/element.h"
 
 namespace sxt::mtxtst {

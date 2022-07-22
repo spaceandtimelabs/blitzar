@@ -1,7 +1,6 @@
 #include "sxt/field51/property/zero.h"
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/field51/type/literal.h"
 
 using namespace sxt::f51t;

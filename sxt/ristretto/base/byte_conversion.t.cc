@@ -3,7 +3,6 @@
 #include <array>
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/curve21/type/element_p3.h"
 
 using namespace sxt;

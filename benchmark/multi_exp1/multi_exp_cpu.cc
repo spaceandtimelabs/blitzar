@@ -1,9 +1,8 @@
 #include "benchmark/multi_exp1/multi_exp_cpu.h"
 
+#include "benchmark/multi_exp1/multiply_add.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/type/element_p3.h"
-
-#include "benchmark/multi_exp1/multiply_add.h"
 
 namespace sxt {
 //--------------------------------------------------------------------------------------------------

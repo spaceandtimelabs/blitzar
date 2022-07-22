@@ -5,9 +5,7 @@
 #include <iostream>
 
 #include "sxt/base/bit/iteration.h"
-
 #include "sxt/memory/management/managed_array.h"
-
 #include "sxt/multiexp/index/index_table.h"
 
 namespace sxt::mtxpi {

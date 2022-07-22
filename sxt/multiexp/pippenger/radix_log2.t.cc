@@ -1,7 +1,6 @@
 #include "sxt/multiexp/pippenger/radix_log2.h"
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/multiexp/base/exponent.h"
 
 using namespace sxt;

@@ -4,12 +4,10 @@
 #include <memory>
 #include <string_view>
 
-#include "sxt/curve21/type/element_p3.h"
-
-#include "sxt/memory/management/managed_array.h"
-
 #include "benchmark/multi_exp1/multi_exp_cpu.h"
 #include "benchmark/multi_exp1/multi_exp_gpu.h"
+#include "sxt/curve21/type/element_p3.h"
+#include "sxt/memory/management/managed_array.h"
 
 using namespace sxt;
 

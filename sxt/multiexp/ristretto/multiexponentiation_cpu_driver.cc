@@ -4,17 +4,13 @@
 
 #include "sxt/base/bit/count.h"
 #include "sxt/base/container/span.h"
-
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/type/conversion_utility.h"
 #include "sxt/curve21/type/element_p1p1.h"
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/memory/management/managed_array.h"
-
 #include "sxt/multiexp/index/index_table.h"
-
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/type/compressed_element.h"
 

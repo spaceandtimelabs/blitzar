@@ -1,9 +1,7 @@
 #include "sxt/seqcommit/backend/naive_gpu_backend.h"
 
 #include "sxt/memory/management/managed_array.h"
-
 #include "sxt/ristretto/type/compressed_element.h"
-
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/gpu_generator.h"
 #include "sxt/seqcommit/naive/commitment_computation_gpu.h"

@@ -3,7 +3,6 @@
 #include <cassert>
 
 #include "sxt/base/type/polymorphic_allocator.h"
-
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"
 

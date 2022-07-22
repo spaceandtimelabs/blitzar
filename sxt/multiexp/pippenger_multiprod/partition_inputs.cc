@@ -4,7 +4,6 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/container/span_void.h"
-
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/index/marker_transformation.h"
 #include "sxt/multiexp/index/partition_marker_utility.h"

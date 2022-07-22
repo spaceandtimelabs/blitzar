@@ -1,7 +1,6 @@
 #include "sxt/ristretto/operation/add.h"
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/ristretto/type/compressed_element.h"
 
 using namespace sxt;

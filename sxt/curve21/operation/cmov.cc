@@ -2,7 +2,6 @@
 
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/type/element_cached.h"
-
 #include "sxt/field51/operation/cmov.h"
 #include "sxt/field51/operation/neg.h"
 

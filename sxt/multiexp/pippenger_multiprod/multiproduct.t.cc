@@ -6,9 +6,7 @@
 #include <random>
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/memory/management/managed_array.h"
-
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger_multiprod/multiproduct_params.h"
 #include "sxt/multiexp/pippenger_multiprod/test_driver.h"

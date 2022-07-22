@@ -7,7 +7,6 @@
 
 #include "sxt/base/container/span_void.h"
 #include "sxt/base/type/polymorphic_allocator.h"
-
 #include "sxt/memory/management/managed_array_fwd.h"
 
 namespace sxt::memmg {

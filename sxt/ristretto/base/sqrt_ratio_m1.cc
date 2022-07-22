@@ -10,7 +10,6 @@
 #include "sxt/ristretto/base/sqrt_ratio_m1.h"
 
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/field51/constant/sqrtm1.h"
 #include "sxt/field51/operation/abs.h"
 #include "sxt/field51/operation/add.h"

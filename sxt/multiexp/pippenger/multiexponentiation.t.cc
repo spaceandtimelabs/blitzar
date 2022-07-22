@@ -6,9 +6,7 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/memory/management/managed_array.h"
-
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/pippenger/test_driver.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"

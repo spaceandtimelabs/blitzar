@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "sxt/base/iterator/counting_iterator.h"
-
 #include "sxt/multiexp/pippenger_multiprod/active_count.h"
 
 namespace sxt::mtxpmp {

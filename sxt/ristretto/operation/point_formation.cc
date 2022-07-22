@@ -2,9 +2,7 @@
 
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/field51/type/element.h"
-
 #include "sxt/ristretto/operation/elligator.h"
 
 namespace sxt::rsto {

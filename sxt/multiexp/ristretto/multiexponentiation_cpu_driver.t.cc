@@ -8,16 +8,13 @@
 #include "sxt/base/container/span.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/memory/management/managed_array.h"
-
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"
 #include "sxt/multiexp/random/random_multiexponentiation_generation.h"
 #include "sxt/multiexp/test/compute_ristretto_muladd.h"
 #include "sxt/multiexp/test/generate_ristretto_elements.h"
-
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/operation/add.h"
 #include "sxt/ristretto/operation/scalar_multiply.h"

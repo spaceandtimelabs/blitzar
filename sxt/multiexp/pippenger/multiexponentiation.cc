@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "sxt/base/bit/count.h"
-
 #include "sxt/multiexp/base/exponent_utility.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger/driver.h"

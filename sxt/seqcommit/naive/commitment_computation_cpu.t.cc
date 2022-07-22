@@ -1,7 +1,6 @@
 #include "sxt/seqcommit/naive/commitment_computation_cpu.h"
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/seqcommit/test/test_pedersen.h"
 
 using namespace sxt;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
-
 #include "sxt/field51/constant/zero.h"
 #include "sxt/field51/operation/sub.h"
 #include "sxt/field51/type/element.h"

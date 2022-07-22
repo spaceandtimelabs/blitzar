@@ -2,12 +2,9 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/fast_random_number_generator.h"
-
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/field51/random/element.h"
 #include "sxt/field51/type/element.h"
-
 #include "sxt/ristretto/operation/point_formation.h"
 
 namespace sxt::rstrn {

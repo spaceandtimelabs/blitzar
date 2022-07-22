@@ -3,7 +3,6 @@
 #include <cinttypes>
 
 #include "sxt/base/container/span.h"
-
 #include "sxt/seqcommit/backend/pedersen_backend.h"
 
 namespace sxt::sqcb {

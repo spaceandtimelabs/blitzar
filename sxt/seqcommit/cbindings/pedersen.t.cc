@@ -5,12 +5,10 @@
 #include <string>
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/ristretto/operation/add.h"
 #include "sxt/ristretto/operation/scalar_multiply.h"
 #include "sxt/ristretto/random/element.h"
 #include "sxt/ristretto/type/compressed_element.h"
-
 #include "sxt/seqcommit/generator/base_element.h"
 
 using namespace sxt;

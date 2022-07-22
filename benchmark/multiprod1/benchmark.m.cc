@@ -5,11 +5,8 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/profile/callgrind.h"
-
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/memory/management/managed_array.h"
-
 #include "sxt/multiexp/curve21/multiproduct_cpu_driver.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger_multiprod/multiproduct.h"

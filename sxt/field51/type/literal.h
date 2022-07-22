@@ -3,7 +3,6 @@
 #include <array>
 
 #include "sxt/base/num/hex.h"
-
 #include "sxt/field51/base/byte_conversion.h"
 #include "sxt/field51/type/element.h"
 

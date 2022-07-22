@@ -4,7 +4,6 @@
 #include <random>
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/multiexp/index/clump2_descriptor.h"
 #include "sxt/multiexp/index/clump2_descriptor_utility.h"
 #include "sxt/multiexp/index/random_clump2.h"

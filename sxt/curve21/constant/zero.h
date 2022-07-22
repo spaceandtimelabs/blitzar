@@ -2,7 +2,6 @@
 
 #include "sxt/curve21/type/element_cached.h"
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/field51/constant/one.h"
 #include "sxt/field51/constant/zero.h"
 

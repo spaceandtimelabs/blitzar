@@ -1,7 +1,6 @@
 #include "sxt/curve21/operation/double.h"
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/conversion_utility.h"
 #include "sxt/curve21/type/element_p3.h"

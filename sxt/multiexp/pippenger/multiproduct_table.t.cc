@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
-
 #include "sxt/multiexp/base/exponent.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/index/index_table.h"

@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "sxt/base/container/span.h"
-
 #include "sxt/multiexp/index/clump2_descriptor.h"
 #include "sxt/multiexp/index/clump2_descriptor_utility.h"
 #include "sxt/multiexp/index/clump2_marker_utility.h"

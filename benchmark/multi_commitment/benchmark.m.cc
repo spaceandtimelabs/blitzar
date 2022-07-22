@@ -11,14 +11,10 @@
 #include <string_view>
 
 #include "sxt/base/container/span.h"
-
 #include "sxt/curve21/type/element_p3.h"
-
 #include "sxt/memory/management/managed_array.h"
-
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/type/compressed_element.h"
-
 #include "sxt/seqcommit/backend/naive_cpu_backend.h"
 #include "sxt/seqcommit/backend/naive_gpu_backend.h"
 #include "sxt/seqcommit/backend/pedersen_backend.h"

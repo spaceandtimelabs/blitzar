@@ -10,7 +10,6 @@
 
 #include "sxt/base/bit/load.h"
 #include "sxt/base/bit/store.h"
-
 #include "sxt/field51/base/reduce.h"
 
 namespace sxt::f51b {
