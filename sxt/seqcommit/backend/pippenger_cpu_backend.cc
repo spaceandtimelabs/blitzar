@@ -7,13 +7,14 @@
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
 #include "sxt/multiexp/ristretto/multiexponentiation_cpu_driver.h"
+#include "sxt/multiexp/ristretto/precomputed_p3_input_accessor.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/cpu_generator.h"
+#include "sxt/seqcommit/generator/precomputed_generators.h"
 #include "sxt/seqcommit/naive/commitment_computation_cpu.h"
 
 namespace sxt::sqcbck {
-
 //--------------------------------------------------------------------------------------------------
 // populate_exponents_array
 //--------------------------------------------------------------------------------------------------
@@ -37,6 +38,29 @@ populate_exponents_array(uint64_t& longest_sequence_size,
   }
 
   return false;
+}
+
+//--------------------------------------------------------------------------------------------------
+// compute_commitments_with_no_generators
+//--------------------------------------------------------------------------------------------------
+static void
+compute_commitments_with_no_generators(memmg::managed_array<rstt::compressed_element>& commitments,
+                                       basct::cspan<mtxb::exponent_sequence> exponents,
+                                       size_t longest_sequence_size) noexcept {
+  std::vector<c21t::element_p3> generators_data;
+  auto generators = sqcgn::get_precomputed_generators();
+  if (generators.size() < longest_sequence_size) {
+    generators_data.resize(longest_sequence_size);
+    std::copy(generators.begin(), generators.end(), generators_data.begin());
+    sqcgn::cpu_get_generators(
+        basct::span<c21t::element_p3>{generators_data.data() + generators.size(),
+                                      longest_sequence_size - generators.size()},
+        generators.size());
+    generators = generators_data;
+  }
+  mtxrs::precomputed_p3_input_accessor input_accessor{generators};
+  mtxrs::multiexponentiation_cpu_driver drv{&input_accessor};
+  mtxpi::compute_multiexponentiation(commitments, drv, exponents);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -65,20 +89,19 @@ void pippenger_cpu_backend::compute_commitments(
     return;
   }
 
-  memmg::managed_array<rstt::compressed_element> inout(longest_sequence_size);
+  memmg::managed_array<rstt::compressed_element> inout;
 
   if (generators.data() != nullptr) {
+    inout = memmg::managed_array<rstt::compressed_element>(longest_sequence_size);
+
     // copy user provided generators to inout
     std::memcpy(inout.data(), generators.data(),
                 longest_sequence_size * sizeof(rstt::compressed_element));
+    mtxrs::multiexponentiation_cpu_driver drv;
+    mtxpi::compute_multiexponentiation(inout, drv, exponents);
   } else {
-    // fetch the default generators
-    this->get_generators(inout, 0);
+    compute_commitments_with_no_generators(inout, exponents, longest_sequence_size);
   }
-
-  mtxrs::multiexponentiation_cpu_driver drv;
-
-  mtxpi::compute_multiexponentiation(inout, drv, exponents);
 
   std::memcpy(commitments.data(), inout.data(),
               commitments.size() * sizeof(rstt::compressed_element));

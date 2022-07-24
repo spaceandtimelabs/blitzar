@@ -22,7 +22,10 @@ inline bool compute_clumped_output_table(mtxi::index_table& table,
                                          basct::span<basct::span<uint64_t>> rows,
                                          size_t num_active_inputs, size_t clump_size) noexcept {
   return compute_clumped_output_table(table, output_clumps,
-                                      reinterpret_cast<basct::cspan<basct::cspan<uint64_t>>&>(rows),
+                                      {
+                                          reinterpret_cast<basct::cspan<uint64_t>*>(rows.data()),
+                                          rows.size(),
+                                      },
                                       num_active_inputs, clump_size);
 }
 

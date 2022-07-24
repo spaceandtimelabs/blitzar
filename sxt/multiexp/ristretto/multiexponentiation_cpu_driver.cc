@@ -11,26 +11,36 @@
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/index/index_table.h"
+#include "sxt/multiexp/ristretto/compressed_input_accessor.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/type/compressed_element.h"
 
 namespace sxt::mtxrs {
+//--------------------------------------------------------------------------------------------------
+// constructor
+//--------------------------------------------------------------------------------------------------
+multiexponentiation_cpu_driver::multiexponentiation_cpu_driver(
+    const mtxrs::input_accessor* input_accessor) noexcept
+    : input_accessor_{input_accessor} {}
+
 //--------------------------------------------------------------------------------------------------
 // compute_multiproduct_inputs
 //--------------------------------------------------------------------------------------------------
 void multiexponentiation_cpu_driver::compute_multiproduct_inputs(
     memmg::managed_array<void>& inout, basct::cspan<basct::cspan<size_t>> powers,
     size_t radix_log2) const noexcept {
-
-  assert(inout.size() == powers.size());
   size_t num_terms = 0;
-
   for (auto& subpowers : powers) {
     num_terms += subpowers.size();
   }
 
-  basct::cspan<rstt::compressed_element> inputs{
-      static_cast<rstt::compressed_element*>(inout.data()), inout.size()};
+  compressed_input_accessor default_accessor;
+  auto accessor = input_accessor_;
+  if (accessor == nullptr) {
+    accessor = &default_accessor;
+  }
+  auto num_inputs = powers.size();
+  auto inputs = inout.data();
 
   size_t term_index = 0;
   memmg::managed_array<c21t::element_p3> terms{num_terms, inout.get_allocator()};
@@ -38,12 +48,12 @@ void multiexponentiation_cpu_driver::compute_multiproduct_inputs(
   // we compute the power set for each input generator, such as:
   // inout = {2^0 * a, 2^3 * a, 2^6 * a, 2^0 * b, 2^3 * b, 2^6 * b, 2^0 * c, 2^3 * c},
   // where {a, b, c} are curve255 points given as input
-  for (size_t input_index = 0; input_index < inputs.size(); ++input_index) {
+  for (size_t input_index = 0; input_index < num_inputs; ++input_index) {
     size_t ith_iter = 0;
     size_t input_power = 0;
 
     c21t::element_p3 p;
-    rstb::from_bytes(p, inputs[input_index].data());
+    accessor->get_element(p, inputs, input_index);
 
     // we use a `while` loop to compute in one pass the terms
     // 2^0 * p, 2^1 * p, 2^2 * p, 2^3 * p, ..., 2^(powers[input_index] * radix_log2) * p

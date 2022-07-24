@@ -4,6 +4,22 @@ load(
 )
 
 sxt_cc_component(
+    name = "precomputed_generators",
+    impl_deps = [
+        ":base_element",
+        "//sxt/curve21/type:element_p3",
+    ],
+    test_deps = [
+        ":base_element",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "base_element",
     impl_deps = [
         "//sxt/base/num:fast_random_number_generator",

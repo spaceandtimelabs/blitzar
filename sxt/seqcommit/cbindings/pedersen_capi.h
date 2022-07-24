@@ -13,6 +13,7 @@ extern "C" {
 /** config struct to hold the chosen backend **/
 struct sxt_config {
   int backend;
+  uint64_t num_precomputed_generators;
 };
 
 struct sxt_ristretto_element {

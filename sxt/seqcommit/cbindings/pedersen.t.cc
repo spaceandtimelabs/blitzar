@@ -10,6 +10,7 @@
 #include "sxt/ristretto/random/element.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/generator/base_element.h"
+#include "sxt/seqcommit/generator/precomputed_generators.h"
 
 using namespace sxt;
 using namespace sxt::sqccb;
@@ -414,6 +415,10 @@ TEST_CASE("run compute pedersen commitment tests") {
   test_pedersen_commitments_with_given_backend(SXT_NAIVE_BACKEND_CPU, "naive cpu");
   test_pedersen_commitments_with_given_backend(SXT_NAIVE_BACKEND_GPU, "naive gpu");
   test_pedersen_commitments_with_given_backend(SXT_PIPPENGER_BACKEND_CPU, "pippenger cpu");
+
+  sqcgn::init_precomputed_generators(10);
+  test_pedersen_commitments_with_given_backend(SXT_PIPPENGER_BACKEND_CPU,
+                                               "pippenger cpu w/ precompute");
 }
 
 static void test_generators_with_given_backend(int backend, std::string backend_name) {

@@ -13,6 +13,7 @@
 #include "sxt/seqcommit/backend/pedersen_backend.h"
 #include "sxt/seqcommit/backend/pippenger_cpu_backend.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
+#include "sxt/seqcommit/generator/precomputed_generators.h"
 
 using namespace sxt;
 
@@ -46,6 +47,10 @@ int sxt_init(const sxt_config* config) {
     exit(1);
   if (backend != nullptr)
     exit(1);
+
+  if (config->num_precomputed_generators > 0) {
+    sqcgn::init_precomputed_generators(config->num_precomputed_generators);
+  }
 
   if (config->backend == SXT_NAIVE_BACKEND_CPU) {
     backend = sqcbck::get_naive_cpu_backend();

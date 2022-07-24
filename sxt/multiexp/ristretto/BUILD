@@ -4,8 +4,38 @@ load(
 )
 
 sxt_cc_component(
+    name = "compressed_input_accessor",
+    impl_deps = [
+        "//sxt/ristretto/base:byte_conversion",
+        "//sxt/ristretto/type:compressed_element",
+    ],
+    with_test = False,
+    deps = [
+        ":input_accessor",
+    ],
+)
+
+sxt_cc_component(
+    name = "precomputed_p3_input_accessor",
+    impl_deps = [
+    ],
+    with_test = False,
+    deps = [
+        ":input_accessor",
+        "//sxt/base/container:span",
+        "//sxt/curve21/type:element_p3",
+    ],
+)
+
+sxt_cc_component(
+    name = "input_accessor",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "multiexponentiation_cpu_driver",
     impl_deps = [
+        ":compressed_input_accessor",
         "//sxt/base/bit:count",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/index:index_table",

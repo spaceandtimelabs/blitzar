@@ -51,6 +51,8 @@ sxt_cc_component(
         "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/base:indexed_exponent_sequence",
         "//sxt/seqcommit/generator:cpu_generator",
+        "//sxt/seqcommit/generator:precomputed_generators",
+        "//sxt/multiexp/ristretto:precomputed_p3_input_accessor",
         "//sxt/multiexp/ristretto:multiexponentiation_cpu_driver",
         "//sxt/multiexp/pippenger:multiexponentiation",
         "//sxt/multiexp/base:exponent_sequence",
