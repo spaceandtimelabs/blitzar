@@ -5,6 +5,8 @@
 #include <string>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/type/element_p3.h"
+#include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/operation/add.h"
 #include "sxt/ristretto/operation/scalar_multiply.h"
 #include "sxt/ristretto/random/element.h"
@@ -16,7 +18,7 @@ using namespace sxt;
 using namespace sxt::sqccb;
 
 TEST_CASE("run pedersen initialization and finalize tests") {
-  sxt_ristretto_element commitments[1];
+  sxt_compressed_ristretto commitments[1];
   sxt_sequence_descriptor valid_descriptors[1];
 
   SECTION("incorrect input to the initialization will error out") {
@@ -65,19 +67,20 @@ TEST_CASE("run pedersen initialization and finalize tests") {
   }
 }
 
-static void test_pedersen_commitments_with_given_backend(int backend, std::string backend_name) {
-
+static void test_pedersen_commitments_with_given_backend(int backend,
+                                                         uint64_t num_precomputed_generators,
+                                                         std::string backend_name) {
   ////////////////////////////////////////////////////////////////
   // sxt_compute_pedersen_commitments
   ////////////////////////////////////////////////////////////////
   SECTION(backend_name + " - We can compute commitments without providing any generator") {
 
     SECTION("correct initialization and input will not error out") {
-      const sxt_config config = {backend};
+      const sxt_config config = {backend, num_precomputed_generators};
       REQUIRE(sxt_init(&config) == 0);
 
       uint8_t data[33];
-      sxt_ristretto_element commitment;
+      sxt_compressed_ristretto commitment;
       sxt_sequence_descriptor valid_seq_descriptor = {.element_nbytes = 1, // number bytes
                                                       .n = 1,              // number rows
                                                       .data = data,        // data pointer
@@ -91,7 +94,7 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
     }
 
     SECTION("null commitment pointers will error out") {
-      const sxt_config config = {backend};
+      const sxt_config config = {backend, num_precomputed_generators};
       REQUIRE(sxt_init(&config) == 0);
 
       uint8_t data[33];
@@ -108,10 +111,10 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
     }
 
     SECTION("null value_sequences will error out") {
-      const sxt_config config = {backend};
+      const sxt_config config = {backend, num_precomputed_generators};
       REQUIRE(sxt_init(&config) == 0);
 
-      sxt_ristretto_element commitment;
+      sxt_compressed_ristretto commitment;
       int ret = sxt_compute_pedersen_commitments(&commitment, 1, nullptr);
 
       REQUIRE(ret != 0);
@@ -120,10 +123,10 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
     }
 
     SECTION("zero sequences will not error out") {
-      const sxt_config config = {backend};
+      const sxt_config config = {backend, num_precomputed_generators};
       REQUIRE(sxt_init(&config) == 0);
 
-      sxt_ristretto_element commitment;
+      sxt_compressed_ristretto commitment;
       int ret = sxt_compute_pedersen_commitments(&commitment, 0, nullptr);
 
       REQUIRE(ret == 0);
@@ -132,11 +135,11 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
     }
 
     SECTION("zero length commitments will not error out") {
-      const sxt_config config = {backend};
+      const sxt_config config = {backend, num_precomputed_generators};
       REQUIRE(sxt_init(&config) == 0);
 
       uint8_t data[33];
-      sxt_ristretto_element commitment;
+      sxt_compressed_ristretto commitment;
       sxt_sequence_descriptor zero_length_seq_descriptor = {.element_nbytes = 1, // number bytes
                                                             .n = 0,              // number rows
                                                             .data = data,        // data pointer
@@ -153,12 +156,12 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
     }
 
     SECTION("out of range (< 1 or > 32) element_nbytes will error out") {
-      const sxt_config config = {backend};
+      const sxt_config config = {backend, num_precomputed_generators};
       REQUIRE(sxt_init(&config) == 0);
 
       SECTION("element_nbytes == 0 (< 1) error out") {
         uint8_t data[33];
-        sxt_ristretto_element commitment;
+        sxt_compressed_ristretto commitment;
         sxt_sequence_descriptor invalid_descriptors = {.element_nbytes = 0, // number bytes
                                                        .n = 1,              // number rows
                                                        .data = data,        // data pointer
@@ -171,7 +174,7 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
 
       SECTION("element_nbytes == 33 (> 32) error out") {
         uint8_t data[33];
-        sxt_ristretto_element commitment;
+        sxt_compressed_ristretto commitment;
         sxt_sequence_descriptor invalid_descriptors = {.element_nbytes = 33, // number bytes
                                                        .n = 1,               // number rows
                                                        .data = data,         // data pointer
@@ -186,10 +189,10 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
     }
 
     SECTION("null element data pointer will error out") {
-      const sxt_config config = {backend};
+      const sxt_config config = {backend, num_precomputed_generators};
       REQUIRE(sxt_init(&config) == 0);
 
-      sxt_ristretto_element commitment;
+      sxt_compressed_ristretto commitment;
       sxt_sequence_descriptor invalid_descriptors = {.element_nbytes = 1, // number bytes
                                                      .n = 1,              // number rows
                                                      .data = nullptr,     // null data pointer
@@ -203,7 +206,7 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
     }
 
     SECTION("We can multiply and add two commitments together") {
-      const sxt_config config = {backend};
+      const sxt_config config = {backend, num_precomputed_generators};
       REQUIRE(sxt_init(&config) == 0);
 
       const uint64_t num_rows = 4;
@@ -211,7 +214,7 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
       const uint8_t element_nbytes = sizeof(int);
       const unsigned int multiplicative_constant = 52;
 
-      sxt_ristretto_element commitments_data[num_sequences];
+      sxt_compressed_ristretto commitments_data[num_sequences];
 
       const int query[num_sequences][num_rows] = {
           {2000, 7500, 5000, 1500},
@@ -259,13 +262,13 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
     }
 
     SECTION("We can compute sparse commitments") {
-      const sxt_config config = {backend};
+      const sxt_config config = {backend, num_precomputed_generators};
       REQUIRE(sxt_init(&config) == 0);
 
       const uint64_t num_sequences = 2;
       const uint8_t element_nbytes = sizeof(int);
 
-      sxt_ristretto_element commitments_data[num_sequences];
+      sxt_compressed_ristretto commitments_data[num_sequences];
 
       const int dense_data[11] = {1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0};
 
@@ -302,13 +305,13 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
     }
 
     SECTION("we can compute dense commitments as sparse commitments") {
-      const sxt_config config = {backend};
+      const sxt_config config = {backend, num_precomputed_generators};
       REQUIRE(sxt_init(&config) == 0);
 
       const uint64_t num_sequences = 2;
       const uint8_t element_nbytes = sizeof(int);
 
-      sxt_ristretto_element commitments_data[num_sequences];
+      sxt_compressed_ristretto commitments_data[num_sequences];
 
       const int dense_data[11] = {1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0};
 
@@ -350,28 +353,28 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
   ////////////////////////////////////////////////////////////////
 
   SECTION(backend_name + " - We can compute commitments with provided generators") {
-    const sxt_config config = {backend};
+    const sxt_config config = {backend, num_precomputed_generators};
     REQUIRE(sxt_init(&config) == 0);
 
     const uint64_t num_rows = 4;
     const uint64_t num_sequences = 1;
     const uint8_t element_nbytes = sizeof(int);
 
-    sxt_ristretto_element generators_data[num_rows];
-    sxt_ristretto_element commitments_data[num_sequences];
+    sxt_ristretto generators_data[num_rows];
+    sxt_compressed_ristretto commitments_data[num_sequences];
 
     const uint32_t query[num_rows] = {2000, 7500, 5000, 1500};
     rstt::compressed_element expected_g;
 
     for (uint64_t i = 0; i < num_rows; ++i) {
-      rstt::compressed_element& g_i =
-          reinterpret_cast<rstt::compressed_element*>(generators_data)[i];
+      c21t::element_p3& g_i = reinterpret_cast<c21t::element_p3*>(generators_data)[i];
 
-      sqcgn::compute_compressed_base_element(g_i, query[i]);
+      sqcgn::compute_base_element(g_i, query[i]);
 
       rstt::compressed_element h;
+      rstb::to_bytes(h.data(), g_i);
 
-      rsto::scalar_multiply(h, query[i], g_i);
+      rsto::scalar_multiply(h, query[i], h);
 
       rsto::add(expected_g, expected_g, h);
     }
@@ -412,12 +415,15 @@ static void test_pedersen_commitments_with_given_backend(int backend, std::strin
 }
 
 TEST_CASE("run compute pedersen commitment tests") {
-  test_pedersen_commitments_with_given_backend(SXT_NAIVE_BACKEND_CPU, "naive cpu");
-  test_pedersen_commitments_with_given_backend(SXT_NAIVE_BACKEND_GPU, "naive gpu");
-  test_pedersen_commitments_with_given_backend(SXT_PIPPENGER_BACKEND_CPU, "pippenger cpu");
+  test_pedersen_commitments_with_given_backend(SXT_NAIVE_BACKEND_CPU, 0, "naive cpu");
+  test_pedersen_commitments_with_given_backend(SXT_NAIVE_BACKEND_GPU, 0, "naive gpu");
+  test_pedersen_commitments_with_given_backend(SXT_PIPPENGER_BACKEND_CPU, 0, "pippenger cpu");
 
-  sqcgn::init_precomputed_generators(10);
-  test_pedersen_commitments_with_given_backend(SXT_PIPPENGER_BACKEND_CPU,
+  test_pedersen_commitments_with_given_backend(SXT_NAIVE_BACKEND_CPU, 10,
+                                               "naive cpu w/ precompute");
+  test_pedersen_commitments_with_given_backend(SXT_NAIVE_BACKEND_GPU, 10,
+                                               "naive gpu w/ precompute");
+  test_pedersen_commitments_with_given_backend(SXT_PIPPENGER_BACKEND_CPU, 10,
                                                "pippenger cpu w/ precompute");
 }
 
@@ -441,17 +447,17 @@ static void test_generators_with_given_backend(int backend, std::string backend_
     REQUIRE(sxt_init(&config) == 0);
 
     uint64_t num_generators = 10;
-    sxt_ristretto_element generators[num_generators];
+    sxt_ristretto generators[num_generators];
 
     int ret = sxt_get_generators(generators, num_generators, 0);
 
     REQUIRE(ret == 0);
 
-    rstt::compressed_element expected_g[num_generators];
+    c21t::element_p3 expected_g[num_generators];
     for (size_t i = 0; i < num_generators; ++i) {
-      sqcgn::compute_compressed_base_element(expected_g[i], i);
+      sqcgn::compute_base_element(expected_g[i], i);
 
-      REQUIRE(expected_g[i] == reinterpret_cast<rstt::compressed_element*>(generators)[i]);
+      REQUIRE(expected_g[i] == reinterpret_cast<c21t::element_p3*>(generators)[i]);
     }
 
     REQUIRE(reset_backend_for_testing() == 0);
@@ -477,17 +483,17 @@ static void test_generators_with_given_backend(int backend, std::string backend_
 
     uint64_t num_generators = 10;
     uint64_t offset_generators = 15;
-    sxt_ristretto_element generators[num_generators];
+    sxt_ristretto generators[num_generators];
 
     int ret = sxt_get_generators(generators, num_generators, offset_generators);
 
     REQUIRE(ret == 0);
 
-    rstt::compressed_element expected_g[num_generators];
+    c21t::element_p3 expected_g[num_generators];
     for (size_t i = 0; i < num_generators; ++i) {
-      sqcgn::compute_compressed_base_element(expected_g[i], i + offset_generators);
+      sqcgn::compute_base_element(expected_g[i], i + offset_generators);
 
-      REQUIRE(expected_g[i] == reinterpret_cast<rstt::compressed_element*>(generators)[i]);
+      REQUIRE(expected_g[i] == reinterpret_cast<c21t::element_p3*>(generators)[i]);
     }
 
     REQUIRE(reset_backend_for_testing() == 0);

@@ -10,6 +10,9 @@ struct indexed_exponent_sequence;
 namespace sxt::rstt {
 class compressed_element;
 }
+namespace sxt::c21t {
+struct element_p3;
+}
 
 namespace sxt::sqcnv {
 
@@ -18,6 +21,6 @@ namespace sxt::sqcnv {
 //--------------------------------------------------------------------------------------------------
 void compute_commitments_cpu(basct::span<rstt::compressed_element> commitments,
                              basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
-                             basct::cspan<rstt::compressed_element> generators) noexcept;
+                             basct::cspan<c21t::element_p3> generators) noexcept;
 
 } // namespace sxt::sqcnv

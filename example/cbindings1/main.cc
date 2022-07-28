@@ -19,7 +19,7 @@ int main() {
                                          nullptr};
   const int num_sequences = 1;
   const sxt_sequence_descriptor descriptors[num_sequences] = {descriptor1};
-  sxt_ristretto_element commitments[num_sequences];
+  sxt_compressed_ristretto commitments[num_sequences];
   auto rcode = sxt_compute_pedersen_commitments(commitments, num_sequences, descriptors);
   if (rcode != 0) {
     std::cerr << "sxt_compute_pedersen_commitments failed\n";

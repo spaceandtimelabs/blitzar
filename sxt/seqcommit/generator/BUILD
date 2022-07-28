@@ -6,8 +6,9 @@ load(
 sxt_cc_component(
     name = "precomputed_generators",
     impl_deps = [
-        ":base_element",
         "//sxt/curve21/type:element_p3",
+        "//sxt/seqcommit/generator:cpu_generator",
+        "//sxt/seqcommit/generator:gpu_generator",
     ],
     test_deps = [
         ":base_element",
@@ -42,8 +43,6 @@ sxt_cc_component(
     impl_deps = [
         ":base_element",
         "//sxt/curve21/type:element_p3",
-        "//sxt/ristretto/type:compressed_element",
-        "//sxt/ristretto/base:byte_conversion",
     ],
     test_deps = [
         "//sxt/seqcommit/test:test_generators",
@@ -60,11 +59,9 @@ sxt_cc_component(
         ":base_element",
         "//sxt/base/num:divide_up",
         "//sxt/curve21/type:element_p3",
-        "//sxt/ristretto/type:compressed_element",
         "//sxt/base/device:memory_utility",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
-        "//sxt/ristretto/base:byte_conversion",
     ],
     is_cuda = True,
     test_deps = [

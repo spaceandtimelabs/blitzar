@@ -16,9 +16,17 @@ struct sxt_config {
   uint64_t num_precomputed_generators;
 };
 
-struct sxt_ristretto_element {
+struct sxt_compressed_ristretto {
   // encodes an element of the ristretto255 group
   uint8_t ristretto_bytes[32];
+};
+
+struct sxt_ristretto {
+  // encodes an element of the curve255 group
+  uint64_t X[5];
+  uint64_t Y[5];
+  uint64_t Z[5];
+  uint64_t T[5];
 };
 
 /** describes a sequence of values **/
@@ -103,7 +111,7 @@ int sxt_init(const struct sxt_config* config);
  *
  * - num_sequences equal to 0 will skip the computation
  */
-int sxt_compute_pedersen_commitments(struct sxt_ristretto_element* commitments,
+int sxt_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitments,
                                      uint32_t num_sequences,
                                      const struct sxt_sequence_descriptor* descriptors);
 
@@ -149,8 +157,8 @@ int sxt_compute_pedersen_commitments(struct sxt_ristretto_element* commitments,
  * - num_sequences equal to 0 will skip the computation
  */
 int sxt_compute_pedersen_commitments_with_generators(
-    struct sxt_ristretto_element* commitments, uint32_t num_sequences,
-    const struct sxt_sequence_descriptor* descriptors, struct sxt_ristretto_element* generators);
+    struct sxt_compressed_ristretto* commitments, uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors, struct sxt_ristretto* generators);
 
 /**
  * Gets the pre-specified random generated elements used for the Pedersen commitments in the
@@ -186,7 +194,7 @@ int sxt_compute_pedersen_commitments_with_generators(
  *
  * - num_generators equal to 0 will skip the computation
  */
-int sxt_get_generators(struct sxt_ristretto_element* generators, uint64_t offset_generators,
+int sxt_get_generators(struct sxt_ristretto* generators, uint64_t offset_generators,
                        uint64_t num_generators);
 
 #ifdef __cplusplus

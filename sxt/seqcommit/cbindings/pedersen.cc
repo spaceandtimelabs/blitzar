@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "sxt/base/container/span.h"
+#include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/backend/naive_cpu_backend.h"
@@ -48,20 +49,23 @@ int sxt_init(const sxt_config* config) {
   if (backend != nullptr)
     exit(1);
 
-  if (config->num_precomputed_generators > 0) {
-    sqcgn::init_precomputed_generators(config->num_precomputed_generators);
-  }
-
   if (config->backend == SXT_NAIVE_BACKEND_CPU) {
     backend = sqcbck::get_naive_cpu_backend();
+
+    sqcgn::init_precomputed_generators(config->num_precomputed_generators, false);
+
     return 0;
   } else if (config->backend == SXT_NAIVE_BACKEND_GPU) {
     int num_devices = get_num_devices();
 
     if (num_devices > 0) {
       backend = sqcbck::get_naive_gpu_backend();
+
+      sqcgn::init_precomputed_generators(config->num_precomputed_generators, true);
     } else {
       backend = sqcbck::get_naive_cpu_backend();
+
+      sqcgn::init_precomputed_generators(config->num_precomputed_generators, false);
 
       std::cout << "WARN: Using 'compute_commitments_cpu'. " << std::endl;
     }
@@ -69,6 +73,9 @@ int sxt_init(const sxt_config* config) {
     return 0;
   } else if (config->backend == SXT_PIPPENGER_BACKEND_CPU) {
     backend = sqcbck::get_pippenger_cpu_backend();
+
+    sqcgn::init_precomputed_generators(config->num_precomputed_generators, false);
+
     return 0;
   }
 
@@ -117,10 +124,10 @@ static int validate_sequence_descriptor(uint64_t& longest_sequence, uint32_t num
 //--------------------------------------------------------------------------------------------------
 // process_compute_pedersen_commitments
 //--------------------------------------------------------------------------------------------------
-static int process_compute_pedersen_commitments(struct sxt_ristretto_element* commitments,
+static int process_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitments,
                                                 uint32_t num_sequences,
                                                 const struct sxt_sequence_descriptor* descriptors,
-                                                struct sxt_ristretto_element* generators) {
+                                                struct sxt_ristretto* generators) {
 
   // backend not initialized (sxt_init not called correctly)
   if (backend == nullptr)
@@ -129,14 +136,14 @@ static int process_compute_pedersen_commitments(struct sxt_ristretto_element* co
   if (num_sequences == 0)
     return 0;
 
-  uint64_t longest_sequence = 0;
+  uint64_t length_longest_sequence = 0;
 
-  // verify if input is validate
+  // verify if input is invalid
   if (commitments == nullptr ||
-      validate_sequence_descriptor(longest_sequence, num_sequences, descriptors))
+      validate_sequence_descriptor(length_longest_sequence, num_sequences, descriptors))
     return 1;
 
-  static_assert(sizeof(rstt::compressed_element) == sizeof(sxt_ristretto_element),
+  static_assert(sizeof(rstt::compressed_element) == sizeof(sxt_compressed_ristretto),
                 "types must be ABI compatible");
 
   basct::span<rstt::compressed_element> commitments_result(
@@ -147,25 +154,27 @@ static int process_compute_pedersen_commitments(struct sxt_ristretto_element* co
   static_assert(sizeof(sqcb::indexed_exponent_sequence) == sizeof(sxt_sequence_descriptor),
                 "types must be ABI compatible");
 
-  bool is_sparse_sequence = false;
+  bool has_sparse_sequence = false;
 
   // populating sequence object
   for (uint64_t i = 0; i < num_sequences; ++i) {
-    is_sparse_sequence |= (descriptors[i].indices != nullptr);
+    has_sparse_sequence |= (descriptors[i].indices != nullptr);
 
     sequences[i] = *(reinterpret_cast<const sqcb::indexed_exponent_sequence*>(&descriptors[i]));
   }
 
+  uint64_t generators_length = length_longest_sequence;
   basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences.data(), num_sequences);
 
   if (generators == nullptr) {
-    longest_sequence = 0;
+    generators_length = 0;
   }
 
-  basct::span<rstt::compressed_element> generators_span(
-      reinterpret_cast<rstt::compressed_element*>(generators), longest_sequence);
+  basct::cspan<c21t::element_p3> generators_span(reinterpret_cast<c21t::element_p3*>(generators),
+                                                 generators_length);
 
-  backend->compute_commitments(commitments_result, value_sequences, generators_span);
+  backend->compute_commitments(commitments_result, value_sequences, generators_span,
+                               length_longest_sequence, has_sparse_sequence);
 
   return 0;
 }
@@ -173,7 +182,7 @@ static int process_compute_pedersen_commitments(struct sxt_ristretto_element* co
 //--------------------------------------------------------------------------------------------------
 // sxt_compute_pedersen_commitments
 //--------------------------------------------------------------------------------------------------
-int sxt_compute_pedersen_commitments(sxt_ristretto_element* commitments, uint32_t num_sequences,
+int sxt_compute_pedersen_commitments(sxt_compressed_ristretto* commitments, uint32_t num_sequences,
                                      const sxt_sequence_descriptor* descriptors) {
 
   int ret = process_compute_pedersen_commitments(commitments, num_sequences, descriptors, nullptr);
@@ -185,8 +194,8 @@ int sxt_compute_pedersen_commitments(sxt_ristretto_element* commitments, uint32_
 // sxt_compute_pedersen_commitments
 //--------------------------------------------------------------------------------------------------
 int sxt_compute_pedersen_commitments_with_generators(
-    struct sxt_ristretto_element* commitments, uint32_t num_sequences,
-    const struct sxt_sequence_descriptor* descriptors, struct sxt_ristretto_element* generators) {
+    struct sxt_compressed_ristretto* commitments, uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors, struct sxt_ristretto* generators) {
 
   // we only verify if generators is null, but we
   // expect it to have size equal to the longest
@@ -203,7 +212,7 @@ int sxt_compute_pedersen_commitments_with_generators(
 //--------------------------------------------------------------------------------------------------
 // sxt_get_generators
 //--------------------------------------------------------------------------------------------------
-int sxt_get_generators(struct sxt_ristretto_element* generators, uint64_t num_generators,
+int sxt_get_generators(struct sxt_ristretto* generators, uint64_t num_generators,
                        uint64_t offset_generators) {
 
   // if no generator specified, then ignore the function call
@@ -218,8 +227,8 @@ int sxt_get_generators(struct sxt_ristretto_element* generators, uint64_t num_ge
   if (backend == nullptr)
     return 1;
 
-  basct::span<rstt::compressed_element> generators_result(
-      reinterpret_cast<rstt::compressed_element*>(generators), num_generators);
+  basct::span<c21t::element_p3> generators_result(reinterpret_cast<c21t::element_p3*>(generators),
+                                                  num_generators);
 
   backend->get_generators(generators_result, offset_generators);
 

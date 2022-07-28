@@ -26,8 +26,6 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/curve21/constant:zero",
         "//sxt/curve21/type:element_p3",
-        "//sxt/ristretto/base:byte_conversion",
-        "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",
     ],
 )

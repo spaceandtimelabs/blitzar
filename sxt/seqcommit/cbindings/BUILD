@@ -29,6 +29,8 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/ristretto/operation:add",
         "//sxt/ristretto/random:element",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/ristretto/base:byte_conversion",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",
         "//sxt/seqcommit/generator:precomputed_generators",

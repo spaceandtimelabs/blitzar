@@ -11,6 +11,7 @@
 #include <string_view>
 
 #include "sxt/base/container/span.h"
+#include "sxt/base/profile/callgrind.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/ristretto/base/byte_conversion.h"
@@ -130,7 +131,7 @@ static void populate_table(bool use_pre_computed_generators, bool is_boolean, ui
                            uint64_t commitment_length, uint8_t element_nbytes,
                            memmg::managed_array<uint8_t>& data_table,
                            memmg::managed_array<sqcb::indexed_exponent_sequence>& data_commitments,
-                           memmg::managed_array<rstt::compressed_element>& generators) {
+                           memmg::managed_array<c21t::element_p3>& generators) {
 
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -144,9 +145,7 @@ static void populate_table(bool use_pre_computed_generators, bool is_boolean, ui
 
   if (use_pre_computed_generators) {
     for (size_t i = 0; i < commitment_length; ++i) {
-      c21t::element_p3 g_i;
-      sqcgn::compute_base_element(g_i, i);
-      rstb::to_bytes(generators[i].data(), g_i);
+      sqcgn::compute_base_element(generators[i], i);
     }
   }
 
@@ -187,7 +186,7 @@ int main(int argc, char* argv[]) {
   std::cout << "********************************************" << std::endl;
 
   // populate data section
-  memmg::managed_array<rstt::compressed_element> generators(p.commitment_length);
+  memmg::managed_array<c21t::element_p3> generators(p.commitment_length);
   memmg::managed_array<sqcb::indexed_exponent_sequence> data_commitments(p.commitments);
   memmg::managed_array<rstt::compressed_element> commitments_per_sequence(p.commitments);
   memmg::managed_array<uint8_t> data_table(p.commitment_length * p.commitments * p.element_nbytes);
@@ -205,16 +204,22 @@ int main(int argc, char* argv[]) {
   for (int i = 0; i < p.num_samples; ++i) {
     if (p.use_pre_computed_generators) {
       // populate generators
-      basct::span<rstt::compressed_element> span_generators(generators.data(), p.commitment_length);
+      basct::span<c21t::element_p3> span_generators(generators.data(), p.commitment_length);
 
       p.trigger_timer();
-      p.backend->compute_commitments(commitments, value_sequences, span_generators);
+      SXT_TOGGLE_COLLECT;
+      p.backend->compute_commitments(commitments, value_sequences, span_generators,
+                                     p.commitment_length, false);
+      SXT_TOGGLE_COLLECT;
       p.stop_timer();
     } else {
-      basct::span<rstt::compressed_element> empty_generators;
+      basct::span<c21t::element_p3> empty_generators;
 
       p.trigger_timer();
-      p.backend->compute_commitments(commitments, value_sequences, empty_generators);
+      SXT_TOGGLE_COLLECT;
+      p.backend->compute_commitments(commitments, value_sequences, empty_generators,
+                                     p.commitment_length, false);
+      SXT_TOGGLE_COLLECT;
       p.stop_timer();
     }
 

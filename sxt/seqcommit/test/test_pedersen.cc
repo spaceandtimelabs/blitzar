@@ -17,14 +17,14 @@ namespace sxt::sqctst {
 void test_pedersen_compute_commitment(
     basf::function_ref<void(basct::span<rstt::compressed_element>,
                             basct::cspan<sqcb::indexed_exponent_sequence>,
-                            basct::cspan<rstt::compressed_element> generators)>
+                            basct::cspan<c21t::element_p3> generators)>
         f) {
   SECTION("we can add two commitments together") {
     const uint64_t num_rows = 4;
     const uint64_t num_sequences = 3;
     const uint8_t element_nbytes = sizeof(int);
 
-    basct::span<rstt::compressed_element> empty_generators;
+    basct::span<c21t::element_p3> empty_generators;
     rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
     basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
@@ -71,7 +71,7 @@ void test_pedersen_compute_commitment(
     const uint64_t num_sequences = 4;
     const uint8_t element_nbytes = sizeof(int);
 
-    basct::span<rstt::compressed_element> empty_generators;
+    basct::span<c21t::element_p3> empty_generators;
     rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
     basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
@@ -125,7 +125,7 @@ void test_pedersen_compute_commitment(
     const uint64_t num_sequences = 1;
     const uint8_t element_nbytes = sizeof(int);
 
-    basct::span<rstt::compressed_element> empty_generators;
+    basct::span<c21t::element_p3> empty_generators;
     rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
     basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
@@ -173,7 +173,7 @@ void test_pedersen_compute_commitment(
     const uint64_t num_sequences = 3;
     const uint8_t element_nbytes = 32;
 
-    basct::span<rstt::compressed_element> empty_generators;
+    basct::span<c21t::element_p3> empty_generators;
     rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
     basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
@@ -231,7 +231,7 @@ void test_pedersen_compute_commitment(
     const uint8_t element_nbytes = sizeof(int);
     const unsigned int multiplicative_constant = 52;
 
-    basct::span<rstt::compressed_element> empty_generators;
+    basct::span<c21t::element_p3> empty_generators;
     rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
     basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
@@ -282,7 +282,7 @@ void test_pedersen_compute_commitment(
     const uint64_t num_rows = 1;
     const uint64_t num_sequences = 3;
 
-    basct::span<rstt::compressed_element> empty_generators;
+    basct::span<c21t::element_p3> empty_generators;
     rstt::compressed_element commitments_data[num_sequences];
     sqcb::indexed_exponent_sequence sequences[num_sequences];
     basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
@@ -362,7 +362,7 @@ void test_pedersen_compute_commitment(
       sequences[i].exponent_sequence.element_nbytes = element_nbytes;
     }
 
-    basct::span<rstt::compressed_element> empty_generators(nullptr, 0);
+    basct::span<c21t::element_p3> empty_generators(nullptr, 0);
     basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences, num_sequences);
 
@@ -395,7 +395,7 @@ void test_pedersen_compute_commitment(
           "number of rows") {
     const uint64_t num_commitments = 4;
 
-    basct::span<rstt::compressed_element> empty_generators;
+    basct::span<c21t::element_p3> empty_generators;
     rstt::compressed_element commitments_data[num_commitments];
     sqcb::indexed_exponent_sequence sequences[num_commitments];
     basct::span<rstt::compressed_element> commitments(commitments_data, num_commitments);
@@ -463,7 +463,7 @@ void test_pedersen_compute_commitment(
 
   SECTION("We can pass generators to the commitment computation") {
 
-    rstt::compressed_element ristretto_gens[4];
+    c21t::element_p3 ristretto_gens[4];
     const int data_values[4] = {1, 2, 3, 4};
     c21t::element_p3 expected_g = c21cn::zero_p3_v;
 
@@ -471,8 +471,7 @@ void test_pedersen_compute_commitment(
       c21t::element_p3 g_i;
       sqcgn::compute_base_element(g_i, i + 3);
 
-      rstb::to_bytes(ristretto_gens[i].data(), g_i);
-      rstb::from_bytes(g_i, ristretto_gens[i].data());
+      ristretto_gens[i] = g_i;
 
       c21t::element_p3 h;
       c21o::scalar_multiply(
@@ -493,7 +492,7 @@ void test_pedersen_compute_commitment(
     sequences[0].exponent_sequence.element_nbytes = sizeof(int);
 
     basct::span<rstt::compressed_element> commitments(commitments_data, 1);
-    basct::span<rstt::compressed_element> span_generators(ristretto_gens, 4);
+    basct::span<c21t::element_p3> span_generators(ristretto_gens, 4);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences, 1);
 
     f(commitments, value_sequences, span_generators);
@@ -525,7 +524,7 @@ void test_pedersen_compute_commitment(
     sqcb::indexed_exponent_sequence sequences[num_sequences] = {dense_descriptor,
                                                                 sparse_descriptor};
 
-    basct::span<rstt::compressed_element> span_generators(nullptr, 0);
+    basct::span<c21t::element_p3> span_generators(nullptr, 0);
     basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences, num_sequences);
 
@@ -560,7 +559,7 @@ void test_pedersen_compute_commitment(
     sqcb::indexed_exponent_sequence sequences[num_sequences] = {dense_descriptor,
                                                                 sparse_descriptor};
 
-    basct::span<rstt::compressed_element> span_generators(nullptr, 0);
+    basct::span<c21t::element_p3> span_generators(nullptr, 0);
     basct::span<rstt::compressed_element> commitments(commitments_data, num_sequences);
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(sequences, num_sequences);
 

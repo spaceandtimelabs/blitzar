@@ -18,7 +18,7 @@ namespace sxt::sqcnv {
 //--------------------------------------------------------------------------------------------------
 void compute_commitments_cpu(basct::span<rstt::compressed_element> commitments,
                              basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
-                             basct::cspan<rstt::compressed_element> generators) noexcept {
+                             basct::cspan<c21t::element_p3> generators) noexcept {
 
   assert(commitments.size() == value_sequences.size());
 
@@ -45,7 +45,7 @@ void compute_commitments_cpu(basct::span<rstt::compressed_element> commitments,
 
         sqcgn::compute_base_element(g_i, row_g_i);
       } else { // otherwise, use the user given generators
-        rstb::from_bytes(g_i, generators[row_i].data());
+        g_i = generators[row_i];
       }
 
       c21o::scalar_multiply(h_i, basct::cspan<uint8_t>{bytes_row_i_column_k, element_nbytes},

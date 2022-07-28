@@ -13,7 +13,7 @@ TEST_CASE("we can precompute generators") {
   REQUIRE(generators.empty());
 
   // if we precompute generators, we can access them
-  init_precomputed_generators(10);
+  init_precomputed_generators(10, false);
   generators = get_precomputed_generators();
   REQUIRE(generators.size() == 10);
 

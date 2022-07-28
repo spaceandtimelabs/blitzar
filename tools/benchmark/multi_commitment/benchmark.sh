@@ -1,12 +1,9 @@
 #!/bin/bash
-USE_CALLGRIND="0"
 EXEC_CMD="bazel run -c opt //benchmark/multi_commitment:benchmark -- "
-EXEC_CMD_CALLGRIND="bazel run -c opt //benchmark/multi_commitment:benchmark_callgrind -- "
+EXEC_CMD_CALLGRIND="bazel run -c opt --define callgrind=true //benchmark/multi_commitment:benchmark_callgrind -- "
 
 ############################################
 
-verbose=1
-num_samples=3
 use_pre_computed_generators=1
 spreadsheet_dir="benchmark/multi_commitment"
 results_dir="benchmark/multi_commitment/.results"
@@ -23,6 +20,9 @@ run() {
     word_sizes=$1
     execs=$2
     backend=$3
+    use_callgrind=$4
+    num_samples=$5
+    verbose=$6
 
     # Run all the benchmarks
     for ws in ${word_sizes[@]}; do
@@ -36,7 +36,7 @@ run() {
 
             curr_benchmark_file="${base_dir}/${backend}_${c}_commits_${r}_length_${ws}_wordsize_${num_samples}_samples"
 
-            if [ "${USE_CALLGRIND}" == "1" ]; then
+            if [ "${use_callgrind}" == "1" ]; then
                 ${EXEC_CMD_CALLGRIND} ${backend} ${c} ${r} ${ws} ${verbose} ${num_samples} ${use_pre_computed_generators}
                 mv -f *.svg ${curr_benchmark_file}.svg
             else
@@ -98,87 +98,96 @@ spreadsheet() {
 }
 
 backend="$1"
-
-word_sizes=("0" "1" "4" "8" "32")
-
-############################################
-############################################
-# RUN STANDARD EXECUTION
-############################################
-############################################
-execs=()
+RUN_BENCHMARK="$2"
+RUN_BENCHMARK_WITH_CALLGRIND="$3"
 
 ############################################
-# Number of Commitments - Small
 ############################################
-
-NC="1"
-execs+=(
-    "${NC}-1" "${NC}-10" "${NC}-100" "${NC}-1000"
-    "${NC}-10000" "${NC}-100000"
-)
-
+# RUN BENCHMARK
 ############################################
-# Number of Commitments - Medium 1
 ############################################
+if [ "${RUN_BENCHMARK}" == "1" ]; then
+    verbose=1
+    num_samples=3
+    word_sizes=("0" "1" "4" "8" "32")
 
-NC="10"
-execs+=(
-    "${NC}-1" "${NC}-10" "${NC}-100"
-    "${NC}-1000" "${NC}-10000"
-)
+    ############################################
+    ############################################
+    # RUN STANDARD EXECUTION
+    ############################################
+    ############################################
+    execs=()
 
-############################################
-# Number of Commitments - Medium 2
-############################################
+    ############################################
+    # Number of Commitments - Small
+    ############################################
 
-NC="100"
-execs+=(
-    "${NC}-1" "${NC}-10" "${NC}-100"
-    "${NC}-1000"
-)
+    NC="1"
+    execs+=(
+        "${NC}-1" "${NC}-10" "${NC}-100" "${NC}-1000"
+        "${NC}-10000" "${NC}-100000"
+    )
 
-############################################
-# Number of Commitments - Large
-############################################
+    ############################################
+    # Number of Commitments - Medium 1
+    ############################################
 
-NC="1000"
-execs+=(
-    "${NC}-1" "${NC}-10" "${NC}-100"
-)
+    NC="10"
+    execs+=(
+        "${NC}-1" "${NC}-10" "${NC}-100"
+        "${NC}-1000" "${NC}-10000"
+    )
 
-if [ "$2" == "run" ]; then
-    USE_CALLGRIND="0"
-    $2 $word_sizes $execs $backend # run specified function
+    ############################################
+    # Number of Commitments - Medium 2
+    ############################################
+
+    NC="100"
+    execs+=(
+        "${NC}-1" "${NC}-10" "${NC}-100"
+        "${NC}-1000"
+    )
+
+    ############################################
+    # Number of Commitments - Large
+    ############################################
+
+    NC="1000"
+    execs+=(
+        "${NC}-1" "${NC}-10" "${NC}-100"
+    )
+
+
+    run $word_sizes $execs $backend 0 $num_samples $verbose # run specified function
+
+    spreadsheet $word_sizes $execs $backend # run specified function
 fi
 
-spreadsheet $word_sizes $execs $backend # run specified function
+############################################
+############################################
+# RUN CALLGRIND BENCHMARK
+############################################
+############################################
+if [ "${RUN_BENCHMARK_WITH_CALLGRIND}" == "1" ]; then
+    execs=()
+    
+    verbose=0
+    num_samples=1
+    word_sizes=("0" "32")
 
-############################################
-############################################
-# RUN CALLGRIND EXECUTION
-############################################
-############################################
-execs=()
-word_sizes=("0" "32")
+    ############################################
+    # Number of Commitments - Small
+    ############################################
 
-############################################
-# Number of Commitments - Small
-############################################
+    NC="1"
+    execs+=("1-10000")
 
-NC="1"
-num_samples=15
-execs+=("${NC}-10000")
-num_samples=3
+    ############################################
+    # Number of Commitments - Medium 2
+    ############################################
 
-############################################
-# Number of Commitments - Medium 2
-############################################
+    NC="100"
+    execs+=("${NC}-100")
 
-NC="100"
-execs+=("${NC}-100")
-
-if [ "$2" == "run" ]; then
-    USE_CALLGRIND="1"
-    $2 $word_sizes $execs $backend # run specified function
+    run $word_sizes $execs $backend 1 $num_samples $verbose # run specified function
 fi

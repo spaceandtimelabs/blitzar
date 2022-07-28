@@ -12,6 +12,7 @@ sxt_cc_benchmark(
     visibility = ["//visibility:public"],
     deps = [
         "//sxt/base/container:span",
+        "//sxt/base/profile:callgrind",
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
         "//sxt/ristretto/base:byte_conversion",

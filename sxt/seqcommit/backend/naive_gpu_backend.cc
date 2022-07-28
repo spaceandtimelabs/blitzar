@@ -1,9 +1,11 @@
 #include "sxt/seqcommit/backend/naive_gpu_backend.h"
 
+#include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/gpu_generator.h"
+#include "sxt/seqcommit/generator/precomputed_generators.h"
 #include "sxt/seqcommit/naive/commitment_computation_gpu.h"
 
 namespace sxt::sqcbck {
@@ -12,7 +14,7 @@ namespace sxt::sqcbck {
 //--------------------------------------------------------------------------------------------------
 static void pre_initialize_gpu() {
   // initialization of dummy variables
-  basct::span<rstt::compressed_element> dummy_empty_generators;
+  basct::span<c21t::element_p3> dummy_empty_generators;
   memmg::managed_array<uint8_t> dummy_data_table(1); // 1 col, 1 row, 1 bytes per data
   memmg::managed_array<rstt::compressed_element> dummy_commitments_per_col(1);
   memmg::managed_array<sqcb::indexed_exponent_sequence> dummy_data_cols(1);
@@ -43,14 +45,24 @@ naive_gpu_backend::naive_gpu_backend() { pre_initialize_gpu(); }
 void naive_gpu_backend::compute_commitments(
     basct::span<rstt::compressed_element> commitments,
     basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
-    basct::span<rstt::compressed_element> generators) noexcept {
+    basct::cspan<c21t::element_p3> generators, uint64_t length_longest_sequence,
+    bool has_sparse_sequence) noexcept {
+
+  if (!generators.empty() || has_sparse_sequence) {
+    sqcnv::compute_commitments_gpu(commitments, value_sequences, generators);
+    return;
+  }
+
+  std::vector<c21t::element_p3> generators_data;
+  generators = sqcgn::get_precomputed_generators(generators_data, length_longest_sequence, true);
+
   sqcnv::compute_commitments_gpu(commitments, value_sequences, generators);
 }
 
 //--------------------------------------------------------------------------------------------------
 // get_generators
 //--------------------------------------------------------------------------------------------------
-void naive_gpu_backend::get_generators(basct::span<rstt::compressed_element> generators,
+void naive_gpu_backend::get_generators(basct::span<c21t::element_p3> generators,
                                        uint64_t offset_generators) noexcept {
   sqcgn::gpu_get_generators(generators, offset_generators);
 }
