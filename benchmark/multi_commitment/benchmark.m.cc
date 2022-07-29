@@ -29,7 +29,8 @@ struct params {
   int status;
   bool verbose;
   int num_samples = 1;
-  uint64_t commitments, commitment_length;
+  uint64_t num_commitments;
+  uint64_t commitment_length;
   std::string backend_str;
   uint64_t element_nbytes;
   bool is_boolean;
@@ -43,16 +44,17 @@ struct params {
     status = 0;
 
     if (argc < 8) {
-      std::cerr << "Usage: benchmark <naive-cpu|naive-gpu|pip-cpu>"
-                << "<commitment_length> <commitments> <element_nbytes>"
-                << "<allow_verbose> <num_samples> <use_pre_computed_generators>\n";
+      std::cerr << "Usage: benchmark "
+                << "<naive-cpu|naive-gpu|pip-cpu> "
+                << "<num_commitments> <commitment_length> <element_nbytes> "
+                << "<verbose> <num_samples> <use_pre_computed_generators>\n";
       status = -1;
     }
 
     select_backend_fn(argv[1]);
 
     verbose = is_boolean = false;
-    commitments = std::atoi(argv[2]);
+    num_commitments = std::atoi(argv[2]);
     commitment_length = std::atoi(argv[3]);
     element_nbytes = std::atoi(argv[4]);
 
@@ -69,8 +71,8 @@ struct params {
 
     use_pre_computed_generators = std::atoi(argv[7]);
 
-    if (commitments <= 0 || commitment_length <= 0 || element_nbytes > 32) {
-      std::cerr << "Restriction: 1 <= commitments, "
+    if (num_commitments <= 0 || commitment_length <= 0 || element_nbytes > 32) {
+      std::cerr << "Restriction: 1 <= num_commitments, "
                 << "1 <= commitment_length, 1 <= element_nbytes <= 32\n";
       status = -1;
     }
@@ -113,13 +115,13 @@ struct params {
 //--------------------------------------------------------------------------------------------------
 // print_result
 //--------------------------------------------------------------------------------------------------
-static void print_result(uint64_t commitments,
+static void print_result(uint64_t num_commitments,
                          memmg::managed_array<rstt::compressed_element>& commitments_per_sequence) {
 
   std::cout << "===== result\n";
 
   // print the 32 bytes commitment results of each sequence
-  for (size_t c = 0; c < commitments; ++c) {
+  for (size_t c = 0; c < num_commitments; ++c) {
     std::cout << "commitment " << c << " = " << commitments_per_sequence[c] << std::endl;
   }
 }
@@ -127,7 +129,7 @@ static void print_result(uint64_t commitments,
 //--------------------------------------------------------------------------------------------------
 // populate_table
 //--------------------------------------------------------------------------------------------------
-static void populate_table(bool use_pre_computed_generators, bool is_boolean, uint64_t commitments,
+static void populate_table(bool use_pre_computed_generators, bool is_boolean, uint64_t num_commitments,
                            uint64_t commitment_length, uint8_t element_nbytes,
                            memmg::managed_array<uint8_t>& data_table,
                            memmg::managed_array<sqcb::indexed_exponent_sequence>& data_commitments,
@@ -153,7 +155,7 @@ static void populate_table(bool use_pre_computed_generators, bool is_boolean, ui
     data_table[i] = distribution(gen);
   }
 
-  for (size_t c = 0; c < commitments; ++c) {
+  for (size_t c = 0; c < num_commitments; ++c) {
     auto& data_sequence = data_commitments[c];
 
     data_sequence.indices = nullptr;
@@ -173,29 +175,29 @@ int main(int argc, char* argv[]) {
   if (p.status != 0)
     return -1;
 
-  double table_size = (p.commitments * p.commitment_length * p.element_nbytes) / 1024.;
+  double table_size = (p.num_commitments * p.commitment_length * p.element_nbytes) / 1024.;
 
   std::cout << "===== benchmark results" << std::endl;
   std::cout << "backend : " << p.backend_str << std::endl;
   std::cout << "commitment length : " << p.commitment_length << std::endl;
-  std::cout << "number of commitments : " << p.commitments << std::endl;
+  std::cout << "number of commitments : " << p.num_commitments << std::endl;
   std::cout << "element_nbytes : " << p.element_nbytes << std::endl;
   std::cout << "is boolean : " << p.is_boolean << std::endl;
   std::cout << "table_size (MB) : " << table_size << std::endl;
-  std::cout << "num_exponentations : " << (p.commitments * p.commitment_length) << std::endl;
+  std::cout << "num_exponentations : " << (p.num_commitments * p.commitment_length) << std::endl;
   std::cout << "********************************************" << std::endl;
 
   // populate data section
   memmg::managed_array<c21t::element_p3> generators(p.commitment_length);
-  memmg::managed_array<sqcb::indexed_exponent_sequence> data_commitments(p.commitments);
-  memmg::managed_array<rstt::compressed_element> commitments_per_sequence(p.commitments);
-  memmg::managed_array<uint8_t> data_table(p.commitment_length * p.commitments * p.element_nbytes);
+  memmg::managed_array<sqcb::indexed_exponent_sequence> data_commitments(p.num_commitments);
+  memmg::managed_array<rstt::compressed_element> commitments_per_sequence(p.num_commitments);
+  memmg::managed_array<uint8_t> data_table(p.commitment_length * p.num_commitments * p.element_nbytes);
 
-  basct::span<rstt::compressed_element> commitments(commitments_per_sequence.data(), p.commitments);
+  basct::span<rstt::compressed_element> commitments(commitments_per_sequence.data(), p.num_commitments);
   basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(data_commitments.data(),
-                                                                p.commitments);
+                                                                p.num_commitments);
 
-  populate_table(p.use_pre_computed_generators, p.is_boolean, p.commitments, p.commitment_length,
+  populate_table(p.use_pre_computed_generators, p.is_boolean, p.num_commitments, p.commitment_length,
                  p.element_nbytes, data_table, data_commitments, generators);
 
   std::vector<double> durations;
@@ -237,7 +239,7 @@ int main(int argc, char* argv[]) {
 
   std_deviation = sqrt(std_deviation / p.num_samples);
 
-  double data_throughput = p.commitment_length * p.commitments / mean_duration_compute;
+  double data_throughput = p.commitment_length * p.num_commitments / mean_duration_compute;
 
   std::cout << "pre-computed generators : " << (p.use_pre_computed_generators ? "yes" : "no")
             << std::endl;
@@ -247,7 +249,7 @@ int main(int argc, char* argv[]) {
             << std::endl;
 
   if (p.verbose)
-    print_result(p.commitments, commitments_per_sequence);
+    print_result(p.num_commitments, commitments_per_sequence);
 
   std::cout << "********************************************" << std::endl;
 

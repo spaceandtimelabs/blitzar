@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
@@ -32,7 +31,7 @@ def read_summary_file(file):
 
     return summary
 
-base_dir = 'benchmark/multi_commitment/benchmark_results'
+base_dir = 'benchmark/multi_commitment/.results'
 summary_pip_cpu = read_summary_file(base_dir + '/summary_pip-cpu.txt')
 summary_naive_cpu = read_summary_file(base_dir + '/summary_naive-cpu.txt')
 

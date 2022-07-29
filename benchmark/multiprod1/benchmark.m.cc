@@ -56,6 +56,7 @@ int main(int argc, char* argv[]) {
   // we populate the inout array with `num_inputs` random curve21 elements
   mtxtst::generate_curve21_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
 
+  size_t num_rows = products.num_rows();
   memmg::managed_array<c21t::element_p3> expected_result(products.num_rows());
 
   // we benchmark multiple times to reduce the randomness of each execution
@@ -113,7 +114,7 @@ int main(int argc, char* argv[]) {
   if (verbose) {
     auto& results = (use_naive ? expected_result : inout);
 
-    for (size_t i = 0; i < results.size(); ++i) {
+    for (size_t i = 0; i < num_rows; ++i) {
       std::cout << results.data()[i] << std::endl;
     }
   }

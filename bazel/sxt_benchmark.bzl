@@ -50,13 +50,13 @@ def sxt_cc_benchmark(
         ],
         tools = [
             ":" + name,
-            "//bazel:bench_profile",
+            "//tools/benchmark:bench_profile",
         ],
         local = 1,
         executable = 1,
         output_to_bindir = 1,
         visibility = visibility,
-        cmd_bash = "$(location //bazel:bench_profile) $$PWD/$(location :%s) $@" % name,
+        cmd_bash = "$(location //tools/benchmark:bench_profile) $$PWD/$(location :%s) $@" % name,
     )
 
     native.cc_binary(

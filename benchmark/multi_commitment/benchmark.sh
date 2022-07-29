@@ -4,8 +4,9 @@ EXEC_CMD_CALLGRIND="bazel run -c opt --define callgrind=true //benchmark/multi_c
 
 ############################################
 
+# specifies if the benchmark should use pre-computed generators
 use_pre_computed_generators=1
-spreadsheet_dir="benchmark/multi_commitment"
+
 results_dir="benchmark/multi_commitment/.results"
 
 read_field() {

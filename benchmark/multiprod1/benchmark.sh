@@ -11,7 +11,7 @@ run() {
     num_sequences=$4
     max_num_inputs=$5
     num_samples=$6
-    compare_naive=$7
+    verbose=1
 
     base_dir="${results_dir}/use_naive_${use_naive}/"
 
@@ -19,7 +19,7 @@ run() {
 
     curr_benchmark_file="${base_dir}/out"
 
-    input_params="$use_naive $sequence_length $num_sequences $max_num_inputs $num_samples $compare_naive"
+    input_params="$use_naive $sequence_length $num_sequences $max_num_inputs $num_samples $verbose"
 
     if [ "${use_callgrind}" == "2" ]; then
         $EXEC_CMD_CALLGRIND $input_params
@@ -30,12 +30,11 @@ run() {
 }
 
 use_naive=$1
-compare_naive=$2
 num_samples=50
 max_num_inputs=4000
 num_sequences=30
 sequence_length=1000
 
-run 1 $use_naive $sequence_length $num_sequences $max_num_inputs $num_samples $compare_naive
+run 1 $use_naive $sequence_length $num_sequences $max_num_inputs $num_samples
 
-run 2 $use_naive $sequence_length $num_sequences $max_num_inputs 1 $compare_naive
+run 2 $use_naive $sequence_length $num_sequences $max_num_inputs 1
