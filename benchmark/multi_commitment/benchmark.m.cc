@@ -129,9 +129,9 @@ static void print_result(uint64_t num_commitments,
 //--------------------------------------------------------------------------------------------------
 // populate_table
 //--------------------------------------------------------------------------------------------------
-static void populate_table(bool use_pre_computed_generators, bool is_boolean, uint64_t num_commitments,
-                           uint64_t commitment_length, uint8_t element_nbytes,
-                           memmg::managed_array<uint8_t>& data_table,
+static void populate_table(bool use_pre_computed_generators, bool is_boolean,
+                           uint64_t num_commitments, uint64_t commitment_length,
+                           uint8_t element_nbytes, memmg::managed_array<uint8_t>& data_table,
                            memmg::managed_array<sqcb::indexed_exponent_sequence>& data_commitments,
                            memmg::managed_array<c21t::element_p3>& generators) {
 
@@ -191,14 +191,16 @@ int main(int argc, char* argv[]) {
   memmg::managed_array<c21t::element_p3> generators(p.commitment_length);
   memmg::managed_array<sqcb::indexed_exponent_sequence> data_commitments(p.num_commitments);
   memmg::managed_array<rstt::compressed_element> commitments_per_sequence(p.num_commitments);
-  memmg::managed_array<uint8_t> data_table(p.commitment_length * p.num_commitments * p.element_nbytes);
+  memmg::managed_array<uint8_t> data_table(p.commitment_length * p.num_commitments *
+                                           p.element_nbytes);
 
-  basct::span<rstt::compressed_element> commitments(commitments_per_sequence.data(), p.num_commitments);
+  basct::span<rstt::compressed_element> commitments(commitments_per_sequence.data(),
+                                                    p.num_commitments);
   basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(data_commitments.data(),
                                                                 p.num_commitments);
 
-  populate_table(p.use_pre_computed_generators, p.is_boolean, p.num_commitments, p.commitment_length,
-                 p.element_nbytes, data_table, data_commitments, generators);
+  populate_table(p.use_pre_computed_generators, p.is_boolean, p.num_commitments,
+                 p.commitment_length, p.element_nbytes, data_table, data_commitments, generators);
 
   std::vector<double> durations;
   double mean_duration_compute = 0;

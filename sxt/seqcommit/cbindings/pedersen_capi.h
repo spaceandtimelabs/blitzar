@@ -158,7 +158,7 @@ int sxt_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitment
  */
 int sxt_compute_pedersen_commitments_with_generators(
     struct sxt_compressed_ristretto* commitments, uint32_t num_sequences,
-    const struct sxt_sequence_descriptor* descriptors, struct sxt_ristretto* generators);
+    const struct sxt_sequence_descriptor* descriptors, const struct sxt_ristretto* generators);
 
 /**
  * Gets the pre-specified random generated elements used for the Pedersen commitments in the

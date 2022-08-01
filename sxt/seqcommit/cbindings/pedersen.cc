@@ -127,7 +127,7 @@ static int validate_sequence_descriptor(uint64_t& longest_sequence, uint32_t num
 static int process_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitments,
                                                 uint32_t num_sequences,
                                                 const struct sxt_sequence_descriptor* descriptors,
-                                                struct sxt_ristretto* generators) {
+                                                const struct sxt_ristretto* generators) {
 
   // backend not initialized (sxt_init not called correctly)
   if (backend == nullptr)
@@ -170,8 +170,9 @@ static int process_compute_pedersen_commitments(struct sxt_compressed_ristretto*
     generators_length = 0;
   }
 
-  basct::cspan<c21t::element_p3> generators_span(reinterpret_cast<c21t::element_p3*>(generators),
-                                                 generators_length);
+  // we assume that the `compute_commitments` does not change any content in the generators span
+  basct::cspan<c21t::element_p3> generators_span(
+      reinterpret_cast<const c21t::element_p3*>(generators), generators_length);
 
   backend->compute_commitments(commitments_result, value_sequences, generators_span,
                                length_longest_sequence, has_sparse_sequence);
@@ -195,7 +196,7 @@ int sxt_compute_pedersen_commitments(sxt_compressed_ristretto* commitments, uint
 //--------------------------------------------------------------------------------------------------
 int sxt_compute_pedersen_commitments_with_generators(
     struct sxt_compressed_ristretto* commitments, uint32_t num_sequences,
-    const struct sxt_sequence_descriptor* descriptors, struct sxt_ristretto* generators) {
+    const struct sxt_sequence_descriptor* descriptors, const struct sxt_ristretto* generators) {
 
   // we only verify if generators is null, but we
   // expect it to have size equal to the longest
