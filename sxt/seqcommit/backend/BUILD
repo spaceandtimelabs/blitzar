@@ -60,6 +60,7 @@ sxt_cc_component(
         "//sxt/seqcommit/generator:precomputed_generators",
         "//sxt/multiexp/ristretto:precomputed_p3_input_accessor",
         "//sxt/multiexp/ristretto:multiexponentiation_cpu_driver",
+        "//sxt/multiexp/ristretto:pippenger_multiproduct_solver",
         "//sxt/multiexp/pippenger:multiexponentiation",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/seqcommit/naive:commitment_computation_cpu",

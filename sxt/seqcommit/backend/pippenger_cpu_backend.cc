@@ -7,6 +7,7 @@
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
 #include "sxt/multiexp/ristretto/multiexponentiation_cpu_driver.h"
+#include "sxt/multiexp/ristretto/pippenger_multiproduct_solver.h"
 #include "sxt/multiexp/ristretto/precomputed_p3_input_accessor.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
@@ -30,22 +31,6 @@ populate_exponents_array(memmg::managed_array<mtxb::exponent_sequence>& exponent
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_commitments_with_no_generators
-//--------------------------------------------------------------------------------------------------
-static void
-compute_commitments_with_no_generators(memmg::managed_array<rstt::compressed_element>& commitments,
-                                       basct::cspan<mtxb::exponent_sequence> exponents,
-                                       size_t length_longest_sequence) noexcept {
-  std::vector<c21t::element_p3> generators_data;
-  auto generators =
-      sqcgn::get_precomputed_generators(generators_data, length_longest_sequence, false);
-
-  mtxrs::precomputed_p3_input_accessor input_accessor{generators};
-  mtxrs::multiexponentiation_cpu_driver drv{&input_accessor};
-  mtxpi::compute_multiexponentiation(commitments, drv, exponents);
-}
-
-//--------------------------------------------------------------------------------------------------
 // compute_commitments
 //--------------------------------------------------------------------------------------------------
 void pippenger_cpu_backend::compute_commitments(
@@ -58,14 +43,7 @@ void pippenger_cpu_backend::compute_commitments(
 
   populate_exponents_array(exponents, value_sequences);
 
-  memmg::managed_array<rstt::compressed_element> inout;
-
-  if (!generators.empty()) {
-    mtxrs::precomputed_p3_input_accessor input_accessor{generators};
-    mtxrs::multiexponentiation_cpu_driver drv{&input_accessor};
-
-    mtxpi::compute_multiexponentiation(inout, drv, exponents);
-  } else {
+  if (has_sparse_sequence) {
     /////////////////////////////////////////////////////////
     // TODO
     /////////////////////////////////////////////////////////
@@ -73,14 +51,17 @@ void pippenger_cpu_backend::compute_commitments(
     // to process sparse sequences. But later, this should
     // be changed to use the pippenger implementation instead
     /////////////////////////////////////////////////////////
-    if (has_sparse_sequence) {
-      sqcnv::compute_commitments_cpu(commitments, value_sequences, generators);
-      return;
-    }
-
-    compute_commitments_with_no_generators(inout, exponents, length_longest_sequence);
+    return sqcnv::compute_commitments_cpu(commitments, value_sequences, generators);
   }
-
+  memmg::managed_array<rstt::compressed_element> inout;
+  std::vector<c21t::element_p3> generators_data;
+  if (generators.empty()) {
+    generators = sqcgn::get_precomputed_generators(generators_data, length_longest_sequence, false);
+  }
+  mtxrs::precomputed_p3_input_accessor input_accessor{generators};
+  mtxrs::pippenger_multiproduct_solver multiproduct_solver;
+  mtxrs::multiexponentiation_cpu_driver drv{&input_accessor, &multiproduct_solver};
+  mtxpi::compute_multiexponentiation(inout, drv, exponents);
   std::memcpy(commitments.data(), inout.data(),
               commitments.size() * sizeof(rstt::compressed_element));
 }

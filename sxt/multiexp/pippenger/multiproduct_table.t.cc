@@ -42,32 +42,42 @@ TEST_CASE("we can construct a table that identifies the terms needed for "
 
   SECTION("we correctly handle the empty case with a single input term") {
     std::vector<mtxb::exponent> term_or_all = {mtxb::exponent{}};
-    make_multiproduct_term_table(table, {term_or_all.data(), term_or_all.size()}, 3);
+    auto num_entries =
+        make_multiproduct_term_table(table, {term_or_all.data(), term_or_all.size()}, 3);
+    REQUIRE(num_entries == 0);
     REQUIRE(table == mtxi::index_table{{}});
   }
 
   SECTION("we correctly handle the empty case with two input terms") {
     std::vector<mtxb::exponent> term_or_all = {mtxb::exponent{}, mtxb::exponent{}};
-    make_multiproduct_term_table(table, {term_or_all.data(), term_or_all.size()}, 3);
+    auto num_entries =
+        make_multiproduct_term_table(table, {term_or_all.data(), term_or_all.size()}, 3);
+    REQUIRE(num_entries == 0);
     REQUIRE(table == mtxi::index_table{{}, {}});
   }
 
   SECTION("we can construct a table with a single term and a single entry") {
     std::vector<mtxb::exponent> term_or_all = {mtxb::exponent{0b1, 0, 0, 0}};
-    make_multiproduct_term_table(table, {term_or_all.data(), term_or_all.size()}, 3);
+    auto num_entries =
+        make_multiproduct_term_table(table, {term_or_all.data(), term_or_all.size()}, 3);
+    REQUIRE(num_entries == 1);
     REQUIRE(table == mtxi::index_table{{0}});
   }
 
   SECTION("we can construct a table with a single term and multiple entries") {
     std::vector<mtxb::exponent> term_or_all = {mtxb::exponent{0b1001, 0b1, 0, 0}};
-    make_multiproduct_term_table(table, {term_or_all.data(), term_or_all.size()}, 3);
+    auto num_entries =
+        make_multiproduct_term_table(table, {term_or_all.data(), term_or_all.size()}, 3);
+    REQUIRE(num_entries == 3);
     REQUIRE(table == mtxi::index_table{{0, 1, 21}});
   }
 
   SECTION("we can construct a table with multiple terms and multiple entries") {
     std::vector<mtxb::exponent> term_or_all = {mtxb::exponent{0b1001, 0, 0, 0},
                                                mtxb::exponent{0b1000, 0, 0, 0}};
-    make_multiproduct_term_table(table, {term_or_all.data(), term_or_all.size()}, 3);
+    auto num_entries =
+        make_multiproduct_term_table(table, {term_or_all.data(), term_or_all.size()}, 3);
+    REQUIRE(num_entries == 3);
     REQUIRE(table == mtxi::index_table{{0, 1}, {1}});
   }
 }
@@ -97,7 +107,7 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     std::vector<mtxb::exponent> term_or_all = {mtxb::exponent{1, 0, 0, 0}};
     std::vector<uint8_t> output_digit_or_all = {1};
     make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3);
-    REQUIRE(table == mtxi::index_table{{0}});
+    REQUIRE(table == mtxi::index_table{{0, 0, 0}});
   }
 
   SECTION("we handle the case of two exponentiations of 1") {
@@ -108,7 +118,7 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
                                                mtxb::exponent{1, 0, 0, 0}};
     std::vector<uint8_t> output_digit_or_all = {1};
     make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3);
-    REQUIRE(table == mtxi::index_table{{0, 1}});
+    REQUIRE(table == mtxi::index_table{{0, 0, 0, 1}});
   }
 
   SECTION("we handle the case of a single exponentiation of 2") {
@@ -118,7 +128,7 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     std::vector<mtxb::exponent> term_or_all = {mtxb::exponent{2, 0, 0, 0}};
     std::vector<uint8_t> output_digit_or_all = {2};
     make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3);
-    REQUIRE(table == mtxi::index_table{{0}});
+    REQUIRE(table == mtxi::index_table{{0, 0, 0}});
   }
 
   SECTION("we handle the case of a single exponentiation of 3") {
@@ -128,7 +138,7 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     std::vector<mtxb::exponent> term_or_all = {mtxb::exponent{3, 0, 0, 0}};
     std::vector<uint8_t> output_digit_or_all = {3};
     make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3);
-    REQUIRE(table == mtxi::index_table{{0}, {0}});
+    REQUIRE(table == mtxi::index_table{{0, 0, 0}, {1, 0, 0}});
   }
 
   SECTION("we handle the case of two exponentiations of 1 and 2") {
@@ -139,7 +149,7 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
                                                mtxb::exponent{2, 0, 0, 0}};
     std::vector<uint8_t> output_digit_or_all = {0b11};
     make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3);
-    REQUIRE(table == mtxi::index_table{{0}, {1}});
+    REQUIRE(table == mtxi::index_table{{0, 0, 0}, {1, 0, 1}});
   }
 
   SECTION("we handle the case of two digits") {
@@ -149,6 +159,6 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     std::vector<mtxb::exponent> term_or_all = {mtxb::exponent{3, 0, 0, 0}};
     std::vector<uint8_t> output_digit_or_all = {1};
     make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 1);
-    REQUIRE(table == mtxi::index_table{{0, 1}});
+    REQUIRE(table == mtxi::index_table{{0, 0, 0, 1}});
   }
 }

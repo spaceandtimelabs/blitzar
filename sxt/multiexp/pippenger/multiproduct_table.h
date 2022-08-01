@@ -24,9 +24,9 @@ void make_digit_index_array(std::array<size_t, 8>& array, size_t first, uint8_t 
 //--------------------------------------------------------------------------------------------------
 // make_multiproduct_term_table
 //--------------------------------------------------------------------------------------------------
-void make_multiproduct_term_table(mtxi::index_table& table,
-                                  basct::cspan<mtxb::exponent> term_or_all,
-                                  size_t radix_log2) noexcept;
+size_t make_multiproduct_term_table(mtxi::index_table& table,
+                                    basct::cspan<mtxb::exponent> term_or_all,
+                                    size_t radix_log2) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // make_multiproduct_table

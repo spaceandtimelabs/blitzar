@@ -18,7 +18,7 @@ static void init_multiproduct_table(mtxi::index_table& table, size_t max_entries
   for (auto& digit : output_digit_or_all) {
     row_count += basbt::pop_count(digit);
   }
-  table.reshape(row_count, max_entries);
+  table.reshape(row_count, max_entries + 2 * row_count);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -46,8 +46,12 @@ static uint64_t* init_multiproduct_output_rows(basct::span<basct::span<uint64_t>
     if (count == 0) {
       continue;
     }
-    rows[multiproduct_output_index++] = {entry_data, 0};
-    entry_data += count;
+    auto output_index = multiproduct_output_index++;
+    auto& row = rows[output_index];
+    row = {entry_data, 2};
+    row[0] = output_index;
+    row[1] = 0;
+    entry_data += count + 2;
   }
   return entry_data;
 }
@@ -67,9 +71,9 @@ void make_digit_index_array(std::array<size_t, 8>& array, size_t first, uint8_t 
 //--------------------------------------------------------------------------------------------------
 // make_multiproduct_term_table
 //--------------------------------------------------------------------------------------------------
-void make_multiproduct_term_table(mtxi::index_table& table,
-                                  basct::cspan<mtxb::exponent> term_or_all,
-                                  size_t radix_log2) noexcept {
+size_t make_multiproduct_term_table(mtxi::index_table& table,
+                                    basct::cspan<mtxb::exponent> term_or_all,
+                                    size_t radix_log2) noexcept {
   size_t num_nonzero_digits = 0;
   for (auto& e : term_or_all) {
     num_nonzero_digits += mtxb::count_nonzero_digits(e, radix_log2);
@@ -90,6 +94,7 @@ void make_multiproduct_term_table(mtxi::index_table& table,
     rows[term_index] = {entries, entry_count};
     entries += entry_count;
   }
+  return num_nonzero_digits;
 }
 
 //--------------------------------------------------------------------------------------------------

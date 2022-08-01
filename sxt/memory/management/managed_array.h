@@ -33,6 +33,11 @@ public:
 
   managed_array(managed_array&& other, allocator_type alloc) noexcept;
 
+  // conversion
+  operator basct::span_void() noexcept {
+    return basct::span_void{data_, size_, num_bytes_ / size_};
+  }
+
   // assignment
   managed_array& operator=(const managed_array& other) noexcept;
   managed_array& operator=(managed_array&& other) noexcept;

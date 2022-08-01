@@ -14,7 +14,8 @@ namespace sxt::mtxpi {
 //--------------------------------------------------------------------------------------------------
 void test_driver::compute_multiproduct_inputs(memmg::managed_array<void>& inout,
                                               basct::cspan<basct::cspan<size_t>> powers,
-                                              size_t radix_log2) const noexcept {
+                                              size_t radix_log2, size_t /*num_multiproduct_inputs*/,
+                                              size_t /*num_multiproduct_entries*/) const noexcept {
   assert(inout.size() == powers.size());
   size_t num_terms = 0;
   for (auto& subpowers : powers) {
@@ -35,7 +36,8 @@ void test_driver::compute_multiproduct_inputs(memmg::managed_array<void>& inout,
 // compute_multiproduct
 //--------------------------------------------------------------------------------------------------
 void test_driver::compute_multiproduct(memmg::managed_array<void>& inout,
-                                       mtxi::index_table& multiproduct_table) const noexcept {
+                                       mtxi::index_table& multiproduct_table,
+                                       size_t /*num_inputs*/) const noexcept {
   basct::cspan<uint64_t> inputs{static_cast<uint64_t*>(inout.data()), inout.size()};
   memmg::managed_array<uint64_t> outputs{multiproduct_table.num_rows(), inout.get_allocator()};
   for (size_t row_index = 0; row_index < multiproduct_table.num_rows(); ++row_index) {
@@ -43,7 +45,8 @@ void test_driver::compute_multiproduct(memmg::managed_array<void>& inout,
     assert(!products.empty());
     auto& output = outputs[row_index];
     output = 0;
-    for (auto input : products) {
+    for (size_t product_index = 2; product_index < products.size(); ++product_index) {
+      auto input = products[product_index];
       assert(input < inputs.size());
       output += inputs[input];
     }

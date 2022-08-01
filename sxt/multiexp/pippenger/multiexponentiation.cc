@@ -45,16 +45,18 @@ static void compute_multiproduct(memmg::managed_array<void>& inout,
                                                               aggregates.output_or_all.size()));
 
   mtxi::index_table table;
-  make_multiproduct_term_table(table, aggregates.term_or_all, radix_log2);
+  auto num_multiproduct_inputs =
+      make_multiproduct_term_table(table, aggregates.term_or_all, radix_log2);
 
-  drv.compute_multiproduct_inputs(inout, table.cheader(), radix_log2);
+  drv.compute_multiproduct_inputs(inout, table.cheader(), radix_log2, num_multiproduct_inputs,
+                                  aggregates.pop_count);
 
   compute_output_digit_or_all(output_digit_or_all, aggregates.output_or_all, radix_log2);
 
   make_multiproduct_table(table, exponents, aggregates.pop_count, aggregates.term_or_all,
                           output_digit_or_all, radix_log2);
 
-  drv.compute_multiproduct(inout, table);
+  drv.compute_multiproduct(inout, table, num_multiproduct_inputs);
 }
 
 //--------------------------------------------------------------------------------------------------
