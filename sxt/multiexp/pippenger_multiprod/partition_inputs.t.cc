@@ -24,13 +24,10 @@ TEST_CASE("we can partition the inputs of a multiproduct") {
     REQUIRE(stats.prev_num_terms == 1);
     REQUIRE(stats.num_terms == 1);
 
-    REQUIRE(num_inactive_outputs == 1);
-    REQUIRE(num_inactive_inputs == 1);
-
     memmg::managed_array<uint64_t> expected_inputs{10};
     REQUIRE(inputs == expected_inputs);
 
-    mtxi::index_table expected_products{{0, 1, 0}};
+    mtxi::index_table expected_products{{0, 0, 0}};
     REQUIRE(products == expected_products);
   }
 
@@ -45,12 +42,9 @@ TEST_CASE("we can partition the inputs of a multiproduct") {
     REQUIRE(stats.prev_num_terms == 1);
     REQUIRE(stats.num_terms == 1);
 
-    REQUIRE(num_inactive_outputs == 1);
-    REQUIRE(num_inactive_inputs == 1);
-
     REQUIRE(inputs[0] == 15);
 
-    mtxi::index_table expected_products{{0, 1, 0}};
+    mtxi::index_table expected_products{{0, 0, 0}};
     REQUIRE(products == expected_products);
   }
 
@@ -65,13 +59,10 @@ TEST_CASE("we can partition the inputs of a multiproduct") {
     REQUIRE(stats.prev_num_terms == 2);
     REQUIRE(stats.num_terms == 2);
 
-    REQUIRE(num_inactive_outputs == 2);
-    REQUIRE(num_inactive_inputs == 2);
-
     REQUIRE(inputs[0] == 5);
     REQUIRE(inputs[1] == 15);
 
-    mtxi::index_table expected_products{{0, 1, 1}, {1, 1, 0}};
+    mtxi::index_table expected_products{{0, 0, 1}, {1, 0, 0}};
     REQUIRE(products == expected_products);
   }
 
@@ -87,13 +78,10 @@ TEST_CASE("we can partition the inputs of a multiproduct") {
     REQUIRE(stats.prev_num_terms == 3);
     REQUIRE(stats.num_terms == 2);
 
-    REQUIRE(num_inactive_outputs == 0);
-    REQUIRE(num_inactive_inputs == 1);
+    REQUIRE(inputs[0] == 15);
+    REQUIRE(inputs[1] == 20);
 
-    REQUIRE(inputs[0] == 20);
-    REQUIRE(inputs[1] == 15);
-
-    mtxi::index_table expected_products{{0, 0, 0}, {1, 1, 0, 0}};
+    mtxi::index_table expected_products{{0, 0, 0}, {1, 0, 0, 1}};
     REQUIRE(products == expected_products);
   }
 
@@ -108,13 +96,10 @@ TEST_CASE("we can partition the inputs of a multiproduct") {
     REQUIRE(stats.prev_num_terms == 4);
     REQUIRE(stats.num_terms == 4);
 
-    REQUIRE(num_inactive_outputs == 3);
-    REQUIRE(num_inactive_inputs == 4);
-
     memmg::managed_array<uint64_t> expected_inputs{5, 15, 6, 20};
     REQUIRE(inputs == expected_inputs);
 
-    mtxi::index_table expected_products{{0, 1, 1}, {1, 2, 0, 3}, {2, 1, 2}};
+    mtxi::index_table expected_products{{0, 0, 1}, {1, 0, 0, 3}, {2, 0, 2}};
     REQUIRE(products == expected_products);
   }
 }

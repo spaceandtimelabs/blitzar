@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <cstdlib>
-#include <iostream>
 #include <limits>
 #include <vector>
 
@@ -47,10 +46,14 @@ void compute_multiproduct(basct::span_void inout, basct::span<basct::span<uint64
                               num_inputs - num_inactive_inputs);
   if (params.partition_size > 0) {
     reduction_stats stats;
+    auto num_inactive_inputs_p = num_inactive_inputs;
     partition_inputs(inout.subspan(num_inactive_inputs), stats, products, num_inactive_outputs,
-                     num_inactive_inputs, drv, params.partition_size);
+                     num_inactive_inputs_p, drv, params.partition_size);
+    auto num_active_inputs = stats.num_terms - (num_inactive_inputs_p - num_inactive_inputs);
+    num_inactive_inputs = num_inactive_inputs_p;
+    prune_and_permute_products(inout.subspan(num_inactive_inputs), products, num_inactive_outputs,
+                               num_inactive_inputs, drv, num_active_inputs);
   }
-  size_t num_active_inputs = num_inputs - num_inactive_inputs;
   while (num_inactive_outputs < products.size()) {
     reduction_stats stats;
     size_t num_inactive_inputs_p = num_inactive_inputs;
@@ -59,7 +62,7 @@ void compute_multiproduct(basct::span_void inout, basct::span<basct::span<uint64
     if (stats.prev_num_terms == stats.num_terms) {
       break;
     }
-    num_active_inputs = stats.num_terms - (num_inactive_inputs_p - num_inactive_inputs);
+    auto num_active_inputs = stats.num_terms - (num_inactive_inputs_p - num_inactive_inputs);
     num_inactive_inputs = num_inactive_inputs_p;
 
     mtxi::index_table clumped_output_table;

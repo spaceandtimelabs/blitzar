@@ -34,7 +34,6 @@ void partition_inputs(basct::span_void inout, reduction_stats& stats,
   mtxi::reindex_rows(products.subspan(num_inactive_outputs), markers_view, compute_active_offset);
   markers.resize(markers_view.size());
   stats.num_terms = markers.size();
-  prune_rows(products, markers, num_inactive_outputs, num_inactive_inputs);
 
   drv.apply_partition_operation(inout, markers, partition_size);
 }

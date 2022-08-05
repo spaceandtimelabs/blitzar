@@ -4,15 +4,27 @@ load(
 )
 
 sxt_cc_component(
+    name = "multiproduct_bitset_operator",
+    with_test = False,
+    deps = [
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/type:element_p3",
+    ],
+)
+
+sxt_cc_component(
     name = "multiproduct_cpu_driver",
     impl_deps = [
+        ":multiproduct_bitset_operator",
         "//sxt/curve21/constant:zero",
-        "//sxt/base/bit:iteration",
         "//sxt/curve21/operation:add",
         "//sxt/base/container:span_void",
         "//sxt/curve21/type:element_p3",
         "//sxt/multiexp/index:clump2_descriptor",
         "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/bitset_multiprod:value_cache",
+        "//sxt/multiexp/bitset_multiprod:value_cache_utility",
+        "//sxt/multiexp/bitset_multiprod:multiproduct",
         "//sxt/multiexp/index:clump2_marker_utility",
     ],
     test_deps = [

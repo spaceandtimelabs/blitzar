@@ -1,13 +1,17 @@
 #include "sxt/multiexp/curve21/multiproduct_cpu_driver.h"
 
-#include <iostream>
+#include <algorithm>
+#include <vector>
 
-#include "sxt/base/bit/iteration.h"
 #include "sxt/base/container/span_void.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/multiexp/bitset_multiprod/multiproduct.h"
+#include "sxt/multiexp/bitset_multiprod/value_cache.h"
+#include "sxt/multiexp/bitset_multiprod/value_cache_utility.h"
+#include "sxt/multiexp/curve21/multiproduct_bitset_operator.h"
 #include "sxt/multiexp/index/clump2_descriptor.h"
 #include "sxt/multiexp/index/clump2_marker_utility.h"
 
@@ -24,26 +28,24 @@ void multiproduct_cpu_driver::apply_partition_operation(basct::span_void inout,
   basct::span<c21t::element_p3> inputs{static_cast<c21t::element_p3*>(inout.data()), num_inputs};
   memmg::managed_array<c21t::element_p3> inputs_p(num_inputs_p);
 
+  std::vector<c21t::element_p3> cache_data(mtxbmp::compute_cache_size(partition_size));
+  mtxbmp::value_cache<c21t::element_p3> cache;
+  multiproduct_bitset_operator op;
+  uint64_t partition_index = static_cast<uint64_t>(-1);
   for (size_t marker_index = 0; marker_index < num_inputs_p; ++marker_index) {
     auto marker = partition_markers[marker_index];
-    auto partition_index = marker >> partition_size;
-    auto bitset = marker ^ (partition_index << partition_size);
-
-    assert(bitset != 0);
-
-    size_t partition_first = partition_index * partition_size;
-
-    c21t::element_p3 reduction = inputs[partition_first + basbt::consume_next_bit(bitset)];
-
-    while (bitset != 0) {
-      auto index = basbt::consume_next_bit(bitset);
-
-      c21o::add(reduction, reduction, inputs[partition_first + index]);
+    auto partition_index_p = marker >> partition_size;
+    size_t partition_first = partition_index_p * partition_size;
+    if (partition_index_p != partition_index) {
+      partition_index = partition_index_p;
+      cache = {cache_data.data(), std::min(partition_size, num_inputs - partition_first)};
+      mtxbmp::init_value_cache(
+          cache, op,
+          basct::cspan<c21t::element_p3>{inputs.subspan(partition_first, cache.num_terms())});
     }
-
-    inputs_p[marker_index] = reduction;
+    auto bitset = marker ^ (partition_index << partition_size);
+    mtxbmp::compute_multiproduct(inputs_p[marker_index], cache, op, bitset);
   }
-
   std::copy_n(inputs_p.data(), inputs_p.size(), inputs.data());
 }
 

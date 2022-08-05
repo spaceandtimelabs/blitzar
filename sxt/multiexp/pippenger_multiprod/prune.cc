@@ -26,6 +26,7 @@ void prune_rows(basct::span<basct::span<uint64_t>> rows, std::vector<uint64_t>& 
     for (size_t entry_index = 2 + num_inactive_entries; entry_index < row.size(); ++entry_index) {
       auto entry = row[entry_index];
       ++v1[entry];
+      assert(entry < max_active_counts.size());
       max_active_counts[entry] = std::max(max_active_counts[entry], num_active_entries);
     }
   }
