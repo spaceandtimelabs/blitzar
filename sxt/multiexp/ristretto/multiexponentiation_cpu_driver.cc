@@ -3,6 +3,8 @@
 #include <cassert>
 
 #include "sxt/base/bit/count.h"
+#include "sxt/base/bit/span_op.h"
+#include "sxt/base/container/blob_array.h"
 #include "sxt/base/container/span.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
@@ -100,28 +102,21 @@ void multiexponentiation_cpu_driver::compute_multiproduct(memmg::managed_array<v
 // combine_multiproduct_outputs
 //--------------------------------------------------------------------------------------------------
 void multiexponentiation_cpu_driver::combine_multiproduct_outputs(
-    memmg::managed_array<void>& inout, basct::cspan<uint8_t> output_digit_or_all) const noexcept {
-
+    memmg::managed_array<void>& inout,
+    const basct::blob_array& output_digit_or_all) const noexcept {
   basct::cspan<c21t::element_p3> inputs{static_cast<c21t::element_p3*>(inout.data()), inout.size()};
-
   memmg::managed_array<rstt::compressed_element> outputs{output_digit_or_all.size(),
                                                          inout.get_allocator()};
   size_t input_index = 0;
   for (size_t output_index = 0; output_index < output_digit_or_all.size(); ++output_index) {
-    uint64_t digit_or_all = output_digit_or_all[output_index];
-
+    auto digit_or_all = output_digit_or_all[output_index];
     int digit_count_one = basbt::pop_count(digit_or_all);
-
     if (digit_count_one == 0) {
       memset(outputs[output_index].data(), 0, sizeof(rstt::compressed_element));
-
       continue;
     }
-
-    int digit_bit_index = 8 * sizeof(digit_or_all) - basbt::count_leading_zeros(digit_or_all) - 1;
-
+    size_t digit_bit_index = 8 * digit_or_all.size() - basbt::count_leading_zeros(digit_or_all) - 1;
     input_index += digit_count_one;
-
     c21t::element_p1p1 res2_p1p1;
 
     // we manually set the first `input_index`
@@ -136,16 +131,13 @@ void multiexponentiation_cpu_driver::combine_multiproduct_outputs(
       c21t::to_element_p3(output, res2_p1p1);
 
       // if i-th bit is set, we need to add a_i to output
-      if (digit_or_all & (1ull << digit_bit_index)) {
+      if (basbt::test_bit(digit_or_all, digit_bit_index)) {
         c21o::add(output, output, inputs[--input_index]);
       }
     }
-
     input_index += digit_count_one;
-
     rstb::to_bytes(outputs[output_index].data(), output);
   }
-
   inout = std::move(outputs);
 }
 } // namespace sxt::mtxrs

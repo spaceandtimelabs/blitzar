@@ -9,41 +9,103 @@ using namespace sxt::mtxb;
 TEST_CASE("we can extract digits given a radix that's a power of two") {
   SECTION("we can extract digits from a byte using a radix of 2^8") {
     uint8_t val[] = {0b10};
-    REQUIRE(extract_digit(val, 8, 0) == 0b10);
+    uint8_t digit[1];
+    extract_digit(digit, val, 8, 0);
+    REQUIRE(digit[0] == 0b10);
   }
 
   SECTION("we can extract digits from a byte with a radix less than 2^8") {
     uint8_t val[] = {0b10110011};
+    uint8_t digit[1];
 
-    REQUIRE(extract_digit(val, 3, 0) == 0b011);
-    REQUIRE(extract_digit(val, 3, 1) == 0b110);
-    REQUIRE(extract_digit(val, 3, 2) == 0b010);
+    extract_digit(digit, val, 3, 0);
+    REQUIRE(digit[0] == 0b011);
+
+    extract_digit(digit, val, 3, 1);
+    REQUIRE(digit[0] == 0b110);
+
+    extract_digit(digit, val, 3, 2);
+    REQUIRE(digit[0] == 0b010);
   }
 
   SECTION("we can extract digits from a multi-byte number") {
     uint8_t val[] = {0b10110011, 0b11001011};
+    uint8_t digit[1];
 
-    REQUIRE(extract_digit(val, 8, 0) == val[0]);
-    REQUIRE(extract_digit(val, 8, 1) == val[1]);
+    extract_digit(digit, val, 8, 0);
+    REQUIRE(digit[0] == val[0]);
 
-    REQUIRE(extract_digit(val, 3, 0) == 0b011);
-    REQUIRE(extract_digit(val, 3, 1) == 0b110);
-    REQUIRE(extract_digit(val, 3, 2) == 0b110);
-    REQUIRE(extract_digit(val, 3, 3) == 0b101);
-    REQUIRE(extract_digit(val, 3, 4) == 0b100);
-    REQUIRE(extract_digit(val, 3, 5) == 0b001);
+    extract_digit(digit, val, 8, 1);
+    REQUIRE(digit[0] == val[1]);
+
+    extract_digit(digit, val, 3, 0);
+    REQUIRE(digit[0] == 0b011);
+
+    extract_digit(digit, val, 3, 1);
+    REQUIRE(digit[0] == 0b110);
+
+    extract_digit(digit, val, 3, 2);
+    REQUIRE(digit[0] == 0b110);
+
+    extract_digit(digit, val, 3, 3);
+    REQUIRE(digit[0] == 0b101);
+
+    extract_digit(digit, val, 3, 4);
+    REQUIRE(digit[0] == 0b100);
+
+    extract_digit(digit, val, 3, 5);
+    REQUIRE(digit[0] == 0b001);
+  }
+
+  SECTION("we can extract digits of size greater than a byte") {
+    uint8_t val[] = {0b10110011, 0b11001011};
+    uint8_t digit[2];
+
+    extract_digit(digit, val, 9, 0);
+    REQUIRE(digit[0] == val[0]);
+    REQUIRE(digit[1] == 0b1);
+
+    extract_digit(digit, val, 9, 1);
+    REQUIRE(digit[0] == 0b1100101);
+    REQUIRE(digit[1] == 0);
+  }
+
+  SECTION("we can exract a digit of the maximum size") {
+    uint8_t val[] = {0b10110011, 0b11001011};
+    uint8_t digit[2];
+
+    extract_digit(digit, val, 16, 0);
+    REQUIRE(digit[0] == val[0]);
+    REQUIRE(digit[1] == val[1]);
   }
 }
 
-TEST_CASE("we can count the number of non-zero digits in an exponent") {
-  SECTION("we correctly count exponents with the highest bit at position 0") {
-    uint8_t val[] = {1, 0};
-    REQUIRE(count_nonzero_digits(val, 0, 3) == 1);
+TEST_CASE("we can determine if a digit is zero") {
+  SECTION("we handle a zero exponent of a single byte") {
+    uint8_t val[] = {0};
+    REQUIRE(is_digit_zero(val, 8, 0));
+    REQUIRE(is_digit_zero(val, 1, 0));
+    REQUIRE(is_digit_zero(val, 1, 1));
+    REQUIRE(is_digit_zero(val, 7, 1));
+    REQUIRE(is_digit_zero(val, 9, 0));
   }
 
-  SECTION("we correctly count exponents with the highest bit at the end") {
-    uint8_t val[] = {1, 0b10000000};
-    REQUIRE(count_nonzero_digits(val, 15, 3) == 2);
+  SECTION("we handle a single byte exponent of 1") {
+    uint8_t val[] = {1};
+    REQUIRE(!is_digit_zero(val, 8, 0));
+    REQUIRE(!is_digit_zero(val, 7, 0));
+    REQUIRE(is_digit_zero(val, 7, 1));
+    REQUIRE(!is_digit_zero(val, 9, 0));
+  }
+
+  SECTION("we handle two bytes") {
+    uint8_t val[] = {0, 1};
+    REQUIRE(!is_digit_zero(val, 9, 0));
+    REQUIRE(is_digit_zero(val, 9, 1));
+
+    val[1] = 0b10000000;
+    REQUIRE(!is_digit_zero(val, 16, 0));
+    REQUIRE(is_digit_zero(val, 15, 0));
   }
 }
 

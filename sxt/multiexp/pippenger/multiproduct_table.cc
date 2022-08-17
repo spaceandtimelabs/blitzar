@@ -1,11 +1,14 @@
 #include "sxt/multiexp/pippenger/multiproduct_table.h"
 
+#include <algorithm>
+
 #include "sxt/base/bit/count.h"
 #include "sxt/base/bit/iteration.h"
+#include "sxt/base/bit/span_op.h"
+#include "sxt/base/container/blob_array.h"
+#include "sxt/base/num/divide_up.h"
 #include "sxt/multiexp/base/digit_utility.h"
-#include "sxt/multiexp/base/exponent.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/multiexp/base/exponent_utility.h"
 #include "sxt/multiexp/index/index_table.h"
 
 namespace sxt::mtxpi {
@@ -13,9 +16,9 @@ namespace sxt::mtxpi {
 // init_multiproduct_table
 //--------------------------------------------------------------------------------------------------
 static void init_multiproduct_table(mtxi::index_table& table, size_t max_entries,
-                                    basct::cspan<uint8_t> output_digit_or_all) noexcept {
+                                    const basct::blob_array& output_digit_or_all) noexcept {
   size_t row_count = 0;
-  for (auto& digit : output_digit_or_all) {
+  for (auto digit : output_digit_or_all) {
     row_count += basbt::pop_count(digit);
   }
   table.reshape(row_count, max_entries + 2 * row_count);
@@ -24,22 +27,19 @@ static void init_multiproduct_table(mtxi::index_table& table, size_t max_entries
 //--------------------------------------------------------------------------------------------------
 // init_multiproduct_output_rows
 //--------------------------------------------------------------------------------------------------
-static uint64_t* init_multiproduct_output_rows(basct::span<basct::span<uint64_t>> rows,
-                                               size_t& multiproduct_output_index,
-                                               uint64_t* entry_data,
-                                               const mtxb::exponent_sequence& sequence,
-                                               uint8_t digit_or_all, size_t radix_log2) noexcept {
-  std::array<size_t, 8> row_counts = {};
+static uint64_t* init_multiproduct_output_rows(
+    basct::span<basct::span<uint64_t>> rows, size_t& multiproduct_output_index,
+    uint64_t* entry_data, std::vector<size_t>& row_counts, std::vector<uint8_t>& digit,
+    const mtxb::exponent_sequence& sequence, basct::cspan<uint8_t> digit_or_all) noexcept {
+  std::fill(row_counts.begin(), row_counts.end(), 0);
+  auto radix_log2 = row_counts.size();
   for (size_t term_index = 0; term_index < sequence.n; ++term_index) {
     basct::cspan<uint8_t> e{sequence.data + term_index * sequence.element_nbytes,
                             sequence.element_nbytes};
-    auto num_digits = mtxb::count_num_digits(e, radix_log2);
-    for (size_t digit_index = 0; digit_index < num_digits; ++digit_index) {
-      uint64_t digit = mtxb::extract_digit(e, radix_log2, digit_index);
-      while (digit != 0) {
-        auto pos = basbt::consume_next_bit(digit);
-        ++row_counts[pos];
-      }
+    auto digit_last = mtxb::get_last_digit(e, radix_log2);
+    for (size_t digit_index = 0; digit_index < digit_last; ++digit_index) {
+      mtxb::extract_digit(digit, e, radix_log2, digit_index);
+      basbt::for_each_bit(digit, [&](size_t bit_index) noexcept { ++row_counts[bit_index]; });
     }
   }
   for (auto count : row_counts) {
@@ -59,35 +59,29 @@ static uint64_t* init_multiproduct_output_rows(basct::span<basct::span<uint64_t>
 //--------------------------------------------------------------------------------------------------
 // make_digit_index_array
 //--------------------------------------------------------------------------------------------------
-void make_digit_index_array(std::array<size_t, 8>& array, size_t first, uint8_t or_all) noexcept {
-  array = {};
-  uint64_t x = or_all;
-  while (x != 0) {
-    auto pos = basbt::consume_next_bit(x);
-    array[pos] = first++;
-  }
+void make_digit_index_array(basct::span<size_t> array, size_t first,
+                            basct::cspan<uint8_t> or_all) noexcept {
+  basbt::for_each_bit(or_all, [&](size_t index) noexcept { array[index] = first++; });
 }
 
 //--------------------------------------------------------------------------------------------------
 // make_multiproduct_term_table
 //--------------------------------------------------------------------------------------------------
-size_t make_multiproduct_term_table(mtxi::index_table& table,
-                                    basct::cspan<mtxb::exponent> term_or_all,
+size_t make_multiproduct_term_table(mtxi::index_table& table, const basct::blob_array& term_or_all,
                                     size_t radix_log2) noexcept {
   size_t num_nonzero_digits = 0;
-  for (auto& e : term_or_all) {
-    num_nonzero_digits += mtxb::count_nonzero_digits(e, radix_log2);
+  for (size_t term_index = 0; term_index < term_or_all.size(); ++term_index) {
+    num_nonzero_digits += mtxb::count_nonzero_digits(term_or_all[term_index], radix_log2);
   }
   table.reshape(term_or_all.size(), num_nonzero_digits);
   auto rows = table.header();
   auto entries = table.entry_data();
   for (size_t term_index = 0; term_index < term_or_all.size(); ++term_index) {
-    auto& e = term_or_all[term_index];
+    auto e = term_or_all[term_index];
     size_t entry_count = 0;
-    auto num_digits = mtxb::count_num_digits(e, radix_log2);
-    for (size_t digit_index = 0; digit_index < num_digits; ++digit_index) {
-      auto digit = mtxb::extract_digit(e, radix_log2, digit_index);
-      if (digit != 0) {
+    auto last_digit = mtxb::get_last_digit(e, radix_log2);
+    for (size_t digit_index = 0; digit_index < last_digit; ++digit_index) {
+      if (!mtxb::is_digit_zero(e, radix_log2, digit_index)) {
         entries[entry_count++] = digit_index;
       }
     }
@@ -102,39 +96,42 @@ size_t make_multiproduct_term_table(mtxi::index_table& table,
 //--------------------------------------------------------------------------------------------------
 void make_multiproduct_table(mtxi::index_table& table,
                              basct::cspan<mtxb::exponent_sequence> exponents, size_t max_entries,
-                             basct::cspan<mtxb::exponent> term_or_all,
-                             basct::cspan<uint8_t> output_digit_or_all,
+                             const basct::blob_array& term_or_all,
+                             const basct::blob_array& output_digit_or_all,
                              size_t radix_log2) noexcept {
   assert(exponents.size() == output_digit_or_all.size());
 
   init_multiproduct_table(table, max_entries, output_digit_or_all);
 
+  auto digit_num_bytes = basn::divide_up(radix_log2, 8ul);
+  std::vector<uint8_t> digit(digit_num_bytes);
+  std::vector<size_t> index_array(radix_log2);
   auto entry_data = table.entry_data();
   auto rows = table.header();
   size_t multiproduct_output_index = 0;
   for (size_t output_index = 0; output_index < output_digit_or_all.size(); ++output_index) {
     auto digit_or_all = output_digit_or_all[output_index];
     auto sequence = exponents[output_index];
-    std::array<size_t, 8> index_array;
-    make_digit_index_array(index_array, multiproduct_output_index, digit_or_all);
+
+    auto bit_index_first = multiproduct_output_index;
     entry_data = init_multiproduct_output_rows(rows, multiproduct_output_index, entry_data,
-                                               sequence, digit_or_all, radix_log2);
+                                               index_array, digit, sequence, digit_or_all);
+    make_digit_index_array(index_array, bit_index_first, digit_or_all);
     size_t input_first = 0;
     for (size_t term_index = 0; term_index < sequence.n; ++term_index) {
       basct::cspan<uint8_t> e{sequence.data + term_index * sequence.element_nbytes,
                               sequence.element_nbytes};
-      auto num_digits = mtxb::count_num_digits(e, radix_log2);
+      auto digit_last = mtxb::get_last_digit(e, radix_log2);
       size_t input_offset = 0;
-      for (size_t digit_index = 0; digit_index < num_digits; ++digit_index) {
-        uint64_t digit = mtxb::extract_digit(e, radix_log2, digit_index);
-        while (digit != 0) {
-          auto pos = basbt::consume_next_bit(digit);
-          auto& row = rows[index_array[pos]];
+      for (size_t digit_index = 0; digit_index < digit_last; ++digit_index) {
+        mtxb::extract_digit(digit, e, radix_log2, digit_index);
+        basbt::for_each_bit(digit, [&](size_t bit_index) noexcept {
+          auto& row = rows[index_array[bit_index]];
           row[row.size()] = input_first + input_offset;
           row = {row.data(), row.size() + 1};
-        }
+        });
         input_offset += static_cast<size_t>(
-            mtxb::extract_digit(term_or_all[term_index], radix_log2, digit_index) != 0);
+            !mtxb::is_digit_zero(term_or_all[term_index], radix_log2, digit_index));
       }
       input_first += mtxb::count_nonzero_digits(term_or_all[term_index], radix_log2);
     }

@@ -25,7 +25,9 @@ public:
 
   void advance(ptrdiff_t delta) noexcept { counter_ += delta; }
 
-  int distance_to(counting_iterator other) const noexcept { return other.counter_ - counter_; }
+  ptrdiff_t distance_to(counting_iterator other) const noexcept {
+    return other.counter_ - counter_;
+  }
 
 private:
   T counter_{0};

@@ -1,5 +1,7 @@
 #include "sxt/base/bit/iteration.h"
 
+#include <vector>
+
 #include "sxt/base/test/unit_test.h"
 
 using namespace sxt::basbt;
@@ -39,5 +41,45 @@ TEST_CASE("we can iterate through the bits that are set in an integer") {
     REQUIRE(bitset != 0);
     REQUIRE(consume_next_bit(bitset) == 7);
     REQUIRE(bitset == 0);
+  }
+}
+
+TEST_CASE("we can iterate over the bits in a blob") {
+  std::vector<size_t> indexes;
+  auto f = [&](size_t index) noexcept { indexes.push_back(index); };
+
+  SECTION("we handle the empty case of a single byte") {
+    uint8_t bytes[] = {0};
+    for_each_bit(bytes, sizeof(bytes), f);
+    REQUIRE(indexes.empty());
+  }
+
+  SECTION("we handle the empty case of many bytes") {
+    uint8_t bytes[100] = {};
+    for_each_bit(bytes, sizeof(bytes), f);
+    REQUIRE(indexes.empty());
+  }
+
+  SECTION("we handle the case of a single bit") {
+    uint8_t bytes[100] = {};
+    bytes[0] = 1;
+    for_each_bit(bytes, sizeof(bytes), f);
+    REQUIRE(indexes == std::vector<size_t>{0});
+  }
+
+  SECTION("we handle the case of a single bit at the end") {
+    uint8_t bytes[100] = {};
+    bytes[99] = 0b10000000;
+    for_each_bit(bytes, sizeof(bytes), f);
+    REQUIRE(indexes == std::vector<size_t>{799});
+  }
+
+  SECTION("we handle multiple bits at various locations") {
+    uint8_t bytes[100] = {};
+    bytes[0] = 0b100;
+    bytes[10] = 0b1;
+    bytes[99] = 0b10000000;
+    for_each_bit(bytes, sizeof(bytes), f);
+    REQUIRE(indexes == std::vector<size_t>{2, 80, 799});
   }
 }

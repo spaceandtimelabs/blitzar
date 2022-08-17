@@ -29,6 +29,18 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "span_op",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":count",
+        ":iteration",
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "store",
     with_test = False,
     deps = [

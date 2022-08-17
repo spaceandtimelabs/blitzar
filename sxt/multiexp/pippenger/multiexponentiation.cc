@@ -3,7 +3,10 @@
 #include <vector>
 
 #include "sxt/base/bit/count.h"
-#include "sxt/multiexp/base/exponent_utility.h"
+#include "sxt/base/bit/span_op.h"
+#include "sxt/base/container/blob_array.h"
+#include "sxt/base/num/divide_up.h"
+#include "sxt/multiexp/base/digit_utility.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger/driver.h"
 #include "sxt/multiexp/pippenger/exponent_aggregates.h"
@@ -15,19 +18,21 @@ namespace sxt::mtxpi {
 //--------------------------------------------------------------------------------------------------
 // compute_output_digit_or_all
 //--------------------------------------------------------------------------------------------------
-static void compute_output_digit_or_all(std::vector<uint8_t>& output_digit_or_all,
-                                        basct::cspan<mtxb::exponent> output_or_all,
+static void compute_output_digit_or_all(basct::blob_array& output_digit_or_all,
+                                        const basct::blob_array& output_or_all,
                                         size_t radix_log2) noexcept {
-  output_digit_or_all.reserve(output_or_all.size());
-  for (size_t output_index = 0; output_index < output_or_all.size(); ++output_index) {
-    auto& or_all = output_or_all[output_index];
+  auto digit_num_bytes = basn::divide_up(radix_log2, 8ul);
+  auto num_outputs = output_or_all.size();
+  output_digit_or_all.resize(num_outputs, digit_num_bytes);
+  std::vector<uint8_t> digit(digit_num_bytes);
+  for (size_t output_index = 0; output_index < num_outputs; ++output_index) {
+    auto or_all = output_or_all[output_index];
     auto num_digits = mtxb::count_num_digits(or_all, radix_log2);
-    uint8_t mask = 0;
+    auto digit_or_all = output_digit_or_all[output_index];
     for (size_t digit_index = 0; digit_index < num_digits; ++digit_index) {
-      auto digit = mtxb::extract_digit(or_all, radix_log2, digit_index);
-      mask |= digit;
+      mtxb::extract_digit(digit, or_all, radix_log2, digit_index);
+      basbt::or_equal(digit_or_all, digit);
     }
-    output_digit_or_all.push_back(mask);
   }
 }
 
@@ -35,14 +40,13 @@ static void compute_output_digit_or_all(std::vector<uint8_t>& output_digit_or_al
 // compute_multiproduct
 //--------------------------------------------------------------------------------------------------
 static void compute_multiproduct(memmg::managed_array<void>& inout,
-                                 std::vector<uint8_t>& output_digit_or_all, const driver& drv,
+                                 basct::blob_array& output_digit_or_all, const driver& drv,
                                  basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   exponent_aggregates aggregates;
   compute_exponent_aggregates(aggregates, exponents);
 
-  size_t radix_log2 = std::min(8ul, mtxpi::compute_radix_log2(aggregates.max_exponent,
-                                                              aggregates.term_or_all.size(),
-                                                              aggregates.output_or_all.size()));
+  size_t radix_log2 = mtxpi::compute_radix_log2(
+      aggregates.max_exponent, aggregates.term_or_all.size(), aggregates.output_or_all.size());
 
   mtxi::index_table table;
   auto num_multiproduct_inputs =
@@ -64,8 +68,11 @@ static void compute_multiproduct(memmg::managed_array<void>& inout,
 //--------------------------------------------------------------------------------------------------
 void compute_multiexponentiation(memmg::managed_array<void>& inout, const driver& drv,
                                  basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
-  std::vector<uint8_t> output_digit_or_all;
+  basct::blob_array output_digit_or_all;
   compute_multiproduct(inout, output_digit_or_all, drv, exponents);
+
+  basct::span<uint8_t> output_digit_or_all_p{output_digit_or_all.data(),
+                                             output_digit_or_all.size()};
   drv.combine_multiproduct_outputs(inout, output_digit_or_all);
 }
 } // namespace sxt::mtxpi

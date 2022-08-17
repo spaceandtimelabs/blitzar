@@ -6,6 +6,10 @@
 #include "sxt/base/container/span.h"
 #include "sxt/memory/management/managed_array_fwd.h"
 
+namespace sxt::basct {
+class blob_array;
+}
+
 namespace sxt::mtxb {
 class exponent;
 }
@@ -32,6 +36,6 @@ public:
 
   virtual void
   combine_multiproduct_outputs(memmg::managed_array<void>& inout,
-                               basct::cspan<uint8_t> output_digit_or_all) const noexcept = 0;
+                               const basct::blob_array& output_digit_or_all) const noexcept = 0;
 };
 } // namespace sxt::mtxpi

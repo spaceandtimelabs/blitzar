@@ -38,6 +38,8 @@ sxt_cc_component(
         ":compressed_input_accessor",
         ":naive_multiproduct_solver",
         "//sxt/base/bit:count",
+        "//sxt/base/bit:span_op",
+        "//sxt/base/container:blob_array",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/index:index_table",
         "//sxt/curve21/type:element_p3",

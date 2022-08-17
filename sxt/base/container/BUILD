@@ -4,6 +4,17 @@ load(
 )
 
 sxt_cc_component(
+    name = "blob_array",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":span",
+        ":span_iterator",
+    ],
+)
+
+sxt_cc_component(
     name = "span",
     test_deps = [
         "//sxt/base/test:unit_test",
@@ -19,5 +30,16 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
+    ],
+)
+
+sxt_cc_component(
+    name = "span_iterator",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":span",
+        "//sxt/base/iterator:iterator_facade",
     ],
 )

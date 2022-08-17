@@ -19,8 +19,8 @@ public:
                             mtxi::index_table& multiproduct_table,
                             size_t num_inputs) const noexcept override;
 
-  virtual void
-  combine_multiproduct_outputs(memmg::managed_array<void>& inout,
-                               basct::cspan<uint8_t> output_digit_or_all) const noexcept override;
+  virtual void combine_multiproduct_outputs(
+      memmg::managed_array<void>& inout,
+      const basct::blob_array& output_digit_or_all) const noexcept override;
 };
 } // namespace sxt::mtxpi

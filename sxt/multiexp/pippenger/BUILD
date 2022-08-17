@@ -16,6 +16,8 @@ sxt_cc_component(
     name = "test_driver",
     impl_deps = [
         "//sxt/base/bit:iteration",
+        "//sxt/base/bit:span_op",
+        "//sxt/base/container:blob_array",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/index:index_table",
     ],
@@ -29,20 +31,21 @@ sxt_cc_component(
     name = "exponent_aggregates",
     with_test = False,
     deps = [
-        "//sxt/multiexp/base:exponent",
+        "//sxt/base/container:blob_array",
     ],
 )
 
 sxt_cc_component(
     name = "radix_log2",
     impl_deps = [
-        "//sxt/multiexp/base:exponent",
+        "//sxt/base/bit:span_op",
         "//sxt/base/num:log2p1",
-        "//sxt/base/container:span",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/multiexp/base:exponent",
+    ],
+    deps = [
+        "//sxt/base/container:span",
     ],
 )
 
@@ -51,8 +54,7 @@ sxt_cc_component(
     impl_deps = [
         ":exponent_aggregates",
         "//sxt/base/bit:count",
-        "//sxt/multiexp/base:exponent",
-        "//sxt/multiexp/base:exponent_utility",
+        "//sxt/base/bit:span_op",
         "//sxt/multiexp/base:exponent_sequence",
     ],
     test_deps = [
@@ -68,14 +70,15 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/base/bit:count",
         "//sxt/base/bit:iteration",
+        "//sxt/base/bit:span_op",
+        "//sxt/base/container:blob_array",
+        "//sxt/base/num:divide_up",
         "//sxt/multiexp/base:digit_utility",
-        "//sxt/multiexp/base:exponent",
-        "//sxt/multiexp/base:exponent_utility",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/index:index_table",
     ],
     test_deps = [
-        "//sxt/multiexp/base:exponent",
+        "//sxt/base/container:blob_array",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/index:index_table",
         "//sxt/base/test:unit_test",
@@ -94,7 +97,10 @@ sxt_cc_component(
         ":multiproduct_table",
         ":radix_log2",
         "//sxt/base/bit:count",
-        "//sxt/multiexp/base:exponent_utility",
+        "//sxt/base/bit:span_op",
+        "//sxt/base/container:blob_array",
+        "//sxt/base/num:divide_up",
+        "//sxt/multiexp/base:digit_utility",
         "//sxt/multiexp/index:index_table",
     ],
     test_deps = [

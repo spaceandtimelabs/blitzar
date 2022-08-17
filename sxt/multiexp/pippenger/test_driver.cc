@@ -5,6 +5,8 @@
 #include <iostream>
 
 #include "sxt/base/bit/iteration.h"
+#include "sxt/base/bit/span_op.h"
+#include "sxt/base/container/blob_array.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/index/index_table.h"
 
@@ -58,18 +60,17 @@ void test_driver::compute_multiproduct(memmg::managed_array<void>& inout,
 // combine_multiproduct_outputs
 //--------------------------------------------------------------------------------------------------
 void test_driver::combine_multiproduct_outputs(
-    memmg::managed_array<void>& inout, basct::cspan<uint8_t> output_digit_or_all) const noexcept {
+    memmg::managed_array<void>& inout,
+    const basct::blob_array& output_digit_or_all) const noexcept {
   basct::cspan<uint64_t> inputs{static_cast<uint64_t*>(inout.data()), inout.size()};
   memmg::managed_array<uint64_t> outputs{output_digit_or_all.size(), inout.get_allocator()};
   size_t input_index = 0;
   for (size_t output_index = 0; output_index < output_digit_or_all.size(); ++output_index) {
     auto& output = outputs[output_index];
     output = 0;
-    uint64_t digit_or_all = output_digit_or_all[output_index];
-    while (digit_or_all != 0) {
-      auto pos = basbt::consume_next_bit(digit_or_all);
-      output += (1 << pos) * inputs[input_index++];
-    }
+    basbt::for_each_bit(output_digit_or_all[output_index], [&](size_t pos) noexcept {
+      output += (1ull << pos) * inputs[input_index++];
+    });
   }
   inout = std::move(outputs);
 }
