@@ -38,28 +38,37 @@ basct::cspan<c21t::element_p3> get_precomputed_generators() noexcept {
 }
 
 basct::cspan<c21t::element_p3>
-get_precomputed_generators(std::vector<c21t::element_p3>& generators_data,
-                           size_t length_longest_sequence, bool use_gpu) noexcept {
-
-  if (precomputed_generators_v.size() >= length_longest_sequence) {
-    return precomputed_generators_v;
+get_precomputed_generators(std::vector<c21t::element_p3>& generators_data, size_t length_generators,
+                           size_t offset, bool use_gpu) noexcept {
+  if (precomputed_generators_v.size() >= length_generators + offset) {
+    return precomputed_generators_v.subspan(offset);
   }
 
-  generators_data.resize(length_longest_sequence);
+  generators_data.resize(length_generators);
 
-  std::copy(precomputed_generators_v.begin(), precomputed_generators_v.end(),
-            generators_data.begin());
+  size_t gen_span_offset = 0;
+  basct::span<c21t::element_p3> gen_span;
+
+  if (precomputed_generators_v.size() > offset) {
+    std::copy(precomputed_generators_v.begin() + offset, precomputed_generators_v.end(),
+              generators_data.begin());
+
+    // compute generators from `gen_span_offset...(gen_span.size() + gen_span_offset)`
+    gen_span_offset = precomputed_generators_v.size();
+
+    gen_span = {generators_data.data() + (precomputed_generators_v.size() - offset),
+                (length_generators + offset) - precomputed_generators_v.size()};
+  } else {
+    // compute generators from `offset...(offset + length_generators)`
+    gen_span_offset = offset;
+
+    gen_span = {generators_data.data(), length_generators};
+  }
 
   if (use_gpu) {
-    sqcgn::gpu_get_generators(
-        basct::span<c21t::element_p3>{generators_data.data() + precomputed_generators_v.size(),
-                                      length_longest_sequence - precomputed_generators_v.size()},
-        precomputed_generators_v.size());
+    sqcgn::gpu_get_generators(gen_span, gen_span_offset);
   } else {
-    sqcgn::cpu_get_generators(
-        basct::span<c21t::element_p3>{generators_data.data() + precomputed_generators_v.size(),
-                                      length_longest_sequence - precomputed_generators_v.size()},
-        precomputed_generators_v.size());
+    sqcgn::cpu_get_generators(gen_span, gen_span_offset);
   }
 
   return generators_data;

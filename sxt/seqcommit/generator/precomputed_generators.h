@@ -22,5 +22,5 @@ basct::cspan<c21t::element_p3> get_precomputed_generators() noexcept;
 
 basct::cspan<c21t::element_p3>
 get_precomputed_generators(std::vector<c21t::element_p3>& generators_data,
-                           size_t length_longest_sequence, bool use_gpu) noexcept;
+                           size_t length_longest_sequence, size_t offset, bool use_gpu) noexcept;
 } // namespace sxt::sqcgn

@@ -1,5 +1,7 @@
 #include "sxt/seqcommit/backend/naive_gpu_backend.h"
 
+#include <algorithm>
+
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/ristretto/type/compressed_element.h"
@@ -54,7 +56,7 @@ void naive_gpu_backend::compute_commitments(
   }
 
   std::vector<c21t::element_p3> generators_data;
-  generators = sqcgn::get_precomputed_generators(generators_data, length_longest_sequence, true);
+  generators = sqcgn::get_precomputed_generators(generators_data, length_longest_sequence, 0, true);
 
   sqcnv::compute_commitments_gpu(commitments, value_sequences, generators);
 }
@@ -64,7 +66,10 @@ void naive_gpu_backend::compute_commitments(
 //--------------------------------------------------------------------------------------------------
 void naive_gpu_backend::get_generators(basct::span<c21t::element_p3> generators,
                                        uint64_t offset_generators) noexcept {
-  sqcgn::gpu_get_generators(generators, offset_generators);
+  std::vector<c21t::element_p3> temp_generators_data;
+  auto precomputed_generators = sqcgn::get_precomputed_generators(
+      temp_generators_data, generators.size(), offset_generators, true);
+  std::copy_n(precomputed_generators.begin(), generators.size(), generators.data());
 }
 
 //--------------------------------------------------------------------------------------------------

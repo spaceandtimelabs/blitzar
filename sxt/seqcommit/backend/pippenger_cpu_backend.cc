@@ -1,5 +1,6 @@
 #include "sxt/seqcommit/backend/pippenger_cpu_backend.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 
@@ -56,7 +57,8 @@ void pippenger_cpu_backend::compute_commitments(
   memmg::managed_array<rstt::compressed_element> inout;
   std::vector<c21t::element_p3> generators_data;
   if (generators.empty()) {
-    generators = sqcgn::get_precomputed_generators(generators_data, length_longest_sequence, false);
+    generators =
+        sqcgn::get_precomputed_generators(generators_data, length_longest_sequence, 0, false);
   }
   mtxrs::precomputed_p3_input_accessor input_accessor{generators};
   mtxrs::pippenger_multiproduct_solver multiproduct_solver;
@@ -71,7 +73,10 @@ void pippenger_cpu_backend::compute_commitments(
 //--------------------------------------------------------------------------------------------------
 void pippenger_cpu_backend::get_generators(basct::span<c21t::element_p3> generators,
                                            uint64_t offset_generators) noexcept {
-  sqcgn::cpu_get_generators(generators, offset_generators);
+  std::vector<c21t::element_p3> temp_generators_data;
+  auto precomputed_generators = sqcgn::get_precomputed_generators(
+      temp_generators_data, generators.size(), offset_generators, false);
+  std::copy_n(precomputed_generators.begin(), generators.size(), generators.data());
 }
 
 //--------------------------------------------------------------------------------------------------
