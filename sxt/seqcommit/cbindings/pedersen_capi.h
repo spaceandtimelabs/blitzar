@@ -197,6 +197,36 @@ int sxt_compute_pedersen_commitments_with_generators(
 int sxt_get_generators(struct sxt_ristretto* generators, uint64_t offset_generators,
                        uint64_t num_generators);
 
+/**
+ * Gets the n-th ristretto point defined as:
+ *
+ * If n == 0:
+ *    one_commit[0] = ristretto_identity;
+ *
+ * Else:
+ *    one_commit[0] = g[0] + g[1] + ... + g[n - 1];
+ *
+ * where
+ *
+ * struct sxt_ristretto ristretto_identity = {
+ *    {0, 0, 0, 0, 0},
+ *    {1, 0, 0, 0, 0},
+ *    {1, 0, 0, 0, 0},
+ *    {0, 0, 0, 0, 0},
+ * };
+ *
+ * and `g[i]` is the i-th generator provided by `sxt_get_generators` function at offset 0.
+ *
+ * # Return:
+ *
+ * - 0 on success; otherwise a nonzero error code
+ *
+ * # Invalid input parameters, which generate error code:
+ *
+ * - one_commit == nullptr
+ */
+int sxt_get_one_commit(struct sxt_ristretto* one_commit, uint64_t n);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

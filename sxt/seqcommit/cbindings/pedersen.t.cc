@@ -5,6 +5,8 @@
 #include <string>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/constant/zero.h"
+#include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/operation/add.h"
@@ -12,7 +14,6 @@
 #include "sxt/ristretto/random/element.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/generator/base_element.h"
-#include "sxt/seqcommit/generator/precomputed_generators.h"
 
 using namespace sxt;
 using namespace sxt::sqccb;
@@ -504,4 +505,51 @@ TEST_CASE("Fetching generators") {
   test_generators_with_given_backend(SXT_NAIVE_BACKEND_CPU, "naive cpu");
   test_generators_with_given_backend(SXT_NAIVE_BACKEND_GPU, "naive gpu");
   test_generators_with_given_backend(SXT_PIPPENGER_BACKEND_CPU, "pippenger cpu");
+}
+
+static void test_one_commitments_with_given_backend(int backend, std::string backend_name) {
+  SECTION(backend_name + " - nullptr one_commitment pointer will error out") {
+    const sxt_config config = {backend};
+    REQUIRE(sxt_init(&config) == 0);
+    int ret = sxt_get_one_commit(nullptr, 0);
+    REQUIRE(ret != 0);
+    REQUIRE(reset_backend_for_testing() == 0);
+  }
+
+  SECTION(backend_name + " - with valid results will not error out") {
+    const sxt_config config = {backend};
+    REQUIRE(sxt_init(&config) == 0);
+
+    uint64_t num_generators = 10;
+    sxt_ristretto generators[num_generators];
+    int ret = sxt_get_generators(generators, num_generators, 0);
+    REQUIRE(ret == 0);
+
+    sxt_ristretto one_commitment;
+    ret = sxt_get_one_commit(&one_commitment, 0);
+    REQUIRE(ret == 0);
+    REQUIRE(reinterpret_cast<c21t::element_p3*>(&one_commitment)[0] == c21cn::zero_p3_v);
+
+    ret = sxt_get_one_commit(&one_commitment, 1);
+    REQUIRE(ret == 0);
+    REQUIRE(reinterpret_cast<c21t::element_p3*>(&one_commitment)[0] ==
+            reinterpret_cast<c21t::element_p3*>(generators)[0]);
+
+    c21t::element_p3 sum_gen_0_1;
+    c21o::add(sum_gen_0_1, reinterpret_cast<c21t::element_p3*>(generators)[0],
+              reinterpret_cast<c21t::element_p3*>(generators)[1]);
+
+    ret = sxt_get_one_commit(&one_commitment, 2);
+    REQUIRE(ret == 0);
+    REQUIRE(reinterpret_cast<c21t::element_p3*>(&one_commitment)[0] ==
+            reinterpret_cast<c21t::element_p3*>(&sum_gen_0_1)[0]);
+
+    REQUIRE(reset_backend_for_testing() == 0);
+  }
+}
+
+TEST_CASE("Fetching one commitments") {
+  test_one_commitments_with_given_backend(SXT_NAIVE_BACKEND_CPU, "naive cpu");
+  test_one_commitments_with_given_backend(SXT_NAIVE_BACKEND_GPU, "naive gpu");
+  test_one_commitments_with_given_backend(SXT_PIPPENGER_BACKEND_CPU, "pippenger cpu");
 }

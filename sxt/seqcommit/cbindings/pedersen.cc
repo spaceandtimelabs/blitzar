@@ -14,7 +14,8 @@
 #include "sxt/seqcommit/backend/pedersen_backend.h"
 #include "sxt/seqcommit/backend/pippenger_cpu_backend.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
-#include "sxt/seqcommit/generator/precomputed_generators.h"
+#include "sxt/seqcommit/generator/precomputed_initializer.h"
+#include "sxt/seqcommit/generator/precomputed_one_commitments.h"
 
 using namespace sxt;
 
@@ -52,7 +53,7 @@ int sxt_init(const sxt_config* config) {
   if (config->backend == SXT_NAIVE_BACKEND_CPU) {
     backend = sqcbck::get_naive_cpu_backend();
 
-    sqcgn::init_precomputed_generators(config->num_precomputed_generators, false);
+    sqcgn::init_precomputed_components(config->num_precomputed_generators, false);
 
     return 0;
   } else if (config->backend == SXT_NAIVE_BACKEND_GPU) {
@@ -61,11 +62,11 @@ int sxt_init(const sxt_config* config) {
     if (num_devices > 0) {
       backend = sqcbck::get_naive_gpu_backend();
 
-      sqcgn::init_precomputed_generators(config->num_precomputed_generators, true);
+      sqcgn::init_precomputed_components(config->num_precomputed_generators, true);
     } else {
       backend = sqcbck::get_naive_cpu_backend();
 
-      sqcgn::init_precomputed_generators(config->num_precomputed_generators, false);
+      sqcgn::init_precomputed_components(config->num_precomputed_generators, false);
 
       std::cout << "WARN: Using 'compute_commitments_cpu'. " << std::endl;
     }
@@ -74,7 +75,7 @@ int sxt_init(const sxt_config* config) {
   } else if (config->backend == SXT_PIPPENGER_BACKEND_CPU) {
     backend = sqcbck::get_pippenger_cpu_backend();
 
-    sqcgn::init_precomputed_generators(config->num_precomputed_generators, false);
+    sqcgn::init_precomputed_components(config->num_precomputed_generators, false);
 
     return 0;
   }
@@ -232,6 +233,18 @@ int sxt_get_generators(struct sxt_ristretto* generators, uint64_t num_generators
                                                   num_generators);
 
   backend->get_generators(generators_result, offset_generators);
+
+  return 0;
+}
+
+//--------------------------------------------------------------------------------------------------
+// sxt_get_one_commit
+//--------------------------------------------------------------------------------------------------
+int sxt_get_one_commit(struct sxt_ristretto* one_commit, uint64_t n) {
+  if (one_commit == nullptr)
+    return 1;
+
+  reinterpret_cast<c21t::element_p3*>(one_commit)[0] = sqcgn::get_precomputed_one_commit(n);
 
   return 0;
 }

@@ -21,6 +21,54 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "precomputed_one_commitments",
+    impl_deps = [
+        ":cpu_one_commitments",
+        "//sxt/curve21/type:element_p3",
+    ],
+    test_deps = [
+        ":cpu_one_commitments",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/type:element_p3",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
+    name = "precomputed_initializer",
+    impl_deps = [
+        ":precomputed_generators",
+        ":precomputed_one_commitments",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [],
+)
+
+sxt_cc_component(
+    name = "cpu_one_commitments",
+    impl_deps = [
+        ":precomputed_generators",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/constant:zero",
+    ],
+    test_deps = [
+        ":cpu_generator",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/constant:zero",
+        "//sxt/curve21/type:element_p3",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "base_element",
     impl_deps = [
         "//sxt/base/num:fast_random_number_generator",
