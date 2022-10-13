@@ -1,20 +1,20 @@
 #pragma once
 
 #include <array>
+#include <cstring>
 
 #include "sxt/base/type/literal.h"
-#include "sxt/field51/base/byte_conversion.h"
-#include "sxt/field51/type/element.h"
+#include "sxt/scalar25/type/element.h"
 
-namespace sxt::f51t {
+namespace sxt::s25t {
 //--------------------------------------------------------------------------------------------------
-// _f51
+// _s25
 //--------------------------------------------------------------------------------------------------
-template <char... Chars> element operator"" _f51() noexcept {
+template <char... Chars> element operator"" _s25() noexcept {
   std::array<uint64_t, 4> bytes = {};
   bast::parse_literal<Chars...>(bytes);
   element res;
-  f51b::from_bytes(res.data(), reinterpret_cast<const uint8_t*>(bytes.data()));
+  std::memcpy(static_cast<void*>(res.data()), static_cast<const void*>(bytes.data()), 32);
   return res;
 }
-} // namespace sxt::f51t
+} // namespace sxt::s25t

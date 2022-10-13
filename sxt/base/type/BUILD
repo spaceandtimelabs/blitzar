@@ -14,6 +14,14 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "literal",
+    with_test = False,
+    deps = [
+        "//sxt/base/num:hex",
+    ],
+)
+
+sxt_cc_component(
     name = "remove_cvref",
     with_test = False,
 )
