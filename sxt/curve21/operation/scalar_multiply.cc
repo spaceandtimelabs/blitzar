@@ -1,32 +1,29 @@
 #include "sxt/curve21/operation/scalar_multiply.h"
 
 #include <cassert>
+#include <cstring>
 
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/cmov.h"
 #include "sxt/curve21/operation/double.h"
-#include "sxt/curve21/operation/reduce_exponent.h"
 #include "sxt/curve21/type/conversion_utility.h"
 #include "sxt/curve21/type/element_cached.h"
 #include "sxt/curve21/type/element_p1p1.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/scalar25/base/reduce.h"
+#include "sxt/scalar25/type/element.h"
 
 namespace sxt::c21o {
 //--------------------------------------------------------------------------------------------------
 // fill_exponent
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-static void fill_exponent(uint8_t a[32], basct::cspan<uint8_t> data) noexcept {
-  size_t i = 0;
-  for (; i < data.size(); ++i) {
-    a[i] = data[i];
-  }
-  for (; i < 32; ++i) {
-    a[i] = 0;
-  }
-  if (a[31] > 127) {
-    reduce_exponent(a); // a_i = a_i % (2^252 + 27742317777372353535851937790883648493)
+static void fill_exponent(s25t::element& a, basct::cspan<uint8_t> data) noexcept {
+  std::memcpy(a.data(), data.data(), data.size());
+
+  if (a.data()[31] > 127) {
+    s25b::reduce32(a); // a_i = a_i % (2^252 + 27742317777372353535851937790883648493)
   }
 }
 
@@ -126,8 +123,8 @@ CUDA_CALLABLE
 void scalar_multiply(c21t::element_p3& h, basct::cspan<uint8_t> a,
                      const c21t::element_p3& p) noexcept {
   assert(a.size() <= 32);
-  uint8_t a_p[32];
+  s25t::element a_p{};
   fill_exponent(a_p, a);
-  scalar_multiply255(h, a_p, p);
+  scalar_multiply255(h, a_p.data(), p);
 }
 } // namespace sxt::c21o

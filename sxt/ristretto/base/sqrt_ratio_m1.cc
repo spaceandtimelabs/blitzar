@@ -16,7 +16,7 @@
 #include "sxt/field51/operation/cmov.h"
 #include "sxt/field51/operation/mul.h"
 #include "sxt/field51/operation/pow22523.h"
-#include "sxt/field51/operation/square.h"
+#include "sxt/field51/operation/sq.h"
 #include "sxt/field51/operation/sub.h"
 #include "sxt/field51/property/zero.h"
 
@@ -33,9 +33,9 @@ int compute_sqrt_ratio_m1(f51t::element& x, const f51t::element& u,
   f51t::element x_sqrtm1;
   int has_m_root, has_p_root, has_f_root;
 
-  f51o::square(v3, v);
+  f51o::sq(v3, v);
   f51o::mul(v3, v3, v); /* v3 = v^3 */
-  f51o::square(x, v3);
+  f51o::sq(x, v3);
   f51o::mul(x, x, u);
   f51o::mul(x, x, v); /* x = uv^7 */
 
@@ -43,7 +43,7 @@ int compute_sqrt_ratio_m1(f51t::element& x, const f51t::element& u,
   f51o::mul(x, x, v3);
   f51o::mul(x, x, u); /* x = uv^3(uv^7)^((q-5)/8) */
 
-  f51o::square(vxx, x);
+  f51o::sq(vxx, x);
   f51o::mul(vxx, vxx, v);                                     /* vx^2 */
   f51o::sub(m_root_check, vxx, u);                            /* vx^2-u */
   f51o::add(p_root_check, vxx, u);                            /* vx^2+u */

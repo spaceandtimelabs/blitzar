@@ -49,7 +49,7 @@ sxt_cc_component(
         "//sxt/field51/type:element",
         "//sxt/field51/operation:add",
         "//sxt/field51/operation:sub",
-        "//sxt/field51/operation:square",
+        "//sxt/field51/operation:sq",
     ],
     is_cuda = True,
     test_deps = [
@@ -66,23 +66,13 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "reduce_exponent",
-    impl_deps = [
-        "//sxt/base/bit:load",
-    ],
-    is_cuda = True,
-    test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-)
-
-sxt_cc_component(
     name = "scalar_multiply",
     impl_deps = [
         ":add",
         ":cmov",
         ":double",
-        ":reduce_exponent",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/base:reduce",
         "//sxt/base/container:span",
         "//sxt/curve21/constant:zero",
         "//sxt/curve21/type:conversion_utility",
@@ -92,7 +82,7 @@ sxt_cc_component(
         "//sxt/field51/type:element",
         "//sxt/field51/operation:add",
         "//sxt/field51/operation:sub",
-        "//sxt/field51/operation:square",
+        "//sxt/field51/operation:sq",
     ],
     is_cuda = True,
     test_deps = [

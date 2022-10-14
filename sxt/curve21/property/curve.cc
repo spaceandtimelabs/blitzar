@@ -13,7 +13,7 @@
 #include "sxt/field51/constant/d.h"
 #include "sxt/field51/operation/add.h"
 #include "sxt/field51/operation/mul.h"
-#include "sxt/field51/operation/square.h"
+#include "sxt/field51/operation/sq.h"
 #include "sxt/field51/operation/sub.h"
 #include "sxt/field51/property/zero.h"
 #include "sxt/field51/type/element.h"
@@ -30,15 +30,15 @@ bool is_on_curve(const c21t::element_p3& p) noexcept {
   f51t::element t0;
   f51t::element t1;
 
-  f51o::square(x2, p.X);
-  f51o::square(y2, p.Y);
-  f51o::square(z2, p.Z);
+  f51o::sq(x2, p.X);
+  f51o::sq(y2, p.Y);
+  f51o::sq(z2, p.Z);
   f51o::sub(t0, y2, x2);
   f51o::mul(t0, t0, z2);
 
   f51o::mul(t1, x2, y2);
   f51o::mul(t1, t1, f51t::element{f51cn::d_v});
-  f51o::square(z4, z2);
+  f51o::sq(z4, z2);
   f51o::add(t1, t1, z4);
   f51o::sub(t0, t0, t1);
 

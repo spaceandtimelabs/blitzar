@@ -11,7 +11,7 @@ sxt_cc_component(
         "//sxt/field51/constant:d",
         "//sxt/field51/operation:add",
         "//sxt/field51/operation:mul",
-        "//sxt/field51/operation:square",
+        "//sxt/field51/operation:sq",
         "//sxt/field51/operation:sub",
         "//sxt/field51/property:zero",
     ],

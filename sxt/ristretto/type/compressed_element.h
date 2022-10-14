@@ -14,7 +14,7 @@ class compressed_element {
 public:
   compressed_element() noexcept = default;
 
-  compressed_element(std::initializer_list<uint8_t> values) noexcept;
+  explicit compressed_element(std::initializer_list<uint8_t> values) noexcept;
 
   CUDA_CALLABLE
   uint8_t* data() noexcept { return data_; }

@@ -7,17 +7,17 @@
  * See third_party/license/libsodium.LICENSE
  */
 
-#include "sxt/field51/operation/square.h"
+#include "sxt/field51/operation/sq.h"
 
 #include "sxt/base/type/int.h"
 #include "sxt/field51/type/element.h"
 
 namespace sxt::f51o {
 //--------------------------------------------------------------------------------------------------
-// square
+// sq
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void square(f51t::element& h, const f51t::element& f) noexcept {
+void sq(f51t::element& h, const f51t::element& f) noexcept {
   const uint64_t mask = 0x7ffffffffffffULL;
   uint128_t r0, r1, r2, r3, r4;
   uint128_t f0, f1, f2, f3, f4;
@@ -77,14 +77,14 @@ void square(f51t::element& h, const f51t::element& f) noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
-// square2
+// sq2
 //--------------------------------------------------------------------------------------------------
 /*
  h = 2 * f * f
  Can overlap h with f.
 */
 CUDA_CALLABLE
-void square2(f51t::element& h, const f51t::element& f) noexcept {
+void sq2(f51t::element& h, const f51t::element& f) noexcept {
   const uint64_t mask = 0x7ffffffffffffULL;
   uint128_t r0, r1, r2, r3, r4, carry;
   uint64_t f0, f1, f2, f3, f4;

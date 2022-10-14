@@ -98,7 +98,7 @@ sxt_cc_component(
     name = "pow22523",
     impl_deps = [
         ":mul",
-        ":square",
+        ":sq",
         "//sxt/field51/type:element",
     ],
     is_cuda = True,
@@ -111,7 +111,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "square",
+    name = "sq",
     impl_deps = [
         "//sxt/base/type:int",
         "//sxt/field51/type:element",

@@ -18,7 +18,7 @@
 #include "sxt/field51/operation/cmov.h"
 #include "sxt/field51/operation/mul.h"
 #include "sxt/field51/operation/neg.h"
-#include "sxt/field51/operation/square.h"
+#include "sxt/field51/operation/sq.h"
 #include "sxt/field51/operation/sub.h"
 #include "sxt/field51/type/element.h"
 #include "sxt/ristretto/base/sqrt_ratio_m1.h"
@@ -40,7 +40,7 @@ void apply_elligator(c21t::element_p3& p, const f51t::element& t) noexcept {
   int wasnt_square;
   auto one = f51cn::one_v;
 
-  f51o::square(r, t);                               /* r = t^2 */
+  f51o::sq(r, t);                                   /* r = t^2 */
   f51o::mul(r, f51t::element{f51cn::sqrtm1_v}, r);  /* r = sqrt(-1)*t^2 */
   f51o::add(u, r, one);                             /* u = r+1 */
   f51o::mul(u, u, f51t::element{f51cn::onemsqd_v}); /* u = (r+1)*(1-d^2) */
@@ -66,7 +66,7 @@ void apply_elligator(c21t::element_p3& p, const f51t::element& t) noexcept {
   f51o::add(w0, s, s);                                /* w0 = 2s */
   f51o::mul(w0, w0, v);                               /* w0 = 2s*v */
   f51o::mul(w1, n, f51t::element{f51cn::sqrtadm1_v}); /* w1 = n*sqrt(ad-1) */
-  f51o::square(ss, s);                                /* ss = s^2 */
+  f51o::sq(ss, s);                                    /* ss = s^2 */
   f51o::sub(w2, one, ss);                             /* w2 = 1-s^2 */
   f51o::add(w3, one, ss);                             /* w3 = 1+s^2 */
 

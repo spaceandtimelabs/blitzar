@@ -22,7 +22,7 @@
 #include "sxt/field51/operation/mul.h"
 #include "sxt/field51/operation/neg.h"
 #include "sxt/field51/operation/pow22523.h"
-#include "sxt/field51/operation/square.h"
+#include "sxt/field51/operation/sq.h"
 #include "sxt/field51/operation/sub.h"
 #include "sxt/field51/property/sign.h"
 #include "sxt/field51/property/zero.h"
@@ -57,7 +57,7 @@ void to_bytes(uint8_t s[32], const c21t::element_p3& p) noexcept {
   f51o::mul(u1, u1, zmy);   /* u1 = (Z+Y)*(Z-Y) */
   f51o::mul(u2, p.X, p.Y);  /* u2 = X*Y */
 
-  f51o::square(u1_u2u2, u2);       /* u1_u2u2 = u2^2 */
+  f51o::sq(u1_u2u2, u2);           /* u1_u2u2 = u2^2 */
   f51o::mul(u1_u2u2, u1, u1_u2u2); /* u1_u2u2 = u1*u2^2 */
 
   (void)rstb::compute_sqrt_ratio_m1(inv_sqrt, one, u1_u2u2);
@@ -131,15 +131,15 @@ int from_bytes(c21t::element_p3& p, const uint8_t* s) noexcept {
 
   f51b::from_bytes(s_.data(), s);
 
-  f51o::square(ss, s_); /* ss = s^2 */
+  f51o::sq(ss, s_); /* ss = s^2 */
 
   u1 = f51t::element{f51cn::one_v};
-  f51o::sub(u1, u1, ss);  /* u1 = 1-ss */
-  f51o::square(u1u1, u1); /* u1u1 = u1^2 */
+  f51o::sub(u1, u1, ss); /* u1 = 1-ss */
+  f51o::sq(u1u1, u1);    /* u1u1 = u1^2 */
 
   u2 = f51t::element{f51cn::one_v};
-  f51o::add(u2, u2, ss);  /* u2 = 1+ss */
-  f51o::square(u2u2, u2); /* u2u2 = u2^2 */
+  f51o::add(u2, u2, ss); /* u2 = 1+ss */
+  f51o::sq(u2u2, u2);    /* u2u2 = u2^2 */
 
   f51o::mul(v, f51t::element{f51cn::d_v}, u1u1); /* v = d*u1^2 */
   f51o::neg(v, v);                               /* v = -d*u1^2 */
