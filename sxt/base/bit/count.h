@@ -9,10 +9,14 @@ namespace sxt::basbt {
 //--------------------------------------------------------------------------------------------------
 inline int count_trailing_zeros(unsigned long x) noexcept { return __builtin_ctzl(x); }
 
+inline int count_trailing_zeros(unsigned long long x) noexcept { return __builtin_ctzll(x); }
+
 //--------------------------------------------------------------------------------------------------
 // count_leading_zeros
 //--------------------------------------------------------------------------------------------------
 inline int count_leading_zeros(unsigned long x) noexcept { return __builtin_clzl(x); }
+
+inline int count_leading_zeros(unsigned long long x) noexcept { return __builtin_clzll(x); }
 
 //--------------------------------------------------------------------------------------------------
 // count_leading_zeros

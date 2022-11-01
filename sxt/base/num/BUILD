@@ -33,3 +33,25 @@ sxt_cc_component(
         "//sxt/base/macro:cuda_callable",
     ],
 )
+
+sxt_cc_component(
+    name = "ceil_log2",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":power2_equality",
+        "//sxt/base/bit:count",
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
+    name = "power2_equality",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
