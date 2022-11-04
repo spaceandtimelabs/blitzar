@@ -7,18 +7,29 @@
 using namespace sxt::prft;
 
 TEST_CASE("conformance test protocol") {
-  strobe128 s1 = strobe128({reinterpret_cast<const uint8_t*>("Conformance Test Protocol"), 25});
+  strobe128 s1 = strobe128("Conformance Test Protocol");
 
   std::array<uint8_t, 1024> msg;
   memset(msg.data(), 99u, msg.size());
 
-  s1.meta_ad({reinterpret_cast<const uint8_t*>("ms"), 2}, false);
-  s1.meta_ad({reinterpret_cast<const uint8_t*>("g"), 1}, true);
-  s1.ad(msg, false);
+  {
+    uint8_t label_data[] = "ms";
+    s1.meta_ad({label_data, sizeof(label_data) - 1}, false);
+  }
+
+  {
+    uint8_t label_data[] = "g";
+    s1.meta_ad({label_data, sizeof(label_data) - 1}, true);
+    s1.ad(msg, false);
+  }
 
   std::array<uint8_t, 32> prf1;
-  s1.meta_ad({reinterpret_cast<const uint8_t*>("prf"), 3}, false);
-  s1.prf(prf1, false);
+
+  {
+    uint8_t label_data[] = "prf";
+    s1.meta_ad({label_data, sizeof(label_data) - 1}, false);
+    s1.prf(prf1, false);
+  }
 
   std::array<uint8_t, 32> expected_prf1 = {180, 142, 100, 92, 161, 124, 102, 127, 213, 32, 107,
                                            165, 122, 106, 34, 141, 114, 216, 225, 144, 56, 20,
@@ -26,12 +37,19 @@ TEST_CASE("conformance test protocol") {
 
   REQUIRE(prf1 == expected_prf1);
 
-  s1.meta_ad({reinterpret_cast<const uint8_t*>("key"), 3}, false);
-  s1.key(prf1, false);
+  {
+    uint8_t label_data[] = "key";
+    s1.meta_ad({label_data, sizeof(label_data) - 1}, false);
+    s1.key(prf1, false);
+  }
 
   std::array<uint8_t, 32> prf2;
-  s1.meta_ad({reinterpret_cast<const uint8_t*>("prf"), 3}, false);
-  s1.prf(prf2, false);
+
+  {
+    uint8_t label_data[] = "prf";
+    s1.meta_ad({label_data, sizeof(label_data) - 1}, false);
+    s1.prf(prf2, false);
+  }
 
   std::array<uint8_t, 32> expected_prf2 = {
       7u,  228u, 92u,  206u, 128u, 120u, 206u, 226u, 89u, 227u, 227u, 117u, 187u, 133u, 215u, 86u,

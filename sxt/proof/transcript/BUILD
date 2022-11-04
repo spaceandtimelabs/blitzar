@@ -35,3 +35,24 @@ sxt_cc_component(
         "//sxt/base/container:span",
     ],
 )
+
+sxt_cc_component(
+    name = "transcript_primitive",
+    impl_deps = [],
+    with_test = False,
+    deps = [],
+)
+
+sxt_cc_component(
+    name = "transcript_utility",
+    impl_deps = [],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/ristretto/type:compressed_element",
+    ],
+    deps = [
+        ":transcript",
+        ":transcript_primitive",
+        "//sxt/base/container:span",
+    ],
+)

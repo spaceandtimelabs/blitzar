@@ -8,15 +8,14 @@
 using namespace sxt::prft;
 
 TEST_CASE("simple protocol with one message and one challenge") {
-  transcript real_transcript = transcript({reinterpret_cast<const uint8_t*>("test protocol"), 13});
+  transcript real_transcript("test protocol");
 
-  real_transcript.append_message({reinterpret_cast<const uint8_t*>("some label"), 10},
-                                 {reinterpret_cast<const uint8_t*>("some data"), 9});
+  uint8_t label_data[] = "some data";
+  real_transcript.append_message("some label", {label_data, sizeof(label_data) - 1});
 
   std::array<uint8_t, 32> real_challenge = {};
 
-  real_transcript.challenge_bytes(real_challenge,
-                                  {reinterpret_cast<const uint8_t*>("challenge"), 9});
+  real_transcript.challenge_bytes(real_challenge, "challenge");
 
   std::array<uint8_t, 32> expected_challenge = {
       213, 162, 25,  114, 208, 213, 254, 50,  12, 13,  38, 63,  172, 127, 255, 184,
@@ -29,13 +28,13 @@ TEST_CASE("complex protocol with multiple messages and challenges") {
   /// these messages are long enough to wrap around the sponge state, and
   /// with multiple rounds of messages and challenges.
 
-  transcript real_transcript = transcript({reinterpret_cast<const uint8_t*>("test protocol"), 13});
+  transcript real_transcript("test protocol");
 
   std::array<uint8_t, 1024> data;
   memset(data.data(), 99, data.size());
 
-  real_transcript.append_message({reinterpret_cast<const uint8_t*>("step1"), 5},
-                                 {reinterpret_cast<const uint8_t*>("some data"), 9});
+  uint8_t label_data[] = "some data";
+  real_transcript.append_message("step1", {label_data, sizeof(label_data) - 1});
 
   std::array<uint8_t, 32> real_challenge;
   std::vector<std::array<uint8_t, 32>> expected_challenges = {
@@ -105,14 +104,12 @@ TEST_CASE("complex protocol with multiple messages and challenges") {
        125, 250, 33, 82,  221, 81,  103, 79,  243, 202, 67,  131, 81, 207, 0,  60}};
 
   for (size_t i = 0; i < 32; ++i) {
-    real_transcript.challenge_bytes(real_challenge,
-                                    {reinterpret_cast<const uint8_t*>("challenge"), 9});
+    real_transcript.challenge_bytes(real_challenge, "challenge");
 
     REQUIRE(real_challenge == expected_challenges[i]);
 
-    real_transcript.append_message({reinterpret_cast<const uint8_t*>("bigdata"), 7}, data);
+    real_transcript.append_message("bigdata", data);
 
-    real_transcript.append_message({reinterpret_cast<const uint8_t*>("challengedata"), 13},
-                                   real_challenge);
+    real_transcript.append_message("challengedata", real_challenge);
   }
 }

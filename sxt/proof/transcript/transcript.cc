@@ -15,6 +15,8 @@
  */
 #include "sxt/proof/transcript/transcript.h"
 
+#include <cstring>
+
 namespace sxt::prft {
 //--------------------------------------------------------------------------------------------------
 // encode_usize_as_u32
@@ -27,8 +29,7 @@ static uint32_t encode_usize_as_u32(size_t len) noexcept {
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
-transcript::transcript(basct::cspan<uint8_t> label) noexcept
-    : strobe_({reinterpret_cast<const uint8_t*>("Merlin v1.0"), 11}) {
+transcript::transcript(std::string_view label) noexcept : strobe_("Merlin v1.0") {
   /// Initialize a new transcript with the supplied `label`, which
   /// is used as a domain separator.
   ///
@@ -39,14 +40,13 @@ transcript::transcript(basct::cspan<uint8_t> label) noexcept
   /// **not by the proof implementation**. See the [Passing
   /// Transcripts](https://merlin.cool/use/passing.html) section of
   /// the Merlin website for more details on why.
-  append_message({reinterpret_cast<const uint8_t*>("dom-sep"), 7}, label);
+  append_message("dom-sep", {reinterpret_cast<const uint8_t*>(label.data()), label.size()});
 }
 
 //--------------------------------------------------------------------------------------------------
 // append_message
 //--------------------------------------------------------------------------------------------------
-void transcript::append_message(basct::cspan<uint8_t> label,
-                                basct::cspan<uint8_t> message) noexcept {
+void transcript::append_message(std::string_view label, basct::cspan<uint8_t> message) noexcept {
   /// Append a prover's `message` to the transcript.
   ///
   /// The `label` parameter is metadata about the message, and is
@@ -54,15 +54,15 @@ void transcript::append_message(basct::cspan<uint8_t> label,
   /// Protocols](https://merlin.cool/use/protocol.html) section of
   /// the Merlin website for details on labels.
   const uint32_t data_len = encode_usize_as_u32(message.size());
-  strobe_.meta_ad(label, false);
-  strobe_.meta_ad({reinterpret_cast<const uint8_t*>(&data_len), 4}, true);
+  strobe_.meta_ad({reinterpret_cast<const uint8_t*>(label.data()), label.size()}, false);
+  strobe_.meta_ad({reinterpret_cast<const uint8_t*>(&data_len), sizeof(uint32_t)}, true);
   strobe_.ad(message, false);
 }
 
 //--------------------------------------------------------------------------------------------------
 // challenge_bytes
 //--------------------------------------------------------------------------------------------------
-void transcript::challenge_bytes(basct::span<uint8_t> dest, basct::cspan<uint8_t> label) noexcept {
+void transcript::challenge_bytes(basct::span<uint8_t> dest, std::string_view label) noexcept {
   /// Fill the supplied buffer with the verifier's challenge bytes.
   ///
   /// The `label` parameter is metadata about the challenge, and is
@@ -70,8 +70,16 @@ void transcript::challenge_bytes(basct::span<uint8_t> dest, basct::cspan<uint8_t
   /// Protocols](https://merlin.cool/use/protocol.html) section of
   /// the Merlin website for details on labels.
   const uint32_t data_len = encode_usize_as_u32(dest.size());
-  strobe_.meta_ad(label, false);
-  strobe_.meta_ad({reinterpret_cast<const uint8_t*>(&data_len), 4}, true);
+  strobe_.meta_ad({reinterpret_cast<const uint8_t*>(label.data()), label.size()}, false);
+  strobe_.meta_ad({reinterpret_cast<const uint8_t*>(&data_len), sizeof(uint32_t)}, true);
   strobe_.prf(dest, false);
+}
+
+//--------------------------------------------------------------------------------------------------
+// operator==
+//--------------------------------------------------------------------------------------------------
+bool operator==(const transcript& lhs, const transcript& rhs) noexcept {
+  return std::memcmp(static_cast<const void*>(&lhs), static_cast<const void*>(&rhs),
+                     sizeof(transcript)) == 0;
 }
 } // namespace sxt::prft

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 #include "sxt/base/container/span.h"
 
@@ -10,9 +11,9 @@ namespace sxt::prft {
 //--------------------------------------------------------------------------------------------------
 class strobe128 {
 public:
-  explicit strobe128(basct::cspan<uint8_t> label) noexcept;
+  explicit strobe128(std::string_view label) noexcept;
 
-  void meta_ad(basct::cspan<uint8_t> data, uint8_t more) noexcept;
+  void meta_ad(basct::cspan<uint8_t> data, bool more) noexcept;
 
   void ad(basct::cspan<uint8_t> data, bool more) noexcept;
 
@@ -29,7 +30,7 @@ private:
 
   void run_f() noexcept;
   void absorb(basct::cspan<uint8_t> data) noexcept;
-  void begin_op(uint8_t flags, uint8_t more) noexcept;
+  void begin_op(uint8_t flags, bool more) noexcept;
   void squeeze(basct::span<uint8_t> data) noexcept;
   void overwrite(basct::cspan<uint8_t> data) noexcept;
 };

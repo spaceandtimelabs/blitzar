@@ -58,15 +58,15 @@ static constexpr uint8_t flag_k_v = 1 << 5;
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
-strobe128::strobe128(basct::cspan<uint8_t> label) noexcept {
+strobe128::strobe128(std::string_view label) noexcept {
   keccakf(state_bytes_);
-  meta_ad(label, 0);
+  meta_ad({reinterpret_cast<const uint8_t*>(label.data()), label.size()}, false);
 }
 
 //--------------------------------------------------------------------------------------------------
 // meta_ad
 //--------------------------------------------------------------------------------------------------
-void strobe128::meta_ad(basct::cspan<uint8_t> data, uint8_t more) noexcept {
+void strobe128::meta_ad(basct::cspan<uint8_t> data, bool more) noexcept {
   begin_op(flag_m_v | flag_a_v, more);
   absorb(data);
 }
@@ -125,7 +125,7 @@ void strobe128::absorb(basct::cspan<uint8_t> data) noexcept {
 //--------------------------------------------------------------------------------------------------
 // begin_op
 //--------------------------------------------------------------------------------------------------
-void strobe128::begin_op(uint8_t flags, uint8_t more) noexcept {
+void strobe128::begin_op(uint8_t flags, bool more) noexcept {
   if (more) {
     /* Changing flags while continuing is illegal */
     assert(cur_flags_ == flags);
