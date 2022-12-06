@@ -6,8 +6,8 @@ load(
 sxt_cc_component(
     name = "add",
     impl_deps = [
+        ":reduce",
         "//sxt/base/bit:load",
-        "//sxt/scalar25/base:reduce",
     ],
     is_cuda = True,
     test_deps = [
@@ -22,8 +22,8 @@ sxt_cc_component(
 sxt_cc_component(
     name = "neg",
     impl_deps = [
+        ":reduce",
         "//sxt/base/bit:load",
-        "//sxt/scalar25/base:reduce",
     ],
     is_cuda = True,
     test_deps = [
@@ -38,6 +38,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "complement",
     impl_deps = [
+        ":reduce",
         "//sxt/base/bit:load",
         "//sxt/scalar25/base:reduce",
     ],
@@ -139,6 +140,22 @@ sxt_cc_component(
         ":sqmul",
         "//sxt/base/bit:load",
         "//sxt/scalar25/property:zero",
+    ],
+    is_cuda = True,
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/scalar25/type:element",
+    ],
+)
+
+sxt_cc_component(
+    name = "reduce",
+    impl_deps = [
+        "//sxt/base/bit:load",
+        "//sxt/scalar25/base:reduce",
     ],
     is_cuda = True,
     test_deps = [

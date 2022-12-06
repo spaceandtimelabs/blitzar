@@ -12,10 +12,10 @@
 
 namespace sxt::s25b {
 //--------------------------------------------------------------------------------------------------
-// reduce_all
+// reduce_impl
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-static void reduce_all(s25t::element& dest, int64_t s[24]) noexcept {
+void reduce_impl(uint8_t dest[32], int64_t s[24]) noexcept {
   int64_t carry0;
   int64_t carry1;
   int64_t carry2;
@@ -278,39 +278,38 @@ static void reduce_all(s25t::element& dest, int64_t s[24]) noexcept {
   s[11] += carry10;
   s[10] -= carry10 * ((uint64_t)1L << 21);
 
-  auto dest_data = dest.data();
-  dest_data[0] = s[0] >> 0;
-  dest_data[1] = s[0] >> 8;
-  dest_data[2] = (s[0] >> 16) | (s[1] * ((uint64_t)1 << 5));
-  dest_data[3] = s[1] >> 3;
-  dest_data[4] = s[1] >> 11;
-  dest_data[5] = (s[1] >> 19) | (s[2] * ((uint64_t)1 << 2));
-  dest_data[6] = s[2] >> 6;
-  dest_data[7] = (s[2] >> 14) | (s[3] * ((uint64_t)1 << 7));
-  dest_data[8] = s[3] >> 1;
-  dest_data[9] = s[3] >> 9;
-  dest_data[10] = (s[3] >> 17) | (s[4] * ((uint64_t)1 << 4));
-  dest_data[11] = s[4] >> 4;
-  dest_data[12] = s[4] >> 12;
-  dest_data[13] = (s[4] >> 20) | (s[5] * ((uint64_t)1 << 1));
-  dest_data[14] = s[5] >> 7;
-  dest_data[15] = (s[5] >> 15) | (s[6] * ((uint64_t)1 << 6));
-  dest_data[16] = s[6] >> 2;
-  dest_data[17] = s[6] >> 10;
-  dest_data[18] = (s[6] >> 18) | (s[7] * ((uint64_t)1 << 3));
-  dest_data[19] = s[7] >> 5;
-  dest_data[20] = s[7] >> 13;
-  dest_data[21] = s[8] >> 0;
-  dest_data[22] = s[8] >> 8;
-  dest_data[23] = (s[8] >> 16) | (s[9] * ((uint64_t)1 << 5));
-  dest_data[24] = s[9] >> 3;
-  dest_data[25] = s[9] >> 11;
-  dest_data[26] = (s[9] >> 19) | (s[10] * ((uint64_t)1 << 2));
-  dest_data[27] = s[10] >> 6;
-  dest_data[28] = (s[10] >> 14) | (s[11] * ((uint64_t)1 << 7));
-  dest_data[29] = s[11] >> 1;
-  dest_data[30] = s[11] >> 9;
-  dest_data[31] = s[11] >> 17;
+  dest[0] = s[0] >> 0;
+  dest[1] = s[0] >> 8;
+  dest[2] = (s[0] >> 16) | (s[1] * ((uint64_t)1 << 5));
+  dest[3] = s[1] >> 3;
+  dest[4] = s[1] >> 11;
+  dest[5] = (s[1] >> 19) | (s[2] * ((uint64_t)1 << 2));
+  dest[6] = s[2] >> 6;
+  dest[7] = (s[2] >> 14) | (s[3] * ((uint64_t)1 << 7));
+  dest[8] = s[3] >> 1;
+  dest[9] = s[3] >> 9;
+  dest[10] = (s[3] >> 17) | (s[4] * ((uint64_t)1 << 4));
+  dest[11] = s[4] >> 4;
+  dest[12] = s[4] >> 12;
+  dest[13] = (s[4] >> 20) | (s[5] * ((uint64_t)1 << 1));
+  dest[14] = s[5] >> 7;
+  dest[15] = (s[5] >> 15) | (s[6] * ((uint64_t)1 << 6));
+  dest[16] = s[6] >> 2;
+  dest[17] = s[6] >> 10;
+  dest[18] = (s[6] >> 18) | (s[7] * ((uint64_t)1 << 3));
+  dest[19] = s[7] >> 5;
+  dest[20] = s[7] >> 13;
+  dest[21] = s[8] >> 0;
+  dest[22] = s[8] >> 8;
+  dest[23] = (s[8] >> 16) | (s[9] * ((uint64_t)1 << 5));
+  dest[24] = s[9] >> 3;
+  dest[25] = s[9] >> 11;
+  dest[26] = (s[9] >> 19) | (s[10] * ((uint64_t)1 << 2));
+  dest[27] = s[10] >> 6;
+  dest[28] = (s[10] >> 14) | (s[11] * ((uint64_t)1 << 7));
+  dest[29] = s[11] >> 1;
+  dest[30] = s[11] >> 9;
+  dest[31] = s[11] >> 17;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -320,64 +319,26 @@ static void reduce_all(s25t::element& dest, int64_t s[24]) noexcept {
 // Modified from libsodium's sc25519_reduce which reduces a 64-byte array by
 // reading s[32] to s[63] out as zero.
 CUDA_CALLABLE
-void reduce33(s25t::element& dest, uint8_t byte32) noexcept {
-  auto dest_data = dest.data();
-
-  uint64_t last_two_bytes =
-      static_cast<uint64_t>(dest_data[31]) | (static_cast<uint64_t>(byte32) << 8);
+void reduce33(uint8_t dest[32], uint8_t byte32) noexcept {
+  uint64_t last_two_bytes = static_cast<uint64_t>(dest[31]) | (static_cast<uint64_t>(byte32) << 8);
 
   int64_t reduce_data[24] = {
-      2097151LL & static_cast<int64_t>(basbt::load_3(dest_data)),
-      2097151LL & static_cast<int64_t>(basbt::load_4(dest_data + 2) >> 5),
-      2097151LL & static_cast<int64_t>(basbt::load_3(dest_data + 5) >> 2),
-      2097151LL & static_cast<int64_t>(basbt::load_4(dest_data + 7) >> 7),
-      2097151LL & static_cast<int64_t>(basbt::load_4(dest_data + 10) >> 4),
-      2097151LL & static_cast<int64_t>(basbt::load_3(dest_data + 13) >> 1),
-      2097151LL & static_cast<int64_t>(basbt::load_4(dest_data + 15) >> 6),
-      2097151LL & static_cast<int64_t>(basbt::load_3(dest_data + 18) >> 3),
-      2097151LL & static_cast<int64_t>(basbt::load_3(dest_data + 21)),
-      2097151LL & static_cast<int64_t>(basbt::load_4(dest_data + 23) >> 5),
-      2097151LL & static_cast<int64_t>(basbt::load_3(dest_data + 26) >> 2),
-      2097151LL & static_cast<int64_t>(basbt::load_4(dest_data + 28) >> 7),
+      2097151LL & static_cast<int64_t>(basbt::load_3(dest)),
+      2097151LL & static_cast<int64_t>(basbt::load_4(dest + 2) >> 5),
+      2097151LL & static_cast<int64_t>(basbt::load_3(dest + 5) >> 2),
+      2097151LL & static_cast<int64_t>(basbt::load_4(dest + 7) >> 7),
+      2097151LL & static_cast<int64_t>(basbt::load_4(dest + 10) >> 4),
+      2097151LL & static_cast<int64_t>(basbt::load_3(dest + 13) >> 1),
+      2097151LL & static_cast<int64_t>(basbt::load_4(dest + 15) >> 6),
+      2097151LL & static_cast<int64_t>(basbt::load_3(dest + 18) >> 3),
+      2097151LL & static_cast<int64_t>(basbt::load_3(dest + 21)),
+      2097151LL & static_cast<int64_t>(basbt::load_4(dest + 23) >> 5),
+      2097151LL & static_cast<int64_t>(basbt::load_3(dest + 26) >> 2),
+      2097151LL & static_cast<int64_t>(basbt::load_4(dest + 28) >> 7),
       2097151LL & static_cast<int64_t>(last_two_bytes >> 4),
       0LL,
   };
 
-  reduce_all(dest, reduce_data);
-}
-
-//--------------------------------------------------------------------------------------------------
-// reduce64
-//--------------------------------------------------------------------------------------------------
-//
-// Modified from libsodium's sc25519_reduce
-CUDA_CALLABLE
-void reduce64(s25t::element& dest, const uint8_t s[64]) noexcept {
-  int64_t reduce_data[24] = {2097151LL & static_cast<int64_t>(basbt::load_3(s)),
-                             2097151LL & static_cast<int64_t>(basbt::load_4(s + 2) >> 5),
-                             2097151LL & static_cast<int64_t>(basbt::load_3(s + 5) >> 2),
-                             2097151LL & static_cast<int64_t>(basbt::load_4(s + 7) >> 7),
-                             2097151LL & static_cast<int64_t>(basbt::load_4(s + 10) >> 4),
-                             2097151LL & static_cast<int64_t>(basbt::load_3(s + 13) >> 1),
-                             2097151LL & static_cast<int64_t>(basbt::load_4(s + 15) >> 6),
-                             2097151LL & static_cast<int64_t>(basbt::load_3(s + 18) >> 3),
-                             2097151LL & static_cast<int64_t>(basbt::load_3(s + 21)),
-                             2097151LL & static_cast<int64_t>(basbt::load_4(s + 23) >> 5),
-                             2097151LL & static_cast<int64_t>(basbt::load_3(s + 26) >> 2),
-                             2097151LL & static_cast<int64_t>(basbt::load_4(s + 28) >> 7),
-                             2097151LL & static_cast<int64_t>(basbt::load_4(s + 31) >> 4),
-                             2097151LL & static_cast<int64_t>(basbt::load_3(s + 34) >> 1),
-                             2097151LL & static_cast<int64_t>(basbt::load_4(s + 36) >> 6),
-                             2097151LL & static_cast<int64_t>(basbt::load_3(s + 39) >> 3),
-                             2097151LL & static_cast<int64_t>(basbt::load_3(s + 42)),
-                             2097151LL & static_cast<int64_t>(basbt::load_4(s + 44) >> 5),
-                             2097151LL & static_cast<int64_t>(basbt::load_3(s + 47) >> 2),
-                             2097151LL & static_cast<int64_t>(basbt::load_4(s + 49) >> 7),
-                             2097151LL & static_cast<int64_t>(basbt::load_4(s + 52) >> 4),
-                             2097151LL & static_cast<int64_t>(basbt::load_3(s + 55) >> 1),
-                             2097151LL & static_cast<int64_t>(basbt::load_4(s + 57) >> 6),
-                             static_cast<int64_t>(basbt::load_4(s + 60) >> 3)};
-
-  reduce_all(dest, reduce_data);
+  reduce_impl(dest, reduce_data);
 }
 } // namespace sxt::s25b

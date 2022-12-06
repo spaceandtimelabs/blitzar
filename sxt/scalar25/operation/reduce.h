@@ -1,16 +1,9 @@
 #pragma once
 
-#include <cstdint>
-
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/scalar25/type/element.h"
 
-namespace sxt::s25b {
-//--------------------------------------------------------------------------------------------------
-// reduce_impl
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void reduce_impl(uint8_t dest[32], int64_t s[24]) noexcept;
-
+namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
 // reduce33
 //--------------------------------------------------------------------------------------------------
@@ -19,15 +12,15 @@ void reduce_impl(uint8_t dest[32], int64_t s[24]) noexcept;
 //   byte32
 //
 // Output:
-//   dest[0]+256*dest[1]+...+256^31*dest[31] = (t mod l)
+//   s[0]+256*s[1]+...+256^31*s[31] = (t mod l)
 //
-// where t = dest[0] + 256*dest[1] + ... + 256^31*dest[31] + 256^32*byte32
+// where t = s[0] + 256*s[1] + ... + 256^31*s[31] + 256^32*byte32
 //
 // where l = 2^252 + 27742317777372353535851937790883648493.
 //
 // Overwrites s in place.
 CUDA_CALLABLE
-void reduce33(uint8_t dest[32], uint8_t byte32) noexcept;
+void reduce33(s25t::element& s, uint8_t byte32) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // reduce32
@@ -42,5 +35,20 @@ void reduce33(uint8_t dest[32], uint8_t byte32) noexcept;
 //
 // Overwrites s in place.
 CUDA_CALLABLE
-inline void reduce32(uint8_t s[32]) noexcept { return reduce33(s, 0); }
-} // namespace sxt::s25b
+inline void reduce32(s25t::element& s) noexcept { return reduce33(s, 0); }
+
+//--------------------------------------------------------------------------------------------------
+// reduce64
+//--------------------------------------------------------------------------------------------------
+// Input:
+//   s[0]+256*s[1]+...+256^63*s[63] = s
+//
+// Output:
+//   dest[0]+256*dest[1]+...+256^31*dest[31] = s mod l
+//
+// where l = 2^252 + 27742317777372353535851937790883648493.
+//
+// Writes to dest.
+CUDA_CALLABLE
+void reduce64(s25t::element& dest, const uint8_t s[64]) noexcept;
+} // namespace sxt::s25o

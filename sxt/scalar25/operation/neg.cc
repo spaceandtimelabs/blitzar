@@ -8,7 +8,7 @@
  */
 #include "sxt/scalar25/operation/neg.h"
 
-#include "sxt/scalar25/base/reduce.h"
+#include "sxt/scalar25/operation/reduce.h"
 
 namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
@@ -41,6 +41,6 @@ void neg(s25t::element& n, const s25t::element& s) noexcept {
     c = (c >> 8) & 1U;
   }
 
-  s25b::reduce64(n, t_);
+  s25o::reduce64(n, t_);
 }
 } // namespace sxt::s25o

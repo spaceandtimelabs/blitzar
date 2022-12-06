@@ -11,9 +11,5 @@ sxt_cc_component(
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/scalar25/type:literal",
-    ],
-    deps = [
-        "//sxt/scalar25/type:element",
     ],
 )

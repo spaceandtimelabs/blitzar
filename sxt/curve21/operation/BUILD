@@ -72,7 +72,7 @@ sxt_cc_component(
         ":cmov",
         ":double",
         "//sxt/scalar25/type:element",
-        "//sxt/scalar25/base:reduce",
+        "//sxt/scalar25/operation:reduce",
         "//sxt/base/container:span",
         "//sxt/curve21/constant:zero",
         "//sxt/curve21/type:conversion_utility",

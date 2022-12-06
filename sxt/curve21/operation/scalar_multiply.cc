@@ -11,7 +11,7 @@
 #include "sxt/curve21/type/element_cached.h"
 #include "sxt/curve21/type/element_p1p1.h"
 #include "sxt/curve21/type/element_p3.h"
-#include "sxt/scalar25/base/reduce.h"
+#include "sxt/scalar25/operation/reduce.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::c21o {
@@ -23,7 +23,7 @@ static void fill_exponent(s25t::element& a, basct::cspan<uint8_t> data) noexcept
   std::memcpy(a.data(), data.data(), data.size());
 
   if (a.data()[31] > 127) {
-    s25b::reduce32(a); // a_i = a_i % (2^252 + 27742317777372353535851937790883648493)
+    s25o::reduce32(a); // a_i = a_i % (2^252 + 27742317777372353535851937790883648493)
   }
 }
 

@@ -15,7 +15,7 @@ int is_zero(const s25t::element& e) noexcept {
   // since `is_zero` do not detect them
   // Ex: 2^252 + 27742317777372353535851937790883648493
   // will not be considered zero by `is_zero`
-  s25b::reduce32(t);
+  s25b::reduce32(t.data());
 
   return basbt::is_zero(t.data(), sizeof(t));
 }

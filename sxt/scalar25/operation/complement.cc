@@ -8,7 +8,7 @@
  */
 #include "sxt/scalar25/operation/complement.h"
 
-#include "sxt/scalar25/base/reduce.h"
+#include "sxt/scalar25/operation/reduce.h"
 
 namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
@@ -41,6 +41,6 @@ void complement(s25t::element& comp, const s25t::element& s) noexcept {
     c = (c >> 8) & 1U;
   }
 
-  s25b::reduce64(comp, t_);
+  s25o::reduce64(comp, t_);
 }
 } // namespace sxt::s25o

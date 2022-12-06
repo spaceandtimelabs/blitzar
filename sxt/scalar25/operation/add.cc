@@ -8,7 +8,7 @@
  */
 #include "sxt/scalar25/operation/add.h"
 
-#include "sxt/scalar25/base/reduce.h"
+#include "sxt/scalar25/operation/reduce.h"
 
 namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
@@ -32,6 +32,6 @@ void add(s25t::element& z, const s25t::element& x, const s25t::element& y) noexc
     carry >>= 8;
   }
 
-  s25b::reduce33(z, static_cast<uint8_t>(carry));
+  s25o::reduce33(z, static_cast<uint8_t>(carry));
 }
 } // namespace sxt::s25o
