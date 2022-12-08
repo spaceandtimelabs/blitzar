@@ -48,7 +48,37 @@ static void compute_random_test_case(std::mt19937& rng, size_t num_sequences,
   REQUIRE(inout == expected_result);
 }
 
-TEST_CASE("Pippenger Multiexponentiation using Ristretto Points") {
+static void
+compute_uncompressed_random_test_case(std::mt19937& rng, size_t num_sequences,
+                                      mtxrn::random_multiexponentiation_descriptor descriptor,
+                                      const multiexponentiation_cpu_driver& drv) {
+  uint64_t num_inputs = 0;
+
+  std::pmr::monotonic_buffer_resource resource;
+  std::vector<mtxb::exponent_sequence> sequences(num_sequences);
+
+  mtxrn::generate_random_multiexponentiation(num_inputs, sequences, &resource, rng, descriptor);
+
+  memmg::managed_array<rstt::compressed_element> inputs(num_inputs);
+  mtxtst::generate_ristretto_elements(inputs, rng);
+
+  memmg::managed_array<c21t::element_p3> inout(num_inputs);
+  for (size_t input_index = 0; input_index < num_inputs; ++input_index) {
+    rstb::from_bytes(inout[input_index], inputs[input_index].data());
+  }
+  mtxpi::compute_multiexponentiation(inout, drv, sequences);
+  memmg::managed_array<rstt::compressed_element> result(num_sequences);
+  for (size_t result_index = 0; result_index < num_sequences; ++result_index) {
+    rstb::to_bytes(result[result_index].data(), inout[result_index]);
+  }
+
+  memmg::managed_array<rstt::compressed_element> expected_result(num_sequences);
+  mtxtst::compute_ristretto_muladd(expected_result, inputs, sequences);
+
+  REQUIRE(result == expected_result);
+}
+
+TEST_CASE("we can compute compressed multiexponentiations") {
   multiexponentiation_cpu_driver drv;
 
   std::mt19937 rng{2022};
@@ -369,6 +399,27 @@ TEST_CASE("Pippenger Multiexponentiation using Ristretto Points") {
                                 .min_exponent_num_bytes = 1,
                                 .max_exponent_num_bytes = 32},
                                drv);
+    }
+  }
+}
+
+TEST_CASE("we can compute uncompressed multiexponentiations") {
+  multiexponentiation_cpu_driver drv{nullptr, nullptr, false};
+
+  std::mt19937 rng{2022};
+  rstt::compressed_element gs[4];
+  mtxtst::generate_ristretto_elements(gs, rng);
+
+  SECTION("we handle multiple outputs and"
+          "multiple random sequences of varying"
+          "length and varying num_bytes") {
+    for (size_t i = 0; i < 10; ++i) {
+      compute_uncompressed_random_test_case(rng, i,
+                                            {.min_sequence_length = 1,
+                                             .max_sequence_length = 100,
+                                             .min_exponent_num_bytes = 1,
+                                             .max_exponent_num_bytes = 32},
+                                            drv);
     }
   }
 }

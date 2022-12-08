@@ -16,6 +16,33 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "uncompressed_input_accessor",
+    impl_deps = [
+        "//sxt/curve21/type:element_p3",
+    ],
+    with_test = False,
+    deps = [
+        ":input_accessor",
+    ],
+)
+
+sxt_cc_component(
+    name = "doubling_reduction",
+    impl_deps = [
+        "//sxt/base/bit:count",
+        "//sxt/base/bit:span_op",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "precomputed_p3_input_accessor",
     impl_deps = [
     ],
@@ -36,6 +63,8 @@ sxt_cc_component(
     name = "multiexponentiation_cpu_driver",
     impl_deps = [
         ":compressed_input_accessor",
+        ":uncompressed_input_accessor",
+        ":doubling_reduction",
         ":naive_multiproduct_solver",
         "//sxt/base/bit:count",
         "//sxt/base/bit:span_op",

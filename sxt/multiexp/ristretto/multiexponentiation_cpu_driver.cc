@@ -1,6 +1,7 @@
 #include "sxt/multiexp/ristretto/multiexponentiation_cpu_driver.h"
 
 #include <cassert>
+#include <type_traits>
 
 #include "sxt/base/bit/count.h"
 #include "sxt/base/bit/span_op.h"
@@ -14,18 +15,47 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/ristretto/compressed_input_accessor.h"
+#include "sxt/multiexp/ristretto/doubling_reduction.h"
 #include "sxt/multiexp/ristretto/naive_multiproduct_solver.h"
+#include "sxt/multiexp/ristretto/uncompressed_input_accessor.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/type/compressed_element.h"
 
 namespace sxt::mtxrs {
 //--------------------------------------------------------------------------------------------------
+// combine_multiproduct_outputs_impl
+//--------------------------------------------------------------------------------------------------
+template <class T>
+void combine_multiproduct_outputs_impl(basct::span<T> outputs,
+                                       basct::cspan<c21t::element_p3> inputs,
+                                       const basct::blob_array& output_digit_or_all) noexcept {
+  size_t input_index = 0;
+  for (size_t output_index = 0; output_index < output_digit_or_all.size(); ++output_index) {
+    auto digit_or_all = output_digit_or_all[output_index];
+    int digit_count_one = basbt::pop_count(digit_or_all);
+    if (digit_count_one == 0) {
+      std::memset(static_cast<void*>(&outputs[output_index]), 0, sizeof(T));
+      continue;
+    }
+    c21t::element_p3 output;
+    doubling_reduce(output, digit_or_all, inputs.subspan(input_index, digit_count_one));
+    input_index += digit_count_one;
+    if constexpr (std::is_same_v<T, rstt::compressed_element>) {
+      rstb::to_bytes(outputs[output_index].data(), output);
+    } else {
+      outputs[output_index] = output;
+    }
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
 multiexponentiation_cpu_driver::multiexponentiation_cpu_driver(
     const mtxrs::input_accessor* input_accessor,
-    const mtxrs::multiproduct_solver* multiproduct_solver) noexcept
-    : input_accessor_{input_accessor}, multiproduct_solver_{multiproduct_solver} {}
+    const mtxrs::multiproduct_solver* multiproduct_solver, bool compress) noexcept
+    : input_accessor_{input_accessor}, multiproduct_solver_{multiproduct_solver}, compress_{
+                                                                                      compress} {}
 
 //--------------------------------------------------------------------------------------------------
 // compute_multiproduct_inputs
@@ -33,10 +63,15 @@ multiexponentiation_cpu_driver::multiexponentiation_cpu_driver(
 void multiexponentiation_cpu_driver::compute_multiproduct_inputs(
     memmg::managed_array<void>& inout, basct::cspan<basct::cspan<size_t>> powers, size_t radix_log2,
     size_t num_multiproduct_inputs, size_t num_multiproduct_entries) const noexcept {
-  compressed_input_accessor default_accessor;
+  compressed_input_accessor default_compressed_accessor;
+  uncompressed_input_accessor default_uncompressed_accessor;
   auto accessor = input_accessor_;
   if (accessor == nullptr) {
-    accessor = &default_accessor;
+    if (compress_) {
+      accessor = &default_compressed_accessor;
+    } else {
+      accessor = &default_uncompressed_accessor;
+    }
   }
   auto num_inputs = powers.size();
   auto inputs = inout.data();
@@ -105,39 +140,17 @@ void multiexponentiation_cpu_driver::combine_multiproduct_outputs(
     memmg::managed_array<void>& inout,
     const basct::blob_array& output_digit_or_all) const noexcept {
   basct::cspan<c21t::element_p3> inputs{static_cast<c21t::element_p3*>(inout.data()), inout.size()};
-  memmg::managed_array<rstt::compressed_element> outputs{output_digit_or_all.size(),
-                                                         inout.get_allocator()};
-  size_t input_index = 0;
-  for (size_t output_index = 0; output_index < output_digit_or_all.size(); ++output_index) {
-    auto digit_or_all = output_digit_or_all[output_index];
-    int digit_count_one = basbt::pop_count(digit_or_all);
-    if (digit_count_one == 0) {
-      memset(outputs[output_index].data(), 0, sizeof(rstt::compressed_element));
-      continue;
-    }
-    size_t digit_bit_index = 8 * digit_or_all.size() - basbt::count_leading_zeros(digit_or_all) - 1;
-    input_index += digit_count_one;
-    c21t::element_p1p1 res2_p1p1;
-
-    // we manually set the first `input_index`
-    // to prevent one `double` and one `add` operation
-    auto output = inputs[--input_index];
-
-    // The following implementation uses the formula:
-    // output = 2^{i_0} * a0 + 2^{i_1} * (a1 + 2^{i_2} * (a2 + ..)..),
-    // where i_0 <= i_1 <= i_2 <= ... <= i_n.
-    while (digit_bit_index-- > 0) {
-      c21o::double_element(res2_p1p1, output);
-      c21t::to_element_p3(output, res2_p1p1);
-
-      // if i-th bit is set, we need to add a_i to output
-      if (basbt::test_bit(digit_or_all, digit_bit_index)) {
-        c21o::add(output, output, inputs[--input_index]);
-      }
-    }
-    input_index += digit_count_one;
-    rstb::to_bytes(outputs[output_index].data(), output);
+  if (compress_) {
+    memmg::managed_array<rstt::compressed_element> outputs{output_digit_or_all.size(),
+                                                           inout.get_allocator()};
+    combine_multiproduct_outputs_impl<rstt::compressed_element>(outputs, inputs,
+                                                                output_digit_or_all);
+    inout = std::move(outputs);
+  } else {
+    memmg::managed_array<c21t::element_p3> outputs{output_digit_or_all.size(),
+                                                   inout.get_allocator()};
+    combine_multiproduct_outputs_impl<c21t::element_p3>(outputs, inputs, output_digit_or_all);
+    inout = std::move(outputs);
   }
-  inout = std::move(outputs);
 }
 } // namespace sxt::mtxrs

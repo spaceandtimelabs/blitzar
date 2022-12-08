@@ -21,4 +21,11 @@ inline void double_element(c21t::element_p1p1& r, const c21t::element_p3& p) noe
   to_element_p2(q, p);
   double_element(r, q);
 }
+
+CUDA_CALLABLE
+inline void double_element(c21t::element_p3& r, const c21t::element_p3& p) noexcept {
+  c21t::element_p1p1 t;
+  double_element(t, p);
+  to_element_p3(r, t);
+}
 } // namespace sxt::c21o

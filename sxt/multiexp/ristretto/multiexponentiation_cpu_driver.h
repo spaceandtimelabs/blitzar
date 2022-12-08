@@ -17,7 +17,8 @@ class multiexponentiation_cpu_driver final : public sxt::mtxpi::driver {
 public:
   explicit multiexponentiation_cpu_driver(
       const mtxrs::input_accessor* input_accessor = nullptr,
-      const mtxrs::multiproduct_solver* multiproduct_solver = nullptr) noexcept;
+      const mtxrs::multiproduct_solver* multiproduct_solver = nullptr,
+      bool compress = true) noexcept;
 
   void compute_multiproduct_inputs(memmg::managed_array<void>& inout,
                                    basct::cspan<basct::cspan<size_t>> powers, size_t radix_log2,
@@ -35,5 +36,6 @@ public:
 private:
   const input_accessor* input_accessor_;
   const multiproduct_solver* multiproduct_solver_;
+  bool compress_;
 };
 } // namespace sxt::mtxrs
