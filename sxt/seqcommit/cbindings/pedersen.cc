@@ -13,57 +13,11 @@
 #include "sxt/seqcommit/backend/pedersen_backend.h"
 #include "sxt/seqcommit/backend/pippenger_cpu_backend.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
+#include "sxt/seqcommit/cbindings/backend.h"
 #include "sxt/seqcommit/generator/precomputed_initializer.h"
 #include "sxt/seqcommit/generator/precomputed_one_commitments.h"
 
 using namespace sxt;
-
-//--------------------------------------------------------------------------------------------------
-// backend
-//--------------------------------------------------------------------------------------------------
-static sqcbck::pedersen_backend* backend = nullptr;
-
-//--------------------------------------------------------------------------------------------------
-// sxt_init
-//--------------------------------------------------------------------------------------------------
-int sxt_init(const sxt_config* config) {
-  if (config == nullptr)
-    exit(1);
-  if (backend != nullptr)
-    exit(1);
-
-  if (config->backend == SXT_NAIVE_BACKEND_CPU) {
-    backend = sqcbck::get_naive_cpu_backend();
-
-    sqcgn::init_precomputed_components(config->num_precomputed_generators, false);
-
-    return 0;
-  } else if (config->backend == SXT_NAIVE_BACKEND_GPU) {
-    int num_devices = sxt::basdv::get_num_devices();
-
-    if (num_devices > 0) {
-      backend = sqcbck::get_naive_gpu_backend();
-
-      sqcgn::init_precomputed_components(config->num_precomputed_generators, true);
-    } else {
-      backend = sqcbck::get_naive_cpu_backend();
-
-      sqcgn::init_precomputed_components(config->num_precomputed_generators, false);
-
-      std::cout << "WARN: Using 'compute_commitments_cpu'. " << std::endl;
-    }
-
-    return 0;
-  } else if (config->backend == SXT_PIPPENGER_BACKEND_CPU) {
-    backend = sqcbck::get_pippenger_cpu_backend();
-
-    sqcgn::init_precomputed_components(config->num_precomputed_generators, false);
-
-    return 0;
-  }
-
-  return 1;
-}
 
 //--------------------------------------------------------------------------------------------------
 // validate_descriptor
@@ -113,7 +67,7 @@ static int process_compute_pedersen_commitments(struct sxt_compressed_ristretto*
                                                 const struct sxt_ristretto* generators) {
 
   // backend not initialized (sxt_init not called correctly)
-  if (backend == nullptr)
+  if (!sqccb::is_backend_initialized())
     return 1;
 
   if (num_sequences == 0)
@@ -157,6 +111,7 @@ static int process_compute_pedersen_commitments(struct sxt_compressed_ristretto*
   basct::cspan<c21t::element_p3> generators_span(
       reinterpret_cast<const c21t::element_p3*>(generators), generators_length);
 
+  auto backend = sqccb::get_backend();
   backend->compute_commitments(commitments_result, value_sequences, generators_span,
                                length_longest_sequence, has_sparse_sequence);
 
@@ -208,12 +163,13 @@ int sxt_get_generators(struct sxt_ristretto* generators, uint64_t num_generators
     return 1;
 
   // backend not initialized (sxt_init not called correctly)
-  if (backend == nullptr)
+  if (!sqccb::is_backend_initialized())
     return 1;
 
   basct::span<c21t::element_p3> generators_result(reinterpret_cast<c21t::element_p3*>(generators),
                                                   num_generators);
 
+  auto backend = sqccb::get_backend();
   backend->get_generators(generators_result, offset_generators);
 
   return 0;
@@ -230,17 +186,3 @@ int sxt_get_one_commit(struct sxt_ristretto* one_commit, uint64_t n) {
 
   return 0;
 }
-
-namespace sxt::sqccb {
-//--------------------------------------------------------------------------------------------------
-// reset_backend_for_testing
-//--------------------------------------------------------------------------------------------------
-int reset_backend_for_testing() {
-  if (backend == nullptr)
-    exit(1);
-
-  backend = nullptr;
-
-  return 0;
-}
-} // namespace sxt::sqccb

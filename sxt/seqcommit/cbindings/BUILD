@@ -9,8 +9,28 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "backend",
+    impl_deps = [
+        "//sxt/base/device:property",
+        "//sxt/seqcommit/backend:naive_cpu_backend",
+        "//sxt/seqcommit/backend:naive_gpu_backend",
+        "//sxt/seqcommit/backend:pippenger_cpu_backend",
+        "//sxt/seqcommit/generator:precomputed_initializer",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":pedersen_capi",
+        "//sxt/seqcommit/backend:pedersen_backend",
+    ],
+    alwayslink = 1,
+)
+
+sxt_cc_component(
     name = "pedersen",
     impl_deps = [
+        ":backend",
         "//sxt/base/container:span",
         "//sxt/base/device:property",
         "//sxt/ristretto/type:compressed_element",
@@ -26,6 +46,7 @@ sxt_cc_component(
         "//sxt/seqcommit/naive:commitment_computation_gpu",
     ],
     test_deps = [
+        ":backend",
         "//sxt/base/test:unit_test",
         "//sxt/ristretto/operation:add",
         "//sxt/ristretto/random:element",

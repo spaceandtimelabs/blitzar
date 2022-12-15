@@ -13,6 +13,7 @@
 #include "sxt/ristretto/operation/scalar_multiply.h"
 #include "sxt/ristretto/random/element.h"
 #include "sxt/ristretto/type/compressed_element.h"
+#include "sxt/seqcommit/cbindings/backend.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
 using namespace sxt;
@@ -21,12 +22,6 @@ using namespace sxt::sqccb;
 TEST_CASE("run pedersen initialization and finalize tests") {
   sxt_compressed_ristretto commitments[1];
   sxt_sequence_descriptor valid_descriptors[1];
-
-  SECTION("incorrect input to the initialization will error out") {
-    const sxt_config config = {100000};
-
-    REQUIRE(sxt_init(&config) != 0);
-  }
 
   SECTION("not initialized library will error out") {
     int ret = sxt_compute_pedersen_commitments(commitments, 0, valid_descriptors);
@@ -42,7 +37,7 @@ TEST_CASE("run pedersen initialization and finalize tests") {
 
     REQUIRE(ret == 0);
 
-    REQUIRE(reset_backend_for_testing() == 0);
+    sqccb::reset_backend_for_testing();
   }
 
   SECTION("correct naive gpu backend will not error out") {
@@ -53,7 +48,7 @@ TEST_CASE("run pedersen initialization and finalize tests") {
 
     REQUIRE(ret == 0);
 
-    REQUIRE(reset_backend_for_testing() == 0);
+    sqccb::reset_backend_for_testing();
   }
 
   SECTION("correct pippenger cpu backend will not error out") {
@@ -64,7 +59,7 @@ TEST_CASE("run pedersen initialization and finalize tests") {
 
     REQUIRE(ret == 0);
 
-    REQUIRE(reset_backend_for_testing() == 0);
+    sqccb::reset_backend_for_testing();
   }
 }
 
@@ -91,7 +86,7 @@ static void test_pedersen_commitments_with_given_backend(int backend,
 
       REQUIRE(ret == 0);
 
-      REQUIRE(reset_backend_for_testing() == 0);
+      sqccb::reset_backend_for_testing();
     }
 
     SECTION("null commitment pointers will error out") {
@@ -108,7 +103,7 @@ static void test_pedersen_commitments_with_given_backend(int backend,
 
       REQUIRE(ret != 0);
 
-      REQUIRE(reset_backend_for_testing() == 0);
+      sqccb::reset_backend_for_testing();
     }
 
     SECTION("null value_sequences will error out") {
@@ -120,7 +115,7 @@ static void test_pedersen_commitments_with_given_backend(int backend,
 
       REQUIRE(ret != 0);
 
-      REQUIRE(reset_backend_for_testing() == 0);
+      sqccb::reset_backend_for_testing();
     }
 
     SECTION("zero sequences will not error out") {
@@ -132,7 +127,7 @@ static void test_pedersen_commitments_with_given_backend(int backend,
 
       REQUIRE(ret == 0);
 
-      REQUIRE(reset_backend_for_testing() == 0);
+      sqccb::reset_backend_for_testing();
     }
 
     SECTION("zero length commitments will not error out") {
@@ -153,7 +148,7 @@ static void test_pedersen_commitments_with_given_backend(int backend,
       REQUIRE(rstt::compressed_element() ==
               reinterpret_cast<rstt::compressed_element*>(&commitment)[0]);
 
-      REQUIRE(reset_backend_for_testing() == 0);
+      sqccb::reset_backend_for_testing();
     }
 
     SECTION("out of range (< 1 or > 32) element_nbytes will error out") {
@@ -186,7 +181,7 @@ static void test_pedersen_commitments_with_given_backend(int backend,
         REQUIRE(ret != 0);
       }
 
-      REQUIRE(reset_backend_for_testing() == 0);
+      sqccb::reset_backend_for_testing();
     }
 
     SECTION("null element data pointer will error out") {
@@ -203,7 +198,7 @@ static void test_pedersen_commitments_with_given_backend(int backend,
 
       REQUIRE(ret != 0);
 
-      REQUIRE(reset_backend_for_testing() == 0);
+      sqccb::reset_backend_for_testing();
     }
 
     SECTION("We can multiply and add two commitments together") {
@@ -259,7 +254,7 @@ static void test_pedersen_commitments_with_given_backend(int backend,
         REQUIRE(p == expected_commitment_c);
       }
 
-      REQUIRE(reset_backend_for_testing() == 0);
+      sqccb::reset_backend_for_testing();
     }
 
     SECTION("We can compute sparse commitments") {
@@ -302,7 +297,7 @@ static void test_pedersen_commitments_with_given_backend(int backend,
         REQUIRE(dense_commitment == sparse_commitment);
       }
 
-      REQUIRE(reset_backend_for_testing() == 0);
+      sqccb::reset_backend_for_testing();
     }
 
     SECTION("we can compute dense commitments as sparse commitments") {
@@ -345,7 +340,7 @@ static void test_pedersen_commitments_with_given_backend(int backend,
         REQUIRE(dense_commitment == sparse_commitment);
       }
 
-      REQUIRE(reset_backend_for_testing() == 0);
+      sqccb::reset_backend_for_testing();
     }
   }
 
@@ -411,7 +406,7 @@ static void test_pedersen_commitments_with_given_backend(int backend,
       REQUIRE(commitment_c == expected_commitment_c);
     }
 
-    REQUIRE(reset_backend_for_testing() == 0);
+    sqccb::reset_backend_for_testing();
   }
 }
 
@@ -440,7 +435,7 @@ static void test_generators_with_given_backend(int backend, std::string backend_
 
     REQUIRE(ret == 0);
 
-    REQUIRE(reset_backend_for_testing() == 0);
+    sqccb::reset_backend_for_testing();
   }
 
   SECTION(backend_name + " - non zero num_generators will not error out") {
@@ -461,7 +456,7 @@ static void test_generators_with_given_backend(int backend, std::string backend_
       REQUIRE(expected_g[i] == reinterpret_cast<c21t::element_p3*>(generators)[i]);
     }
 
-    REQUIRE(reset_backend_for_testing() == 0);
+    sqccb::reset_backend_for_testing();
   }
 
   SECTION(backend_name + " - nullptr generators pointer will error out") {
@@ -475,7 +470,7 @@ static void test_generators_with_given_backend(int backend, std::string backend_
 
     REQUIRE(ret != 0);
 
-    REQUIRE(reset_backend_for_testing() == 0);
+    sqccb::reset_backend_for_testing();
   }
 
   SECTION(backend_name + " - computed generators are correct when offset is non zero") {
@@ -497,7 +492,7 @@ static void test_generators_with_given_backend(int backend, std::string backend_
       REQUIRE(expected_g[i] == reinterpret_cast<c21t::element_p3*>(generators)[i]);
     }
 
-    REQUIRE(reset_backend_for_testing() == 0);
+    sqccb::reset_backend_for_testing();
   }
 }
 
@@ -513,7 +508,7 @@ static void test_one_commitments_with_given_backend(int backend, std::string bac
     REQUIRE(sxt_init(&config) == 0);
     int ret = sxt_get_one_commit(nullptr, 0);
     REQUIRE(ret != 0);
-    REQUIRE(reset_backend_for_testing() == 0);
+    sqccb::reset_backend_for_testing();
   }
 
   SECTION(backend_name + " - with valid results will not error out") {
@@ -544,7 +539,7 @@ static void test_one_commitments_with_given_backend(int backend, std::string bac
     REQUIRE(reinterpret_cast<c21t::element_p3*>(&one_commitment)[0] ==
             reinterpret_cast<c21t::element_p3*>(&sum_gen_0_1)[0]);
 
-    REQUIRE(reset_backend_for_testing() == 0);
+    sqccb::reset_backend_for_testing();
   }
 }
 

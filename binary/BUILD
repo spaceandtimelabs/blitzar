@@ -6,6 +6,7 @@ load(
 cuda_dlink(
     name = "pedersen_device",
     deps = [
+        "//sxt/seqcommit/cbindings:backend",
         "//sxt/seqcommit/cbindings:pedersen",
     ],
 )
@@ -22,6 +23,7 @@ cc_binary(
     deps = [
         ":libproofs-gpu-export-map.ld",
         ":pedersen_device",
+        "//sxt/seqcommit/cbindings:backend",
         "//sxt/seqcommit/cbindings:pedersen",
     ],
 )
