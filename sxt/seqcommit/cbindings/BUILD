@@ -31,6 +31,7 @@ sxt_cc_component(
     name = "pedersen",
     impl_deps = [
         ":backend",
+        ":get_generators",
         "//sxt/base/container:span",
         "//sxt/base/device:property",
         "//sxt/ristretto/type:compressed_element",
@@ -57,6 +58,24 @@ sxt_cc_component(
         "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",
         "//sxt/ristretto/operation:scalar_multiply",
+    ],
+    deps = [
+        ":pedersen_capi",
+    ],
+    alwayslink = 1,
+)
+
+sxt_cc_component(
+    name = "get_generators",
+    impl_deps = [
+        ":backend",
+        "//sxt/curve21/type:element_p3",
+    ],
+    test_deps = [
+        ":backend",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/seqcommit/generator:base_element",
     ],
     deps = [
         ":pedersen_capi",

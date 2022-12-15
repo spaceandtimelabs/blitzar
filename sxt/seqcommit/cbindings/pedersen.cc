@@ -149,33 +149,6 @@ int sxt_compute_pedersen_commitments_with_generators(
 }
 
 //--------------------------------------------------------------------------------------------------
-// sxt_get_generators
-//--------------------------------------------------------------------------------------------------
-int sxt_get_generators(struct sxt_ristretto* generators, uint64_t num_generators,
-                       uint64_t offset_generators) {
-
-  // if no generator specified, then ignore the function call
-  if (num_generators == 0)
-    return 0;
-
-  // at least one generator to be computed, but null array pointer
-  if (num_generators > 0 && generators == nullptr)
-    return 1;
-
-  // backend not initialized (sxt_init not called correctly)
-  if (!sqccb::is_backend_initialized())
-    return 1;
-
-  basct::span<c21t::element_p3> generators_result(reinterpret_cast<c21t::element_p3*>(generators),
-                                                  num_generators);
-
-  auto backend = sqccb::get_backend();
-  backend->get_generators(generators_result, offset_generators);
-
-  return 0;
-}
-
-//--------------------------------------------------------------------------------------------------
 // sxt_get_one_commit
 //--------------------------------------------------------------------------------------------------
 int sxt_get_one_commit(struct sxt_ristretto* one_commit, uint64_t n) {
