@@ -1,11 +1,10 @@
 #include "sxt/seqcommit/cbindings/pedersen.h"
 
-#include <cuda_runtime.h>
-
 #include <iostream>
 #include <memory>
 
 #include "sxt/base/container/span.h"
+#include "sxt/base/device/property.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/ristretto/type/compressed_element.h"
@@ -25,23 +24,6 @@ using namespace sxt;
 static sqcbck::pedersen_backend* backend = nullptr;
 
 //--------------------------------------------------------------------------------------------------
-// get_num_devices
-//--------------------------------------------------------------------------------------------------
-static int get_num_devices() {
-  int num_devices;
-
-  auto rcode = cudaGetDeviceCount(&num_devices);
-
-  if (rcode != cudaSuccess) {
-    num_devices = 0;
-
-    std::cout << "cudaGetDeviceCount failed: " << cudaGetErrorString(rcode) << "\n";
-  }
-
-  return num_devices;
-}
-
-//--------------------------------------------------------------------------------------------------
 // sxt_init
 //--------------------------------------------------------------------------------------------------
 int sxt_init(const sxt_config* config) {
@@ -57,7 +39,7 @@ int sxt_init(const sxt_config* config) {
 
     return 0;
   } else if (config->backend == SXT_NAIVE_BACKEND_GPU) {
-    int num_devices = get_num_devices();
+    int num_devices = sxt::basdv::get_num_devices();
 
     if (num_devices > 0) {
       backend = sqcbck::get_naive_gpu_backend();
