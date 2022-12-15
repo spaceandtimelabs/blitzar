@@ -147,15 +147,3 @@ int sxt_compute_pedersen_commitments_with_generators(
 
   return ret;
 }
-
-//--------------------------------------------------------------------------------------------------
-// sxt_get_one_commit
-//--------------------------------------------------------------------------------------------------
-int sxt_get_one_commit(struct sxt_ristretto* one_commit, uint64_t n) {
-  if (one_commit == nullptr)
-    return 1;
-
-  reinterpret_cast<c21t::element_p3*>(one_commit)[0] = sqcgn::get_precomputed_one_commit(n);
-
-  return 0;
-}

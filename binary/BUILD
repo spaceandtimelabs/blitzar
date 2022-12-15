@@ -8,6 +8,7 @@ cuda_dlink(
     deps = [
         "//sxt/seqcommit/cbindings:backend",
         "//sxt/seqcommit/cbindings:get_generators",
+        "//sxt/seqcommit/cbindings:get_one_commit",
         "//sxt/seqcommit/cbindings:pedersen",
     ],
 )
@@ -26,6 +27,7 @@ cc_binary(
         ":pedersen_device",
         "//sxt/seqcommit/cbindings:backend",
         "//sxt/seqcommit/cbindings:get_generators",
+        "//sxt/seqcommit/cbindings:get_one_commit",
         "//sxt/seqcommit/cbindings:pedersen",
     ],
 )

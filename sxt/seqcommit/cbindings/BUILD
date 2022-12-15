@@ -82,3 +82,24 @@ sxt_cc_component(
     ],
     alwayslink = 1,
 )
+
+sxt_cc_component(
+    name = "get_one_commit",
+    impl_deps = [
+        ":backend",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/seqcommit/generator:precomputed_one_commitments",
+    ],
+    test_deps = [
+        ":backend",
+        ":get_generators",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/constant:zero",
+        "//sxt/curve21/operation:add",
+    ],
+    deps = [
+        ":pedersen_capi",
+    ],
+    alwayslink = 1,
+)
