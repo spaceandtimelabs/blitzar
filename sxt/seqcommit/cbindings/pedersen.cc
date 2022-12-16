@@ -1,21 +1,11 @@
 #include "sxt/seqcommit/cbindings/pedersen.h"
 
 #include <iostream>
-#include <memory>
 
-#include "sxt/base/container/span.h"
-#include "sxt/base/device/property.h"
-#include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/ristretto/type/compressed_element.h"
-#include "sxt/seqcommit/backend/naive_cpu_backend.h"
-#include "sxt/seqcommit/backend/naive_gpu_backend.h"
-#include "sxt/seqcommit/backend/pedersen_backend.h"
-#include "sxt/seqcommit/backend/pippenger_cpu_backend.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/cbindings/backend.h"
-#include "sxt/seqcommit/generator/precomputed_initializer.h"
-#include "sxt/seqcommit/generator/precomputed_one_commitments.h"
 
 using namespace sxt;
 
@@ -67,8 +57,12 @@ static int process_compute_pedersen_commitments(struct sxt_compressed_ristretto*
                                                 const struct sxt_ristretto* generators) {
 
   // backend not initialized (sxt_init not called correctly)
-  if (!sqccb::is_backend_initialized())
-    return 1;
+  if (!sxt::sqccb::is_backend_initialized()) {
+    std::cerr
+        << "ABORT: backend uninitialized in the `process_compute_pedersen_commitments` function"
+        << std::endl;
+    std::abort();
+  }
 
   if (num_sequences == 0)
     return 0;

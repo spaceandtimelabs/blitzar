@@ -1,503 +1,317 @@
 #include "sxt/seqcommit/cbindings/pedersen.h"
 
-#include <algorithm>
-#include <array>
-#include <string>
+#include <vector>
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/constant/zero.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/type/element_p3.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/operation/add.h"
 #include "sxt/ristretto/operation/scalar_multiply.h"
-#include "sxt/ristretto/random/element.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/cbindings/backend.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
 using namespace sxt;
-using namespace sxt::sqccb;
 
-TEST_CASE("run pedersen initialization and finalize tests") {
-  sxt_compressed_ristretto commitments[1];
-  sxt_sequence_descriptor valid_descriptors[1];
-
-  SECTION("not initialized library will error out") {
-    int ret = sxt_compute_pedersen_commitments(commitments, 0, valid_descriptors);
-
-    REQUIRE(ret != 0);
-  }
-
-  SECTION("correct naive cpu backend will not error out") {
-    const sxt_config config = {SXT_NAIVE_BACKEND_CPU};
-    REQUIRE(sxt_init(&config) == 0);
-
-    int ret = sxt_compute_pedersen_commitments(commitments, 0, valid_descriptors);
-
-    REQUIRE(ret == 0);
-
-    sqccb::reset_backend_for_testing();
-  }
-
-  SECTION("correct naive gpu backend will not error out") {
-    const sxt_config config = {SXT_NAIVE_BACKEND_GPU};
-    REQUIRE(sxt_init(&config) == 0);
-
-    int ret = sxt_compute_pedersen_commitments(commitments, 0, valid_descriptors);
-
-    REQUIRE(ret == 0);
-
-    sqccb::reset_backend_for_testing();
-  }
-
-  SECTION("correct pippenger cpu backend will not error out") {
-    const sxt_config config = {SXT_PIPPENGER_BACKEND_CPU};
-    REQUIRE(sxt_init(&config) == 0);
-
-    int ret = sxt_compute_pedersen_commitments(commitments, 0, valid_descriptors);
-
-    REQUIRE(ret == 0);
-
-    sqccb::reset_backend_for_testing();
-  }
+//--------------------------------------------------------------------------------------------------
+// initialize_backend
+//--------------------------------------------------------------------------------------------------
+static void initialize_backend(int backend, uint64_t precomputed_elements) {
+  const sxt_config config = {backend, precomputed_elements};
+  REQUIRE(sxt_init(&config) == 0);
 }
 
-static void test_pedersen_commitments_with_given_backend(int backend,
-                                                         uint64_t num_precomputed_generators,
-                                                         std::string backend_name) {
-  ////////////////////////////////////////////////////////////////
-  // sxt_compute_pedersen_commitments
-  ////////////////////////////////////////////////////////////////
-  SECTION(backend_name + " - We can compute commitments without providing any generator") {
+//--------------------------------------------------------------------------------------------------
+// make_sequence_descriptor
+//--------------------------------------------------------------------------------------------------
+template <class T>
+static sxt_sequence_descriptor make_sequence_descriptor(const std::vector<T>& data,
+                                                        const std::vector<uint64_t>& indices) {
+  if (indices.size() > 0) {
+    assert(data.size() == indices.size());
+  }
 
-    SECTION("correct initialization and input will not error out") {
-      const sxt_config config = {backend, num_precomputed_generators};
-      REQUIRE(sxt_init(&config) == 0);
+  return {.element_nbytes = sizeof(T),
+          .n = data.size(),
+          .data = reinterpret_cast<const uint8_t*>(data.data()),
+          .indices = indices.data()};
+}
 
-      uint8_t data[33];
+//--------------------------------------------------------------------------------------------------
+// test_pedersen_commitments_with_given_backend_and_no_generators
+//--------------------------------------------------------------------------------------------------
+static void test_pedersen_commitments_with_given_backend_and_no_generators(
+    int backend, uint64_t num_precomputed_generators) {
+  initialize_backend(backend, num_precomputed_generators);
+
+  SECTION("Null input commitment pointer will error out") {
+    const std::vector<uint8_t> data(1);
+    const std::vector<uint64_t> indices(0);
+    sxt_compressed_ristretto* commitment = nullptr;
+    const auto seq_descriptor = make_sequence_descriptor(data, indices);
+    const uint32_t num_sequences = 1;
+    REQUIRE(sxt_compute_pedersen_commitments(commitment, num_sequences, &seq_descriptor) != 0);
+  }
+
+  SECTION("Null input sequence pointer and num_sequence bigger than zero will error out") {
+    const uint32_t num_sequences = 1;
+    const sxt_sequence_descriptor* invalid_descriptor = nullptr;
+    sxt_compressed_ristretto commitment;
+    REQUIRE(sxt_compute_pedersen_commitments(&commitment, num_sequences, invalid_descriptor) != 0);
+  }
+
+  SECTION("Zero num_sequence will not error out even with a null input sequence pointer") {
+    const uint32_t num_sequences = 0;
+    const sxt_sequence_descriptor* invalid_descriptor = nullptr;
+    sxt_compressed_ristretto commitment{1u};
+    REQUIRE(sxt_compute_pedersen_commitments(&commitment, num_sequences, invalid_descriptor) == 0);
+    REQUIRE(rstt::compressed_element{1u} ==
+            *reinterpret_cast<rstt::compressed_element*>(&commitment));
+  }
+
+  SECTION("Input sequences with zero length will not error out even with a null data pointer") {
+    const std::vector<uint8_t> data(0);
+    const std::vector<uint64_t> indices(0);
+    const auto seq_descriptor = make_sequence_descriptor(data, indices);
+    const uint32_t num_sequences = 1;
+    sxt_compressed_ristretto commitment;
+    REQUIRE(sxt_compute_pedersen_commitments(&commitment, num_sequences, &seq_descriptor) == 0);
+    REQUIRE(rstt::compressed_element() ==
+            *reinterpret_cast<rstt::compressed_element*>(&commitment));
+  }
+
+  SECTION("Null data pointer with a non-zero sequence length will error out") {
+    const uint64_t sequence_length = 1;
+    const sxt_sequence_descriptor invalid_descriptor = {.element_nbytes = sizeof(uint8_t),
+                                                        .n = sequence_length,
+                                                        .data = nullptr,
+                                                        .indices = nullptr};
+    const uint32_t num_sequences = 1;
+    sxt_compressed_ristretto commitment;
+    REQUIRE(sxt_compute_pedersen_commitments(&commitment, num_sequences, &invalid_descriptor) != 0);
+  }
+
+  SECTION("Out of range sequence element_nbytes will error out") {
+    SECTION("when element_nbytes is smaller than 1") {
+      const std::vector<uint8_t> data(1);
+      const uint64_t sequence_length = data.size();
+      const std::vector<sxt_sequence_descriptor> invalid_descriptor = {
+          {.element_nbytes = 0, .n = sequence_length, .data = data.data(), .indices = nullptr}};
+      const uint32_t num_sequences = 1;
       sxt_compressed_ristretto commitment;
-      sxt_sequence_descriptor valid_seq_descriptor = {.element_nbytes = 1, // number bytes
-                                                      .n = 1,              // number rows
-                                                      .data = data,        // data pointer
-                                                      .indices = nullptr};
-
-      int ret = sxt_compute_pedersen_commitments(&commitment, 1, &valid_seq_descriptor);
-
-      REQUIRE(ret == 0);
-
-      sqccb::reset_backend_for_testing();
+      REQUIRE(sxt_compute_pedersen_commitments(&commitment, num_sequences,
+                                               invalid_descriptor.data()) != 0);
     }
 
-    SECTION("null commitment pointers will error out") {
-      const sxt_config config = {backend, num_precomputed_generators};
-      REQUIRE(sxt_init(&config) == 0);
-
-      uint8_t data[33];
-      sxt_sequence_descriptor valid_descriptor = {.element_nbytes = 1, // number bytes
-                                                  .n = 1,              // number rows
-                                                  .data = data,        // data pointer
-                                                  nullptr};
-
-      int ret = sxt_compute_pedersen_commitments(nullptr, 1, &valid_descriptor);
-
-      REQUIRE(ret != 0);
-
-      sqccb::reset_backend_for_testing();
-    }
-
-    SECTION("null value_sequences will error out") {
-      const sxt_config config = {backend, num_precomputed_generators};
-      REQUIRE(sxt_init(&config) == 0);
-
+    SECTION("when element_nbytes is bigger than 32") {
+      const std::vector<uint8_t> data(34);
+      const uint64_t sequence_length = 1;
+      const std::vector<sxt_sequence_descriptor> invalid_descriptor = {
+          {.element_nbytes = 33, .n = sequence_length, .data = data.data(), .indices = nullptr}};
+      const uint32_t num_sequences = invalid_descriptor.size();
       sxt_compressed_ristretto commitment;
-      int ret = sxt_compute_pedersen_commitments(&commitment, 1, nullptr);
-
-      REQUIRE(ret != 0);
-
-      sqccb::reset_backend_for_testing();
-    }
-
-    SECTION("zero sequences will not error out") {
-      const sxt_config config = {backend, num_precomputed_generators};
-      REQUIRE(sxt_init(&config) == 0);
-
-      sxt_compressed_ristretto commitment;
-      int ret = sxt_compute_pedersen_commitments(&commitment, 0, nullptr);
-
-      REQUIRE(ret == 0);
-
-      sqccb::reset_backend_for_testing();
-    }
-
-    SECTION("zero length commitments will not error out") {
-      const sxt_config config = {backend, num_precomputed_generators};
-      REQUIRE(sxt_init(&config) == 0);
-
-      uint8_t data[33];
-      sxt_compressed_ristretto commitment;
-      sxt_sequence_descriptor zero_length_seq_descriptor = {.element_nbytes = 1, // number bytes
-                                                            .n = 0,              // number rows
-                                                            .data = data,        // data pointer
-                                                            nullptr};
-
-      int ret = sxt_compute_pedersen_commitments(&commitment, 1, &zero_length_seq_descriptor);
-
-      REQUIRE(ret == 0);
-
-      REQUIRE(rstt::compressed_element() ==
-              reinterpret_cast<rstt::compressed_element*>(&commitment)[0]);
-
-      sqccb::reset_backend_for_testing();
-    }
-
-    SECTION("out of range (< 1 or > 32) element_nbytes will error out") {
-      const sxt_config config = {backend, num_precomputed_generators};
-      REQUIRE(sxt_init(&config) == 0);
-
-      SECTION("element_nbytes == 0 (< 1) error out") {
-        uint8_t data[33];
-        sxt_compressed_ristretto commitment;
-        sxt_sequence_descriptor invalid_descriptors = {.element_nbytes = 0, // number bytes
-                                                       .n = 1,              // number rows
-                                                       .data = data,        // data pointer
-                                                       .indices = nullptr};
-
-        int ret = sxt_compute_pedersen_commitments(&commitment, 1, &invalid_descriptors);
-
-        REQUIRE(ret != 0);
-      }
-
-      SECTION("element_nbytes == 33 (> 32) error out") {
-        uint8_t data[33];
-        sxt_compressed_ristretto commitment;
-        sxt_sequence_descriptor invalid_descriptors = {.element_nbytes = 33, // number bytes
-                                                       .n = 1,               // number rows
-                                                       .data = data,         // data pointer
-                                                       .indices = nullptr};
-
-        int ret = sxt_compute_pedersen_commitments(&commitment, 1, &invalid_descriptors);
-
-        REQUIRE(ret != 0);
-      }
-
-      sqccb::reset_backend_for_testing();
-    }
-
-    SECTION("null element data pointer will error out") {
-      const sxt_config config = {backend, num_precomputed_generators};
-      REQUIRE(sxt_init(&config) == 0);
-
-      sxt_compressed_ristretto commitment;
-      sxt_sequence_descriptor invalid_descriptors = {.element_nbytes = 1, // number bytes
-                                                     .n = 1,              // number rows
-                                                     .data = nullptr,     // null data pointer
-                                                     .indices = nullptr};
-
-      int ret = sxt_compute_pedersen_commitments(&commitment, 1, &invalid_descriptors);
-
-      REQUIRE(ret != 0);
-
-      sqccb::reset_backend_for_testing();
-    }
-
-    SECTION("We can multiply and add two commitments together") {
-      const sxt_config config = {backend, num_precomputed_generators};
-      REQUIRE(sxt_init(&config) == 0);
-
-      const uint64_t num_rows = 4;
-      const uint64_t num_sequences = 3;
-      const uint8_t element_nbytes = sizeof(int);
-      const unsigned int multiplicative_constant = 52;
-
-      sxt_compressed_ristretto commitments_data[num_sequences];
-
-      const int query[num_sequences][num_rows] = {
-          {2000, 7500, 5000, 1500},
-          {5000, 0, 400000, 10},
-          {multiplicative_constant * 2000 + 5000, multiplicative_constant * 7500 + 0,
-           multiplicative_constant * 5000 + 400000, multiplicative_constant * 1500 + 10}};
-
-      sxt_sequence_descriptor valid_descriptors[num_sequences];
-
-      // populating sequence object
-      for (uint64_t i = 0; i < num_sequences; ++i) {
-        sxt_sequence_descriptor descriptor = {element_nbytes, num_rows,
-                                              reinterpret_cast<const uint8_t*>(query[i]), nullptr};
-
-        valid_descriptors[i] = descriptor;
-      }
-
-      SECTION("c = 52 * a + b ==> commit_c = 52 * commit_a + commit_b") {
-        int ret =
-            sxt_compute_pedersen_commitments(commitments_data, num_sequences, valid_descriptors);
-
-        REQUIRE(ret == 0);
-
-        rstt::compressed_element p =
-            reinterpret_cast<rstt::compressed_element*>(commitments_data)[0];
-
-        rstt::compressed_element q =
-            reinterpret_cast<rstt::compressed_element*>(commitments_data)[1];
-        ;
-
-        rsto::scalar_multiply(p, multiplicative_constant, p); // h_i = a_i * g_i
-
-        rsto::add(p, p, q);
-
-        rstt::compressed_element expected_commitment_c =
-            reinterpret_cast<rstt::compressed_element*>(commitments_data)[2];
-
-        // verify that result is not null
-        REQUIRE(rstt::compressed_element() != p);
-
-        REQUIRE(p == expected_commitment_c);
-      }
-
-      sqccb::reset_backend_for_testing();
-    }
-
-    SECTION("We can compute sparse commitments") {
-      const sxt_config config = {backend, num_precomputed_generators};
-      REQUIRE(sxt_init(&config) == 0);
-
-      const uint64_t num_sequences = 2;
-      const uint8_t element_nbytes = sizeof(int);
-
-      sxt_compressed_ristretto commitments_data[num_sequences];
-
-      const int dense_data[11] = {1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0};
-
-      const int sparse_data[5] = {1, 2, 3, 4, 9};
-
-      const uint64_t sparse_indices[5] = {0, 2, 4, 5, 9};
-
-      sxt_sequence_descriptor dense_descriptor = {
-          element_nbytes, 11, reinterpret_cast<const uint8_t*>(dense_data), nullptr};
-
-      sxt_sequence_descriptor sparse_descriptor = {
-          element_nbytes, 5, reinterpret_cast<const uint8_t*>(sparse_data), sparse_indices};
-
-      sxt_sequence_descriptor descriptors[num_sequences] = {dense_descriptor, sparse_descriptor};
-
-      SECTION("sparse_commitments == dense_commitment") {
-        int ret = sxt_compute_pedersen_commitments(commitments_data, num_sequences, descriptors);
-
-        REQUIRE(ret == 0);
-
-        rstt::compressed_element& dense_commitment =
-            reinterpret_cast<rstt::compressed_element*>(commitments_data)[0];
-
-        rstt::compressed_element& sparse_commitment =
-            reinterpret_cast<rstt::compressed_element*>(commitments_data)[1];
-
-        // verify that result is not null
-        REQUIRE(rstt::compressed_element() != dense_commitment);
-
-        REQUIRE(dense_commitment == sparse_commitment);
-      }
-
-      sqccb::reset_backend_for_testing();
-    }
-
-    SECTION("we can compute dense commitments as sparse commitments") {
-      const sxt_config config = {backend, num_precomputed_generators};
-      REQUIRE(sxt_init(&config) == 0);
-
-      const uint64_t num_sequences = 2;
-      const uint8_t element_nbytes = sizeof(int);
-
-      sxt_compressed_ristretto commitments_data[num_sequences];
-
-      const int dense_data[11] = {1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0};
-
-      const int sparse_data[11] = {1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0};
-
-      const uint64_t sparse_indices[11] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-
-      sxt_sequence_descriptor dense_descriptor = {
-          element_nbytes, 11, reinterpret_cast<const uint8_t*>(dense_data), nullptr};
-
-      sxt_sequence_descriptor sparse_descriptor = {
-          element_nbytes, 11, reinterpret_cast<const uint8_t*>(sparse_data), sparse_indices};
-
-      sxt_sequence_descriptor descriptors[num_sequences] = {dense_descriptor, sparse_descriptor};
-
-      SECTION("dense_commitment == dense_commitment as sparse") {
-        int ret = sxt_compute_pedersen_commitments(commitments_data, num_sequences, descriptors);
-
-        REQUIRE(ret == 0);
-
-        rstt::compressed_element& dense_commitment =
-            reinterpret_cast<rstt::compressed_element*>(commitments_data)[0];
-
-        rstt::compressed_element& sparse_commitment =
-            reinterpret_cast<rstt::compressed_element*>(commitments_data)[1];
-
-        // verify that result is not null
-        REQUIRE(rstt::compressed_element() != dense_commitment);
-
-        REQUIRE(dense_commitment == sparse_commitment);
-      }
-
-      sqccb::reset_backend_for_testing();
+      REQUIRE(sxt_compute_pedersen_commitments(&commitment, num_sequences,
+                                               invalid_descriptor.data()) != 0);
     }
   }
 
-  ////////////////////////////////////////////////////////////////
-  // sxt_compute_pedersen_commitments_with_generators
-  ////////////////////////////////////////////////////////////////
+  SECTION("We can multiply and add two commitments together, then compare them against the c "
+          "binding results") {
+    const uint64_t scal = 52;
+    const std::vector<uint64_t> indices = {};
+    const std::vector<uint64_t> data_1 = {2000, 7500, 5000, 1500};
+    const std::vector<uint64_t> data_2 = {5000, 0, 400000, 10};
+    const std::vector<uint64_t> data_3 = {
+        scal * data_1[0] + data_2[0], scal * data_1[1] + data_2[1], scal * data_1[2] + data_2[2],
+        scal * data_1[3] + data_2[3]};
+    const std::vector<sxt_sequence_descriptor> valid_descriptors = {
+        make_sequence_descriptor(data_1, indices),
+        make_sequence_descriptor(data_2, indices),
+        make_sequence_descriptor(data_3, indices),
+    };
+    const uint64_t num_sequences = valid_descriptors.size();
 
-  SECTION(backend_name + " - We can compute commitments with provided generators") {
-    const sxt_config config = {backend, num_precomputed_generators};
-    REQUIRE(sxt_init(&config) == 0);
+    // we verify that `c = scal * a + b` implies that `commit_c = scal * commit_a + commit_b`
+    rstt::compressed_element commitments_data[num_sequences];
+    REQUIRE(sxt_compute_pedersen_commitments(
+                reinterpret_cast<sxt_compressed_ristretto*>(commitments_data), num_sequences,
+                valid_descriptors.data()) == 0);
 
-    const uint64_t num_rows = 4;
+    auto commit_a = commitments_data[0], commit_b = commitments_data[1],
+         commit_c = commitments_data[0];
+    rsto::scalar_multiply(commit_a, scal, commit_a);
+    rsto::add(commit_c, commit_a, commit_b);
+
+    REQUIRE(rstt::compressed_element() != commit_c);
+    REQUIRE(commit_c == commitments_data[2]);
+  }
+
+  SECTION("We can correctly compute sparse commitments") {
+    const std::vector<uint8_t> sparse_data = {1, 2, 3, 4, 9};
+    const std::vector<uint8_t> dense_data = {1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0};
+    const std::vector<uint64_t> dense_indices = {}, sparse_indices = {0, 2, 4, 5, 9};
+    const auto dense_descriptor = make_sequence_descriptor(dense_data, dense_indices);
+    const auto sparse_descriptor = make_sequence_descriptor(sparse_data, sparse_indices);
+    const std::vector<sxt_sequence_descriptor> descriptors = {dense_descriptor, sparse_descriptor};
+    const uint64_t num_sequences = descriptors.size();
+
+    // we verify that both sparse and dense results are equal
+    rstt::compressed_element commitments_data[num_sequences];
+    REQUIRE(sxt_compute_pedersen_commitments(
+                reinterpret_cast<sxt_compressed_ristretto*>(commitments_data), num_sequences,
+                descriptors.data()) == 0);
+    REQUIRE(rstt::compressed_element() != commitments_data[0]);
+    REQUIRE(commitments_data[0] == commitments_data[1]);
+  }
+
+  SECTION("We can correctly compute dense commitments as sparse commitments") {
+    const std::vector<uint8_t> dense_data = {1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0};
+    const std::vector<uint8_t> sparse_data = {1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0};
+    const std::vector<uint64_t> dense_indices = {},
+                                sparse_indices = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    const auto dense_descriptor = make_sequence_descriptor(dense_data, dense_indices);
+    const auto sparse_descriptor = make_sequence_descriptor(sparse_data, sparse_indices);
+    const std::vector<sxt_sequence_descriptor> descriptors = {dense_descriptor, sparse_descriptor};
+    const uint64_t num_sequences = descriptors.size();
+
+    // dense_commitment result is the same as the sparse commitment
+    rstt::compressed_element commitments_data[num_sequences];
+    REQUIRE(sxt_compute_pedersen_commitments(
+                reinterpret_cast<sxt_compressed_ristretto*>(commitments_data), num_sequences,
+                descriptors.data()) == 0);
+
+    REQUIRE(rstt::compressed_element() != commitments_data[0]);
+    REQUIRE(commitments_data[0] == commitments_data[1]);
+  }
+
+  sqccb::reset_backend_for_testing();
+}
+
+//--------------------------------------------------------------------------------------------------
+// compute_random_generators
+//--------------------------------------------------------------------------------------------------
+static std::vector<c21t::element_p3> compute_random_generators(uint64_t seq_length) {
+  std::vector<c21t::element_p3> generators(seq_length);
+
+  for (uint64_t i = 0; i < seq_length; ++i) {
+    sqcgn::compute_base_element(generators[i], 1 + i * i);
+  }
+
+  return generators;
+}
+
+//--------------------------------------------------------------------------------------------------
+// compute_expected_commitment
+//--------------------------------------------------------------------------------------------------
+template <class T>
+static rstt::compressed_element
+compute_expected_commitment(const std::vector<T>& data,
+                            const std::vector<c21t::element_p3>& generators) {
+  assert(data.size() == generators.size());
+
+  rstt::compressed_element expected_commitment;
+  rstb::to_bytes(expected_commitment.data(), c21cn::zero_p3_v);
+
+  for (uint64_t i = 0; i < data.size(); ++i) {
+    rstt::compressed_element aux_h;
+    rstb::to_bytes(aux_h.data(), generators[i]);
+    rsto::scalar_multiply(aux_h, data[i], aux_h);
+    rsto::add(expected_commitment, expected_commitment, aux_h);
+  }
+
+  return expected_commitment;
+}
+
+//--------------------------------------------------------------------------------------------------
+// test_pedersen_commitments_with_given_backend_and_generators
+//--------------------------------------------------------------------------------------------------
+static void
+test_pedersen_commitments_with_given_backend_and_generators(int backend,
+                                                            uint64_t num_precomputed_generators) {
+  initialize_backend(backend, num_precomputed_generators);
+
+  SECTION("We verify that using null generator pointers will error out") {
+    const std::vector<uint64_t> indices = {};
+    const std::vector<uint32_t> data = {2000, 7500};
+    const std::vector<sxt_ristretto> generators_data = {};
+    const auto seq_descriptor = make_sequence_descriptor(data, indices);
     const uint64_t num_sequences = 1;
-    const uint8_t element_nbytes = sizeof(int);
 
-    sxt_ristretto generators_data[num_rows];
-    sxt_compressed_ristretto commitments_data[num_sequences];
+    sxt_compressed_ristretto commitments_data;
+    REQUIRE(sxt_compute_pedersen_commitments_with_generators(
+                &commitments_data, num_sequences, &seq_descriptor, generators_data.data()) != 0);
+  }
 
-    const uint32_t query[num_rows] = {2000, 7500, 5000, 1500};
-    rstt::compressed_element expected_g;
+  SECTION("We verify that using the correct generators will produce correct results") {
+    const std::vector<uint64_t> indices = {};
+    const std::vector<uint32_t> data = {2000, 7500};
+    const auto seq_descriptor = make_sequence_descriptor(data, indices);
+    const uint64_t num_sequences = 1;
+    const auto generators = compute_random_generators(data.size());
+    const auto expected_commitment = compute_expected_commitment(data, generators);
 
-    for (uint64_t i = 0; i < num_rows; ++i) {
-      c21t::element_p3& g_i = reinterpret_cast<c21t::element_p3*>(generators_data)[i];
+    sxt_compressed_ristretto commitments_data;
+    REQUIRE(sxt_compute_pedersen_commitments_with_generators(
+                &commitments_data, num_sequences, &seq_descriptor,
+                reinterpret_cast<const sxt_ristretto*>(generators.data())) == 0);
+    REQUIRE(*reinterpret_cast<rstt::compressed_element*>(&commitments_data) == expected_commitment);
+  }
 
-      sqcgn::compute_base_element(g_i, query[i]);
+  SECTION("We verify that sparse sequence indices are ignored when generators are provided") {
+    const std::vector<uint8_t> sparse_data = {1, 3};
+    const std::vector<uint64_t> sparse_indices = {0, 5};
+    const auto generators = compute_random_generators(sparse_data.size());
+    const auto expected_commitment = compute_expected_commitment(sparse_data, generators);
+    const auto sparse_descriptor = make_sequence_descriptor(sparse_data, sparse_indices);
+    const uint64_t num_sequences = 1;
 
-      rstt::compressed_element h;
-      rstb::to_bytes(h.data(), g_i);
+    sxt_compressed_ristretto commitments_data;
+    REQUIRE(sxt_compute_pedersen_commitments_with_generators(
+                &commitments_data, num_sequences, &sparse_descriptor,
+                reinterpret_cast<const sxt_ristretto*>(generators.data())) == 0);
+    REQUIRE(*reinterpret_cast<rstt::compressed_element*>(&commitments_data) == expected_commitment);
+  }
 
-      rsto::scalar_multiply(h, query[i], h);
+  sqccb::reset_backend_for_testing();
+}
 
-      rsto::add(expected_g, expected_g, h);
-    }
+//--------------------------------------------------------------------------------------------------
+// compute_commitments_with_specified_precomputed_elements
+//--------------------------------------------------------------------------------------------------
+static void compute_commitments_with_specified_precomputed_elements(int backend,
+                                                                    uint64_t num_precomputed_els) {
+  SECTION("We can compute commitments without any provided generators") {
+    test_pedersen_commitments_with_given_backend_and_no_generators(backend, num_precomputed_els);
+  }
 
-    rstt::compressed_element expected_commitment_c = expected_g;
-
-    sxt_sequence_descriptor valid_descriptors[num_sequences];
-
-    // populating sequence object
-    for (uint64_t i = 0; i < num_sequences; ++i) {
-      sxt_sequence_descriptor descriptor = {element_nbytes, num_rows,
-                                            reinterpret_cast<const uint8_t*>(query), nullptr};
-
-      valid_descriptors[i] = descriptor;
-    }
-
-    SECTION("passing null generators will error out") {
-      int ret = sxt_compute_pedersen_commitments_with_generators(commitments_data, num_sequences,
-                                                                 valid_descriptors, nullptr);
-
-      REQUIRE(ret != 0);
-    }
-
-    SECTION("passing valid generators will not error out") {
-      int ret = sxt_compute_pedersen_commitments_with_generators(
-          commitments_data, num_sequences, valid_descriptors, generators_data);
-
-      REQUIRE(ret == 0);
-
-      rstt::compressed_element& commitment_c =
-          reinterpret_cast<rstt::compressed_element*>(commitments_data)[0];
-
-      REQUIRE(commitment_c == expected_commitment_c);
-    }
-
-    sqccb::reset_backend_for_testing();
+  SECTION("We can compute commitments providing generators as input") {
+    test_pedersen_commitments_with_given_backend_and_generators(backend, num_precomputed_els);
   }
 }
 
-TEST_CASE("run compute pedersen commitment tests") {
-  test_pedersen_commitments_with_given_backend(SXT_NAIVE_BACKEND_CPU, 0, "naive cpu");
-  test_pedersen_commitments_with_given_backend(SXT_NAIVE_BACKEND_GPU, 0, "naive gpu");
-  test_pedersen_commitments_with_given_backend(SXT_PIPPENGER_BACKEND_CPU, 0, "pippenger cpu");
-
-  test_pedersen_commitments_with_given_backend(SXT_NAIVE_BACKEND_CPU, 10,
-                                               "naive cpu w/ precompute");
-  test_pedersen_commitments_with_given_backend(SXT_NAIVE_BACKEND_GPU, 10,
-                                               "naive gpu w/ precompute");
-  test_pedersen_commitments_with_given_backend(SXT_PIPPENGER_BACKEND_CPU, 10,
-                                               "pippenger cpu w/ precompute");
-}
-
-static void test_generators_with_given_backend(int backend, std::string backend_name) {
-  SECTION(backend_name + " - zero num_generators will not error out") {
-    const sxt_config config = {backend};
-    REQUIRE(sxt_init(&config) == 0);
-
-    uint64_t offset = 0;
-    uint64_t num_generators = 0;
-
-    int ret = sxt_get_generators(nullptr, num_generators, offset);
-
-    REQUIRE(ret == 0);
-
-    sqccb::reset_backend_for_testing();
+//--------------------------------------------------------------------------------------------------
+// compute_commitments_with_given_backend
+//--------------------------------------------------------------------------------------------------
+static void compute_commitments_with_given_backend(int backend) {
+  SECTION("We can compute commitments without precomputing elements") {
+    uint64_t num_precomputed_els = 0;
+    compute_commitments_with_specified_precomputed_elements(backend, num_precomputed_els);
   }
 
-  SECTION(backend_name + " - non zero num_generators will not error out") {
-    const sxt_config config = {backend};
-    REQUIRE(sxt_init(&config) == 0);
-
-    uint64_t num_generators = 10;
-    sxt_ristretto generators[num_generators];
-
-    int ret = sxt_get_generators(generators, num_generators, 0);
-
-    REQUIRE(ret == 0);
-
-    c21t::element_p3 expected_g[num_generators];
-    for (size_t i = 0; i < num_generators; ++i) {
-      sqcgn::compute_base_element(expected_g[i], i);
-
-      REQUIRE(expected_g[i] == reinterpret_cast<c21t::element_p3*>(generators)[i]);
-    }
-
-    sqccb::reset_backend_for_testing();
-  }
-
-  SECTION(backend_name + " - nullptr generators pointer will error out") {
-    const sxt_config config = {backend};
-    REQUIRE(sxt_init(&config) == 0);
-
-    uint64_t offset = 0;
-    uint64_t num_generators = 3;
-
-    int ret = sxt_get_generators(nullptr, num_generators, offset);
-
-    REQUIRE(ret != 0);
-
-    sqccb::reset_backend_for_testing();
-  }
-
-  SECTION(backend_name + " - computed generators are correct when offset is non zero") {
-    const sxt_config config = {backend};
-    REQUIRE(sxt_init(&config) == 0);
-
-    uint64_t num_generators = 10;
-    uint64_t offset_generators = 15;
-    sxt_ristretto generators[num_generators];
-
-    int ret = sxt_get_generators(generators, num_generators, offset_generators);
-
-    REQUIRE(ret == 0);
-
-    c21t::element_p3 expected_g[num_generators];
-    for (size_t i = 0; i < num_generators; ++i) {
-      sqcgn::compute_base_element(expected_g[i], i + offset_generators);
-
-      REQUIRE(expected_g[i] == reinterpret_cast<c21t::element_p3*>(generators)[i]);
-    }
-
-    sqccb::reset_backend_for_testing();
+  SECTION("We can compute commitments using non-zero precomputed elements") {
+    uint64_t num_precomputed_els = 10;
+    compute_commitments_with_specified_precomputed_elements(backend, num_precomputed_els);
   }
 }
 
-TEST_CASE("Fetching generators") {
-  test_generators_with_given_backend(SXT_NAIVE_BACKEND_CPU, "naive cpu");
-  test_generators_with_given_backend(SXT_NAIVE_BACKEND_GPU, "naive gpu");
-  test_generators_with_given_backend(SXT_PIPPENGER_BACKEND_CPU, "pippenger cpu");
+TEST_CASE("We can compute pedersen commitments using the naive cpu backend") {
+  compute_commitments_with_given_backend(SXT_NAIVE_BACKEND_CPU);
+}
+
+TEST_CASE("We can compute pedersen commitments using the naive gpu backend") {
+  compute_commitments_with_given_backend(SXT_NAIVE_BACKEND_GPU);
+}
+
+TEST_CASE("We can compute pedersen commitments using the pippenger cpu backend") {
+  compute_commitments_with_given_backend(SXT_PIPPENGER_BACKEND_CPU);
 }
