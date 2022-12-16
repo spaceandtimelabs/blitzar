@@ -1,14 +1,14 @@
-#include "sxt/seqcommit/cbindings/pedersen.h"
+#include "sxt/cbindings/pedersen.h"
 
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/cbindings/backend.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/operation/add.h"
 #include "sxt/ristretto/operation/scalar_multiply.h"
 #include "sxt/ristretto/type/compressed_element.h"
-#include "sxt/seqcommit/cbindings/backend.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
 using namespace sxt;
@@ -184,7 +184,7 @@ static void test_pedersen_commitments_with_given_backend_and_no_generators(
     REQUIRE(commitments_data[0] == commitments_data[1]);
   }
 
-  sqccb::reset_backend_for_testing();
+  cbn::reset_backend_for_testing();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -272,7 +272,7 @@ test_pedersen_commitments_with_given_backend_and_generators(int backend,
     REQUIRE(*reinterpret_cast<rstt::compressed_element*>(&commitments_data) == expected_commitment);
   }
 
-  sqccb::reset_backend_for_testing();
+  cbn::reset_backend_for_testing();
 }
 
 //--------------------------------------------------------------------------------------------------

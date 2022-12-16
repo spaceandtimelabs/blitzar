@@ -1,9 +1,9 @@
 #pragma once
 
+#include "sxt/cbindings/pedersen_capi.h"
 #include "sxt/seqcommit/backend/pedersen_backend.h"
-#include "sxt/seqcommit/cbindings/pedersen_capi.h"
 
-namespace sxt::sqccb {
+namespace sxt::cbn {
 
 //--------------------------------------------------------------------------------------------------
 // is_backend_initialized
@@ -20,4 +20,4 @@ sqcbck::pedersen_backend* get_backend() noexcept;
 //--------------------------------------------------------------------------------------------------
 void reset_backend_for_testing() noexcept;
 
-} // namespace sxt::sqccb
+} // namespace sxt::cbn

@@ -1,4 +1,4 @@
-#include "sxt/seqcommit/cbindings/get_one_commit.h"
+#include "sxt/cbindings/get_one_commit.h"
 
 #include <algorithm>
 #include <array>
@@ -6,11 +6,11 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/cbindings/backend.h"
+#include "sxt/cbindings/get_generators.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
-#include "sxt/seqcommit/cbindings/backend.h"
-#include "sxt/seqcommit/cbindings/get_generators.h"
 
 using namespace sxt;
 
@@ -26,7 +26,7 @@ static std::vector<c21t::element_p3> initialize_generators(int backend, uint64_t
   REQUIRE(sxt_get_generators(reinterpret_cast<sxt_ristretto*>(generators.data()), num_generators,
                              0) == 0);
 
-  sxt::sqccb::reset_backend_for_testing();
+  sxt::cbn::reset_backend_for_testing();
 
   return generators;
 }
@@ -39,7 +39,7 @@ static void verify_one_commit(int backend, uint64_t num_precomputed_els, uint64_
   REQUIRE(sxt_get_one_commit(&one_commitment, n) == 0);
   REQUIRE(reinterpret_cast<c21t::element_p3*>(&one_commitment)[0] == expected_element);
 
-  sxt::sqccb::reset_backend_for_testing();
+  sxt::cbn::reset_backend_for_testing();
 }
 
 static void test_one_commit_with_given_backend(int backend) {

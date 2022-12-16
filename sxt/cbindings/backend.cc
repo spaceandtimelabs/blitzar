@@ -1,4 +1,4 @@
-#include "sxt/seqcommit/cbindings/backend.h"
+#include "sxt/cbindings/backend.h"
 
 #include <cassert>
 #include <iostream>
@@ -12,7 +12,7 @@
 
 using namespace sxt;
 
-namespace sxt::sqccb {
+namespace sxt::cbn {
 //--------------------------------------------------------------------------------------------------
 // backend
 //--------------------------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ void reset_backend_for_testing() noexcept {
 
   backend = nullptr;
 }
-} // namespace sxt::sqccb
+} // namespace sxt::cbn
 
 //--------------------------------------------------------------------------------------------------
 // sxt_init
@@ -86,22 +86,22 @@ int sxt_init(const sxt_config* config) {
     std::abort();
   }
 
-  if (sqccb::backend != nullptr) {
+  if (cbn::backend != nullptr) {
     std::cerr << "ABORT: trying to reinitialize the backend in the `sxt_init` c binding function"
               << std::endl;
     std::abort();
   }
 
   if (config->backend == SXT_NAIVE_BACKEND_CPU) {
-    sqccb::initialize_naive_cpu_backend(config);
+    cbn::initialize_naive_cpu_backend(config);
 
     return 0;
   } else if (config->backend == SXT_NAIVE_BACKEND_GPU) {
-    sqccb::initialize_naive_gpu_backend(config);
+    cbn::initialize_naive_gpu_backend(config);
 
     return 0;
   } else if (config->backend == SXT_PIPPENGER_BACKEND_CPU) {
-    sqccb::initialize_pippenger_cpu_backend(config);
+    cbn::initialize_pippenger_cpu_backend(config);
 
     return 0;
   }

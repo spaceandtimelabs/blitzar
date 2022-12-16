@@ -1,16 +1,16 @@
-#include "sxt/seqcommit/cbindings/get_one_commit.h"
+#include "sxt/cbindings/get_one_commit.h"
 
 #include <iostream>
 
+#include "sxt/cbindings/backend.h"
 #include "sxt/curve21/type/element_p3.h"
-#include "sxt/seqcommit/cbindings/backend.h"
 #include "sxt/seqcommit/generator/precomputed_one_commitments.h"
 
 //--------------------------------------------------------------------------------------------------
 // sxt_get_one_commit
 //--------------------------------------------------------------------------------------------------
 int sxt_get_one_commit(struct sxt_ristretto* one_commit, uint64_t n) {
-  if (!sxt::sqccb::is_backend_initialized()) {
+  if (!sxt::cbn::is_backend_initialized()) {
     std::cerr << "ABORT: backend uninitialized in the `sxt_get_one_commit` c binding function"
               << std::endl;
     std::abort();

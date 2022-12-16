@@ -1,15 +1,15 @@
-#include "sxt/seqcommit/cbindings/get_generators.h"
+#include "sxt/cbindings/get_generators.h"
 
 #include <cassert>
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/cbindings/backend.h"
 #include "sxt/curve21/type/element_p3.h"
-#include "sxt/seqcommit/cbindings/backend.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
 using namespace sxt;
-using namespace sxt::sqccb;
+using namespace sxt::cbn;
 
 static void initialize_backend(int backend, uint64_t precomputed_elements) {
   const sxt_config config = {backend, precomputed_elements};

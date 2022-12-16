@@ -1,9 +1,9 @@
-#include "sxt/seqcommit/cbindings/backend.h"
+#include "sxt/cbindings/backend.h"
 
 #include "sxt/base/test/unit_test.h"
 
 using namespace sxt;
-using namespace sxt::sqccb;
+using namespace sxt::cbn;
 
 TEST_CASE("We can verify that invalid backends will error out") {
   const sxt_config config = {-1, 0};

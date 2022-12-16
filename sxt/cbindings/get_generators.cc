@@ -1,9 +1,9 @@
-#include "sxt/seqcommit/cbindings/get_generators.h"
+#include "sxt/cbindings/get_generators.h"
 
 #include <iostream>
 
+#include "sxt/cbindings/backend.h"
 #include "sxt/curve21/type/element_p3.h"
-#include "sxt/seqcommit/cbindings/backend.h"
 
 using namespace sxt;
 
@@ -12,7 +12,7 @@ using namespace sxt;
 //--------------------------------------------------------------------------------------------------
 int sxt_get_generators(struct sxt_ristretto* generators, uint64_t num_generators,
                        uint64_t offset_generators) {
-  if (!sxt::sqccb::is_backend_initialized()) {
+  if (!sxt::cbn::is_backend_initialized()) {
     std::cerr << "ABORT: backend uninitialized in the `sxt_get_generators` c binding function"
               << std::endl;
     std::abort();
@@ -33,7 +33,7 @@ int sxt_get_generators(struct sxt_ristretto* generators, uint64_t num_generators
   basct::span<c21t::element_p3> generators_result(reinterpret_cast<c21t::element_p3*>(generators),
                                                   num_generators);
 
-  auto backend = sxt::sqccb::get_backend();
+  auto backend = sxt::cbn::get_backend();
   backend->get_generators(generators_result, offset_generators);
 
   return 0;

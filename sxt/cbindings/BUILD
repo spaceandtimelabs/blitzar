@@ -2,6 +2,35 @@ load(
     "//bazel:sxt_component.bzl",
     "sxt_cc_component",
 )
+load(
+    "//bazel:cuda_dlink.bzl",
+    "cuda_dlink",
+)
+
+cuda_dlink(
+    name = "cbindings_device",
+    deps = [
+        ":backend",
+        ":get_generators",
+        ":get_one_commit",
+        ":pedersen",
+    ],
+)
+
+cc_binary(
+    name = "libproofs-gpu.so",
+    linkopts = [
+        "-Wl,--version-script=$(location :libproofs-gpu-export-map.ld)",
+        "-static-libstdc++",
+        "-static-libgcc",
+    ],
+    linkshared = 1,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":cbindings_device",
+        ":libproofs-gpu-export-map.ld",
+    ],
+)
 
 sxt_cc_component(
     name = "pedersen_capi",
@@ -23,30 +52,6 @@ sxt_cc_component(
     deps = [
         ":pedersen_capi",
         "//sxt/seqcommit/backend:pedersen_backend",
-    ],
-    alwayslink = 1,
-)
-
-sxt_cc_component(
-    name = "pedersen",
-    impl_deps = [
-        "//sxt/seqcommit/cbindings:backend",
-        "//sxt/memory/management:managed_array",
-        "//sxt/ristretto/type:compressed_element",
-        "//sxt/seqcommit/base:indexed_exponent_sequence",
-    ],
-    test_deps = [
-        ":backend",
-        "//sxt/base/test:unit_test",
-        "//sxt/curve21/constant:zero",
-        "//sxt/ristretto/base:byte_conversion",
-        "//sxt/ristretto/operation:add",
-        "//sxt/ristretto/operation:scalar_multiply",
-        "//sxt/ristretto/type:compressed_element",
-        "//sxt/seqcommit/generator:base_element",
-    ],
-    deps = [
-        ":pedersen_capi",
     ],
     alwayslink = 1,
 )
@@ -83,6 +88,30 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:add",
+    ],
+    deps = [
+        ":pedersen_capi",
+    ],
+    alwayslink = 1,
+)
+
+sxt_cc_component(
+    name = "pedersen",
+    impl_deps = [
+        ":backend",
+        "//sxt/memory/management:managed_array",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/seqcommit/base:indexed_exponent_sequence",
+    ],
+    test_deps = [
+        ":backend",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/constant:zero",
+        "//sxt/ristretto/base:byte_conversion",
+        "//sxt/ristretto/operation:add",
+        "//sxt/ristretto/operation:scalar_multiply",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/seqcommit/generator:base_element",
     ],
     deps = [
         ":pedersen_capi",

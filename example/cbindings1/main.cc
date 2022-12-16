@@ -1,7 +1,7 @@
 #include <cstddef>
 #include <iostream>
 
-#include "sxt/seqcommit/cbindings/pedersen_capi.h"
+#include "sxt/cbindings/pedersen_capi.h"
 
 int main() {
   const sxt_config config = {SXT_NAIVE_BACKEND_GPU};

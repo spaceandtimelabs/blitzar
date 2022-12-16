@@ -1,11 +1,11 @@
-#include "sxt/seqcommit/cbindings/pedersen.h"
+#include "sxt/cbindings/pedersen.h"
 
 #include <iostream>
 
+#include "sxt/cbindings/backend.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
-#include "sxt/seqcommit/cbindings/backend.h"
 
 using namespace sxt;
 
@@ -57,7 +57,7 @@ static int process_compute_pedersen_commitments(struct sxt_compressed_ristretto*
                                                 const struct sxt_ristretto* generators) {
 
   // backend not initialized (sxt_init not called correctly)
-  if (!sxt::sqccb::is_backend_initialized()) {
+  if (!sxt::cbn::is_backend_initialized()) {
     std::cerr
         << "ABORT: backend uninitialized in the `process_compute_pedersen_commitments` function"
         << std::endl;
@@ -105,7 +105,7 @@ static int process_compute_pedersen_commitments(struct sxt_compressed_ristretto*
   basct::cspan<c21t::element_p3> generators_span(
       reinterpret_cast<const c21t::element_p3*>(generators), generators_length);
 
-  auto backend = sqccb::get_backend();
+  auto backend = cbn::get_backend();
   backend->compute_commitments(commitments_result, value_sequences, generators_span,
                                length_longest_sequence, has_sparse_sequence);
 
