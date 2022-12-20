@@ -81,6 +81,7 @@ sxt_cc_component(
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/random:random_multiexponentiation_descriptor",

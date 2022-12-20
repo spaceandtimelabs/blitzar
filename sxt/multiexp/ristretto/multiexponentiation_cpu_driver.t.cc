@@ -8,6 +8,7 @@
 #include "sxt/base/container/span.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
