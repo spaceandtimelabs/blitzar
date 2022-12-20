@@ -38,3 +38,16 @@ TEST_CASE(
   inv(s, a);
   REQUIRE(s == 0x3333333333333333333333333333333375fcb92ed64b8f7ab36e09edf645d96_s25);
 }
+
+TEST_CASE("we can do bulk inversion") {
+  element sx[2] = {0x123_s25, 0x456_s25};
+  element sx_inv[2];
+  batch_inv(sx_inv, sx);
+
+  element expected;
+  inv(expected, sx[0]);
+  REQUIRE(sx_inv[0] == expected);
+
+  inv(expected, sx[1]);
+  REQUIRE(sx_inv[1] == expected);
+}

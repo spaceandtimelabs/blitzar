@@ -140,6 +140,7 @@ sxt_cc_component(
         ":sqmul",
         "//sxt/base/bit:load",
         "//sxt/scalar25/property:zero",
+        "//sxt/scalar25/type:element",
     ],
     is_cuda = True,
     test_deps = [
@@ -147,7 +148,8 @@ sxt_cc_component(
         "//sxt/scalar25/type:literal",
     ],
     deps = [
-        "//sxt/scalar25/type:element",
+        "//sxt/base/container:span",
+        "//sxt/base/macro:cuda_callable",
     ],
 )
 

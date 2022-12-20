@@ -14,6 +14,7 @@
 #include "sxt/scalar25/operation/sq.h"
 #include "sxt/scalar25/operation/sqmul.h"
 #include "sxt/scalar25/property/zero.h"
+#include "sxt/scalar25/type/element.h"
 
 namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
@@ -67,5 +68,18 @@ void inv(s25t::element& s_inv, const s25t::element& s) noexcept {
   sqmul(s_inv, 10, _11110101);
   sqmul(s_inv, 8, _11010011);
   sqmul(s_inv, 8, _11101011);
+}
+
+//--------------------------------------------------------------------------------------------------
+// batch_inv
+//--------------------------------------------------------------------------------------------------
+void batch_inv(basct::span<s25t::element> sx_inv, basct::cspan<s25t::element> sx) noexcept {
+  // Note: there are more efficient ways to do inversion in bulk; but we're starting
+  // with the simplest approach for now.
+  assert(sx_inv.size() == sx.size());
+  auto n = sx_inv.size();
+  for (size_t i = 0; i < n; ++i) {
+    inv(sx_inv[i], sx[i]);
+  }
 }
 } // namespace sxt::s25o
