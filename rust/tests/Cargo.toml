@@ -7,5 +7,5 @@ edition = "2021"
 
 [dependencies]
 
-[dependencies.proofs_gpu]
+[dependencies.proofs-gpu-sys]
 path = "../proofs-gpu-sys/"

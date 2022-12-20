@@ -1,7 +1,8 @@
 [package]
-name = "proofs_gpu"
+name = "proofs-gpu-sys"
 version = "0.0.0" 
 edition = "2021"
+repository = "https://github.com/spaceandtimelabs/proofs-gpu"
 
 exclude = ["/target", "/Cargo.lock"]
 include = ["/src", "build.rs", "Cargo.toml", "*.so*"]
