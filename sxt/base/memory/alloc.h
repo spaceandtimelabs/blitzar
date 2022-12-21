@@ -3,9 +3,9 @@
 #include <cstddef>
 #include <memory_resource>
 
-namespace sxt::bast {
+namespace sxt::basm {
 //--------------------------------------------------------------------------------------------------
-// polymorphic_allocator
+// alloc_t
 //--------------------------------------------------------------------------------------------------
-using polymorphic_allocator = std::pmr::polymorphic_allocator<std::byte>;
-} // namespace sxt::bast
+using alloc_t = std::pmr::polymorphic_allocator<std::byte>;
+} // namespace sxt::basm

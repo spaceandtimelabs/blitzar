@@ -4,19 +4,16 @@ load(
 )
 
 sxt_cc_component(
-    name = "managed_array_fwd",
+    name = "alloc",
     with_test = False,
 )
 
 sxt_cc_component(
-    name = "managed_array",
+    name = "alloc_utility",
     test_deps = [
-        "//sxt/base/test:allocator_aware",
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        ":managed_array_fwd",
-        "//sxt/base/container:span_void",
-        "//sxt/base/memory:alloc",
+        ":alloc",
     ],
 )

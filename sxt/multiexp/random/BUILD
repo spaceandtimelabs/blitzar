@@ -17,7 +17,7 @@ sxt_cc_component(
     with_test = False,
     deps = [
         "//sxt/base/container:span",
-        "//sxt/base/type:polymorphic_allocator",
+        "//sxt/base/memory:alloc",
     ],
 )
 

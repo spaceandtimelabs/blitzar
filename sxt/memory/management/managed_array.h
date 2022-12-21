@@ -6,7 +6,7 @@
 #include <utility>
 
 #include "sxt/base/container/span_void.h"
-#include "sxt/base/type/polymorphic_allocator.h"
+#include "sxt/base/memory/alloc.h"
 #include "sxt/memory/management/managed_array_fwd.h"
 
 namespace sxt::memmg {
@@ -16,7 +16,7 @@ namespace sxt::memmg {
 // void
 template <> class managed_array<void> {
 public:
-  using allocator_type = bast::polymorphic_allocator;
+  using allocator_type = basm::alloc_t;
 
   // constructor
   managed_array() noexcept = default;
@@ -72,7 +72,7 @@ template <class T> class managed_array {
   static_assert(std::is_trivially_destructible_v<T>);
 
 public:
-  using allocator_type = bast::polymorphic_allocator;
+  using allocator_type = basm::alloc_t;
 
   // constructor
   managed_array() noexcept = default;

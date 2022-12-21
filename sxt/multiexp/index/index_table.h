@@ -5,7 +5,7 @@
 #include <iosfwd>
 
 #include "sxt/base/container/span.h"
-#include "sxt/base/type/polymorphic_allocator.h"
+#include "sxt/base/memory/alloc.h"
 
 namespace sxt::mtxi {
 //--------------------------------------------------------------------------------------------------
@@ -13,7 +13,7 @@ namespace sxt::mtxi {
 //--------------------------------------------------------------------------------------------------
 class index_table {
 public:
-  using allocator_type = bast::polymorphic_allocator;
+  using allocator_type = basm::alloc_t;
   using header_type = basct::span<uint64_t>;
   using const_header_type = basct::span<const uint64_t>;
 
