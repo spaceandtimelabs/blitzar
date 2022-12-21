@@ -127,4 +127,9 @@ void scalar_multiply(c21t::element_p3& h, basct::cspan<uint8_t> a,
   fill_exponent(a_p, a);
   scalar_multiply255(h, a_p.data(), p);
 }
+
+void scalar_multiply(c21t::element_p3& h, const s25t::element& a,
+                     const c21t::element_p3& p) noexcept {
+  scalar_multiply255(h, reinterpret_cast<const uint8_t*>(&a), p);
+}
 } // namespace sxt::c21o

@@ -94,3 +94,19 @@ sxt_cc_component(
         "//sxt/base/macro:cuda_callable",
     ],
 )
+
+sxt_cc_component(
+    name = "overload",
+    impl_deps = [
+        ":add",
+        ":scalar_multiply",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/scalar25/type:literal",
+        "//sxt/scalar25/operation:overload",
+    ],
+    test_deps = [
+        "//sxt/curve21/type:element_p3",
+        "//sxt/scalar25/type:literal",
+        "//sxt/base/test:unit_test",
+    ],
+)
