@@ -168,3 +168,20 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
     ],
 )
+
+sxt_cc_component(
+    name = "overload",
+    impl_deps = [
+        ":add",
+        ":mul",
+        ":neg",
+        ":inv",
+        ":sub",
+        "//sxt/scalar25/type:element",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:literal",
+        "//sxt/scalar25/type:element",
+    ],
+)
