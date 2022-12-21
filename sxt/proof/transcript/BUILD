@@ -45,10 +45,15 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "transcript_utility",
-    impl_deps = [],
+    impl_deps = [
+        "//sxt/scalar25/operation:reduce",
+        "//sxt/scalar25/type:element",
+    ],
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/ristretto/type:compressed_element",
+        "//sxt/scalar25/operation:reduce",
+        "//sxt/scalar25/type:element",
     ],
     deps = [
         ":transcript",
