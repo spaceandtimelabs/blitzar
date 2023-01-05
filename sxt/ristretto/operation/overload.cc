@@ -24,6 +24,16 @@ compressed_element operator+(const compressed_element& lhs,
   return res;
 }
 
+compressed_element operator+(const c21t::element_p3& lhs, const compressed_element& rhs) noexcept {
+  compressed_element lhs_p;
+  rsto::compress(lhs_p, lhs);
+  return lhs_p + rhs;
+}
+
+compressed_element operator+(const compressed_element& lhs, const c21t::element_p3& rhs) noexcept {
+  return rhs + lhs;
+}
+
 //--------------------------------------------------------------------------------------------------
 // operator-
 //--------------------------------------------------------------------------------------------------
@@ -45,6 +55,18 @@ compressed_element operator-(const compressed_element& x) noexcept {
   compressed_element res;
   rsto::compress(res, res_p);
   return res;
+}
+
+compressed_element operator-(const c21t::element_p3& lhs, const compressed_element& rhs) noexcept {
+  compressed_element lhs_p;
+  rsto::compress(lhs_p, lhs);
+  return lhs_p - rhs;
+}
+
+compressed_element operator-(const compressed_element& lhs, const c21t::element_p3& rhs) noexcept {
+  compressed_element rhs_p;
+  rsto::compress(rhs_p, rhs);
+  return lhs - rhs_p;
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -57,8 +57,10 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
     ],
     test_deps = [
+        ":compression",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:overload",
         "//sxt/scalar25/type:literal",
         "//sxt/ristretto/type:literal",
-        "//sxt/base/test:unit_test",
     ],
 )
