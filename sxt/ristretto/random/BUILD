@@ -11,7 +11,7 @@ sxt_cc_component(
         "//sxt/field51/random:element",
         "//sxt/field51/type:element",
         "//sxt/ristretto/base:byte_conversion",
-        "//sxt/ristretto/operation:point_formation",
+        "//sxt/ristretto/base:point_formation",
         "//sxt/ristretto/type:compressed_element",
     ],
     is_cuda = True,

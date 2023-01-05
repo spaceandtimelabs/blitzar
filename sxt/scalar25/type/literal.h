@@ -12,7 +12,7 @@ namespace sxt::s25t {
 //--------------------------------------------------------------------------------------------------
 template <char... Chars> element operator"" _s25() noexcept {
   std::array<uint64_t, 4> bytes = {};
-  bast::parse_literal<Chars...>(bytes);
+  bast::parse_literal<4, Chars...>(bytes);
   element res;
   std::memcpy(static_cast<void*>(res.data()), static_cast<const void*>(bytes.data()), 32);
   return res;

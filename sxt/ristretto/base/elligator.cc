@@ -7,7 +7,7 @@
  * See third_party/license/libsodium.LICENSE
  */
 
-#include "sxt/ristretto/operation/elligator.h"
+#include "sxt/ristretto/base/elligator.h"
 
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/field51/constant/d.h"
@@ -23,7 +23,7 @@
 #include "sxt/field51/type/element.h"
 #include "sxt/ristretto/base/sqrt_ratio_m1.h"
 
-namespace sxt::rsto {
+namespace sxt::rstb {
 //--------------------------------------------------------------------------------------------------
 // apply_elligator
 //--------------------------------------------------------------------------------------------------
@@ -75,4 +75,4 @@ void apply_elligator(c21t::element_p3& p, const f51t::element& t) noexcept {
   f51o::mul(p.Z, w1, w3);
   f51o::mul(p.T, w0, w2);
 }
-} // namespace sxt::rsto
+} // namespace sxt::rstb

@@ -12,7 +12,7 @@ namespace sxt::f51t {
 //--------------------------------------------------------------------------------------------------
 template <char... Chars> element operator"" _f51() noexcept {
   std::array<uint64_t, 4> bytes = {};
-  bast::parse_literal<Chars...>(bytes);
+  bast::parse_literal<4, Chars...>(bytes);
   element res;
   f51b::from_bytes(res.data(), reinterpret_cast<const uint8_t*>(bytes.data()));
   return res;

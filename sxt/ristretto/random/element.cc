@@ -5,7 +5,7 @@
 #include "sxt/field51/random/element.h"
 #include "sxt/field51/type/element.h"
 #include "sxt/ristretto/base/byte_conversion.h"
-#include "sxt/ristretto/operation/point_formation.h"
+#include "sxt/ristretto/base/point_formation.h"
 #include "sxt/ristretto/type/compressed_element.h"
 
 namespace sxt::rstrn {
@@ -18,7 +18,7 @@ void generate_random_element(c21t::element_p3& p,
   f51t::element r0, r1;
   f51rn::generate_random_element(r0, rng);
   f51rn::generate_random_element(r1, rng);
-  rsto::form_ristretto_point(p, r0, r1);
+  rstb::form_ristretto_point(p, r0, r1);
 }
 
 void generate_random_element(rstt::compressed_element& p,

@@ -9,10 +9,10 @@ namespace sxt::f51t {
 class element;
 }
 
-namespace sxt::rsto {
+namespace sxt::rstb {
 //--------------------------------------------------------------------------------------------------
 // apply_elligator
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 void apply_elligator(c21t::element_p3& p, const f51t::element& t) noexcept;
-} // namespace sxt::rsto
+} // namespace sxt::rstb

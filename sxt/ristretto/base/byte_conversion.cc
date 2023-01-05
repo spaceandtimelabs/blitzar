@@ -30,6 +30,26 @@
 #include "sxt/ristretto/base/sqrt_ratio_m1.h"
 
 namespace sxt::rstb {
+//--------------------------------------------------------------------------------------------------
+// is_canonical
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+static int is_canonical(const unsigned char* s) {
+  unsigned char c;
+  unsigned char d;
+  unsigned char e;
+  unsigned int i;
+
+  c = (s[31] & 0x7f) ^ 0x7f;
+  for (i = 30; i > 0; i--) {
+    c |= s[i] ^ 0xff;
+  }
+  c = (((unsigned int)c) - 1U) >> 8;
+  d = (0xed - 1U - (unsigned int)s[0]) >> 8;
+  e = s[31] >> 7;
+
+  return 1 - (((c & d) | e | s[0]) & 1);
+}
 
 //--------------------------------------------------------------------------------------------------
 // to_bytes
@@ -90,24 +110,6 @@ void to_bytes(uint8_t s[32], const c21t::element_p3& p) noexcept {
   f51o::abs(s_, s_);
 
   f51b::to_bytes(s, s_.data());
-}
-
-CUDA_CALLABLE
-static int is_canonical(const unsigned char* s) {
-  unsigned char c;
-  unsigned char d;
-  unsigned char e;
-  unsigned int i;
-
-  c = (s[31] & 0x7f) ^ 0x7f;
-  for (i = 30; i > 0; i--) {
-    c |= s[i] ^ 0xff;
-  }
-  c = (((unsigned int)c) - 1U) >> 8;
-  d = (0xed - 1U - (unsigned int)s[0]) >> 8;
-  e = s[31] >> 7;
-
-  return 1 - (((c & d) | e | s[0]) & 1);
 }
 
 //--------------------------------------------------------------------------------------------------

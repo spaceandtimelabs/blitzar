@@ -10,7 +10,9 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "literal",
-    with_test = False,
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
     deps = [
         "//sxt/base/num:hex",
     ],
