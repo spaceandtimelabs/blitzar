@@ -20,6 +20,22 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "inner_product",
+    impl_deps = [
+        ":mul",
+        ":muladd",
+    ],
+    test_deps = [
+        ":overload",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "neg",
     impl_deps = [
         ":reduce",
