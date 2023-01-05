@@ -4,6 +4,15 @@ load(
 )
 
 sxt_cc_component(
+    name = "compression",
+    impl_deps = [
+        "//sxt/ristretto/base:byte_conversion",
+        "//sxt/ristretto/type:compressed_element",
+    ],
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "add",
     impl_deps = [
         "//sxt/ristretto/type:compressed_element",
@@ -36,5 +45,20 @@ sxt_cc_component(
     deps = [
         "//sxt/base/container:span",
         "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
+    name = "overload",
+    impl_deps = [
+        ":compression",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/curve21/operation:overload",
+        "//sxt/curve21/type:element_p3",
+    ],
+    test_deps = [
+        "//sxt/scalar25/type:literal",
+        "//sxt/ristretto/type:literal",
+        "//sxt/base/test:unit_test",
     ],
 )
