@@ -30,3 +30,24 @@ sxt_cc_component(
         "//sxt/base/memory:alloc",
     ],
 )
+
+sxt_cc_component(
+    name = "verification_computation",
+    impl_deps = [
+        "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/operation:inv",
+        "//sxt/scalar25/operation:sq",
+        "//sxt/scalar25/operation:neg",
+        "//sxt/scalar25/operation:inner_product",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/operation:inv",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
