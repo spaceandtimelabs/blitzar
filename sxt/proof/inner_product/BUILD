@@ -4,6 +4,34 @@ load(
 )
 
 sxt_cc_component(
+    name = "fold",
+    impl_deps = [
+        "//sxt/curve21/type:element_p3",
+        "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/multiexp/ristretto:pippenger_multiproduct_solver",
+        "//sxt/multiexp/ristretto:precomputed_p3_input_accessor",
+        "//sxt/multiexp/ristretto:multiexponentiation_cpu_driver",
+        "//sxt/multiexp/pippenger:multiexponentiation",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/operation:muladd",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/curve21/operation:overload",
+        "//sxt/ristretto/random:element",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/random:element",
+        "//sxt/scalar25/operation:overload",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "proof_descriptor",
     with_test = False,
     deps = [
