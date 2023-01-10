@@ -4,6 +4,21 @@ load(
 )
 
 sxt_cc_component(
+    name = "workspace",
+    with_test = False,
+)
+
+sxt_cc_component(
+    name = "cpu_workspace",
+    with_test = False,
+    deps = [
+        ":workspace",
+        "//sxt/base/container:span",
+        "//sxt/scalar25/type:element",
+    ],
+)
+
+sxt_cc_component(
     name = "driver",
     with_test = False,
     deps = [
@@ -89,6 +104,43 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "workspace",
-    with_test = False,
+    name = "cpu_driver",
+    impl_deps = [
+        ":fold",
+        ":proof_descriptor",
+        ":verification_computation",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/multiexp/ristretto:pippenger_multiproduct_solver",
+        "//sxt/multiexp/ristretto:precomputed_p3_input_accessor",
+        "//sxt/multiexp/ristretto:multiexponentiation_cpu_driver",
+        "//sxt/multiexp/pippenger:multiexponentiation",
+        "//sxt/ristretto/operation:compression",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/operation:inner_product",
+        "//sxt/scalar25/operation:inv",
+    ],
+    test_deps = [
+        ":proof_descriptor",
+        ":random_product_generation",
+        ":workspace",
+        "//sxt/base/test:unit_test",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/scalar25/operation:inv",
+        "//sxt/curve21/operation:overload",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/random:element",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/ristretto/random:element",
+        "//sxt/ristretto/operation:compression",
+        "//sxt/ristretto/operation:overload",
+    ],
+    deps = [
+        ":cpu_workspace",
+        ":driver",
+        "//sxt/base/container:span",
+    ],
 )
