@@ -4,6 +4,14 @@ load(
 )
 
 sxt_cc_component(
+    name = "driver",
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "fold",
     impl_deps = [
         "//sxt/curve21/type:element_p3",
@@ -78,4 +86,9 @@ sxt_cc_component(
     deps = [
         "//sxt/base/container:span",
     ],
+)
+
+sxt_cc_component(
+    name = "workspace",
+    with_test = False,
 )
