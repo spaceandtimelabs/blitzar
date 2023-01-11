@@ -55,6 +55,41 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "proof_computation",
+    impl_deps = [
+        ":driver",
+        ":proof_descriptor",
+        ":workspace",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:scalar_multiply",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/ristretto/operation:compression",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/proof/transcript:transcript_utility",
+        "//sxt/scalar25/type:element",
+    ],
+    test_deps = [
+        ":cpu_driver",
+        ":proof_descriptor",
+        ":random_product_generation",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/base/test:unit_test",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/ristretto/operation:compression",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/scalar25/type:element",
+        "//sxt/proof/transcript:transcript",
+        "//sxt/curve21/operation:overload",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "proof_descriptor",
     with_test = False,
     deps = [
