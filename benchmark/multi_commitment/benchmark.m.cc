@@ -12,14 +12,13 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/profile/callgrind.h"
+#include "sxt/cbindings/backend/computational_backend.h"
+#include "sxt/cbindings/backend/cpu_backend.h"
+#include "sxt/cbindings/backend/gpu_backend.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/type/compressed_element.h"
-#include "sxt/seqcommit/backend/naive_cpu_backend.h"
-#include "sxt/seqcommit/backend/naive_gpu_backend.h"
-#include "sxt/seqcommit/backend/pedersen_backend.h"
-#include "sxt/seqcommit/backend/pippenger_cpu_backend.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
@@ -35,7 +34,7 @@ struct params {
   uint64_t element_nbytes;
   bool is_boolean;
   bool use_pre_computed_generators;
-  std::unique_ptr<sqcbck::pedersen_backend> backend;
+  std::unique_ptr<cbnbck::computational_backend> backend;
 
   std::chrono::steady_clock::time_point begin_time;
   std::chrono::steady_clock::time_point end_time;
@@ -45,7 +44,7 @@ struct params {
 
     if (argc < 8) {
       std::cerr << "Usage: benchmark "
-                << "<naive-cpu|naive-gpu|pip-cpu> "
+                << "<cpu|gpu> "
                 << "<num_commitments> <commitment_length> <element_nbytes> "
                 << "<verbose> <num_samples> <use_pre_computed_generators>\n";
       status = -1;
@@ -79,21 +78,15 @@ struct params {
   }
 
   void select_backend_fn(const std::string_view backend_view) noexcept {
-    if (backend_view == "naive-cpu") {
-      backend_str = "naive-cpu";
-      backend = std::make_unique<sqcbck::naive_cpu_backend>();
+    if (backend_view == "gpu") {
+      backend_str = "gpu";
+      backend = std::make_unique<cbnbck::gpu_backend>();
       return;
     }
 
-    if (backend_view == "naive-gpu") {
-      backend_str = "naive-gpu";
-      backend = std::make_unique<sqcbck::naive_gpu_backend>();
-      return;
-    }
-
-    if (backend_view == "pip-cpu") {
-      backend_str = "pip-cpu";
-      backend = std::make_unique<sqcbck::pippenger_cpu_backend>();
+    if (backend_view == "cpu") {
+      backend_str = "cpu";
+      backend = std::make_unique<cbnbck::cpu_backend>();
       return;
     }
 

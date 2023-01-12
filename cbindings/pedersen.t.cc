@@ -1,9 +1,9 @@
-#include "sxt/cbindings/pedersen.h"
+#include "cbindings/pedersen.h"
 
 #include <vector>
 
+#include "cbindings/backend.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/cbindings/backend.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/operation/add.h"
@@ -304,14 +304,10 @@ static void compute_commitments_with_given_backend(int backend) {
   }
 }
 
-TEST_CASE("We can compute pedersen commitments using the naive cpu backend") {
-  compute_commitments_with_given_backend(SXT_NAIVE_BACKEND_CPU);
-}
-
 TEST_CASE("We can compute pedersen commitments using the naive gpu backend") {
-  compute_commitments_with_given_backend(SXT_NAIVE_BACKEND_GPU);
+  compute_commitments_with_given_backend(SXT_GPU_BACKEND);
 }
 
 TEST_CASE("We can compute pedersen commitments using the pippenger cpu backend") {
-  compute_commitments_with_given_backend(SXT_PIPPENGER_BACKEND_CPU);
+  compute_commitments_with_given_backend(SXT_CPU_BACKEND);
 }

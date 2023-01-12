@@ -1,13 +1,12 @@
-#include "sxt/cbindings/backend.h"
+#include "cbindings/backend.h"
 
 #include <cassert>
 #include <iostream>
 
 #include "sxt/base/device/property.h"
-#include "sxt/seqcommit/backend/naive_cpu_backend.h"
-#include "sxt/seqcommit/backend/naive_gpu_backend.h"
-#include "sxt/seqcommit/backend/pedersen_backend.h"
-#include "sxt/seqcommit/backend/pippenger_cpu_backend.h"
+#include "sxt/cbindings/backend/computational_backend.h"
+#include "sxt/cbindings/backend/cpu_backend.h"
+#include "sxt/cbindings/backend/gpu_backend.h"
 #include "sxt/seqcommit/generator/precomputed_initializer.h"
 
 using namespace sxt;
@@ -16,32 +15,24 @@ namespace sxt::cbn {
 //--------------------------------------------------------------------------------------------------
 // backend
 //--------------------------------------------------------------------------------------------------
-static sqcbck::pedersen_backend* backend = nullptr;
+static cbnbck::computational_backend* backend = nullptr;
 
 //--------------------------------------------------------------------------------------------------
-// initialize_naive_cpu_backend
+// initialize_cpu_backend
 //--------------------------------------------------------------------------------------------------
-static void initialize_naive_cpu_backend(const sxt_config* config) noexcept {
-  backend = sqcbck::get_naive_cpu_backend();
+static void initialize_cpu_backend(const sxt_config* config) noexcept {
+  backend = cbnbck::get_cpu_backend();
   sqcgn::init_precomputed_components(config->num_precomputed_generators, false);
 }
 
 //--------------------------------------------------------------------------------------------------
-// initialize_pippenger_cpu_backend
+// initialize_gpu_backend
 //--------------------------------------------------------------------------------------------------
-static void initialize_pippenger_cpu_backend(const sxt_config* config) noexcept {
-  backend = sqcbck::get_pippenger_cpu_backend();
-  sqcgn::init_precomputed_components(config->num_precomputed_generators, false);
-}
-
-//--------------------------------------------------------------------------------------------------
-// initialize_naive_gpu_backend
-//--------------------------------------------------------------------------------------------------
-static void initialize_naive_gpu_backend(const sxt_config* config) noexcept {
+static void initialize_gpu_backend(const sxt_config* config) noexcept {
   int num_devices = basdv::get_num_devices();
 
   if (num_devices == 0) {
-    initialize_pippenger_cpu_backend(config);
+    initialize_cpu_backend(config);
 
     // this message is used only to warn the user that gpu will not be used
     std::cout << "WARN: Using pippenger cpu instead of naive gpu backend." << std::endl;
@@ -49,7 +40,7 @@ static void initialize_naive_gpu_backend(const sxt_config* config) noexcept {
     return;
   }
 
-  backend = sqcbck::get_naive_gpu_backend();
+  backend = cbnbck::get_gpu_backend();
   sqcgn::init_precomputed_components(config->num_precomputed_generators, true);
 }
 
@@ -61,7 +52,7 @@ bool is_backend_initialized() noexcept { return backend != nullptr; }
 //--------------------------------------------------------------------------------------------------
 // get_backend
 //--------------------------------------------------------------------------------------------------
-sqcbck::pedersen_backend* get_backend() noexcept {
+cbnbck::computational_backend* get_backend() noexcept {
   assert(backend != nullptr);
 
   return backend;
@@ -92,16 +83,12 @@ int sxt_init(const sxt_config* config) {
     std::abort();
   }
 
-  if (config->backend == SXT_NAIVE_BACKEND_CPU) {
-    cbn::initialize_naive_cpu_backend(config);
+  if (config->backend == SXT_GPU_BACKEND) {
+    cbn::initialize_gpu_backend(config);
 
     return 0;
-  } else if (config->backend == SXT_NAIVE_BACKEND_GPU) {
-    cbn::initialize_naive_gpu_backend(config);
-
-    return 0;
-  } else if (config->backend == SXT_PIPPENGER_BACKEND_CPU) {
-    cbn::initialize_pippenger_cpu_backend(config);
+  } else if (config->backend == SXT_CPU_BACKEND) {
+    cbn::initialize_cpu_backend(config);
 
     return 0;
   }

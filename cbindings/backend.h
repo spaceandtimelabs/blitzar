@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sxt/cbindings/pedersen_capi.h"
-#include "sxt/seqcommit/backend/pedersen_backend.h"
+#include "cbindings/proofs_gpu_api.h"
+#include "sxt/cbindings/backend/computational_backend.h"
 
 namespace sxt::cbn {
 
@@ -13,7 +13,7 @@ bool is_backend_initialized() noexcept;
 //--------------------------------------------------------------------------------------------------
 // get_backend
 //--------------------------------------------------------------------------------------------------
-sqcbck::pedersen_backend* get_backend() noexcept;
+cbnbck::computational_backend* get_backend() noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // reset_backend_for_testing

@@ -1,7 +1,7 @@
 cc_library(
     name = "proofs",
     srcs = [
-        "//sxt/cbindings:libproofs-gpu.so",
+        "//cbindings:libproofs-gpu.so",
     ],
     alwayslink = 1,
 )
@@ -13,6 +13,6 @@ cc_binary(
     ],
     deps = [
         ":proofs",
-        "//sxt/cbindings:pedersen_capi",
+        "//cbindings:proofs_gpu_api",
     ],
 )

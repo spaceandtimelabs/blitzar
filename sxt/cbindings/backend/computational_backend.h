@@ -14,14 +14,14 @@ namespace sxt::c21t {
 struct element_p3;
 }
 
-namespace sxt::sqcbck {
+namespace sxt::cbnbck {
 
 //--------------------------------------------------------------------------------------------------
-// pedersen_backend
+// computational_backend
 //--------------------------------------------------------------------------------------------------
-class pedersen_backend {
+class computational_backend {
 public:
-  virtual ~pedersen_backend() noexcept = default;
+  virtual ~computational_backend() noexcept = default;
 
   virtual void compute_commitments(basct::span<rstt::compressed_element> commitments,
                                    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
@@ -33,4 +33,4 @@ public:
                               uint64_t offset_generators) noexcept = 0;
 };
 
-} // namespace sxt::sqcbck
+} // namespace sxt::cbnbck

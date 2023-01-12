@@ -4,7 +4,7 @@ load(
 )
 
 sxt_cc_component(
-    name = "pedersen_backend",
+    name = "computational_backend",
     with_test = False,
     deps = [
         "//sxt/base/container:span",
@@ -15,24 +15,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "naive_cpu_backend",
-    impl_deps = [
-        "//sxt/curve21/type:element_p3",
-        "//sxt/ristretto/type:compressed_element",
-        "//sxt/seqcommit/base:indexed_exponent_sequence",
-        "//sxt/seqcommit/naive:commitment_computation_cpu",
-        "//sxt/seqcommit/generator:cpu_generator",
-        "//sxt/seqcommit/generator:precomputed_generators",
-    ],
-    with_test = False,
-    deps = [
-        ":pedersen_backend",
-        "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
-    name = "naive_gpu_backend",
+    name = "gpu_backend",
     impl_deps = [
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
@@ -44,13 +27,13 @@ sxt_cc_component(
     ],
     with_test = False,
     deps = [
-        ":pedersen_backend",
+        ":computational_backend",
         "//sxt/base/container:span",
     ],
 )
 
 sxt_cc_component(
-    name = "pippenger_cpu_backend",
+    name = "cpu_backend",
     impl_deps = [
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
@@ -67,7 +50,7 @@ sxt_cc_component(
     ],
     with_test = False,
     deps = [
-        ":pedersen_backend",
+        ":computational_backend",
         "//sxt/base/container:span",
     ],
 )

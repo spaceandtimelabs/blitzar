@@ -1,13 +1,13 @@
-#include "sxt/cbindings/get_one_commit.h"
+#include "cbindings/get_one_commit.h"
 
 #include <algorithm>
 #include <array>
 #include <string>
 #include <vector>
 
+#include "cbindings/backend.h"
+#include "cbindings/get_generators.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/cbindings/backend.h"
-#include "sxt/cbindings/get_generators.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
@@ -73,14 +73,10 @@ static void test_one_commit_with_given_backend(int backend) {
   }
 }
 
-TEST_CASE("We can correctly fetch the one commit using the naive cpu backend") {
-  test_one_commit_with_given_backend(SXT_NAIVE_BACKEND_CPU);
-}
-
 TEST_CASE("We can correctly fetch the one commit using the naive gpu backend") {
-  test_one_commit_with_given_backend(SXT_NAIVE_BACKEND_GPU);
+  test_one_commit_with_given_backend(SXT_GPU_BACKEND);
 }
 
 TEST_CASE("We can correctly fetch the one commit using the pippenger cpu backend") {
-  test_one_commit_with_given_backend(SXT_PIPPENGER_BACKEND_CPU);
+  test_one_commit_with_given_backend(SXT_CPU_BACKEND);
 }

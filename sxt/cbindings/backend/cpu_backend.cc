@@ -1,4 +1,4 @@
-#include "sxt/seqcommit/backend/pippenger_cpu_backend.h"
+#include "sxt/cbindings/backend/cpu_backend.h"
 
 #include <algorithm>
 #include <cassert>
@@ -16,7 +16,7 @@
 #include "sxt/seqcommit/generator/precomputed_generators.h"
 #include "sxt/seqcommit/naive/commitment_computation_cpu.h"
 
-namespace sxt::sqcbck {
+namespace sxt::cbnbck {
 //--------------------------------------------------------------------------------------------------
 // populate_exponents_array
 //--------------------------------------------------------------------------------------------------
@@ -34,11 +34,11 @@ populate_exponents_array(memmg::managed_array<mtxb::exponent_sequence>& exponent
 //--------------------------------------------------------------------------------------------------
 // compute_commitments
 //--------------------------------------------------------------------------------------------------
-void pippenger_cpu_backend::compute_commitments(
-    basct::span<rstt::compressed_element> commitments,
-    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
-    basct::cspan<c21t::element_p3> generators, uint64_t length_longest_sequence,
-    bool has_sparse_sequence) noexcept {
+void cpu_backend::compute_commitments(basct::span<rstt::compressed_element> commitments,
+                                      basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
+                                      basct::cspan<c21t::element_p3> generators,
+                                      uint64_t length_longest_sequence,
+                                      bool has_sparse_sequence) noexcept {
 
   memmg::managed_array<mtxb::exponent_sequence> exponents(value_sequences.size());
 
@@ -71,8 +71,8 @@ void pippenger_cpu_backend::compute_commitments(
 //--------------------------------------------------------------------------------------------------
 // get_generators
 //--------------------------------------------------------------------------------------------------
-void pippenger_cpu_backend::get_generators(basct::span<c21t::element_p3> generators,
-                                           uint64_t offset_generators) noexcept {
+void cpu_backend::get_generators(basct::span<c21t::element_p3> generators,
+                                 uint64_t offset_generators) noexcept {
   std::vector<c21t::element_p3> temp_generators_data;
   auto precomputed_generators = sqcgn::get_precomputed_generators(
       temp_generators_data, generators.size(), offset_generators, false);
@@ -80,11 +80,11 @@ void pippenger_cpu_backend::get_generators(basct::span<c21t::element_p3> generat
 }
 
 //--------------------------------------------------------------------------------------------------
-// get_pippenger_cpu_backend
+// get_cpu_backend
 //--------------------------------------------------------------------------------------------------
-pippenger_cpu_backend* get_pippenger_cpu_backend() {
+cpu_backend* get_cpu_backend() {
   // see https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
-  static pippenger_cpu_backend* backend = new pippenger_cpu_backend{};
+  static cpu_backend* backend = new cpu_backend{};
   return backend;
 }
-} // namespace sxt::sqcbck
+} // namespace sxt::cbnbck

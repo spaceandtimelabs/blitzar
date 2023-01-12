@@ -1,10 +1,10 @@
 #include <cstddef>
 #include <iostream>
 
-#include "sxt/cbindings/pedersen_capi.h"
+#include "cbindings/proofs_gpu_api.h"
 
 int main() {
-  const sxt_config config = {SXT_NAIVE_BACKEND_GPU};
+  const sxt_config config = {SXT_GPU_BACKEND};
 
   if (sxt_init(&config) != 0) {
     std::cerr << "sxt_init failed\n";

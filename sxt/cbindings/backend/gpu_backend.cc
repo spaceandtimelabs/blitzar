@@ -1,4 +1,4 @@
-#include "sxt/seqcommit/backend/naive_gpu_backend.h"
+#include "sxt/cbindings/backend/gpu_backend.h"
 
 #include <algorithm>
 
@@ -10,7 +10,7 @@
 #include "sxt/seqcommit/generator/precomputed_generators.h"
 #include "sxt/seqcommit/naive/commitment_computation_gpu.h"
 
-namespace sxt::sqcbck {
+namespace sxt::cbnbck {
 //--------------------------------------------------------------------------------------------------
 // pre_initialize_gpu
 //--------------------------------------------------------------------------------------------------
@@ -37,18 +37,18 @@ static void pre_initialize_gpu() {
 }
 
 //--------------------------------------------------------------------------------------------------
-// naive_gpu_backend
+// gpu_backend
 //--------------------------------------------------------------------------------------------------
-naive_gpu_backend::naive_gpu_backend() { pre_initialize_gpu(); }
+gpu_backend::gpu_backend() { pre_initialize_gpu(); }
 
 //--------------------------------------------------------------------------------------------------
 // compute_commitments
 //--------------------------------------------------------------------------------------------------
-void naive_gpu_backend::compute_commitments(
-    basct::span<rstt::compressed_element> commitments,
-    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
-    basct::cspan<c21t::element_p3> generators, uint64_t length_longest_sequence,
-    bool has_sparse_sequence) noexcept {
+void gpu_backend::compute_commitments(basct::span<rstt::compressed_element> commitments,
+                                      basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
+                                      basct::cspan<c21t::element_p3> generators,
+                                      uint64_t length_longest_sequence,
+                                      bool has_sparse_sequence) noexcept {
 
   if (!generators.empty() || has_sparse_sequence) {
     sqcnv::compute_commitments_gpu(commitments, value_sequences, generators);
@@ -64,8 +64,8 @@ void naive_gpu_backend::compute_commitments(
 //--------------------------------------------------------------------------------------------------
 // get_generators
 //--------------------------------------------------------------------------------------------------
-void naive_gpu_backend::get_generators(basct::span<c21t::element_p3> generators,
-                                       uint64_t offset_generators) noexcept {
+void gpu_backend::get_generators(basct::span<c21t::element_p3> generators,
+                                 uint64_t offset_generators) noexcept {
   std::vector<c21t::element_p3> temp_generators_data;
   auto precomputed_generators = sqcgn::get_precomputed_generators(
       temp_generators_data, generators.size(), offset_generators, true);
@@ -73,11 +73,11 @@ void naive_gpu_backend::get_generators(basct::span<c21t::element_p3> generators,
 }
 
 //--------------------------------------------------------------------------------------------------
-// get_naive_gpu_backend
+// get_gpu_backend
 //--------------------------------------------------------------------------------------------------
-naive_gpu_backend* get_naive_gpu_backend() {
+gpu_backend* get_gpu_backend() {
   // see https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
-  static naive_gpu_backend* backend = new naive_gpu_backend{};
+  static gpu_backend* backend = new gpu_backend{};
   return backend;
 }
-} // namespace sxt::sqcbck
+} // namespace sxt::cbnbck

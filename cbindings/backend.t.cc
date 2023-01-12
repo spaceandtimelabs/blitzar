@@ -1,4 +1,4 @@
-#include "sxt/cbindings/backend.h"
+#include "cbindings/backend.h"
 
 #include "sxt/base/test/unit_test.h"
 
@@ -40,14 +40,10 @@ static void test_backend_initialization(int backend) {
   }
 }
 
-TEST_CASE("We can correctly initialize the naive cpu backend") {
-  test_backend_initialization(SXT_NAIVE_BACKEND_CPU);
-}
-
 TEST_CASE("We can correctly initialize the naive gpu backend") {
-  test_backend_initialization(SXT_NAIVE_BACKEND_GPU);
+  test_backend_initialization(SXT_GPU_BACKEND);
 }
 
 TEST_CASE("We can correctly initialize the pippenger cpu backend") {
-  test_backend_initialization(SXT_PIPPENGER_BACKEND_CPU);
+  test_backend_initialization(SXT_CPU_BACKEND);
 }

@@ -1,10 +1,10 @@
-#include "sxt/cbindings/get_generators.h"
+#include "cbindings/get_generators.h"
 
 #include <cassert>
 #include <vector>
 
+#include "cbindings/backend.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/cbindings/backend.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
@@ -97,14 +97,10 @@ static void test_generators_with_given_backend(int backend) {
   }
 }
 
-TEST_CASE("We can correctly get generators using the naive cpu backend") {
-  test_generators_with_given_backend(SXT_NAIVE_BACKEND_CPU);
-}
-
 TEST_CASE("We can correctly get generators using the naive gpu backend") {
-  test_generators_with_given_backend(SXT_NAIVE_BACKEND_GPU);
+  test_generators_with_given_backend(SXT_GPU_BACKEND);
 }
 
 TEST_CASE("We can correctly get generators using the pippenger cpu backend") {
-  test_generators_with_given_backend(SXT_PIPPENGER_BACKEND_CPU);
+  test_generators_with_given_backend(SXT_CPU_BACKEND);
 }

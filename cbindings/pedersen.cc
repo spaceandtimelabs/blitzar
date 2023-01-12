@@ -1,8 +1,8 @@
-#include "sxt/cbindings/pedersen.h"
+#include "cbindings/pedersen.h"
 
 #include <iostream>
 
-#include "sxt/cbindings/backend.h"
+#include "cbindings/backend.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"

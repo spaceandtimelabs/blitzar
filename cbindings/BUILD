@@ -33,7 +33,7 @@ cc_binary(
 )
 
 sxt_cc_component(
-    name = "pedersen_capi",
+    name = "proofs_gpu_api",
     with_test = False,
 )
 
@@ -41,17 +41,16 @@ sxt_cc_component(
     name = "backend",
     impl_deps = [
         "//sxt/base/device:property",
-        "//sxt/seqcommit/backend:naive_cpu_backend",
-        "//sxt/seqcommit/backend:naive_gpu_backend",
-        "//sxt/seqcommit/backend:pippenger_cpu_backend",
+        "//sxt/cbindings/backend:gpu_backend",
+        "//sxt/cbindings/backend:cpu_backend",
         "//sxt/seqcommit/generator:precomputed_initializer",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        ":pedersen_capi",
-        "//sxt/seqcommit/backend:pedersen_backend",
+        ":proofs_gpu_api",
+        "//sxt/cbindings/backend:computational_backend",
     ],
     alwayslink = 1,
 )
@@ -69,7 +68,7 @@ sxt_cc_component(
         "//sxt/seqcommit/generator:base_element",
     ],
     deps = [
-        ":pedersen_capi",
+        ":proofs_gpu_api",
     ],
     alwayslink = 1,
 )
@@ -90,7 +89,7 @@ sxt_cc_component(
         "//sxt/curve21/operation:add",
     ],
     deps = [
-        ":pedersen_capi",
+        ":proofs_gpu_api",
     ],
     alwayslink = 1,
 )
@@ -114,7 +113,7 @@ sxt_cc_component(
         "//sxt/seqcommit/generator:base_element",
     ],
     deps = [
-        ":pedersen_capi",
+        ":proofs_gpu_api",
     ],
     alwayslink = 1,
 )

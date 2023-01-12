@@ -1,8 +1,8 @@
-#include "sxt/cbindings/get_one_commit.h"
+#include "cbindings/get_one_commit.h"
 
 #include <iostream>
 
-#include "sxt/cbindings/backend.h"
+#include "cbindings/backend.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/seqcommit/generator/precomputed_one_commitments.h"
 

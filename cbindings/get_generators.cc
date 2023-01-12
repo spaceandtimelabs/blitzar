@@ -1,8 +1,8 @@
-#include "sxt/cbindings/get_generators.h"
+#include "cbindings/get_generators.h"
 
 #include <iostream>
 
-#include "sxt/cbindings/backend.h"
+#include "cbindings/backend.h"
 #include "sxt/curve21/type/element_p3.h"
 
 using namespace sxt;
