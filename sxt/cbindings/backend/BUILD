@@ -17,6 +17,8 @@ sxt_cc_component(
 sxt_cc_component(
     name = "gpu_backend",
     impl_deps = [
+        "//sxt/proof/transcript:transcript",
+        "//sxt/scalar25/type:element",
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
         "//sxt/ristretto/type:compressed_element",
@@ -24,6 +26,9 @@ sxt_cc_component(
         "//sxt/seqcommit/naive:commitment_computation_gpu",
         "//sxt/seqcommit/generator:gpu_generator",
         "//sxt/seqcommit/generator:precomputed_generators",
+        "//sxt/proof/inner_product:proof_descriptor",
+        "//sxt/proof/inner_product:proof_computation",
+        "//sxt/proof/inner_product:cpu_driver",
     ],
     with_test = False,
     deps = [
@@ -35,6 +40,8 @@ sxt_cc_component(
 sxt_cc_component(
     name = "cpu_backend",
     impl_deps = [
+        "//sxt/proof/transcript:transcript",
+        "//sxt/scalar25/type:element",
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
         "//sxt/ristretto/type:compressed_element",
@@ -47,6 +54,9 @@ sxt_cc_component(
         "//sxt/multiexp/pippenger:multiexponentiation",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/seqcommit/naive:commitment_computation_cpu",
+        "//sxt/proof/inner_product:proof_descriptor",
+        "//sxt/proof/inner_product:proof_computation",
+        "//sxt/proof/inner_product:cpu_driver",
     ],
     with_test = False,
     deps = [

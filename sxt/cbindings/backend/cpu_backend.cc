@@ -10,7 +10,12 @@
 #include "sxt/multiexp/ristretto/multiexponentiation_cpu_driver.h"
 #include "sxt/multiexp/ristretto/pippenger_multiproduct_solver.h"
 #include "sxt/multiexp/ristretto/precomputed_p3_input_accessor.h"
+#include "sxt/proof/inner_product/cpu_driver.h"
+#include "sxt/proof/inner_product/proof_computation.h"
+#include "sxt/proof/inner_product/proof_descriptor.h"
+#include "sxt/proof/transcript/transcript.h"
 #include "sxt/ristretto/type/compressed_element.h"
+#include "sxt/scalar25/type/element.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/cpu_generator.h"
 #include "sxt/seqcommit/generator/precomputed_generators.h"
@@ -38,7 +43,7 @@ void cpu_backend::compute_commitments(basct::span<rstt::compressed_element> comm
                                       basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
                                       basct::cspan<c21t::element_p3> generators,
                                       uint64_t length_longest_sequence,
-                                      bool has_sparse_sequence) noexcept {
+                                      bool has_sparse_sequence) const noexcept {
 
   memmg::managed_array<mtxb::exponent_sequence> exponents(value_sequences.size());
 
@@ -72,11 +77,38 @@ void cpu_backend::compute_commitments(basct::span<rstt::compressed_element> comm
 // get_generators
 //--------------------------------------------------------------------------------------------------
 void cpu_backend::get_generators(basct::span<c21t::element_p3> generators,
-                                 uint64_t offset_generators) noexcept {
+                                 uint64_t offset_generators) const noexcept {
   std::vector<c21t::element_p3> temp_generators_data;
   auto precomputed_generators = sqcgn::get_precomputed_generators(
       temp_generators_data, generators.size(), offset_generators, false);
   std::copy_n(precomputed_generators.begin(), generators.size(), generators.data());
+}
+
+//--------------------------------------------------------------------------------------------------
+// prove_inner_product
+//--------------------------------------------------------------------------------------------------
+void cpu_backend::prove_inner_product(basct::span<rstt::compressed_element> l_vector,
+                                      basct::span<rstt::compressed_element> r_vector,
+                                      s25t::element& ap_value, prft::transcript& transcript,
+                                      const prfip::proof_descriptor& descriptor,
+                                      basct::cspan<s25t::element> a_vector) const noexcept {
+  prfip::cpu_driver drv;
+  prfip::prove_inner_product(l_vector, r_vector, ap_value, transcript, drv, descriptor, a_vector);
+}
+
+//--------------------------------------------------------------------------------------------------
+// verify_inner_product
+//--------------------------------------------------------------------------------------------------
+bool cpu_backend::verify_inner_product(prft::transcript& transcript,
+                                       const prfip::proof_descriptor& descriptor,
+                                       const s25t::element& product,
+                                       const c21t::element_p3& a_commit,
+                                       basct::cspan<rstt::compressed_element> l_vector,
+                                       basct::cspan<rstt::compressed_element> r_vector,
+                                       const s25t::element& ap_value) const noexcept {
+  prfip::cpu_driver drv;
+  return prfip::verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector,
+                                     r_vector, ap_value);
 }
 
 //--------------------------------------------------------------------------------------------------
