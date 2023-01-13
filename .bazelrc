@@ -7,6 +7,18 @@ build --copt -fPIC
 build:asan --copt -fsanitize=address
 build:asan --linkopt -fsanitize=address
 
+# For asan to work with cuda, we need to add this option
+# See https://github.com/google/sanitizers/issues/629#issuecomment-161357276
+test:asan --action_env=ASAN_OPTIONS=protect_shadow_gap=0
+run:asan --action_env=ASAN_OPTIONS=protect_shadow_gap=0
+
+# Hack to add suppressions for libcuda
+# See https://github.com/bazelbuild/bazel/issues/3216
+#     https://stackoverflow.com/a/74297943
+build:asan --workspace_status_command=./ci/lsan_hack.sh
+run:asan --action_env=LSAN_OPTIONS=suppressions=/tmp/sxt-proofs-gpu-lsan.supp
+test:asan --action_env=LSAN_OPTIONS=suppressions=/tmp/sxt-proofs-gpu-lsan.supp
+
 build:cuda --crosstool_top=@local_config_cuda//crosstool:toolchain
 build:cuda --define=using_cuda=true --define=using_cuda_nvcc=true --define=using_cuda_clang=false
 
