@@ -13,6 +13,7 @@ cuda_dlink(
         ":backend",
         ":get_generators",
         ":get_one_commit",
+        ":inner_product",
         ":pedersen",
     ],
 )
@@ -111,6 +112,37 @@ sxt_cc_component(
         "//sxt/ristretto/operation:scalar_multiply",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",
+    ],
+    deps = [
+        ":proofs_gpu_api",
+    ],
+    alwayslink = 1,
+)
+
+sxt_cc_component(
+    name = "inner_product",
+    impl_deps = [
+        ":backend",
+        "//sxt/base/container:span",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/proof/inner_product:proof_descriptor",
+        "//sxt/seqcommit/generator:precomputed_generators",
+    ],
+    test_deps = [
+        ":backend",
+        ":get_generators",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:element",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/proof/transcript:transcript",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/scalar25/type:literal",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/curve21/operation:overload",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/scalar25/random:element",
     ],
     deps = [
         ":proofs_gpu_api",
