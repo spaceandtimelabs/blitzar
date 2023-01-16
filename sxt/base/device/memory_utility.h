@@ -32,4 +32,9 @@ void async_memcpy_host_to_device(void* dst, const void* src, size_t count,
 //--------------------------------------------------------------------------------------------------
 void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
                                  cudaStream_t stream) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// memset_device
+//--------------------------------------------------------------------------------------------------
+void memset_device(void* dst, int value, size_t count) noexcept;
 } // namespace sxt::basdv

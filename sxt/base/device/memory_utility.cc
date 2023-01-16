@@ -62,4 +62,15 @@ void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
     std::abort();
   }
 }
+
+//--------------------------------------------------------------------------------------------------
+// memset_device
+//--------------------------------------------------------------------------------------------------
+void memset_device(void* dst, int value, size_t count) noexcept {
+  auto rcode = cudaMemset(dst, value, count);
+  if (rcode != cudaSuccess) {
+    std::cerr << "cudaMemset failed: " << cudaGetErrorString(rcode) << "\n";
+    std::abort();
+  }
+}
 } // namespace sxt::basdv

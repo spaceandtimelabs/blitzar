@@ -282,6 +282,12 @@ void compute_commitments_gpu(basct::span<rstt::compressed_element> commitments,
   memmg::managed_array<rstt::compressed_element> commitments_device(commitments.size(),
                                                                     memr::get_device_resource());
 
+  // we need to initialize all commitment sequence memory to zero,
+  // given that `launch_commitment_kernels` will not launch kernels
+  // for zero-length sequences
+  basdv::memset_device(commitments_device.data(), 0,
+                       commitments_device.size() * sizeof(rstt::compressed_element));
+
   // compute all the commitments
   // for each one of the sequences in
   // `value_sequences` span

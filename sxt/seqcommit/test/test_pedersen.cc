@@ -66,6 +66,27 @@ void test_pedersen_compute_commitment(
     }
   }
 
+  SECTION("We can correctly compute commitments for a sequence with zero length") {
+    const uint64_t num_rows = 0;
+    const uint64_t num_sequences = 1;
+    const uint8_t element_nbytes = sizeof(int);
+
+    basct::span<c21t::element_p3> empty_generators;
+    rstt::compressed_element commitments_data{123, 2};
+    sqcb::indexed_exponent_sequence sequences;
+    basct::span<rstt::compressed_element> commitments(&commitments_data, num_sequences);
+    basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(&sequences, num_sequences);
+
+    // populating sequence object
+    sequences.exponent_sequence.n = num_rows;
+    sequences.exponent_sequence.data = nullptr;
+    sequences.exponent_sequence.element_nbytes = element_nbytes;
+
+    f(commitments, value_sequences, empty_generators);
+
+    REQUIRE(sxt::rstt::compressed_element() == commitments_data);
+  }
+
   SECTION("We can add 3 * g as well as g + g + g") {
     const uint64_t num_rows = 1;
     const uint64_t num_sequences = 4;
