@@ -1,32 +1,32 @@
 #pragma once
 
 struct CUstream_st;
-typedef CUstream_st* cudaStream_t;
 
-namespace sxt::basdv {
+namespace sxt::xenb {
+struct stream_handle;
+
 //--------------------------------------------------------------------------------------------------
 // stream
 //--------------------------------------------------------------------------------------------------
+/**
+ * Wrapper around a pooled CUDA stream.
+ */
 class stream {
 public:
-  // constructor
   stream() noexcept;
+  stream(stream&& other) noexcept;
 
   ~stream() noexcept;
 
-  /* Prohibits from receiving another stream */
-  stream(const stream& other) = delete;
-
-  stream(stream&& other) = delete;
-
-  stream& operator=(stream&&) = delete;
-
+  stream(const stream&) = delete;
   stream& operator=(const stream&) = delete;
+  stream& operator=(stream&& other) noexcept;
 
-  cudaStream_t raw_stream() noexcept { return stream_; }
+  stream_handle* release_handle() noexcept;
+
+  CUstream_st* raw_stream() const noexcept;
 
 private:
-  cudaStream_t stream_;
+  stream_handle* handle_;
 };
-
-} // namespace sxt::basdv
+} // namespace sxt::xenb

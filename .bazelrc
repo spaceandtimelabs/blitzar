@@ -49,3 +49,5 @@ build --action_env TMP="/tmp"
 # for more information.
 # To fix the problem, we added the following line:
 build --sandbox_add_mount_pair=.:/tmp
+
+test --test_output=errors

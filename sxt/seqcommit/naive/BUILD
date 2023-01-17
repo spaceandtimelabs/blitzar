@@ -25,8 +25,8 @@ sxt_cc_component(
     name = "commitment_computation_gpu",
     impl_deps = [
         "//sxt/base/device:memory_utility",
-        "//sxt/base/device:stream",
         "//sxt/base/num:divide_up",
+        "//sxt/execution/base:stream",
         "//sxt/curve21/constant:zero",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",
