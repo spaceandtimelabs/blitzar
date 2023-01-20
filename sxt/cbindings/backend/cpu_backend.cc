@@ -1,8 +1,7 @@
 #include "sxt/cbindings/backend/cpu_backend.h"
 
-#include <algorithm>
-#include <cassert>
 #include <cstring>
+#include <vector>
 
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
@@ -74,14 +73,12 @@ void cpu_backend::compute_commitments(basct::span<rstt::compressed_element> comm
 }
 
 //--------------------------------------------------------------------------------------------------
-// get_generators
+// get_precomputed_generators
 //--------------------------------------------------------------------------------------------------
-void cpu_backend::get_generators(basct::span<c21t::element_p3> generators,
-                                 uint64_t offset_generators) const noexcept {
-  std::vector<c21t::element_p3> temp_generators_data;
-  auto precomputed_generators = sqcgn::get_precomputed_generators(
-      temp_generators_data, generators.size(), offset_generators, false);
-  std::copy_n(precomputed_generators.begin(), generators.size(), generators.data());
+basct::cspan<c21t::element_p3>
+cpu_backend::get_precomputed_generators(std::vector<c21t::element_p3>& temp_generators, uint64_t n,
+                                        uint64_t offset_generators) const noexcept {
+  return sqcgn::get_precomputed_generators(temp_generators, n, offset_generators, false);
 }
 
 //--------------------------------------------------------------------------------------------------

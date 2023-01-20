@@ -133,7 +133,6 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
         "//sxt/base/error:assert",
         "//sxt/proof/inner_product:proof_descriptor",
-        "//sxt/seqcommit/generator:precomputed_generators",
     ],
     test_deps = [
         ":backend",

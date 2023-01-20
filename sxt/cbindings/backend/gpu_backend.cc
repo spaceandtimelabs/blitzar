@@ -1,6 +1,6 @@
 #include "sxt/cbindings/backend/gpu_backend.h"
 
-#include <algorithm>
+#include <vector>
 
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
@@ -67,14 +67,12 @@ void gpu_backend::compute_commitments(basct::span<rstt::compressed_element> comm
 }
 
 //--------------------------------------------------------------------------------------------------
-// get_generators
+// get_precomputed_generators
 //--------------------------------------------------------------------------------------------------
-void gpu_backend::get_generators(basct::span<c21t::element_p3> generators,
-                                 uint64_t offset_generators) const noexcept {
-  std::vector<c21t::element_p3> temp_generators_data;
-  auto precomputed_generators = sqcgn::get_precomputed_generators(
-      temp_generators_data, generators.size(), offset_generators, true);
-  std::copy_n(precomputed_generators.begin(), generators.size(), generators.data());
+basct::cspan<c21t::element_p3>
+gpu_backend::get_precomputed_generators(std::vector<c21t::element_p3>& temp_generators, uint64_t n,
+                                        uint64_t offset_generators) const noexcept {
+  return sqcgn::get_precomputed_generators(temp_generators, n, offset_generators, true);
 }
 
 //--------------------------------------------------------------------------------------------------

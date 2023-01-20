@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cinttypes>
+#include <vector>
 
 #include "sxt/base/container/span.h"
 
@@ -41,8 +42,9 @@ public:
                                    uint64_t longest_sequence,
                                    bool has_sparse_sequence) const noexcept = 0;
 
-  virtual void get_generators(basct::span<c21t::element_p3> generators,
-                              uint64_t offset_generators) const noexcept = 0;
+  virtual basct::cspan<c21t::element_p3>
+  get_precomputed_generators(std::vector<c21t::element_p3>& temp_generators, uint64_t n,
+                             uint64_t offset_generators) const noexcept = 0;
 
   virtual void prove_inner_product(basct::span<rstt::compressed_element> l_vector,
                                    basct::span<rstt::compressed_element> r_vector,

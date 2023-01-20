@@ -1,6 +1,8 @@
 #include "cbindings/get_generators.h"
 
+#include <algorithm>
 #include <iostream>
+#include <vector>
 
 #include "cbindings/backend.h"
 #include "sxt/base/error/assert.h"
@@ -28,11 +30,13 @@ int sxt_get_generators(struct sxt_ristretto* generators, uint64_t num_generators
     return 1;
   }
 
-  basct::span<c21t::element_p3> generators_result(reinterpret_cast<c21t::element_p3*>(generators),
-                                                  num_generators);
-
   auto backend = sxt::cbn::get_backend();
-  backend->get_generators(generators_result, offset_generators);
+
+  std::vector<c21t::element_p3> temp_generators;
+  auto precomputed_generators =
+      backend->get_precomputed_generators(temp_generators, num_generators, offset_generators);
+  std::copy_n(precomputed_generators.begin(), num_generators,
+              reinterpret_cast<c21t::element_p3*>(generators));
 
   return 0;
 }

@@ -8,7 +8,6 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
-#include "sxt/seqcommit/generator/precomputed_generators.h"
 
 using namespace sxt;
 
@@ -21,7 +20,6 @@ static void check_prove_inner_product_input(sxt_compressed_ristretto* l_vector,
                                             sxt_scalar* ap_value, sxt_transcript* transcript,
                                             uint64_t n, const sxt_scalar* b_vector,
                                             const sxt_scalar* a_vector) noexcept {
-
   SXT_RELEASE_ASSERT(
       transcript != nullptr,
       "transcript must not be null in the `sxt_prove_inner_product` c binding function");
@@ -50,7 +48,6 @@ static void check_verify_inner_product_input(sxt_transcript* transcript, uint64_
                                              const sxt_compressed_ristretto* l_vector,
                                              const sxt_compressed_ristretto* r_vector,
                                              const sxt_scalar* ap_value) noexcept {
-
   SXT_RELEASE_ASSERT(
       transcript != nullptr,
       "transcript must not be null in the `sxt_verify_inner_product` c binding function");
@@ -90,21 +87,17 @@ void sxt_prove_inner_product(struct sxt_compressed_ristretto* l_vector,
   auto n_lg2 = static_cast<size_t>(basn::ceil_log2(n));
   auto np = 1ull << n_lg2;
 
-  // Note: it's inefficient calling `get_precomputed_generators` with
-  // `use_gpu` set to false in case both `generators_offset + n > precomputed_elements_n`
-  // and `SXT_GPU_BACKEND` is set to false. The execution would be slower than necessary.
-  // However, if the backend is properly configured to use the right number of
-  // `precomputed_elements_n`, then this call shouldn't matter.
-  std::vector<c21t::element_p3> temp_generators_data;
+  auto backend = sxt::cbn::get_backend();
+
+  std::vector<c21t::element_p3> temp_generators;
   auto precomputed_generators =
-      sqcgn::get_precomputed_generators(temp_generators_data, np + 1, generators_offset, false);
+      backend->get_precomputed_generators(temp_generators, np + 1, generators_offset);
 
   prfip::proof_descriptor descriptor{
       .b_vector = {reinterpret_cast<const s25t::element*>(b_vector), n},
       .g_vector = {precomputed_generators.data(), np},
       .q_value = precomputed_generators.data() + np};
 
-  auto backend = sxt::cbn::get_backend();
   backend->prove_inner_product({reinterpret_cast<rstt::compressed_element*>(l_vector), n_lg2},
                                {reinterpret_cast<rstt::compressed_element*>(r_vector), n_lg2},
                                *reinterpret_cast<s25t::element*>(ap_value),
@@ -129,21 +122,17 @@ int sxt_verify_inner_product(struct sxt_transcript* transcript, uint64_t n,
   auto n_lg2 = static_cast<size_t>(basn::ceil_log2(n));
   auto np = 1ull << n_lg2;
 
-  // Note: it's inefficient calling `get_precomputed_generators` with
-  // `use_gpu` set to false in case both `generators_offset + n > precomputed_elements_n`
-  // and `SXT_GPU_BACKEND` is set to false. The execution would be slower than necessary.
-  // However, if the backend is properly configured to use the right number of
-  // `precomputed_elements_n`, then this call shouldn't matter.
-  std::vector<c21t::element_p3> temp_generators_data;
+  auto backend = sxt::cbn::get_backend();
+
+  std::vector<c21t::element_p3> temp_generators;
   auto precomputed_generators =
-      sqcgn::get_precomputed_generators(temp_generators_data, np + 1, generators_offset, false);
+      backend->get_precomputed_generators(temp_generators, np + 1, generators_offset);
 
   prfip::proof_descriptor descriptor{
       .b_vector = {reinterpret_cast<const s25t::element*>(b_vector), n},
       .g_vector = {precomputed_generators.data(), np},
       .q_value = precomputed_generators.data() + np};
 
-  auto backend = sxt::cbn::get_backend();
   auto res = backend->verify_inner_product(
       *reinterpret_cast<prft::transcript*>(transcript), descriptor,
       *reinterpret_cast<const s25t::element*>(product),
