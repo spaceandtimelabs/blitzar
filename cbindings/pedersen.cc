@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "cbindings/backend.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/base/indexed_exponent_sequence.h"
@@ -55,14 +56,9 @@ static int process_compute_pedersen_commitments(struct sxt_compressed_ristretto*
                                                 uint32_t num_sequences,
                                                 const struct sxt_sequence_descriptor* descriptors,
                                                 const struct sxt_ristretto* generators) {
-
-  // backend not initialized (sxt_init not called correctly)
-  if (!sxt::cbn::is_backend_initialized()) {
-    std::cerr
-        << "ABORT: backend uninitialized in the `process_compute_pedersen_commitments` function"
-        << std::endl;
-    std::abort();
-  }
+  SXT_RELEASE_ASSERT(
+      sxt::cbn::is_backend_initialized(),
+      "backend uninitialized in the `process_compute_pedersen_commitments` function");
 
   if (num_sequences == 0)
     return 0;

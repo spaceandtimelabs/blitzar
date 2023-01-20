@@ -5,6 +5,9 @@ load(
 
 sxt_cc_component(
     name = "active_count",
+    impl_deps = [
+        "//sxt/base/error:assert",
+    ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
@@ -15,6 +18,9 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "active_offset",
+    impl_deps = [
+        "//sxt/base/error:assert",
+    ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
@@ -42,6 +48,8 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/index:clump2_descriptor",
         "//sxt/multiexp/index:clump2_marker_utility",
+        "//sxt/base/error:assert",
+        "//sxt/base/error:panic",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
@@ -130,6 +138,7 @@ sxt_cc_component(
         "//sxt/base/container:span_void",
         "//sxt/base/iterator:counting_iterator",
         "//sxt/multiexp/index:index_table",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         ":multiproduct_params",
@@ -188,6 +197,7 @@ sxt_cc_component(
     impl_deps = [
         ":active_count",
         "//sxt/base/iterator:counting_iterator",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",

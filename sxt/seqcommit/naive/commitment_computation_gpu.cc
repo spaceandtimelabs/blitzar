@@ -1,9 +1,9 @@
 #include "sxt/seqcommit/naive/commitment_computation_gpu.h"
 
-#include <cassert>
 #include <vector>
 
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
@@ -36,8 +36,8 @@ static void get_value_sequence_size(uint64_t& sequence_size, uint64_t& total_num
   for (size_t c = 0; c < value_sequences.size(); ++c) {
     auto& data_commitment = value_sequences[c];
 
-    assert(data_commitment.exponent_sequence.element_nbytes > 0 &&
-           data_commitment.exponent_sequence.element_nbytes <= 32);
+    SXT_DEBUG_ASSERT(data_commitment.exponent_sequence.element_nbytes > 0 &&
+                     data_commitment.exponent_sequence.element_nbytes <= 32);
 
     biggest_n = max(biggest_n, data_commitment.exponent_sequence.n);
     total_num_indices +=
@@ -186,7 +186,7 @@ launch_commitment_kernels(memmg::managed_array<rstt::compressed_element>& commit
   if (generators.size() > 0) {
     gens_dev_ptr = generators_device.data();
 
-    assert(generators.size() >= biggest_n);
+    SXT_DEBUG_ASSERT(generators.size() >= biggest_n);
 
     // we are assuming that we always have: generators.size() >= biggest_n
     basdv::memcpy_host_to_device(gens_dev_ptr, generators.data(),
@@ -276,7 +276,7 @@ launch_commitment_kernels(memmg::managed_array<rstt::compressed_element>& commit
 void compute_commitments_gpu(basct::span<rstt::compressed_element> commitments,
                              basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
                              basct::cspan<c21t::element_p3> generators) noexcept {
-  assert(commitments.size() == value_sequences.size());
+  SXT_DEBUG_ASSERT(commitments.size() == value_sequences.size());
 
   // allocates memory to commitments in the device
   memmg::managed_array<rstt::compressed_element> commitments_device(commitments.size(),

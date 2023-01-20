@@ -1,11 +1,12 @@
 #include <chrono>
-#include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <string_view>
 
 #include "benchmark/multi_exp1/multi_exp_cpu.h"
 #include "benchmark/multi_exp1/multi_exp_gpu.h"
+#include "sxt/base/error/panic.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 
@@ -20,8 +21,8 @@ static bench_fn select_backend_fn(const std::string_view backend) noexcept {
   if (backend == "gpu") {
     return multi_exp_gpu;
   }
-  std::cerr << "invalid backend: " << backend << "\n";
-  std::abort();
+
+  baser::panic("invalid backend: " + std::string(backend));
 }
 
 int main(int argc, char* argv[]) {

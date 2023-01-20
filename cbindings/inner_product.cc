@@ -5,6 +5,7 @@
 
 #include "cbindings/backend.h"
 #include "sxt/base/container/span.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/seqcommit/generator/precomputed_generators.h"
@@ -21,40 +22,23 @@ static void check_prove_inner_product_input(sxt_compressed_ristretto* l_vector,
                                             uint64_t n, const sxt_scalar* b_vector,
                                             const sxt_scalar* a_vector) noexcept {
 
-  if (transcript == nullptr) {
-    std::cerr
-        << "ABORT: transcript must not be null in the `sxt_prove_inner_product` c binding function"
-        << std::endl;
-    std::abort();
-  }
-
-  if (ap_value == nullptr) {
-    std::cerr
-        << "ABORT: ap_value must not be null in the `sxt_prove_inner_product` c binding function"
-        << std::endl;
-    std::abort();
-  }
-
-  if (b_vector == nullptr || a_vector == nullptr) {
-    std::cerr << "ABORT: a_vector and b_vector must not be null in the `sxt_prove_inner_product` c "
-                 "binding function"
-              << std::endl;
-    std::abort();
-  }
-
-  if (n == 0) {
-    std::cerr << "ABORT: a_vector and b_vector lengths must be greater than zero in the "
-                 "`sxt_prove_inner_product` c binding function"
-              << std::endl;
-    std::abort();
-  }
-
-  if (n > 1 && (l_vector == nullptr || r_vector == nullptr)) {
-    std::cerr << "ABORT: l_vector and r_vector lengths must not be null when a_vector "
-              << "size is bigger than one in the `sxt_prove_inner_product` c binding function"
-              << std::endl;
-    std::abort();
-  }
+  SXT_RELEASE_ASSERT(
+      transcript != nullptr,
+      "transcript must not be null in the `sxt_prove_inner_product` c binding function");
+  SXT_RELEASE_ASSERT(
+      ap_value != nullptr,
+      "ap_value must not be null in the `sxt_prove_inner_product` c binding function");
+  SXT_RELEASE_ASSERT(
+      b_vector != nullptr,
+      "b_vector must not be null in the `sxt_prove_inner_product` c binding function");
+  SXT_RELEASE_ASSERT(
+      a_vector != nullptr,
+      "a_vector must not be null in the `sxt_prove_inner_product` c binding function");
+  SXT_RELEASE_ASSERT(n > 0, "a_vector and b_vector lengths must be greater than zero in the "
+                            "`sxt_prove_inner_product` c binding function");
+  SXT_RELEASE_ASSERT(n == 1 || (l_vector != nullptr && r_vector != nullptr),
+                     "l_vector and r_vector lengths must not be null when a_vector size is bigger "
+                     "than one in the `sxt_prove_inner_product` c binding function");
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -67,54 +51,27 @@ static void check_verify_inner_product_input(sxt_transcript* transcript, uint64_
                                              const sxt_compressed_ristretto* r_vector,
                                              const sxt_scalar* ap_value) noexcept {
 
-  if (transcript == nullptr) {
-    std::cerr
-        << "ABORT: transcript must not be null in the `sxt_verify_inner_product` c binding function"
-        << std::endl;
-    std::abort();
-  }
-
-  if (ap_value == nullptr) {
-    std::cerr
-        << "ABORT: ap_value must not be null in the `sxt_verify_inner_product` c binding function"
-        << std::endl;
-    std::abort();
-  }
-
-  if (product == nullptr) {
-    std::cerr
-        << "ABORT: product must not be null in the `sxt_verify_inner_product` c binding function"
-        << std::endl;
-    std::abort();
-  }
-
-  if (a_commit == nullptr) {
-    std::cerr
-        << "ABORT: a_commit must not be null in the `sxt_verify_inner_product` c binding function"
-        << std::endl;
-    std::abort();
-  }
-
-  if (b_vector == nullptr) {
-    std::cerr
-        << "ABORT: b_vector must not be null in the `sxt_verify_inner_product` c binding function"
-        << std::endl;
-    std::abort();
-  }
-
-  if (n == 0) {
-    std::cerr << "ABORT: a_vector and b_vector lengths must be greater than zero in the "
-                 "`sxt_verify_inner_product` c binding function"
-              << std::endl;
-    std::abort();
-  }
-
-  if (n > 1 && (l_vector == nullptr || r_vector == nullptr)) {
-    std::cerr << "ABORT: l_vector and r_vector lengths must not be null when a_vector "
-              << "size is bigger than one in the `sxt_verify_inner_product` c binding function"
-              << std::endl;
-    std::abort();
-  }
+  SXT_RELEASE_ASSERT(
+      transcript != nullptr,
+      "transcript must not be null in the `sxt_verify_inner_product` c binding function");
+  SXT_RELEASE_ASSERT(
+      ap_value != nullptr,
+      "ap_value must not be null in the `sxt_verify_inner_product` c binding function");
+  SXT_RELEASE_ASSERT(
+      product != nullptr,
+      "product must not be null in the `sxt_verify_inner_product` c binding function");
+  SXT_RELEASE_ASSERT(
+      a_commit != nullptr,
+      "a_commit must not be null in the `sxt_verify_inner_product` c binding function");
+  SXT_RELEASE_ASSERT(
+      b_vector != nullptr,
+      "b_vector must not be null in the `sxt_verify_inner_product` c binding function");
+  SXT_RELEASE_ASSERT(n > 0, "b_vector length must be greater than zero in the "
+                            "`sxt_verify_inner_product` c binding function");
+  SXT_RELEASE_ASSERT(
+      n == 1 || (l_vector != nullptr && r_vector != nullptr),
+      "l_vector and r_vector lengths must not be null when a_vector "
+      "size is bigger than one in the `sxt_verify_inner_product` c binding function");
 }
 
 } // namespace sxt::cbn

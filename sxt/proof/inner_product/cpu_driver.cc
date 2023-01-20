@@ -1,10 +1,10 @@
 #include "sxt/proof/inner_product/cpu_driver.h"
 
 #include <algorithm>
-#include <cassert>
 #include <memory>
 #include <memory_resource>
 
+#include "sxt/base/error/assert.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
@@ -76,7 +76,7 @@ cpu_driver::make_workspace(const proof_descriptor& descriptor,
                            basct::cspan<s25t::element> a_vector) const noexcept {
   auto n = a_vector.size();
   auto np_half = descriptor.g_vector.size() / 2;
-  assert(n > 1);
+  SXT_DEBUG_ASSERT(n > 1);
 
   auto res = std::make_unique<cpu_workspace>();
   res->descriptor = &descriptor;
@@ -120,7 +120,7 @@ void cpu_driver::commit_to_fold(rstt::compressed_element& l_value,
     b_vector = work.b_vector;
   }
   auto mid = g_vector.size() / 2;
-  assert(mid > 0);
+  SXT_DEBUG_ASSERT(mid > 0);
 
   auto a_low = a_vector.subspan(0, mid);
   auto a_high = a_vector.subspan(mid);
@@ -167,7 +167,7 @@ void cpu_driver::fold(workspace& ws, const s25t::element& x) const noexcept {
     b_vector = work.b_vector;
   }
   auto mid = g_vector.size() / 2;
-  assert(mid > 0);
+  SXT_DEBUG_ASSERT(mid > 0);
 
   ++work.round_index;
 
@@ -200,7 +200,7 @@ void cpu_driver::compute_expected_commitment(rstt::compressed_element& commit,
   auto num_rounds = l_vector.size();
   auto np = descriptor.g_vector.size();
   // clang-format off
-  assert(
+  SXT_DEBUG_ASSERT(
     np > 0 &&
     l_vector.size() == num_rounds &&
     r_vector.size() == num_rounds &&

@@ -1,7 +1,6 @@
 #include "sxt/seqcommit/naive/commitment_computation_cpu.h"
 
-#include <cassert>
-
+#include "sxt/base/error/assert.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
@@ -20,7 +19,7 @@ void compute_commitments_cpu(basct::span<rstt::compressed_element> commitments,
                              basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
                              basct::cspan<c21t::element_p3> generators) noexcept {
 
-  assert(commitments.size() == value_sequences.size());
+  SXT_DEBUG_ASSERT(commitments.size() == value_sequences.size());
 
   for (size_t sequence_k = 0; sequence_k < commitments.size(); ++sequence_k) {
     c21t::element_p3 p_k = c21cn::zero_p3_v;

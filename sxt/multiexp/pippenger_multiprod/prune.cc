@@ -1,11 +1,11 @@
 #include "sxt/multiexp/pippenger_multiprod/prune.h"
 
 #include <algorithm>
-#include <cassert>
 #include <iterator>
 #include <utility>
 #include <vector>
 
+#include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/counting_iterator.h"
 #include "sxt/multiexp/pippenger_multiprod/active_count.h"
 
@@ -22,11 +22,11 @@ void prune_rows(basct::span<basct::span<uint64_t>> rows, std::vector<uint64_t>& 
     auto& row = rows[row_index];
     auto num_inactive_entries = row[1];
     auto num_active_entries = row.size() - 2 - num_inactive_entries;
-    assert(num_active_entries > 0);
+    SXT_DEBUG_ASSERT(num_active_entries > 0);
     for (size_t entry_index = 2 + num_inactive_entries; entry_index < row.size(); ++entry_index) {
       auto entry = row[entry_index];
       ++v1[entry];
-      assert(entry < max_active_counts.size());
+      SXT_DEBUG_ASSERT(entry < max_active_counts.size());
       max_active_counts[entry] = std::max(max_active_counts[entry], num_active_entries);
     }
   }
@@ -36,7 +36,7 @@ void prune_rows(basct::span<basct::span<uint64_t>> rows, std::vector<uint64_t>& 
   auto [sep, sep_p] = std::partition_copy(basit::counting_iterator<uint64_t>{0},
                                           basit::counting_iterator<uint64_t>{markers.size()},
                                           v2.begin(), v2.rbegin(), [&](size_t index) noexcept {
-                                            assert(v1[index] > 0);
+                                            SXT_DEBUG_ASSERT(v1[index] > 0);
                                             return v1[index] == 1 || max_active_counts[index] == 1;
                                           });
   auto deactivation_count = static_cast<size_t>(std::distance(v2.begin(), sep));

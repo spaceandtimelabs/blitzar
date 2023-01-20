@@ -1,7 +1,6 @@
 #include "sxt/proof/inner_product/fold.h"
 
-#include <cassert>
-
+#include "sxt/base/error/assert.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
@@ -18,8 +17,8 @@ namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
 void fold_scalars(basct::span<s25t::element>& xp_vector, basct::cspan<s25t::element> x_vector,
                   const s25t::element& m_low, const s25t::element& m_high, size_t mid) noexcept {
-  assert(x_vector.size() > mid && x_vector.size() <= 2 * mid);
-  assert(xp_vector.size() >= mid);
+  SXT_DEBUG_ASSERT(x_vector.size() > mid && x_vector.size() <= 2 * mid);
+  SXT_DEBUG_ASSERT(xp_vector.size() >= mid);
   xp_vector = xp_vector.subspan(0, mid);
   auto p = x_vector.size() - mid;
   for (size_t i = 0; i < p; ++i) {
@@ -41,8 +40,8 @@ void fold_scalars(basct::span<s25t::element>& xp_vector, basct::cspan<s25t::elem
 void fold_generators(basct::span<c21t::element_p3>& gp_vector,
                      basct::cspan<c21t::element_p3> g_vector, const s25t::element& m_low,
                      const s25t::element& m_high, size_t mid) noexcept {
-  assert(gp_vector.size() >= mid);
-  assert(g_vector.size() == 2 * mid);
+  SXT_DEBUG_ASSERT(gp_vector.size() >= mid);
+  SXT_DEBUG_ASSERT(g_vector.size() == 2 * mid);
   s25t::element m_values[] = {m_low, m_high};
   c21t::element_p3 g_values[2];
   mtxrs::precomputed_p3_input_accessor accessor{g_values};

@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "sxt/base/error/panic.h"
+
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // synchronize_stream
@@ -12,8 +14,7 @@ namespace sxt::basdv {
 void synchronize_stream(CUstream_st* stream) noexcept {
   auto rcode = cudaStreamSynchronize(stream);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaStreamSynchronize failed: " << cudaGetErrorString(rcode) << "\n";
-    std::abort();
+    baser::panic("cudaStreamSynchronize failed: " + std::string(cudaGetErrorString(rcode)));
   }
 }
 } // namespace sxt::basdv

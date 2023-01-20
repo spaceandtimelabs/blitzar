@@ -1,8 +1,7 @@
 #include "sxt/multiexp/base/digit_utility.h"
 
-#include <cassert>
-
 #include "sxt/base/bit/count.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/num/divide_up.h"
 
 namespace sxt::mtxb {
@@ -11,10 +10,10 @@ namespace sxt::mtxb {
 //--------------------------------------------------------------------------------------------------
 void extract_digit(basct::span<uint8_t> digit, basct::cspan<uint8_t> e, size_t radix_log2,
                    size_t digit_index) noexcept {
-  assert(digit.size() == basn::divide_up(radix_log2, 8ul));
+  SXT_DEBUG_ASSERT(digit.size() == basn::divide_up(radix_log2, 8ul));
   auto digit_num_bytes = digit.size();
   auto bit_first = radix_log2 * digit_index;
-  assert(e.size() * 8 > bit_first);
+  SXT_DEBUG_ASSERT(e.size() * 8 > bit_first);
   auto byte_first = bit_first / 8;
   auto offset = bit_first - 8 * byte_first;
   digit[0] = e[byte_first] >> offset;

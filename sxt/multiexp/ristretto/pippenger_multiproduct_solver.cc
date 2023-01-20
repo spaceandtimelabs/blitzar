@@ -1,7 +1,5 @@
 #include "sxt/multiexp/ristretto/pippenger_multiproduct_solver.h"
 
-#include <cassert>
-
 #include "sxt/base/container/span.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"

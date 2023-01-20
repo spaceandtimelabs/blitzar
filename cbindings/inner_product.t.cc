@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "cbindings/backend.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
@@ -58,7 +59,7 @@ static void generate_inner_product_input(std::vector<s25t::element>& a_vector,
 // test_prove_and_verify_with_given_n
 //--------------------------------------------------------------------------------------------------
 static void test_prove_and_verify_with_given_n(uint64_t n, uint64_t generators_offset) {
-  assert(n > 0);
+  SXT_DEBUG_ASSERT(n > 0);
 
   s25t::element ap_value;
   prft::transcript transcript{"abc"};

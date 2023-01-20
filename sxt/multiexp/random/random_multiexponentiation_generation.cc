@@ -1,7 +1,6 @@
 #include "sxt/multiexp/random/random_multiexponentiation_generation.h"
 
-#include <cassert>
-
+#include "sxt/base/error/assert.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"
 
@@ -22,9 +21,9 @@ void generate_random_multiexponentiation(
     std::uniform_int_distribution<uint8_t> exponent_gen(descriptor.min_exponent_num_bytes,
                                                         descriptor.max_exponent_num_bytes);
 
-    assert(descriptor.min_exponent_num_bytes > 0);
-    assert(descriptor.min_sequence_length <= descriptor.max_sequence_length);
-    assert(descriptor.min_exponent_num_bytes <= descriptor.max_exponent_num_bytes);
+    SXT_DEBUG_ASSERT(descriptor.min_exponent_num_bytes > 0);
+    SXT_DEBUG_ASSERT(descriptor.min_sequence_length <= descriptor.max_sequence_length);
+    SXT_DEBUG_ASSERT(descriptor.min_exponent_num_bytes <= descriptor.max_exponent_num_bytes);
 
     size_t sequence_length = sequence_gen(rng);
     uint8_t exponent_length = exponent_gen(rng);

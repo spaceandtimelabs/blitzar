@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "cbindings/backend.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/ristretto/base/byte_conversion.h"
@@ -28,7 +29,7 @@ template <class T>
 static sxt_sequence_descriptor make_sequence_descriptor(const std::vector<T>& data,
                                                         const std::vector<uint64_t>& indices) {
   if (indices.size() > 0) {
-    assert(data.size() == indices.size());
+    SXT_DEBUG_ASSERT(data.size() == indices.size());
   }
 
   return {.element_nbytes = sizeof(T),
@@ -207,7 +208,7 @@ template <class T>
 static rstt::compressed_element
 compute_expected_commitment(const std::vector<T>& data,
                             const std::vector<c21t::element_p3>& generators) {
-  assert(data.size() == generators.size());
+  SXT_DEBUG_ASSERT(data.size() == generators.size());
 
   rstt::compressed_element expected_commitment;
   rstb::to_bytes(expected_commitment.data(), c21cn::zero_p3_v);

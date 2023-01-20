@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory_resource>
 
+#include "sxt/base/error/panic.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
@@ -111,8 +112,7 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   transcript = prft::transcript{"abc"};
   if (!verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
                             ap_value)) {
-    std::cerr << "failed to verify proof\n";
-    std::abort();
+    baser::panic("failed to verify proof");
   }
 
   // verify fails if ap_value is wrong
@@ -120,8 +120,7 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   auto ap_value_p = ap_value + 0x5134_s25;
   if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
                            ap_value_p)) {
-    std::cerr << "verification should fail\n";
-    std::abort();
+    baser::panic("verification should fail");
   }
 
   // verify fails if product is wrong
@@ -129,8 +128,7 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   auto product_p = product + 0x5134_s25;
   if (verify_inner_product(transcript, drv, descriptor, product_p, a_commit, l_vector, r_vector,
                            ap_value)) {
-    std::cerr << "verification should fail\n";
-    std::abort();
+    baser::panic("verification should fail");
   }
 
   // verification should fail if a_commit is wrong
@@ -138,8 +136,7 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   auto a_commit_p = a_commit + 0x5134_s25 * g_vector[0];
   if (verify_inner_product(transcript, drv, descriptor, product, a_commit_p, l_vector, r_vector,
                            ap_value)) {
-    std::cerr << "verification should fail\n";
-    std::abort();
+    baser::panic("verification should fail");
   }
 
   // verification fails if the transcript is wrong and n > 1
@@ -147,8 +144,7 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
     transcript = prft::transcript{"xyz"};
     if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
                              ap_value)) {
-      std::cerr << "verification should fail\n";
-      std::abort();
+      baser::panic("verification should fail");
     }
   }
 
@@ -158,16 +154,14 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   transcript = prft::transcript{"abc"};
   if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector_p, r_vector,
                            ap_value)) {
-    std::cerr << "verification should fail\n";
-    std::abort();
+    baser::panic("verification should fail");
   }
   auto r_vector_p = r_vector;
   r_vector_p.emplace_back();
   transcript = prft::transcript{"abc"};
   if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector_p,
                            ap_value)) {
-    std::cerr << "verification should fail\n";
-    std::abort();
+    baser::panic("verification should fail");
   }
 
   // verification fails if an L or R value is wrong (n > 1)
@@ -178,16 +172,14 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
     transcript = prft::transcript{"abc"};
     if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector_p, r_vector,
                              ap_value)) {
-      std::cerr << "verification should fail\n";
-      std::abort();
+      baser::panic("verification should fail");
     }
     auto r_vector_p = r_vector;
     rsto::compress(r_vector_p[0], some_val);
     transcript = prft::transcript{"abc"};
     if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector_p,
                              ap_value)) {
-      std::cerr << "verification should fail\n";
-      std::abort();
+      baser::panic("verification should fail");
     }
   }
 
@@ -199,7 +191,6 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   transcript = prft::transcript{"abc"};
   if (verify_inner_product(transcript, drv, descriptor_p, product, a_commit, l_vector, r_vector,
                            ap_value)) {
-    std::cerr << "verification should fail\n";
-    std::abort();
+    baser::panic("verification should fail");
   }
 }

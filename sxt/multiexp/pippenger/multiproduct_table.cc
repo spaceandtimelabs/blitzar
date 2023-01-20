@@ -6,6 +6,7 @@
 #include "sxt/base/bit/iteration.h"
 #include "sxt/base/bit/span_op.h"
 #include "sxt/base/container/blob_array.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/multiexp/base/digit_utility.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
@@ -99,7 +100,7 @@ void make_multiproduct_table(mtxi::index_table& table,
                              const basct::blob_array& term_or_all,
                              const basct::blob_array& output_digit_or_all,
                              size_t radix_log2) noexcept {
-  assert(exponents.size() == output_digit_or_all.size());
+  SXT_DEBUG_ASSERT(exponents.size() == output_digit_or_all.size());
 
   init_multiproduct_table(table, max_entries, output_digit_or_all);
 

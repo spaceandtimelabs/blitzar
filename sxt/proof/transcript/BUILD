@@ -5,6 +5,9 @@ load(
 
 sxt_cc_component(
     name = "transcript",
+    impl_deps = [
+        "//sxt/base/error:assert",
+    ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
@@ -27,6 +30,7 @@ sxt_cc_component(
     name = "strobe128",
     impl_deps = [
         ":keccakf",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",

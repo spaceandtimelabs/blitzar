@@ -1,12 +1,12 @@
 #include "sxt/multiexp/ristretto/multiexponentiation_cpu_driver.h"
 
-#include <cassert>
 #include <type_traits>
 
 #include "sxt/base/bit/count.h"
 #include "sxt/base/bit/span_op.h"
 #include "sxt/base/container/blob_array.h"
 #include "sxt/base/container/span.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/type/conversion_utility.h"
@@ -105,7 +105,7 @@ void multiexponentiation_cpu_driver::compute_multiproduct_inputs(
         // we compare the current input_power with the previous, input_power - 1
         if (input_power < powers[input_index].size()) {
           // because we must guarantee that `powers[input_index]` array is sorted
-          assert(powers[input_index][input_power - 1] < powers[input_index][input_power]);
+          SXT_DEBUG_ASSERT(powers[input_index][input_power - 1] < powers[input_index][input_power]);
         }
       }
 

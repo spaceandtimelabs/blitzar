@@ -1,7 +1,6 @@
 #include "sxt/proof/inner_product/random_product_generation.h"
 
-#include <cassert>
-
+#include "sxt/base/error/assert.h"
 #include "sxt/base/memory/alloc_utility.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/curve21/type/element_p3.h"
@@ -17,7 +16,7 @@ namespace sxt::prfip {
 void generate_random_product(proof_descriptor& descriptor, basct::cspan<s25t::element>& a_vector,
                              basn::fast_random_number_generator& rng, basm::alloc_t alloc,
                              size_t n) noexcept {
-  assert(n > 0);
+  SXT_DEBUG_ASSERT(n > 0);
 
   // a_vector, b_vector
   auto a_vector_p = basm::allocate_array<s25t::element>(alloc, n);

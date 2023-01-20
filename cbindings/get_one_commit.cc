@@ -3,24 +3,20 @@
 #include <iostream>
 
 #include "cbindings/backend.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/seqcommit/generator/precomputed_one_commitments.h"
+
+using namespace sxt;
 
 //--------------------------------------------------------------------------------------------------
 // sxt_get_one_commit
 //--------------------------------------------------------------------------------------------------
 int sxt_get_one_commit(struct sxt_ristretto* one_commit, uint64_t n) {
-  if (!sxt::cbn::is_backend_initialized()) {
-    std::cerr << "ABORT: backend uninitialized in the `sxt_get_one_commit` c binding function"
-              << std::endl;
-    std::abort();
-  }
-
-  if (one_commit == nullptr) {
-    std::cerr << "ABORT: one_commit input to `sxt_get_one_commit` c binding function is null"
-              << std::endl;
-    std::abort();
-  }
+  SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized(),
+                     "backend uninitialized in the `sxt_get_one_commit` c binding function");
+  SXT_RELEASE_ASSERT(one_commit != nullptr,
+                     "one_commit input to `sxt_get_one_commit` c binding function is null");
 
   reinterpret_cast<sxt::c21t::element_p3*>(one_commit)[0] =
       sxt::sqcgn::get_precomputed_one_commit(n);

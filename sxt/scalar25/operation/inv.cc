@@ -76,7 +76,7 @@ void inv(s25t::element& s_inv, const s25t::element& s) noexcept {
 void batch_inv(basct::span<s25t::element> sx_inv, basct::cspan<s25t::element> sx) noexcept {
   // Note: there are more efficient ways to do inversion in bulk; but we're starting
   // with the simplest approach for now.
-  assert(sx_inv.size() == sx.size());
+  SXT_DEBUG_ASSERT(sx_inv.size() == sx.size());
   auto n = sx_inv.size();
   for (size_t i = 0; i < n; ++i) {
     inv(sx_inv[i], sx[i]);

@@ -26,6 +26,7 @@ sxt_cc_component(
         "//sxt/multiexp/bitset_multiprod:value_cache_utility",
         "//sxt/multiexp/bitset_multiprod:multiproduct",
         "//sxt/multiexp/index:clump2_marker_utility",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         "//sxt/base/container:span",

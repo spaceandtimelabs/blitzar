@@ -8,6 +8,8 @@
 #include <utility>
 #include <vector>
 
+#include "sxt/base/error/assert.h"
+
 namespace sxt::bastst {
 //--------------------------------------------------------------------------------------------------
 // check_equality
@@ -15,10 +17,8 @@ namespace sxt::bastst {
 namespace detail {
 template <class T>
 auto check_equality(const T& lhs, const T& rhs) noexcept -> decltype(lhs == rhs) {
-  if (!(lhs == rhs)) {
-    std::cerr << "lhs and rhs should be equal\n";
-    std::abort();
-  }
+  SXT_RELEASE_ASSERT(lhs == rhs, "lhs and rhs should be equal");
+
   return true;
 }
 

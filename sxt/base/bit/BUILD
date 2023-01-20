@@ -10,6 +10,7 @@ sxt_cc_component(
     ],
     deps = [
         ":count",
+        "//sxt/base/error:assert",
     ],
 )
 
@@ -37,6 +38,7 @@ sxt_cc_component(
         ":count",
         ":iteration",
         "//sxt/base/container:span",
+        "//sxt/base/error:assert",
     ],
 )
 

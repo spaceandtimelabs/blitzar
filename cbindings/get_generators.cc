@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "cbindings/backend.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/curve21/type/element_p3.h"
 
 using namespace sxt;
@@ -12,11 +13,8 @@ using namespace sxt;
 //--------------------------------------------------------------------------------------------------
 int sxt_get_generators(struct sxt_ristretto* generators, uint64_t num_generators,
                        uint64_t offset_generators) {
-  if (!sxt::cbn::is_backend_initialized()) {
-    std::cerr << "ABORT: backend uninitialized in the `sxt_get_generators` c binding function"
-              << std::endl;
-    std::abort();
-  }
+  SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized(),
+                     "backend uninitialized in the `sxt_get_generators` c binding function");
 
   // we ignore the function call when zero generators are specified.
   // in this case, generators can be null

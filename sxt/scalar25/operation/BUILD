@@ -24,6 +24,7 @@ sxt_cc_component(
     impl_deps = [
         ":mul",
         ":muladd",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         ":overload",

@@ -5,6 +5,9 @@ load(
 
 sxt_cc_component(
     name = "device_resource",
+    impl_deps = [
+        "//sxt/base/error:panic",
+    ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
@@ -16,6 +19,9 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "pinned_resource",
+    impl_deps = [
+        "//sxt/base/error:panic",
+    ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
@@ -28,6 +34,9 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "managed_device_resource",
+    impl_deps = [
+        "//sxt/base/error:panic",
+    ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],

@@ -13,6 +13,7 @@ sxt_cc_component(
     impl_deps = [
         ":random_multiexponentiation_descriptor",
         "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/base/error:assert",
     ],
     with_test = False,
     deps = [
@@ -33,6 +34,7 @@ sxt_cc_component(
         "//sxt/multiexp/index:index_table",
         "//sxt/multiexp/index:reindex",
         "//sxt/memory/management:managed_array",
+        "//sxt/base/error:panic",
     ],
     with_test = False,
     deps = [

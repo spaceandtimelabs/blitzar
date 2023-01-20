@@ -1,8 +1,7 @@
 #include "sxt/multiexp/index/partition_marker_utility.h"
 
-#include <cassert>
-
 #include "sxt/base/bit/count.h"
+#include "sxt/base/error/assert.h"
 
 namespace sxt::mtxi {
 //--------------------------------------------------------------------------------------------------
@@ -10,8 +9,8 @@ namespace sxt::mtxi {
 //--------------------------------------------------------------------------------------------------
 uint64_t consume_partition_marker(basct::span<uint64_t>& indexes,
                                   uint64_t partition_size) noexcept {
-  assert(!indexes.empty());
-  assert(partition_size > 0 && partition_size < 64);
+  SXT_DEBUG_ASSERT(!indexes.empty());
+  SXT_DEBUG_ASSERT(partition_size > 0 && partition_size < 64);
   auto n = indexes.size();
   auto idx = indexes[0];
   auto partition_index = idx / partition_size;
@@ -20,7 +19,7 @@ uint64_t consume_partition_marker(basct::span<uint64_t>& indexes,
   uint64_t marker = (partition_index << partition_size) | (1 << partition_offset);
   size_t i = 1;
   for (; i < n; ++i) {
-    assert(idx < indexes[i]);
+    SXT_DEBUG_ASSERT(idx < indexes[i]);
     idx = indexes[i];
     partition_offset = idx - partition_first;
     if (partition_offset >= partition_size) {

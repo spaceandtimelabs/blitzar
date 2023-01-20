@@ -1,12 +1,12 @@
 #include "sxt/multiexp/pippenger/test_driver.h"
 
-#include <cassert>
 #include <cstdint>
 #include <iostream>
 
 #include "sxt/base/bit/iteration.h"
 #include "sxt/base/bit/span_op.h"
 #include "sxt/base/container/blob_array.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/index/index_table.h"
 
@@ -18,7 +18,7 @@ void test_driver::compute_multiproduct_inputs(memmg::managed_array<void>& inout,
                                               basct::cspan<basct::cspan<size_t>> powers,
                                               size_t radix_log2, size_t /*num_multiproduct_inputs*/,
                                               size_t /*num_multiproduct_entries*/) const noexcept {
-  assert(inout.size() == powers.size());
+  SXT_DEBUG_ASSERT(inout.size() == powers.size());
   size_t num_terms = 0;
   for (auto& subpowers : powers) {
     num_terms += subpowers.size();
@@ -44,12 +44,12 @@ void test_driver::compute_multiproduct(memmg::managed_array<void>& inout,
   memmg::managed_array<uint64_t> outputs{multiproduct_table.num_rows(), inout.get_allocator()};
   for (size_t row_index = 0; row_index < multiproduct_table.num_rows(); ++row_index) {
     auto products = multiproduct_table.header()[row_index];
-    assert(!products.empty());
+    SXT_DEBUG_ASSERT(!products.empty());
     auto& output = outputs[row_index];
     output = 0;
     for (size_t product_index = 2; product_index < products.size(); ++product_index) {
       auto input = products[product_index];
-      assert(input < inputs.size());
+      SXT_DEBUG_ASSERT(input < inputs.size());
       output += inputs[input];
     }
   }

@@ -1,7 +1,6 @@
 #include "sxt/execution/base/stream.h"
 
-#include <cassert>
-
+#include "sxt/base/error/assert.h"
 #include "sxt/execution/base/stream_handle.h"
 #include "sxt/execution/base/stream_pool.h"
 
@@ -47,7 +46,7 @@ stream_handle* stream::release_handle() noexcept {
 // raw_stream
 //--------------------------------------------------------------------------------------------------
 CUstream_st* stream::raw_stream() const noexcept {
-  assert(handle_ != nullptr);
+  SXT_DEBUG_ASSERT(handle_ != nullptr);
   return handle_->stream;
 }
 } // namespace sxt::xenb

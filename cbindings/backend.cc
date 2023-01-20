@@ -1,9 +1,9 @@
 #include "cbindings/backend.h"
 
-#include <cassert>
 #include <iostream>
 
 #include "sxt/base/device/property.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/cbindings/backend/computational_backend.h"
 #include "sxt/cbindings/backend/cpu_backend.h"
 #include "sxt/cbindings/backend/gpu_backend.h"
@@ -53,7 +53,7 @@ bool is_backend_initialized() noexcept { return backend != nullptr; }
 // get_backend
 //--------------------------------------------------------------------------------------------------
 cbnbck::computational_backend* get_backend() noexcept {
-  assert(backend != nullptr);
+  SXT_RELEASE_ASSERT(backend != nullptr);
 
   return backend;
 }
@@ -62,7 +62,7 @@ cbnbck::computational_backend* get_backend() noexcept {
 // reset_backend_for_testing
 //--------------------------------------------------------------------------------------------------
 void reset_backend_for_testing() noexcept {
-  assert(backend != nullptr);
+  SXT_RELEASE_ASSERT(backend != nullptr);
 
   backend = nullptr;
 }
@@ -72,16 +72,9 @@ void reset_backend_for_testing() noexcept {
 // sxt_init
 //--------------------------------------------------------------------------------------------------
 int sxt_init(const sxt_config* config) {
-  if (config == nullptr) {
-    std::cerr << "ABORT: config input to `sxt_init` c binding function is null" << std::endl;
-    std::abort();
-  }
-
-  if (cbn::backend != nullptr) {
-    std::cerr << "ABORT: trying to reinitialize the backend in the `sxt_init` c binding function"
-              << std::endl;
-    std::abort();
-  }
+  SXT_RELEASE_ASSERT(config != nullptr, "config input to `sxt_init` c binding function is null");
+  SXT_RELEASE_ASSERT(cbn::backend == nullptr,
+                     "trying to reinitialize the backend in the `sxt_init` c binding function");
 
   if (config->backend == SXT_GPU_BACKEND) {
     cbn::initialize_gpu_backend(config);

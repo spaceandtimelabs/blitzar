@@ -1,7 +1,8 @@
 #include "sxt/base/num/log2p1.h"
 
-#include <cassert>
 #include <cmath>
+
+#include "sxt/base/error/assert.h"
 
 namespace sxt::basn {
 //--------------------------------------------------------------------------------------------------
@@ -12,7 +13,7 @@ double log2p1(basct::cspan<uint8_t> x) noexcept {
   double power256 = 1.;
 
   // only numbers smaller than 127 bytes (1016 bits) are allowed
-  assert(x.size() <= 127);
+  SXT_DEBUG_ASSERT(x.size() <= 127);
 
   for (size_t i = 0; i < x.size(); ++i) {
     res += static_cast<double>(x[i]) * power256;

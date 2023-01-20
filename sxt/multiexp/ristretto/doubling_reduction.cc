@@ -1,9 +1,8 @@
 #include "sxt/multiexp/ristretto/doubling_reduction.h"
 
-#include <cassert>
-
 #include "sxt/base/bit/count.h"
 #include "sxt/base/bit/span_op.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 
@@ -13,7 +12,7 @@ namespace sxt::mtxrs {
 //--------------------------------------------------------------------------------------------------
 void doubling_reduce(c21t::element_p3& res, basct::cspan<uint8_t> digit_or_all,
                      basct::cspan<c21t::element_p3> inputs) noexcept {
-  assert(!inputs.empty() && inputs.size() == basbt::pop_count(digit_or_all));
+  SXT_DEBUG_ASSERT(!inputs.empty() && inputs.size() == basbt::pop_count(digit_or_all));
 
   auto input_index = inputs.size();
   size_t digit_bit_index = 8 * digit_or_all.size() - basbt::count_leading_zeros(digit_or_all) - 1;

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 
+#include "sxt/base/error/panic.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/index/reindex.h"
 #include "sxt/multiexp/random/random_multiproduct_descriptor.h"
@@ -16,8 +17,7 @@ void generate_random_multiproduct(mtxi::index_table& products, size_t& num_input
                                   size_t& num_entries, std::mt19937& rng,
                                   const random_multiproduct_descriptor& descriptor) noexcept {
   if (descriptor.max_sequence_length > descriptor.max_num_inputs) {
-    std::cerr << "max_sequence_length must be less than or equal to max_num_inputs\n";
-    std::abort();
+    baser::panic("max_sequence_length must be less than or equal to max_num_inputs");
   }
 
   // determine the product table dimensions

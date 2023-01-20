@@ -5,6 +5,9 @@ load(
 
 sxt_cc_component(
     name = "allocator_aware",
+    impl_deps = [
+        "//sxt/base/error:assert",
+    ],
     with_test = False,
 )
 

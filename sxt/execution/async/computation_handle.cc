@@ -1,8 +1,7 @@
 #include "sxt/execution/async/computation_handle.h"
 
-#include <cassert>
-
 #include "sxt/base/device/synchronization.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/execution/base/stream.h"
 #include "sxt/execution/base/stream_handle.h"
 #include "sxt/execution/base/stream_pool.h"
@@ -38,7 +37,7 @@ void computation_handle::wait() noexcept {
   auto pool = xenb::get_stream_pool();
   while (head_ != nullptr) {
     auto handle = head_;
-    assert(handle->stream != nullptr);
+    SXT_DEBUG_ASSERT(handle->stream != nullptr);
     basdv::synchronize_stream(handle->stream);
     head_ = handle->next;
     handle->next = nullptr;
@@ -51,7 +50,7 @@ void computation_handle::wait() noexcept {
 //--------------------------------------------------------------------------------------------------
 void computation_handle::add_stream(xenb::stream&& stream) noexcept {
   auto handle = stream.release_handle();
-  assert(handle != nullptr && handle->next == nullptr);
+  SXT_DEBUG_ASSERT(handle != nullptr && handle->next == nullptr);
   handle->next = head_;
   head_ = handle;
 }

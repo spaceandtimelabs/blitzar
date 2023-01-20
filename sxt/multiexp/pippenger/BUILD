@@ -20,6 +20,7 @@ sxt_cc_component(
         "//sxt/base/container:blob_array",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/index:index_table",
+        "//sxt/base/error:assert",
     ],
     with_test = False,
     deps = [
@@ -76,6 +77,7 @@ sxt_cc_component(
         "//sxt/multiexp/base:digit_utility",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/index:index_table",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         "//sxt/base/container:blob_array",

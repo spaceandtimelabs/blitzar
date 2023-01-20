@@ -6,6 +6,7 @@ load(
 sxt_cc_component(
     name = "add_ints",
     impl_deps = [
+        "//sxt/base/error:panic",
     ],
     with_test = False,
     deps = [
@@ -19,6 +20,7 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:add",
+        "//sxt/base/error:panic",
     ],
     with_test = False,
     deps = [

@@ -1,15 +1,16 @@
 #include "sxt/scalar25/type/element.h"
 
-#include <cassert>
 #include <cstring>
 #include <iostream>
+
+#include "sxt/base/error/assert.h"
 
 namespace sxt::s25t {
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
 element::element(std::initializer_list<uint8_t> values) noexcept : data_{} {
-  assert(values.size() <= 32);
+  SXT_DEBUG_ASSERT(values.size() <= 32);
   std::memcpy(static_cast<void*>(data_), static_cast<const void*>(&(*values.begin())),
               values.size());
 }

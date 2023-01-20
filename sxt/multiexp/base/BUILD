@@ -8,6 +8,7 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/base/bit:count",
         "//sxt/base/num:divide_up",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",

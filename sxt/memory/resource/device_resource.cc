@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "sxt/base/error/panic.h"
+
 namespace sxt::memr {
 //--------------------------------------------------------------------------------------------------
 // do_allocate
@@ -13,8 +15,7 @@ void* device_resource::do_allocate(size_t bytes, size_t /*alignment*/) noexcept 
   void* res;
   auto rcode = cudaMalloc(&res, bytes);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaMalloc failed: " << rcode << "\n";
-    std::abort();
+    baser::panic("cudaMalloc failed: " + std::to_string(rcode));
   }
   return res;
 }
@@ -25,8 +26,7 @@ void* device_resource::do_allocate(size_t bytes, size_t /*alignment*/) noexcept 
 void device_resource::do_deallocate(void* ptr, size_t /*bytes*/, size_t /*alignment*/) noexcept {
   auto rcode = cudaFree(ptr);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaFree failed: " << rcode << "\n";
-    std::abort();
+    baser::panic("cudaFree failed: " + std::to_string(rcode));
   }
 }
 

@@ -2,8 +2,9 @@
 
 #include <cuda_runtime.h>
 
-#include <cstdlib>
-#include <iostream>
+#include <string>
+
+#include "sxt/base/error/panic.h"
 
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
@@ -12,8 +13,7 @@ namespace sxt::basdv {
 void async_memcpy_host_to_device(void* dst, const void* src, size_t count) noexcept {
   auto rcode = cudaMemcpyAsync(dst, src, count, cudaMemcpyHostToDevice);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaMemcpyAsync failed: " << cudaGetErrorString(rcode) << "\n";
-    std::abort();
+    baser::panic("cudaMemcpyAsync failed: " + std::string(cudaGetErrorString(rcode)));
   }
 }
 
@@ -23,8 +23,7 @@ void async_memcpy_host_to_device(void* dst, const void* src, size_t count) noexc
 void memcpy_host_to_device(void* dst, const void* src, size_t count) noexcept {
   auto rcode = cudaMemcpy(dst, src, count, cudaMemcpyHostToDevice);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaMemcpy failed: " << cudaGetErrorString(rcode) << "\n";
-    std::abort();
+    baser::panic("cudaMemcpy failed: " + std::string(cudaGetErrorString(rcode)));
   }
 }
 
@@ -34,8 +33,7 @@ void memcpy_host_to_device(void* dst, const void* src, size_t count) noexcept {
 void memcpy_device_to_host(void* dst, const void* src, size_t count) noexcept {
   auto rcode = cudaMemcpy(dst, src, count, cudaMemcpyDeviceToHost);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaMemcpy failed: " << cudaGetErrorString(rcode) << "\n";
-    std::abort();
+    baser::panic("cudaMemcpy failed: " + std::string(cudaGetErrorString(rcode)));
   }
 }
 
@@ -46,8 +44,7 @@ void async_memcpy_host_to_device(void* dst, const void* src, size_t count,
                                  cudaStream_t stream) noexcept {
   auto rcode = cudaMemcpyAsync(dst, src, count, cudaMemcpyHostToDevice, stream);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaMemcpyAsync failed: " << cudaGetErrorString(rcode) << "\n";
-    std::abort();
+    baser::panic("cudaMemcpyAsync failed: " + std::string(cudaGetErrorString(rcode)));
   }
 }
 
@@ -58,8 +55,7 @@ void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
                                  cudaStream_t stream) noexcept {
   auto rcode = cudaMemcpyAsync(dst, src, count, cudaMemcpyDeviceToHost, stream);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaMemcpyAsync failed: " << cudaGetErrorString(rcode) << "\n";
-    std::abort();
+    baser::panic("cudaMemcpyAsync failed: " + std::string(cudaGetErrorString(rcode)));
   }
 }
 
@@ -69,8 +65,7 @@ void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
 void memset_device(void* dst, int value, size_t count) noexcept {
   auto rcode = cudaMemset(dst, value, count);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaMemset failed: " << cudaGetErrorString(rcode) << "\n";
-    std::abort();
+    baser::panic("cudaMemset failed: " + std::string(cudaGetErrorString(rcode)));
   }
 }
 } // namespace sxt::basdv

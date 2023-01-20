@@ -1,7 +1,8 @@
 #pragma once
 
-#include <cassert>
 #include <cstddef>
+
+#include "sxt/base/error/assert.h"
 
 namespace sxt::basct {
 //--------------------------------------------------------------------------------------------------
@@ -24,7 +25,7 @@ public:
   size_t element_size() const noexcept { return element_size_; }
 
   Derived subspan(size_t offset) const noexcept {
-    assert(offset <= size_);
+    SXT_DEBUG_ASSERT(offset <= size_);
     return {
         static_cast<void*>(static_cast<char*>(data_) + element_size_ * offset),
         size_ - offset,
@@ -33,8 +34,8 @@ public:
   }
 
   Derived subspan(size_t offset, size_t size_p) const noexcept {
-    assert(offset <= size_);
-    assert(offset + size_p <= size_);
+    SXT_DEBUG_ASSERT(offset <= size_);
+    SXT_DEBUG_ASSERT(offset + size_p <= size_);
     return {
         static_cast<void*>(static_cast<char*>(data_) + element_size_ * offset),
         size_p,

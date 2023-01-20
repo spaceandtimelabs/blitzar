@@ -21,6 +21,7 @@ sxt_cc_component(
     deps = [
         ":value_cache",
         "//sxt/base/container:span",
+        "//sxt/base/error:assert",
     ],
 )
 
@@ -35,6 +36,7 @@ sxt_cc_component(
         ":value_cache",
         "//sxt/base/bit:iteration",
         "//sxt/base/container:span",
+        "//sxt/base/error:assert",
     ],
 )
 

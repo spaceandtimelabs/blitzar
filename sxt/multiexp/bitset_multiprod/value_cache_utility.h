@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cassert>
 #include <cstddef>
 
+#include "sxt/base/error/assert.h"
 #include "sxt/multiexp/bitset_multiprod/value_cache.h"
 
 namespace sxt::mtxbmp {
@@ -29,7 +29,7 @@ void init_value_cache_side(basct::span<T> cache_side, Op op, basct::cspan<T> ter
 //--------------------------------------------------------------------------------------------------
 template <class T, class Op>
 void init_value_cache(value_cache<T> cache, Op op, basct::cspan<T> terms) noexcept {
-  assert(terms.size() == cache.num_terms());
+  SXT_DEBUG_ASSERT(terms.size() == cache.num_terms());
   auto [left_cache, right_cache] = cache.split();
   auto left_num_terms = cache.half_num_terms();
   init_value_cache_side(left_cache, op, terms.subspan(0, left_num_terms));

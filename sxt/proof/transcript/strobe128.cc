@@ -15,8 +15,7 @@
  */
 #include "sxt/proof/transcript/strobe128.h"
 
-#include <cassert>
-
+#include "sxt/base/error/assert.h"
 #include "sxt/proof/transcript/keccakf.h"
 
 namespace sxt::prft {
@@ -128,12 +127,12 @@ void strobe128::absorb(basct::cspan<uint8_t> data) noexcept {
 void strobe128::begin_op(uint8_t flags, bool more) noexcept {
   if (more) {
     /* Changing flags while continuing is illegal */
-    assert(cur_flags_ == flags);
+    SXT_DEBUG_ASSERT(cur_flags_ == flags);
     return;
   }
 
   /* T flag is not supported */
-  assert(!(flags & flag_t_v));
+  SXT_DEBUG_ASSERT(!(flags & flag_t_v));
 
   uint8_t old_begin = pos_begin_;
   pos_begin_ = pos_ + 1;

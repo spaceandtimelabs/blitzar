@@ -20,6 +20,7 @@ sxt_cc_component(
         "//sxt/execution/base:stream_handle",
         "//sxt/execution/base:stream_pool",
         "//sxt/execution/base:stream",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         ":test_kernel",

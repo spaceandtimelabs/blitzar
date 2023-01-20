@@ -1,8 +1,8 @@
 #include "sxt/multiexp/index/transpose.h"
 
-#include <cassert>
 #include <vector>
 
+#include "sxt/base/error/assert.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/index/index_table_utility.h"
 
@@ -18,7 +18,7 @@ size_t transpose(index_table& table, basct::cspan<basct::cspan<uint64_t>> rows,
   size_t num_entries = distinct_entry_count * padding;
   for (auto row : rows) {
     for (auto x : row.subspan(offset_functor(row))) {
-      assert(x < distinct_entry_count);
+      SXT_DEBUG_ASSERT(x < distinct_entry_count);
       ++counts[x];
       ++num_entries;
     }

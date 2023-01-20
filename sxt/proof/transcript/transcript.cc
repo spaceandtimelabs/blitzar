@@ -17,12 +17,14 @@
 
 #include <cstring>
 
+#include "sxt/base/error/assert.h"
+
 namespace sxt::prft {
 //--------------------------------------------------------------------------------------------------
 // encode_usize_as_u32
 //--------------------------------------------------------------------------------------------------
 static uint32_t encode_usize_as_u32(size_t len) noexcept {
-  assert(len <= (static_cast<size_t>(UINT32_MAX)));
+  SXT_DEBUG_ASSERT(len <= (static_cast<size_t>(UINT32_MAX)));
   return static_cast<uint32_t>(len);
 }
 

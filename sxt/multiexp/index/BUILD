@@ -23,6 +23,7 @@ sxt_cc_component(
     name = "clump2_marker_utility",
     impl_deps = [
         ":clump2_descriptor",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         ":clump2_descriptor",
@@ -51,6 +52,7 @@ sxt_cc_component(
     name = "partition_marker_utility",
     impl_deps = [
         "//sxt/base/bit:count",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
@@ -76,6 +78,7 @@ sxt_cc_component(
     name = "index_table_utility",
     impl_deps = [
         ":index_table",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
@@ -110,6 +113,7 @@ sxt_cc_component(
     impl_deps = [
         ":index_table",
         ":index_table_utility",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         ":index_table",

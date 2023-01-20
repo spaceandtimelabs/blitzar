@@ -42,6 +42,7 @@ sxt_cc_component(
     name = "backend",
     impl_deps = [
         "//sxt/base/device:property",
+        "//sxt/base/error:assert",
         "//sxt/cbindings/backend:gpu_backend",
         "//sxt/cbindings/backend:cpu_backend",
         "//sxt/seqcommit/generator:precomputed_initializer",
@@ -61,6 +62,7 @@ sxt_cc_component(
     impl_deps = [
         ":backend",
         "//sxt/curve21/type:element_p3",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         ":backend",
@@ -78,6 +80,7 @@ sxt_cc_component(
     name = "get_one_commit",
     impl_deps = [
         ":backend",
+        "//sxt/base/error:assert",
         "//sxt/curve21/type:element_p3",
         "//sxt/seqcommit/generator:precomputed_one_commitments",
     ],
@@ -99,6 +102,7 @@ sxt_cc_component(
     name = "pedersen",
     impl_deps = [
         ":backend",
+        "//sxt/base/error:assert",
         "//sxt/memory/management:managed_array",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/base:indexed_exponent_sequence",
@@ -112,6 +116,7 @@ sxt_cc_component(
         "//sxt/ristretto/operation:scalar_multiply",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",
+        "//sxt/base/error:assert",
     ],
     deps = [
         ":proofs_gpu_api",
@@ -126,6 +131,7 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/base/num:ceil_log2",
         "//sxt/curve21/type:element_p3",
+        "//sxt/base/error:assert",
         "//sxt/proof/inner_product:proof_descriptor",
         "//sxt/seqcommit/generator:precomputed_generators",
     ],
@@ -143,6 +149,7 @@ sxt_cc_component(
         "//sxt/curve21/operation:overload",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/scalar25/random:element",
+        "//sxt/base/error:assert",
     ],
     deps = [
         ":proofs_gpu_api",

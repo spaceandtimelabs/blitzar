@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cassert>
 #include <cstdint>
 
 #include "sxt/base/bit/iteration.h"
 #include "sxt/base/container/span.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/multiexp/bitset_multiprod/value_cache.h"
 
 namespace sxt::mtxbmp {
@@ -27,7 +27,7 @@ const T& lookup_or_compute(basct::span<T> cache_side, Op op, uint64_t bitset) no
 //--------------------------------------------------------------------------------------------------
 template <class T, class Op>
 void compute_multiproduct(T& res, value_cache<T> cache, Op op, uint64_t bitset) noexcept {
-  assert(bitset != 0);
+  SXT_DEBUG_ASSERT(bitset != 0);
   auto half_num_terms = cache.half_num_terms();
   auto right_bitset = bitset >> half_num_terms;
   auto left_bitset = bitset ^ (right_bitset << half_num_terms);

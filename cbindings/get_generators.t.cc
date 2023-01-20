@@ -1,9 +1,9 @@
 #include "cbindings/get_generators.h"
 
-#include <cassert>
 #include <vector>
 
 #include "cbindings/backend.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/seqcommit/generator/base_element.h"
@@ -31,7 +31,7 @@ static std::vector<sxt_ristretto> initialize_generators(int backend,
 
 static void verify_generator(const std::vector<sxt_ristretto>& generators, uint64_t index,
                              uint64_t offset) {
-  assert(generators.size() > index);
+  SXT_DEBUG_ASSERT(generators.size() > index);
 
   c21t::element_p3 expected_gi;
   sqcgn::compute_base_element(expected_gi, index + offset);

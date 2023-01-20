@@ -1,8 +1,8 @@
 #include "sxt/proof/inner_product/proof_computation.h"
 
-#include <cassert>
 #include <vector>
 
+#include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
@@ -49,7 +49,7 @@ void prove_inner_product(basct::span<rstt::compressed_element> l_vector,
   auto np = 1ull << n_lg2;
   auto num_rounds = n_lg2;
   // clang-format off
-  assert(
+  SXT_DEBUG_ASSERT(
     l_vector.size() == num_rounds &&
     r_vector.size() == num_rounds &&
     descriptor.b_vector.size() == n &&
@@ -98,7 +98,7 @@ bool verify_inner_product(prft::transcript& transcript, const driver& drv,
   auto np = 1ull << n_lg2;
   auto num_rounds = n_lg2;
   // clang-format off
-  assert(
+  SXT_DEBUG_ASSERT(
     descriptor.b_vector.size() == n &&
     descriptor.g_vector.size() == np
   );

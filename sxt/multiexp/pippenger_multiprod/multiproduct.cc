@@ -1,11 +1,11 @@
 #include "sxt/multiexp/pippenger_multiprod/multiproduct.h"
 
-#include <cassert>
 #include <cstdlib>
 #include <limits>
 #include <vector>
 
 #include "sxt/base/container/span_void.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/counting_iterator.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger_multiprod/clump_inputs.h"
@@ -86,7 +86,7 @@ void compute_multiproduct(basct::span_void inout, basct::span<basct::span<uint64
 
 void compute_multiproduct(basct::span_void inout, mtxi::index_table& products, const driver& drv,
                           size_t num_inputs) noexcept {
-  assert(inout.size() >= num_inputs && inout.size() >= products.num_rows());
+  SXT_DEBUG_ASSERT(inout.size() >= num_inputs && inout.size() >= products.num_rows());
   normalize_product_table(products, inout.size());
   compute_multiproduct(inout, products.header(), drv, num_inputs);
 }

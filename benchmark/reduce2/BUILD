@@ -47,6 +47,7 @@ sxt_cc_benchmark(
     deps = [
         ":reduce_cpu",
         ":reduce_gpu",
+        "//sxt/base/error:panic",
         "//sxt/curve21/type:element_p3",
     ],
 )

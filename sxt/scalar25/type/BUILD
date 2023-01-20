@@ -5,6 +5,9 @@ load(
 
 sxt_cc_component(
     name = "element",
+    impl_deps = [
+        "//sxt/base/error:assert",
+    ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],

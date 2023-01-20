@@ -20,6 +20,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
+        "//sxt/base/error:assert",
         "//sxt/base/macro:cuda_callable",
     ],
 )
@@ -30,6 +31,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
+        "//sxt/base/error:assert",
     ],
 )
 

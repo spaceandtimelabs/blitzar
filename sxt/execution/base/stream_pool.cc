@@ -2,10 +2,10 @@
 
 #include <cuda_runtime.h>
 
-#include <cassert>
-#include <cstdlib>
-#include <iostream>
+#include <string>
 
+#include "sxt/base/error/assert.h"
+#include "sxt/base/error/panic.h"
 #include "sxt/execution/base/stream_handle.h"
 
 namespace sxt::xenb {
@@ -16,8 +16,7 @@ static stream_handle* make_stream_handle() noexcept {
   auto res = new stream_handle{};
   auto rcode = cudaStreamCreate(&res->stream);
   if (rcode != cudaSuccess) {
-    std::cerr << "cudaStreamCreate failed: " << cudaGetErrorString(rcode) << "\n";
-    std::abort();
+    baser::panic("cudaStreamCreate failed: " + std::string(cudaGetErrorString(rcode)));
   }
   res->next = nullptr;
   return res;
@@ -44,8 +43,7 @@ stream_pool::~stream_pool() noexcept {
     auto next = handle->next;
     auto rcode = cudaStreamDestroy(handle->stream);
     if (rcode != cudaSuccess) {
-      std::cerr << "cudaStreamDestroy failed: " << cudaGetErrorString(rcode) << "\n";
-      std::abort();
+      baser::panic("cudaStreamDestroy failed: " + std::string(cudaGetErrorString(rcode)));
     }
     delete handle;
     handle = next;
@@ -69,7 +67,7 @@ stream_handle* stream_pool::aquire_handle() noexcept {
 // release_handle
 //--------------------------------------------------------------------------------------------------
 void stream_pool::release_handle(stream_handle* handle) noexcept {
-  assert(handle != nullptr);
+  SXT_DEBUG_ASSERT(handle != nullptr);
   handle->next = head_;
   head_ = handle;
 }

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <cassert>
 #include <cstddef>
 #include <type_traits>
 
+#include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
 
 namespace sxt::basct {
@@ -52,7 +52,7 @@ public:
 
   CUDA_CALLABLE
   span subspan(size_t offset) const noexcept {
-    assert(offset <= size_);
+    SXT_DEBUG_ASSERT(offset <= size_);
     return {
         data_ + offset,
         size_ - offset,
@@ -61,8 +61,8 @@ public:
 
   CUDA_CALLABLE
   span subspan(size_t offset, size_t size_p) const noexcept {
-    assert(offset <= size_);
-    assert(offset + size_p <= size_);
+    SXT_DEBUG_ASSERT(offset <= size_);
+    SXT_DEBUG_ASSERT(offset + size_p <= size_);
     return {
         data_ + offset,
         size_p,

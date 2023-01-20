@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "sxt/base/container/span_void.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
@@ -68,7 +69,7 @@ void multiproduct_cpu_driver::apply_clump2_operation(
     auto clump_first = descriptor.size * clump_index;
     auto reduction = inputs[clump_first + index1];
 
-    assert(index1 <= index2);
+    SXT_DEBUG_ASSERT(index1 <= index2);
 
     if (index1 != index2) {
       c21o::add(reduction, reduction, inputs[clump_first + index2]);
@@ -90,7 +91,7 @@ void multiproduct_cpu_driver::compute_naive_multiproduct(
   memmg::managed_array<c21t::element_p3> outputs(products.size());
 
   for (auto row : products) {
-    assert(row.size() >= 2 && row.size() >= 2 + row[1]);
+    SXT_DEBUG_ASSERT(row.size() >= 2 && row.size() >= 2 + row[1]);
     auto& output = outputs[row[0]];
 
     if (row.size() == 2) {
@@ -131,7 +132,7 @@ void multiproduct_cpu_driver::permute_inputs(basct::span_void inout,
                                              basct::cspan<uint64_t> permutation) const noexcept {
   auto n = permutation.size();
 
-  assert(n <= inout.size());
+  SXT_DEBUG_ASSERT(n <= inout.size());
 
   memmg::managed_array<c21t::element_p3> inputs_p(n);
   basct::span<c21t::element_p3> inputs{static_cast<c21t::element_p3*>(inout.data()), n};
@@ -139,7 +140,7 @@ void multiproduct_cpu_driver::permute_inputs(basct::span_void inout,
   for (size_t index = 0; index < n; ++index) {
     auto index_p = permutation[index];
 
-    assert(index_p < n);
+    SXT_DEBUG_ASSERT(index_p < n);
 
     inputs_p[index] = inputs[index_p];
   }

@@ -39,6 +39,7 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/operation:mul",
         "//sxt/scalar25/operation:muladd",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
@@ -68,6 +69,7 @@ sxt_cc_component(
         "//sxt/ristretto/type:compressed_element",
         "//sxt/proof/transcript:transcript_utility",
         "//sxt/scalar25/type:element",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         ":cpu_driver",
@@ -83,6 +85,7 @@ sxt_cc_component(
         "//sxt/curve21/operation:overload",
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:literal",
+        "//sxt/base/error:panic",
     ],
     deps = [
         "//sxt/base/container:span",
@@ -109,6 +112,7 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
         "//sxt/ristretto/random:element",
         "//sxt/scalar25/random:element",
+        "//sxt/base/error:assert",
     ],
     with_test = False,
     deps = [
@@ -120,6 +124,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "verification_computation",
     impl_deps = [
+        "//sxt/base/error:assert",
         "//sxt/scalar25/operation:mul",
         "//sxt/scalar25/operation:inv",
         "//sxt/scalar25/operation:sq",
@@ -157,6 +162,7 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/operation:inner_product",
         "//sxt/scalar25/operation:inv",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         ":proof_descriptor",

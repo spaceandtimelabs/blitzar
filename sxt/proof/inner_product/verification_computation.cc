@@ -1,8 +1,8 @@
 #include "sxt/proof/inner_product/verification_computation.h"
 
-#include <cassert>
 #include <vector>
 
+#include "sxt/base/error/assert.h"
 #include "sxt/scalar25/operation/inner_product.h"
 #include "sxt/scalar25/operation/inv.h"
 #include "sxt/scalar25/operation/mul.h"
@@ -84,7 +84,7 @@ void compute_verification_exponents(basct::span<s25t::element> exponents,
   auto n = b_vector.size();
   auto np = 1ull << num_rounds;
   // clang-format off
-  assert(
+  SXT_DEBUG_ASSERT(
       n > 0 &&
       (n == np || n > (1ull << (num_rounds-1))) &&
       num_exponents == 1 + np + 2 * num_rounds &&

@@ -73,6 +73,7 @@ sxt_cc_benchmark(
     deps = [
         ":multi_exp_cpu",
         ":multi_exp_gpu",
+        "//sxt/base/error:panic",
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
     ],

@@ -11,6 +11,7 @@ sxt_cc_component(
         "//sxt/ristretto/base:byte_conversion",
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/curve21/operation:add",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         "//sxt/seqcommit/test:test_pedersen",
@@ -38,6 +39,7 @@ sxt_cc_component(
         "//sxt/memory/resource:device_resource",
         "//sxt/memory/resource:managed_device_resource",
         "//sxt/ristretto/base:byte_conversion",
+        "//sxt/base/error:assert",
     ],
     is_cuda = True,
     test_deps = [
