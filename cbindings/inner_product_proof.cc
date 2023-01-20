@@ -1,4 +1,4 @@
-#include "cbindings/inner_product.h"
+#include "cbindings/inner_product_proof.h"
 
 #include <iostream>
 #include <vector>

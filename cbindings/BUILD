@@ -13,7 +13,7 @@ cuda_dlink(
         ":backend",
         ":get_generators",
         ":get_one_commit",
-        ":inner_product",
+        ":inner_product_proof",
         ":pedersen",
     ],
 )
@@ -125,7 +125,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "inner_product",
+    name = "inner_product_proof",
     impl_deps = [
         ":backend",
         "//sxt/base/container:span",
