@@ -560,13 +560,6 @@ def _find_libs(repository_ctx, check_cuda_libs_script, cuda_config):
             cuda_config.cublas_version,
             static = False,
         ),
-        "cusolver": _check_cuda_lib_params(
-            "cusolver",
-            cpu_value,
-            cuda_config.config["cusolver_library_dir"],
-            cuda_config.cusolver_version,
-            static = False,
-        ),
         "curand": _check_cuda_lib_params(
             "curand",
             cpu_value,
@@ -579,13 +572,6 @@ def _find_libs(repository_ctx, check_cuda_libs_script, cuda_config):
             cpu_value,
             cuda_config.config["cufft_library_dir"],
             cuda_config.cufft_version,
-            static = False,
-        ),
-        "cupti": _check_cuda_lib_params(
-            "cupti",
-            cpu_value,
-            cuda_config.config["cupti_library_dir"],
-            cuda_config.cuda_version,
             static = False,
         ),
         "cusparse": _check_cuda_lib_params(
@@ -1102,10 +1088,8 @@ def _create_local_cuda_repository(repository_ctx):
             "%{cudart_static_linkopt}": _cudart_static_linkopt(cuda_config.cpu_value),
             "%{cudart_lib}": _basename(repository_ctx, cuda_libs["cudart"]),
             "%{cublas_lib}": _basename(repository_ctx, cuda_libs["cublas"]),
-            "%{cusolver_lib}": _basename(repository_ctx, cuda_libs["cusolver"]),
             "%{cufft_lib}": _basename(repository_ctx, cuda_libs["cufft"]),
             "%{curand_lib}": _basename(repository_ctx, cuda_libs["curand"]),
-            "%{cupti_lib}": _basename(repository_ctx, cuda_libs["cupti"]),
             "%{cusparse_lib}": _basename(repository_ctx, cuda_libs["cusparse"]),
             "%{cub_actual}": cub_actual,
             "%{copy_rules}": "\n".join(copy_rules),

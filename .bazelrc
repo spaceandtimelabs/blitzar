@@ -37,7 +37,7 @@ build --action_env GCC_HOST_COMPILER_PATH="/usr/bin/gcc"
 
 build --action_env CUDA_TOOLKIT_PATH="/usr/local/cuda"
 build --action_env PYTHON_BIN_PATH="/usr/bin/python3"
-build --action_env TF_CUDA_VERSION="11.6"
+build --action_env TF_CUDA_VERSION="12.0"
 build --action_env TF_CUDA_COMPUTE_CAPABILITIES="7.0"
 build --action_env COMPUTECPP_TOOLKIT_PATH="/usr/local/computecpp"
 build --action_env TMP="/tmp"
