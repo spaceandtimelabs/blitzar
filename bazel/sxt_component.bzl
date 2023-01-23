@@ -4,14 +4,15 @@ load(
     "cuda_dlink",
 )
 
-# We add this -std=c++17 flag, because
+# We add this -std=c++20 flag, because
 # benchmarks could not be compiled without it.
-# The `build --cxxopt -std=c++17` flag set in the
+# The `build --cxxopt -std=c++20` flag set in the
 # `.bazelrc` file was not passed to the compiler.
 # However, this flag is relevant to some modules.
 def sxt_copts():
     return [
-        "-std=c++17",
+        "-Wno-volatile",
+        "-std=c++20",
     ]
 
 def sxt_cc_component(
