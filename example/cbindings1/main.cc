@@ -20,11 +20,7 @@ int main() {
   const int num_sequences = 1;
   const sxt_sequence_descriptor descriptors[num_sequences] = {descriptor1};
   sxt_compressed_ristretto commitments[num_sequences];
-  auto rcode = sxt_compute_pedersen_commitments(commitments, num_sequences, descriptors);
-  if (rcode != 0) {
-    std::cerr << "sxt_compute_pedersen_commitments failed\n";
-    return -1;
-  }
+  sxt_compute_pedersen_commitments(commitments, num_sequences, descriptors, 0);
   auto commitments_data = reinterpret_cast<unsigned char*>(commitments);
   for (size_t i = 0; i < sizeof(commitments); ++i) {
     std::cout << std::hex << static_cast<unsigned>(commitments_data[i]);

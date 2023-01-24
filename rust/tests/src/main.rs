@@ -68,13 +68,12 @@ mod tests {
                 cbinding_descriptors[i] = descriptor;
             }
 
-            let ret_compute = proofs_gpu_sys::sxt_compute_pedersen_commitments(
+            proofs_gpu_sys::sxt_compute_pedersen_commitments(
                 cbinding_commitments.as_mut_ptr(),
                 num_commitments as u32,
                 cbinding_descriptors.as_mut_ptr(),
+                0 as u64
             );
-
-            assert_eq!(ret_compute, 0);
         }
 
         assert_eq!(cbinding_commitments[0].ristretto_bytes, expected_0);

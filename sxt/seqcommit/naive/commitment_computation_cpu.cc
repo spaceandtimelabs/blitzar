@@ -32,18 +32,12 @@ void compute_commitments_cpu(basct::span<rstt::compressed_element> commitments,
       const uint8_t* bytes_row_i_column_k =
           column_k_data.exponent_sequence.data + row_i * element_nbytes;
 
-      // verify if default generators should be used
-      // otherwise, use the above dense representation
-      if (generators.empty()) {
-        size_t row_g_i = row_i;
-
-        // verify if sparse representation should be used
-        if (column_k_data.indices != nullptr) {
-          row_g_i = column_k_data.indices[row_i];
-        }
-
-        sqcgn::compute_base_element(g_i, row_g_i);
-      } else { // otherwise, use the user given generators
+      if (column_k_data.indices != nullptr) {
+        // use sparse representation
+        sqcgn::compute_base_element(g_i, column_k_data.indices[row_i]);
+      } else if (generators.empty()) {
+        sqcgn::compute_base_element(g_i, row_i);
+      } else {
         g_i = generators[row_i];
       }
 

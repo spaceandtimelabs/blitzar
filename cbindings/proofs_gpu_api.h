@@ -85,14 +85,21 @@ int sxt_init(const struct sxt_config* config);
  * ristretto255 group. Then res\[i] encodes the ristretto255 group value
  *
  * ```text
- *     Prod_{j=1 to n_i} g_j ^ a_ij
+ *     Prod_{j=1 to n_i} g_{offset_generators + j} ^ a_ij
  * ```
  *
- * where n_i represents the number of elements in sequence i and g_j is a group
- * element determined by a prespecified function
+ * where n_i represents the number of elements in sequence i and g_{offset_generators + j}
+ * is a group element determined by a prespecified function
  *
  * ```text
  *     g: uint64_t -> ristretto255
+ * ```
+ *
+ * Note: in case `descriptor\[i]` is a sparce sequence, the `offset_generators` value is ignored
+ * and `descriptor\[i].indices` is used instead to compute
+ *
+ * ```text
+ *     Prod_{j=1 to n_i} g_{descriptor\[i].indices[j]} ^ a_ij
  * ```
  *
  * # Arguments:
@@ -103,11 +110,7 @@ int sxt_init(const struct sxt_config* config);
  * - num_sequences (in): specifies the number of sequences
  * - descriptors   (in): an array of length num_sequences that specifies each sequence
  *
- * # Return:
- *
- * - 0 on success; otherwise a nonzero error code
- *
- * # Invalid input parameters, which generate error code:
+ * # Abnormal program termination in case of:
  *
  * - backend not initialized or incorrectly initialized
  * - descriptors == nullptr
@@ -120,9 +123,10 @@ int sxt_init(const struct sxt_config* config);
  *
  * - num_sequences equal to 0 will skip the computation
  */
-int sxt_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitments,
-                                     uint32_t num_sequences,
-                                     const struct sxt_sequence_descriptor* descriptors);
+void sxt_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitments,
+                                      uint32_t num_sequences,
+                                      const struct sxt_sequence_descriptor* descriptors,
+                                      uint64_t offset_generators);
 
 /**
  * Compute the pedersen commitments for sequences of values
@@ -136,7 +140,14 @@ int sxt_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitment
  * ```
  *
  * where n_i represents the number of elements in sequence i and g_j is a group
- * element determined by the `generators\[i]` user value given as input
+ * element determined by the `generators\[j]` user value given as input
+ *
+ * Note: in case `descriptor\[i]` is a sparce sequence, the `offset_generators` value is ignored
+ * and `descriptor\[i].indices` is used instead to compute
+ *
+ * ```text
+ *     Prod_{j=1 to n_i} g_{descriptor\[i].indices[j]} ^ a_ij
+ * ```
  *
  * # Arguments:
  *
@@ -147,11 +158,7 @@ int sxt_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitment
  * - descriptors   (in): an array of length num_sequences that specifies each sequence
  * - generators    (in): an array of length `max_num_rows` = `the maximum between all n_i`
  *
- * # Return:
- *
- * - 0 on success; otherwise a nonzero error code
- *
- * # Invalid input parameters, which generate error code:
+ * # Abnormal program termination in case of:
  *
  * - backend not initialized or incorrectly initialized
  * - descriptors == nullptr
@@ -165,7 +172,7 @@ int sxt_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitment
  *
  * - num_sequences equal to 0 will skip the computation
  */
-int sxt_compute_pedersen_commitments_with_generators(
+void sxt_compute_pedersen_commitments_with_generators(
     struct sxt_compressed_ristretto* commitments, uint32_t num_sequences,
     const struct sxt_sequence_descriptor* descriptors, const struct sxt_ristretto* generators);
 

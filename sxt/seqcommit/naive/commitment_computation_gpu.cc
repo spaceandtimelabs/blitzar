@@ -69,18 +69,12 @@ __global__ static void compute_commitments_kernel(c21t::element_p3* partial_comm
 
   c21t::element_p3 g_i;
 
-  // verify if default generators should be used
-  if (generators == nullptr) {
-    int row_g_i = row_i;
-
-    // verify if sparse representation should be used
-    // otherwise, use the above dense representation
-    if (value_sequence.indices != nullptr) {
-      row_g_i = value_sequence.indices[row_i];
-    }
-
-    sqcgn::compute_base_element(g_i, row_g_i);
-  } else { // otherwise, use the user given generators
+  if (value_sequence.indices != nullptr) {
+    // use sparse representation
+    sqcgn::compute_base_element(g_i, value_sequence.indices[row_i]);
+  } else if (generators == nullptr) {
+    sqcgn::compute_base_element(g_i, row_i);
+  } else {
     g_i = generators[row_i];
   }
 
