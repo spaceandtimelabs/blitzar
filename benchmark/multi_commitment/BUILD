@@ -17,9 +17,9 @@ sxt_cc_benchmark(
         "//sxt/cbindings/backend:gpu_backend",
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/base:exponent_sequence",
         "//sxt/ristretto/base:byte_conversion",
         "//sxt/ristretto/type:compressed_element",
-        "//sxt/seqcommit/base:indexed_exponent_sequence",
         "//sxt/seqcommit/generator:base_element",
     ],
 )

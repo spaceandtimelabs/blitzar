@@ -4,9 +4,6 @@ EXEC_CMD_CALLGRIND="bazel run -c opt --define callgrind=true //benchmark/multi_c
 
 ############################################
 
-# specifies if the benchmark should use pre-computed generators
-use_pre_computed_generators=1
-
 results_dir="benchmark/multi_commitment/.results"
 
 read_field() {
@@ -38,10 +35,10 @@ run() {
             curr_benchmark_file="${base_dir}/${backend}_${c}_commits_${r}_length_${ws}_wordsize_${num_samples}_samples"
 
             if [ "${use_callgrind}" == "1" ]; then
-                ${EXEC_CMD_CALLGRIND} ${backend} ${c} ${r} ${ws} ${verbose} ${num_samples} ${use_pre_computed_generators}
+                ${EXEC_CMD_CALLGRIND} ${backend} ${c} ${r} ${ws} ${verbose} ${num_samples}
                 mv -f *.svg ${curr_benchmark_file}.svg
             else
-                ${EXEC_CMD} ${backend} ${c} ${r} ${ws} ${verbose} ${num_samples} ${use_pre_computed_generators} > ${curr_benchmark_file}.out
+                ${EXEC_CMD} ${backend} ${c} ${r} ${ws} ${verbose} ${num_samples} > ${curr_benchmark_file}.out
             fi
         done
     done
@@ -83,9 +80,9 @@ spreadsheet() {
 
             table_size=$(read_field 7 $curr_benchmark_file);
             num_exps=$(read_field 8 $curr_benchmark_file);
-            duration=$(read_field 11 $curr_benchmark_file);
-            std_deviation=$(read_field 12 $curr_benchmark_file);
-            throughput=$(read_field 13 $curr_benchmark_file);
+            duration=$(read_field 10 $curr_benchmark_file);
+            std_deviation=$(read_field 11 $curr_benchmark_file);
+            throughput=$(read_field 12 $curr_benchmark_file);
 
             if [ "$prev" != "$c" ]; then
                 echo -e "-- \t-- \t-- \t-- \t-- \t-- \t-- \t-- " >> ${spreadsheet_file}

@@ -16,9 +16,9 @@
 #include "sxt/cbindings/backend/gpu_backend.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/type/compressed_element.h"
-#include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
 using namespace sxt;
@@ -32,7 +32,6 @@ struct params {
   std::string backend_str;
   uint64_t element_nbytes;
   bool is_boolean;
-  bool use_pre_computed_generators;
   std::unique_ptr<cbnbck::computational_backend> backend;
 
   std::chrono::steady_clock::time_point begin_time;
@@ -41,11 +40,11 @@ struct params {
   params(int argc, char* argv[]) {
     status = 0;
 
-    if (argc < 8) {
+    if (argc < 7) {
       std::cerr << "Usage: benchmark "
                 << "<cpu|gpu> "
                 << "<num_commitments> <commitment_length> <element_nbytes> "
-                << "<verbose> <num_samples> <use_pre_computed_generators>\n";
+                << "<verbose> <num_samples>\n";
       status = -1;
     }
 
@@ -66,8 +65,6 @@ struct params {
     }
 
     num_samples = std::atoi(argv[6]);
-
-    use_pre_computed_generators = std::atoi(argv[7]);
 
     if (num_commitments <= 0 || commitment_length <= 0 || element_nbytes > 32) {
       std::cerr << "Restriction: 1 <= num_commitments, "
@@ -121,10 +118,9 @@ static void print_result(uint64_t num_commitments,
 //--------------------------------------------------------------------------------------------------
 // populate_table
 //--------------------------------------------------------------------------------------------------
-static void populate_table(bool use_pre_computed_generators, bool is_boolean,
-                           uint64_t num_commitments, uint64_t commitment_length,
+static void populate_table(bool is_boolean, uint64_t num_commitments, uint64_t commitment_length,
                            uint8_t element_nbytes, memmg::managed_array<uint8_t>& data_table,
-                           memmg::managed_array<sqcb::indexed_exponent_sequence>& data_commitments,
+                           memmg::managed_array<mtxb::exponent_sequence>& data_commitments,
                            memmg::managed_array<c21t::element_p3>& generators) {
 
   std::random_device rd;
@@ -137,10 +133,8 @@ static void populate_table(bool use_pre_computed_generators, bool is_boolean,
     distribution = std::uniform_int_distribution<uint8_t>(0, UINT8_MAX);
   }
 
-  if (use_pre_computed_generators) {
-    for (size_t i = 0; i < commitment_length; ++i) {
-      sqcgn::compute_base_element(generators[i], i);
-    }
+  for (size_t i = 0; i < commitment_length; ++i) {
+    sqcgn::compute_base_element(generators[i], i);
   }
 
   for (size_t i = 0; i < data_table.size(); ++i) {
@@ -150,11 +144,9 @@ static void populate_table(bool use_pre_computed_generators, bool is_boolean,
   for (size_t c = 0; c < num_commitments; ++c) {
     auto& data_sequence = data_commitments[c];
 
-    data_sequence.indices = nullptr;
-    data_sequence.exponent_sequence.n = commitment_length;
-    data_sequence.exponent_sequence.element_nbytes = element_nbytes;
-    data_sequence.exponent_sequence.data =
-        data_table.data() + c * commitment_length * element_nbytes;
+    data_sequence.n = commitment_length;
+    data_sequence.element_nbytes = element_nbytes;
+    data_sequence.data = data_table.data() + c * commitment_length * element_nbytes;
   }
 }
 
@@ -181,43 +173,30 @@ int main(int argc, char* argv[]) {
 
   // populate data section
   memmg::managed_array<c21t::element_p3> generators(p.commitment_length);
-  memmg::managed_array<sqcb::indexed_exponent_sequence> data_commitments(p.num_commitments);
+  memmg::managed_array<mtxb::exponent_sequence> data_commitments(p.num_commitments);
   memmg::managed_array<rstt::compressed_element> commitments_per_sequence(p.num_commitments);
   memmg::managed_array<uint8_t> data_table(p.commitment_length * p.num_commitments *
                                            p.element_nbytes);
 
   basct::span<rstt::compressed_element> commitments(commitments_per_sequence.data(),
                                                     p.num_commitments);
-  basct::cspan<sqcb::indexed_exponent_sequence> value_sequences(data_commitments.data(),
-                                                                p.num_commitments);
+  basct::cspan<mtxb::exponent_sequence> value_sequences(data_commitments.data(), p.num_commitments);
 
-  populate_table(p.use_pre_computed_generators, p.is_boolean, p.num_commitments,
-                 p.commitment_length, p.element_nbytes, data_table, data_commitments, generators);
+  populate_table(p.is_boolean, p.num_commitments, p.commitment_length, p.element_nbytes, data_table,
+                 data_commitments, generators);
 
   std::vector<double> durations;
   double mean_duration_compute = 0;
 
   for (int i = 0; i < p.num_samples; ++i) {
-    if (p.use_pre_computed_generators) {
-      // populate generators
-      basct::span<c21t::element_p3> span_generators(generators.data(), p.commitment_length);
+    // populate generators
+    basct::span<c21t::element_p3> span_generators(generators.data(), p.commitment_length);
 
-      p.trigger_timer();
-      SXT_TOGGLE_COLLECT;
-      p.backend->compute_commitments(commitments, value_sequences, span_generators,
-                                     p.commitment_length, false);
-      SXT_TOGGLE_COLLECT;
-      p.stop_timer();
-    } else {
-      basct::span<c21t::element_p3> empty_generators;
-
-      p.trigger_timer();
-      SXT_TOGGLE_COLLECT;
-      p.backend->compute_commitments(commitments, value_sequences, empty_generators,
-                                     p.commitment_length, false);
-      SXT_TOGGLE_COLLECT;
-      p.stop_timer();
-    }
+    p.trigger_timer();
+    SXT_TOGGLE_COLLECT;
+    p.backend->compute_commitments(commitments, value_sequences, span_generators);
+    SXT_TOGGLE_COLLECT;
+    p.stop_timer();
 
     double duration_compute = p.elapsed_time();
 
@@ -235,8 +214,6 @@ int main(int argc, char* argv[]) {
 
   double data_throughput = p.commitment_length * p.num_commitments / mean_duration_compute;
 
-  std::cout << "pre-computed generators : " << (p.use_pre_computed_generators ? "yes" : "no")
-            << std::endl;
   std::cout << "compute duration (s) : " << std::fixed << mean_duration_compute << std::endl;
   std::cout << "compute std deviation (s) : " << std::fixed << std_deviation << std::endl;
   std::cout << "throughput (exponentiations / s) : " << std::scientific << data_throughput

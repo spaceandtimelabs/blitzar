@@ -51,16 +51,6 @@ struct sxt_sequence_descriptor {
   // in the sequence and each element enocodes a number of element_nbytes bytes
   // represented in the little endian format
   const uint8_t* data;
-
-  // when `indices` is nullptr, then the sequence descriptor
-  // represents a dense sequence. In this case, data[i] is
-  // always tied with row i.
-  // If `indices` is not nullptr, then the sequence represents
-  // a sparse sequence such that `indices[i]` holds
-  // the actual row_i in which data[i] is tied with. In case
-  // indices is not nullptr, then `indices` must have
-  // exactly `n` elements.
-  const uint64_t* indices;
 };
 
 /**
@@ -95,13 +85,6 @@ int sxt_init(const struct sxt_config* config);
  *     g: uint64_t -> ristretto255
  * ```
  *
- * Note: in case `descriptor\[i]` is a sparce sequence, the `offset_generators` value is ignored
- * and `descriptor\[i].indices` is used instead to compute
- *
- * ```text
- *     Prod_{j=1 to n_i} g_{descriptor\[i].indices[j]} ^ a_ij
- * ```
- *
  * # Arguments:
  *
  * - commitments   (out): an array of length num_sequences where the computed commitments
@@ -109,6 +92,7 @@ int sxt_init(const struct sxt_config* config);
  *
  * - num_sequences (in): specifies the number of sequences
  * - descriptors   (in): an array of length num_sequences that specifies each sequence
+ * - offset_generators (in): specifies the offset used to fetch the generators
  *
  * # Abnormal program termination in case of:
  *
@@ -142,13 +126,6 @@ void sxt_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitmen
  * where n_i represents the number of elements in sequence i and g_j is a group
  * element determined by the `generators\[j]` user value given as input
  *
- * Note: in case `descriptor\[i]` is a sparce sequence, the `offset_generators` value is ignored
- * and `descriptor\[i].indices` is used instead to compute
- *
- * ```text
- *     Prod_{j=1 to n_i} g_{descriptor\[i].indices[j]} ^ a_ij
- * ```
- *
  * # Arguments:
  *
  * - commitments   (out): an array of length num_sequences where the computed commitments
@@ -163,7 +140,6 @@ void sxt_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitmen
  * - backend not initialized or incorrectly initialized
  * - descriptors == nullptr
  * - commitments == nullptr
- * - generators == nullptr
  * - descriptor\[i].element_nbytes == 0
  * - descriptor\[i].element_nbytes > 32
  * - descriptor\[i].n > 0 && descriptor\[i].data == nullptr

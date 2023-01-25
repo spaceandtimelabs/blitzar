@@ -6,35 +6,20 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/ristretto/type/compressed_element.h"
-#include "sxt/seqcommit/base/indexed_exponent_sequence.h"
 
 using namespace sxt;
 
-//--------------------------------------------------------------------------------------------------
-// find_longest_sequence
-//--------------------------------------------------------------------------------------------------
-static uint64_t find_longest_sequence(uint64_t num_sequences,
-                                      const sxt_sequence_descriptor* descriptors) {
-  SXT_RELEASE_ASSERT(descriptors != nullptr);
-
-  uint64_t longest_sequence = 0;
-  for (uint32_t i = 0; i < num_sequences; ++i) {
-    longest_sequence = std::max(longest_sequence, descriptors[i].n);
-  }
-
-  return longest_sequence;
-}
-
+namespace sxt::cbn {
 //--------------------------------------------------------------------------------------------------
 // populate_exponent_sequence
 //--------------------------------------------------------------------------------------------------
-static void populate_exponent_sequence(basct::span<sqcb::indexed_exponent_sequence> sequences,
-                                       bool& has_sparse_sequence,
-                                       const sxt_sequence_descriptor* descriptors) {
-  SXT_RELEASE_ASSERT(descriptors != nullptr);
+static uint64_t populate_exponent_sequence(basct::span<mtxb::exponent_sequence> sequences,
+                                           basct::cspan<sxt_sequence_descriptor> descriptors) {
+  SXT_RELEASE_ASSERT(descriptors.data() != nullptr);
 
-  has_sparse_sequence = false;
+  uint64_t longest_sequence = 0;
 
   for (uint32_t i = 0; i < sequences.size(); ++i) {
     auto& curr_descriptor = descriptors[i];
@@ -43,37 +28,50 @@ static void populate_exponent_sequence(basct::span<sqcb::indexed_exponent_sequen
 
     SXT_RELEASE_ASSERT(curr_descriptor.element_nbytes != 0 && curr_descriptor.element_nbytes <= 32);
 
-    has_sparse_sequence |= (curr_descriptor.indices != nullptr);
+    longest_sequence = std::max(longest_sequence, curr_descriptor.n);
 
-    sequences[i] = {.exponent_sequence = {.element_nbytes = curr_descriptor.element_nbytes,
-                                          .n = curr_descriptor.n,
-                                          .data = curr_descriptor.data},
-                    .indices = curr_descriptor.indices};
+    sequences[i] = {.element_nbytes = curr_descriptor.element_nbytes,
+                    .n = curr_descriptor.n,
+                    .data = curr_descriptor.data};
   }
+
+  return longest_sequence;
 }
 
 //--------------------------------------------------------------------------------------------------
 // process_compute_pedersen_commitments
 //--------------------------------------------------------------------------------------------------
 static void process_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitments,
-                                                 uint32_t num_sequences,
-                                                 const struct sxt_sequence_descriptor* descriptors,
-                                                 basct::cspan<c21t::element_p3> generators) {
-  SXT_RELEASE_ASSERT(commitments != nullptr);
+                                                 basct::cspan<sxt_sequence_descriptor> descriptors,
+                                                 const c21t::element_p3* generators,
+                                                 uint64_t offset_generators) {
+  if (descriptors.size() == 0)
+    return;
 
+  SXT_RELEASE_ASSERT(commitments != nullptr);
+  SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized());
   static_assert(sizeof(rstt::compressed_element) == sizeof(sxt_compressed_ristretto),
                 "types must be ABI compatible");
 
-  basct::span<rstt::compressed_element> commitments_result(
-      reinterpret_cast<rstt::compressed_element*>(commitments), num_sequences);
+  memmg::managed_array<mtxb::exponent_sequence> sequences(descriptors.size());
+  auto num_generators = populate_exponent_sequence(sequences, descriptors);
 
-  bool has_sparse_sequence;
-  memmg::managed_array<sqcb::indexed_exponent_sequence> sequences(num_sequences);
-  populate_exponent_sequence(sequences, has_sparse_sequence, descriptors);
+  auto backend = cbn::get_backend();
+  std::vector<c21t::element_p3> temp_generators;
+  basct::cspan<c21t::element_p3> generators_span;
 
-  cbn::get_backend()->compute_commitments(commitments_result, sequences, generators,
-                                          generators.size(), has_sparse_sequence);
+  if (generators == nullptr) {
+    generators_span =
+        backend->get_precomputed_generators(temp_generators, num_generators, offset_generators);
+  } else {
+    generators_span = basct::cspan<c21t::element_p3>(generators, num_generators);
+  }
+
+  backend->compute_commitments(
+      {reinterpret_cast<rstt::compressed_element*>(commitments), descriptors.size()}, sequences,
+      generators_span);
 }
+} // namespace sxt::cbn
 
 //--------------------------------------------------------------------------------------------------
 // sxt_compute_pedersen_commitments_with_generators
@@ -81,17 +79,9 @@ static void process_compute_pedersen_commitments(struct sxt_compressed_ristretto
 void sxt_compute_pedersen_commitments_with_generators(
     struct sxt_compressed_ristretto* commitments, uint32_t num_sequences,
     const struct sxt_sequence_descriptor* descriptors, const struct sxt_ristretto* generators) {
-  if (num_sequences == 0)
-    return;
-
-  SXT_RELEASE_ASSERT(generators != nullptr);
-  SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized());
-
-  uint64_t num_generators = find_longest_sequence(num_sequences, descriptors);
-  basct::cspan<c21t::element_p3> generators_span(
-      reinterpret_cast<const c21t::element_p3*>(generators), num_generators);
-
-  process_compute_pedersen_commitments(commitments, num_sequences, descriptors, generators_span);
+  cbn::process_compute_pedersen_commitments(commitments, {descriptors, num_sequences},
+                                            reinterpret_cast<const c21t::element_p3*>(generators),
+                                            0);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -100,16 +90,6 @@ void sxt_compute_pedersen_commitments_with_generators(
 void sxt_compute_pedersen_commitments(sxt_compressed_ristretto* commitments, uint32_t num_sequences,
                                       const sxt_sequence_descriptor* descriptors,
                                       uint64_t offset_generators) {
-  if (num_sequences == 0)
-    return;
-
-  SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized());
-
-  std::vector<c21t::element_p3> temp_generators;
-  uint64_t num_generators = find_longest_sequence(num_sequences, descriptors);
-  auto precomputed_generators = sxt::cbn::get_backend()->get_precomputed_generators(
-      temp_generators, num_generators, offset_generators);
-
-  process_compute_pedersen_commitments(commitments, num_sequences, descriptors,
-                                       precomputed_generators);
+  cbn::process_compute_pedersen_commitments(commitments, {descriptors, num_sequences}, nullptr,
+                                            offset_generators);
 }

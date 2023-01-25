@@ -105,7 +105,7 @@ sxt_cc_component(
         "//sxt/base/error:assert",
         "//sxt/memory/management:managed_array",
         "//sxt/ristretto/type:compressed_element",
-        "//sxt/seqcommit/base:indexed_exponent_sequence",
+        "//sxt/multiexp/base:exponent_sequence",
         "//sxt/curve21/type:element_p3",
     ],
     test_deps = [

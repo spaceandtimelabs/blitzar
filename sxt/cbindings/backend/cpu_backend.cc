@@ -15,59 +15,20 @@
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/scalar25/type/element.h"
-#include "sxt/seqcommit/base/indexed_exponent_sequence.h"
-#include "sxt/seqcommit/generator/cpu_generator.h"
 #include "sxt/seqcommit/generator/precomputed_generators.h"
-#include "sxt/seqcommit/naive/commitment_computation_cpu.h"
 
 namespace sxt::cbnbck {
-//--------------------------------------------------------------------------------------------------
-// populate_exponents_array
-//--------------------------------------------------------------------------------------------------
-// returns true if there is some sparse sequence in
-// the `value_sequences` span; otherwise returns false
-static void
-populate_exponents_array(memmg::managed_array<mtxb::exponent_sequence>& exponents,
-                         basct::cspan<sqcb::indexed_exponent_sequence> value_sequences) {
-
-  for (size_t i = 0; i < value_sequences.size(); ++i) {
-    exponents[i] = value_sequences[i].exponent_sequence;
-  }
-}
-
 //--------------------------------------------------------------------------------------------------
 // compute_commitments
 //--------------------------------------------------------------------------------------------------
 void cpu_backend::compute_commitments(basct::span<rstt::compressed_element> commitments,
-                                      basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
-                                      basct::cspan<c21t::element_p3> generators,
-                                      uint64_t length_longest_sequence,
-                                      bool has_sparse_sequence) const noexcept {
-
-  memmg::managed_array<mtxb::exponent_sequence> exponents(value_sequences.size());
-
-  populate_exponents_array(exponents, value_sequences);
-
-  if (has_sparse_sequence) {
-    /////////////////////////////////////////////////////////
-    // TODO
-    /////////////////////////////////////////////////////////
-    // for now, we use the naive cpu implementation
-    // to process sparse sequences. But later, this should
-    // be changed to use the pippenger implementation instead
-    /////////////////////////////////////////////////////////
-    return sqcnv::compute_commitments_cpu(commitments, value_sequences, generators);
-  }
+                                      basct::cspan<mtxb::exponent_sequence> value_sequences,
+                                      basct::cspan<c21t::element_p3> generators) const noexcept {
   memmg::managed_array<rstt::compressed_element> inout;
-  std::vector<c21t::element_p3> generators_data;
-  if (generators.empty()) {
-    generators =
-        sqcgn::get_precomputed_generators(generators_data, length_longest_sequence, 0, false);
-  }
   mtxrs::precomputed_p3_input_accessor input_accessor{generators};
   mtxrs::pippenger_multiproduct_solver multiproduct_solver;
   mtxrs::multiexponentiation_cpu_driver drv{&input_accessor, &multiproduct_solver};
-  mtxpi::compute_multiexponentiation(inout, drv, exponents);
+  mtxpi::compute_multiexponentiation(inout, drv, value_sequences);
   std::memcpy(commitments.data(), inout.data(),
               commitments.size() * sizeof(rstt::compressed_element));
 }

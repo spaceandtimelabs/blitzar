@@ -40,16 +40,10 @@ static std::vector<c21t::element_p3> compute_random_generators(uint64_t seq_leng
 // make_sequence_descriptor
 //--------------------------------------------------------------------------------------------------
 template <class T>
-static sxt_sequence_descriptor make_sequence_descriptor(const std::vector<T>& data,
-                                                        const std::vector<uint64_t>& indices) {
-  if (indices.size() > 0) {
-    SXT_DEBUG_ASSERT(data.size() == indices.size());
-  }
-
+static sxt_sequence_descriptor make_sequence_descriptor(const std::vector<T>& data) {
   return {.element_nbytes = sizeof(T),
           .n = data.size(),
-          .data = reinterpret_cast<const uint8_t*>(data.data()),
-          .indices = indices.data()};
+          .data = reinterpret_cast<const uint8_t*>(data.data())};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -94,8 +88,7 @@ static void test_pedersen_commitments_with_given_backend_and_no_generators(
   SECTION("Input sequences with zero length will not error out even with a null data pointer") {
     const uint64_t offset_gens = 0;
     const std::vector<uint8_t> data(0);
-    const std::vector<uint64_t> indices(0);
-    const auto seq_descriptor = make_sequence_descriptor(data, indices);
+    const auto seq_descriptor = make_sequence_descriptor(data);
     const uint32_t num_sequences = 1;
     sxt_compressed_ristretto commitment;
     sxt_compute_pedersen_commitments(&commitment, num_sequences, &seq_descriptor, offset_gens);
@@ -107,16 +100,15 @@ static void test_pedersen_commitments_with_given_backend_and_no_generators(
           "binding results") {
     const uint64_t scal = 52;
     const uint64_t offset_gens = 0;
-    const std::vector<uint64_t> indices = {};
     const std::vector<uint64_t> data_1 = {2000, 7500, 5000, 1500};
     const std::vector<uint64_t> data_2 = {5000, 0, 400000, 10};
     const std::vector<uint64_t> data_3 = {
         scal * data_1[0] + data_2[0], scal * data_1[1] + data_2[1], scal * data_1[2] + data_2[2],
         scal * data_1[3] + data_2[3]};
     const std::vector<sxt_sequence_descriptor> valid_descriptors = {
-        make_sequence_descriptor(data_1, indices),
-        make_sequence_descriptor(data_2, indices),
-        make_sequence_descriptor(data_3, indices),
+        make_sequence_descriptor(data_1),
+        make_sequence_descriptor(data_2),
+        make_sequence_descriptor(data_3),
     };
     const uint64_t num_sequences = valid_descriptors.size();
 
@@ -134,83 +126,19 @@ static void test_pedersen_commitments_with_given_backend_and_no_generators(
     REQUIRE(commit_c == commitments_data[2]);
   }
 
-  SECTION("We can correctly compute sparse commitments") {
-    const uint64_t offset_gens = 0;
-    const std::vector<uint8_t> sparse_data = {1, 2, 3, 4, 9};
-    const std::vector<uint8_t> dense_data = {1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0};
-    const std::vector<uint64_t> dense_indices = {}, sparse_indices = {0, 2, 4, 5, 9};
-    const auto dense_descriptor = make_sequence_descriptor(dense_data, dense_indices);
-    const auto sparse_descriptor = make_sequence_descriptor(sparse_data, sparse_indices);
-    const std::vector<sxt_sequence_descriptor> descriptors = {dense_descriptor, sparse_descriptor};
-    const uint64_t num_sequences = descriptors.size();
-
-    // we verify that both sparse and dense results are equal
-    rstt::compressed_element commitments_data[num_sequences];
-    sxt_compute_pedersen_commitments(reinterpret_cast<sxt_compressed_ristretto*>(commitments_data),
-                                     num_sequences, descriptors.data(), offset_gens);
-    REQUIRE(rstt::compressed_element() != commitments_data[0]);
-    REQUIRE(commitments_data[0] == commitments_data[1]);
-  }
-
-  SECTION("We can correctly compute dense commitments as sparse commitments") {
-    const uint64_t offset_gens = 0;
-    const std::vector<uint8_t> dense_data = {1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0};
-    const std::vector<uint8_t> sparse_data = {1, 0, 2, 0, 3, 4, 0, 0, 0, 9, 0};
-    const std::vector<uint64_t> dense_indices = {},
-                                sparse_indices = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    const auto dense_descriptor = make_sequence_descriptor(dense_data, dense_indices);
-    const auto sparse_descriptor = make_sequence_descriptor(sparse_data, sparse_indices);
-    const std::vector<sxt_sequence_descriptor> descriptors = {dense_descriptor, sparse_descriptor};
-    const uint64_t num_sequences = descriptors.size();
-
-    // dense_commitment result is the same as the sparse commitment
-    rstt::compressed_element commitments_data[num_sequences];
-    sxt_compute_pedersen_commitments(reinterpret_cast<sxt_compressed_ristretto*>(commitments_data),
-                                     num_sequences, descriptors.data(), offset_gens);
-
-    REQUIRE(rstt::compressed_element() != commitments_data[0]);
-    REQUIRE(commitments_data[0] == commitments_data[1]);
-  }
-
   SECTION("We can compute commitments with a non-zero offset generator") {
     const uint64_t offset_gens = 10;
-    const std::vector<uint8_t> dense_data = {1, 0, 2};
-    const std::vector<uint8_t> sparse_data = {1, 2};
-    const std::vector<uint64_t> dense_indices = {}, sparse_indices = {0, 2};
-    const auto dense_descriptor = make_sequence_descriptor(dense_data, dense_indices);
-    const auto sparse_descriptor = make_sequence_descriptor(sparse_data, sparse_indices);
-    const std::vector<sxt_sequence_descriptor> descriptors = {sparse_descriptor, dense_descriptor};
-    const auto num_sequences = descriptors.size();
+    const std::vector<uint8_t> data = {1, 0, 2, 6, 0, 7};
+    const auto descriptor = make_sequence_descriptor(data);
 
-    rstt::compressed_element commitments_data[num_sequences];
-    sxt_compute_pedersen_commitments(reinterpret_cast<sxt_compressed_ristretto*>(commitments_data),
-                                     descriptors.size(), descriptors.data(), offset_gens);
+    rstt::compressed_element commitments_data;
+    sxt_compute_pedersen_commitments(reinterpret_cast<sxt_compressed_ristretto*>(&commitments_data),
+                                     1, &descriptor, offset_gens);
 
-    SECTION("We verify that both sparse and dense commitments are different") {
-      REQUIRE(commitments_data[0] != commitments_data[1]);
-    }
+    const auto generators = compute_random_generators(data.size(), offset_gens);
+    const auto expected_commitment = compute_expected_commitment(data, generators);
 
-    SECTION("We verify that the offset generator is ignored for the sparse sequence") {
-      const uint64_t offset_gens = 0;
-      const std::vector<uint64_t> sparse_indices_as_dense = {};
-      const std::vector<uint8_t> sparse_data_as_dense = {1, 0, 2};
-      const auto sparse_descriptor_as_dense =
-          make_sequence_descriptor(sparse_data_as_dense, sparse_indices_as_dense);
-
-      rstt::compressed_element expected_commitment;
-      sxt_compute_pedersen_commitments(
-          reinterpret_cast<sxt_compressed_ristretto*>(&expected_commitment), 1,
-          &sparse_descriptor_as_dense, offset_gens);
-
-      REQUIRE(commitments_data[0] == expected_commitment);
-    }
-
-    SECTION("We verify that the offset generator is correctly used with the dense sequence") {
-      const auto generators = compute_random_generators(dense_data.size(), offset_gens);
-      const auto expected_commitment = compute_expected_commitment(dense_data, generators);
-
-      REQUIRE(commitments_data[1] == expected_commitment);
-    }
+    REQUIRE(commitments_data == expected_commitment);
   }
 
   cbn::reset_backend_for_testing();
@@ -225,9 +153,8 @@ test_pedersen_commitments_with_given_backend_and_generators(int backend,
   initialize_backend(backend, num_precomputed_generators);
 
   SECTION("We verify that using the correct generators will produce correct results") {
-    const std::vector<uint64_t> indices = {};
     const std::vector<uint32_t> data = {2000, 7500};
-    const auto seq_descriptor = make_sequence_descriptor(data, indices);
+    const auto seq_descriptor = make_sequence_descriptor(data);
     const uint64_t num_sequences = 1;
     const auto generators = compute_random_generators(data.size(), 10);
     const auto expected_commitment = compute_expected_commitment(data, generators);
@@ -235,26 +162,6 @@ test_pedersen_commitments_with_given_backend_and_generators(int backend,
     sxt_compressed_ristretto commitments_data;
     sxt_compute_pedersen_commitments_with_generators(
         &commitments_data, num_sequences, &seq_descriptor,
-        reinterpret_cast<const sxt_ristretto*>(generators.data()));
-    REQUIRE(*reinterpret_cast<rstt::compressed_element*>(&commitments_data) == expected_commitment);
-  }
-
-  SECTION("We verify that sparse sequence indices are used instead of provided generators") {
-    const uint64_t offset_gens = 0;
-    const uint64_t num_sequences = 1;
-    const std::vector<uint8_t> sparse_data = {1, 3};
-    const std::vector<uint64_t> sparse_indices = {0, 5};
-    const auto generators = compute_random_generators(sparse_data.size(), 10);
-    const auto sparse_descriptor = make_sequence_descriptor(sparse_data, sparse_indices);
-
-    rstt::compressed_element expected_commitment;
-    sxt_compute_pedersen_commitments(
-        reinterpret_cast<sxt_compressed_ristretto*>(&expected_commitment), num_sequences,
-        &sparse_descriptor, offset_gens);
-
-    sxt_compressed_ristretto commitments_data;
-    sxt_compute_pedersen_commitments_with_generators(
-        &commitments_data, num_sequences, &sparse_descriptor,
         reinterpret_cast<const sxt_ristretto*>(generators.data()));
     REQUIRE(*reinterpret_cast<rstt::compressed_element*>(&commitments_data) == expected_commitment);
   }

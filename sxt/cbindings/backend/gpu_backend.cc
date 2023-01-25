@@ -4,14 +4,13 @@
 
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/proof/inner_product/cpu_driver.h"
 #include "sxt/proof/inner_product/proof_computation.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/scalar25/type/element.h"
-#include "sxt/seqcommit/base/indexed_exponent_sequence.h"
-#include "sxt/seqcommit/generator/gpu_generator.h"
 #include "sxt/seqcommit/generator/precomputed_generators.h"
 #include "sxt/seqcommit/naive/commitment_computation_gpu.h"
 
@@ -21,21 +20,20 @@ namespace sxt::cbnbck {
 //--------------------------------------------------------------------------------------------------
 static void pre_initialize_gpu() {
   // initialization of dummy variables
-  basct::span<c21t::element_p3> dummy_empty_generators;
+  memmg::managed_array<c21t::element_p3> dummy_empty_generators(1);
   memmg::managed_array<uint8_t> dummy_data_table(1); // 1 col, 1 row, 1 bytes per data
   memmg::managed_array<rstt::compressed_element> dummy_commitments_per_col(1);
-  memmg::managed_array<sqcb::indexed_exponent_sequence> dummy_data_cols(1);
+  memmg::managed_array<mtxb::exponent_sequence> dummy_data_cols(1);
   basct::span<rstt::compressed_element> dummy_commitments(dummy_commitments_per_col.data(), 1);
-  basct::cspan<sqcb::indexed_exponent_sequence> dummy_value_sequences(dummy_data_cols.data(), 1);
+  basct::cspan<mtxb::exponent_sequence> dummy_value_sequences(dummy_data_cols.data(), 1);
 
   dummy_data_table[0] = 1;
 
   auto& data_col = dummy_data_cols[0];
 
-  data_col.indices = nullptr;
-  data_col.exponent_sequence.n = 1;
-  data_col.exponent_sequence.element_nbytes = 1;
-  data_col.exponent_sequence.data = dummy_data_table.data();
+  data_col.n = 1;
+  data_col.element_nbytes = 1;
+  data_col.data = dummy_data_table.data();
 
   // A small dummy computation to avoid the future cost of JIT compiling PTX code
   sqcnv::compute_commitments_gpu(dummy_commitments, dummy_value_sequences, dummy_empty_generators);
@@ -50,19 +48,8 @@ gpu_backend::gpu_backend() { pre_initialize_gpu(); }
 // compute_commitments
 //--------------------------------------------------------------------------------------------------
 void gpu_backend::compute_commitments(basct::span<rstt::compressed_element> commitments,
-                                      basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
-                                      basct::cspan<c21t::element_p3> generators,
-                                      uint64_t length_longest_sequence,
-                                      bool has_sparse_sequence) const noexcept {
-
-  if (!generators.empty() || has_sparse_sequence) {
-    sqcnv::compute_commitments_gpu(commitments, value_sequences, generators);
-    return;
-  }
-
-  std::vector<c21t::element_p3> generators_data;
-  generators = sqcgn::get_precomputed_generators(generators_data, length_longest_sequence, 0, true);
-
+                                      basct::cspan<mtxb::exponent_sequence> value_sequences,
+                                      basct::cspan<c21t::element_p3> generators) const noexcept {
   sqcnv::compute_commitments_gpu(commitments, value_sequences, generators);
 }
 

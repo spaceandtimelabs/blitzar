@@ -6,8 +6,8 @@
 #include "sxt/base/container/span.h"
 #include "sxt/cbindings/backend/computational_backend.h"
 
-namespace sxt::sqcb {
-struct indexed_exponent_sequence;
+namespace sxt::mtxb {
+struct exponent_sequence;
 }
 namespace sxt::rstt {
 class compressed_element;
@@ -36,9 +36,8 @@ namespace sxt::cbnbck {
 class cpu_backend final : public computational_backend {
 public:
   void compute_commitments(basct::span<rstt::compressed_element> commitments,
-                           basct::cspan<sqcb::indexed_exponent_sequence> value_sequences,
-                           basct::cspan<c21t::element_p3> generators, uint64_t longest_sequence,
-                           bool has_sparse_sequence) const noexcept override;
+                           basct::cspan<mtxb::exponent_sequence> value_sequences,
+                           basct::cspan<c21t::element_p3> generators) const noexcept override;
 
   basct::cspan<c21t::element_p3>
   get_precomputed_generators(std::vector<c21t::element_p3>& temp_generators, uint64_t n,

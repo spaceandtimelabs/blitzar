@@ -36,6 +36,7 @@ TEST_CASE("we can precompute generators") {
   REQUIRE(data.size() == 12);
   compute_base_element(e, 11);
   REQUIRE(generators[11] == e);
+  REQUIRE(generators.size() == 12);
 
   // we get correct generators when `offset != 0` and
   // `offset + data.length() <= precomputed.length()`
@@ -43,6 +44,7 @@ TEST_CASE("we can precompute generators") {
   REQUIRE(data.size() == 12); // data should not be modified
   compute_base_element(e, 4);
   REQUIRE(generators[0] == e);
+  REQUIRE(generators.size() == 2);
 
   generators = get_precomputed_generators(data, 6, 4, false);
   REQUIRE(data.size() == 12); // data should not be modified
@@ -50,6 +52,7 @@ TEST_CASE("we can precompute generators") {
   REQUIRE(generators[0] == e);
   compute_base_element(e, 9);
   REQUIRE(generators[5] == e);
+  REQUIRE(generators.size() == 6);
 
   // we get correct generators when `offset != 0` and `offset < precomputed.length()`,
   // but `offset + data.length() > precomputed.length()`
@@ -59,6 +62,7 @@ TEST_CASE("we can precompute generators") {
   REQUIRE(generators[0] == e);
   compute_base_element(e, 10);
   REQUIRE(generators[7] == e);
+  REQUIRE(generators.size() == 8);
 
   // we get correct generators when `offset > precomputed.length()`
   generators = get_precomputed_generators(data, 2, 12, false);
@@ -67,4 +71,5 @@ TEST_CASE("we can precompute generators") {
   REQUIRE(generators[0] == e);
   compute_base_element(e, 13);
   REQUIRE(generators[1] == e);
+  REQUIRE(generators.size() == 2);
 }

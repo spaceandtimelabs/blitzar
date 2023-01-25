@@ -2,8 +2,6 @@ extern crate proofs_gpu_sys;
 
 #[cfg(test)]
 mod tests {
-    use std::ptr;
-    
     #[test]
     fn compute_commitments_works() {
         let config: proofs_gpu_sys::sxt_config = proofs_gpu_sys::sxt_config {
@@ -61,8 +59,7 @@ mod tests {
                 let descriptor = proofs_gpu_sys::sxt_sequence_descriptor {
                     element_nbytes: n1_num_bytes,  // number bytes
                     n: n1,            // number rows
-                    data: data_bytes[i].as_mut_ptr() as *const u8,   // data pointer
-                    indices: ptr::null()
+                    data: data_bytes[i].as_mut_ptr() as *const u8
                 };
 
                 cbinding_descriptors[i] = descriptor;

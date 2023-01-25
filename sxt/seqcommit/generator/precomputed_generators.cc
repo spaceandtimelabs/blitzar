@@ -41,7 +41,7 @@ basct::cspan<c21t::element_p3>
 get_precomputed_generators(std::vector<c21t::element_p3>& generators_data, size_t length_generators,
                            size_t offset, bool use_gpu) noexcept {
   if (precomputed_generators_v.size() >= length_generators + offset) {
-    return precomputed_generators_v.subspan(offset);
+    return precomputed_generators_v.subspan(offset, length_generators);
   }
 
   generators_data.resize(length_generators);

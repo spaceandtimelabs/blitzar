@@ -1,28 +1,6 @@
 load("//bazel:sxt_component.bzl", "sxt_cc_component")
 
 sxt_cc_component(
-    name = "commitment_computation_cpu",
-    impl_deps = [
-        "//sxt/ristretto/type:compressed_element",
-        "//sxt/seqcommit/generator:base_element",
-        "//sxt/seqcommit/base:indexed_exponent_sequence",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/constant:zero",
-        "//sxt/ristretto/base:byte_conversion",
-        "//sxt/curve21/operation:scalar_multiply",
-        "//sxt/curve21/operation:add",
-        "//sxt/base/error:assert",
-    ],
-    test_deps = [
-        "//sxt/seqcommit/test:test_pedersen",
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
     name = "commitment_computation_gpu",
     impl_deps = [
         "//sxt/base/device:memory_utility",
@@ -30,8 +8,7 @@ sxt_cc_component(
         "//sxt/execution/base:stream",
         "//sxt/curve21/constant:zero",
         "//sxt/ristretto/type:compressed_element",
-        "//sxt/seqcommit/generator:base_element",
-        "//sxt/seqcommit/base:indexed_exponent_sequence",
+        "//sxt/multiexp/base:exponent_sequence",
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/curve21/operation:add",
@@ -43,8 +20,14 @@ sxt_cc_component(
     ],
     is_cuda = True,
     test_deps = [
-        "//sxt/seqcommit/test:test_pedersen",
         "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:scalar_multiply",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/ristretto/base:byte_conversion",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/seqcommit/generator:base_element",
     ],
     deps = [
         "//sxt/base/container:span",
