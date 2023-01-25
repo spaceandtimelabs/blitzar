@@ -246,7 +246,7 @@ def CompileNvcc(argv, log=False, device_c=False):
   # The `build --cxxopt -std=c++17` flag set in the 
   # `.bazelrc` file was not passed to the compiler.
   # However, this flag is relevant to some modules.
-  nvccopts = '-std=c++17 '
+  nvccopts = '-std=c++20 '
 
   nvccopts += '-D_FORCE_INLINES '
   for capability in GetOptionValue(argv, "--cuda-gpu-arch"):

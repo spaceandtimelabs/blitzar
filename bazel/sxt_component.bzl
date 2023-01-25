@@ -1,4 +1,4 @@
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library", "cuda_test")
 load(
     "//bazel:cuda_dlink.bzl",
     "cuda_dlink",
@@ -11,7 +11,6 @@ load(
 # However, this flag is relevant to some modules.
 def sxt_copts():
     return [
-        "-Wno-volatile",
         "-std=c++20",
     ]
 
@@ -76,14 +75,27 @@ def sxt_cc_component(
             name = device_test_name,
             deps = deps_p,
         )
-        native.cc_test(
-            name = name + ".t",
-            srcs = [
-                name + ".t.cc",
-            ],
-            deps = deps_p + [
-                ":" + device_test_name,
-            ],
-            visibility = ["//visibility:public"],
-            **kwargs
-        )
+        if is_cuda:
+            cuda_test(
+                name = name + ".t",
+                srcs = [
+                    name + ".t.cc",
+                ],
+                deps = deps_p + [
+                    ":" + device_test_name,
+                ],
+                visibility = ["//visibility:public"],
+                **kwargs
+            )
+        else:
+            native.cc_test(
+                name = name + ".t",
+                srcs = [
+                    name + ".t.cc",
+                ],
+                deps = deps_p + [
+                    ":" + device_test_name,
+                ],
+                visibility = ["//visibility:public"],
+                **kwargs
+            )

@@ -5,6 +5,7 @@
 
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/base/macro/cuda_warning.h"
 
 namespace sxt::basct {
 //--------------------------------------------------------------------------------------------------
@@ -31,12 +32,14 @@ public:
   CUDA_CALLABLE span(const span<std::remove_const_t<T>>& other) noexcept
       : size_{other.size()}, data_{other.data()} {}
 
+  CUDA_DISABLE_HOSTDEV_WARNING
   template <class Cont,
             std::enable_if_t<
                 std::is_convertible_v<decltype(std::declval<Cont&>().data()), T*> &&
                 std::is_convertible_v<decltype(std::declval<Cont&>().size()), size_t>>* = nullptr>
   CUDA_CALLABLE span(Cont& cont) noexcept : size_{cont.size()}, data_{cont.data()} {}
 
+  CUDA_DISABLE_HOSTDEV_WARNING
   template <
       class Cont,
       std::enable_if_t<

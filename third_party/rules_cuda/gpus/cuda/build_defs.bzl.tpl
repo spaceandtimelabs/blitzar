@@ -100,3 +100,7 @@ def cuda_header_library(
 def cuda_library(copts = [], **kwargs):
     """Wrapper over cc_library which adds default CUDA options."""
     native.cc_library(copts = cuda_default_copts() + copts, **kwargs)
+
+def cuda_test(copts = [], **kwargs):
+    """Wrapper over cc_library which adds default CUDA options."""
+    native.cc_test(copts = cuda_default_copts() + copts, **kwargs)

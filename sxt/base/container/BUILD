@@ -22,6 +22,7 @@ sxt_cc_component(
     deps = [
         "//sxt/base/error:assert",
         "//sxt/base/macro:cuda_callable",
+        "//sxt/base/macro:cuda_warning",
     ],
 )
 
