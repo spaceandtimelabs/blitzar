@@ -29,9 +29,50 @@ sxt_cc_component(
         "//sxt/execution/base:stream",
         "//sxt/base/device:memory_utility",
         "//sxt/base/test:unit_test",
-        "//sxt/base/device:property",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:device_resource",
         "//sxt/memory/resource:pinned_resource",
+    ],
+)
+
+sxt_cc_component(
+    name = "future_value_storage",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
+    name = "future_completion_fn",
+    with_test = False,
+)
+
+sxt_cc_component(
+    name = "future_ready",
+    with_test = False,
+)
+
+sxt_cc_component(
+    name = "future_fwd",
+    with_test = False,
+)
+
+sxt_cc_component(
+    name = "future",
+    test_deps = [
+        ":test_kernel",
+        "//sxt/execution/base:stream",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:pinned_resource",
+    ],
+    deps = [
+        ":computation_handle",
+        ":future_completion_fn",
+        ":future_fwd",
+        ":future_ready",
+        ":future_value_storage",
     ],
 )

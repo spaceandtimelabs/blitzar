@@ -26,6 +26,8 @@ public:
 
   CUstream_st* raw_stream() const noexcept;
 
+  operator CUstream_st*() const noexcept { return this->raw_stream(); }
+
 private:
   stream_handle* handle_;
 };
