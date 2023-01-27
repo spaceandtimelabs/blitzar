@@ -54,8 +54,8 @@ void combine_multiproduct_outputs_impl(basct::span<T> outputs,
 multiexponentiation_cpu_driver::multiexponentiation_cpu_driver(
     const mtxrs::input_accessor* input_accessor,
     const mtxrs::multiproduct_solver* multiproduct_solver, bool compress) noexcept
-    : input_accessor_{input_accessor}, multiproduct_solver_{multiproduct_solver}, compress_{
-                                                                                      compress} {}
+    : input_accessor_{input_accessor}, multiproduct_solver_{multiproduct_solver},
+      compress_{compress} {}
 
 //--------------------------------------------------------------------------------------------------
 // compute_multiproduct_inputs

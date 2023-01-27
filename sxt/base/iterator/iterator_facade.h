@@ -10,7 +10,9 @@ namespace sxt::basit {
 // has_distance_to_v
 //--------------------------------------------------------------------------------------------------
 namespace detail {
-template <class T, class = void> struct has_distance_to { static constexpr bool value = false; };
+template <class T, class = void> struct has_distance_to {
+  static constexpr bool value = false;
+};
 
 template <class T>
 struct has_distance_to<T, std::void_t<decltype(std::declval<T>().distance_to(std::declval<T>()))>> {
@@ -24,7 +26,9 @@ template <class T> static constexpr bool has_distance_to_v = has_distance_to<T>:
 // iterator_difference_type
 //--------------------------------------------------------------------------------------------------
 namespace detail {
-template <class T, class = void> struct iterator_difference_type { using type = std::ptrdiff_t; };
+template <class T, class = void> struct iterator_difference_type {
+  using type = std::ptrdiff_t;
+};
 
 template <class T> struct iterator_difference_type<T, std::enable_if_t<has_distance_to_v<T>>> {
   using type = decltype(std::declval<T>().distance_to(std::declval<T>()));
@@ -80,7 +84,9 @@ struct iterator_pointer<
 // has_increment
 //--------------------------------------------------------------------------------------------------
 namespace detail {
-template <class T, class = void> struct has_increment { static constexpr bool value = false; };
+template <class T, class = void> struct has_increment {
+  static constexpr bool value = false;
+};
 
 template <class T> struct has_increment<T, std::void_t<decltype(std::declval<T>().increment())>> {
   static constexpr bool value = true;
@@ -93,7 +99,9 @@ template <class T> static constexpr bool has_increment_v = has_increment<T>::val
 // has_decrement
 //--------------------------------------------------------------------------------------------------
 namespace detail {
-template <class T, class = void> struct has_decrement { static constexpr bool value = false; };
+template <class T, class = void> struct has_decrement {
+  static constexpr bool value = false;
+};
 
 template <class T> struct has_decrement<T, std::void_t<decltype(std::declval<T>().decrement())>> {
   static constexpr bool value = true;
@@ -106,7 +114,9 @@ template <class T> static constexpr bool has_decrement_v = has_decrement<T>::val
 // has_advance
 //--------------------------------------------------------------------------------------------------
 namespace detail {
-template <class T, class = void> struct has_advance { static constexpr bool value = false; };
+template <class T, class = void> struct has_advance {
+  static constexpr bool value = false;
+};
 
 template <class T>
 struct has_advance<T, std::void_t<decltype(std::declval<T>().advance(std::ptrdiff_t{}))>> {

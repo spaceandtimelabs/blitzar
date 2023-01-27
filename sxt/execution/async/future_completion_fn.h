@@ -7,9 +7,13 @@ namespace sxt::xena {
 // future_completion_fn_type
 //--------------------------------------------------------------------------------------------------
 namespace detail {
-template <class T> struct future_completion_fn_type { using type = std::function<void(T&)>; };
+template <class T> struct future_completion_fn_type {
+  using type = std::function<void(T&)>;
+};
 
-template <> struct future_completion_fn_type<void> { using type = std::function<void()>; };
+template <> struct future_completion_fn_type<void> {
+  using type = std::function<void()>;
+};
 } // namespace detail
 
 //--------------------------------------------------------------------------------------------------
