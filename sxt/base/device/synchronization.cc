@@ -11,7 +11,7 @@ namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // synchronize_stream
 //--------------------------------------------------------------------------------------------------
-void synchronize_stream(CUstream_st* stream) noexcept {
+void synchronize_stream(bast::raw_stream_t stream) noexcept {
   auto rcode = cudaStreamSynchronize(stream);
   if (rcode != cudaSuccess) {
     baser::panic("cudaStreamSynchronize failed: " + std::string(cudaGetErrorString(rcode)));

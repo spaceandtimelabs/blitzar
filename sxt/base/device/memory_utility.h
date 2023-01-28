@@ -2,8 +2,7 @@
 
 #include <cstddef>
 
-struct CUstream_st;
-typedef CUstream_st* cudaStream_t;
+#include "sxt/base/type/raw_stream.h"
 
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
@@ -25,13 +24,13 @@ void memcpy_device_to_host(void* dst, const void* src, size_t count) noexcept;
 // async_memcpy_host_to_device
 //--------------------------------------------------------------------------------------------------
 void async_memcpy_host_to_device(void* dst, const void* src, size_t count,
-                                 cudaStream_t stream) noexcept;
+                                 bast::raw_stream_t stream) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // async_memcpy_device_to_host
 //--------------------------------------------------------------------------------------------------
 void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
-                                 cudaStream_t stream) noexcept;
+                                 bast::raw_stream_t stream) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // memset_device

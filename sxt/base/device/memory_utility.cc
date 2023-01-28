@@ -41,7 +41,7 @@ void memcpy_device_to_host(void* dst, const void* src, size_t count) noexcept {
 // async_memcpy_host_to_device
 //--------------------------------------------------------------------------------------------------
 void async_memcpy_host_to_device(void* dst, const void* src, size_t count,
-                                 cudaStream_t stream) noexcept {
+                                 bast::raw_stream_t stream) noexcept {
   auto rcode = cudaMemcpyAsync(dst, src, count, cudaMemcpyHostToDevice, stream);
   if (rcode != cudaSuccess) {
     baser::panic("cudaMemcpyAsync failed: " + std::string(cudaGetErrorString(rcode)));
@@ -52,7 +52,7 @@ void async_memcpy_host_to_device(void* dst, const void* src, size_t count,
 // async_memcpy_device_to_host
 //--------------------------------------------------------------------------------------------------
 void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
-                                 cudaStream_t stream) noexcept {
+                                 bast::raw_stream_t stream) noexcept {
   auto rcode = cudaMemcpyAsync(dst, src, count, cudaMemcpyDeviceToHost, stream);
   if (rcode != cudaSuccess) {
     baser::panic("cudaMemcpyAsync failed: " + std::string(cudaGetErrorString(rcode)));

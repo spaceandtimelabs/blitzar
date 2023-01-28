@@ -1,6 +1,6 @@
 #pragma once
 
-struct CUstream_st;
+#include "sxt/base/type/raw_stream.h"
 
 namespace sxt::xenb {
 struct stream_handle;
@@ -24,9 +24,9 @@ public:
 
   stream_handle* release_handle() noexcept;
 
-  CUstream_st* raw_stream() const noexcept;
+  bast::raw_stream_t raw_stream() const noexcept;
 
-  operator CUstream_st*() const noexcept { return this->raw_stream(); }
+  operator bast::raw_stream_t() const noexcept { return this->raw_stream(); }
 
 private:
   stream_handle* handle_;

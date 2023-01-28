@@ -1,13 +1,10 @@
 #pragma once
 
-#include "sxt/base/type/raw_stream.h"
+struct CUstream_st;
 
-namespace sxt::xenb {
+namespace sxt::bast {
 //--------------------------------------------------------------------------------------------------
-// stream_handle
+// raw_stream_t
 //--------------------------------------------------------------------------------------------------
-struct stream_handle {
-  bast::raw_stream_t stream;
-  stream_handle* next;
-};
-} // namespace sxt::xenb
+using raw_stream_t = CUstream_st*;
+} // namespace sxt::bast

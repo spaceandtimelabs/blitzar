@@ -16,11 +16,17 @@ sxt_cc_component(
         "//sxt/base/device:property",
         "//sxt/base/test:unit_test",
     ],
+    deps = [
+        "//sxt/base/type:raw_stream",
+    ],
 )
 
 sxt_cc_component(
     name = "stream_handle",
     with_test = False,
+    deps = [
+        "//sxt/base/type:raw_stream",
+    ],
 )
 
 sxt_cc_component(

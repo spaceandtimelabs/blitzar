@@ -22,3 +22,8 @@ sxt_cc_component(
     name = "remove_cvref",
     with_test = False,
 )
+
+sxt_cc_component(
+    name = "raw_stream",
+    with_test = False,
+)
