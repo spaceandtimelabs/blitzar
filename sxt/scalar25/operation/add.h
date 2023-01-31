@@ -18,4 +18,8 @@ namespace sxt::s25o {
 // where l = 2^252 + 27742317777372353535851937790883648493
 CUDA_CALLABLE
 void add(s25t::element& z, const s25t::element& x, const s25t::element& y) noexcept;
+
+CUDA_CALLABLE
+void add(s25t::element& z, const volatile s25t::element& x,
+         const volatile s25t::element& y) noexcept;
 } // namespace sxt::s25o
