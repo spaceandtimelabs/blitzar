@@ -6,10 +6,15 @@ load(
 sxt_cc_component(
     name = "compression",
     impl_deps = [
+        "//sxt/base/error:assert",
         "//sxt/ristretto/base:byte_conversion",
         "//sxt/ristretto/type:compressed_element",
+        "//sxt/curve21/type:element_p3",
     ],
     with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+    ],
 )
 
 sxt_cc_component(

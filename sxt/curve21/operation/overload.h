@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace sxt::s25t {
 class element;
 }
@@ -23,6 +25,8 @@ element_p3 operator-(const element_p3& p) noexcept;
 // operator*
 //--------------------------------------------------------------------------------------------------
 element_p3 operator*(const s25t::element& lhs, const element_p3& rhs) noexcept;
+
+element_p3 operator*(uint64_t lhs, const element_p3& rhs) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // operator+=

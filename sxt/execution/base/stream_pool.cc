@@ -75,9 +75,9 @@ void stream_pool::release_handle(stream_handle* handle) noexcept {
 //--------------------------------------------------------------------------------------------------
 // get_stream_pool
 //--------------------------------------------------------------------------------------------------
-stream_pool* get_stream_pool() noexcept {
+stream_pool* get_stream_pool(size_t initial_size) noexcept {
   // Allocate a thread local pool that's available for the duration of the process.
-  static thread_local auto pool = new stream_pool{10};
+  static thread_local auto pool = new stream_pool{initial_size};
   return pool;
 }
 } // namespace sxt::xenb

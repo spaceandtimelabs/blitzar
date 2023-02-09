@@ -18,6 +18,7 @@ TEST_CASE("we can use operators on curve21 elements") {
 
   SECTION("we do basic operations") {
     REQUIRE(0x2_s25 * e1 == e1 + e1);
+    REQUIRE(2 * e1 == e1 + e1);
     REQUIRE(e1 + (e1 - e1) == e1);
     REQUIRE(e1 + (e1 + -e1) == e1);
     REQUIRE(-(-e1) == e1);

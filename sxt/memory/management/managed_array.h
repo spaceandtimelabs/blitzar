@@ -38,6 +38,10 @@ public:
     return basct::span_void{data_, size_, num_bytes_ / size_};
   }
 
+  operator basct::span_cvoid() const noexcept {
+    return basct::span_cvoid{data_, size_, num_bytes_ / size_};
+  }
+
   // assignment
   managed_array& operator=(const managed_array& other) noexcept;
   managed_array& operator=(managed_array&& other) noexcept;
@@ -59,6 +63,18 @@ public:
 
   // methods
   void reset() noexcept;
+
+  template <class T> managed_array<T>& as_array() & noexcept {
+    return reinterpret_cast<managed_array<T>&>(*this);
+  }
+
+  template <class T> managed_array<T>&& as_array() && noexcept {
+    return reinterpret_cast<managed_array<T>&&>(std::move(*this));
+  }
+
+  template <class T> const managed_array<T>& as_array() const& noexcept {
+    return reinterpret_cast<const managed_array<T>&>(*this);
+  }
 
 private:
   allocator_type alloc_;
@@ -112,6 +128,10 @@ public:
 
   operator basct::span_void() noexcept {
     return basct::span_void{data_.data(), data_.size(), sizeof(T)};
+  }
+
+  operator basct::span_cvoid() const noexcept {
+    return basct::span_cvoid{data_.data(), data_.size(), sizeof(T)};
   }
 
   // accessors

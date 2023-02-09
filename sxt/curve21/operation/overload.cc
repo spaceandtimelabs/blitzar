@@ -43,6 +43,12 @@ element_p3 operator*(const s25t::element& lhs, const element_p3& rhs) noexcept {
   return res;
 }
 
+element_p3 operator*(uint64_t lhs, const element_p3& rhs) noexcept {
+  element_p3 res;
+  c21o::scalar_multiply(res, lhs, rhs);
+  return res;
+}
+
 //--------------------------------------------------------------------------------------------------
 // operator+=
 //--------------------------------------------------------------------------------------------------
