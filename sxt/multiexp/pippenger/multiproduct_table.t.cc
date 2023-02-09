@@ -103,7 +103,8 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
         {.element_nbytes = 1, .n = 1, .data = exponents.data()}};
     term_or_all.resize(1, 8);
     output_digit_or_all.resize(1, 8);
-    make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3);
+    REQUIRE(0 ==
+            make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3));
     REQUIRE(table == mtxi::index_table{});
   }
 
@@ -115,7 +116,8 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     output_digit_or_all.resize(1, 8);
     term_or_all[0][0] = 1;
     output_digit_or_all[0][0] = 1;
-    make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3);
+    REQUIRE(1 ==
+            make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3));
     REQUIRE(table == mtxi::index_table{{0, 0, 0}});
   }
 
@@ -128,7 +130,8 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     term_or_all[1][0] = 1;
     output_digit_or_all.resize(1, 8);
     output_digit_or_all[0][0] = 1;
-    make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3);
+    REQUIRE(2 ==
+            make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3));
     REQUIRE(table == mtxi::index_table{{0, 0, 0, 1}});
   }
 
@@ -140,7 +143,8 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     term_or_all[0][0] = 2;
     output_digit_or_all.resize(1, 8);
     output_digit_or_all[0][0] = 2;
-    make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3);
+    REQUIRE(1 ==
+            make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3));
     REQUIRE(table == mtxi::index_table{{0, 0, 0}});
   }
 
@@ -152,7 +156,8 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     term_or_all[0][0] = 3;
     output_digit_or_all.resize(1, 8);
     output_digit_or_all[0][0] = 3;
-    make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3);
+    REQUIRE(1 ==
+            make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3));
     REQUIRE(table == mtxi::index_table{{0, 0, 0}, {1, 0, 0}});
   }
 
@@ -165,7 +170,8 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     term_or_all[1][0] = 2;
     output_digit_or_all.resize(1, 8);
     output_digit_or_all[0][0] = 0b11;
-    make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3);
+    REQUIRE(2 ==
+            make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3));
     REQUIRE(table == mtxi::index_table{{0, 0, 0}, {1, 0, 1}});
   }
 
@@ -177,7 +183,8 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     term_or_all[0][0] = 3;
     output_digit_or_all.resize(1, 8);
     output_digit_or_all[0][0] = 1;
-    make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 1);
+    REQUIRE(2 ==
+            make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 1));
     REQUIRE(table == mtxi::index_table{{0, 0, 0, 1}});
   }
 
@@ -198,7 +205,8 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     output_digit_or_all[0][0] = exponents_bytes[0];
     output_digit_or_all[0][1] = exponents_bytes[1];
 
-    make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 16);
+    REQUIRE(1 ==
+            make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 16));
     REQUIRE(table == mtxi::index_table{{0, 0, 0},
                                        {1, 0, 0},
                                        {2, 0, 0},
@@ -227,7 +235,8 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     output_digit_or_all[0][0] = exponents_bytes[0] | 0b101011;
     output_digit_or_all[0][1] = 0b11;
 
-    make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 10);
+    REQUIRE(2 ==
+            make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 10));
     REQUIRE(table == mtxi::index_table{{0, 0, 0, 1},
                                        {1, 0, 1},
                                        {2, 0, 0},

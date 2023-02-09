@@ -31,9 +31,9 @@ size_t make_multiproduct_term_table(mtxi::index_table& table, const basct::blob_
 //--------------------------------------------------------------------------------------------------
 // make_multiproduct_table
 //--------------------------------------------------------------------------------------------------
-void make_multiproduct_table(mtxi::index_table& table,
-                             basct::cspan<mtxb::exponent_sequence> exponents, size_t max_entries,
-                             const basct::blob_array& term_or_all,
-                             const basct::blob_array& output_digit_or_all,
-                             size_t radix_log2) noexcept;
+size_t make_multiproduct_table(mtxi::index_table& table,
+                               basct::cspan<mtxb::exponent_sequence> exponents, size_t max_entries,
+                               const basct::blob_array& term_or_all,
+                               const basct::blob_array& output_digit_or_all,
+                               size_t radix_log2) noexcept;
 } // namespace sxt::mtxpi

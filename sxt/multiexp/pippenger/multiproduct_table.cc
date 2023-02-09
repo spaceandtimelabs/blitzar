@@ -95,11 +95,11 @@ size_t make_multiproduct_term_table(mtxi::index_table& table, const basct::blob_
 //--------------------------------------------------------------------------------------------------
 // make_multiproduct_table
 //--------------------------------------------------------------------------------------------------
-void make_multiproduct_table(mtxi::index_table& table,
-                             basct::cspan<mtxb::exponent_sequence> exponents, size_t max_entries,
-                             const basct::blob_array& term_or_all,
-                             const basct::blob_array& output_digit_or_all,
-                             size_t radix_log2) noexcept {
+size_t make_multiproduct_table(mtxi::index_table& table,
+                               basct::cspan<mtxb::exponent_sequence> exponents, size_t max_entries,
+                               const basct::blob_array& term_or_all,
+                               const basct::blob_array& output_digit_or_all,
+                               size_t radix_log2) noexcept {
   SXT_DEBUG_ASSERT(exponents.size() == output_digit_or_all.size());
 
   init_multiproduct_table(table, max_entries, output_digit_or_all);
@@ -110,6 +110,7 @@ void make_multiproduct_table(mtxi::index_table& table,
   auto entry_data = table.entry_data();
   auto rows = table.header();
   size_t multiproduct_output_index = 0;
+  size_t max_inputs = 0;
   for (size_t output_index = 0; output_index < output_digit_or_all.size(); ++output_index) {
     auto digit_or_all = output_digit_or_all[output_index];
     auto sequence = exponents[output_index];
@@ -136,6 +137,8 @@ void make_multiproduct_table(mtxi::index_table& table,
       }
       input_first += mtxb::count_nonzero_digits(term_or_all[term_index], radix_log2);
     }
+    max_inputs = std::max(input_first, max_inputs);
   }
+  return max_inputs;
 }
 } // namespace sxt::mtxpi
