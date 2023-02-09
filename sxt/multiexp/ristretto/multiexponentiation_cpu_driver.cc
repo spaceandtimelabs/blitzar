@@ -13,9 +13,9 @@
 #include "sxt/curve21/type/element_p1p1.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/multiexp/curve21/doubling_reduction.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/ristretto/compressed_input_accessor.h"
-#include "sxt/multiexp/ristretto/doubling_reduction.h"
 #include "sxt/multiexp/ristretto/naive_multiproduct_solver.h"
 #include "sxt/multiexp/ristretto/uncompressed_input_accessor.h"
 #include "sxt/ristretto/base/byte_conversion.h"
@@ -38,7 +38,7 @@ void combine_multiproduct_outputs_impl(basct::span<T> outputs,
       continue;
     }
     c21t::element_p3 output;
-    doubling_reduce(output, digit_or_all, inputs.subspan(input_index, digit_count_one));
+    mtxc21::doubling_reduce(output, digit_or_all, inputs.subspan(input_index, digit_count_one));
     input_index += digit_count_one;
     if constexpr (std::is_same_v<T, rstt::compressed_element>) {
       rstb::to_bytes(outputs[output_index].data(), output);

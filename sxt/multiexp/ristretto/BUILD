@@ -27,23 +27,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "doubling_reduction",
-    impl_deps = [
-        "//sxt/base/bit:count",
-        "//sxt/base/bit:span_op",
-        "//sxt/curve21/operation:add",
-        "//sxt/curve21/operation:double",
-        "//sxt/base/error:assert",
-    ],
-    test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
     name = "precomputed_p3_input_accessor",
     impl_deps = [
         "//sxt/base/error:assert",
@@ -66,12 +49,12 @@ sxt_cc_component(
     impl_deps = [
         ":compressed_input_accessor",
         ":uncompressed_input_accessor",
-        ":doubling_reduction",
         ":naive_multiproduct_solver",
         "//sxt/base/bit:count",
         "//sxt/base/bit:span_op",
         "//sxt/base/container:blob_array",
         "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/curve21:doubling_reduction",
         "//sxt/multiexp/index:index_table",
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/operation:add",

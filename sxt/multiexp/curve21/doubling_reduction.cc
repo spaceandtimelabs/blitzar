@@ -1,4 +1,4 @@
-#include "sxt/multiexp/ristretto/doubling_reduction.h"
+#include "sxt/multiexp/curve21/doubling_reduction.h"
 
 #include "sxt/base/bit/count.h"
 #include "sxt/base/bit/span_op.h"
@@ -6,7 +6,7 @@
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 
-namespace sxt::mtxrs {
+namespace sxt::mtxc21 {
 //--------------------------------------------------------------------------------------------------
 // doubling_reduce
 //--------------------------------------------------------------------------------------------------
@@ -31,4 +31,4 @@ void doubling_reduce(c21t::element_p3& res, basct::cspan<uint8_t> digit_or_all,
     }
   }
 }
-} // namespace sxt::mtxrs
+} // namespace sxt::mtxc21

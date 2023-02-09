@@ -4,6 +4,25 @@ load(
 )
 
 sxt_cc_component(
+    name = "doubling_reduction",
+    impl_deps = [
+        "//sxt/base/bit:count",
+        "//sxt/base/bit:span_op",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
+        "//sxt/base/error:assert",
+    ],
+    test_deps = [
+        "//sxt/curve21/operation:overload",
+        "//sxt/ristretto/type:literal",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "multiproduct_bitset_operator",
     with_test = False,
     deps = [
