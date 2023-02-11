@@ -20,6 +20,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
+        ":span_void",
         "//sxt/base/error:assert",
         "//sxt/base/macro:cuda_callable",
         "//sxt/base/macro:cuda_warning",

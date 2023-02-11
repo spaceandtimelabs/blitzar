@@ -1,8 +1,10 @@
 #pragma once
 
+#include <concepts>
 #include <cstddef>
 #include <type_traits>
 
+#include "sxt/base/container/span_void.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/macro/cuda_warning.h"
@@ -28,24 +30,35 @@ public:
 
   template <size_t N> CUDA_CALLABLE span(T (&arr)[N]) noexcept : size_{N}, data_{arr} {}
 
-  template <class Dummy = int, std::enable_if_t<std::is_const_v<T>, Dummy>* = nullptr>
   CUDA_CALLABLE span(const span<std::remove_const_t<T>>& other) noexcept
+    requires std::is_const_v<T>
       : size_{other.size()}, data_{other.data()} {}
 
   CUDA_DISABLE_HOSTDEV_WARNING
-  template <class Cont,
-            std::enable_if_t<
-                std::is_convertible_v<decltype(std::declval<Cont&>().data()), T*> &&
-                std::is_convertible_v<decltype(std::declval<Cont&>().size()), size_t>>* = nullptr>
-  CUDA_CALLABLE span(Cont& cont) noexcept : size_{cont.size()}, data_{cont.data()} {}
+  template <class Cont>
+  CUDA_CALLABLE span(Cont& cont) noexcept
+    requires requires {
+      { cont.data() } -> std::convertible_to<T*>;
+      { cont.size() } -> std::convertible_to<size_t>;
+    }
+      : size_{cont.size()}, data_{cont.data()} {}
 
   CUDA_DISABLE_HOSTDEV_WARNING
-  template <
-      class Cont,
-      std::enable_if_t<
-          std::is_convertible_v<decltype(std::declval<const Cont&>().data()), T*> &&
-          std::is_convertible_v<decltype(std::declval<const Cont&>().size()), size_t>>* = nullptr>
-  CUDA_CALLABLE span(const Cont& cont) noexcept : size_{cont.size()}, data_{cont.data()} {}
+  template <class Cont>
+  CUDA_CALLABLE span(const Cont& cont) noexcept
+    requires requires {
+      { cont.data() } -> std::convertible_to<T*>;
+      { cont.size() } -> std::convertible_to<size_t>;
+    }
+      : size_{cont.size()}, data_{cont.data()} {}
+
+  operator span_cvoid() const noexcept { return {static_cast<void*>(data_), size_, sizeof(T)}; }
+
+  operator span_void() const noexcept
+    requires(!std::is_const_v<T>)
+  {
+    return {static_cast<void*>(data_), size_, sizeof(T)};
+  }
 
   CUDA_CALLABLE
   T* data() const noexcept { return data_; }
