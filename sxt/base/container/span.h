@@ -52,7 +52,9 @@ public:
     }
       : size_{cont.size()}, data_{cont.data()} {}
 
-  operator span_cvoid() const noexcept { return {static_cast<void*>(data_), size_, sizeof(T)}; }
+  operator span_cvoid() const noexcept {
+    return {static_cast<const void*>(data_), size_, sizeof(T)};
+  }
 
   operator span_void() const noexcept
     requires(!std::is_const_v<T>)

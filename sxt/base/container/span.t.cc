@@ -30,4 +30,16 @@ TEST_CASE("span represents a view into a contiguous region of memory") {
     REQUIRE(s.data() == v.data());
     REQUIRE(s.size() == v.size());
   }
+
+  SECTION("we can implicitly convert to a void span") {
+    std::vector<int> v = {1, 2, 3};
+
+    span<int> s1{v};
+    span_void sv1{s1};
+    REQUIRE(sv1.data() == v.data());
+
+    cspan<int> s2{v};
+    span_cvoid sv2{s2};
+    REQUIRE(sv2.data() == v.data());
+  }
 }
