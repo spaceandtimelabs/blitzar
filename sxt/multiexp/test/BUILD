@@ -57,15 +57,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "int_generation",
-    impl_deps = [],
-    with_test = False,
-    deps = [
-        "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
     name = "generate_ristretto_elements",
     impl_deps = [
         "//sxt/ristretto/type:compressed_element",

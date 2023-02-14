@@ -1,6 +1,6 @@
-#include "sxt/multiexp/test/int_generation.h"
+#include "sxt/multiexp/random/int_generation.h"
 
-namespace sxt::mtxtst {
+namespace sxt::mtxrn {
 //--------------------------------------------------------------------------------------------------
 // generate_uint64s
 //--------------------------------------------------------------------------------------------------
@@ -12,4 +12,4 @@ void generate_uint64s(basct::span<uint64_t> generators, std::mt19937& rng) noexc
     generators[i] = generators_gen(rng);
   }
 }
-} // namespace sxt::mtxtst
+} // namespace sxt::mtxrn

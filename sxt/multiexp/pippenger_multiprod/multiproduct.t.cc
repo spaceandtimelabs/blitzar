@@ -10,10 +10,10 @@
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger_multiprod/multiproduct_params.h"
 #include "sxt/multiexp/pippenger_multiprod/test_driver.h"
+#include "sxt/multiexp/random/int_generation.h"
 #include "sxt/multiexp/random/random_multiproduct_descriptor.h"
 #include "sxt/multiexp/random/random_multiproduct_generation.h"
 #include "sxt/multiexp/test/add_ints.h"
-#include "sxt/multiexp/test/int_generation.h"
 
 using namespace sxt;
 using namespace sxt::mtxpmp;
@@ -26,7 +26,7 @@ static void verify_random_example(std::mt19937& rng,
   size_t num_entries;
   mtxrn::generate_random_multiproduct(products, num_inputs, num_entries, rng, descriptor);
   memmg::managed_array<uint64_t> inout(num_entries);
-  mtxtst::generate_uint64s(basct::span<uint64_t>{inout.data(), num_inputs}, rng);
+  mtxrn::generate_uint64s(basct::span<uint64_t>{inout.data(), num_inputs}, rng);
   memmg::managed_array<uint64_t> expected_result(products.num_rows());
   mtxtst::add_ints(expected_result, products.cheader(), inout);
   compute_multiproduct(inout, products, drv, num_inputs);

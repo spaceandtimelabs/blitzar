@@ -148,8 +148,8 @@ sxt_cc_component(
         "//sxt/multiexp/index:index_table",
         "//sxt/multiexp/random:random_multiproduct_descriptor",
         "//sxt/multiexp/random:random_multiproduct_generation",
+        "//sxt/multiexp/random:int_generation",
         "//sxt/multiexp/test:add_ints",
-        "//sxt/multiexp/test:int_generation",
     ],
     deps = [
         "//sxt/base/container:span",

@@ -1,18 +1,19 @@
-#include "sxt/multiexp/pippenger/multiexponentiation.h"
+#include "sxt/multiexp/pippenger/multiexponentiation2.h"
 
-#include <vector>
+#include <algorithm>
+#include <limits>
 
-#include "sxt/base/bit/count.h"
 #include "sxt/base/bit/span_op.h"
 #include "sxt/base/container/blob_array.h"
 #include "sxt/base/num/divide_up.h"
+#include "sxt/execution/async/future.h"
+#include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/digit_utility.h"
 #include "sxt/multiexp/index/index_table.h"
-#include "sxt/multiexp/pippenger/driver.h"
+#include "sxt/multiexp/pippenger/driver2.h"
 #include "sxt/multiexp/pippenger/exponent_aggregates.h"
 #include "sxt/multiexp/pippenger/exponent_aggregates_computation.h"
 #include "sxt/multiexp/pippenger/multiproduct_table.h"
-#include "sxt/multiexp/pippenger/radix_log2.h"
 
 namespace sxt::mtxpi {
 //--------------------------------------------------------------------------------------------------
@@ -39,37 +40,36 @@ static void compute_output_digit_or_all(basct::blob_array& output_digit_or_all,
 //--------------------------------------------------------------------------------------------------
 // compute_multiproduct
 //--------------------------------------------------------------------------------------------------
-static void compute_multiproduct(memmg::managed_array<void>& inout,
-                                 basct::blob_array& output_digit_or_all, const driver& drv,
-                                 basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
+static xena::future<memmg::managed_array<void>>
+compute_multiproduct(basct::blob_array& output_digit_or_all, const driver2& drv,
+                     basct::span_cvoid generators,
+                     basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   exponent_aggregates aggregates;
   compute_exponent_aggregates(aggregates, exponents);
 
-  size_t radix_log2 = mtxpi::compute_radix_log2(
-      aggregates.max_exponent, aggregates.term_or_all.size(), aggregates.output_or_all.size());
-
-  mtxi::index_table table;
-  auto num_multiproduct_inputs =
-      make_multiproduct_term_table(table, aggregates.term_or_all, radix_log2);
-
-  drv.compute_multiproduct_inputs(inout, table.cheader(), radix_log2, num_multiproduct_inputs,
-                                  aggregates.pop_count);
+  auto radix_log2 =
+      aggregates.max_exponent.size() * 8 - basbt::count_leading_zeros(aggregates.max_exponent);
+  radix_log2 = std::max(1lu, radix_log2);
 
   compute_output_digit_or_all(output_digit_or_all, aggregates.output_or_all, radix_log2);
 
-  make_multiproduct_table(table, exponents, aggregates.pop_count, aggregates.term_or_all,
-                          output_digit_or_all, radix_log2);
+  mtxi::index_table table;
+  auto num_multiproduct_inputs =
+      make_multiproduct_table(table, exponents, aggregates.pop_count, aggregates.term_or_all,
+                              output_digit_or_all, radix_log2);
 
-  drv.compute_multiproduct(inout, table, num_multiproduct_inputs);
+  return drv.compute_multiproduct(std::move(table), generators, aggregates.term_or_all,
+                                  num_multiproduct_inputs);
 }
 
 //--------------------------------------------------------------------------------------------------
 // compute_multiexponentiation
 //--------------------------------------------------------------------------------------------------
-void compute_multiexponentiation(memmg::managed_array<void>& inout, const driver& drv,
-                                 basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
+xena::future<memmg::managed_array<void>>
+compute_multiexponentiation(const driver2& drv, basct::span_cvoid generators,
+                            basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   basct::blob_array output_digit_or_all;
-  compute_multiproduct(inout, output_digit_or_all, drv, exponents);
-  drv.combine_multiproduct_outputs(inout, output_digit_or_all);
+  auto multiproduct = compute_multiproduct(output_digit_or_all, drv, generators, exponents);
+  return drv.combine_multiproduct_outputs(std::move(multiproduct), std::move(output_digit_or_all));
 }
 } // namespace sxt::mtxpi

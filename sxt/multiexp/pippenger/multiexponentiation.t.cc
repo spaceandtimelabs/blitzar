@@ -9,10 +9,10 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/pippenger/test_driver.h"
+#include "sxt/multiexp/random/int_generation.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"
 #include "sxt/multiexp/random/random_multiexponentiation_generation.h"
 #include "sxt/multiexp/test/compute_uint64_muladd.h"
-#include "sxt/multiexp/test/int_generation.h"
 
 using namespace sxt;
 using namespace sxt::mtxpi;
@@ -30,7 +30,7 @@ static void compute_random_test_case(std::mt19937& rng, size_t num_sequences,
 
   memmg::managed_array<uint64_t> inout(num_inputs);
 
-  mtxtst::generate_uint64s(inout, rng);
+  mtxrn::generate_uint64s(inout, rng);
 
   memmg::managed_array<uint64_t> expected_result(num_sequences);
 

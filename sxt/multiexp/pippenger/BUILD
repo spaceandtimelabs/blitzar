@@ -13,6 +13,16 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "driver2",
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
+        "//sxt/memory/management:managed_array_fwd",
+    ],
+)
+
+sxt_cc_component(
     name = "test_driver",
     impl_deps = [
         "//sxt/base/bit:iteration",
@@ -25,6 +35,25 @@ sxt_cc_component(
     with_test = False,
     deps = [
         ":driver",
+    ],
+)
+
+sxt_cc_component(
+    name = "test_driver2",
+    impl_deps = [
+        "//sxt/base/bit:span_op",
+        "//sxt/base/container:span",
+        "//sxt/base/container:span_void",
+        "//sxt/base/error:assert",
+        "//sxt/base/container:blob_array",
+        "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/index:index_table",
+        "//sxt/multiexp/base:generator_utility",
+    ],
+    with_test = False,
+    deps = [
+        ":driver2",
     ],
 )
 
@@ -113,10 +142,43 @@ sxt_cc_component(
         "//sxt/multiexp/random:random_multiexponentiation_descriptor",
         "//sxt/multiexp/random:random_multiexponentiation_generation",
         "//sxt/multiexp/test:compute_uint64_muladd",
-        "//sxt/multiexp/test:int_generation",
+        "//sxt/multiexp/random:int_generation",
     ],
     deps = [
         "//sxt/base/container:span",
+        "//sxt/memory/management:managed_array_fwd",
+    ],
+)
+
+sxt_cc_component(
+    name = "multiexponentiation2",
+    impl_deps = [
+        ":driver2",
+        ":exponent_aggregates",
+        ":exponent_aggregates_computation",
+        ":multiproduct_table",
+        "//sxt/base/bit:span_op",
+        "//sxt/base/container:blob_array",
+        "//sxt/base/num:divide_up",
+        "//sxt/memory/management:managed_array",
+        "//sxt/execution/async:future",
+        "//sxt/multiexp/base:digit_utility",
+        "//sxt/multiexp/index:index_table",
+    ],
+    test_deps = [
+        ":test_driver2",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/multiexp/random:random_multiexponentiation_descriptor",
+        "//sxt/multiexp/random:random_multiexponentiation_generation",
+        "//sxt/multiexp/test:compute_uint64_muladd",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/container:span_void",
+        "//sxt/execution/async:future_fwd",
         "//sxt/memory/management:managed_array_fwd",
     ],
 )
