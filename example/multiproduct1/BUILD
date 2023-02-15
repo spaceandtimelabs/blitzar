@@ -16,6 +16,6 @@ sxt_cc_benchmark(
         "//sxt/multiexp/curve21:multiproduct_cpu_driver",
         "//sxt/multiexp/index:index_table",
         "//sxt/multiexp/pippenger_multiprod:multiproduct",
-        "//sxt/multiexp/test:generate_curve21_elements",
+        "//sxt/ristretto/random:element",
     ],
 )

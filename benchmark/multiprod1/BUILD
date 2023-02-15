@@ -21,6 +21,6 @@ sxt_cc_benchmark(
         "//sxt/multiexp/random:random_multiproduct_descriptor",
         "//sxt/multiexp/random:random_multiproduct_generation",
         "//sxt/multiexp/test:add_curve21_elements",
-        "//sxt/multiexp/test:generate_curve21_elements",
+        "//sxt/ristretto/random:element",
     ],
 )

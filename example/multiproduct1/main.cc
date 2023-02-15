@@ -6,7 +6,7 @@
 #include "sxt/multiexp/curve21/multiproduct_cpu_driver.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger_multiprod/multiproduct.h"
-#include "sxt/multiexp/test/generate_curve21_elements.h"
+#include "sxt/ristretto/random/element.h"
 
 using namespace sxt;
 
@@ -77,7 +77,7 @@ int main() {
   size_t num_entries = 192;
   memmg::managed_array<c21t::element_p3> inout(num_entries);
   std::mt19937 rng{0};
-  mtxtst::generate_curve21_elements(inout, rng);
+  rstrn::generate_random_elements(inout, rng);
   mtxc21::multiproduct_cpu_driver drv;
   SXT_TOGGLE_COLLECT;
   mtxpmp::compute_multiproduct(inout, products.header(), drv, 6);

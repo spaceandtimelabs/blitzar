@@ -54,7 +54,7 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/pippenger_multiprod:multiproduct",
         "//sxt/multiexp/index:index_table",
-        "//sxt/multiexp/test:generate_curve21_elements",
+        "//sxt/ristretto/random:element",
         "//sxt/multiexp/test:add_curve21_elements",
         "//sxt/multiexp/random:random_multiproduct_descriptor",
         "//sxt/multiexp/random:random_multiproduct_generation",

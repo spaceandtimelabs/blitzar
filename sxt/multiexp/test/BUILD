@@ -70,16 +70,3 @@ sxt_cc_component(
         "//sxt/base/container:span",
     ],
 )
-
-sxt_cc_component(
-    name = "generate_curve21_elements",
-    impl_deps = [
-        "//sxt/curve21/type:element_p3",
-        "//sxt/base/num:fast_random_number_generator",
-        "//sxt/ristretto/random:element",
-    ],
-    with_test = False,
-    deps = [
-        "//sxt/base/container:span",
-    ],
-)

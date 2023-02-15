@@ -7,6 +7,7 @@ sxt_cc_component(
     name = "element",
     impl_deps = [
         "//sxt/base/num:fast_random_number_generator",
+        "//sxt/base/macro:cuda_warning",
         "//sxt/curve21/type:element_p3",
         "//sxt/field51/random:element",
         "//sxt/field51/type:element",

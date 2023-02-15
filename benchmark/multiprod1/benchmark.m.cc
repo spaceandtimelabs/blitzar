@@ -13,7 +13,7 @@
 #include "sxt/multiexp/random/random_multiproduct_descriptor.h"
 #include "sxt/multiexp/random/random_multiproduct_generation.h"
 #include "sxt/multiexp/test/add_curve21_elements.h"
-#include "sxt/multiexp/test/generate_curve21_elements.h"
+#include "sxt/ristretto/random/element.h"
 
 using namespace sxt;
 
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
   memmg::managed_array<c21t::element_p3> inout(num_entries);
 
   // we populate the inout array with `num_inputs` random curve21 elements
-  mtxtst::generate_curve21_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
+  rstrn::generate_random_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
 
   size_t num_rows = products.num_rows();
   memmg::managed_array<c21t::element_p3> expected_result(products.num_rows());

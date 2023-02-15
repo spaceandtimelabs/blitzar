@@ -11,7 +11,7 @@
 #include "sxt/multiexp/random/random_multiproduct_descriptor.h"
 #include "sxt/multiexp/random/random_multiproduct_generation.h"
 #include "sxt/multiexp/test/add_curve21_elements.h"
-#include "sxt/multiexp/test/generate_curve21_elements.h"
+#include "sxt/ristretto/random/element.h"
 
 using namespace sxt;
 using namespace sxt::mtxc21;
@@ -25,7 +25,7 @@ static void verify_random_example(std::mt19937& rng,
   mtxrn::generate_random_multiproduct(products, num_inputs, num_entries, rng, descriptor);
 
   memmg::managed_array<c21t::element_p3> inout(num_entries);
-  mtxtst::generate_curve21_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
+  rstrn::generate_random_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
 
   memmg::managed_array<c21t::element_p3> expected_result(products.num_rows());
   mtxtst::add_curve21_elements(expected_result, products.cheader(), inout);
@@ -53,7 +53,7 @@ TEST_CASE("we can compute curve21 multiproducts") {
   SECTION("we handle a multiproduct with a single term") {
     size_t num_inputs = 1;
     memmg::managed_array<c21t::element_p3> inout(1);
-    mtxtst::generate_curve21_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
+    rstrn::generate_random_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
 
     mtxi::index_table products{{0}};
 
@@ -68,7 +68,7 @@ TEST_CASE("we can compute curve21 multiproducts") {
   SECTION("we handle a single output with multiple terms") {
     size_t num_inputs = 2;
     memmg::managed_array<c21t::element_p3> inout(2);
-    mtxtst::generate_curve21_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
+    rstrn::generate_random_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
 
     mtxi::index_table products{{0, 1}};
 
@@ -83,7 +83,7 @@ TEST_CASE("we can compute curve21 multiproducts") {
   SECTION("we handle a multi-product with two outputs") {
     size_t num_inputs = 3;
     memmg::managed_array<c21t::element_p3> inout(5);
-    mtxtst::generate_curve21_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
+    rstrn::generate_random_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
 
     mtxi::index_table products{{0, 1, 2}, {0, 2}};
 
