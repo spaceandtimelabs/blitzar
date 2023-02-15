@@ -16,4 +16,7 @@ namespace sxt::f51o {
  */
 CUDA_CALLABLE
 void mul(f51t::element& h, const f51t::element& f, const f51t::element& g) noexcept;
+
+CUDA_CALLABLE
+void mul(volatile f51t::element& h, const f51t::element& f, const f51t::element& g) noexcept;
 } // namespace sxt::f51o

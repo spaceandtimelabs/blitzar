@@ -54,11 +54,24 @@ inline void to_element_p2(element_p2& r, const element_p1p1& p) noexcept {
 //--------------------------------------------------------------------------------------------------
 // to_element_p3
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-inline void to_element_p3(element_p3& r, const element_p1p1& p) noexcept {
+namespace detail {
+template <class T>
+CUDA_CALLABLE inline void to_element_p3_impl(T& r, const element_p1p1& p) noexcept {
   f51o::mul(r.X, p.X, p.T);
   f51o::mul(r.Y, p.Y, p.Z);
   f51o::mul(r.Z, p.Z, p.T);
   f51o::mul(r.T, p.X, p.Y);
+}
+
+} // namespace detail
+
+CUDA_CALLABLE
+inline void to_element_p3(element_p3& r, const element_p1p1& p) noexcept {
+  detail::to_element_p3_impl(r, p);
+}
+
+CUDA_CALLABLE
+inline void to_element_p3(volatile element_p3& r, const element_p1p1& p) noexcept {
+  detail::to_element_p3_impl(r, p);
 }
 } // namespace sxt::c21t
