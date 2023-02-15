@@ -9,10 +9,7 @@
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/multiexp/pippenger/multiexponentiation.h"
-#include "sxt/multiexp/ristretto/multiexponentiation_cpu_driver.h"
-#include "sxt/multiexp/ristretto/pippenger_multiproduct_solver.h"
-#include "sxt/multiexp/ristretto/precomputed_p3_input_accessor.h"
+#include "sxt/multiexp/curve21/multiexponentiation.h"
 #include "sxt/proof/inner_product/cpu_workspace.h"
 #include "sxt/proof/inner_product/fold.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
@@ -31,25 +28,18 @@ static void multiexponentiate(c21t::element_p3& res, basct::cspan<c21t::element_
                               basct::cspan<s25t::element> x_vector) noexcept {
   auto n = std::min(g_vector.size(), x_vector.size());
   g_vector = g_vector.subspan(0, n);
-  mtxrs::precomputed_p3_input_accessor accessor{g_vector};
-  mtxrs::pippenger_multiproduct_solver multiproduct_solver;
-  mtxrs::multiexponentiation_cpu_driver driver{&accessor, &multiproduct_solver, false};
-  memmg::managed_array<c21t::element_p3> inout;
   mtxb::exponent_sequence exponents{
       .element_nbytes = 32,
       .n = n,
       .data = reinterpret_cast<const uint8_t*>(x_vector.data()),
   };
-  mtxpi::compute_multiexponentiation(inout, driver,
-                                     basct::cspan<mtxb::exponent_sequence>{&exponents, 1});
-  res = inout[0];
+  auto values = mtxc21::compute_multiexponentiation(
+      g_vector, basct::cspan<mtxb::exponent_sequence>{&exponents, 1});
+  res = values[0];
 }
 
 static void multiexponentiate(c21t::element_p3 c_commits[2], const c21t::element_p3& q_value,
                               const s25t::element c_values[2]) noexcept {
-  mtxrs::precomputed_p3_input_accessor accessor{{&q_value, 1}};
-  mtxrs::pippenger_multiproduct_solver multiproduct_solver;
-  mtxrs::multiexponentiation_cpu_driver driver{&accessor, &multiproduct_solver, false};
   memmg::managed_array<c21t::element_p3> inout;
   mtxb::exponent_sequence exponents[2] = {
       {
@@ -63,9 +53,9 @@ static void multiexponentiate(c21t::element_p3 c_commits[2], const c21t::element
           .data = reinterpret_cast<const uint8_t*>(c_values + 1),
       },
   };
-  mtxpi::compute_multiexponentiation(inout, driver, exponents);
-  c_commits[0] = inout[0];
-  c_commits[1] = inout[1];
+  auto values = mtxc21::compute_multiexponentiation({&q_value, 1}, exponents);
+  c_commits[0] = values[0];
+  c_commits[1] = values[1];
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -214,8 +204,8 @@ void cpu_driver::compute_expected_commitment(rstt::compressed_element& commit,
   compute_verification_exponents(exponents, x_vector, ap_value, descriptor.b_vector);
 
   // generators
-  memmg::managed_array<c21t::element_p3> inout(num_exponents);
-  auto iter = inout.data();
+  memmg::managed_array<c21t::element_p3> generators(num_exponents);
+  auto iter = generators.data();
   *iter++ = *descriptor.q_value;
   iter = std::copy(descriptor.g_vector.begin(), descriptor.g_vector.end(), iter);
   for (auto& li : l_vector) {
@@ -226,14 +216,12 @@ void cpu_driver::compute_expected_commitment(rstt::compressed_element& commit,
   }
 
   // commitment
-  mtxrs::pippenger_multiproduct_solver multiproduct_solver;
-  mtxrs::multiexponentiation_cpu_driver driver{nullptr, &multiproduct_solver, false};
   mtxb::exponent_sequence exponent_sequence{
       .element_nbytes = 32,
       .n = num_exponents,
       .data = reinterpret_cast<const uint8_t*>(exponents.data()),
   };
-  mtxpi::compute_multiexponentiation(inout, driver, {&exponent_sequence, 1});
-  rsto::compress(commit, inout[0]);
+  auto commits = mtxc21::compute_multiexponentiation(generators, {&exponent_sequence, 1});
+  rsto::compress(commit, commits[0]);
 }
 } // namespace sxt::prfip

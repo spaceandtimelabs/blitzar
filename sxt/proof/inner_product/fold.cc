@@ -1,12 +1,10 @@
 #include "sxt/proof/inner_product/fold.h"
 
 #include "sxt/base/error/assert.h"
+#include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/multiexp/pippenger/multiexponentiation.h"
-#include "sxt/multiexp/ristretto/multiexponentiation_cpu_driver.h"
-#include "sxt/multiexp/ristretto/pippenger_multiproduct_solver.h"
-#include "sxt/multiexp/ristretto/precomputed_p3_input_accessor.h"
+#include "sxt/multiexp/curve21/multiexponentiation.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
 #include "sxt/scalar25/type/element.h"
@@ -44,9 +42,6 @@ void fold_generators(basct::span<c21t::element_p3>& gp_vector,
   SXT_DEBUG_ASSERT(g_vector.size() == 2 * mid);
   s25t::element m_values[] = {m_low, m_high};
   c21t::element_p3 g_values[2];
-  mtxrs::precomputed_p3_input_accessor accessor{g_values};
-  mtxrs::pippenger_multiproduct_solver multiproduct_solver;
-  mtxrs::multiexponentiation_cpu_driver driver{&accessor, &multiproduct_solver, false};
   mtxb::exponent_sequence exponents{
       .element_nbytes = 32,
       .n = 2,
@@ -57,8 +52,10 @@ void fold_generators(basct::span<c21t::element_p3>& gp_vector,
   for (size_t i = 0; i < mid; ++i) {
     g_values[0] = g_vector[i];
     g_values[1] = g_vector[mid + i];
-    mtxpi::compute_multiexponentiation(inout, driver, {&exponents, 1});
-    gp_vector[i] = inout[0];
+    gp_vector[i] = [&] {
+      auto res = mtxc21::compute_multiexponentiation(g_values, {&exponents, 1});
+      return res[0];
+    }();
   }
 }
 } // namespace sxt::prfip
