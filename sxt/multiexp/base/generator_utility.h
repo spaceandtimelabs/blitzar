@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <iostream>
 
 #include "sxt/base/container/blob_array.h"
 #include "sxt/base/container/span.h"

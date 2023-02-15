@@ -28,7 +28,7 @@ naive_multiproduct_solver::solve(mtxi::index_table&& multiproduct_table,
   for (size_t row_index = 0; row_index < multiproduct_table.num_rows(); ++row_index) {
     auto products = multiproduct_table.header()[row_index];
     SXT_DEBUG_ASSERT(products.size() > 2);
-    c21t::element_p3 output = generators[products[2]];
+    c21t::element_p3 output = inputs[products[2]];
     for (size_t input_index = 3; input_index < products.size(); ++input_index) {
       auto input = products[input_index];
       c21o::add(output, output, inputs[input]);

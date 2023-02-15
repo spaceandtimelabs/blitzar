@@ -4,9 +4,11 @@
 
 #include "sxt/base/error/assert.h"
 #include "sxt/base/memory/alloc_utility.h"
+#include "sxt/curve21/type/element_p3.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/random/int_generation.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"
+#include "sxt/ristretto/random/element.h"
 
 namespace sxt::mtxrn {
 //--------------------------------------------------------------------------------------------------
@@ -95,5 +97,18 @@ void generate_random_multiexponentiation(
       num_inputs,
   };
   generate_uint64s(inputs, rng);
+}
+
+void generate_random_multiexponentiation(
+    basct::span<c21t::element_p3>& inputs, basct::span<mtxb::exponent_sequence>& exponents,
+    basm::alloc_t alloc, std::mt19937& rng,
+    const random_multiexponentiation_descriptor2& descriptor) noexcept {
+  size_t num_inputs;
+  generate_random_multiexponentiation(num_inputs, exponents, alloc, rng, descriptor);
+  inputs = {
+      basm::allocate_array<c21t::element_p3>(alloc, num_inputs),
+      num_inputs,
+  };
+  rstrn::generate_random_elements(inputs, rng);
 }
 } // namespace sxt::mtxrn

@@ -10,7 +10,7 @@
 #include "sxt/multiexp/pippenger_multiprod/multiproduct.h"
 #include "sxt/multiexp/random/random_multiproduct_descriptor.h"
 #include "sxt/multiexp/random/random_multiproduct_generation.h"
-#include "sxt/multiexp/test/add_curve21_elements.h"
+#include "sxt/multiexp/test/curve21_arithmetic.h"
 #include "sxt/ristretto/random/element.h"
 
 using namespace sxt;
@@ -28,7 +28,7 @@ static void verify_random_example(std::mt19937& rng,
   rstrn::generate_random_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
 
   memmg::managed_array<c21t::element_p3> expected_result(products.num_rows());
-  mtxtst::add_curve21_elements(expected_result, products.cheader(), inout);
+  mtxtst::sum_curve21_elements(expected_result, products.cheader(), inout);
 
   mtxpmp::compute_multiproduct(inout, products, drv, num_inputs);
 
@@ -58,7 +58,7 @@ TEST_CASE("we can compute curve21 multiproducts") {
     mtxi::index_table products{{0}};
 
     memmg::managed_array<c21t::element_p3> expected_result(1);
-    mtxtst::add_curve21_elements(expected_result, products.cheader(), inout);
+    mtxtst::sum_curve21_elements(expected_result, products.cheader(), inout);
 
     mtxpmp::compute_multiproduct(inout, products, drv, num_inputs);
 
@@ -73,7 +73,7 @@ TEST_CASE("we can compute curve21 multiproducts") {
     mtxi::index_table products{{0, 1}};
 
     memmg::managed_array<c21t::element_p3> expected_result(1);
-    mtxtst::add_curve21_elements(expected_result, products.cheader(), inout);
+    mtxtst::sum_curve21_elements(expected_result, products.cheader(), inout);
 
     mtxpmp::compute_multiproduct(inout, products, drv, num_inputs);
 
@@ -88,7 +88,7 @@ TEST_CASE("we can compute curve21 multiproducts") {
     mtxi::index_table products{{0, 1, 2}, {0, 2}};
 
     memmg::managed_array<c21t::element_p3> expected_result(2);
-    mtxtst::add_curve21_elements(expected_result, products.cheader(), inout);
+    mtxtst::sum_curve21_elements(expected_result, products.cheader(), inout);
 
     mtxpmp::compute_multiproduct(inout, products, drv, num_inputs);
 

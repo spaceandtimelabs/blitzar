@@ -12,7 +12,7 @@
 #include "sxt/multiexp/pippenger_multiprod/multiproduct.h"
 #include "sxt/multiexp/random/random_multiproduct_descriptor.h"
 #include "sxt/multiexp/random/random_multiproduct_generation.h"
-#include "sxt/multiexp/test/add_curve21_elements.h"
+#include "sxt/multiexp/test/curve21_arithmetic.h"
 #include "sxt/ristretto/random/element.h"
 
 using namespace sxt;
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 
     if (use_naive) {
       SXT_TOGGLE_COLLECT;
-      mtxtst::add_curve21_elements(expected_result, products_aux.cheader(), inout);
+      mtxtst::sum_curve21_elements(expected_result, products_aux.cheader(), inout);
       SXT_TOGGLE_COLLECT;
     } else {
       SXT_TOGGLE_COLLECT;

@@ -20,7 +20,7 @@ sxt_cc_benchmark(
         "//sxt/multiexp/pippenger_multiprod:multiproduct",
         "//sxt/multiexp/random:random_multiproduct_descriptor",
         "//sxt/multiexp/random:random_multiproduct_generation",
-        "//sxt/multiexp/test:add_curve21_elements",
+        "//sxt/multiexp/test:curve21_arithmetic",
         "//sxt/ristretto/random:element",
     ],
 )

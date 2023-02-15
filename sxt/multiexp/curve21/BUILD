@@ -32,6 +32,60 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "multiexponentiation",
+    impl_deps = [
+        ":multiexponentiation_cpu_driver",
+        ":pippenger_multiproduct_solver",
+        "//sxt/memory/management:managed_array",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/multiexp/pippenger:multiexponentiation2",
+        "//sxt/execution/async:future",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/memory/management:managed_array_fwd",
+    ],
+)
+
+sxt_cc_component(
+    name = "multiexponentiation_cpu_driver",
+    impl_deps = [
+        ":doubling_reduction",
+        ":multiproduct_solver",
+        "//sxt/base/bit:span_op",
+        "//sxt/base/container:blob_array",
+        "//sxt/memory/management:managed_array",
+        "//sxt/execution/async:future",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/constant:zero",
+    ],
+    test_deps = [
+        ":naive_multiproduct_solver",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/constant:zero",
+        "//sxt/curve21/operation:overload",
+        "//sxt/ristretto/type:literal",
+        "//sxt/ristretto/operation:compression",
+        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/multiexp/pippenger:multiexponentiation2",
+        "//sxt/multiexp/random:random_multiproduct_descriptor",
+        "//sxt/multiexp/random:random_multiproduct_generation",
+        "//sxt/multiexp/random:random_multiexponentiation_descriptor",
+        "//sxt/multiexp/random:random_multiexponentiation_generation",
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/management:managed_array",
+        "//sxt/execution/async:future",
+        "//sxt/multiexp/test:curve21_arithmetic",
+    ],
+    deps = [
+        "//sxt/multiexp/pippenger:driver2",
+    ],
+)
+
+sxt_cc_component(
     name = "multiproduct_cpu_driver",
     impl_deps = [
         ":multiproduct_bitset_operator",
@@ -54,8 +108,8 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/pippenger_multiprod:multiproduct",
         "//sxt/multiexp/index:index_table",
+        "//sxt/multiexp/test:curve21_arithmetic",
         "//sxt/ristretto/random:element",
-        "//sxt/multiexp/test:add_curve21_elements",
         "//sxt/multiexp/random:random_multiproduct_descriptor",
         "//sxt/multiexp/random:random_multiproduct_generation",
     ],
