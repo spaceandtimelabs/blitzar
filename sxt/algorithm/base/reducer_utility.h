@@ -10,18 +10,18 @@ namespace sxt::algb {
 //--------------------------------------------------------------------------------------------------
 // accumulate
 //--------------------------------------------------------------------------------------------------
-template <algb::reducer Reducer, algb::mapper Reader>
-  requires std::same_as<typename Reducer::value_type, typename Reader::value_type>
-CUDA_CALLABLE void accumulate(typename Reducer::value_type& res, Reader mapper,
+template <algb::reducer Reducer, algb::mapper Mapper>
+  requires std::same_as<typename Reducer::value_type, typename Mapper::value_type>
+CUDA_CALLABLE void accumulate(typename Reducer::value_type& res, Mapper mapper,
                               unsigned int i) noexcept
   requires(!requires { Reducer::accumulate(res, mapper, i); })
 {
   Reducer::accumulate(res, mapper.map_index(i));
 }
 
-template <algb::reducer Reducer, algb::mapper Reader>
-  requires std::same_as<typename Reducer::value_type, typename Reader::value_type>
-CUDA_CALLABLE void accumulate(typename Reducer::value_type& res, Reader mapper,
+template <algb::reducer Reducer, algb::mapper Mapper>
+  requires std::same_as<typename Reducer::value_type, typename Mapper::value_type>
+CUDA_CALLABLE void accumulate(typename Reducer::value_type& res, Mapper mapper,
                               unsigned int i) noexcept
   requires(requires { Reducer::accumulate(res, mapper, i); })
 {

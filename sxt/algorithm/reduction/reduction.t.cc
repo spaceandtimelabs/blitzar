@@ -50,7 +50,7 @@ TEST_CASE("we can perform reductions on the GPU") {
   }
 
   SECTION("we can reduce small data sets") {
-    for (auto n : {4, 31, 32, 33, 42, 63, 64, 65}) {
+    for (unsigned n = 3; n < 67; ++n) {
       make_dataset(cpu_data, gpu_data, rng, n);
       auto res = reduce<test_add_reducer>(algb::identity_mapper{gpu_data.data()}, n);
       REQUIRE(res.await_result() == compute_sum(cpu_data));

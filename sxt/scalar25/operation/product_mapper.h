@@ -1,7 +1,6 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/base/type/raw_stream.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/type/element.h"
 
@@ -12,7 +11,6 @@ namespace sxt::s25o {
 class product_mapper {
 public:
   using value_type = s25t::element;
-  static constexpr auto num_bytes_per_index = 2 * sizeof(s25t::element);
 
   CUDA_CALLABLE product_mapper(const s25t::element* lhs_data,
                                const s25t::element* rhs_data) noexcept
@@ -31,9 +29,6 @@ public:
   CUDA_CALLABLE const s25t::element* lhs_data() const noexcept { return lhs_data_; }
 
   CUDA_CALLABLE const s25t::element* rhs_data() const noexcept { return rhs_data_; }
-
-  product_mapper async_make_host_mapper(void* host_data, bast::raw_stream_t stream, unsigned int n,
-                                        unsigned int offset) const noexcept;
 
 private:
   const s25t::element* lhs_data_;

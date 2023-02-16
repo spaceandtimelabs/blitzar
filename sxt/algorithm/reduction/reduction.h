@@ -20,35 +20,11 @@
 
 namespace sxt::algr {
 //--------------------------------------------------------------------------------------------------
-// host_reduce
-//--------------------------------------------------------------------------------------------------
-namespace detail {
-template <algb::reducer Reducer, algb::mapper Reader>
-  requires std::same_as<typename Reducer::value_type, typename Reader::value_type>
-xena::future<typename Reducer::value_type> host_reduce(Reader mapper, unsigned int n) noexcept {
-  using T = typename Reducer::value_type;
-  xena::computation_handle handle;
-  xenb::stream stream;
-  memmg::managed_array<char> buffer{n * Reader::num_bytes_per_index, memr::get_pinned_resource()};
-  auto host_mapper = mapper.async_make_host_mapper(buffer.data(), stream, n, 0);
-  handle.add_stream(std::move(stream));
-  auto on_completion = [buffer = std::move(buffer), host_mapper = host_mapper,
-                        n = n](T& value) noexcept {
-    host_mapper.map_index(value, 0);
-    for (unsigned int i = 1; i < n; ++i) {
-      Reducer::accumulate(value, host_mapper.map_index(i));
-    }
-  };
-  return xena::future<T>{std::move(handle), std::move(on_completion)};
-}
-} // namespace detail
-
-//--------------------------------------------------------------------------------------------------
 // reduction_kernel
 //--------------------------------------------------------------------------------------------------
-template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Reader>
-  requires std::same_as<typename Reducer::value_type, typename Reader::value_type>
-__global__ void reduction_kernel(typename Reducer::value_type* out, Reader mapper, unsigned int n) {
+template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Mapper>
+  requires std::same_as<typename Reducer::value_type, typename Mapper::value_type>
+__global__ void reduction_kernel(typename Reducer::value_type* out, Mapper mapper, unsigned int n) {
   using T = typename Reducer::value_type;
   auto thread_index = threadIdx.x;
   auto block_index = blockIdx.x;
@@ -62,13 +38,10 @@ __global__ void reduction_kernel(typename Reducer::value_type* out, Reader mappe
 //--------------------------------------------------------------------------------------------------
 // reduce
 //--------------------------------------------------------------------------------------------------
-template <algb::reducer Reducer, class Reader>
-xena::future<typename Reducer::value_type> reduce(Reader mapper, unsigned int n) noexcept {
+template <algb::reducer Reducer, class Mapper>
+xena::future<typename Reducer::value_type> reduce(Mapper mapper, unsigned int n) noexcept {
   using T = typename Reducer::value_type;
   auto dims = fit_reduction_kernel(n);
-  if (dims.num_blocks == 0) {
-    return detail::host_reduce<Reducer>(mapper, n);
-  }
 
   // kernel computation
   xena::computation_handle handle;

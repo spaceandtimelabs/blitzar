@@ -7,11 +7,10 @@ using namespace sxt;
 using namespace sxt::algr;
 
 TEST_CASE("we can determine the dimensions of a reduction kernel") {
-  SECTION("small reductions run on the host") {
+  SECTION("we handle the smallest case") {
     auto dims = fit_reduction_kernel(1);
-    REQUIRE(dims.num_blocks == 0);
-    dims = fit_reduction_kernel(63);
-    REQUIRE(dims.num_blocks == 0);
+    REQUIRE(dims.num_blocks == 1);
+    REQUIRE(dims.block_size == xenk::block_size_t::v1);
   }
 
   SECTION("for reductions on the device, all threads have work to do") {

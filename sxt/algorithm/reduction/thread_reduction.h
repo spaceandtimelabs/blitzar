@@ -18,18 +18,27 @@ namespace sxt::algr {
  * This is based off of nvidia's guide
  *  https://developer.download.nvidia.com/assets/cuda/files/reduction.pdf
  */
-template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Reader>
-  requires std::same_as<typename Reducer::value_type, typename Reader::value_type>
+template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Mapper>
+  requires std::same_as<typename Reducer::value_type, typename Mapper::value_type>
 __device__ void thread_reduce(typename Reducer::value_type* out,
-                              typename Reducer::value_type* shared_data, Reader mapper,
+                              typename Reducer::value_type* shared_data, Mapper mapper,
                               unsigned int n, unsigned int step, unsigned int thread_index,
                               unsigned int index) {
   // clang-format off
   assert(
-      index + BlockSize < n &&
+      (index + BlockSize < n || (BlockSize == 1 && n > 0)) &&
       "we assume the size of the reduction has been normalized"
   );
   // clang-format on
+
+  // handle BlockSize == 1 as a special case
+  if constexpr (BlockSize == 1) {
+    if (n == 1) {
+      mapper.map_index(*out, index);
+      return;
+    }
+  }
+
   mapper.map_index(shared_data[thread_index], index);
   algb::accumulate<Reducer>(shared_data[thread_index], mapper, index + BlockSize);
   index += step;

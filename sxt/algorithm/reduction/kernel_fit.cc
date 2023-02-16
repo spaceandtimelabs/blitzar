@@ -19,9 +19,35 @@ namespace sxt::algr {
  */
 xenk::kernel_dims fit_reduction_kernel(unsigned int n) noexcept {
   SXT_DEBUG_ASSERT(n > 0);
+  if (n < 4) {
+    return {
+        .num_blocks = 1,
+        .block_size = xenk::block_size_t::v1,
+    };
+  }
+  if (n < 8) {
+    return {
+        .num_blocks = 1,
+        .block_size = xenk::block_size_t::v2,
+    };
+  }
+  if (n < 16) {
+    return {
+        .num_blocks = 1,
+        .block_size = xenk::block_size_t::v4,
+    };
+  }
+  if (n < 32) {
+    return {
+        .num_blocks = 1,
+        .block_size = xenk::block_size_t::v8,
+    };
+  }
   if (n < 64) {
-    // run on host
-    return {};
+    return {
+        .num_blocks = 1,
+        .block_size = xenk::block_size_t::v16,
+    };
   }
 
   // first increase blocks up to 64

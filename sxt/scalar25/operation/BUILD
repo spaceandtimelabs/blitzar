@@ -234,24 +234,15 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "product_mapper",
-    impl_deps = [
-        "//sxt/base/error:assert",
-        "//sxt/base/device:memory_utility",
-    ],
     test_deps = [
         ":overload",
-        "//sxt/execution/base:stream",
         "//sxt/base/test:unit_test",
         "//sxt/scalar25/type:literal",
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/device:synchronization",
         "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:device_resource",
     ],
     deps = [
         ":mul",
         "//sxt/base/macro:cuda_callable",
-        "//sxt/base/type:raw_stream",
         "//sxt/scalar25/type:element",
     ],
 )
