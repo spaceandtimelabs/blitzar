@@ -23,12 +23,6 @@ void make_digit_index_array(basct::span<size_t> array, size_t first,
                             basct::cspan<uint8_t> or_all) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// make_multiproduct_term_table
-//--------------------------------------------------------------------------------------------------
-size_t make_multiproduct_term_table(mtxi::index_table& table, const basct::blob_array& term_or_all,
-                                    size_t radix_log2) noexcept;
-
-//--------------------------------------------------------------------------------------------------
 // make_multiproduct_table
 //--------------------------------------------------------------------------------------------------
 size_t make_multiproduct_table(mtxi::index_table& table,

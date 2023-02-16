@@ -41,51 +41,6 @@ TEST_CASE("we can build an index array from digit bits") {
   }
 }
 
-TEST_CASE("we can construct a table that identifies the terms needed for "
-          "pipppenger's multiproduct phase") {
-  mtxi::index_table table;
-
-  SECTION("we correctly handle the empty case with a single input term") {
-    basct::blob_array term_or_all(1, 4);
-    auto num_entries = make_multiproduct_term_table(table, term_or_all, 3);
-    REQUIRE(num_entries == 0);
-    REQUIRE(table == mtxi::index_table{{}});
-  }
-
-  SECTION("we correctly handle the empty case with two input terms") {
-    basct::blob_array term_or_all(2, 4);
-    auto num_entries = make_multiproduct_term_table(table, term_or_all, 3);
-    REQUIRE(num_entries == 0);
-    REQUIRE(table == mtxi::index_table{{}, {}});
-  }
-
-  SECTION("we can construct a table with a single term and a single entry") {
-    basct::blob_array term_or_all(1, 4);
-    term_or_all[0][0] = 0b1;
-    auto num_entries = make_multiproduct_term_table(table, term_or_all, 3);
-    REQUIRE(num_entries == 1);
-    REQUIRE(table == mtxi::index_table{{0}});
-  }
-
-  SECTION("we can construct a table with a single term and multiple entries") {
-    basct::blob_array term_or_all(1, 32);
-    term_or_all[0][0] = 0b1001;
-    term_or_all[0][8] = 0b1;
-    auto num_entries = make_multiproduct_term_table(table, term_or_all, 3);
-    REQUIRE(num_entries == 3);
-    REQUIRE(table == mtxi::index_table{{0, 1, 21}});
-  }
-
-  SECTION("we can construct a table with multiple terms and multiple entries") {
-    basct::blob_array term_or_all(2, 32);
-    term_or_all[0][0] = 0b1001;
-    term_or_all[1][0] = 0b1000;
-    auto num_entries = make_multiproduct_term_table(table, term_or_all, 3);
-    REQUIRE(num_entries == 3);
-    REQUIRE(table == mtxi::index_table{{0, 1}, {1}});
-  }
-}
-
 TEST_CASE("we can construct a table for the multiproduct computation") {
   mtxi::index_table table;
 

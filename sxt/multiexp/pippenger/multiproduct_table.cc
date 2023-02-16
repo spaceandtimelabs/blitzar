@@ -66,33 +66,6 @@ void make_digit_index_array(basct::span<size_t> array, size_t first,
 }
 
 //--------------------------------------------------------------------------------------------------
-// make_multiproduct_term_table
-//--------------------------------------------------------------------------------------------------
-size_t make_multiproduct_term_table(mtxi::index_table& table, const basct::blob_array& term_or_all,
-                                    size_t radix_log2) noexcept {
-  size_t num_nonzero_digits = 0;
-  for (size_t term_index = 0; term_index < term_or_all.size(); ++term_index) {
-    num_nonzero_digits += mtxb::count_nonzero_digits(term_or_all[term_index], radix_log2);
-  }
-  table.reshape(term_or_all.size(), num_nonzero_digits);
-  auto rows = table.header();
-  auto entries = table.entry_data();
-  for (size_t term_index = 0; term_index < term_or_all.size(); ++term_index) {
-    auto e = term_or_all[term_index];
-    size_t entry_count = 0;
-    auto last_digit = mtxb::get_last_digit(e, radix_log2);
-    for (size_t digit_index = 0; digit_index < last_digit; ++digit_index) {
-      if (!mtxb::is_digit_zero(e, radix_log2, digit_index)) {
-        entries[entry_count++] = digit_index;
-      }
-    }
-    rows[term_index] = {entries, entry_count};
-    entries += entry_count;
-  }
-  return num_nonzero_digits;
-}
-
-//--------------------------------------------------------------------------------------------------
 // make_multiproduct_table
 //--------------------------------------------------------------------------------------------------
 size_t make_multiproduct_table(mtxi::index_table& table,
