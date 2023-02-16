@@ -10,12 +10,12 @@ struct exponent_sequence;
 }
 
 namespace sxt::mtxpi {
-class driver2;
+class driver;
 
 //--------------------------------------------------------------------------------------------------
 // compute_multiexponentiation
 //--------------------------------------------------------------------------------------------------
 xena::future<memmg::managed_array<void>>
-compute_multiexponentiation(const driver2& drv, basct::span_cvoid generators,
+compute_multiexponentiation(const driver& drv, basct::span_cvoid generators,
                             basct::cspan<mtxb::exponent_sequence> exponents) noexcept;
 } // namespace sxt::mtxpi

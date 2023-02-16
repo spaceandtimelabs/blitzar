@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sxt/multiexp/pippenger/driver2.h"
+#include "sxt/multiexp/pippenger/driver.h"
 
 namespace sxt::mtxc21 {
 class multiproduct_solver;
@@ -8,11 +8,11 @@ class multiproduct_solver;
 //--------------------------------------------------------------------------------------------------
 // multiexponentiation_cpu_driver
 //--------------------------------------------------------------------------------------------------
-class multiexponentiation_cpu_driver final : public mtxpi::driver2 {
+class multiexponentiation_cpu_driver final : public mtxpi::driver {
 public:
   explicit multiexponentiation_cpu_driver(const multiproduct_solver* solver) noexcept;
 
-  // mtxpi::driver2
+  // mtxpi::driver
   xena::future<memmg::managed_array<void>>
   compute_multiproduct(mtxi::index_table&& multiproduct_table, basct::span_cvoid generators,
                        const basct::blob_array& masks, size_t num_inputs) const noexcept override;

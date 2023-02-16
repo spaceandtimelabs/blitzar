@@ -22,9 +22,9 @@ namespace sxt::mtxpi {
 //--------------------------------------------------------------------------------------------------
 // driver
 //--------------------------------------------------------------------------------------------------
-class driver2 {
+class driver {
 public:
-  virtual ~driver2() noexcept = default;
+  virtual ~driver() noexcept = default;
 
   virtual xena::future<memmg::managed_array<void>>
   compute_multiproduct(mtxi::index_table&& multiproduct_table, basct::span_cvoid generators,

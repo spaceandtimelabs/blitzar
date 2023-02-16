@@ -2,15 +2,15 @@
 
 #include <cstddef>
 
-#include "sxt/multiexp/pippenger/driver2.h"
+#include "sxt/multiexp/pippenger/driver.h"
 
 namespace sxt::mtxpi {
 //--------------------------------------------------------------------------------------------------
-// test_driver2
+// test_driver
 //--------------------------------------------------------------------------------------------------
-class test_driver2 final : public driver2 {
+class test_driver final : public driver {
 public:
-  // driver2
+  // driver
   xena::future<memmg::managed_array<void>>
   compute_multiproduct(mtxi::index_table&& multiproduct_table, basct::span_cvoid generators,
                        const basct::blob_array& masks, size_t num_inputs) const noexcept override;

@@ -13,7 +13,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/curve21/naive_multiproduct_solver.h"
-#include "sxt/multiexp/pippenger/multiexponentiation2.h"
+#include "sxt/multiexp/pippenger/multiexponentiation.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"
 #include "sxt/multiexp/random/random_multiexponentiation_generation.h"
 #include "sxt/multiexp/test/curve21_arithmetic.h"
@@ -253,7 +253,7 @@ TEST_CASE("we can compute randomized multiexponentiations with cuve21 elements")
   basct::span<c21t::element_p3> generators;
 
   SECTION("we handle multiple random sequences of varying length") {
-    mtxrn::random_multiexponentiation_descriptor2 descriptor{
+    mtxrn::random_multiexponentiation_descriptor descriptor{
         .min_num_sequences = 1,
         .max_num_sequences = 1,
         .min_sequence_length = 0,
@@ -273,7 +273,7 @@ TEST_CASE("we can compute randomized multiexponentiations with cuve21 elements")
   }
 
   SECTION("we handle multiple outputs and random sequences of length 1") {
-    mtxrn::random_multiexponentiation_descriptor2 descriptor{
+    mtxrn::random_multiexponentiation_descriptor descriptor{
         .min_num_sequences = 1,
         .max_num_sequences = 10,
         .min_sequence_length = 1,
@@ -293,7 +293,7 @@ TEST_CASE("we can compute randomized multiexponentiations with cuve21 elements")
   }
 
   SECTION("we handle multiple outputs and multiple random sequences of varying length") {
-    mtxrn::random_multiexponentiation_descriptor2 descriptor{
+    mtxrn::random_multiexponentiation_descriptor descriptor{
         .min_num_sequences = 1,
         .max_num_sequences = 10,
         .min_sequence_length = 1,
@@ -313,7 +313,7 @@ TEST_CASE("we can compute randomized multiexponentiations with cuve21 elements")
   }
 
   SECTION("we handle random sequences of length 1 and varying num_bytes") {
-    mtxrn::random_multiexponentiation_descriptor2 descriptor{
+    mtxrn::random_multiexponentiation_descriptor descriptor{
         .min_num_sequences = 1,
         .max_num_sequences = 1,
         .min_sequence_length = 1,
@@ -333,7 +333,7 @@ TEST_CASE("we can compute randomized multiexponentiations with cuve21 elements")
   }
 
   SECTION("we handle multiple random sequences of varying length and varying num_bytes") {
-    mtxrn::random_multiexponentiation_descriptor2 descriptor{
+    mtxrn::random_multiexponentiation_descriptor descriptor{
         .min_num_sequences = 1,
         .max_num_sequences = 1,
         .min_sequence_length = 1,
@@ -354,7 +354,7 @@ TEST_CASE("we can compute randomized multiexponentiations with cuve21 elements")
 
   SECTION("we handle multiple outputs and multiple random sequences of varying length and varying "
           "num_bytes") {
-    mtxrn::random_multiexponentiation_descriptor2 descriptor{
+    mtxrn::random_multiexponentiation_descriptor descriptor{
         .min_num_sequences = 1,
         .max_num_sequences = 10,
         .min_sequence_length = 1,

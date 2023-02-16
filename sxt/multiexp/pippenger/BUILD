@@ -4,7 +4,7 @@ load(
 )
 
 sxt_cc_component(
-    name = "driver2",
+    name = "driver",
     with_test = False,
     deps = [
         "//sxt/base/container:span",
@@ -14,7 +14,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "test_driver2",
+    name = "test_driver",
     impl_deps = [
         "//sxt/base/bit:span_op",
         "//sxt/base/container:span",
@@ -28,7 +28,7 @@ sxt_cc_component(
     ],
     with_test = False,
     deps = [
-        ":driver2",
+        ":driver",
     ],
 )
 
@@ -81,9 +81,9 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "multiexponentiation2",
+    name = "multiexponentiation",
     impl_deps = [
-        ":driver2",
+        ":driver",
         ":exponent_aggregates",
         ":exponent_aggregates_computation",
         ":multiproduct_table",
@@ -96,7 +96,7 @@ sxt_cc_component(
         "//sxt/multiexp/index:index_table",
     ],
     test_deps = [
-        ":test_driver2",
+        ":test_driver",
         "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
         "//sxt/memory/management:managed_array",

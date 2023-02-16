@@ -1,4 +1,4 @@
-#include "sxt/multiexp/pippenger/multiexponentiation2.h"
+#include "sxt/multiexp/pippenger/multiexponentiation.h"
 
 #include <iostream>
 #include <memory_resource>
@@ -9,7 +9,7 @@
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/multiexp/pippenger/test_driver2.h"
+#include "sxt/multiexp/pippenger/test_driver.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"
 #include "sxt/multiexp/random/random_multiexponentiation_generation.h"
 #include "sxt/multiexp/test/compute_uint64_muladd.h"
@@ -18,7 +18,7 @@ using namespace sxt;
 using namespace sxt::mtxpi;
 
 TEST_CASE("we can compute select multiexponentiations") {
-  test_driver2 drv;
+  test_driver drv;
 
   SECTION("we handle the empty case") {
     std::vector<mtxb::exponent_sequence> sequences;
@@ -150,7 +150,7 @@ TEST_CASE("we can compute select multiexponentiations") {
 }
 
 TEST_CASE("we can compute randomized multiexponentiations") {
-  test_driver2 drv;
+  test_driver drv;
   std::mt19937 rng{2022};
 
   std::pmr::monotonic_buffer_resource resource;
@@ -158,7 +158,7 @@ TEST_CASE("we can compute randomized multiexponentiations") {
   basct::span<uint64_t> generators;
 
   SECTION("we handle a random sequences of varying length") {
-    mtxrn::random_multiexponentiation_descriptor2 descriptor{
+    mtxrn::random_multiexponentiation_descriptor descriptor{
         .min_num_sequences = 1,
         .max_num_sequences = 1,
         .min_sequence_length = 0,
@@ -178,12 +178,12 @@ TEST_CASE("we can compute randomized multiexponentiations") {
   }
 
   SECTION("we handle multiple outputs and random sequences of length 1") {
-    mtxrn::random_multiexponentiation_descriptor2 descriptor{.min_num_sequences = 1,
-                                                             .max_num_sequences = 1'000,
-                                                             .min_sequence_length = 1,
-                                                             .max_sequence_length = 1,
-                                                             .min_exponent_num_bytes = 1,
-                                                             .max_exponent_num_bytes = 1};
+    mtxrn::random_multiexponentiation_descriptor descriptor{.min_num_sequences = 1,
+                                                            .max_num_sequences = 1'000,
+                                                            .min_sequence_length = 1,
+                                                            .max_sequence_length = 1,
+                                                            .min_exponent_num_bytes = 1,
+                                                            .max_exponent_num_bytes = 1};
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
       auto res = compute_multiexponentiation(drv, generators, sequences)
@@ -196,12 +196,12 @@ TEST_CASE("we can compute randomized multiexponentiations") {
   }
 
   SECTION("we handle multiple outputs and with random sequences of varying length") {
-    mtxrn::random_multiexponentiation_descriptor2 descriptor{.min_num_sequences = 1,
-                                                             .max_num_sequences = 100,
-                                                             .min_sequence_length = 1,
-                                                             .max_sequence_length = 100,
-                                                             .min_exponent_num_bytes = 1,
-                                                             .max_exponent_num_bytes = 1};
+    mtxrn::random_multiexponentiation_descriptor descriptor{.min_num_sequences = 1,
+                                                            .max_num_sequences = 100,
+                                                            .min_sequence_length = 1,
+                                                            .max_sequence_length = 100,
+                                                            .min_exponent_num_bytes = 1,
+                                                            .max_exponent_num_bytes = 1};
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
       auto res = compute_multiexponentiation(drv, generators, sequences)
@@ -214,12 +214,12 @@ TEST_CASE("we can compute randomized multiexponentiations") {
   }
 
   SECTION("we handle random sequences of length 1 and varying num_bytes") {
-    mtxrn::random_multiexponentiation_descriptor2 descriptor{.min_num_sequences = 1,
-                                                             .max_num_sequences = 1,
-                                                             .min_sequence_length = 1,
-                                                             .max_sequence_length = 1,
-                                                             .min_exponent_num_bytes = 1,
-                                                             .max_exponent_num_bytes = 8};
+    mtxrn::random_multiexponentiation_descriptor descriptor{.min_num_sequences = 1,
+                                                            .max_num_sequences = 1,
+                                                            .min_sequence_length = 1,
+                                                            .max_sequence_length = 1,
+                                                            .min_exponent_num_bytes = 1,
+                                                            .max_exponent_num_bytes = 8};
     for (size_t i = 0; i < 100; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
       auto res = compute_multiexponentiation(drv, generators, sequences)
@@ -232,12 +232,12 @@ TEST_CASE("we can compute randomized multiexponentiations") {
   }
 
   SECTION("we handle random sequences of varying length and varying num_bytes") {
-    mtxrn::random_multiexponentiation_descriptor2 descriptor{.min_num_sequences = 1,
-                                                             .max_num_sequences = 1,
-                                                             .min_sequence_length = 1,
-                                                             .max_sequence_length = 100,
-                                                             .min_exponent_num_bytes = 1,
-                                                             .max_exponent_num_bytes = 8};
+    mtxrn::random_multiexponentiation_descriptor descriptor{.min_num_sequences = 1,
+                                                            .max_num_sequences = 1,
+                                                            .min_sequence_length = 1,
+                                                            .max_sequence_length = 100,
+                                                            .min_exponent_num_bytes = 1,
+                                                            .max_exponent_num_bytes = 8};
     for (size_t i = 0; i < 100; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
       auto res = compute_multiexponentiation(drv, generators, sequences)
@@ -251,12 +251,12 @@ TEST_CASE("we can compute randomized multiexponentiations") {
 
   SECTION(
       "we handle multiple outputs and random sequences of varying length and varying num_bytes") {
-    mtxrn::random_multiexponentiation_descriptor2 descriptor{.min_num_sequences = 1,
-                                                             .max_num_sequences = 100,
-                                                             .min_sequence_length = 1,
-                                                             .max_sequence_length = 100,
-                                                             .min_exponent_num_bytes = 1,
-                                                             .max_exponent_num_bytes = 8};
+    mtxrn::random_multiexponentiation_descriptor descriptor{.min_num_sequences = 1,
+                                                            .max_num_sequences = 100,
+                                                            .min_sequence_length = 1,
+                                                            .max_sequence_length = 100,
+                                                            .min_exponent_num_bytes = 1,
+                                                            .max_exponent_num_bytes = 8};
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
       auto res = compute_multiexponentiation(drv, generators, sequences)

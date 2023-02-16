@@ -1,4 +1,4 @@
-#include "sxt/multiexp/pippenger/test_driver2.h"
+#include "sxt/multiexp/pippenger/test_driver.h"
 
 #include "sxt/base/bit/span_op.h"
 #include "sxt/base/container/blob_array.h"
@@ -15,9 +15,9 @@ namespace sxt::mtxpi {
 // compute_multiproduct
 //--------------------------------------------------------------------------------------------------
 xena::future<memmg::managed_array<void>>
-test_driver2::compute_multiproduct(mtxi::index_table&& multiproduct_table,
-                                   basct::span_cvoid generators, const basct::blob_array& masks,
-                                   size_t num_inputs) const noexcept {
+test_driver::compute_multiproduct(mtxi::index_table&& multiproduct_table,
+                                  basct::span_cvoid generators, const basct::blob_array& masks,
+                                  size_t num_inputs) const noexcept {
   memmg::managed_array<uint64_t> inputs_data;
   basct::cspan<uint64_t> inputs;
   auto generators_p =
@@ -48,8 +48,8 @@ test_driver2::compute_multiproduct(mtxi::index_table&& multiproduct_table,
 // combine_multiproduct_outputs
 //--------------------------------------------------------------------------------------------------
 xena::future<memmg::managed_array<void>>
-test_driver2::combine_multiproduct_outputs(xena::future<memmg::managed_array<void>>&& multiproduct,
-                                           basct::blob_array&& output_digit_or_all) const noexcept {
+test_driver::combine_multiproduct_outputs(xena::future<memmg::managed_array<void>>&& multiproduct,
+                                          basct::blob_array&& output_digit_or_all) const noexcept {
   SXT_RELEASE_ASSERT(multiproduct.available());
   auto multiproduct_array = multiproduct.await_result();
   basct::cspan<uint64_t> inputs{static_cast<uint64_t*>(multiproduct_array.data()),

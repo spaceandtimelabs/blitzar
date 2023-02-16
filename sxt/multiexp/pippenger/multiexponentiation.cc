@@ -1,4 +1,4 @@
-#include "sxt/multiexp/pippenger/multiexponentiation2.h"
+#include "sxt/multiexp/pippenger/multiexponentiation.h"
 
 #include <algorithm>
 #include <limits>
@@ -10,7 +10,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/digit_utility.h"
 #include "sxt/multiexp/index/index_table.h"
-#include "sxt/multiexp/pippenger/driver2.h"
+#include "sxt/multiexp/pippenger/driver.h"
 #include "sxt/multiexp/pippenger/exponent_aggregates.h"
 #include "sxt/multiexp/pippenger/exponent_aggregates_computation.h"
 #include "sxt/multiexp/pippenger/multiproduct_table.h"
@@ -41,7 +41,7 @@ static void compute_output_digit_or_all(basct::blob_array& output_digit_or_all,
 // compute_multiproduct
 //--------------------------------------------------------------------------------------------------
 static xena::future<memmg::managed_array<void>>
-compute_multiproduct(basct::blob_array& output_digit_or_all, const driver2& drv,
+compute_multiproduct(basct::blob_array& output_digit_or_all, const driver& drv,
                      basct::span_cvoid generators,
                      basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   exponent_aggregates aggregates;
@@ -66,7 +66,7 @@ compute_multiproduct(basct::blob_array& output_digit_or_all, const driver2& drv,
 // compute_multiexponentiation
 //--------------------------------------------------------------------------------------------------
 xena::future<memmg::managed_array<void>>
-compute_multiexponentiation(const driver2& drv, basct::span_cvoid generators,
+compute_multiexponentiation(const driver& drv, basct::span_cvoid generators,
                             basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   basct::blob_array output_digit_or_all;
   auto multiproduct = compute_multiproduct(output_digit_or_all, drv, generators, exponents);

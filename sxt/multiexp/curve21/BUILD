@@ -38,7 +38,7 @@ sxt_cc_component(
         ":pippenger_multiproduct_solver",
         "//sxt/memory/management:managed_array",
         "//sxt/curve21/type:element_p3",
-        "//sxt/multiexp/pippenger:multiexponentiation2",
+        "//sxt/multiexp/pippenger:multiexponentiation",
         "//sxt/execution/async:future",
     ],
     test_deps = [
@@ -70,7 +70,7 @@ sxt_cc_component(
         "//sxt/ristretto/type:literal",
         "//sxt/ristretto/operation:compression",
         "//sxt/multiexp/base:exponent_sequence",
-        "//sxt/multiexp/pippenger:multiexponentiation2",
+        "//sxt/multiexp/pippenger:multiexponentiation",
         "//sxt/multiexp/random:random_multiproduct_descriptor",
         "//sxt/multiexp/random:random_multiproduct_generation",
         "//sxt/multiexp/random:random_multiexponentiation_descriptor",
@@ -81,7 +81,7 @@ sxt_cc_component(
         "//sxt/multiexp/test:curve21_arithmetic",
     ],
     deps = [
-        "//sxt/multiexp/pippenger:driver2",
+        "//sxt/multiexp/pippenger:driver",
     ],
 )
 

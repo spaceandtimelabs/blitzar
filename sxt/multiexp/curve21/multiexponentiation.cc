@@ -5,7 +5,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/curve21/multiexponentiation_cpu_driver.h"
 #include "sxt/multiexp/curve21/pippenger_multiproduct_solver.h"
-#include "sxt/multiexp/pippenger/multiexponentiation2.h"
+#include "sxt/multiexp/pippenger/multiexponentiation.h"
 
 namespace sxt::mtxc21 {
 //--------------------------------------------------------------------------------------------------
