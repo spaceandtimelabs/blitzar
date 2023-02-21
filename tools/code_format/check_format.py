@@ -190,10 +190,14 @@ class FormatChecker:
         error_messages = []
 
         if not self.is_starlark_file(file_path) and not self.is_workspace_file(file_path):
-            if os.system("%s %s %s" % (BUILD_FIXER_PATH, file_path, file_path)) != 0:
+            command = "%s %s %s" % (BUILD_FIXER_PATH, file_path, file_path)
+
+            if self.execute_fix_command(command, file_path) != 0:
                 error_messages += ["build_fixer rewrite failed for file: %s" % file_path]
 
-        if os.system("%s -lint=fix -mode=fix %s" % (BUILDIFIER_PATH, file_path)) != 0:
+        command = "%s -lint=fix -mode=fix %s" % (BUILDIFIER_PATH, file_path)
+
+        if self.execute_fix_command(command, file_path) != 0:
             error_messages += ["buildifier rewrite failed for file: %s" % file_path]
 
         return error_messages
@@ -205,11 +209,11 @@ class FormatChecker:
 
             command = "%s %s | diff %s -" % (BUILD_FIXER_PATH, file_path, file_path)
 
-            error_messages += self.execute_command(
+            error_messages += self.execute_check_command(
                 command, "build_fixer check failed", file_path)
 
         command = "%s -mode=diff %s" % (BUILDIFIER_PATH, file_path)
-        error_messages += self.execute_command(command, "buildifier check failed", file_path)
+        error_messages += self.execute_check_command(command, "buildifier check failed", file_path)
 
         return error_messages
 
@@ -228,15 +232,31 @@ class FormatChecker:
             "%s --include_dir_order %s --path %s | diff %s -" %
             (HEADER_ORDER_PATH, self.include_dir_order, file_path, file_path))
 
-        error_messages += self.execute_command(
+        error_messages += self.execute_check_command(
             command, "header_order.py check failed", file_path)
 
         command = ("%s %s | diff %s -" % (CLANG_FORMAT_PATH, file_path, file_path))
-        error_messages += self.execute_command(command, "clang-format check failed", file_path)
+        error_messages += self.execute_check_command(command, "clang-format check failed", file_path)
 
         return error_messages
 
-    def execute_command(
+    def execute_fix_command(
+        self,
+        command,
+        file_path):
+        
+        # get current user and group id
+        statinfo = os.stat(file_path)
+        uid, gid = statinfo.st_uid, statinfo.st_gid
+
+        exec_ret = os.system(command)
+
+        # recover previous user and group id
+        os.chown(file_path, uid, gid)
+
+        return exec_ret
+
+    def execute_check_command(
         self,
         command,
         error_message,
@@ -262,7 +282,7 @@ class FormatChecker:
         command = "%s --rewrite --include_dir_order %s --path %s" % (
             HEADER_ORDER_PATH, self.include_dir_order, file_path)
 
-        if os.system(command) != 0:
+        if self.execute_fix_command(command, file_path) != 0:
             return ["header_order.py rewrite error: %s" % (file_path)]
 
         return []
@@ -270,7 +290,7 @@ class FormatChecker:
     def clang_format(self, file_path):
         command = "%s -i %s" % (CLANG_FORMAT_PATH, file_path)
 
-        if os.system(command) != 0:
+        if self.execute_fix_command(command, file_path) != 0:
             return ["clang-format rewrite error: %s" % (file_path)]
 
         return []
