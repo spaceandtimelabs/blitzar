@@ -96,7 +96,6 @@ void multiproduct_cpu_driver::compute_naive_multiproduct(
 
     if (row.size() == 2) {
       output = c21cn::zero_p3_v;
-
       continue;
     }
 
@@ -131,7 +130,6 @@ void multiproduct_cpu_driver::compute_naive_multiproduct(
 void multiproduct_cpu_driver::permute_inputs(basct::span_void inout,
                                              basct::cspan<uint64_t> permutation) const noexcept {
   auto n = permutation.size();
-
   SXT_DEBUG_ASSERT(n <= inout.size());
 
   memmg::managed_array<c21t::element_p3> inputs_p(n);
@@ -139,9 +137,6 @@ void multiproduct_cpu_driver::permute_inputs(basct::span_void inout,
 
   for (size_t index = 0; index < n; ++index) {
     auto index_p = permutation[index];
-
-    SXT_DEBUG_ASSERT(index_p < n);
-
     inputs_p[index] = inputs[index_p];
   }
 

@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "sxt/base/container/span_void.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/memory/alloc.h"
 #include "sxt/memory/management/managed_array_fwd.h"
 
@@ -69,7 +70,7 @@ public:
   }
 
   template <class T> managed_array<T>&& as_array() && noexcept {
-    return reinterpret_cast<managed_array<T>&&>(std::move(*this));
+    return std::move(reinterpret_cast<managed_array<T>&>(*this));
   }
 
   template <class T> const managed_array<T>& as_array() const& noexcept {
@@ -155,9 +156,15 @@ public:
   void reset() noexcept { data_.reset(); }
 
   // operator[]
-  T& operator[](size_t index) noexcept { return this->data()[index]; }
+  T& operator[](size_t index) noexcept {
+    SXT_DEBUG_ASSERT(index < this->size());
+    return this->data()[index];
+  }
 
-  const T& operator[](size_t index) const noexcept { return this->data()[index]; }
+  const T& operator[](size_t index) const noexcept {
+    SXT_DEBUG_ASSERT(index < this->size());
+    return this->data()[index];
+  }
 
 private:
   managed_array<void> data_;

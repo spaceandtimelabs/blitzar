@@ -27,7 +27,7 @@ template <char... Chars> c21t::element_p3 operator"" _rs() noexcept {
 // _crs
 //--------------------------------------------------------------------------------------------------
 template <char... Chars> compressed_element operator"" _crs() noexcept {
-  auto e = operator""_rs<Chars...>();
+  auto e = operator""_rs < Chars... > ();
   compressed_element res;
   rstb::to_bytes(res.data(), e);
   return res;

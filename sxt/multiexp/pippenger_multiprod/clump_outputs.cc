@@ -65,12 +65,14 @@ void rewrite_multiproducts_with_output_clumps(basct::span<basct::span<uint64_t>>
                                output_clumps[marker_index]);
     auto clump_first = clump_size * clump_index;
     auto& row1 = rows[clump_first + index1];
-    row1[row1.size()] = marker_index;
-    row1 = {row1.data(), row1.size() + 1};
+    auto sz = row1.size();
+    row1 = {row1.data(), sz + 1};
+    row1[sz] = marker_index;
     if (index1 != index2) {
       auto& row2 = rows[clump_first + index2];
-      row2[row2.size()] = marker_index;
-      row2 = {row2.data(), row2.size() + 1};
+      auto sz = row2.size();
+      row2 = {row2.data(), sz + 1};
+      row2[sz] = marker_index;
     }
   }
 }

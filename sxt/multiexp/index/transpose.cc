@@ -41,8 +41,9 @@ size_t transpose(index_table& table, basct::cspan<basct::cspan<uint64_t>> rows,
     auto row = rows[row_index];
     for (auto x : row.subspan(offset_functor(row))) {
       auto& row_t = table.header()[x];
-      row_t[row_t.size()] = row_index;
-      row_t = {row_t.data(), row_t.size() + 1};
+      auto sz = row_t.size();
+      row_t = {row_t.data(), sz + 1};
+      row_t[sz] = row_index;
     }
   }
 

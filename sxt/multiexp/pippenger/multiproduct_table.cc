@@ -102,8 +102,9 @@ size_t make_multiproduct_table(mtxi::index_table& table,
         mtxb::extract_digit(digit, e, radix_log2, digit_index);
         basbt::for_each_bit(digit, [&](size_t bit_index) noexcept {
           auto& row = rows[index_array[bit_index]];
-          row[row.size()] = input_first + input_offset;
+          auto sz = row.size();
           row = {row.data(), row.size() + 1};
+          row[sz] = input_first + input_offset;
         });
         input_offset += static_cast<size_t>(
             !mtxb::is_digit_zero(term_or_all[term_index], radix_log2, digit_index));

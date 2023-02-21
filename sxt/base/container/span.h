@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
@@ -70,7 +71,7 @@ public:
 
   CUDA_CALLABLE
   span subspan(size_t offset) const noexcept {
-    SXT_DEBUG_ASSERT(offset <= size_);
+    assert(offset <= size_);
     return {
         data_ + offset,
         size_ - offset,
@@ -79,8 +80,7 @@ public:
 
   CUDA_CALLABLE
   span subspan(size_t offset, size_t size_p) const noexcept {
-    SXT_DEBUG_ASSERT(offset <= size_);
-    SXT_DEBUG_ASSERT(offset + size_p <= size_);
+    assert(offset + size_p <= size_);
     return {
         data_ + offset,
         size_p,
@@ -95,7 +95,10 @@ public:
   T* end() const noexcept { return data_ + size_; }
 
   CUDA_CALLABLE
-  T& operator[](size_t index) const noexcept { return data_[index]; }
+  T& operator[](size_t index) const noexcept {
+    assert(index < size_);
+    return data_[index];
+  }
 
 private:
   size_t size_;
