@@ -34,3 +34,15 @@ sxt_cc_component(
         "//sxt/base/macro:cuda_callable",
     ],
 )
+
+sxt_cc_component(
+    name = "gather_mapper",
+    test_deps = [
+        ":mapper",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/error:assert",
+        "//sxt/base/macro:cuda_callable",
+    ],
+)

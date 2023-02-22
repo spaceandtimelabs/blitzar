@@ -2,6 +2,8 @@
 
 #include <type_traits>
 
+#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/base/macro/cuda_warning.h"
 #include "sxt/execution/kernel/block_size.h"
 
 namespace sxt::xenk {
@@ -11,7 +13,8 @@ namespace sxt::xenk {
 /**
  * Allow us to conveniently launch kernels that take block size as a template parameter.
  */
-template <class F> void launch_kernel(block_size_t block_size, F f) noexcept {
+CUDA_DISABLE_HOSTDEV_WARNING
+template <class F> CUDA_CALLABLE void launch_kernel(block_size_t block_size, F f) noexcept {
   switch (block_size) {
   case block_size_t::v128: {
     return f(std::integral_constant<unsigned int, 128>{});

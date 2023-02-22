@@ -13,6 +13,8 @@ sxt_cc_component(
     with_test = False,
     deps = [
         ":block_size",
+        "//sxt/base/macro:cuda_callable",
+        "//sxt/base/macro:cuda_warning",
     ],
 )
 
