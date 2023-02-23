@@ -23,14 +23,21 @@ __global__ void multiproduct_kernel(typename Reducer::value_type* out,
   auto block_index = blockIdx.x;
   auto descriptor = block_descriptors[block_index];
   algb::gather_mapper<T> mapper{generators, indexes + descriptor.index_first};
+  // Note: It's expected that most products will be of similar length and
+  // hence share a common block size, but we allow for the same kernel to
+  // compute product reductions with varying block sizes.
   xenk::launch_kernel(
       descriptor.block_size,
       [=]<unsigned BlockSize>(std::integral_constant<unsigned, BlockSize>) noexcept {
         assert(block_index >= descriptor.block_offset);
         auto index = (block_index - descriptor.block_offset) * (BlockSize * 2) + thread_index;
         auto step = BlockSize * 2 * descriptor.reduction_num_blocks;
-        algr::thread_reduce<Reducer, BlockSize>(out + block_index, shared_data, mapper,
-                                                descriptor.n, step, thread_index, index);
+        // If BlockSize is less than the maximum block size (the size the kernel was launched with),
+        // then treat the some of the threads as inactive.
+        if (thread_index < BlockSize) {
+          algr::thread_reduce<Reducer, BlockSize>(out + block_index, shared_data, mapper,
+                                                  descriptor.n, step, thread_index, index);
+        }
       });
 }
 } // namespace sxt::mtxmpg

@@ -40,3 +40,29 @@ sxt_cc_component(
         "//sxt/base/container:span",
     ],
 )
+
+sxt_cc_component(
+    name = "multiexponentiation",
+    impl_deps = [
+        ":curve21_arithmetic",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/constant:zero",
+        "//sxt/curve21/operation:overload",
+        "//sxt/ristretto/type:literal",
+        "//sxt/ristretto/operation:compression",
+        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/multiexp/random:random_multiproduct_descriptor",
+        "//sxt/multiexp/random:random_multiproduct_generation",
+        "//sxt/multiexp/random:random_multiexponentiation_descriptor",
+        "//sxt/multiexp/random:random_multiexponentiation_generation",
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/management:managed_array",
+        "//sxt/execution/async:future",
+    ],
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/functional:function_ref",
+        "//sxt/memory/management:managed_array_fwd",
+    ],
+)

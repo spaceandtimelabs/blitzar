@@ -36,23 +36,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "future_value_storage",
-    test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-)
-
-sxt_cc_component(
-    name = "future_completion_fn",
-    with_test = False,
-)
-
-sxt_cc_component(
-    name = "future_ready",
-    with_test = False,
-)
-
-sxt_cc_component(
     name = "future_fwd",
     with_test = False,
 )
@@ -70,9 +53,8 @@ sxt_cc_component(
     ],
     deps = [
         ":computation_handle",
-        ":future_completion_fn",
         ":future_fwd",
-        ":future_ready",
-        ":future_value_storage",
+        "//sxt/base/error:assert",
+        "//sxt/base/functional:move_only_function",
     ],
 )

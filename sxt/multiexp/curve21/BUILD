@@ -53,32 +53,54 @@ sxt_cc_component(
 sxt_cc_component(
     name = "multiexponentiation_cpu_driver",
     impl_deps = [
-        ":doubling_reduction",
         ":multiproduct_solver",
-        "//sxt/base/bit:span_op",
+        ":multiproducts_combination",
         "//sxt/base/container:blob_array",
         "//sxt/memory/management:managed_array",
         "//sxt/execution/async:future",
         "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/constant:zero",
     ],
     test_deps = [
         ":naive_multiproduct_solver",
         "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/constant:zero",
-        "//sxt/curve21/operation:overload",
-        "//sxt/ristretto/type:literal",
-        "//sxt/ristretto/operation:compression",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/pippenger:multiexponentiation",
-        "//sxt/multiexp/random:random_multiproduct_descriptor",
-        "//sxt/multiexp/random:random_multiproduct_generation",
-        "//sxt/multiexp/random:random_multiexponentiation_descriptor",
-        "//sxt/multiexp/random:random_multiexponentiation_generation",
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
         "//sxt/execution/async:future",
-        "//sxt/multiexp/test:curve21_arithmetic",
+        "//sxt/multiexp/test:multiexponentiation",
+    ],
+    deps = [
+        "//sxt/multiexp/pippenger:driver",
+    ],
+)
+
+sxt_cc_component(
+    name = "multiexponentiation_gpu_driver",
+    impl_deps = [
+        ":doubling_reduction",
+        ":multiproducts_combination",
+        "//sxt/base/bit:span_op",
+        "//sxt/base/container:blob_array",
+        "//sxt/base/container:span_void",
+        "//sxt/base/container:span",
+        "//sxt/memory/management:managed_array",
+        "//sxt/execution/async:future",
+        "//sxt/multiexp/multiproduct_gpu:multiproduct",
+        "//sxt/multiexp/index:index_table",
+        "//sxt/curve21/operation:accumulator",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/constant:zero",
+    ],
+    is_cuda = True,
+    test_deps = [
+        "//sxt/memory/management:managed_array",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/base/test:unit_test",
+        "//sxt/multiexp/test:multiexponentiation",
+        "//sxt/multiexp/pippenger:multiexponentiation",
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/execution/async:future",
     ],
     deps = [
         "//sxt/multiexp/pippenger:driver",
@@ -125,6 +147,22 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
         "//sxt/memory/management:managed_array_fwd",
+    ],
+)
+
+sxt_cc_component(
+    name = "multiproducts_combination",
+    impl_deps = [
+        ":doubling_reduction",
+        "//sxt/base/bit:span_op",
+        "//sxt/base/error:assert",
+        "//sxt/base/container:blob_array",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/constant:zero",
+    ],
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
     ],
 )
 

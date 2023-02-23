@@ -65,13 +65,14 @@ xena::future<typename Reducer::value_type> reduce(Mapper mapper, unsigned int n)
     result_array = std::move(result_array),
     num_blocks = dims.num_blocks
                            // clang-format on
-  ](T& value) noexcept {
-    value = result_array[0];
+  ]() noexcept {
+    auto value = result_array[0];
     for (unsigned int i = 1; i < num_blocks; ++i) {
       Reducer::accumulate(value, result_array[i]);
     }
+    return value;
   };
 
-  return xena::future<T>{std::move(handle), std::move(on_completion)};
+  return xena::future<T>{std::move(on_completion), std::move(handle)};
 }
 } // namespace sxt::algr

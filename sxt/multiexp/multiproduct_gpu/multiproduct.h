@@ -72,21 +72,21 @@ compute_multiproduct(basct::cspan<typename Reducer::value_type> generators,
     indexes_gpu = std::move(indexes_gpu),
     block_descriptors_gpu = std::move(block_descriptors_gpu),
     partial_res_gpu = std::move(partial_res_gpu),
-    partial_res = std::move(partial_res)
+    partial_res = std::move(partial_res),
+    num_products = products.size()
                         // clang-format on
-  ](memmg::managed_array<void>& res) noexcept {
-    complete_multiproduct<Reducer>(res.as_array<T>(), computation_descriptor.block_descriptors,
-                                   partial_res);
+  ]() noexcept {
+    memmg::managed_array<T> res(num_products);
+    complete_multiproduct<Reducer>(res, computation_descriptor.block_descriptors, partial_res);
+    return res;
   };
 
   // future
-  memmg::managed_array<T> res(products.size());
   xena::computation_handle computation_handle;
   computation_handle.add_stream(std::move(stream));
   return xena::future<memmg::managed_array<void>>{
-      std::move(res),
-      std::move(computation_handle),
       std::move(completion),
+      std::move(computation_handle),
   };
 }
 } // namespace sxt::mtxmpg

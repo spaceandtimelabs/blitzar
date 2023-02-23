@@ -2,11 +2,10 @@
 
 #include <utility>
 
+#include "sxt/base/error/assert.h"
+#include "sxt/base/functional/move_only_function.h"
 #include "sxt/execution/async/computation_handle.h"
-#include "sxt/execution/async/future_completion_fn.h"
 #include "sxt/execution/async/future_fwd.h"
-#include "sxt/execution/async/future_ready.h"
-#include "sxt/execution/async/future_value_storage.h"
 
 namespace sxt::xena {
 //--------------------------------------------------------------------------------------------------
@@ -15,7 +14,7 @@ namespace sxt::xena {
 /**
  * Manage asynchronous computations.
  *
- * This is a highly simplified version of a future. It doesn't support chaining, multiplexing, or
+ * This is a highly simplified version of a future. It doesn't support multiplexing or
  * error results. It's expected that we'll rewrite this class, but it can serve as a placeholder to
  * get basic algorithms out.
  *
@@ -24,26 +23,14 @@ namespace sxt::xena {
  */
 template <class T> class future {
 public:
-  using completion_fn = future_completion_fn<T>;
+  using completion_fn = basf::move_only_function<T() noexcept>;
 
   future() noexcept = default;
 
-  explicit future(future_ready_tag /*tag*/) noexcept : is_available_{true} {}
-
-  template <class ValRRef = std::add_rvalue_reference_t<T>>
-  future(ValRRef value, future_ready_tag /*tag*/) noexcept
-      : is_available_{true}, value_{std::move(value)} {}
-
-  explicit future(computation_handle&& computation,
-                  completion_fn&& on_computation_done = {}) noexcept
+  explicit future(completion_fn&& on_computation_done,
+                  computation_handle&& computation = {}) noexcept
       : on_computation_done_{std::move(on_computation_done)}, computation_{std::move(computation)} {
   }
-
-  template <class ValRRef = std::add_rvalue_reference_t<T>>
-  future(ValRRef value, computation_handle&& computation,
-         completion_fn&& on_computation_done = {}) noexcept
-      : value_{std::move(value)}, on_computation_done_{std::move(on_computation_done)},
-        computation_{std::move(computation)} {}
 
   future(const future&) = delete;
   future(future&&) noexcept = default;
@@ -52,41 +39,56 @@ public:
   future& operator=(future&& other) noexcept {
     // Note: computation_ is move assigned before the on_computation_done_ functor because
     // computation_ may depend on resources owned by on_computation_done_, and move assignment
-    // may block until it is completed
+    // may block until it is completed if the future is already active
     computation_ = std::move(other.computation_);
     on_computation_done_ = std::move(other.on_computation_done_);
-    value_ = std::move(other.value_);
-    is_available_ = other.is_available_;
-
     return *this;
   }
 
-  bool available() const noexcept { return is_available_; }
+  bool available() const noexcept { return computation_.empty(); }
 
-  void wait() noexcept {
-    if (is_available_) {
-      return;
-    }
-    computation_.wait();
-    if (on_computation_done_) {
-      if constexpr (std::is_same_v<T, void>) {
-        on_computation_done_();
-      } else {
-        on_computation_done_(value_);
-      }
-      on_computation_done_ = completion_fn{};
-    }
-    is_available_ = true;
-  }
+  void wait() noexcept { computation_.wait(); }
 
   T await_result() noexcept {
+    SXT_DEBUG_ASSERT(on_computation_done_, "no completion set");
     this->wait();
-    return value_.consume_value();
+    return on_computation_done_();
+  }
+
+  template <class F>
+  auto then(F&& f) noexcept
+    requires requires {
+      { F{std::move(f)} } noexcept;
+      f(T{});
+    }
+  {
+    SXT_DEBUG_ASSERT(on_computation_done_, "no completion set");
+    using Tp = decltype(f(std::declval<T>()));
+    auto completion_p = [f = std::move(f),
+                         completion = std::move(on_computation_done_)]() mutable noexcept -> Tp {
+      return f(completion());
+    };
+    return future<Tp>{std::move(completion_p), std::move(computation_)};
+  }
+
+  template <class F>
+  auto then(F&& f) noexcept
+    requires requires {
+      { F{std::move(f)} } noexcept;
+      f();
+    }
+  {
+    SXT_DEBUG_ASSERT(on_computation_done_, "no completion set");
+    using Tp = decltype(f());
+    auto completion_p = [f = std::move(f),
+                         completion = std::move(on_computation_done_)]() mutable noexcept -> Tp {
+      completion();
+      return f();
+    };
+    return future<Tp>{std::move(completion_p), std::move(computation_)};
   }
 
 private:
-  bool is_available_{false};
-  [[no_unique_address]] future_value_storage<T> value_;
   completion_fn on_computation_done_;
   computation_handle computation_;
 };
@@ -95,8 +97,10 @@ private:
 // make_ready_future
 //--------------------------------------------------------------------------------------------------
 template <class T> future<T> make_ready_future(T&& value) noexcept {
-  return future<T>{std::move(value), future_ready_v};
+  return future<T>{[res = std::move(value)]() mutable noexcept -> T { return T{std::move(res)}; }};
 }
 
-inline future<void> make_ready_future() noexcept { return future<void>{future_ready_v}; }
+inline future<void> make_ready_future() noexcept {
+  return future<void>{[]() noexcept {}};
+}
 } // namespace sxt::xena

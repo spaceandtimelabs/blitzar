@@ -15,6 +15,86 @@
 using namespace sxt;
 using namespace sxt::xena;
 
+static memmg::managed_array<uint64_t> make_random_array(std::mt19937& rng, size_t n) noexcept;
+
+static future<uint64_t> f1(const memmg::managed_array<uint64_t>& a,
+                           const memmg::managed_array<uint64_t>& b) noexcept;
+
+static future<void> f2(uint64_t& res, const memmg::managed_array<uint64_t>& a,
+                       const memmg::managed_array<uint64_t>& b) noexcept;
+
+TEST_CASE("future manages the result of an asynchronous computation") {
+  std::mt19937 rng;
+  int n = 5;
+  auto a = make_random_array(rng, n);
+  auto b = make_random_array(rng, n);
+
+  uint64_t c = 0;
+  for (int i = 0; i < n; ++i) {
+    c += a[i] + b[i];
+  }
+
+  SECTION("future is default constructible") {
+    future<void> f1;
+    REQUIRE(f1.available());
+
+    future<int> f2;
+    REQUIRE(f2.available());
+  }
+
+  SECTION("we can make ready futures that won't block") {
+    auto f1 = make_ready_future();
+    REQUIRE(f1.available());
+    f1.await_result();
+
+    auto f2 = make_ready_future(123);
+    REQUIRE(f2.available());
+    REQUIRE(f2.await_result() == 123);
+
+    auto f3 = make_ready_future(std::make_unique<int>(123));
+    REQUIRE(f3.available());
+    REQUIRE(*f3.await_result() == 123);
+  }
+
+  SECTION("we can chain together futures") {
+    auto f = make_ready_future(123).then([](int x) noexcept { return x + 1; });
+    REQUIRE(f.await_result() == 124);
+  }
+
+  SECTION("we can chain a void future") {
+    auto f = make_ready_future().then([]() noexcept { return 123; });
+    REQUIRE(f.await_result() == 123);
+  }
+
+  SECTION("we await asynchronous GPU computations") {
+    auto fut = f1(a, b);
+    REQUIRE(!fut.available());
+    REQUIRE(fut.await_result() == c);
+  }
+
+  SECTION("we can await async GPU computations with a void result") {
+    uint64_t res;
+    auto fut = f2(res, a, b);
+    fut.await_result();
+    REQUIRE(res == c);
+  }
+
+  SECTION("we can move assign futures with async GPU computations") {
+    auto a_p = make_random_array(rng, n);
+    auto fut = f1(a_p, b);
+    fut = f1(a, b);
+    REQUIRE(fut.await_result() == c);
+  }
+
+  SECTION("we can destroy a future that's kept running") { auto fut = f1(a, b); }
+
+  SECTION("we can chain a GPU computation") {
+    auto fut = f1(a, b).then([](uint64_t x) noexcept { return 2 * x; });
+    REQUIRE(!fut.available());
+    REQUIRE(fut.await_result() == 2 * c);
+  }
+}
+
 static memmg::managed_array<uint64_t> make_random_array(std::mt19937& rng, size_t n) noexcept {
   memmg::managed_array<uint64_t> res{n, memr::get_pinned_resource()};
   for (size_t i = 0; i < n; ++i) {
@@ -48,14 +128,15 @@ static future<uint64_t> f1(const memmg::managed_array<uint64_t>& a,
     b_dev = std::move(b_dev),
     c_dev = std::move(c_dev),
     c = std::move(c)
-  ](uint64_t& res) noexcept {
+  ]() noexcept {
     // clang-format on
-    res = 0;
+    uint64_t res = 0;
     for (auto ci : c) {
       res += ci;
     }
+    return res;
   };
-  return future<uint64_t>{std::move(handle), std::move(completion)};
+  return future<uint64_t>{std::move(completion), std::move(handle)};
 }
 
 static future<void> f2(uint64_t& res, const memmg::managed_array<uint64_t>& a,
@@ -91,57 +172,5 @@ static future<void> f2(uint64_t& res, const memmg::managed_array<uint64_t>& a,
       res += ci;
     }
   };
-  return future<void>{std::move(handle), std::move(completion)};
-}
-
-TEST_CASE("future manages the result of an asynchronous computation") {
-  std::mt19937 rng;
-  int n = 5;
-  auto a = make_random_array(rng, n);
-  auto b = make_random_array(rng, n);
-
-  uint64_t c = 0;
-  for (int i = 0; i < n; ++i) {
-    c += a[i] + b[i];
-  }
-
-  SECTION("future is default constructible") {
-    future<void> f1;
-    REQUIRE(!f1.available());
-
-    future<int> f2;
-    REQUIRE(!f2.available());
-  }
-
-  SECTION("we can make ready futures that won't block") {
-    auto f1 = make_ready_future();
-    REQUIRE(f1.available());
-    f1.await_result();
-
-    auto f2 = make_ready_future(123);
-    REQUIRE(f2.available());
-    REQUIRE(f2.await_result() == 123);
-
-    auto f3 = make_ready_future(std::make_unique<int>(123));
-    REQUIRE(f3.available());
-    REQUIRE(*f3.await_result() == 123);
-  }
-
-  SECTION("we await asynchronous GPU computations") { REQUIRE(f1(a, b).await_result() == c); }
-
-  SECTION("we can await async GPU computations with a void result") {
-    uint64_t res;
-    auto fut = f2(res, a, b);
-    fut.await_result();
-    REQUIRE(res == c);
-  }
-
-  SECTION("we can move assign futures with async GPU computations") {
-    auto a_p = make_random_array(rng, n);
-    auto fut = f1(a_p, b);
-    fut = f1(a, b);
-    REQUIRE(fut.await_result() == c);
-  }
-
-  SECTION("we can destroy a future that's kept running") { auto fut = f1(a, b); }
+  return future<void>{std::move(completion), std::move(handle)};
 }

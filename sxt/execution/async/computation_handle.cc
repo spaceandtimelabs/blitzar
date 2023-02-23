@@ -34,15 +34,18 @@ computation_handle& computation_handle::operator=(computation_handle&& other) no
 // wait
 //--------------------------------------------------------------------------------------------------
 void computation_handle::wait() noexcept {
+  if (head_ == nullptr) {
+    return;
+  }
   auto pool = xenb::get_stream_pool();
-  while (head_ != nullptr) {
+  do {
     auto handle = head_;
     SXT_DEBUG_ASSERT(handle->stream != nullptr);
     basdv::synchronize_stream(handle->stream);
     head_ = handle->next;
     handle->next = nullptr;
     pool->release_handle(handle);
-  }
+  } while (head_ != nullptr);
 }
 
 //--------------------------------------------------------------------------------------------------
