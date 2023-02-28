@@ -63,6 +63,8 @@ public:
   bool empty() const noexcept { return size_ == 0; }
 
   // methods
+  void shrink(size_t size) noexcept;
+
   void reset() noexcept;
 
   template <class T> managed_array<T>& as_array() & noexcept {
@@ -153,6 +155,8 @@ public:
   const T* end() const noexcept { return this->data() + data_.size(); }
 
   // methods
+  void shrink(size_t size) noexcept { data_.shrink(size); }
+
   void reset() noexcept { data_.reset(); }
 
   // operator[]

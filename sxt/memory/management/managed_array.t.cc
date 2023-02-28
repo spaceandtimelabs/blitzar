@@ -35,4 +35,11 @@ TEST_CASE("managed_array is an allocator-aware container manages an array of "
     managed_array<int> arr{1, 2, 3};
     bastst::exercise_allocator_aware_operations(arr);
   }
+
+  SECTION("we can shrink an array") {
+    managed_array<int> arr{1, 2, 3};
+    arr.shrink(2);
+    managed_array<int> expected{1, 2};
+    REQUIRE(arr == expected);
+  }
 }

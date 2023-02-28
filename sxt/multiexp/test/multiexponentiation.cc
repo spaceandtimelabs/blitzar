@@ -11,6 +11,7 @@
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/multiexp/base/exponent_sequence_utility.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"
 #include "sxt/multiexp/random/random_multiexponentiation_generation.h"
 #include "sxt/multiexp/test/curve21_arithmetic.h"
@@ -20,18 +21,6 @@
 using sxt::rstt::operator""_rs;
 
 namespace sxt::mtxtst {
-//--------------------------------------------------------------------------------------------------
-// to_exponent_sequence
-//--------------------------------------------------------------------------------------------------
-template <class T>
-static mtxb::exponent_sequence to_exponent_sequence(const std::vector<T>& values) noexcept {
-  return {
-      .element_nbytes = sizeof(T),
-      .n = values.size(),
-      .data = reinterpret_cast<const uint8_t*>(values.data()),
-  };
-}
-
 //--------------------------------------------------------------------------------------------------
 // exercise_multiexponentiation_fn
 //--------------------------------------------------------------------------------------------------
@@ -45,7 +34,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
 
   SECTION("we handle a sequence with no exponents") {
     std::vector<mtxb::exponent_sequence> sequences = {
-        {.element_nbytes = 0, .n = 0, .data = nullptr}};
+        {.element_nbytes = 1, .n = 0, .data = nullptr}};
     auto res = f({}, sequences);
     memmg::managed_array<c21t::element_p3> expected = {
         c21cn::zero_p3_v,
@@ -56,7 +45,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
   SECTION("we handle an exponent of zero") {
     std::vector<uint32_t> exponents = {0};
     std::vector<mtxb::exponent_sequence> sequences = {
-        to_exponent_sequence(exponents),
+        mtxb::to_exponent_sequence(exponents),
     };
     memmg::managed_array<c21t::element_p3> generators = {
         0x123_rs,
@@ -71,7 +60,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
   SECTION("we handle an exponent of one") {
     std::vector<uint32_t> exponents = {1};
     std::vector<mtxb::exponent_sequence> sequences = {
-        to_exponent_sequence(exponents),
+        mtxb::to_exponent_sequence(exponents),
     };
     memmg::managed_array<c21t::element_p3> generators = {
         0x123_rs,
@@ -83,7 +72,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
   SECTION("we handle an exponent of two") {
     std::vector<uint32_t> exponents = {2};
     std::vector<mtxb::exponent_sequence> sequences = {
-        to_exponent_sequence(exponents),
+        mtxb::to_exponent_sequence(exponents),
     };
     memmg::managed_array<c21t::element_p3> generators = {
         0x123_rs,
@@ -98,7 +87,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
   SECTION("we handle an exponent of three") {
     std::vector<uint32_t> exponents = {3};
     std::vector<mtxb::exponent_sequence> sequences = {
-        to_exponent_sequence(exponents),
+        mtxb::to_exponent_sequence(exponents),
     };
     memmg::managed_array<c21t::element_p3> generators = {
         0x123_rs,
@@ -113,7 +102,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
   SECTION("we can handle a large exponent") {
     std::vector<uint64_t> exponents = {std::numeric_limits<uint64_t>::max()};
     std::vector<mtxb::exponent_sequence> sequences = {
-        to_exponent_sequence(exponents),
+        mtxb::to_exponent_sequence(exponents),
     };
     memmg::managed_array<c21t::element_p3> generators = {
         0x123_rs,
@@ -128,7 +117,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
   SECTION("we handle sequences with more than a single element") {
     std::vector<uint16_t> exponents = {3, 2};
     std::vector<mtxb::exponent_sequence> sequences = {
-        to_exponent_sequence(exponents),
+        mtxb::to_exponent_sequence(exponents),
     };
     memmg::managed_array<c21t::element_p3> generators = {
         0x123_rs,
@@ -143,8 +132,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
 
   SECTION("we handle multiple sequences of length zero") {
     std::vector<mtxb::exponent_sequence> sequences = {
-        {.element_nbytes = 0, .n = 0, .data = nullptr},
-        {.element_nbytes = 0, .n = 0, .data = nullptr}};
+        {.element_nbytes = 1, .n = 0, .data = nullptr},
+        {.element_nbytes = 1, .n = 0, .data = nullptr}};
     auto res = f({}, sequences);
     memmg::managed_array<c21t::element_p3> expected = {
         c21cn::zero_p3_v,
@@ -157,8 +146,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     std::vector<uint8_t> exponents1 = {1};
     std::vector<uint16_t> exponents2 = {3};
     std::vector<mtxb::exponent_sequence> sequences = {
-        to_exponent_sequence(exponents1),
-        to_exponent_sequence(exponents2),
+        mtxb::to_exponent_sequence(exponents1),
+        mtxb::to_exponent_sequence(exponents2),
     };
     memmg::managed_array<c21t::element_p3> generators = {
         0x123_rs,
@@ -175,8 +164,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     std::vector<uint8_t> exponents1 = {1, 10, 3};
     std::vector<uint16_t> exponents2 = {2, 6, 4};
     std::vector<mtxb::exponent_sequence> sequences = {
-        to_exponent_sequence(exponents1),
-        to_exponent_sequence(exponents2),
+        mtxb::to_exponent_sequence(exponents1),
+        mtxb::to_exponent_sequence(exponents2),
     };
     memmg::managed_array<c21t::element_p3> generators = {
         0x123_rs,
@@ -195,8 +184,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     std::vector<uint8_t> exponents1 = {10};
     std::vector<uint16_t> exponents2 = {2, 6, 4};
     std::vector<mtxb::exponent_sequence> sequences = {
-        to_exponent_sequence(exponents1),
-        to_exponent_sequence(exponents2),
+        mtxb::to_exponent_sequence(exponents1),
+        mtxb::to_exponent_sequence(exponents2),
     };
     memmg::managed_array<c21t::element_p3> generators = {
         0x123_rs,

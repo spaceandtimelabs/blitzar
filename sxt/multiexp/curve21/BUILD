@@ -35,17 +35,29 @@ sxt_cc_component(
     name = "multiexponentiation",
     impl_deps = [
         ":multiexponentiation_cpu_driver",
+        ":multiproducts_combination",
         ":pippenger_multiproduct_solver",
+        "//sxt/base/container:blob_array",
+        "//sxt/curve21/operation:accumulator",
         "//sxt/memory/management:managed_array",
         "//sxt/curve21/type:element_p3",
         "//sxt/multiexp/pippenger:multiexponentiation",
+        "//sxt/multiexp/pippenger:multiproduct_decomposition",
         "//sxt/execution/async:future",
+        "//sxt/multiexp/multiproduct_gpu:multiproduct",
     ],
+    is_cuda = True,
     test_deps = [
+        "//sxt/memory/management:managed_array",
+        "//sxt/curve21/type:element_p3",
         "//sxt/base/test:unit_test",
+        "//sxt/multiexp/test:multiexponentiation",
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/execution/async:future",
     ],
     deps = [
         "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
         "//sxt/memory/management:managed_array_fwd",
     ],
 )
@@ -69,38 +81,6 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/execution/async:future",
         "//sxt/multiexp/test:multiexponentiation",
-    ],
-    deps = [
-        "//sxt/multiexp/pippenger:driver",
-    ],
-)
-
-sxt_cc_component(
-    name = "multiexponentiation_gpu_driver",
-    impl_deps = [
-        ":doubling_reduction",
-        ":multiproducts_combination",
-        "//sxt/base/bit:span_op",
-        "//sxt/base/container:blob_array",
-        "//sxt/base/container:span_void",
-        "//sxt/base/container:span",
-        "//sxt/memory/management:managed_array",
-        "//sxt/execution/async:future",
-        "//sxt/multiexp/multiproduct_gpu:multiproduct",
-        "//sxt/multiexp/index:index_table",
-        "//sxt/curve21/operation:accumulator",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/constant:zero",
-    ],
-    is_cuda = True,
-    test_deps = [
-        "//sxt/memory/management:managed_array",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/base/test:unit_test",
-        "//sxt/multiexp/test:multiexponentiation",
-        "//sxt/multiexp/pippenger:multiexponentiation",
-        "//sxt/memory/resource:managed_device_resource",
-        "//sxt/execution/async:future",
     ],
     deps = [
         "//sxt/multiexp/pippenger:driver",

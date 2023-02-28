@@ -57,6 +57,27 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "multiproduct_decomposition",
+    impl_deps = [
+        "//sxt/base/bit:bit_position",
+        "//sxt/base/num:constexpr_switch",
+        "//sxt/base/container:blob_array",
+        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/memory/management:managed_array",
+    ],
+    test_deps = [
+        "//sxt/memory/management:managed_array",
+        "//sxt/base/container:blob_array",
+        "//sxt/multiexp/base:exponent_sequence_utility",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/memory/management:managed_array_fwd",
+    ],
+)
+
+sxt_cc_component(
     name = "multiproduct_table",
     impl_deps = [
         "//sxt/base/bit:count",

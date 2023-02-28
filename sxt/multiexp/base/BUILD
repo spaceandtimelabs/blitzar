@@ -34,3 +34,11 @@ sxt_cc_component(
     name = "exponent_sequence",
     with_test = False,
 )
+
+sxt_cc_component(
+    name = "exponent_sequence_utility",
+    with_test = False,
+    deps = [
+        ":exponent_sequence",
+    ],
+)

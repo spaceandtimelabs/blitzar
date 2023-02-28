@@ -16,6 +16,7 @@ def sxt_copts():
 
 def sxt_cc_component(
         name,
+        copts = [],
         is_cuda = False,
         with_test = True,
         alwayslink = False,
@@ -55,7 +56,7 @@ def sxt_cc_component(
             srcs = [
                 name + ".cc",
             ],
-            copts = sxt_copts(),
+            copts = sxt_copts() + copts,
             linkstatic = 1,
             implementation_deps = impl_deps,
             deps = deps,

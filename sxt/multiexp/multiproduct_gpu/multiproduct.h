@@ -14,19 +14,15 @@
 #include "sxt/multiexp/multiproduct_gpu/kernel.h"
 #include "sxt/multiexp/multiproduct_gpu/multiproduct_computation_descriptor.h"
 
-namespace sxt::basct {
-class blob_array;
-}
-
 namespace sxt::mtxmpg {
 //--------------------------------------------------------------------------------------------------
 // compute_multiproduct
 //--------------------------------------------------------------------------------------------------
 template <algb::reducer Reducer>
-xena::future<memmg::managed_array<void>>
+xena::future<memmg::managed_array<typename Reducer::value_type>>
 compute_multiproduct(basct::cspan<typename Reducer::value_type> generators,
-                     basct::cspan<basct::cspan<uint64_t>> products, const basct::blob_array& masks,
-                     size_t num_inputs) noexcept {
+                     memmg::managed_array<unsigned>&& indexes,
+                     basct::cspan<unsigned> product_sizes) noexcept {
   using T = typename Reducer::value_type;
   multiproduct_computation_descriptor computation_descriptor{
       .num_blocks{},
@@ -34,7 +30,7 @@ compute_multiproduct(basct::cspan<typename Reducer::value_type> generators,
       .indexes{memr::get_pinned_resource()},
       .block_descriptors{memr::get_pinned_resource()},
   };
-  setup_multiproduct_computation(computation_descriptor, products, masks, num_inputs);
+  setup_multiproduct_computation(computation_descriptor, std::move(indexes), product_sizes);
   xenb::stream stream;
 
   // indexes_gpu
@@ -73,7 +69,7 @@ compute_multiproduct(basct::cspan<typename Reducer::value_type> generators,
     block_descriptors_gpu = std::move(block_descriptors_gpu),
     partial_res_gpu = std::move(partial_res_gpu),
     partial_res = std::move(partial_res),
-    num_products = products.size()
+    num_products = product_sizes.size()
                         // clang-format on
   ]() noexcept {
     memmg::managed_array<T> res(num_products);
@@ -84,7 +80,7 @@ compute_multiproduct(basct::cspan<typename Reducer::value_type> generators,
   // future
   xena::computation_handle computation_handle;
   computation_handle.add_stream(std::move(stream));
-  return xena::future<memmg::managed_array<void>>{
+  return xena::future<memmg::managed_array<T>>{
       std::move(completion),
       std::move(computation_handle),
   };

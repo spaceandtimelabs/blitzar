@@ -58,6 +58,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
         "//sxt/execution/async:future",
+        "//sxt/multiexp/base:exponent_sequence_utility",
     ],
     with_test = False,
     deps = [

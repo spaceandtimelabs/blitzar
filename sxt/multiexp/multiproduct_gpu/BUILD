@@ -40,18 +40,16 @@ sxt_cc_component(
     impl_deps = [
         ":multiproduct_computation_descriptor",
         "//sxt/algorithm/reduction:kernel_fit",
-        "//sxt/base/container:blob_array",
         "//sxt/execution/kernel:kernel_dims",
     ],
     test_deps = [
         ":multiproduct_computation_descriptor",
         "//sxt/memory/management:managed_array",
-        "//sxt/multiexp/index:index_table",
-        "//sxt/base/container:blob_array",
         "//sxt/base/test:unit_test",
     ],
     deps = [
         "//sxt/base/container:span",
+        "//sxt/memory/management:managed_array_fwd",
     ],
 )
 
@@ -78,8 +76,6 @@ sxt_cc_component(
     name = "multiproduct",
     is_cuda = True,
     test_deps = [
-        "//sxt/base/container:blob_array",
-        "//sxt/multiexp/index:index_table",
         "//sxt/algorithm/reduction:test_reducer",
         "//sxt/memory/resource:managed_device_resource",
         "//sxt/base/test:unit_test",

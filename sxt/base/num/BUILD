@@ -4,6 +4,16 @@ load(
 )
 
 sxt_cc_component(
+    name = "constexpr_switch",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/error:assert",
+    ],
+)
+
+sxt_cc_component(
     name = "hex",
 )
 
