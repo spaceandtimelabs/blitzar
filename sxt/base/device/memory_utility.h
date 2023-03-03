@@ -36,4 +36,9 @@ void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
 // memset_device
 //--------------------------------------------------------------------------------------------------
 void memset_device(void* dst, int value, size_t count) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// is_device_pointer
+//--------------------------------------------------------------------------------------------------
+bool is_device_pointer(const void* ptr) noexcept;
 } // namespace sxt::basdv

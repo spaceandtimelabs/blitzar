@@ -68,4 +68,16 @@ void memset_device(void* dst, int value, size_t count) noexcept {
     baser::panic("cudaMemset failed: " + std::string(cudaGetErrorString(rcode)));
   }
 }
+
+//--------------------------------------------------------------------------------------------------
+// is_device_pointer
+//--------------------------------------------------------------------------------------------------
+bool is_device_pointer(const void* ptr) noexcept {
+  cudaPointerAttributes attrs;
+  auto rcode = cudaPointerGetAttributes(&attrs, ptr);
+  if (rcode != cudaSuccess) {
+    baser::panic("cudaPointerGetAttributes failed: " + std::string(cudaGetErrorString(rcode)));
+  }
+  return attrs.type == cudaMemoryTypeDevice || attrs.type == cudaMemoryTypeManaged;
+}
 } // namespace sxt::basdv

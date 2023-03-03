@@ -4,6 +4,22 @@ load(
 )
 
 sxt_cc_component(
+    name = "async_device_resource",
+    impl_deps = [
+        "//sxt/base/error:panic",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    with_test = False,
+    deps = [
+        "//sxt/base/type:raw_stream",
+        "@local_config_cuda//cuda:cuda_headers",
+        "@local_config_cuda//cuda:cudart_static",
+    ],
+)
+
+sxt_cc_component(
     name = "device_resource",
     impl_deps = [
         "//sxt/base/error:panic",

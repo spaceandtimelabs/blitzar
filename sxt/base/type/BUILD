@@ -27,3 +27,8 @@ sxt_cc_component(
     name = "raw_stream",
     with_test = False,
 )
+
+sxt_cc_component(
+    name = "raw_cuda_event",
+    with_test = False,
+)

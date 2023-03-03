@@ -4,6 +4,35 @@ load(
 )
 
 sxt_cc_component(
+    name = "event",
+    impl_deps = [
+        "//sxt/base/error:panic",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/type:raw_cuda_event",
+        "@local_config_cuda//cuda:cuda_headers",
+        "@local_config_cuda//cuda:cudart_static",
+    ],
+)
+
+sxt_cc_component(
+    name = "event_utility",
+    impl_deps = [
+        "//sxt/base/error:panic",
+    ],
+    with_test = False,
+    deps = [
+        "//sxt/base/type:raw_cuda_event",
+        "//sxt/base/type:raw_stream",
+        "@local_config_cuda//cuda:cuda_headers",
+        "@local_config_cuda//cuda:cudart_static",
+    ],
+)
+
+sxt_cc_component(
     name = "property",
     test_deps = [
         "//sxt/base/test:unit_test",
@@ -19,7 +48,9 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/base/error:panic",
     ],
-    with_test = False,
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
     deps = [
         "//sxt/base/type:raw_stream",
         "@local_config_cuda//cuda:cuda_headers",
