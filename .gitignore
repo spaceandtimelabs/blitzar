@@ -30,6 +30,8 @@ rust/proofs-gpu-sys/src/bindings.rs
 *.tar.gz
 *.dot
 callgrind.out.*
+.results/
+.proof_results/
 
 # Ignore python files
 # Byte-compiled / optimized / DLL files
