@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2015 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -311,7 +311,7 @@ def ProcessLinkArgs(args_fd, argv):
     elif arg == '-dlink':
       args.append(arg)
     elif arg.startswith('-'):
-      os.write(args_fd, arg + '\n')
+      os.write(args_fd, str.encode(arg + '\n'))
     else:
       args.append(arg)
     index += 1
