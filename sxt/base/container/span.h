@@ -35,6 +35,11 @@ public:
     requires std::is_const_v<T>
       : size_{other.size()}, data_{other.data()} {}
 
+  span(const span&) noexcept = default;
+  span(span&&) noexcept = default;
+  span& operator=(const span&) noexcept = default;
+  span& operator=(span&&) noexcept = default;
+
   CUDA_DISABLE_HOSTDEV_WARNING
   template <class Cont>
   CUDA_CALLABLE span(Cont& cont) noexcept

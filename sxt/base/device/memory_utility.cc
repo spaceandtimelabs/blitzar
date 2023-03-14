@@ -2,6 +2,7 @@
 
 #include <cuda_runtime.h>
 
+#include <iostream>
 #include <string>
 
 #include "sxt/base/error/panic.h"
@@ -49,6 +50,17 @@ void async_memcpy_host_to_device(void* dst, const void* src, size_t count,
 }
 
 //--------------------------------------------------------------------------------------------------
+// async_memcpy_device_to_device
+//--------------------------------------------------------------------------------------------------
+void async_memcpy_device_to_device(void* dst, const void* src, size_t count,
+                                   bast::raw_stream_t stream) noexcept {
+  auto rcode = cudaMemcpyAsync(dst, src, count, cudaMemcpyDeviceToDevice, stream);
+  if (rcode != cudaSuccess) {
+    baser::panic("cudaMemcpyAsync failed: " + std::string(cudaGetErrorString(rcode)));
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
 // async_memcpy_device_to_host
 //--------------------------------------------------------------------------------------------------
 void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
@@ -79,5 +91,17 @@ bool is_device_pointer(const void* ptr) noexcept {
     baser::panic("cudaPointerGetAttributes failed: " + std::string(cudaGetErrorString(rcode)));
   }
   return attrs.type == cudaMemoryTypeDevice || attrs.type == cudaMemoryTypeManaged;
+}
+
+//--------------------------------------------------------------------------------------------------
+// is_host_pointer
+//--------------------------------------------------------------------------------------------------
+bool is_host_pointer(const void* ptr) noexcept {
+  cudaPointerAttributes attrs;
+  auto rcode = cudaPointerGetAttributes(&attrs, ptr);
+  if (rcode != cudaSuccess) {
+    baser::panic("cudaPointerGetAttributes failed: " + std::string(cudaGetErrorString(rcode)));
+  }
+  return attrs.type != cudaMemoryTypeDevice;
 }
 } // namespace sxt::basdv

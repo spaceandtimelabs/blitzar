@@ -12,6 +12,7 @@ load(
 def sxt_copts():
     return [
         "-std=c++20",
+        "-fcoroutines",
     ]
 
 def sxt_cc_component(
@@ -33,7 +34,7 @@ def sxt_cc_component(
             srcs = [
                 name + ".cc",
             ],
-            copts = [
+            copts = sxt_copts() + [
                 "--device-c",
                 "-x",
                 "cuda",
@@ -82,6 +83,7 @@ def sxt_cc_component(
                 srcs = [
                     name + ".t.cc",
                 ],
+                copts = sxt_copts() + copts,
                 deps = deps_p + [
                     ":" + device_test_name,
                 ],
@@ -94,6 +96,7 @@ def sxt_cc_component(
                 srcs = [
                     name + ".t.cc",
                 ],
+                copts = sxt_copts() + copts,
                 deps = deps_p + [
                     ":" + device_test_name,
                 ],

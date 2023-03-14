@@ -22,6 +22,9 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
+    ],
 )
 
 sxt_cc_component(

@@ -17,7 +17,7 @@ public:
   event& operator=(const event&) = delete;
   event& operator=(event&& other) noexcept;
 
-  operator const bast::raw_cuda_event_t() const noexcept { return event_; }
+  operator const CUevent_st*() const noexcept { return event_; }
 
   operator bast::raw_cuda_event_t() noexcept { return event_; }
 

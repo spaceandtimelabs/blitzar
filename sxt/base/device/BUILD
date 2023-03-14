@@ -47,14 +47,19 @@ sxt_cc_component(
     name = "memory_utility",
     impl_deps = [
         "//sxt/base/error:panic",
-    ],
-    test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        "//sxt/base/type:raw_stream",
         "@local_config_cuda//cuda:cuda_headers",
         "@local_config_cuda//cuda:cudart_static",
+    ],
+    test_deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/test:unit_test",
+        "@local_config_cuda//cuda:cuda_headers",
+        "@local_config_cuda//cuda:cudart_static",
+    ],
+    deps = [
+        "//sxt/base/concept:memcpyable_ranges",
+        "//sxt/base/error:assert",
+        "//sxt/base/type:raw_stream",
     ],
 )
 

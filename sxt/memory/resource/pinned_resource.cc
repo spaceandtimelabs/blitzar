@@ -2,8 +2,7 @@
 
 #include <cuda_runtime.h>
 
-#include <cstdlib>
-#include <iostream>
+#include <string>
 
 #include "sxt/base/error/panic.h"
 
@@ -15,7 +14,7 @@ void* pinned_resource::do_allocate(size_t bytes, size_t /*alignment*/) noexcept 
   void* res;
   auto rcode = cudaMallocHost(&res, bytes);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaMalloc failed: " + std::to_string(rcode));
+    baser::panic("cudaMallocHost failed: " + std::string{cudaGetErrorString(rcode)});
   }
   return res;
 }
@@ -26,7 +25,7 @@ void* pinned_resource::do_allocate(size_t bytes, size_t /*alignment*/) noexcept 
 void pinned_resource::do_deallocate(void* ptr, size_t /*bytes*/, size_t /*alignment*/) noexcept {
   auto rcode = cudaFreeHost(ptr);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaFree failed: " + std::to_string(rcode));
+    baser::panic("cudaFreeHost failed: " + std::string{cudaGetErrorString(rcode)});
   }
 }
 
