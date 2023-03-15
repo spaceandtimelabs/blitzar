@@ -9,9 +9,12 @@ config_setting(
 # to force linking to older glibc symbols.
 cc_library(
     name = "glibc_version_lib",
-    srcs = [
-        "glibc_version.cpp",
-    ],
+    srcs = select({
+        "//bazel:portable_glibc_build": [
+            "glibc_version.cpp",
+        ],
+        "//conditions:default": [],
+    }),
     linkopts = [
         "-Wl,--wrap=shm_unlink",
         "-Wl,--wrap=pthread_join",
@@ -62,5 +65,6 @@ cc_library(
         # we hard-code to force its usage.
         "/lib/x86_64-linux-gnu/librt.so.1",
     ],
+    linkstatic = 1,
     visibility = ["//visibility:public"],
 )
