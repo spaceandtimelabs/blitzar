@@ -30,7 +30,12 @@ cc_binary(
     deps = [
         ":cbindings_device",
         ":libproofs-gpu-export-map.ld",
-    ],
+    ] + select({
+        "//bazel:portable_glibc_build": [
+            "//bazel:glibc_version_lib",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 sxt_cc_component(
