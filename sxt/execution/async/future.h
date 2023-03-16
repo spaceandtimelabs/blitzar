@@ -62,17 +62,22 @@ public:
 
   bool ready() const noexcept { return state_.ready(); }
 
-  reference value() noexcept
+  reference value() & noexcept
     requires(!std::is_void_v<T>)
   {
     return state_.value();
   }
 
-  const reference value() const noexcept
+  T value() && noexcept
     requires(!std::is_void_v<T>)
   {
-    SXT_DEBUG_ASSERT(this->ready() && state_.value.has_value());
-    return *state_.value;
+    return T{std::move(state_.value())};
+  }
+
+  const reference value() const& noexcept
+    requires(!std::is_void_v<T>)
+  {
+    return *state_.value();
   }
 
   xena::promise<T>* promise() const noexcept {

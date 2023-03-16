@@ -29,6 +29,6 @@ struct cpu_workspace final : public workspace {
   basct::span<s25t::element> b_vector;
 
   // workspace
-  void ap_value(s25t::element& value) const noexcept override;
+  xena::future<void> ap_value(s25t::element& value) const noexcept override;
 };
 } // namespace sxt::prfip

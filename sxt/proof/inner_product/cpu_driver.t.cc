@@ -6,6 +6,7 @@
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/operation/overload.h"
+#include "sxt/execution/async/future.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/inner_product/random_product_generation.h"
 #include "sxt/proof/inner_product/workspace.h"
@@ -37,7 +38,7 @@ TEST_CASE("we can commit to the fold of an inner product problem") {
 
   SECTION("we correctly commit for the n = 2 case") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 2);
-    auto workspace = drv.make_workspace(descriptor, a_vector);
+    auto workspace = drv.make_workspace(descriptor, a_vector).value();
     drv.commit_to_fold(l_value, r_value, *workspace);
 
     // l_value
@@ -53,7 +54,7 @@ TEST_CASE("we can commit to the fold of an inner product problem") {
 
   SECTION("we correctly commit for the n = 3 case") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 3);
-    auto workspace = drv.make_workspace(descriptor, a_vector);
+    auto workspace = drv.make_workspace(descriptor, a_vector).value();
     drv.commit_to_fold(l_value, r_value, *workspace);
 
     // l_value
@@ -70,7 +71,7 @@ TEST_CASE("we can commit to the fold of an inner product problem") {
 
   SECTION("we correctly commit for the n = 4 case") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 4);
-    auto workspace = drv.make_workspace(descriptor, a_vector);
+    auto workspace = drv.make_workspace(descriptor, a_vector).value();
     drv.commit_to_fold(l_value, r_value, *workspace);
 
     // l_value
@@ -112,7 +113,7 @@ TEST_CASE("we can fold an inner product problem") {
 
   SECTION("we handle the n = 2 case") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 2);
-    auto workspace = drv.make_workspace(descriptor, a_vector);
+    auto workspace = drv.make_workspace(descriptor, a_vector).value();
 
     drv.fold(*workspace, x1);
     workspace->ap_value(ap_value);
@@ -122,7 +123,7 @@ TEST_CASE("we can fold an inner product problem") {
 
   SECTION("we handle the n = 3 case") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 3);
-    auto workspace = drv.make_workspace(descriptor, a_vector);
+    auto workspace = drv.make_workspace(descriptor, a_vector).value();
 
     drv.fold(*workspace, x1);
     drv.commit_to_fold(l_value, r_value, *workspace);

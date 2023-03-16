@@ -47,6 +47,8 @@ sxt_cc_component(
         "//sxt/proof/transcript:transcript",
         "//sxt/scalar25/type:element",
         "//sxt/curve21/type:element_p3",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
         "//sxt/memory/management:managed_array",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/ristretto/operation:compression",

@@ -77,7 +77,10 @@ void gpu_backend::prove_inner_product(basct::span<rstt::compressed_element> l_ve
                                       basct::cspan<s25t::element> a_vector) const noexcept {
   // TODO: update this to use gpu_driver when available
   prfip::cpu_driver drv;
-  prfip::prove_inner_product(l_vector, r_vector, ap_value, transcript, drv, descriptor, a_vector);
+  auto fut = prfip::prove_inner_product(l_vector, r_vector, ap_value, transcript, drv, descriptor,
+                                        a_vector);
+  xens::get_scheduler().run();
+  SXT_DEBUG_ASSERT(fut.ready());
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -92,8 +95,10 @@ bool gpu_backend::verify_inner_product(prft::transcript& transcript,
                                        const s25t::element& ap_value) const noexcept {
   // TODO: update this to use gpu_driver when available
   prfip::cpu_driver drv;
-  return prfip::verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector,
-                                     r_vector, ap_value);
+  auto fut = prfip::verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector,
+                                         r_vector, ap_value);
+  xens::get_scheduler().run();
+  return fut.value();
 }
 
 //--------------------------------------------------------------------------------------------------

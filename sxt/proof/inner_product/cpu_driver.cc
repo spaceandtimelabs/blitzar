@@ -7,6 +7,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/curve21/multiexponentiation.h"
@@ -61,7 +62,7 @@ static void multiexponentiate(c21t::element_p3 c_commits[2], const c21t::element
 //--------------------------------------------------------------------------------------------------
 // make_workspace
 //--------------------------------------------------------------------------------------------------
-std::unique_ptr<workspace>
+xena::future<std::unique_ptr<workspace>>
 cpu_driver::make_workspace(const proof_descriptor& descriptor,
                            basct::cspan<s25t::element> a_vector) const noexcept {
   auto n = a_vector.size();
@@ -88,14 +89,15 @@ cpu_driver::make_workspace(const proof_descriptor& descriptor,
       scalars + np_half,
       np_half,
   };
-  return res;
+  return xena::make_ready_future(std::unique_ptr<workspace>{std::move(res)});
 }
 
 //--------------------------------------------------------------------------------------------------
 // commit_to_fold
 //--------------------------------------------------------------------------------------------------
-void cpu_driver::commit_to_fold(rstt::compressed_element& l_value,
-                                rstt::compressed_element& r_value, workspace& ws) const noexcept {
+xena::future<void> cpu_driver::commit_to_fold(rstt::compressed_element& l_value,
+                                              rstt::compressed_element& r_value,
+                                              workspace& ws) const noexcept {
   auto& work = static_cast<cpu_workspace&>(ws);
   basct::cspan<c21t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
@@ -137,12 +139,14 @@ void cpu_driver::commit_to_fold(rstt::compressed_element& l_value,
   multiexponentiate(r_value_p, g_low, a_high);
   c21o::add(r_value_p, r_value_p, c_commits[1]);
   rsto::compress(r_value, r_value_p);
+
+  return xena::make_ready_future();
 }
 
 //--------------------------------------------------------------------------------------------------
 // fold
 //--------------------------------------------------------------------------------------------------
-void cpu_driver::fold(workspace& ws, const s25t::element& x) const noexcept {
+xena::future<void> cpu_driver::fold(workspace& ws, const s25t::element& x) const noexcept {
   auto& work = static_cast<cpu_workspace&>(ws);
   basct::cspan<c21t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
@@ -168,7 +172,7 @@ void cpu_driver::fold(workspace& ws, const s25t::element& x) const noexcept {
   fold_scalars(work.a_vector, a_vector, x, x_inv, mid);
   if (mid == 1) {
     // no need to compute the other folded values if we reduce to a single element
-    return;
+    return xena::make_ready_future();
   }
 
   // b_vector
@@ -176,17 +180,18 @@ void cpu_driver::fold(workspace& ws, const s25t::element& x) const noexcept {
 
   // g_vector
   fold_generators(work.g_vector, g_vector, x_inv, x, mid);
+
+  return xena::make_ready_future();
 }
 
 //--------------------------------------------------------------------------------------------------
 // compute_expected_commitment
 //--------------------------------------------------------------------------------------------------
-void cpu_driver::compute_expected_commitment(rstt::compressed_element& commit,
-                                             const proof_descriptor& descriptor,
-                                             basct::cspan<rstt::compressed_element> l_vector,
-                                             basct::cspan<rstt::compressed_element> r_vector,
-                                             basct::cspan<s25t::element> x_vector,
-                                             const s25t::element& ap_value) const noexcept {
+xena::future<void> cpu_driver::compute_expected_commitment(
+    rstt::compressed_element& commit, const proof_descriptor& descriptor,
+    basct::cspan<rstt::compressed_element> l_vector,
+    basct::cspan<rstt::compressed_element> r_vector, basct::cspan<s25t::element> x_vector,
+    const s25t::element& ap_value) const noexcept {
   auto num_rounds = l_vector.size();
   auto np = descriptor.g_vector.size();
   // clang-format off
@@ -223,5 +228,7 @@ void cpu_driver::compute_expected_commitment(rstt::compressed_element& commit,
   };
   auto commits = mtxc21::compute_multiexponentiation(generators, {&exponent_sequence, 1});
   rsto::compress(commit, commits[0]);
+
+  return xena::make_ready_future();
 }
 } // namespace sxt::prfip

@@ -9,6 +9,7 @@
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/operation/overload.h"
+#include "sxt/execution/async/future.h"
 #include "sxt/proof/inner_product/cpu_driver.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/inner_product/random_product_generation.h"
@@ -47,15 +48,18 @@ TEST_CASE("we can prove and verify an inner product") {
     auto product = a_vector[0] * b_vector[0];
     auto a_commit = a_vector[0] * g_vector[0];
     REQUIRE(verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
-                                 ap_value));
+                                 ap_value)
+                .value());
 
     auto a_commit_p = 0x123_s25 * g_vector[0];
     REQUIRE(!verify_inner_product(transcript, drv, descriptor, product, a_commit_p, l_vector,
-                                  r_vector, ap_value));
+                                  r_vector, ap_value)
+                 .value());
 
     auto product_p = product + 0x123_s25;
     REQUIRE(!verify_inner_product(transcript, drv, descriptor, product_p, a_commit, l_vector,
-                                  r_vector, ap_value));
+                                  r_vector, ap_value)
+                 .value());
   }
 
   SECTION("we can verify a proof with 2 elements") {
@@ -67,17 +71,20 @@ TEST_CASE("we can prove and verify an inner product") {
     auto product = a_vector[0] * b_vector[0] + a_vector[1] * b_vector[1];
     auto a_commit = a_vector[0] * g_vector[0] + a_vector[1] * descriptor.g_vector[1];
     REQUIRE(verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
-                                 ap_value));
+                                 ap_value)
+                .value());
 
     transcript = prft::transcript{"abc"};
     auto a_commit_p = 0x123_s25 * g_vector[0];
     REQUIRE(!verify_inner_product(transcript, drv, descriptor, product, a_commit_p, l_vector,
-                                  r_vector, ap_value));
+                                  r_vector, ap_value)
+                 .value());
 
     transcript = prft::transcript{"abc"};
     auto product_p = product + 0x123_s25;
     REQUIRE(!verify_inner_product(transcript, drv, descriptor, product_p, a_commit, l_vector,
-                                  r_vector, ap_value));
+                                  r_vector, ap_value)
+                 .value());
   }
 
   SECTION("we can prove and verify random proofs of varying size") {
@@ -111,7 +118,8 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   }
   transcript = prft::transcript{"abc"};
   if (!verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
-                            ap_value)) {
+                            ap_value)
+           .value()) {
     baser::panic("failed to verify proof");
   }
 
@@ -119,7 +127,8 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   transcript = prft::transcript{"abc"};
   auto ap_value_p = ap_value + 0x5134_s25;
   if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
-                           ap_value_p)) {
+                           ap_value_p)
+          .value()) {
     baser::panic("verification should fail");
   }
 
@@ -127,7 +136,8 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   transcript = prft::transcript{"abc"};
   auto product_p = product + 0x5134_s25;
   if (verify_inner_product(transcript, drv, descriptor, product_p, a_commit, l_vector, r_vector,
-                           ap_value)) {
+                           ap_value)
+          .value()) {
     baser::panic("verification should fail");
   }
 
@@ -135,7 +145,8 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   transcript = prft::transcript{"abc"};
   auto a_commit_p = a_commit + 0x5134_s25 * g_vector[0];
   if (verify_inner_product(transcript, drv, descriptor, product, a_commit_p, l_vector, r_vector,
-                           ap_value)) {
+                           ap_value)
+          .value()) {
     baser::panic("verification should fail");
   }
 
@@ -143,7 +154,8 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   if (n > 1) {
     transcript = prft::transcript{"xyz"};
     if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
-                             ap_value)) {
+                             ap_value)
+            .value()) {
       baser::panic("verification should fail");
     }
   }
@@ -153,14 +165,16 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   l_vector_p.emplace_back();
   transcript = prft::transcript{"abc"};
   if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector_p, r_vector,
-                           ap_value)) {
+                           ap_value)
+          .value()) {
     baser::panic("verification should fail");
   }
   auto r_vector_p = r_vector;
   r_vector_p.emplace_back();
   transcript = prft::transcript{"abc"};
   if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector_p,
-                           ap_value)) {
+                           ap_value)
+          .value()) {
     baser::panic("verification should fail");
   }
 
@@ -171,14 +185,16 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
     rsto::compress(l_vector_p[0], some_val);
     transcript = prft::transcript{"abc"};
     if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector_p, r_vector,
-                             ap_value)) {
+                             ap_value)
+            .value()) {
       baser::panic("verification should fail");
     }
     auto r_vector_p = r_vector;
     rsto::compress(r_vector_p[0], some_val);
     transcript = prft::transcript{"abc"};
     if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector_p,
-                             ap_value)) {
+                             ap_value)
+            .value()) {
       baser::panic("verification should fail");
     }
   }
@@ -190,7 +206,8 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   descriptor_p.b_vector = b_vector_p;
   transcript = prft::transcript{"abc"};
   if (verify_inner_product(transcript, drv, descriptor_p, product, a_commit, l_vector, r_vector,
-                           ap_value)) {
+                           ap_value)
+          .value()) {
     baser::panic("verification should fail");
   }
 }

@@ -6,14 +6,21 @@ load(
 sxt_cc_component(
     name = "workspace",
     with_test = False,
+    deps = [
+        "//sxt/execution/async:future_fwd",
+    ],
 )
 
 sxt_cc_component(
     name = "cpu_workspace",
+    impl_deps = [
+        "//sxt/execution/async:future",
+    ],
     with_test = False,
     deps = [
         ":workspace",
         "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
         "//sxt/scalar25/type:element",
     ],
 )
@@ -23,6 +30,7 @@ sxt_cc_component(
     with_test = False,
     deps = [
         "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
     ],
 )
 
@@ -61,6 +69,8 @@ sxt_cc_component(
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/curve21/type:element_p3",
+        "//sxt/execution/async:future",
+        "//sxt/execution/async:coroutine",
         "//sxt/base/num:ceil_log2",
         "//sxt/ristretto/operation:compression",
         "//sxt/ristretto/type:compressed_element",
@@ -72,6 +82,7 @@ sxt_cc_component(
         ":cpu_driver",
         ":proof_descriptor",
         ":random_product_generation",
+        "//sxt/execution/async:future",
         "//sxt/base/num:ceil_log2",
         "//sxt/base/test:unit_test",
         "//sxt/base/num:fast_random_number_generator",
@@ -86,6 +97,7 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
     ],
 )
 
@@ -148,6 +160,7 @@ sxt_cc_component(
         ":verification_computation",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/type:element_p3",
+        "//sxt/execution/async:future",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/curve21:multiexponentiation",
@@ -162,6 +175,7 @@ sxt_cc_component(
         ":proof_descriptor",
         ":random_product_generation",
         ":workspace",
+        "//sxt/execution/async:future",
         "//sxt/base/test:unit_test",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/scalar25/operation:inv",

@@ -26,6 +26,11 @@ TEST_CASE("future manages an asynchronously computed result") {
     REQUIRE(*fut.value() == 123);
   }
 
+  SECTION("we handle rvalue references of ready futures") {
+    auto val = make_ready_future<std::unique_ptr<int>>(std::make_unique<int>(123)).value();
+    REQUIRE(*val == 123);
+  }
+
   SECTION("we can construct a ready void future") {
     auto fut = make_ready_future();
     REQUIRE(fut.ready());

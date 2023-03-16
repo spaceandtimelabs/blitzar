@@ -7,6 +7,8 @@
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/async/future.h"
 #include "sxt/proof/inner_product/driver.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/inner_product/workspace.h"
@@ -39,11 +41,11 @@ static void compute_round_challenge(s25t::element& x, prft::transcript& transcri
 //--------------------------------------------------------------------------------------------------
 // prove_inner_product
 //--------------------------------------------------------------------------------------------------
-void prove_inner_product(basct::span<rstt::compressed_element> l_vector,
-                         basct::span<rstt::compressed_element> r_vector, s25t::element& ap_value,
-                         prft::transcript& transcript, const driver& drv,
-                         const proof_descriptor& descriptor,
-                         basct::cspan<s25t::element> a_vector) noexcept {
+xena::future<void> prove_inner_product(basct::span<rstt::compressed_element> l_vector,
+                                       basct::span<rstt::compressed_element> r_vector,
+                                       s25t::element& ap_value, prft::transcript& transcript,
+                                       const driver& drv, const proof_descriptor& descriptor,
+                                       basct::cspan<s25t::element> a_vector) noexcept {
   auto n = a_vector.size();
   auto n_lg2 = static_cast<size_t>(basn::ceil_log2(n));
   auto np = 1ull << n_lg2;
@@ -62,37 +64,38 @@ void prove_inner_product(basct::span<rstt::compressed_element> l_vector,
 
   if (n == 1) {
     ap_value = a_vector[0];
-    return;
+    co_return;
   }
 
-  auto workspace = drv.make_workspace(descriptor, a_vector);
+  auto workspace = co_await drv.make_workspace(descriptor, a_vector);
   size_t round_index = 0;
   while (np > 1) {
     auto& l_value = l_vector[round_index];
     auto& r_value = r_vector[round_index];
-    drv.commit_to_fold(l_value, r_value, *workspace);
+    co_await drv.commit_to_fold(l_value, r_value, *workspace);
 
     s25t::element x;
     compute_round_challenge(x, transcript, l_value, r_value);
 
-    drv.fold(*workspace, x);
+    co_await drv.fold(*workspace, x);
 
     np /= 2;
     ++round_index;
   }
 
-  workspace->ap_value(ap_value);
+  co_await workspace->ap_value(ap_value);
 }
 
 //--------------------------------------------------------------------------------------------------
 // verify_inner_product
 //--------------------------------------------------------------------------------------------------
-bool verify_inner_product(prft::transcript& transcript, const driver& drv,
-                          const proof_descriptor& descriptor, const s25t::element& product,
-                          const c21t::element_p3& a_commit,
-                          basct::cspan<rstt::compressed_element> l_vector,
-                          basct::cspan<rstt::compressed_element> r_vector,
-                          const s25t::element& ap_value) noexcept {
+xena::future<bool> verify_inner_product(prft::transcript& transcript, const driver& drv,
+                                        const proof_descriptor& descriptor,
+                                        const s25t::element& product,
+                                        const c21t::element_p3& a_commit,
+                                        basct::cspan<rstt::compressed_element> l_vector,
+                                        basct::cspan<rstt::compressed_element> r_vector,
+                                        const s25t::element& ap_value) noexcept {
   auto n = descriptor.b_vector.size();
   auto n_lg2 = static_cast<size_t>(basn::ceil_log2(n));
   auto np = 1ull << n_lg2;
@@ -105,7 +108,7 @@ bool verify_inner_product(prft::transcript& transcript, const driver& drv,
   // clang-format on
 
   if (l_vector.size() != num_rounds || r_vector.size() != num_rounds) {
-    return false;
+    co_return false;
   }
 
   init_transcript(transcript, n);
@@ -118,8 +121,8 @@ bool verify_inner_product(prft::transcript& transcript, const driver& drv,
   }
 
   rstt::compressed_element expected_commit;
-  drv.compute_expected_commitment(expected_commit, descriptor, l_vector, r_vector, x_vector,
-                                  ap_value);
+  co_await drv.compute_expected_commitment(expected_commit, descriptor, l_vector, r_vector,
+                                           x_vector, ap_value);
 
   c21t::element_p3 commit;
   c21o::scalar_multiply(commit, product, *descriptor.q_value);
@@ -127,6 +130,6 @@ bool verify_inner_product(prft::transcript& transcript, const driver& drv,
   rstt::compressed_element commit_p;
   rsto::compress(commit_p, commit);
 
-  return commit_p == expected_commit;
+  co_return commit_p == expected_commit;
 }
 } // namespace sxt::prfip

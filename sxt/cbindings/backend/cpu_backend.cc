@@ -3,6 +3,8 @@
 #include <cstring>
 #include <vector>
 
+#include "sxt/base/error/assert.h"
+#include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/curve21/multiexponentiation.h"
@@ -44,7 +46,9 @@ void cpu_backend::prove_inner_product(basct::span<rstt::compressed_element> l_ve
                                       const prfip::proof_descriptor& descriptor,
                                       basct::cspan<s25t::element> a_vector) const noexcept {
   prfip::cpu_driver drv;
-  prfip::prove_inner_product(l_vector, r_vector, ap_value, transcript, drv, descriptor, a_vector);
+  auto fut = prfip::prove_inner_product(l_vector, r_vector, ap_value, transcript, drv, descriptor,
+                                        a_vector);
+  SXT_DEBUG_ASSERT(fut.ready());
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -59,7 +63,8 @@ bool cpu_backend::verify_inner_product(prft::transcript& transcript,
                                        const s25t::element& ap_value) const noexcept {
   prfip::cpu_driver drv;
   return prfip::verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector,
-                                     r_vector, ap_value);
+                                     r_vector, ap_value)
+      .value();
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "sxt/base/container/span.h"
+#include "sxt/execution/async/future_fwd.h"
 
 namespace sxt::c21t {
 struct element_p3;
@@ -35,7 +36,7 @@ public:
    * Create a workspace that persists through the proving of an inner product and can be used to
    * store context that's referenced by multiple rounds of the proving.
    */
-  virtual std::unique_ptr<workspace>
+  virtual xena::future<std::unique_ptr<workspace>>
   make_workspace(const proof_descriptor& descriptor,
                  basct::cspan<s25t::element> a_vector) const noexcept = 0;
 
@@ -46,8 +47,9 @@ public:
    *  Bulletproofs: Short Proofs for Confidential Transactions and More
    *  https://www.researchgate.net/publication/326643720_Bulletproofs_Short_Proofs_for_Confidential_Transactions_and_More
    */
-  virtual void commit_to_fold(rstt::compressed_element& l_value, rstt::compressed_element& r_value,
-                              workspace& ws) const noexcept = 0;
+  virtual xena::future<void> commit_to_fold(rstt::compressed_element& l_value,
+                                            rstt::compressed_element& r_value,
+                                            workspace& ws) const noexcept = 0;
 
   /**
    * Using the randomly selected scalar x, fold an inner product proof to achieve a proof
@@ -57,7 +59,7 @@ public:
    *  Bulletproofs: Short Proofs for Confidential Transactions and More
    *  https://www.researchgate.net/publication/326643720_Bulletproofs_Short_Proofs_for_Confidential_Transactions_and_More
    */
-  virtual void fold(workspace& ws, const s25t::element& x) const noexcept = 0;
+  virtual xena::future<void> fold(workspace& ws, const s25t::element& x) const noexcept = 0;
 
   /**
    * Compute the expected commitment of an inner product proof after it's been repeatedly folded
@@ -67,11 +69,11 @@ public:
    *  Bulletproofs: Short Proofs for Confidential Transactions and More
    *  https://www.researchgate.net/publication/326643720_Bulletproofs_Short_Proofs_for_Confidential_Transactions_and_More
    */
-  virtual void compute_expected_commitment(rstt::compressed_element& commit,
-                                           const proof_descriptor& descriptor,
-                                           basct::cspan<rstt::compressed_element> l_vector,
-                                           basct::cspan<rstt::compressed_element> r_vector,
-                                           basct::cspan<s25t::element> x_vector,
-                                           const s25t::element& ap_value) const noexcept = 0;
+  virtual xena::future<void>
+  compute_expected_commitment(rstt::compressed_element& commit, const proof_descriptor& descriptor,
+                              basct::cspan<rstt::compressed_element> l_vector,
+                              basct::cspan<rstt::compressed_element> r_vector,
+                              basct::cspan<s25t::element> x_vector,
+                              const s25t::element& ap_value) const noexcept = 0;
 };
 } // namespace sxt::prfip
