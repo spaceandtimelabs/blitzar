@@ -1,11 +1,17 @@
 #pragma once
 
+#include <type_traits>
 #include <utility>
 
-#include "sxt/base/error/assert.h"
-#include "sxt/base/functional/move_only_function.h"
-#include "sxt/execution/async/computation_handle.h"
+#include "sxt/execution/async/continuation.h"
+#include "sxt/execution/async/continuation_fn.h"
+#include "sxt/execution/async/continuation_fn_utility.h"
 #include "sxt/execution/async/future_fwd.h"
+#include "sxt/execution/async/future_state.h"
+#include "sxt/execution/async/future_state_utility.h"
+#include "sxt/execution/async/leaf_continuation.h"
+#include "sxt/execution/async/promise.h"
+#include "sxt/execution/async/promise_future_base.h"
 
 namespace sxt::xena {
 //--------------------------------------------------------------------------------------------------
@@ -14,93 +20,121 @@ namespace sxt::xena {
 /**
  * Manage asynchronous computations.
  *
- * This is a highly simplified version of a future. It doesn't support multiplexing or
- * error results. It's expected that we'll rewrite this class, but it can serve as a placeholder to
- * get basic algorithms out.
+ * This is a highly simplified version of a future derived from seastar
  *
- * See seastar's futures (https://seastar.io/futures-promises/) for a model of what we'd like to
- * build towards.
+ * See https://seastar.io/futures-promises/
  */
-template <class T> class future {
+template <class T> class future final : protected future_base {
 public:
-  using completion_fn = basf::move_only_function<T() noexcept>;
+  using value_type = T;
+  using reference = std::add_lvalue_reference_t<T>;
 
   future() noexcept = default;
-
-  explicit future(completion_fn&& on_computation_done,
-                  computation_handle&& computation = {}) noexcept
-      : on_computation_done_{std::move(on_computation_done)}, computation_{std::move(computation)} {
+  future(const future&) = delete;
+  future(future&& other) noexcept
+      : future_base{std::move(static_cast<future_base&>(other))}, state_{std::move(other.state_)} {
+    if (auto ps = this->promise(); ps != nullptr) {
+      ps->set_state(state_);
+    }
+  }
+  explicit future(future_state<T>&& state) noexcept : state_{std::move(state)} {}
+  explicit future(xena::promise<T>& p) noexcept {
+    this->set_promise(&p);
+    p.set_future(this);
+    p.set_state(state_);
+  }
+  future(xena::promise<T>& p, future_state<T>&& state) noexcept : future{p} {
+    state_ = std::move(state);
   }
 
-  future(const future&) = delete;
-  future(future&&) noexcept = default;
+  ~future() noexcept { this->try_run_empty_continuation(); }
 
   future& operator=(const future&) = delete;
   future& operator=(future&& other) noexcept {
-    // Note: computation_ is move assigned before the on_computation_done_ functor because
-    // computation_ may depend on resources owned by on_computation_done_, and move assignment
-    // may block until it is completed if the future is already active
-    computation_ = std::move(other.computation_);
-    on_computation_done_ = std::move(other.on_computation_done_);
+    this->try_run_empty_continuation();
+    *static_cast<future_base*>(this) = std::move(static_cast<future_base&>(other));
+    state_ = std::move(other.state_);
+    if (auto ps = this->promise(); ps != nullptr) {
+      ps->set_state(state_);
+    }
     return *this;
   }
 
-  bool available() const noexcept { return computation_.empty(); }
+  bool ready() const noexcept { return state_.ready(); }
 
-  void wait() noexcept { computation_.wait(); }
-
-  T await_result() noexcept {
-    SXT_DEBUG_ASSERT(on_computation_done_, "no completion set");
-    this->wait();
-    return on_computation_done_();
-  }
-
-  template <class F>
-  auto then(F&& f) noexcept
-    requires requires {
-      { F{std::move(f)} } noexcept;
-      f(T{});
-    }
+  reference value() noexcept
+    requires(!std::is_void_v<T>)
   {
-    SXT_DEBUG_ASSERT(on_computation_done_, "no completion set");
-    using Tp = decltype(f(std::declval<T>()));
-    auto completion_p = [f = std::move(f),
-                         completion = std::move(on_computation_done_)]() mutable noexcept -> Tp {
-      return f(completion());
-    };
-    return future<Tp>{std::move(completion_p), std::move(computation_)};
+    return state_.value();
   }
 
-  template <class F>
-  auto then(F&& f) noexcept
-    requires requires {
-      { F{std::move(f)} } noexcept;
-      f();
-    }
+  const reference value() const noexcept
+    requires(!std::is_void_v<T>)
   {
-    SXT_DEBUG_ASSERT(on_computation_done_, "no completion set");
-    using Tp = decltype(f());
-    auto completion_p = [f = std::move(f),
-                         completion = std::move(on_computation_done_)]() mutable noexcept -> Tp {
-      completion();
-      return f();
-    };
-    return future<Tp>{std::move(completion_p), std::move(computation_)};
+    SXT_DEBUG_ASSERT(this->ready() && state_.value.has_value());
+    return *state_.value;
   }
+
+  xena::promise<T>* promise() const noexcept {
+    return static_cast<xena::promise<T>*>(static_cast<const future_base*>(this)->promise());
+  }
+
+  template <class F, class Tp = continuation_fn_result_t<F, T>>
+  auto then(F&& f) noexcept -> future<Tp>
+    requires continuation_fn<F, T, Tp>
+  {
+    if (state_.ready()) {
+      future_state<Tp> state_p;
+      invoke_continuation_fn(state_p, f, state_);
+      return future<Tp>{std::move(state_p)};
+    }
+    auto ps = this->promise();
+    SXT_DEBUG_ASSERT(ps != nullptr, "promise must be set");
+    // Note: continuation will be deleted when the associated promise is made ready
+    auto cont =
+        new continuation<T, Tp, std::remove_reference_t<F>>{std::move(state_), std::move(f)};
+    ps->set_state(cont->state());
+    ps->set_continuation(*cont);
+    ps->set_future(nullptr);
+    this->set_promise(nullptr);
+    return future<Tp>{cont->promise_p()};
+  }
+
+  const future_state<T>& state() const noexcept { return state_; }
 
 private:
-  completion_fn on_computation_done_;
-  computation_handle computation_;
+  future_state<T> state_;
+
+  void try_run_empty_continuation() noexcept {
+    if (state_.ready()) {
+      return;
+    }
+    auto ps = this->promise();
+    if (ps == nullptr) {
+      return;
+    }
+
+    // run an empty continuation so that when the associated promise is ready it
+    // will have a valid future_state
+    auto cont = new leaf_continuation<T>{std::move(state_)};
+    ps->set_state(cont->state());
+    ps->set_continuation(*cont);
+    ps->set_future(nullptr);
+    this->set_promise(nullptr);
+  }
 };
+
+extern template class future<void>;
 
 //--------------------------------------------------------------------------------------------------
 // make_ready_future
 //--------------------------------------------------------------------------------------------------
 template <class T> future<T> make_ready_future(T&& value) noexcept {
-  return future<T>{[res = std::move(value)]() mutable noexcept -> T { return T{std::move(res)}; }};
+  future_state<T> state;
+  state.emplace(std::move(value));
+  state.make_ready();
+  return future<T>{std::move(state)};
 }
 
-inline future<void> make_ready_future() noexcept {
-  return future<void>{[]() noexcept {}};
-}
+future<> make_ready_future() noexcept;
 } // namespace sxt::xena

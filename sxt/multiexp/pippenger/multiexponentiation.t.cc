@@ -22,8 +22,8 @@ TEST_CASE("we can compute select multiexponentiations") {
 
   SECTION("we handle the empty case") {
     std::vector<mtxb::exponent_sequence> sequences;
-    auto res = compute_multiexponentiation(drv, {}, sequences).await_result();
-    REQUIRE(res.empty());
+    auto res = compute_multiexponentiation(drv, {}, sequences);
+    REQUIRE(res.value().empty());
   }
 
   SECTION("we handle the zero multiplier case") {
@@ -31,10 +31,9 @@ TEST_CASE("we can compute select multiexponentiations") {
     std::vector<uint8_t> exponents = {0};
     std::vector<mtxb::exponent_sequence> sequences = {
         {.element_nbytes = 1, .n = 1, .data = exponents.data()}};
-    auto res =
-        compute_multiexponentiation(drv, generators, sequences).await_result().as_array<uint64_t>();
+    auto res = compute_multiexponentiation(drv, generators, sequences);
     memmg::managed_array<uint64_t> expected = {0};
-    REQUIRE(res == expected);
+    REQUIRE(res.value().as_array<uint64_t>() == expected);
   }
 
   SECTION("we handle the 1 multiplier case") {
@@ -42,10 +41,9 @@ TEST_CASE("we can compute select multiexponentiations") {
     std::vector<uint8_t> exponents = {1};
     std::vector<mtxb::exponent_sequence> sequences = {
         {.element_nbytes = 1, .n = 1, .data = exponents.data()}};
-    auto res =
-        compute_multiexponentiation(drv, generators, sequences).await_result().as_array<uint64_t>();
+    auto res = compute_multiexponentiation(drv, generators, sequences);
     memmg::managed_array<uint64_t> expected = {123};
-    REQUIRE(res == expected);
+    REQUIRE(res.value().as_array<uint64_t>() == expected);
   }
 
   SECTION("we handle the 2 multiplier case") {
@@ -53,10 +51,9 @@ TEST_CASE("we can compute select multiexponentiations") {
     std::vector<uint8_t> exponents = {2};
     std::vector<mtxb::exponent_sequence> sequences = {
         {.element_nbytes = 1, .n = 1, .data = exponents.data()}};
-    auto res =
-        compute_multiexponentiation(drv, generators, sequences).await_result().as_array<uint64_t>();
+    auto res = compute_multiexponentiation(drv, generators, sequences);
     memmg::managed_array<uint64_t> expected = {2 * 123};
-    REQUIRE(res == expected);
+    REQUIRE(res.value().as_array<uint64_t>() == expected);
   }
 
   SECTION("we handle zero exponents") {
@@ -64,10 +61,9 @@ TEST_CASE("we can compute select multiexponentiations") {
     std::vector<uint8_t> exponents = {2, 0, 1};
     std::vector<mtxb::exponent_sequence> sequences = {
         {.element_nbytes = 1, .n = exponents.size(), .data = exponents.data()}};
-    auto res =
-        compute_multiexponentiation(drv, generators, sequences).await_result().as_array<uint64_t>();
+    auto res = compute_multiexponentiation(drv, generators, sequences);
     memmg::managed_array<uint64_t> expected = {2 * 123 + 789};
-    REQUIRE(res == expected);
+    REQUIRE(res.value().as_array<uint64_t>() == expected);
   }
 
   SECTION("we handle a large multiplier") {
@@ -77,10 +73,9 @@ TEST_CASE("we can compute select multiexponentiations") {
         {.element_nbytes = sizeof(uint64_t),
          .n = 1,
          .data = reinterpret_cast<const uint8_t*>(exponents.data())}};
-    auto res =
-        compute_multiexponentiation(drv, generators, sequences).await_result().as_array<uint64_t>();
+    auto res = compute_multiexponentiation(drv, generators, sequences);
     memmg::managed_array<uint64_t> expected = {123'000'000};
-    REQUIRE(res == expected);
+    REQUIRE(res.value().as_array<uint64_t>() == expected);
   }
 
   SECTION("we handle multiple sequences") {
@@ -88,10 +83,9 @@ TEST_CASE("we can compute select multiexponentiations") {
     std::vector<uint8_t> exponents = {2, 3};
     std::vector<mtxb::exponent_sequence> sequences = {
         {.element_nbytes = 1, .n = exponents.size(), .data = exponents.data()}};
-    auto res =
-        compute_multiexponentiation(drv, generators, sequences).await_result().as_array<uint64_t>();
+    auto res = compute_multiexponentiation(drv, generators, sequences);
     memmg::managed_array<uint64_t> expected = {2 * 123 + 3 * 321};
-    REQUIRE(res == expected);
+    REQUIRE(res.value().as_array<uint64_t>() == expected);
   }
 
   SECTION("we handle multiple outputs") {
@@ -102,13 +96,12 @@ TEST_CASE("we can compute select multiexponentiations") {
         {.element_nbytes = 1, .n = exponents1.size(), .data = exponents1.data()},
         {.element_nbytes = 1, .n = exponents2.size(), .data = exponents2.data()},
     };
-    auto res =
-        compute_multiexponentiation(drv, generators, sequences).await_result().as_array<uint64_t>();
+    auto res = compute_multiexponentiation(drv, generators, sequences);
     memmg::managed_array<uint64_t> expected = {
         2 * 123,
         3 * 123,
     };
-    REQUIRE(res == expected);
+    REQUIRE(res.value().as_array<uint64_t>() == expected);
   }
 
   SECTION("we handle multiple outputs and multiple sequences") {
@@ -119,13 +112,12 @@ TEST_CASE("we can compute select multiexponentiations") {
         {.element_nbytes = 1, .n = exponents1.size(), .data = exponents1.data()},
         {.element_nbytes = 1, .n = exponents2.size(), .data = exponents2.data()},
     };
-    auto res =
-        compute_multiexponentiation(drv, generators, sequences).await_result().as_array<uint64_t>();
+    auto res = compute_multiexponentiation(drv, generators, sequences);
     memmg::managed_array<uint64_t> expected = {
         2 * 123 + 10 * 321,
         3 * 123 + 20 * 321,
     };
-    REQUIRE(res == expected);
+    REQUIRE(res.value().as_array<uint64_t>() == expected);
   }
 
   SECTION("we handle sequences of varying length") {
@@ -138,14 +130,13 @@ TEST_CASE("we can compute select multiexponentiations") {
         {.element_nbytes = 1, .n = exponents2.size(), .data = exponents2.data()},
         {.element_nbytes = 1, .n = exponents3.size(), .data = exponents3.data()},
     };
-    auto res =
-        compute_multiexponentiation(drv, generators, sequences).await_result().as_array<uint64_t>();
+    auto res = compute_multiexponentiation(drv, generators, sequences);
     memmg::managed_array<uint64_t> expected = {
         2 * 123,
         3 * 123 + 20 * 321,
         10 * 123,
     };
-    REQUIRE(res == expected);
+    REQUIRE(res.value().as_array<uint64_t>() == expected);
   }
 }
 
@@ -168,12 +159,10 @@ TEST_CASE("we can compute randomized multiexponentiations") {
     };
     for (size_t i = 0; i < 1000; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
-      auto res = compute_multiexponentiation(drv, generators, sequences)
-                     .await_result()
-                     .as_array<uint64_t>();
+      auto res = compute_multiexponentiation(drv, generators, sequences);
       memmg::managed_array<uint64_t> expected(sequences.size());
       mtxtst::compute_uint64_muladd(expected, generators, sequences);
-      REQUIRE(res == expected);
+      REQUIRE(res.value().as_array<uint64_t>() == expected);
     }
   }
 
@@ -186,12 +175,10 @@ TEST_CASE("we can compute randomized multiexponentiations") {
                                                             .max_exponent_num_bytes = 1};
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
-      auto res = compute_multiexponentiation(drv, generators, sequences)
-                     .await_result()
-                     .as_array<uint64_t>();
+      auto res = compute_multiexponentiation(drv, generators, sequences);
       memmg::managed_array<uint64_t> expected(sequences.size());
       mtxtst::compute_uint64_muladd(expected, generators, sequences);
-      REQUIRE(res == expected);
+      REQUIRE(res.value().as_array<uint64_t>() == expected);
     }
   }
 
@@ -204,12 +191,10 @@ TEST_CASE("we can compute randomized multiexponentiations") {
                                                             .max_exponent_num_bytes = 1};
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
-      auto res = compute_multiexponentiation(drv, generators, sequences)
-                     .await_result()
-                     .as_array<uint64_t>();
+      auto res = compute_multiexponentiation(drv, generators, sequences);
       memmg::managed_array<uint64_t> expected(sequences.size());
       mtxtst::compute_uint64_muladd(expected, generators, sequences);
-      REQUIRE(res == expected);
+      REQUIRE(res.value().as_array<uint64_t>() == expected);
     }
   }
 
@@ -222,12 +207,10 @@ TEST_CASE("we can compute randomized multiexponentiations") {
                                                             .max_exponent_num_bytes = 8};
     for (size_t i = 0; i < 100; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
-      auto res = compute_multiexponentiation(drv, generators, sequences)
-                     .await_result()
-                     .as_array<uint64_t>();
+      auto res = compute_multiexponentiation(drv, generators, sequences);
       memmg::managed_array<uint64_t> expected(sequences.size());
       mtxtst::compute_uint64_muladd(expected, generators, sequences);
-      REQUIRE(res == expected);
+      REQUIRE(res.value().as_array<uint64_t>() == expected);
     }
   }
 
@@ -240,12 +223,10 @@ TEST_CASE("we can compute randomized multiexponentiations") {
                                                             .max_exponent_num_bytes = 8};
     for (size_t i = 0; i < 100; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
-      auto res = compute_multiexponentiation(drv, generators, sequences)
-                     .await_result()
-                     .as_array<uint64_t>();
+      auto res = compute_multiexponentiation(drv, generators, sequences);
       memmg::managed_array<uint64_t> expected(sequences.size());
       mtxtst::compute_uint64_muladd(expected, generators, sequences);
-      REQUIRE(res == expected);
+      REQUIRE(res.value().as_array<uint64_t>() == expected);
     }
   }
 
@@ -259,12 +240,10 @@ TEST_CASE("we can compute randomized multiexponentiations") {
                                                             .max_exponent_num_bytes = 8};
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
-      auto res = compute_multiexponentiation(drv, generators, sequences)
-                     .await_result()
-                     .as_array<uint64_t>();
+      auto res = compute_multiexponentiation(drv, generators, sequences);
       memmg::managed_array<uint64_t> expected(sequences.size());
       mtxtst::compute_uint64_muladd(expected, generators, sequences);
-      REQUIRE(res == expected);
+      REQUIRE(res.value().as_array<uint64_t>() == expected);
     }
   }
 }

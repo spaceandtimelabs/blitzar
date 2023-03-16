@@ -28,7 +28,7 @@ compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
                                             {static_cast<const void*>(generators.data()),
                                              generators.size(), sizeof(c21t::element_p3)},
                                             exponents)
-      .await_result()
+      .value()
       .as_array<c21t::element_p3>();
 }
 

@@ -5,6 +5,7 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/execution/async/computation_handle.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/async/synchronization.h"
 #include "sxt/execution/base/stream.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
@@ -36,15 +37,13 @@ compute_multiproduct(basct::cspan<typename Reducer::value_type> generators,
   // indexes_gpu
   memmg::managed_array<unsigned> indexes_gpu{computation_descriptor.indexes.size(),
                                              memr::get_device_resource()};
-  basdv::async_memcpy_host_to_device(indexes_gpu.data(), computation_descriptor.indexes.data(),
-                                     sizeof(unsigned) * indexes_gpu.size(), stream);
+  basdv::async_copy_host_to_device(indexes_gpu, computation_descriptor.indexes, stream);
 
   // block_descriptors_gpu
   memmg::managed_array<block_computation_descriptor> block_descriptors_gpu{
       computation_descriptor.block_descriptors.size(), memr::get_device_resource()};
-  basdv::async_memcpy_host_to_device(
-      block_descriptors_gpu.data(), computation_descriptor.block_descriptors.data(),
-      sizeof(block_computation_descriptor) * block_descriptors_gpu.size(), stream);
+  basdv::async_copy_host_to_device(block_descriptors_gpu, computation_descriptor.block_descriptors,
+                                   stream);
 
   // launch kernel
   memmg::managed_array<T> partial_res_gpu{computation_descriptor.num_blocks,
@@ -58,8 +57,7 @@ compute_multiproduct(basct::cspan<typename Reducer::value_type> generators,
 
   // partial_res
   memmg::managed_array<T> partial_res{partial_res_gpu.size(), memr::get_pinned_resource()};
-  basdv::async_memcpy_device_to_host(partial_res.data(), partial_res_gpu.data(),
-                                     sizeof(T) * partial_res.size(), stream);
+  basdv::async_copy_device_to_host(partial_res, partial_res_gpu, stream);
 
   // completion
   auto completion = [
@@ -68,21 +66,13 @@ compute_multiproduct(basct::cspan<typename Reducer::value_type> generators,
     indexes_gpu = std::move(indexes_gpu),
     block_descriptors_gpu = std::move(block_descriptors_gpu),
     partial_res_gpu = std::move(partial_res_gpu),
-    partial_res = std::move(partial_res),
     num_products = product_sizes.size()
                         // clang-format on
-  ]() noexcept {
+  ](memmg::managed_array<T>&& partial_res) noexcept {
     memmg::managed_array<T> res(num_products);
     complete_multiproduct<Reducer>(res, computation_descriptor.block_descriptors, partial_res);
     return res;
   };
-
-  // future
-  xena::computation_handle computation_handle;
-  computation_handle.add_stream(std::move(stream));
-  return xena::future<memmg::managed_array<T>>{
-      std::move(completion),
-      std::move(computation_handle),
-  };
+  return xena::await_and_own_stream(std::move(stream), std::move(partial_res)).then(completion);
 }
 } // namespace sxt::mtxmpg

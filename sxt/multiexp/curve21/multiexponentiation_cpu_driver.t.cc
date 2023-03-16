@@ -17,7 +17,7 @@ TEST_CASE("we can compute multiexponentiations") {
   auto f = [&](basct::cspan<c21t::element_p3> generators,
                basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
     return mtxpi::compute_multiexponentiation(drv, generators, exponents)
-        .await_result()
+        .value()
         .as_array<c21t::element_p3>();
   };
   std::mt19937 rng{9873324};

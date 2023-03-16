@@ -44,8 +44,10 @@ sxt_cc_component(
         ":muladd",
         ":product_mapper",
         "//sxt/base/error:assert",
-        "//sxt/execution/async:future",
+        "//sxt/base/device:memory_utility",
         "//sxt/algorithm/reduction:reduction",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
     ],
     is_cuda = True,
     test_deps = [
@@ -54,6 +56,7 @@ sxt_cc_component(
         "//sxt/scalar25/type:literal",
         "//sxt/scalar25/random:element",
         "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/device:memory_utility",
         "//sxt/memory/management:managed_array",
@@ -62,6 +65,7 @@ sxt_cc_component(
     deps = [
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
+        "//sxt/execution/base:stream",
     ],
 )
 

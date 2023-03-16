@@ -3,8 +3,11 @@
 #include <algorithm>
 
 #include "sxt/algorithm/reduction/reduction.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/execution/async/future.h"
+#include "sxt/execution/base/stream.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/scalar25/operation/accumulator.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
@@ -31,7 +34,29 @@ xena::future<s25t::element> async_inner_product(basct::cspan<s25t::element> lhs,
                                                 basct::cspan<s25t::element> rhs) noexcept {
   auto n = std::min(lhs.size(), rhs.size());
   SXT_DEBUG_ASSERT(n > 0);
-  return algr::reduce<accumulator>(product_mapper{lhs.data(), rhs.data()},
+  xenb::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<s25t::element> device_data{&resource};
+  size_t buffer_size = 0;
+  auto is_device_lhs = basdv::is_device_pointer(lhs.data());
+  auto is_device_rhs = basdv::is_device_pointer(rhs.data());
+  buffer_size = (static_cast<size_t>(!is_device_lhs) + static_cast<size_t>(!is_device_rhs)) * n;
+  if (buffer_size > 0) {
+    device_data = memmg::managed_array<s25t::element>{buffer_size, &resource};
+  }
+  auto data = device_data.data();
+  if (!is_device_lhs) {
+    basdv::async_copy_host_to_device(basct::span<s25t::element>{data, n}, lhs.subspan(0, n),
+                                     stream);
+    lhs = {data, n};
+    data += n;
+  }
+  if (!is_device_rhs) {
+    basdv::async_copy_host_to_device(basct::span<s25t::element>{data, n}, rhs.subspan(0, n),
+                                     stream);
+    rhs = {data, n};
+  }
+  return algr::reduce<accumulator>(std::move(stream), product_mapper{lhs.data(), rhs.data()},
                                    static_cast<unsigned int>(n));
 }
 } // namespace sxt::s25o

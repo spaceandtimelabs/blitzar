@@ -65,21 +65,15 @@ TEST_CASE("computation_handle manages a collection of streams") {
   SECTION("we can wait on an async computation") {
     computation_handle handle;
     size_t n = 10;
-    auto num_bytes = n * sizeof(uint64_t);
 
     xenb::stream s;
     auto a = make_random_array(rng, n);
-    memmg::managed_array<uint64_t> a_dev{n, memr::get_device_resource()};
-    basdv::async_memcpy_host_to_device(a_dev.data(), a.data(), num_bytes, s.raw_stream());
-
     auto b = make_random_array(rng, n);
-    memmg::managed_array<uint64_t> b_dev{n, memr::get_device_resource()};
-    basdv::async_memcpy_host_to_device(b_dev.data(), b.data(), num_bytes, s.raw_stream());
 
     memmg::managed_array<uint64_t> c{n, memr::get_pinned_resource()};
     memmg::managed_array<uint64_t> c_dev{n, memr::get_device_resource()};
-    add_for_testing(c_dev.data(), s, a_dev.data(), b_dev.data(), n);
-    basdv::async_memcpy_device_to_host(c.data(), c_dev.data(), num_bytes, s.raw_stream());
+    add_for_testing(c_dev.data(), s, a.data(), b.data(), n);
+    basdv::async_copy_device_to_host(c, c_dev, s.raw_stream());
     handle.add_stream(std::move(s));
 
     handle.wait();
@@ -90,34 +84,26 @@ TEST_CASE("computation_handle manages a collection of streams") {
   SECTION("we can wait on multiple async computations") {
     computation_handle handle;
     size_t n = 10;
-    auto num_bytes = n * sizeof(uint64_t);
 
     // computation 1
     xenb::stream stream1;
     auto a1 = make_random_array(rng, n);
-    memmg::managed_array<uint64_t> a1_dev{n, memr::get_device_resource()};
-    basdv::async_memcpy_host_to_device(a1_dev.data(), a1.data(), num_bytes, stream1.raw_stream());
     auto b1 = make_random_array(rng, n);
-    memmg::managed_array<uint64_t> b1_dev{n, memr::get_device_resource()};
-    basdv::async_memcpy_host_to_device(b1_dev.data(), b1.data(), num_bytes, stream1.raw_stream());
     memmg::managed_array<uint64_t> c1{n, memr::get_pinned_resource()};
     memmg::managed_array<uint64_t> c1_dev{n, memr::get_device_resource()};
-    add_for_testing(c1_dev.data(), stream1, a1_dev.data(), b1_dev.data(), n);
-    basdv::async_memcpy_device_to_host(c1.data(), c1_dev.data(), num_bytes, stream1.raw_stream());
+    add_for_testing(c1_dev.data(), stream1, a1.data(), b1.data(), n);
+    basdv::async_copy_device_to_host(c1, c1_dev, stream1.raw_stream());
     handle.add_stream(std::move(stream1));
 
     // computation 2
     xenb::stream stream2;
     auto a2 = make_random_array(rng, n);
     memmg::managed_array<uint64_t> a2_dev{n, memr::get_device_resource()};
-    basdv::async_memcpy_host_to_device(a2_dev.data(), a2.data(), num_bytes, stream2.raw_stream());
     auto b2 = make_random_array(rng, n);
-    memmg::managed_array<uint64_t> b2_dev{n, memr::get_device_resource()};
-    basdv::async_memcpy_host_to_device(b2_dev.data(), b2.data(), num_bytes, stream2.raw_stream());
     memmg::managed_array<uint64_t> c2{n, memr::get_pinned_resource()};
     memmg::managed_array<uint64_t> c2_dev{n, memr::get_device_resource()};
-    add_for_testing(c2_dev.data(), stream2, a2_dev.data(), b2_dev.data(), n);
-    basdv::async_memcpy_device_to_host(c2.data(), c2_dev.data(), num_bytes, stream2.raw_stream());
+    add_for_testing(c2_dev.data(), stream2, a2.data(), b2.data(), n);
+    basdv::async_copy_device_to_host(c2, c2_dev, stream2.raw_stream());
     handle.add_stream(std::move(stream2));
 
     // wait

@@ -7,6 +7,7 @@
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/scalar25/operation/overload.h"
@@ -75,7 +76,8 @@ TEST_CASE("we can compute inner products asynchronously on the GPU") {
       auto res = async_inner_product(a_dev, b_dev);
       s25t::element expected_res;
       inner_product(expected_res, a_host, b_host);
-      REQUIRE(res.await_result() == expected_res);
+      xens::get_scheduler().run();
+      REQUIRE(res.value() == expected_res);
     }
   }
 
@@ -87,7 +89,8 @@ TEST_CASE("we can compute inner products asynchronously on the GPU") {
       auto res = async_inner_product(a_dev, b_dev);
       s25t::element expected_res;
       inner_product(expected_res, a_host, b_host);
-      REQUIRE(res.await_result() == expected_res);
+      xens::get_scheduler().run();
+      REQUIRE(res.value() == expected_res);
     }
   }
 
@@ -98,6 +101,21 @@ TEST_CASE("we can compute inner products asynchronously on the GPU") {
     auto res = async_inner_product(a_dev, {b_dev.data(), m});
     s25t::element expected_res;
     inner_product(expected_res, a_host, {b_host.data(), m});
-    REQUIRE(res.await_result() == expected_res);
+    xens::get_scheduler().run();
+    REQUIRE(res.value() == expected_res);
+  }
+
+  SECTION("async inner product works with both device and host points") {
+    size_t n = 100;
+    make_dataset(a_host, b_host, a_dev, b_dev, rng, n);
+    auto res1 = async_inner_product(a_dev, b_host);
+    auto res2 = async_inner_product(a_host, b_dev);
+    auto res3 = async_inner_product(a_host, b_host);
+    s25t::element expected_res;
+    inner_product(expected_res, a_host, b_host);
+    xens::get_scheduler().run();
+    REQUIRE(res1.value() == expected_res);
+    REQUIRE(res2.value() == expected_res);
+    REQUIRE(res3.value() == expected_res);
   }
 }

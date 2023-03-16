@@ -19,7 +19,7 @@ TEST_CASE("we can use pippenger's algorithm to solve the multiproduct subproblem
 
   SECTION("we handle the empty case") {
     mtxi::index_table products;
-    auto res = solver.solve(std::move(products), {}, {}, 0).await_result();
+    auto res = solver.solve(std::move(products), {}, {}, 0).value();
     memmg::managed_array<c21t::element_p3> expected;
     REQUIRE(res == expected);
   }
@@ -35,7 +35,7 @@ TEST_CASE("we can use pippenger's algorithm to solve the multiproduct subproblem
     mask[0][0] = 1;
     mask[1][0] = 1;
     mask[2][0] = 1;
-    auto res = solver.solve(std::move(products), generators, mask, 3).await_result();
+    auto res = solver.solve(std::move(products), generators, mask, 3).value();
     REQUIRE(res[0] == generators[0]);
     REQUIRE(res[1] == generators[1] + generators[2]);
   }
@@ -51,7 +51,7 @@ TEST_CASE("we can use pippenger's algorithm to solve the multiproduct subproblem
     mask[0][0] = 1;
     mask[1][0] = 0;
     mask[2][0] = 1;
-    auto res = solver.solve(std::move(products), generators, mask, 2).await_result();
+    auto res = solver.solve(std::move(products), generators, mask, 2).value();
     REQUIRE(res[0] == generators[0]);
     REQUIRE(res[1] == generators[0] + generators[2]);
   }

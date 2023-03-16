@@ -9,13 +9,13 @@
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
 #include "sxt/base/device/memory_utility.h"
-#include "sxt/execution/async/computation_handle.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/async/synchronization.h"
 #include "sxt/execution/base/stream.h"
 #include "sxt/execution/kernel/kernel_dims.h"
 #include "sxt/execution/kernel/launch.h"
 #include "sxt/memory/management/managed_array.h"
-#include "sxt/memory/resource/device_resource.h"
+#include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 
 namespace sxt::algr {
@@ -39,40 +39,31 @@ __global__ void reduction_kernel(typename Reducer::value_type* out, Mapper mappe
 // reduce
 //--------------------------------------------------------------------------------------------------
 template <algb::reducer Reducer, class Mapper>
-xena::future<typename Reducer::value_type> reduce(Mapper mapper, unsigned int n) noexcept {
+xena::future<typename Reducer::value_type> reduce(xenb::stream&& stream, Mapper mapper,
+                                                  unsigned n) noexcept {
   using T = typename Reducer::value_type;
   auto dims = fit_reduction_kernel(n);
 
+  memr::async_device_resource resource{stream};
+
   // kernel computation
-  xena::computation_handle handle;
-  xenb::stream stream;
-  memmg::managed_array<T> out_array{dims.num_blocks, memr::get_device_resource()};
-  xenk::launch_kernel(
-      dims.block_size,
-      [&]<unsigned int BlockSize>(std::integral_constant<unsigned int, BlockSize>) noexcept {
-        reduction_kernel<Reducer, BlockSize>
-            <<<dims.num_blocks, BlockSize, 0, stream.raw_stream()>>>(out_array.data(), mapper, n);
-      });
+  memmg::managed_array<T> out_array{dims.num_blocks, &resource};
+  xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
+                                           std::integral_constant<unsigned, BlockSize>) noexcept {
+    reduction_kernel<Reducer, BlockSize>
+        <<<dims.num_blocks, BlockSize, 0, stream>>>(out_array.data(), mapper, n);
+  });
   memmg::managed_array<T> result_array{dims.num_blocks, memr::get_pinned_resource()};
-  basdv::async_memcpy_device_to_host(result_array.data(), out_array.data(),
-                                     sizeof(T) * dims.num_blocks, stream);
-  handle.add_stream(std::move(stream));
+  basdv::async_copy_device_to_host(result_array, out_array, stream);
 
-  // completion
-  auto on_completion = [
-                           // clang-format off
-    out_array = std::move(out_array), 
-    result_array = std::move(result_array),
-    num_blocks = dims.num_blocks
-                           // clang-format on
-  ]() noexcept {
-    auto value = result_array[0];
-    for (unsigned int i = 1; i < num_blocks; ++i) {
-      Reducer::accumulate(value, result_array[i]);
-    }
-    return value;
-  };
-
-  return xena::future<T>{std::move(on_completion), std::move(handle)};
+  // future
+  return xena::await_and_own_stream(std::move(stream), std::move(result_array))
+      .then([num_blocks = dims.num_blocks](memmg::managed_array<T>&& result_array) noexcept {
+        auto res = result_array[0];
+        for (unsigned int i = 1; i < num_blocks; ++i) {
+          Reducer::accumulate(res, result_array[i]);
+        }
+        return res;
+      });
 }
 } // namespace sxt::algr

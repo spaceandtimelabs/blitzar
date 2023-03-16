@@ -1,176 +1,138 @@
 #include "sxt/execution/async/future.h"
 
 #include <memory>
-#include <random>
 
-#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/execution/async/computation_handle.h"
-#include "sxt/execution/async/test_kernel.h"
-#include "sxt/execution/base/stream.h"
-#include "sxt/memory/management/managed_array.h"
-#include "sxt/memory/resource/device_resource.h"
-#include "sxt/memory/resource/pinned_resource.h"
 
 using namespace sxt;
 using namespace sxt::xena;
 
-static memmg::managed_array<uint64_t> make_random_array(std::mt19937& rng, size_t n) noexcept;
-
-static future<uint64_t> f1(const memmg::managed_array<uint64_t>& a,
-                           const memmg::managed_array<uint64_t>& b) noexcept;
-
-static future<void> f2(uint64_t& res, const memmg::managed_array<uint64_t>& a,
-                       const memmg::managed_array<uint64_t>& b) noexcept;
-
-TEST_CASE("future manages the result of an asynchronous computation") {
-  std::mt19937 rng;
-  int n = 5;
-  auto a = make_random_array(rng, n);
-  auto b = make_random_array(rng, n);
-
-  uint64_t c = 0;
-  for (int i = 0; i < n; ++i) {
-    c += a[i] + b[i];
+TEST_CASE("future manages an asynchronously computed result") {
+  SECTION("we can default construct a void future") {
+    future<> fut;
+    REQUIRE(fut.promise() == nullptr);
+    REQUIRE(!fut.ready());
   }
 
-  SECTION("future is default constructible") {
-    future<void> f1;
-    REQUIRE(f1.available());
-
-    future<int> f2;
-    REQUIRE(f2.available());
+  SECTION("we can default construct a non-void future") {
+    future<int> fut;
+    REQUIRE(fut.promise() == nullptr);
+    REQUIRE(!fut.ready());
   }
 
-  SECTION("we can make ready futures that won't block") {
-    auto f1 = make_ready_future();
-    REQUIRE(f1.available());
-    f1.await_result();
-
-    auto f2 = make_ready_future(123);
-    REQUIRE(f2.available());
-    REQUIRE(f2.await_result() == 123);
-
-    auto f3 = make_ready_future(std::make_unique<int>(123));
-    REQUIRE(f3.available());
-    REQUIRE(*f3.await_result() == 123);
+  SECTION("we can construct a ready future with a value") {
+    auto fut = make_ready_future<std::unique_ptr<int>>(std::make_unique<int>(123));
+    REQUIRE(fut.ready());
+    REQUIRE(*fut.value() == 123);
   }
 
-  SECTION("we can chain together futures") {
-    auto f = make_ready_future(123).then([](int x) noexcept { return x + 1; });
-    REQUIRE(f.await_result() == 124);
+  SECTION("we can construct a ready void future") {
+    auto fut = make_ready_future();
+    REQUIRE(fut.ready());
   }
 
-  SECTION("we can chain a void future") {
-    auto f = make_ready_future().then([]() noexcept { return 123; });
-    REQUIRE(f.await_result() == 123);
+  SECTION("we can construct a future from a promise") {
+    promise<> pr;
+    future<> fut{pr};
+    REQUIRE(!fut.ready());
+    REQUIRE(fut.promise() == &pr);
+    pr.make_ready();
+    REQUIRE(fut.ready());
   }
 
-  SECTION("we await asynchronous GPU computations") {
-    auto fut = f1(a, b);
-    REQUIRE(!fut.available());
-    REQUIRE(fut.await_result() == c);
+  SECTION("we can move-construct a future with no promise") {
+    future<> fut1;
+    future<> fut2{std::move(fut1)};
+    REQUIRE(!fut2.ready());
   }
 
-  SECTION("we can await async GPU computations with a void result") {
-    uint64_t res;
-    auto fut = f2(res, a, b);
-    fut.await_result();
-    REQUIRE(res == c);
+  SECTION("we can move-construct a future with a promise") {
+    promise<> pr;
+    future<> fut1{pr};
+    future<> fut2{std::move(fut1)};
+    REQUIRE(fut1.promise() == nullptr);
+    REQUIRE(!fut2.ready());
+    REQUIRE(fut2.promise() == &pr);
+    pr.make_ready();
+    REQUIRE(fut2.ready());
   }
 
-  SECTION("we can move assign futures with async GPU computations") {
-    auto a_p = make_random_array(rng, n);
-    auto fut = f1(a_p, b);
-    fut = f1(a, b);
-    REQUIRE(fut.await_result() == c);
+  SECTION("we can move-construct a non-void future with a promise") {
+    promise<int> pr;
+    future<int> fut1{pr};
+    future<int> fut2{std::move(fut1)};
+    REQUIRE(fut1.promise() == nullptr);
+    REQUIRE(!fut2.ready());
+    REQUIRE(fut2.promise() == &pr);
+
+    REQUIRE(&fut2.state() == &pr.state());
+
+    pr.set_value(123);
+
+    REQUIRE(fut2.value() == 123);
   }
 
-  SECTION("we can destroy a future that's kept running") { auto fut = f1(a, b); }
-
-  SECTION("we can chain a GPU computation") {
-    auto fut = f1(a, b).then([](uint64_t x) noexcept { return 2 * x; });
-    REQUIRE(!fut.available());
-    REQUIRE(fut.await_result() == 2 * c);
+  SECTION("a future can be destroyed before the promise is complete") {
+    promise<int> pr;
+    { future<int> fut{pr}; }
+    pr.set_value(123);
   }
-}
 
-static memmg::managed_array<uint64_t> make_random_array(std::mt19937& rng, size_t n) noexcept {
-  memmg::managed_array<uint64_t> res{n, memr::get_pinned_resource()};
-  for (size_t i = 0; i < n; ++i) {
-    res[i] = rng();
+  SECTION("a future is valid after its promise has been move constructed") {
+    promise<> pr1;
+    future<> fut{pr1};
+    promise<> pr2{std::move(pr1)};
+    REQUIRE(pr1.future() == nullptr);
+    REQUIRE(fut.promise() == &pr2);
+    pr2.make_ready();
   }
-  return res;
-}
 
-static future<uint64_t> f1(const memmg::managed_array<uint64_t>& a,
-                           const memmg::managed_array<uint64_t>& b) noexcept {
-  auto n = a.size();
-  memmg::managed_array<uint64_t> a_dev{n, memr::get_device_resource()};
-  memmg::managed_array<uint64_t> b_dev{n, memr::get_device_resource()};
-  auto num_bytes = n * sizeof(uint64_t);
-  xenb::stream s;
-  basdv::async_memcpy_host_to_device(a_dev.data(), a.data(), num_bytes, s);
-  basdv::async_memcpy_host_to_device(b_dev.data(), b.data(), num_bytes, s);
-  memmg::managed_array<uint64_t> c_dev{n, memr::get_device_resource()};
+  SECTION("a future is valid after its promise has been move assigned") {
+    promise<> pr1;
+    future<> fut{pr1};
+    promise<> pr2;
+    pr2 = std::move(pr1);
+    REQUIRE(pr1.future() == nullptr);
+    REQUIRE(fut.promise() == &pr2);
+    pr2.make_ready();
+  }
 
-  add_for_testing(c_dev.data(), s, a_dev.data(), b_dev.data(), static_cast<int>(n));
+  SECTION("we can move-assign a future") {
+    promise<> pr1;
+    future<> fut1{pr1};
 
-  memmg::managed_array<uint64_t> c{n, memr::get_pinned_resource()};
-  basdv::async_memcpy_device_to_host(c.data(), c_dev.data(), num_bytes, s);
+    promise<> pr2;
+    future<> fut2{pr2};
+    fut1 = std::move(fut2);
 
-  computation_handle handle;
-  handle.add_stream(std::move(s));
+    REQUIRE(fut1.promise() == &pr2);
+    REQUIRE(fut2.promise() == nullptr);
 
-  // clang-format off
-  auto completion = [
-    a_dev = std::move(a_dev),
-    b_dev = std::move(b_dev),
-    c_dev = std::move(c_dev),
-    c = std::move(c)
-  ]() noexcept {
-    // clang-format on
-    uint64_t res = 0;
-    for (auto ci : c) {
-      res += ci;
-    }
-    return res;
-  };
-  return future<uint64_t>{std::move(completion), std::move(handle)};
-}
+    pr1.make_ready();
+    pr2.make_ready();
+  }
 
-static future<void> f2(uint64_t& res, const memmg::managed_array<uint64_t>& a,
-                       const memmg::managed_array<uint64_t>& b) noexcept {
-  auto n = a.size();
-  memmg::managed_array<uint64_t> a_dev{n, memr::get_device_resource()};
-  memmg::managed_array<uint64_t> b_dev{n, memr::get_device_resource()};
-  auto num_bytes = n * sizeof(uint64_t);
-  xenb::stream s;
-  basdv::async_memcpy_host_to_device(a_dev.data(), a.data(), num_bytes, s);
-  basdv::async_memcpy_host_to_device(b_dev.data(), b.data(), num_bytes, s);
-  memmg::managed_array<uint64_t> c_dev{n, memr::get_device_resource()};
+  SECTION("we can make a continuation from a ready future") {
+    auto val = std::make_unique<int>(123);
+    auto fut = make_ready_future(std::move(val));
+    auto fut_p = fut.then([](std::unique_ptr<int>&& val) noexcept {
+      REQUIRE(*val == 123);
+      val.reset();
+      return 456;
+    });
+    REQUIRE(fut_p.value() == 456);
+  }
 
-  add_for_testing(c_dev.data(), s, a_dev.data(), b_dev.data(), static_cast<int>(n));
-
-  memmg::managed_array<uint64_t> c{n, memr::get_pinned_resource()};
-  basdv::async_memcpy_device_to_host(c.data(), c_dev.data(), num_bytes, s);
-
-  computation_handle handle;
-  handle.add_stream(std::move(s));
-
-  // clang-format off
-  auto completion = [
-    a_dev = std::move(a_dev),
-    b_dev = std::move(b_dev),
-    c_dev = std::move(c_dev),
-    c = std::move(c),
-    &res
-  ]() noexcept {
-    // clang-format on
-    res = 0;
-    for (auto ci : c) {
-      res += ci;
-    }
-  };
-  return future<void>{std::move(completion), std::move(handle)};
+  SECTION("we can make a continuation from a future that's not ready") {
+    promise<std::unique_ptr<int>> pr;
+    future<std::unique_ptr<int>> fut{pr};
+    auto fut_p = fut.then([](std::unique_ptr<int>&& val) noexcept {
+      REQUIRE(*val == 123);
+      val.reset();
+      return 456;
+    });
+    REQUIRE(!fut_p.ready());
+    pr.set_value(std::make_unique<int>(123));
+    REQUIRE(fut_p.value() == 456);
+  }
 }

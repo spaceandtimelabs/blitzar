@@ -5,6 +5,7 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
 #include "sxt/multiexp/test/multiexponentiation.h"
@@ -20,7 +21,9 @@ TEST_CASE("we can compute async multiexponentiations") {
         memr::get_managed_device_resource(),
     };
     std::copy(generators.begin(), generators.end(), generators_p.begin());
-    return async_compute_multiexponentiation(generators_p, exponents).await_result();
+    auto res = async_compute_multiexponentiation(generators_p, exponents);
+    xens::get_scheduler().run();
+    return res.value();
   };
   std::mt19937 rng{893345};
   mtxtst::exercise_multiexponentiation_fn(rng, f);

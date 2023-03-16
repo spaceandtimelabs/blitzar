@@ -79,6 +79,7 @@ sxt_cc_component(
         "//sxt/algorithm/reduction:test_reducer",
         "//sxt/memory/resource:managed_device_resource",
         "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
     ],
     deps = [
         ":block_computation_descriptor",
@@ -91,6 +92,7 @@ sxt_cc_component(
         "//sxt/base/device:memory_utility",
         "//sxt/execution/async:computation_handle",
         "//sxt/execution/async:future",
+        "//sxt/execution/async:synchronization",
         "//sxt/execution/base:stream",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:device_resource",

@@ -54,6 +54,7 @@ sxt_cc_component(
         "//sxt/multiexp/test:multiexponentiation",
         "//sxt/memory/resource:managed_device_resource",
         "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
     ],
     deps = [
         "//sxt/base/container:span",

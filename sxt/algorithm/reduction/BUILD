@@ -32,6 +32,9 @@ sxt_cc_component(
     test_deps = [
         ":test_reducer",
         "//sxt/base/test:unit_test",
+        "//sxt/base/device:synchronization",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
         ":kernel_fit",
@@ -40,13 +43,13 @@ sxt_cc_component(
         "//sxt/algorithm/base:mapper",
         "//sxt/algorithm/base:reducer",
         "//sxt/base/device:memory_utility",
-        "//sxt/execution/async:computation_handle",
         "//sxt/execution/async:future",
+        "//sxt/execution/async:synchronization",
         "//sxt/execution/base:stream",
         "//sxt/execution/kernel:kernel_dims",
         "//sxt/execution/kernel:launch",
         "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:pinned_resource",
     ],
 )

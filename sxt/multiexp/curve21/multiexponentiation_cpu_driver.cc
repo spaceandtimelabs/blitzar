@@ -1,6 +1,7 @@
 #include "sxt/multiexp/curve21/multiexponentiation_cpu_driver.h"
 
 #include "sxt/base/container/blob_array.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
@@ -26,7 +27,7 @@ xena::future<memmg::managed_array<void>> multiexponentiation_cpu_driver::compute
           ->solve(std::move(multiproduct_table),
                   {static_cast<const c21t::element_p3*>(generators.data()), generators.size()},
                   masks, num_inputs)
-          .await_result();
+          .value();
   return xena::make_ready_future<memmg::managed_array<void>>(std::move(res));
 }
 
@@ -37,7 +38,8 @@ xena::future<memmg::managed_array<void>>
 multiexponentiation_cpu_driver::combine_multiproduct_outputs(
     xena::future<memmg::managed_array<void>>&& multiproduct,
     basct::blob_array&& output_digit_or_all) const noexcept {
-  auto products = multiproduct.await_result().as_array<c21t::element_p3>();
+  SXT_DEBUG_ASSERT(multiproduct.ready());
+  auto products = std::move(multiproduct.value().as_array<c21t::element_p3>());
   memmg::managed_array<c21t::element_p3> res(output_digit_or_all.size());
   combine_multiproducts(res, output_digit_or_all, products);
   return xena::make_ready_future<memmg::managed_array<void>>(std::move(res));

@@ -50,8 +50,7 @@ test_driver::compute_multiproduct(mtxi::index_table&& multiproduct_table,
 xena::future<memmg::managed_array<void>>
 test_driver::combine_multiproduct_outputs(xena::future<memmg::managed_array<void>>&& multiproduct,
                                           basct::blob_array&& output_digit_or_all) const noexcept {
-  SXT_RELEASE_ASSERT(multiproduct.available());
-  auto multiproduct_array = multiproduct.await_result();
+  auto& multiproduct_array = multiproduct.value();
   basct::cspan<uint64_t> inputs{static_cast<uint64_t*>(multiproduct_array.data()),
                                 multiproduct_array.size()};
   memmg::managed_array<uint64_t> outputs(output_digit_or_all.size());
