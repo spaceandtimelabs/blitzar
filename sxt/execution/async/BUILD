@@ -4,6 +4,34 @@ load(
 )
 
 sxt_cc_component(
+    name = "awaiter",
+    with_test = False,
+    deps = [
+        ":coroutine_promise",
+        ":future",
+    ],
+)
+
+sxt_cc_component(
+    name = "coroutine",
+    test_deps = [
+        ":synchronization",
+        ":test_kernel",
+        "//sxt/base/device:event",
+        "//sxt/base/device:event_utility",
+        "//sxt/memory/management:managed_array",
+        "//sxt/execution/base:stream",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+    ],
+    deps = [
+        ":awaiter",
+        ":coroutine_promise",
+        ":future",
+    ],
+)
+
+sxt_cc_component(
     name = "gpu_computation_event",
     test_deps = [
         ":future",
@@ -22,6 +50,17 @@ sxt_cc_component(
         ":promise",
         "//sxt/base/device:event",
         "//sxt/execution/schedule:pollable_event",
+    ],
+)
+
+sxt_cc_component(
+    name = "coroutine_promise",
+    with_test = False,
+    deps = [
+        ":future",
+        ":promise",
+        ":task",
+        "//sxt/base/error:panic",
     ],
 )
 
