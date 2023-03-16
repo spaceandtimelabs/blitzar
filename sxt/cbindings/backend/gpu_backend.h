@@ -35,7 +35,7 @@ namespace sxt::cbnbck {
 //--------------------------------------------------------------------------------------------------
 class gpu_backend final : public computational_backend {
 public:
-  gpu_backend();
+  gpu_backend() noexcept;
 
   void compute_commitments(basct::span<rstt::compressed_element> commitments,
                            basct::cspan<mtxb::exponent_sequence> value_sequences,
@@ -60,6 +60,5 @@ public:
 //--------------------------------------------------------------------------------------------------
 // get_gpu_backend
 //--------------------------------------------------------------------------------------------------
-gpu_backend* get_gpu_backend();
-
+gpu_backend* get_gpu_backend() noexcept;
 } // namespace sxt::cbnbck

@@ -32,21 +32,45 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "multiexponentiation",
+    name = "multiproduct",
     impl_deps = [
-        ":multiexponentiation_cpu_driver",
-        ":multiproducts_combination",
-        ":pippenger_multiproduct_solver",
-        "//sxt/base/container:blob_array",
         "//sxt/curve21/operation:accumulator",
-        "//sxt/memory/management:managed_array",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/multiexp/pippenger:multiexponentiation",
-        "//sxt/multiexp/pippenger:multiproduct_decomposition",
         "//sxt/execution/async:future",
         "//sxt/multiexp/multiproduct_gpu:multiproduct",
     ],
     is_cuda = True,
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/type:raw_stream",
+        "//sxt/execution/async:future_fwd",
+    ],
+)
+
+sxt_cc_component(
+    name = "multiexponentiation",
+    impl_deps = [
+        ":multiexponentiation_cpu_driver",
+        ":multiproduct",
+        ":multiproducts_combination",
+        ":pippenger_multiproduct_solver",
+        "//sxt/base/container:blob_array",
+        "//sxt/curve21/operation:accumulator",
+        "//sxt/execution/async:future",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/pippenger:multiexponentiation",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:event",
+        "//sxt/base/device:event_utility",
+        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/curve21/constant:zero",
+        "//sxt/multiexp/pippenger:multiproduct_decomposition_gpu",
+        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/base:stream",
+    ],
     test_deps = [
         "//sxt/memory/management:managed_array",
         "//sxt/curve21/type:element_p3",
@@ -69,6 +93,7 @@ sxt_cc_component(
         ":multiproduct_solver",
         ":multiproducts_combination",
         "//sxt/base/container:blob_array",
+        "//sxt/base/error:assert",
         "//sxt/memory/management:managed_array",
         "//sxt/execution/async:future",
         "//sxt/curve21/type:element_p3",

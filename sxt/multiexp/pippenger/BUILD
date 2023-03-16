@@ -57,27 +57,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "multiproduct_decomposition",
-    impl_deps = [
-        "//sxt/base/bit:bit_position",
-        "//sxt/base/num:constexpr_switch",
-        "//sxt/base/container:blob_array",
-        "//sxt/multiexp/base:exponent_sequence",
-        "//sxt/memory/management:managed_array",
-    ],
-    test_deps = [
-        "//sxt/memory/management:managed_array",
-        "//sxt/base/container:blob_array",
-        "//sxt/multiexp/base:exponent_sequence_utility",
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/memory/management:managed_array_fwd",
-    ],
-)
-
-sxt_cc_component(
     name = "multiproduct_table",
     impl_deps = [
         "//sxt/base/bit:count",
@@ -98,6 +77,70 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
+    name = "multiproduct_decomposition_gpu",
+    impl_deps = [
+        ":multiproduct_decomposition_kernel",
+        "//sxt/base/error:assert",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/num:divide_up",
+        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/execution/async:future",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:synchronization",
+        "//sxt/execution/schedule:scheduler",
+    ],
+    test_deps = [
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/multiexp/base:exponent_sequence_utility",
+        "//sxt/base/test:unit_test",
+        "//sxt/base/device:synchronization",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/execution/async:future",
+        "//sxt/execution/base:stream",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/type:raw_stream",
+        "//sxt/execution/async:future_fwd",
+        "//sxt/memory/management:managed_array_fwd",
+    ],
+)
+
+sxt_cc_component(
+    name = "multiproduct_decomposition_kernel",
+    impl_deps = [
+        "//sxt/base/error:assert",
+        "//sxt/base/num:divide_up",
+        "//sxt/base/device:memory_utility",
+        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/execution/async:future",
+        "//sxt/execution/async:synchronization",
+    ],
+    is_cuda = True,
+    test_deps = [
+        "//sxt/base/device:synchronization",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/execution/async:future",
+        "//sxt/execution/base:stream",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:pinned_resource",
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/multiexp/base:exponent_sequence_utility",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
+        "//sxt/memory/management:managed_array_fwd",
     ],
 )
 

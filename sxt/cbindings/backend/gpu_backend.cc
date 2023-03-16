@@ -2,47 +2,50 @@
 
 #include <vector>
 
+#include "sxt/base/error/assert.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/execution/async/future.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/multiexp/curve21/multiexponentiation.h"
 #include "sxt/proof/inner_product/cpu_driver.h"
 #include "sxt/proof/inner_product/proof_computation.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/transcript/transcript.h"
+#include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/compressed_element.h"
+#include "sxt/ristretto/type/literal.h"
 #include "sxt/scalar25/type/element.h"
 #include "sxt/seqcommit/generator/precomputed_generators.h"
-#include "sxt/seqcommit/naive/commitment_computation_gpu.h"
+
+using sxt::rstt::operator""_rs;
 
 namespace sxt::cbnbck {
 //--------------------------------------------------------------------------------------------------
 // pre_initialize_gpu
 //--------------------------------------------------------------------------------------------------
-static void pre_initialize_gpu() {
-  // initialization of dummy variables
-  memmg::managed_array<c21t::element_p3> dummy_empty_generators(1);
-  memmg::managed_array<uint8_t> dummy_data_table(1); // 1 col, 1 row, 1 bytes per data
-  memmg::managed_array<rstt::compressed_element> dummy_commitments_per_col(1);
-  memmg::managed_array<mtxb::exponent_sequence> dummy_data_cols(1);
-  basct::span<rstt::compressed_element> dummy_commitments(dummy_commitments_per_col.data(), 1);
-  basct::cspan<mtxb::exponent_sequence> dummy_value_sequences(dummy_data_cols.data(), 1);
-
-  dummy_data_table[0] = 1;
-
-  auto& data_col = dummy_data_cols[0];
-
-  data_col.n = 1;
-  data_col.element_nbytes = 1;
-  data_col.data = dummy_data_table.data();
-
+static void pre_initialize_gpu() noexcept {
   // A small dummy computation to avoid the future cost of JIT compiling PTX code
-  sqcnv::compute_commitments_gpu(dummy_commitments, dummy_value_sequences, dummy_empty_generators);
+  memmg::managed_array<c21t::element_p3> generators = {
+      0x123_rs,
+  };
+  memmg::managed_array<uint8_t> data = {1};
+  memmg::managed_array<mtxb::exponent_sequence> value_sequences = {
+      mtxb::exponent_sequence{
+          .element_nbytes = 1,
+          .n = 1,
+          .data = data.data(),
+      },
+  };
+  auto fut = mtxc21::async_compute_multiexponentiation(generators, value_sequences);
+  xens::get_scheduler().run();
 }
 
 //--------------------------------------------------------------------------------------------------
 // gpu_backend
 //--------------------------------------------------------------------------------------------------
-gpu_backend::gpu_backend() { pre_initialize_gpu(); }
+gpu_backend::gpu_backend() noexcept { pre_initialize_gpu(); }
 
 //--------------------------------------------------------------------------------------------------
 // compute_commitments
@@ -50,7 +53,9 @@ gpu_backend::gpu_backend() { pre_initialize_gpu(); }
 void gpu_backend::compute_commitments(basct::span<rstt::compressed_element> commitments,
                                       basct::cspan<mtxb::exponent_sequence> value_sequences,
                                       basct::cspan<c21t::element_p3> generators) const noexcept {
-  sqcnv::compute_commitments_gpu(commitments, value_sequences, generators);
+  auto fut = mtxc21::async_compute_multiexponentiation(generators, value_sequences);
+  xens::get_scheduler().run();
+  rsto::batch_compress(commitments, fut.value());
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -94,7 +99,7 @@ bool gpu_backend::verify_inner_product(prft::transcript& transcript,
 //--------------------------------------------------------------------------------------------------
 // get_gpu_backend
 //--------------------------------------------------------------------------------------------------
-gpu_backend* get_gpu_backend() {
+gpu_backend* get_gpu_backend() noexcept {
   // see https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
   static gpu_backend* backend = new gpu_backend{};
   return backend;

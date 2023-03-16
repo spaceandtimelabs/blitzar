@@ -49,7 +49,6 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/container:span",
-        "//sxt/memory/management:managed_array_fwd",
     ],
 )
 
@@ -90,11 +89,11 @@ sxt_cc_component(
         "//sxt/algorithm/base:reducer",
         "//sxt/base/container:span",
         "//sxt/base/device:memory_utility",
-        "//sxt/execution/async:computation_handle",
         "//sxt/execution/async:future",
         "//sxt/execution/async:synchronization",
         "//sxt/execution/base:stream",
         "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:device_resource",
         "//sxt/memory/resource:pinned_resource",
     ],

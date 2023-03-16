@@ -39,7 +39,6 @@ static void fill_block_descriptors(basct::span<block_computation_descriptor> des
 // setup_multiproduct_computation
 //--------------------------------------------------------------------------------------------------
 void setup_multiproduct_computation(multiproduct_computation_descriptor& descriptor,
-                                    memmg::managed_array<unsigned>&& indexes,
                                     basct::cspan<unsigned> product_sizes) noexcept {
   size_t entry_count = 0;
   size_t block_count = 0;
@@ -64,8 +63,5 @@ void setup_multiproduct_computation(multiproduct_computation_descriptor& descrip
       block_count, descriptor.block_descriptors.get_allocator());
   fill_block_descriptors(block_descriptors, product_sizes, reduction_dims);
   descriptor.block_descriptors = std::move(block_descriptors);
-
-  // indexes
-  descriptor.indexes = std::move(indexes);
 }
 } // namespace sxt::mtxmpg

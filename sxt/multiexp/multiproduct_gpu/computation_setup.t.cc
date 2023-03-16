@@ -11,13 +11,11 @@ TEST_CASE("we can fill in the descriptor for a multiproduct computation that run
   multiproduct_computation_descriptor descriptor;
 
   SECTION("we handle a single product with a single entry") {
-    memmg::managed_array<unsigned> indexes = {0};
     memmg::managed_array<unsigned> product_sizes = {1};
-    setup_multiproduct_computation(descriptor, std::move(indexes), product_sizes);
+    setup_multiproduct_computation(descriptor, product_sizes);
     multiproduct_computation_descriptor expected{
         .num_blocks = 1,
         .max_block_size = xenk::block_size_t::v1,
-        .indexes = {0},
         .block_descriptors =
             {
                 {
@@ -33,13 +31,11 @@ TEST_CASE("we can fill in the descriptor for a multiproduct computation that run
   }
 
   SECTION("we handle two products with a single entry") {
-    memmg::managed_array<unsigned> indexes = {0, 0};
     memmg::managed_array<unsigned> product_sizes = {1, 1};
-    setup_multiproduct_computation(descriptor, std::move(indexes), product_sizes);
+    setup_multiproduct_computation(descriptor, product_sizes);
     multiproduct_computation_descriptor expected{
         .num_blocks = 2,
         .max_block_size = xenk::block_size_t::v1,
-        .indexes = {0, 0},
         .block_descriptors =
             {
                 {
@@ -62,13 +58,11 @@ TEST_CASE("we can fill in the descriptor for a multiproduct computation that run
   }
 
   SECTION("we handle two products with varying number of entries") {
-    memmg::managed_array<unsigned> indexes = {0, 1, 2, 3, 4};
     memmg::managed_array<unsigned> product_sizes = {1, 4};
-    setup_multiproduct_computation(descriptor, std::move(indexes), product_sizes);
+    setup_multiproduct_computation(descriptor, product_sizes);
     multiproduct_computation_descriptor expected{
         .num_blocks = 2,
         .max_block_size = xenk::block_size_t::v2,
-        .indexes = {0, 1, 2, 3, 4},
         .block_descriptors =
             {
                 {
