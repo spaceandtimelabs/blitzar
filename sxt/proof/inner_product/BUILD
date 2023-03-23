@@ -35,12 +35,35 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "generator_fold",
+    impl_deps = [
+        "//sxt/base/error:assert",
+        "//sxt/scalar25/constant:max_bits",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/constant:zero",
+    ],
+    is_cuda = True,
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/curve21/operation:overload",
+        "//sxt/scalar25/type:literal",
+        "//sxt/scalar25/constant:max_bits",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/random:element",
+        "//sxt/ristretto/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
     name = "fold",
     impl_deps = [
-        "//sxt/curve21/type:element_p3",
-        "//sxt/memory/management:managed_array",
-        "//sxt/multiexp/base:exponent_sequence",
-        "//sxt/multiexp/curve21:multiexponentiation",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/operation:mul",
         "//sxt/scalar25/operation:muladd",
@@ -49,8 +72,6 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/base/num:fast_random_number_generator",
-        "//sxt/curve21/operation:overload",
-        "//sxt/ristretto/random:element",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/random:element",
         "//sxt/scalar25/operation:overload",
@@ -156,6 +177,7 @@ sxt_cc_component(
     name = "cpu_driver",
     impl_deps = [
         ":fold",
+        ":generator_fold",
         ":proof_descriptor",
         ":verification_computation",
         "//sxt/curve21/operation:add",

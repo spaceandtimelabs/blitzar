@@ -13,15 +13,32 @@
 #include "sxt/multiexp/curve21/multiexponentiation.h"
 #include "sxt/proof/inner_product/cpu_workspace.h"
 #include "sxt/proof/inner_product/fold.h"
+#include "sxt/proof/inner_product/generator_fold.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/inner_product/verification_computation.h"
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/compressed_element.h"
+#include "sxt/scalar25/constant/max_bits.h"
 #include "sxt/scalar25/operation/inner_product.h"
 #include "sxt/scalar25/operation/inv.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfip {
+//--------------------------------------------------------------------------------------------------
+// fold_generators
+//--------------------------------------------------------------------------------------------------
+static void fold_generators(basct::span<c21t::element_p3>& gp_vector,
+                            basct::cspan<c21t::element_p3> g_vector, const s25t::element& m_low,
+                            const s25t::element& m_high, size_t mid) noexcept {
+  unsigned data[s25cn::max_bits_v];
+  basct::span<unsigned> decomposition{data};
+  decompose_generator_fold(decomposition, m_low, m_high);
+  for (size_t i = 0; i < mid; ++i) {
+    fold_generators(gp_vector[i], decomposition, g_vector[i], g_vector[mid + i]);
+  }
+  gp_vector = gp_vector.subspan(0, mid);
+}
+
 //--------------------------------------------------------------------------------------------------
 // multiexponentiate
 //--------------------------------------------------------------------------------------------------
