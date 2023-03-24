@@ -4,6 +4,11 @@ load(
 )
 
 sxt_cc_component(
+    name = "index_functor",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "mapper",
     with_test = False,
 )

@@ -34,6 +34,11 @@ future<std::remove_cvref_t<T>> await_stream(T&& val, bast::raw_stream_t stream) 
   return res;
 }
 
+//--------------------------------------------------------------------------------------------------
+// await_and_own_stream
+//--------------------------------------------------------------------------------------------------
+future<> await_and_own_stream(xenb::stream&& stream) noexcept;
+
 template <class T>
   requires std::constructible_from<std::optional<std::remove_cvref_t<T>>, T&&>
 future<std::remove_cvref_t<T>> await_and_own_stream(xenb::stream&& stream, T&& val) noexcept {

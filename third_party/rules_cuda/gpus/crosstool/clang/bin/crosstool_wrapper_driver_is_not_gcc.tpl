@@ -194,6 +194,7 @@ def CompileNvcc(argv, log=False, device_c=False):
   """
 
   host_compiler_options = GetHostCompilerOptions(argv)
+  host_compiler_options += ' -fcoroutines'
   nvcc_compiler_options = GetNvccOptions(argv)
   opt_option = GetOptionValue(argv, '-O')
   m_options = GetOptionValue(argv, '-m')
@@ -266,6 +267,7 @@ def CompileNvcc(argv, log=False, device_c=False):
   nvccopts += m_options
   nvccopts += warning_options
   nvccopts += fatbin_options
+  nvccopts += ' --extended-lambda'
   if device_c:
     nvccopts += ' --device-c'
 
