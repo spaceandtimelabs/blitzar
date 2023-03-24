@@ -204,6 +204,19 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "future_utility",
+    impl_deps = [
+        ":coroutine",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":future",
+    ],
+)
+
+sxt_cc_component(
     name = "synchronization",
     with_test = False,
     deps = [
