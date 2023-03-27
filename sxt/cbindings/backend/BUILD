@@ -32,7 +32,7 @@ sxt_cc_component(
         "//sxt/seqcommit/generator:precomputed_generators",
         "//sxt/proof/inner_product:proof_descriptor",
         "//sxt/proof/inner_product:proof_computation",
-        "//sxt/proof/inner_product:cpu_driver",
+        "//sxt/proof/inner_product:gpu_driver",
     ],
     with_test = False,
     deps = [

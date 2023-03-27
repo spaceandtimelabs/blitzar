@@ -9,7 +9,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/curve21/multiexponentiation.h"
-#include "sxt/proof/inner_product/cpu_driver.h"
+#include "sxt/proof/inner_product/gpu_driver.h"
 #include "sxt/proof/inner_product/proof_computation.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/transcript/transcript.h"
@@ -75,8 +75,7 @@ void gpu_backend::prove_inner_product(basct::span<rstt::compressed_element> l_ve
                                       s25t::element& ap_value, prft::transcript& transcript,
                                       const prfip::proof_descriptor& descriptor,
                                       basct::cspan<s25t::element> a_vector) const noexcept {
-  // TODO: update this to use gpu_driver when available
-  prfip::cpu_driver drv;
+  prfip::gpu_driver drv;
   auto fut = prfip::prove_inner_product(l_vector, r_vector, ap_value, transcript, drv, descriptor,
                                         a_vector);
   xens::get_scheduler().run();
@@ -93,8 +92,7 @@ bool gpu_backend::verify_inner_product(prft::transcript& transcript,
                                        basct::cspan<rstt::compressed_element> l_vector,
                                        basct::cspan<rstt::compressed_element> r_vector,
                                        const s25t::element& ap_value) const noexcept {
-  // TODO: update this to use gpu_driver when available
-  prfip::cpu_driver drv;
+  prfip::gpu_driver drv;
   auto fut = prfip::verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector,
                                          r_vector, ap_value);
   xens::get_scheduler().run();

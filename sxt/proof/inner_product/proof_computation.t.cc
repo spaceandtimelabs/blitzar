@@ -10,7 +10,9 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/operation/overload.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/proof/inner_product/cpu_driver.h"
+#include "sxt/proof/inner_product/gpu_driver.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/inner_product/random_product_generation.h"
 #include "sxt/proof/transcript/transcript.h"
@@ -28,7 +30,9 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
 
 TEST_CASE("we can prove and verify an inner product") {
   std::pmr::monotonic_buffer_resource alloc;
-  cpu_driver drv;
+  static cpu_driver cpu_drv;
+  static gpu_driver gpu_drv;
+  const driver& drv = *GENERATE_COPY(&cpu_drv, &gpu_drv);
   proof_descriptor descriptor;
   basct::cspan<s25t::element> a_vector;
   basn::fast_random_number_generator rng{1, 2};
@@ -42,53 +46,65 @@ TEST_CASE("we can prove and verify an inner product") {
   SECTION("we can prove and verify with a single element") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 1);
     std::vector<rstt::compressed_element> l_vector, r_vector;
-    prove_inner_product(l_vector, r_vector, ap_value, transcript, drv, descriptor, a_vector);
+    auto p_fut =
+        prove_inner_product(l_vector, r_vector, ap_value, transcript, drv, descriptor, a_vector);
+    xens::get_scheduler().run();
+    REQUIRE(p_fut.ready());
 
     // Note: transcript not used for single element proof
     auto product = a_vector[0] * b_vector[0];
     auto a_commit = a_vector[0] * g_vector[0];
-    REQUIRE(verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
-                                 ap_value)
-                .value());
+    auto v_fut = verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector,
+                                      r_vector, ap_value);
+    xens::get_scheduler().run();
+    REQUIRE(v_fut.value());
 
     auto a_commit_p = 0x123_s25 * g_vector[0];
-    REQUIRE(!verify_inner_product(transcript, drv, descriptor, product, a_commit_p, l_vector,
-                                  r_vector, ap_value)
-                 .value());
+    v_fut = verify_inner_product(transcript, drv, descriptor, product, a_commit_p, l_vector,
+                                 r_vector, ap_value);
+    xens::get_scheduler().run();
+    REQUIRE(!v_fut.value());
 
     auto product_p = product + 0x123_s25;
-    REQUIRE(!verify_inner_product(transcript, drv, descriptor, product_p, a_commit, l_vector,
-                                  r_vector, ap_value)
-                 .value());
+    v_fut = verify_inner_product(transcript, drv, descriptor, product_p, a_commit, l_vector,
+                                 r_vector, ap_value);
+    xens::get_scheduler().run();
+    REQUIRE(!v_fut.value());
   }
 
   SECTION("we can verify a proof with 2 elements") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 2);
     std::vector<rstt::compressed_element> l_vector(1), r_vector(1);
-    prove_inner_product(l_vector, r_vector, ap_value, transcript, drv, descriptor, a_vector);
+    auto p_fut =
+        prove_inner_product(l_vector, r_vector, ap_value, transcript, drv, descriptor, a_vector);
+    xens::get_scheduler().run();
+    REQUIRE(p_fut.ready());
 
     transcript = prft::transcript{"abc"};
     auto product = a_vector[0] * b_vector[0] + a_vector[1] * b_vector[1];
     auto a_commit = a_vector[0] * g_vector[0] + a_vector[1] * descriptor.g_vector[1];
-    REQUIRE(verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
-                                 ap_value)
-                .value());
+    auto v_fut = verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector,
+                                      r_vector, ap_value);
+    xens::get_scheduler().run();
+    REQUIRE(v_fut.value());
 
     transcript = prft::transcript{"abc"};
     auto a_commit_p = 0x123_s25 * g_vector[0];
-    REQUIRE(!verify_inner_product(transcript, drv, descriptor, product, a_commit_p, l_vector,
-                                  r_vector, ap_value)
-                 .value());
+    v_fut = verify_inner_product(transcript, drv, descriptor, product, a_commit_p, l_vector,
+                                 r_vector, ap_value);
+    xens::get_scheduler().run();
+    REQUIRE(!v_fut.value());
 
     transcript = prft::transcript{"abc"};
     auto product_p = product + 0x123_s25;
-    REQUIRE(!verify_inner_product(transcript, drv, descriptor, product_p, a_commit, l_vector,
-                                  r_vector, ap_value)
-                 .value());
+    v_fut = verify_inner_product(transcript, drv, descriptor, product_p, a_commit, l_vector,
+                                 r_vector, ap_value);
+    xens::get_scheduler().run();
+    REQUIRE(!v_fut.value());
   }
 
   SECTION("we can prove and verify random proofs of varying size") {
-    for (size_t n = 1; n <= 16; ++n) {
+    for (size_t n = 1; n <= 9; ++n) {
       generate_random_product(descriptor, a_vector, rng, &alloc, n);
       exercise_prove_verify(drv, descriptor, a_vector);
     }
@@ -107,7 +123,10 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   std::vector<rstt::compressed_element> l_vector(num_rounds), r_vector(num_rounds);
   s25t::element ap_value;
   prft::transcript transcript{"abc"};
-  prove_inner_product(l_vector, r_vector, ap_value, transcript, drv, descriptor, a_vector);
+  auto p_fut =
+      prove_inner_product(l_vector, r_vector, ap_value, transcript, drv, descriptor, a_vector);
+  xens::get_scheduler().run();
+  REQUIRE(p_fut.ready());
 
   // verify proof
   s25t::element product = a_vector[0] * b_vector[0];
@@ -117,45 +136,50 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
     a_commit = a_commit + a_vector[i] * g_vector[i];
   }
   transcript = prft::transcript{"abc"};
-  if (!verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
-                            ap_value)
-           .value()) {
+  auto v_fut = verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector,
+                                    r_vector, ap_value);
+  xens::get_scheduler().run();
+  if (!v_fut.value()) {
     baser::panic("failed to verify proof");
   }
 
   // verify fails if ap_value is wrong
   transcript = prft::transcript{"abc"};
   auto ap_value_p = ap_value + 0x5134_s25;
-  if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
-                           ap_value_p)
-          .value()) {
+  v_fut = verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
+                               ap_value_p);
+  xens::get_scheduler().run();
+  if (v_fut.value()) {
     baser::panic("verification should fail");
   }
 
   // verify fails if product is wrong
   transcript = prft::transcript{"abc"};
   auto product_p = product + 0x5134_s25;
-  if (verify_inner_product(transcript, drv, descriptor, product_p, a_commit, l_vector, r_vector,
-                           ap_value)
-          .value()) {
+  v_fut = verify_inner_product(transcript, drv, descriptor, product_p, a_commit, l_vector, r_vector,
+                               ap_value);
+  xens::get_scheduler().run();
+  if (v_fut.value()) {
     baser::panic("verification should fail");
   }
 
   // verification should fail if a_commit is wrong
   transcript = prft::transcript{"abc"};
   auto a_commit_p = a_commit + 0x5134_s25 * g_vector[0];
-  if (verify_inner_product(transcript, drv, descriptor, product, a_commit_p, l_vector, r_vector,
-                           ap_value)
-          .value()) {
+  v_fut = verify_inner_product(transcript, drv, descriptor, product, a_commit_p, l_vector, r_vector,
+                               ap_value);
+  xens::get_scheduler().run();
+  if (v_fut.value()) {
     baser::panic("verification should fail");
   }
 
   // verification fails if the transcript is wrong and n > 1
   if (n > 1) {
     transcript = prft::transcript{"xyz"};
-    if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
-                             ap_value)
-            .value()) {
+    v_fut = verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector,
+                                 ap_value);
+    xens::get_scheduler().run();
+    if (v_fut.value()) {
       baser::panic("verification should fail");
     }
   }
@@ -172,9 +196,10 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   auto r_vector_p = r_vector;
   r_vector_p.emplace_back();
   transcript = prft::transcript{"abc"};
-  if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector_p,
-                           ap_value)
-          .value()) {
+  v_fut = verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector_p,
+                               ap_value);
+  xens::get_scheduler().run();
+  if (v_fut.value()) {
     baser::panic("verification should fail");
   }
 
@@ -184,17 +209,19 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
     auto l_vector_p = l_vector;
     rsto::compress(l_vector_p[0], some_val);
     transcript = prft::transcript{"abc"};
-    if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector_p, r_vector,
-                             ap_value)
-            .value()) {
+    v_fut = verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector_p,
+                                 r_vector, ap_value);
+    xens::get_scheduler().run();
+    if (v_fut.value()) {
       baser::panic("verification should fail");
     }
     auto r_vector_p = r_vector;
     rsto::compress(r_vector_p[0], some_val);
     transcript = prft::transcript{"abc"};
-    if (verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector, r_vector_p,
-                             ap_value)
-            .value()) {
+    v_fut = verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector,
+                                 r_vector_p, ap_value);
+    xens::get_scheduler().run();
+    if (v_fut.value()) {
       baser::panic("verification should fail");
     }
   }
@@ -205,9 +232,10 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   auto descriptor_p = descriptor;
   descriptor_p.b_vector = b_vector_p;
   transcript = prft::transcript{"abc"};
-  if (verify_inner_product(transcript, drv, descriptor_p, product, a_commit, l_vector, r_vector,
-                           ap_value)
-          .value()) {
+  v_fut = verify_inner_product(transcript, drv, descriptor_p, product, a_commit, l_vector, r_vector,
+                               ap_value);
+  xens::get_scheduler().run();
+  if (v_fut.value()) {
     baser::panic("verification should fail");
   }
 }

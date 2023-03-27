@@ -126,4 +126,11 @@ async_compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
   }
   co_return std::move(res);
 }
+
+xena::future<c21t::element_p3>
+async_compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
+                                  const mtxb::exponent_sequence& exponents) noexcept {
+  auto res = co_await async_compute_multiexponentiation(generators, {&exponents, 1});
+  co_return res[0];
+}
 } // namespace sxt::mtxc21

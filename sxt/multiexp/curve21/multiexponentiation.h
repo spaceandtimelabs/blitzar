@@ -25,4 +25,8 @@ compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
 xena::future<memmg::managed_array<c21t::element_p3>>
 async_compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
                                   basct::cspan<mtxb::exponent_sequence> exponents) noexcept;
+
+xena::future<c21t::element_p3>
+async_compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
+                                  const mtxb::exponent_sequence& exponents) noexcept;
 } // namespace sxt::mtxc21

@@ -13,9 +13,9 @@ namespace sxt::prfip {
  *
  * In our version of an inner product proof, the prover is establishing that
  *    <a_vector, b_vector> = product
- * where the commitment
+ * where
  *      commit_a = sum_i a[i] * g[i]
- * and b_vector are known to the verifier.
+ * and b_vector is known to the verifier.
  */
 struct proof_descriptor {
   basct::cspan<s25t::element> b_vector;

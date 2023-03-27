@@ -26,11 +26,53 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "gpu_workspace",
+    impl_deps = [
+        "//sxt/base/device:memory_utility",
+        "//sxt/execution/async:future",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:synchronization",
+        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:pinned_resource",
+    ],
+    with_test = False,
+    deps = [
+        ":workspace",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/memory/management:managed_array",
+        "//sxt/scalar25/type:element",
+    ],
+)
+
+sxt_cc_component(
     name = "driver",
     with_test = False,
     deps = [
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
+    ],
+)
+
+sxt_cc_component(
+    name = "driver_test",
+    with_test = False,
+    deps = [
+        ":driver",
+        ":proof_descriptor",
+        ":random_product_generation",
+        ":workspace",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:overload",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/ristretto/operation:compression",
+        "//sxt/ristretto/operation:overload",
+        "//sxt/ristretto/random:element",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/scalar25/operation:inv",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/random:element",
     ],
 )
 
@@ -58,6 +100,47 @@ sxt_cc_component(
     deps = [
         "//sxt/base/container:span",
         "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
+    name = "generator_fold_kernel",
+    impl_deps = [
+        ":generator_fold",
+        "//sxt/algorithm/iteration:for_each",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/error:assert",
+        "//sxt/execution/base:stream",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/curve21/type:element_p3",
+    ],
+    is_cuda = True,
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
+    ],
+)
+
+sxt_cc_component(
+    name = "scalar_fold_kernel",
+    impl_deps = [
+        "//sxt/algorithm/iteration:for_each",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/error:assert",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/operation:muladd",
+        "//sxt/execution/async:future",
+        "//sxt/execution/async:future_utility",
+        "//sxt/execution/async:synchronization",
+    ],
+    is_cuda = True,
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
     ],
 )
 
@@ -101,9 +184,11 @@ sxt_cc_component(
     ],
     test_deps = [
         ":cpu_driver",
+        ":gpu_driver",
         ":proof_descriptor",
         ":random_product_generation",
         "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
         "//sxt/base/num:ceil_log2",
         "//sxt/base/test:unit_test",
         "//sxt/base/num:fast_random_number_generator",
@@ -191,27 +276,50 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/operation:inner_product",
         "//sxt/scalar25/operation:inv",
+        "//sxt/scalar25/constant:max_bits",
         "//sxt/base/error:assert",
     ],
     test_deps = [
-        ":proof_descriptor",
-        ":random_product_generation",
-        ":workspace",
-        "//sxt/execution/async:future",
+        ":driver_test",
         "//sxt/base/test:unit_test",
-        "//sxt/base/num:fast_random_number_generator",
-        "//sxt/scalar25/operation:inv",
-        "//sxt/curve21/operation:overload",
-        "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/random:element",
-        "//sxt/ristretto/type:compressed_element",
-        "//sxt/ristretto/random:element",
-        "//sxt/ristretto/operation:compression",
-        "//sxt/ristretto/operation:overload",
     ],
     deps = [
         ":cpu_workspace",
         ":driver",
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
+    name = "gpu_driver",
+    impl_deps = [
+        ":cpu_driver",
+        ":generator_fold_kernel",
+        ":scalar_fold_kernel",
+        ":proof_descriptor",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/execution/async:synchronization",
+        "//sxt/execution/base:stream",
+        "//sxt/base/error:assert",
+        "//sxt/base/container:span_utility",
+        "//sxt/base/device:memory_utility",
+        "//sxt/multiexp/base:exponent_sequence_utility",
+        "//sxt/multiexp/curve21:multiexponentiation",
+        "//sxt/scalar25/operation:inner_product",
+        "//sxt/scalar25/operation:inv",
+        "//sxt/scalar25/constant:max_bits",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:scalar_multiply",
+        "//sxt/ristretto/operation:compression",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        ":driver_test",
+    ],
+    deps = [
+        ":driver",
+        ":gpu_workspace",
         "//sxt/base/container:span",
     ],
 )
