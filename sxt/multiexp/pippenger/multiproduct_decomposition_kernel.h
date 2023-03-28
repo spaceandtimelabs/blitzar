@@ -13,8 +13,14 @@ namespace sxt::mtxpi {
 //--------------------------------------------------------------------------------------------------
 // decompose_exponent_bits
 //--------------------------------------------------------------------------------------------------
-xena::future<> decompose_exponent_bits(basct::span<unsigned> indexes_p,
-                                       memmg::managed_array<unsigned>& block_counts,
-                                       bast::raw_stream_t stream,
+xena::future<> decompose_exponent_bits(basct::span<unsigned> indexes, bast::raw_stream_t stream,
+                                       basct::cspan<unsigned> offsets,
                                        const mtxb::exponent_sequence& exponents) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// count_exponent_bits
+//--------------------------------------------------------------------------------------------------
+xena::future<> count_exponent_bits(memmg::managed_array<unsigned>& block_counts,
+                                   bast::raw_stream_t stream,
+                                   const mtxb::exponent_sequence& exponents) noexcept;
 } // namespace sxt::mtxpi
