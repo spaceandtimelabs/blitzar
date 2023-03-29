@@ -42,6 +42,11 @@ void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
                                  bast::raw_stream_t stream) noexcept;
 
 //--------------------------------------------------------------------------------------------------
+// async_memset_device
+//--------------------------------------------------------------------------------------------------
+void async_memset_device(void* dst, int val, size_t count, bast::raw_stream_t stream) noexcept;
+
+//--------------------------------------------------------------------------------------------------
 // async_copy_host_to_device
 //--------------------------------------------------------------------------------------------------
 template <class Dst, class Src>

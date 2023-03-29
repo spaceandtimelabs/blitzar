@@ -93,7 +93,6 @@ sxt_cc_component(
         "//sxt/execution/async:future",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:synchronization",
-        "//sxt/execution/schedule:scheduler",
     ],
     test_deps = [
         "//sxt/memory/management:managed_array",

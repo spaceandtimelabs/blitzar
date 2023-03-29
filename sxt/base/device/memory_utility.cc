@@ -72,6 +72,16 @@ void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
 }
 
 //--------------------------------------------------------------------------------------------------
+// async_memset_device
+//--------------------------------------------------------------------------------------------------
+void async_memset_device(void* dst, int val, size_t count, bast::raw_stream_t stream) noexcept {
+  auto rcode = cudaMemsetAsync(dst, val, count, stream);
+  if (rcode != cudaSuccess) {
+    baser::panic("cudaMemsetAsync failed: " + std::string(cudaGetErrorString(rcode)));
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
 // memset_device
 //--------------------------------------------------------------------------------------------------
 void memset_device(void* dst, int value, size_t count) noexcept {
