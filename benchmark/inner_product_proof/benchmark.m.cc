@@ -1,6 +1,7 @@
 #include <chrono>
 #include <iostream>
 #include <memory_resource>
+#include <string_view>
 #include <vector>
 
 #include "params.h"
@@ -9,14 +10,30 @@
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/profile/callgrind.h"
 #include "sxt/cbindings/backend/computational_backend.h"
+#include "sxt/curve21/operation/overload.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/inner_product/random_product_generation.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/ristretto/type/compressed_element.h"
+#include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"
 
 using namespace sxt;
 using namespace sxt::bncip;
+
+//--------------------------------------------------------------------------------------------------
+// print_result
+//--------------------------------------------------------------------------------------------------
+static void print_result(std::string_view name, const std::vector<double>& durations,
+                         size_t n) noexcept {
+  double sum = 0;
+  for (auto duration : durations) {
+    sum += duration;
+  }
+  auto mean = sum / durations.size();
+  std::cout << name << " mean elapse (s): " << mean << "\n";
+  std::cout << name << " mean throughput (1/s): " << (n / mean) << "\n";
+}
 
 //--------------------------------------------------------------------------------------------------
 // main
@@ -40,24 +57,45 @@ int main(int argc, char* argv[]) {
   auto num_rounds = static_cast<size_t>(basn::ceil_log2(params.n));
   std::vector<rstt::compressed_element> l_vector(num_rounds), r_vector(num_rounds);
   s25t::element ap_value;
-  prft::transcript transcript{"abc"};
+  s25t::element product = a_vector[0] * descriptor.b_vector[0];
+  c21t::element_p3 a_commit = a_vector[0] * descriptor.g_vector[0];
+  for (size_t i = 1; i < params.n; ++i) {
+    product = product + a_vector[i] * descriptor.b_vector[i];
+    a_commit = a_commit + a_vector[i] * descriptor.g_vector[i];
+  }
 
-  std::vector<double> durations(params.iterations);
+  std::vector<double> prove_durations(params.iterations), verify_durations(params.iterations);
 
   for (size_t i = 0; i < params.iterations; ++i) {
-    auto t1 = std::chrono::steady_clock::now();
-    params.backend->prove_inner_product(l_vector, r_vector, ap_value, transcript, descriptor,
-                                        a_vector);
-    auto t2 = std::chrono::steady_clock::now();
-    durations[i] = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / 1.0e6;
+    // prove
+    {
+      prft::transcript transcript{"abc"};
+      auto t1 = std::chrono::steady_clock::now();
+      params.backend->prove_inner_product(l_vector, r_vector, ap_value, transcript, descriptor,
+                                          a_vector);
+      auto t2 = std::chrono::steady_clock::now();
+      prove_durations[i] =
+          std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / 1.0e6;
+    }
+
+    // verify
+    {
+      prft::transcript transcript{"abc"};
+      auto t1 = std::chrono::steady_clock::now();
+      auto res = params.backend->verify_inner_product(transcript, descriptor, product, a_commit,
+                                                      l_vector, r_vector, ap_value);
+      if (!res) {
+        std::cerr << "verification failed\n";
+        return -1;
+      }
+      auto t2 = std::chrono::steady_clock::now();
+      verify_durations[i] =
+          std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / 1.0e6;
+    }
   }
 
-  double sum = 0;
-  for (auto duration : durations) {
-    sum += duration;
-  }
-  auto mean = sum / durations.size();
-  std::cout << "mean elapse (s): " << mean << "\n";
-  std::cout << "mean throughput (1/s): " << (params.n / mean) << "\n";
+  print_result("prove", prove_durations, params.n);
+  print_result("verify", verify_durations, params.n);
+
   return 0;
 }

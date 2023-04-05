@@ -34,10 +34,12 @@ sxt_cc_benchmark(
         "//sxt/base/num:ceil_log2",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/profile:callgrind",
+        "//sxt/curve21/operation:overload",
         "//sxt/proof/inner_product:proof_descriptor",
         "//sxt/proof/inner_product:random_product_generation",
         "//sxt/proof/transcript",
         "//sxt/ristretto/type:compressed_element",
+        "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:element",
     ],
 )
