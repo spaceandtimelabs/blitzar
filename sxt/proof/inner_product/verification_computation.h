@@ -8,6 +8,20 @@ class element;
 
 namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
+// compute_g_exponents
+//--------------------------------------------------------------------------------------------------
+void compute_g_exponents(basct::span<s25t::element> g_exponents, const s25t::element& allinv,
+                         const s25t::element& ap_value,
+                         basct::cspan<s25t::element> x_sq_vector) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// compute_lr_exponents_part1
+//--------------------------------------------------------------------------------------------------
+void compute_lr_exponents_part1(basct::span<s25t::element> l_exponents,
+                                basct::span<s25t::element> r_exponents, s25t::element& allinv,
+                                basct::cspan<s25t::element> x_vector) noexcept;
+
+//--------------------------------------------------------------------------------------------------
 // compute_verification_exponents
 //--------------------------------------------------------------------------------------------------
 /**

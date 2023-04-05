@@ -214,7 +214,10 @@ static void exercise_verification(const driver& drv) {
     generate_random_product(descriptor, a_vector, rng, &alloc, 1);
     std::vector<rstt::compressed_element> l_vector(0), r_vector(0);
     std::vector<s25t::element> x_vector(0);
-    drv.compute_expected_commitment(commit, descriptor, l_vector, r_vector, x_vector, a_vector[0]);
+    auto fut = drv.compute_expected_commitment(commit, descriptor, l_vector, r_vector, x_vector,
+                                               a_vector[0]);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
 
     rstt::compressed_element expected;
     rsto::compress(expected, a_vector[0] * b_vector[0] * *q_value + a_vector[0] * g_vector[0]);
@@ -234,7 +237,10 @@ static void exercise_verification(const driver& drv) {
 
     auto folded_a = x_vector[0] * a_vector[0] + x_inv_vector[0] * a_vector[1];
 
-    drv.compute_expected_commitment(commit, descriptor, l_vector, r_vector, x_vector, folded_a);
+    auto fut =
+        drv.compute_expected_commitment(commit, descriptor, l_vector, r_vector, x_vector, folded_a);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
 
     auto folded_b = x_inv_vector[0] * b_vector[0] + x_vector[0] * b_vector[1];
 
@@ -261,7 +267,10 @@ static void exercise_verification(const driver& drv) {
                     x_vector[0] * x_inv_vector[1] * a_vector[1] +
                     x_inv_vector[0] * x_vector[1] * a_vector[2];
 
-    drv.compute_expected_commitment(commit, descriptor, l_vector, r_vector, x_vector, folded_a);
+    auto fut =
+        drv.compute_expected_commitment(commit, descriptor, l_vector, r_vector, x_vector, folded_a);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
 
     auto folded_b = x_inv_vector[0] * x_inv_vector[1] * b_vector[0] +
                     x_inv_vector[0] * x_vector[1] * b_vector[1] +
@@ -296,7 +305,10 @@ static void exercise_verification(const driver& drv) {
                     x_inv_vector[0] * x_vector[1] * a_vector[2] +
                     x_inv_vector[0] * x_inv_vector[1] * a_vector[3];
 
-    drv.compute_expected_commitment(commit, descriptor, l_vector, r_vector, x_vector, folded_a);
+    auto fut =
+        drv.compute_expected_commitment(commit, descriptor, l_vector, r_vector, x_vector, folded_a);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
 
     auto folded_b = x_inv_vector[0] * x_inv_vector[1] * b_vector[0] +
                     x_inv_vector[0] * x_vector[1] * b_vector[1] +

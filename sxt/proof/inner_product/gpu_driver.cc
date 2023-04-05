@@ -8,6 +8,9 @@
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/async/synchronization.h"
 #include "sxt/execution/base/stream.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/device_resource.h"
+#include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/base/exponent_sequence_utility.h"
 #include "sxt/multiexp/curve21/multiexponentiation.h"
 #include "sxt/proof/inner_product/cpu_driver.h"
@@ -16,7 +19,9 @@
 #include "sxt/proof/inner_product/gpu_workspace.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/inner_product/scalar_fold_kernel.h"
+#include "sxt/proof/inner_product/verification_computation_gpu.h"
 #include "sxt/ristretto/operation/compression.h"
+#include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/scalar25/constant/max_bits.h"
 #include "sxt/scalar25/operation/inner_product.h"
 #include "sxt/scalar25/operation/inv.h"
@@ -37,6 +42,39 @@ static xena::future<void> commit_to_fold_partial(rstt::compressed_element& commi
   c21o::scalar_multiply(commit_p, co_await std::move(product_fut), q_value);
   c21o::add(commit_p, co_await std::move(u_commit_fut), commit_p);
   rsto::compress(commit, commit_p);
+}
+
+//--------------------------------------------------------------------------------------------------
+// setup_verification_generators
+//--------------------------------------------------------------------------------------------------
+static xena::future<>
+setup_verification_generators(basct::span<c21t::element_p3> generators,
+                              const proof_descriptor& descriptor,
+                              basct::cspan<rstt::compressed_element> l_vector,
+                              basct::cspan<rstt::compressed_element> r_vector) noexcept {
+  auto np = descriptor.g_vector.size();
+  auto num_rounds = l_vector.size();
+  xenb::stream stream;
+
+  // q_value
+  basdv::async_copy_host_to_device(basct::subspan(generators, 0, 1),
+                                   basct::cspan<c21t::element_p3>{descriptor.q_value, 1}, stream);
+
+  // g_vector
+  basdv::async_copy_host_to_device(basct::subspan(generators, 1, np), descriptor.g_vector, stream);
+
+  // l_vector, r_vector
+  memmg::managed_array<c21t::element_p3> lr_vector{2 * num_rounds, memr::get_pinned_resource()};
+  auto iter = lr_vector.data();
+  for (auto& li : l_vector) {
+    rsto::decompress(*iter++, li);
+  }
+  for (auto& ri : r_vector) {
+    rsto::decompress(*iter++, ri);
+  }
+  basdv::async_copy_host_to_device(basct::subspan(generators, np + 1), lr_vector, stream);
+
+  co_await xena::await_stream(stream);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -145,9 +183,36 @@ xena::future<void> gpu_driver::compute_expected_commitment(
     basct::cspan<rstt::compressed_element> l_vector,
     basct::cspan<rstt::compressed_element> r_vector, basct::cspan<s25t::element> x_vector,
     const s25t::element& ap_value) const noexcept {
-  // TODO(rnburn): replace with GPU version
-  cpu_driver drv;
-  return drv.compute_expected_commitment(commit, descriptor, l_vector, r_vector, x_vector,
-                                         ap_value);
+  auto num_rounds = l_vector.size();
+  auto np = descriptor.g_vector.size();
+  // clang-format off
+  SXT_DEBUG_ASSERT(
+    np > 0 &&
+    l_vector.size() == num_rounds &&
+    r_vector.size() == num_rounds &&
+    x_vector.size() == num_rounds
+  );
+  // clang-format on
+  if (num_rounds < 6) {
+    cpu_driver drv;
+    co_return co_await drv.compute_expected_commitment(commit, descriptor, l_vector, r_vector,
+                                                       x_vector, ap_value);
+  }
+  auto num_exponents = 1 + np + 2 * num_rounds;
+
+  // exponents
+  memmg::managed_array<s25t::element> exponents{num_exponents, memr::get_device_resource()};
+  auto fut =
+      async_compute_verification_exponents(exponents, x_vector, ap_value, descriptor.b_vector);
+
+  // generators
+  memmg::managed_array<c21t::element_p3> generators{num_exponents, memr::get_device_resource()};
+  co_await setup_verification_generators(generators, descriptor, l_vector, r_vector);
+
+  // commitment
+  co_await std::move(fut);
+  auto commit_p = co_await mtxc21::async_compute_multiexponentiation(
+      generators, mtxb::to_exponent_sequence(exponents));
+  rsto::compress(commit, commit_p);
 }
 } // namespace sxt::prfip

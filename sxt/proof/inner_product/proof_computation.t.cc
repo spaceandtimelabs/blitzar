@@ -109,6 +109,12 @@ TEST_CASE("we can prove and verify an inner product") {
       exercise_prove_verify(drv, descriptor, a_vector);
     }
   }
+
+  SECTION("we can prove and verify a random proof of larger size") {
+    size_t n = 123;
+    generate_random_product(descriptor, a_vector, rng, &alloc, n);
+    exercise_prove_verify(drv, descriptor, a_vector);
+  }
 }
 
 static void exercise_prove_verify(const driver& drv, const proof_descriptor& descriptor,

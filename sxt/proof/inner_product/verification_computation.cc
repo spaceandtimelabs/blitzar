@@ -11,12 +11,32 @@
 
 namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
+// compute_g_exponents
+//--------------------------------------------------------------------------------------------------
+void compute_g_exponents(basct::span<s25t::element> g_exponents, const s25t::element& allinv,
+                         const s25t::element& ap_value,
+                         basct::cspan<s25t::element> x_sq_vector) noexcept {
+  auto n = g_exponents.size();
+  s25o::mul(g_exponents[0], allinv, ap_value);
+  size_t a = 1;
+  size_t b = 2;
+  auto multiplier_iter = x_sq_vector.data() + x_sq_vector.size();
+  while (a != n) {
+    auto& multiplier = *--multiplier_iter;
+    for (size_t i = a; i < b; ++i) {
+      s25o::mul(g_exponents[i], multiplier, g_exponents[i - a]);
+    }
+    a = b;
+    b = 2 * a;
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
 // compute_lr_exponents_part1
 //--------------------------------------------------------------------------------------------------
-static void compute_lr_exponents_part1(basct::span<s25t::element> l_exponents,
-                                       basct::span<s25t::element> r_exponents,
-                                       s25t::element& allinv,
-                                       basct::cspan<s25t::element> x_vector) noexcept {
+void compute_lr_exponents_part1(basct::span<s25t::element> l_exponents,
+                                basct::span<s25t::element> r_exponents, s25t::element& allinv,
+                                basct::cspan<s25t::element> x_vector) noexcept {
   auto num_rounds = l_exponents.size();
 
   // 0
@@ -38,37 +58,6 @@ static void compute_lr_exponents_part1(basct::span<s25t::element> l_exponents,
     // ri
     s25o::sq(r_exponents[i], xi_inv);
     s25o::neg(r_exponents[i], r_exponents[i]);
-  }
-}
-
-//--------------------------------------------------------------------------------------------------
-// compute_product_exponent
-//--------------------------------------------------------------------------------------------------
-static void compute_product_exponent(s25t::element& exponent, const s25t::element& ap_value,
-                                     basct::cspan<s25t::element> b_vector,
-                                     basct::cspan<s25t::element> folding_vector) noexcept {
-  s25o::inner_product(exponent, folding_vector, b_vector);
-  s25o::mul(exponent, exponent, ap_value);
-}
-
-//--------------------------------------------------------------------------------------------------
-// compute_g_exponents_part1
-//--------------------------------------------------------------------------------------------------
-static void compute_g_exponents_part1(basct::span<s25t::element> g_exponents,
-                                      const s25t::element& allinv,
-                                      basct::cspan<s25t::element> x_sq_vector) noexcept {
-  auto n = g_exponents.size();
-  g_exponents[0] = allinv;
-  size_t a = 1;
-  size_t b = 2;
-  auto multiplier_iter = x_sq_vector.data() + x_sq_vector.size();
-  while (a != n) {
-    auto& multiplier = *--multiplier_iter;
-    for (size_t i = a; i < b; ++i) {
-      s25o::mul(g_exponents[i], multiplier, g_exponents[i - a]);
-    }
-    a = b;
-    b = 2 * a;
   }
 }
 
@@ -107,11 +96,9 @@ void compute_verification_exponents(basct::span<s25t::element> exponents,
 
   s25t::element allinv;
   compute_lr_exponents_part1(l_exponents, r_exponents, allinv, x_vector);
-  compute_g_exponents_part1(g_exponents, allinv, l_exponents);
-  compute_product_exponent(product, ap_value, b_vector, g_exponents);
-  for (auto& gi : g_exponents) {
-    s25o::mul(gi, ap_value, gi);
-  }
+  compute_g_exponents(g_exponents, allinv, ap_value, l_exponents);
+  s25o::inner_product(product, g_exponents, b_vector);
+
   for (auto& li : l_exponents) {
     s25o::neg(li, li);
   }
