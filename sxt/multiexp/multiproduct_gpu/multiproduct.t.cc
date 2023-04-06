@@ -3,8 +3,8 @@
 #include <numeric>
 
 #include "sxt/algorithm/reduction/test_reducer.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
@@ -13,7 +13,7 @@ using namespace sxt;
 using namespace sxt::mtxmpg;
 
 TEST_CASE("we can compute multiproducts using the GPU") {
-  xenb::stream stream;
+  basdv::stream stream;
 
   size_t max_generators = 10'000;
   memmg::managed_array<uint64_t> generators{max_generators, memr::get_managed_device_resource()};

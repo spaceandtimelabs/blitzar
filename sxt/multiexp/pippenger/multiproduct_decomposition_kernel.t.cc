@@ -3,10 +3,10 @@
 #include <algorithm>
 #include <numeric>
 
+#include "sxt/base/device/stream.h"
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
@@ -17,7 +17,7 @@ using namespace sxt;
 using namespace sxt::mtxpi;
 
 TEST_CASE("we can decompose the bits in a multi-exponentiation") {
-  xenb::stream stream;
+  basdv::stream stream;
   memmg::managed_array<unsigned> block_counts{memr::get_pinned_resource()};
   memmg::managed_array<uint8_t> exponents_data{memr::get_managed_device_resource()};
 

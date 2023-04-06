@@ -1,9 +1,9 @@
 #include "sxt/multiexp/pippenger/multiproduct_decomposition_gpu.h"
 
+#include "sxt/base/device/stream.h"
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
@@ -14,7 +14,7 @@ using namespace sxt::mtxpi;
 
 TEST_CASE("we can compute the decomposition that turns a multi-exponentiation problem into a "
           "multi-product problem") {
-  xenb::stream stream;
+  basdv::stream stream;
   memmg::managed_array<unsigned> indexes{123, memr::get_managed_device_resource()};
 
   SECTION("we handle the case of no terms") {

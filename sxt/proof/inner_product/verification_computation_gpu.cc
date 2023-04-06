@@ -5,11 +5,11 @@
 
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/async/synchronization.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/proof/inner_product/verification_computation.h"
@@ -32,7 +32,7 @@ static xena::future<> compute_g_exponents_gpu(basct::span<s25t::element> g_expon
   memmg::managed_array<s25t::element> g_exponents_host{1ull << num_host_rounds,
                                                        memr::get_pinned_resource()};
   compute_g_exponents(g_exponents_host, allinv, ap_value, x_sq_vector.subspan(num_device_rounds));
-  xenb::stream stream;
+  basdv::stream stream;
   basdv::async_copy_host_to_device(g_exponents_dev.subspan(0, g_exponents_host.size()),
                                    g_exponents_host, stream);
   if (num_host_rounds == num_rounds) {
@@ -55,7 +55,7 @@ compute_g_and_product_exponents(basct::span<s25t::element> exponents, const s25t
   auto g_exponents = exponents.subspan(1, np);
   co_await compute_g_exponents_gpu(g_exponents, allinv, ap_value, x_sq_vector);
   auto product = co_await s25o::async_inner_product(g_exponents, b_vector);
-  xenb::stream stream;
+  basdv::stream stream;
   basdv::async_copy_host_to_device(exponents.subspan(0, 1),
                                    basct::cspan<s25t::element>{&product, 1}, stream);
   co_await xena::await_stream(stream);
@@ -99,7 +99,7 @@ xena::future<> async_compute_verification_exponents(basct::span<s25t::element> e
   for (auto& li : l_exponents) {
     s25o::neg(li, li);
   }
-  xenb::stream stream;
+  basdv::stream stream;
   basdv::async_copy_host_to_device(exponents.subspan(1 + np), lr_exponents, stream);
   co_await std::move(fut);
   co_await xena::await_stream(stream);

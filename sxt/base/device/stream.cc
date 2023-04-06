@@ -1,10 +1,10 @@
-#include "sxt/execution/base/stream.h"
+#include "sxt/base/device/stream.h"
 
+#include "sxt/base/device/stream_handle.h"
+#include "sxt/base/device/stream_pool.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/execution/base/stream_handle.h"
-#include "sxt/execution/base/stream_pool.h"
 
-namespace sxt::xenb {
+namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
@@ -49,4 +49,4 @@ CUstream_st* stream::raw_stream() const noexcept {
   SXT_DEBUG_ASSERT(handle_ != nullptr);
   return handle_->stream;
 }
-} // namespace sxt::xenb
+} // namespace sxt::basdv

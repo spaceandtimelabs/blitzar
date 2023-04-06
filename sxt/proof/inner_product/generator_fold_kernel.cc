@@ -2,9 +2,9 @@
 
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/curve21/type/element_p3.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/proof/inner_product/generator_fold.h"
@@ -24,7 +24,7 @@ xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector,
       // clang-format on
   );
   auto n = static_cast<unsigned>(g_vector.size() / 2);
-  xenb::stream stream;
+  basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<unsigned> decomposition_gpu{decomposition.size(), &resource};
   basdv::async_copy_host_to_device(decomposition_gpu, decomposition, stream);

@@ -9,9 +9,9 @@
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/async/synchronization.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/execution/kernel/kernel_dims.h"
 #include "sxt/execution/kernel/launch.h"
 #include "sxt/memory/management/managed_array.h"
@@ -39,7 +39,7 @@ __global__ void reduction_kernel(typename Reducer::value_type* out, Mapper mappe
 // reduce
 //--------------------------------------------------------------------------------------------------
 template <algb::reducer Reducer, class Mapper>
-xena::future<typename Reducer::value_type> reduce(xenb::stream&& stream, Mapper mapper,
+xena::future<typename Reducer::value_type> reduce(basdv::stream&& stream, Mapper mapper,
                                                   unsigned n) noexcept {
   using T = typename Reducer::value_type;
   auto dims = fit_reduction_kernel(n);

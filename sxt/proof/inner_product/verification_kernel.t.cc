@@ -1,9 +1,9 @@
 #include "sxt/proof/inner_product/verification_kernel.h"
 
+#include "sxt/base/device/stream.h"
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
@@ -19,7 +19,7 @@ TEST_CASE("we can compute remaining g exponents if initial ones are already comp
   memmg::managed_array<s25t::element> g_exponents{memr::get_managed_device_resource()};
   memmg::managed_array<s25t::element> x_sq_vector;
 
-  xenb::stream stream;
+  basdv::stream stream;
 
   SECTION("we handle the np = 2 case") {
     g_exponents = {0x123_s25, 0x0_s25};

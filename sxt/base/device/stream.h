@@ -2,7 +2,7 @@
 
 #include "sxt/base/type/raw_stream.h"
 
-namespace sxt::xenb {
+namespace sxt::basdv {
 struct stream_handle;
 
 //--------------------------------------------------------------------------------------------------
@@ -31,4 +31,4 @@ public:
 private:
   stream_handle* handle_;
 };
-} // namespace sxt::xenb
+} // namespace sxt::basdv

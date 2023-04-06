@@ -102,7 +102,7 @@ sxt_cc_component(
         "//sxt/base/device:synchronization",
         "//sxt/execution/schedule:scheduler",
         "//sxt/execution/async:future",
-        "//sxt/execution/base:stream",
+        "//sxt/base/device:stream",
     ],
     deps = [
         "//sxt/base/container:span",
@@ -129,7 +129,7 @@ sxt_cc_component(
         "//sxt/base/device:synchronization",
         "//sxt/execution/schedule:scheduler",
         "//sxt/execution/async:future",
-        "//sxt/execution/base:stream",
+        "//sxt/base/device:stream",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:pinned_resource",
         "//sxt/memory/resource:managed_device_resource",

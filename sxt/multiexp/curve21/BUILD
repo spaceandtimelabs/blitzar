@@ -69,7 +69,7 @@ sxt_cc_component(
         "//sxt/multiexp/pippenger:multiproduct_decomposition_gpu",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/execution/async:coroutine",
-        "//sxt/execution/base:stream",
+        "//sxt/base/device:stream",
     ],
     test_deps = [
         "//sxt/memory/management:managed_array",

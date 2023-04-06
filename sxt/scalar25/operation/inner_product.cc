@@ -4,8 +4,8 @@
 
 #include "sxt/algorithm/reduction/reduction.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/scalar25/operation/accumulator.h"
@@ -34,7 +34,7 @@ xena::future<s25t::element> async_inner_product(basct::cspan<s25t::element> lhs,
                                                 basct::cspan<s25t::element> rhs) noexcept {
   auto n = std::min(lhs.size(), rhs.size());
   SXT_DEBUG_ASSERT(n > 0);
-  xenb::stream stream;
+  basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<s25t::element> device_data{&resource};
   size_t buffer_size = 0;

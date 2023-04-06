@@ -4,10 +4,10 @@
 
 #include "sxt/algorithm/base/index_functor.h"
 #include "sxt/algorithm/iteration/kernel_fit.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/async/synchronization.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/execution/kernel/kernel_dims.h"
 
 namespace sxt::algi {
@@ -41,12 +41,12 @@ void launch_for_each_kernel(bast::raw_stream_t stream, F f, unsigned n) noexcept
 // for_each
 //--------------------------------------------------------------------------------------------------
 template <algb::index_functor F>
-xena::future<> for_each(xenb::stream&& stream, F f, unsigned n) noexcept {
+xena::future<> for_each(basdv::stream&& stream, F f, unsigned n) noexcept {
   launch_for_each_kernel(stream, f, n);
   return xena::await_and_own_stream(std::move(stream));
 }
 
 template <algb::index_functor F> xena::future<> for_each(F f, unsigned n) noexcept {
-  return for_each(xenb::stream{}, f, n);
+  return for_each(basdv::stream{}, f, n);
 }
 } // namespace sxt::algi

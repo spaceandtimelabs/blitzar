@@ -6,11 +6,11 @@
 
 #include "sxt/base/device/event.h"
 #include "sxt/base/device/event_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/type/raw_stream.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/async/gpu_computation_event.h"
 #include "sxt/execution/async/promise.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/execution/schedule/scheduler.h"
 
 namespace sxt::xena {
@@ -37,11 +37,11 @@ future<std::remove_cvref_t<T>> await_stream(T&& val, bast::raw_stream_t stream) 
 //--------------------------------------------------------------------------------------------------
 // await_and_own_stream
 //--------------------------------------------------------------------------------------------------
-future<> await_and_own_stream(xenb::stream&& stream) noexcept;
+future<> await_and_own_stream(basdv::stream&& stream) noexcept;
 
 template <class T>
   requires std::constructible_from<std::optional<std::remove_cvref_t<T>>, T&&>
-future<std::remove_cvref_t<T>> await_and_own_stream(xenb::stream&& stream, T&& val) noexcept {
+future<std::remove_cvref_t<T>> await_and_own_stream(basdv::stream&& stream, T&& val) noexcept {
   using Tp = std::remove_cvref_t<T>;
   future_state<Tp> state;
   state.emplace(std::forward<T>(val));

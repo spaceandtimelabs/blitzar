@@ -64,8 +64,8 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/container:span",
+        "//sxt/base/device:stream",
         "//sxt/execution/async:future_fwd",
-        "//sxt/execution/base:stream",
     ],
 )
 

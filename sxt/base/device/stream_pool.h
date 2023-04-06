@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-namespace sxt::xenb {
+namespace sxt::basdv {
 struct stream_handle;
 
 //--------------------------------------------------------------------------------------------------
@@ -43,4 +43,4 @@ private:
  * Access the thread_local stream pool.
  */
 stream_pool* get_stream_pool(size_t initial_size = 0) noexcept;
-} // namespace sxt::xenb
+} // namespace sxt::basdv

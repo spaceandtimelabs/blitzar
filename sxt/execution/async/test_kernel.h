@@ -4,10 +4,6 @@
 
 #include "sxt/base/type/raw_stream.h"
 
-namespace sxt::xenb {
-class stream;
-}
-
 namespace sxt::xena {
 //--------------------------------------------------------------------------------------------------
 // add_for_testing

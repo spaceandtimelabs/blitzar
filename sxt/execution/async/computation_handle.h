@@ -1,9 +1,9 @@
 #pragma once
 
-namespace sxt::xenb {
+namespace sxt::basdv {
 class stream;
 }
-namespace sxt::xenb {
+namespace sxt::basdv {
 struct stream_handle;
 }
 
@@ -26,9 +26,9 @@ public:
 
   bool empty() const noexcept { return head_ == nullptr; }
 
-  void add_stream(xenb::stream&& stream) noexcept;
+  void add_stream(basdv::stream&& stream) noexcept;
 
 private:
-  xenb::stream_handle* head_{nullptr};
+  basdv::stream_handle* head_{nullptr};
 };
 } // namespace sxt::xena

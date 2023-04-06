@@ -4,11 +4,11 @@
 #include <utility>
 
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
+#include "sxt/base/device/stream_handle.h"
+#include "sxt/base/device/stream_pool.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/test_kernel.h"
-#include "sxt/execution/base/stream.h"
-#include "sxt/execution/base/stream_handle.h"
-#include "sxt/execution/base/stream_pool.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
@@ -26,10 +26,10 @@ static memmg::managed_array<uint64_t> make_random_array(std::mt19937& rng, size_
 
 TEST_CASE("computation_handle manages a collection of streams") {
   std::mt19937 rng;
-  auto pool = xenb::get_stream_pool();
+  auto pool = basdv::get_stream_pool();
 
   SECTION("upon destruction, streams are recycled back to the thread_local pool") {
-    xenb::stream s;
+    basdv::stream s;
     auto ptr = s.raw_stream();
     {
       computation_handle comp;
@@ -41,7 +41,7 @@ TEST_CASE("computation_handle manages a collection of streams") {
   }
 
   SECTION("we can move construct a computation handle") {
-    xenb::stream s;
+    basdv::stream s;
     computation_handle h1;
     h1.add_stream(std::move(s));
 
@@ -52,10 +52,10 @@ TEST_CASE("computation_handle manages a collection of streams") {
 
   SECTION("we can move assign a computation handle") {
     computation_handle h1;
-    h1.add_stream(xenb::stream{});
+    h1.add_stream(basdv::stream{});
 
     computation_handle h2;
-    h2.add_stream(xenb::stream{});
+    h2.add_stream(basdv::stream{});
 
     h2 = std::move(h1);
     REQUIRE(h1.empty());
@@ -66,7 +66,7 @@ TEST_CASE("computation_handle manages a collection of streams") {
     computation_handle handle;
     size_t n = 10;
 
-    xenb::stream s;
+    basdv::stream s;
     auto a = make_random_array(rng, n);
     auto b = make_random_array(rng, n);
 
@@ -86,7 +86,7 @@ TEST_CASE("computation_handle manages a collection of streams") {
     size_t n = 10;
 
     // computation 1
-    xenb::stream stream1;
+    basdv::stream stream1;
     auto a1 = make_random_array(rng, n);
     auto b1 = make_random_array(rng, n);
     memmg::managed_array<uint64_t> c1{n, memr::get_pinned_resource()};
@@ -96,7 +96,7 @@ TEST_CASE("computation_handle manages a collection of streams") {
     handle.add_stream(std::move(stream1));
 
     // computation 2
-    xenb::stream stream2;
+    basdv::stream stream2;
     auto a2 = make_random_array(rng, n);
     memmg::managed_array<uint64_t> a2_dev{n, memr::get_device_resource()};
     auto b2 = make_random_array(rng, n);

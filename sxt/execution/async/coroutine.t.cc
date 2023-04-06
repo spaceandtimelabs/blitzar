@@ -1,11 +1,11 @@
 #include "sxt/execution/async/coroutine.h"
 
+#include "sxt/base/device/stream.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/computation_handle.h"
 #include "sxt/execution/async/gpu_computation_event.h"
 #include "sxt/execution/async/synchronization.h"
 #include "sxt/execution/async/test_kernel.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 
@@ -63,7 +63,7 @@ static future<int> f_i2() {
 
 static future<memmg::managed_array<uint64_t>>
 f_gpu(const memmg::managed_array<uint64_t>& a, const memmg::managed_array<uint64_t>& b) noexcept {
-  xenb::stream stream;
+  basdv::stream stream;
   auto n = a.size();
   memmg::managed_array<uint64_t> res(n);
   add_for_testing(res.data(), stream, a.data(), b.data(), static_cast<int>(n));

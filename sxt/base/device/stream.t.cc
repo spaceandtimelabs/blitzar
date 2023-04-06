@@ -1,11 +1,11 @@
-#include "sxt/execution/base/stream.h"
+#include "sxt/base/device/stream.h"
 
 #include "sxt/base/device/property.h"
+#include "sxt/base/device/stream_pool.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/execution/base/stream_pool.h"
 
 using namespace sxt;
-using namespace sxt::xenb;
+using namespace sxt::basdv;
 
 TEST_CASE("stream provides a wrapper around pooled CUDA streams") {
   if (basdv::get_num_devices() == 0) {

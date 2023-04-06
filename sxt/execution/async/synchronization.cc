@@ -17,7 +17,7 @@ future<> await_stream(bast::raw_stream_t stream) noexcept {
 //--------------------------------------------------------------------------------------------------
 // await_and_own_stream
 //--------------------------------------------------------------------------------------------------
-future<> await_and_own_stream(xenb::stream&& stream) noexcept {
+future<> await_and_own_stream(basdv::stream&& stream) noexcept {
   promise<> p;
   future<> res{p};
   basdv::event event;

@@ -1,10 +1,10 @@
 #include "sxt/execution/async/computation_handle.h"
 
+#include "sxt/base/device/stream.h"
+#include "sxt/base/device/stream_handle.h"
+#include "sxt/base/device/stream_pool.h"
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/execution/base/stream.h"
-#include "sxt/execution/base/stream_handle.h"
-#include "sxt/execution/base/stream_pool.h"
 
 namespace sxt::xena {
 //--------------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ void computation_handle::wait() noexcept {
   if (head_ == nullptr) {
     return;
   }
-  auto pool = xenb::get_stream_pool();
+  auto pool = basdv::get_stream_pool();
   do {
     auto handle = head_;
     SXT_DEBUG_ASSERT(handle->stream != nullptr);
@@ -51,7 +51,7 @@ void computation_handle::wait() noexcept {
 //--------------------------------------------------------------------------------------------------
 // add_stream
 //--------------------------------------------------------------------------------------------------
-void computation_handle::add_stream(xenb::stream&& stream) noexcept {
+void computation_handle::add_stream(basdv::stream&& stream) noexcept {
   auto handle = stream.release_handle();
   SXT_DEBUG_ASSERT(handle != nullptr && handle->next == nullptr);
   handle->next = head_;

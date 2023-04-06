@@ -2,12 +2,12 @@
 
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/async/synchronization.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
@@ -54,7 +54,7 @@ setup_verification_generators(basct::span<c21t::element_p3> generators,
                               basct::cspan<rstt::compressed_element> r_vector) noexcept {
   auto np = descriptor.g_vector.size();
   auto num_rounds = l_vector.size();
-  xenb::stream stream;
+  basdv::stream stream;
 
   // q_value
   basdv::async_copy_host_to_device(basct::subspan(generators, 0, 1),
@@ -84,7 +84,7 @@ xena::future<std::unique_ptr<workspace>>
 gpu_driver::make_workspace(const proof_descriptor& descriptor,
                            basct::cspan<s25t::element> a_vector) const noexcept {
   auto res = std::make_unique<gpu_workspace>();
-  xenb::stream stream;
+  basdv::stream stream;
   auto alloc = res->a_vector.get_allocator();
 
   res->descriptor = &descriptor;

@@ -6,11 +6,11 @@
 #include "sxt/base/device/event.h"
 #include "sxt/base/device/event_utility.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/computation_handle.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/async/test_kernel.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
@@ -68,7 +68,7 @@ static memmg::managed_array<uint64_t> make_random_array(std::mt19937& rng, size_
 static future<memmg::managed_array<uint64_t>> f1(const memmg::managed_array<uint64_t>& a,
                                                  const memmg::managed_array<uint64_t>& b) noexcept {
   auto n = a.size();
-  xenb::stream s;
+  basdv::stream s;
   memmg::managed_array<uint64_t> c{n, memr::get_pinned_resource()};
   add_for_testing(c.data(), s, a.data(), b.data(), static_cast<int>(n));
   basdv::event event;

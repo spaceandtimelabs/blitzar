@@ -33,7 +33,7 @@ static int64_t compute_sum(const memmg::managed_array<uint64_t>& data) noexcept 
 TEST_CASE("we can perform reductions on the GPU") {
   std::mt19937 rng{0};
 
-  xenb::stream stream;
+  basdv::stream stream;
 
   SECTION("we can reduce a single element") {
     auto data = make_dataset(rng, 1);
@@ -55,8 +55,8 @@ TEST_CASE("we can perform reductions on the GPU") {
   SECTION("we can reduce small data sets") {
     for (unsigned n = 3; n < 67; ++n) {
       auto data = make_dataset(rng, n);
-      auto res =
-          reduce<test_add_reducer>(xenb::stream{}, algb::identity_mapper{data.data()}, data.size());
+      auto res = reduce<test_add_reducer>(basdv::stream{}, algb::identity_mapper{data.data()},
+                                          data.size());
       xens::get_scheduler().run();
       basdv::synchronize_device();
       REQUIRE(res.value() == compute_sum(data));
@@ -66,8 +66,8 @@ TEST_CASE("we can perform reductions on the GPU") {
   SECTION("we can reduce datasets that are a power of two") {
     for (unsigned int n = 2; n < (1u << 12u); n <<= 1u) {
       auto data = make_dataset(rng, n);
-      auto res =
-          reduce<test_add_reducer>(xenb::stream{}, algb::identity_mapper{data.data()}, data.size());
+      auto res = reduce<test_add_reducer>(basdv::stream{}, algb::identity_mapper{data.data()},
+                                          data.size());
       xens::get_scheduler().run();
       basdv::synchronize_device();
       REQUIRE(res.value() == compute_sum(data));
@@ -79,8 +79,8 @@ TEST_CASE("we can perform reductions on the GPU") {
     for (int i = 0; i < 10; ++i) {
       auto n = dist(rng);
       auto data = make_dataset(rng, n);
-      auto res =
-          reduce<test_add_reducer>(xenb::stream{}, algb::identity_mapper{data.data()}, data.size());
+      auto res = reduce<test_add_reducer>(basdv::stream{}, algb::identity_mapper{data.data()},
+                                          data.size());
       xens::get_scheduler().run();
       basdv::synchronize_device();
       REQUIRE(res.value() == compute_sum(data));

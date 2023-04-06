@@ -8,11 +8,11 @@
 #include "sxt/base/device/event.h"
 #include "sxt/base/device/event_utility.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/base/stream.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
@@ -32,7 +32,7 @@ static xena::future<> async_compute_multiexponentiation_impl(
     c21t::element_p3& res, std::optional<basdv::event>& generators_event,
     basct::cspan<c21t::element_p3> generators, const mtxb::exponent_sequence& exponents) noexcept {
   auto num_bytes = exponents.element_nbytes;
-  xenb::stream stream;
+  basdv::stream stream;
   memr::async_device_resource resource{stream};
   res = c21cn::zero_p3_v;
 
@@ -96,7 +96,7 @@ async_compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
                                   basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
 
   // set up generators
-  std::optional<xenb::stream> generators_stream;
+  std::optional<basdv::stream> generators_stream;
   std::optional<basdv::event> generators_event;
   memmg::managed_array<c21t::element_p3> generators_data{memr::get_device_resource()};
   if (!basdv::is_device_pointer(generators.data())) {

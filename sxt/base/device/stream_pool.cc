@@ -1,14 +1,14 @@
-#include "sxt/execution/base/stream_pool.h"
+#include "sxt/base/device/stream_pool.h"
 
 #include <cuda_runtime.h>
 
 #include <string>
 
+#include "sxt/base/device/stream_handle.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/error/panic.h"
-#include "sxt/execution/base/stream_handle.h"
 
-namespace sxt::xenb {
+namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // make_stream_handle
 //--------------------------------------------------------------------------------------------------
@@ -80,4 +80,4 @@ stream_pool* get_stream_pool(size_t initial_size) noexcept {
   static thread_local auto pool = new stream_pool{initial_size};
   return pool;
 }
-} // namespace sxt::xenb
+} // namespace sxt::basdv

@@ -30,10 +30,10 @@ sxt_cc_component(
     deps = [
         ":kernel_fit",
         "//sxt/algorithm/base:index_functor",
+        "//sxt/base/device:stream",
         "//sxt/base/num:divide_up",
         "//sxt/execution/async:future",
         "//sxt/execution/async:synchronization",
-        "//sxt/execution/base:stream",
         "//sxt/execution/kernel:kernel_dims",
     ],
 )
