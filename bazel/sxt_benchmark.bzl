@@ -43,10 +43,10 @@ def sxt_cc_benchmark(
     )
 
     native.genrule(
-        name = name + "_callgrind",
+        name = name + "_flamegraph",
         srcs = [],
         outs = [
-            name + "_profile.sh",
+            name + "_flamegraph_profile.sh",
         ],
         tools = [
             ":" + name,
@@ -56,7 +56,24 @@ def sxt_cc_benchmark(
         executable = 1,
         output_to_bindir = 1,
         visibility = visibility,
-        cmd_bash = "$(location //tools/benchmark:bench_profile) $$PWD/$(location :%s) $@" % name,
+        cmd_bash = "$(location //tools/benchmark:bench_profile) flamegraph $$PWD/$(location :%s) $@" % name,
+    )
+
+    native.genrule(
+        name = name + "_callgrind",
+        srcs = [],
+        outs = [
+            name + "_callgrind_profile.sh",
+        ],
+        tools = [
+            ":" + name,
+            "//tools/benchmark:bench_profile",
+        ],
+        local = 1,
+        executable = 1,
+        output_to_bindir = 1,
+        visibility = visibility,
+        cmd_bash = "$(location //tools/benchmark:bench_profile) callgrind $$PWD/$(location :%s) $@" % name,
     )
 
     native.cc_binary(

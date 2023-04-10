@@ -32,6 +32,8 @@ rust/proofs-gpu-sys/src/bindings.rs
 callgrind.out.*
 .results/
 .proof_results/
+*.data
+vgcore.*
 
 # Ignore python files
 # Byte-compiled / optimized / DLL files
