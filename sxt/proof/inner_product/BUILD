@@ -94,6 +94,7 @@ sxt_cc_component(
         "//sxt/scalar25/type:literal",
         "//sxt/scalar25/constant:max_bits",
         "//sxt/scalar25/operation:overload",
+        "//sxt/ristretto/operation:compression",
         "//sxt/scalar25/random:element",
         "//sxt/ristretto/type:literal",
     ],

@@ -58,6 +58,23 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "neg",
+    impl_deps = [
+        ":add",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/field51/operation:neg",
+    ],
+    is_cuda = True,
+    test_deps = [
+        "//sxt/curve21/type:literal",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
     name = "double",
     impl_deps = [
         "//sxt/field51/type:element",
@@ -114,6 +131,7 @@ sxt_cc_component(
     name = "overload",
     impl_deps = [
         ":add",
+        ":neg",
         ":scalar_multiply",
         "//sxt/curve21/type:element_p3",
         "//sxt/scalar25/type:literal",

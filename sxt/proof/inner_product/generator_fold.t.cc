@@ -5,6 +5,7 @@
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/operation/overload.h"
+#include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/literal.h"
 #include "sxt/scalar25/constant/max_bits.h"
 #include "sxt/scalar25/operation/overload.h"
@@ -67,7 +68,10 @@ TEST_CASE("we can fold generator elements") {
   SECTION("we handle large multipliers") {
     decompose_generator_fold(decomposition, -0x1_s25, -0x1_s25);
     fold_generators(res, decomposition, g_low, g_high);
-    REQUIRE(res == -g_low - g_high);
+    rstt::compressed_element expected, res_p;
+    rsto::compress(expected, -g_low - g_high);
+    rsto::compress(res_p, res);
+    REQUIRE(res_p == expected);
   }
 
   SECTION("we handle random multipliers") {
@@ -77,6 +81,9 @@ TEST_CASE("we can fold generator elements") {
     s25rn::generate_random_element(high, rng);
     decompose_generator_fold(decomposition, low, high);
     fold_generators(res, decomposition, g_low, g_high);
-    REQUIRE(res == low * g_low + high * g_high);
+    rstt::compressed_element expected, res_p;
+    rsto::compress(expected, low * g_low + high * g_high);
+    rsto::compress(res_p, res);
+    REQUIRE(res_p == expected);
   }
 }

@@ -1,6 +1,7 @@
 #include "sxt/curve21/operation/overload.h"
 
 #include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/scalar25/operation/overload.h"
@@ -29,9 +30,9 @@ element_p3 operator-(const element_p3& lhs, const element_p3& rhs) noexcept {
 }
 
 element_p3 operator-(const element_p3& p) noexcept {
-  // Note: This isn't an efficient implementation, but that's ok as the overload operators
-  // are really only used for making test code more readable.
-  return (-0x1_s25) * p;
+  element_p3 res;
+  c21o::neg(res, p);
+  return res;
 }
 
 //--------------------------------------------------------------------------------------------------
