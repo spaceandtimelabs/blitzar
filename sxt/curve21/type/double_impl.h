@@ -1,0 +1,28 @@
+#pragma once
+
+#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/curve21/type/conversion_utility.h"
+#include "sxt/curve21/type/element_p2.h"
+
+namespace sxt::c21t {
+struct element_p1p1;
+struct element_p2;
+
+//--------------------------------------------------------------------------------------------------
+// double_element_impl
+//--------------------------------------------------------------------------------------------------
+/*
+ * r = 2 * p
+ *
+ * Note: in the c21t package to support point formation
+ */
+CUDA_CALLABLE
+void double_element_impl(c21t::element_p1p1& r, const c21t::element_p2& p) noexcept;
+
+CUDA_CALLABLE
+inline void double_element_impl(c21t::element_p1p1& r, const c21t::element_p3& p) noexcept {
+  c21t::element_p2 q;
+  to_element_p2(q, p);
+  double_element_impl(r, q);
+}
+} // namespace sxt::c21t

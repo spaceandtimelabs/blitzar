@@ -77,6 +77,7 @@ CUDA_CALLABLE static void mul_impl(T& h, const f51t::element& f, const f51t::ele
   h[3] = r03;
   h[4] = r04;
 }
+
 //--------------------------------------------------------------------------------------------------
 // mul
 //--------------------------------------------------------------------------------------------------
@@ -88,5 +89,34 @@ void mul(f51t::element& h, const f51t::element& f, const f51t::element& g) noexc
 CUDA_CALLABLE
 void mul(volatile f51t::element& h, const f51t::element& f, const f51t::element& g) noexcept {
   mul_impl(h, f, g);
+}
+
+//--------------------------------------------------------------------------------------------------
+// mul32
+//--------------------------------------------------------------------------------------------------
+void mul32(f51t::element& h, const f51t::element& f, uint32_t n) noexcept {
+  constexpr uint64_t mask = 0x7ffffffffffffULL;
+  uint128_t a;
+  uint128_t sn = (uint128_t)n;
+  uint64_t h0, h1, h2, h3, h4;
+
+  a = f[0] * sn;
+  h0 = ((uint64_t)a) & mask;
+  a = f[1] * sn + ((uint64_t)(a >> 51));
+  h1 = ((uint64_t)a) & mask;
+  a = f[2] * sn + ((uint64_t)(a >> 51));
+  h2 = ((uint64_t)a) & mask;
+  a = f[3] * sn + ((uint64_t)(a >> 51));
+  h3 = ((uint64_t)a) & mask;
+  a = f[4] * sn + ((uint64_t)(a >> 51));
+  h4 = ((uint64_t)a) & mask;
+
+  h0 += (a >> 51) * 19ULL;
+
+  h[0] = h0;
+  h[1] = h1;
+  h[2] = h2;
+  h[3] = h3;
+  h[4] = h4;
 }
 } // namespace sxt::f51o

@@ -73,6 +73,7 @@ sxt_cc_component(
     deps = [
         "//sxt/base/macro:cuda_callable",
         "//sxt/curve21/type:conversion_utility",
+        "//sxt/curve21/type:double_impl",
         "//sxt/curve21/type:element_p1p1",
         "//sxt/curve21/type:element_p2",
         "//sxt/curve21/type:element_p3",

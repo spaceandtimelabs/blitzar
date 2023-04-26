@@ -17,4 +17,11 @@ TEST_CASE("we can multiply finite field elements") {
     auto expected_res = 0x6b9ecf8d8ab80bb3a98db6783ec540c9d2fab4684e954e733461f8f187a84ff8_f51;
     REQUIRE(res == expected_res);
   }
+
+  SECTION("we can multiply by 32-bit integers") {
+    mul32(res, e1, 0x123u);
+    element expected;
+    mul(expected, e1, 0x123_f51);
+    REQUIRE(res == expected);
+  }
 }
