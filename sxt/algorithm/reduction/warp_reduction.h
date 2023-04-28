@@ -21,31 +21,31 @@ __device__ void warp_reduce(volatile typename Reducer::value_type* shared_data,
                             unsigned int thread_index) {
   assert(thread_index < 32 && "can only be called on an individual warp");
   if constexpr (BlockSize >= 64) {
-    Reducer::accumulate(shared_data[thread_index], shared_data[thread_index + 32]);
+    Reducer::accumulate_inplace(shared_data[thread_index], shared_data[thread_index + 32]);
   }
   if constexpr (BlockSize >= 32) {
     if (thread_index < 16) {
-      Reducer::accumulate(shared_data[thread_index], shared_data[thread_index + 16]);
+      Reducer::accumulate_inplace(shared_data[thread_index], shared_data[thread_index + 16]);
     }
   }
   if constexpr (BlockSize >= 16) {
     if (thread_index < 8) {
-      Reducer::accumulate(shared_data[thread_index], shared_data[thread_index + 8]);
+      Reducer::accumulate_inplace(shared_data[thread_index], shared_data[thread_index + 8]);
     }
   }
   if constexpr (BlockSize >= 8) {
     if (thread_index < 4) {
-      Reducer::accumulate(shared_data[thread_index], shared_data[thread_index + 4]);
+      Reducer::accumulate_inplace(shared_data[thread_index], shared_data[thread_index + 4]);
     }
   }
   if constexpr (BlockSize >= 4) {
     if (thread_index < 2) {
-      Reducer::accumulate(shared_data[thread_index], shared_data[thread_index + 2]);
+      Reducer::accumulate_inplace(shared_data[thread_index], shared_data[thread_index + 2]);
     }
   }
   if constexpr (BlockSize >= 2) {
     if (thread_index < 1) {
-      Reducer::accumulate(shared_data[thread_index], shared_data[thread_index + 1]);
+      Reducer::accumulate_inplace(shared_data[thread_index], shared_data[thread_index + 1]);
     }
   }
 }

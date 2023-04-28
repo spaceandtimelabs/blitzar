@@ -13,10 +13,9 @@ namespace sxt::algb {
  * See https://developer.download.nvidia.com/assets/cuda/files/reduction.pdf, page 22
  */
 template <class R>
-concept reducer =
-    requires(typename R::value_type& x, volatile typename R::value_type& xv,
-             const typename R::value_type& y, const volatile typename R::value_type& yv) {
-      { R::accumulate(x, y) } noexcept;
-      { R::accumulate(xv, yv) } noexcept;
-    };
+concept reducer = requires(typename R::value_type& x, volatile typename R::value_type& xv,
+                           volatile typename R::value_type& yv, typename R::value_type& z) {
+  { R::accumulate_inplace(x, z) } noexcept;
+  { R::accumulate_inplace(xv, yv) } noexcept;
+};
 } // namespace sxt::algb

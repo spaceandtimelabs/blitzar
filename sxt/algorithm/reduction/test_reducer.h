@@ -14,5 +14,10 @@ struct test_add_reducer {
   template <class T> static inline CUDA_CALLABLE void accumulate(T& res, uint64_t x) noexcept {
     res = res + x;
   }
+
+  template <class T>
+  static inline CUDA_CALLABLE void accumulate_inplace(T& res, uint64_t x) noexcept {
+    res = res + x;
+  }
 };
 } // namespace sxt::algr

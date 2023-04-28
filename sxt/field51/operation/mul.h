@@ -22,6 +22,14 @@ void mul(f51t::element& h, const f51t::element& f, const f51t::element& g) noexc
 CUDA_CALLABLE
 void mul(volatile f51t::element& h, const f51t::element& f, const f51t::element& g) noexcept;
 
+CUDA_CALLABLE
+void mul(volatile f51t::element& h, const volatile f51t::element& f,
+         const volatile f51t::element& g) noexcept;
+
+CUDA_CALLABLE
+void mul(volatile f51t::element& h, const volatile f51t::element& f,
+         const f51t::element& g) noexcept;
+
 //--------------------------------------------------------------------------------------------------
 // mul32
 //--------------------------------------------------------------------------------------------------

@@ -2,13 +2,10 @@
 
 namespace sxt::f51o {
 //--------------------------------------------------------------------------------------------------
-// sub
+// sub_impl
 //--------------------------------------------------------------------------------------------------
-/*
- h = f - g
- */
-CUDA_CALLABLE
-void sub(f51t::element& h, const f51t::element& f, const f51t::element& g) noexcept {
+template <class T1, class T2, class T3>
+CUDA_CALLABLE void sub_impl(T1& h, const T2& f, const T3& g) noexcept {
   const uint64_t mask = 0x7ffffffffffffULL;
   uint64_t h0, h1, h2, h3, h4;
 
@@ -40,5 +37,24 @@ void sub(f51t::element& h, const f51t::element& f, const f51t::element& g) noexc
   h[2] = h2;
   h[3] = h3;
   h[4] = h4;
+}
+
+//--------------------------------------------------------------------------------------------------
+// sub
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+void sub(f51t::element& h, const f51t::element& f, const f51t::element& g) noexcept {
+  sub_impl(h, f, g);
+}
+
+CUDA_CALLABLE
+void sub(volatile f51t::element& h, const f51t::element& f, const f51t::element& g) noexcept {
+  sub_impl(h, f, g);
+}
+
+CUDA_CALLABLE
+void sub(volatile f51t::element& h, const volatile f51t::element& f,
+         const volatile f51t::element& g) noexcept {
+  sub_impl(h, f, g);
 }
 } // namespace sxt::f51o

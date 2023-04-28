@@ -1,5 +1,7 @@
 #include "sxt/algorithm/reduction/kernel_fit.h"
 
+#include <algorithm>
+
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/kernel/kernel_dims.h"
 
@@ -53,7 +55,9 @@ xenk::kernel_dims fit_reduction_kernel(unsigned int n) noexcept {
   // first increase blocks up to 64
   if (n < 64 * 64) {
     return {
-        .num_blocks = n / 64,
+        // note: guided by benchmarks, we use 16 instead of 64 here
+        // however, this should be reassessed with the production GPU
+        .num_blocks = std::min(16u, n / 64),
         .block_size = xenk::block_size_t::v32,
     };
   }
@@ -65,7 +69,9 @@ xenk::kernel_dims fit_reduction_kernel(unsigned int n) noexcept {
   // 2 x 65'536 = 131,072
   if (n < 131'073) {
     return {
-        .num_blocks = 64,
+        // note: guided by benchmarks, we use 16 instead of 64 here
+        // however, this should be reassessed with the production GPU
+        .num_blocks = 16,
         .block_size = xenk::block_size_t::v32,
     };
   }
@@ -77,7 +83,9 @@ xenk::kernel_dims fit_reduction_kernel(unsigned int n) noexcept {
   // 2 x 102'247 = 204494
   if (n < 204'495) {
     return {
-        .num_blocks = 64,
+        // note: guided by benchmarks, we use 16 instead of 64 here
+        // however, this should be reassessed with the production GPU
+        .num_blocks = 16,
         .block_size = xenk::block_size_t::v64,
     };
   }
@@ -89,7 +97,9 @@ xenk::kernel_dims fit_reduction_kernel(unsigned int n) noexcept {
   // 4 x 217'907 = 787'276
   if (n < 787277) {
     return {
-        .num_blocks = 96,
+        // note: guided by benchmarks, we use 32 instead of 64 here
+        // however, this should be reassessed with the production GPU
+        .num_blocks = 32,
         .block_size = xenk::block_size_t::v64,
     };
   }
@@ -101,7 +111,9 @@ xenk::kernel_dims fit_reduction_kernel(unsigned int n) noexcept {
   // 8 x 927'937 = 2'383'496
   if (n < 2'383'497) {
     return {
-        .num_blocks = 96,
+        // note: guided by benchmarks, we use 32 instead of 96 here
+        // however, this should be reassessed with the production GPU
+        .num_blocks = 32,
         .block_size = xenk::block_size_t::v128,
     };
   }

@@ -30,7 +30,7 @@ __global__ void reduction_kernel(typename Reducer::value_type* out, Mapper mappe
   auto block_index = blockIdx.x;
   auto index = block_index * (BlockSize * 2) + thread_index;
   auto step = BlockSize * 2 * gridDim.x;
-  __shared__ T shared_data[BlockSize];
+  __shared__ T shared_data[2 * BlockSize];
   thread_reduce<Reducer, BlockSize>(out + block_index, shared_data, mapper, n, step, thread_index,
                                     index);
 }
@@ -61,7 +61,8 @@ xena::future<typename Reducer::value_type> reduce(basdv::stream&& stream, Mapper
       .then([num_blocks = dims.num_blocks](memmg::managed_array<T>&& result_array) noexcept {
         auto res = result_array[0];
         for (unsigned int i = 1; i < num_blocks; ++i) {
-          Reducer::accumulate(res, result_array[i]);
+          auto e = result_array[i];
+          Reducer::accumulate_inplace(res, e);
         }
         return res;
       });

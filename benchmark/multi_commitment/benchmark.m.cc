@@ -1,3 +1,5 @@
+#include <cuda_profiler_api.h>
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -188,6 +190,7 @@ int main(int argc, char* argv[]) {
   std::vector<double> durations;
   double mean_duration_compute = 0;
 
+  cudaProfilerStart();
   for (int i = 0; i < p.num_samples; ++i) {
     // populate generators
     basct::span<c21t::element_p3> span_generators(generators.data(), p.commitment_length);
@@ -203,6 +206,7 @@ int main(int argc, char* argv[]) {
     durations.push_back(duration_compute);
     mean_duration_compute += duration_compute / p.num_samples;
   }
+  cudaProfilerStop();
 
   double std_deviation = 0;
 

@@ -12,20 +12,21 @@ namespace sxt::algb {
 //--------------------------------------------------------------------------------------------------
 template <algb::reducer Reducer, algb::mapper Mapper>
   requires std::same_as<typename Reducer::value_type, typename Mapper::value_type>
-CUDA_CALLABLE void accumulate(typename Reducer::value_type& res, Mapper mapper,
-                              unsigned int i) noexcept
-  requires(!requires { Reducer::accumulate(res, mapper, i); })
+CUDA_CALLABLE void accumulate(typename Reducer::value_type& res, typename Reducer::value_type& e,
+                              Mapper mapper, unsigned int i) noexcept
+  requires(!requires { Reducer::accumulate_inplace(res, e, mapper, i); })
 {
-  Reducer::accumulate(res, mapper.map_index(i));
+  mapper.map_index(e, i);
+  Reducer::accumulate_inplace(res, e);
 }
 
 template <algb::reducer Reducer, algb::mapper Mapper>
   requires std::same_as<typename Reducer::value_type, typename Mapper::value_type>
-CUDA_CALLABLE void accumulate(typename Reducer::value_type& res, Mapper mapper,
-                              unsigned int i) noexcept
-  requires(requires { Reducer::accumulate(res, mapper, i); })
+CUDA_CALLABLE void accumulate(typename Reducer::value_type& res, typename Reducer::value_type& e,
+                              Mapper mapper, unsigned int i) noexcept
+  requires(requires { Reducer::accumulate_inplace(res, e, mapper, i); })
 {
   // support specialized accumulate that might be more efficient
-  Reducer::accumulate(res, mapper, i);
+  Reducer::accumulate_inplace(res, e, mapper, i);
 }
 } // namespace sxt::algb

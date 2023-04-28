@@ -9,6 +9,10 @@ cc_library(
     hdrs = [
         "reduce_cpu.h",
     ],
+    copts = [
+        "-fconcepts",
+        "-std=c++20",
+    ],
     deps = [
         "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:add",

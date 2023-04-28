@@ -20,8 +20,8 @@ namespace sxt::f51o {
  h = f + g
  Can overlap h with f or g.
  */
-CUDA_CALLABLE
-inline void add(f51t::element& h, const f51t::element& f, const f51t::element& g) noexcept {
+template <class T1, class T2, class T3>
+CUDA_CALLABLE inline void add(T1& h, const T2& f, const T3& g) noexcept {
   uint64_t h0 = f[0] + g[0];
   uint64_t h1 = f[1] + g[1];
   uint64_t h2 = f[2] + g[2];

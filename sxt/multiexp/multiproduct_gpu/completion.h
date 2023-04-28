@@ -29,7 +29,8 @@ void complete_multiproduct(basct::span<typename Reducer::value_type> products,
     SXT_DEBUG_ASSERT(descriptor.reduction_num_blocks > 0);
     auto product = block_results[block_index];
     for (size_t i = 1; i < descriptor.reduction_num_blocks; ++i) {
-      Reducer::accumulate(product, block_results[block_index + i]);
+      auto block_result_i = block_results[block_index + i];
+      Reducer::accumulate_inplace(product, block_result_i);
     }
     block_index += descriptor.reduction_num_blocks;
     products[product_index++] = product;

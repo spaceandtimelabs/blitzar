@@ -40,36 +40,41 @@ __device__ void thread_reduce(typename Reducer::value_type* out,
   }
 
   mapper.map_index(shared_data[thread_index], index);
-  algb::accumulate<Reducer>(shared_data[thread_index], mapper, index + BlockSize);
+  algb::accumulate<Reducer>(shared_data[thread_index], shared_data[thread_index + BlockSize],
+                            mapper, index + BlockSize);
   index += step;
   auto index_p = index + BlockSize;
+
   while (index_p < n) {
-    algb::accumulate<Reducer>(shared_data[thread_index], mapper, index);
-    algb::accumulate<Reducer>(shared_data[thread_index], mapper, index + BlockSize);
+    algb::accumulate<Reducer>(shared_data[thread_index], shared_data[thread_index + BlockSize],
+                              mapper, index);
+    algb::accumulate<Reducer>(shared_data[thread_index], shared_data[thread_index + BlockSize],
+                              mapper, index + BlockSize);
     index += step;
     index_p = index + BlockSize;
   }
   if (index < n) {
-    algb::accumulate<Reducer>(shared_data[thread_index], mapper, index);
+    algb::accumulate<Reducer>(shared_data[thread_index], shared_data[thread_index + BlockSize],
+                              mapper, index);
   }
   if constexpr (BlockSize > 32) {
     __syncthreads();
   }
   if constexpr (BlockSize >= 512) {
     if (thread_index < 256) {
-      Reducer::accumulate(shared_data[thread_index], shared_data[thread_index + 256]);
+      Reducer::accumulate_inplace(shared_data[thread_index], shared_data[thread_index + 256]);
     }
     __syncthreads();
   }
   if constexpr (BlockSize >= 256) {
     if (thread_index < 128) {
-      Reducer::accumulate(shared_data[thread_index], shared_data[thread_index + 128]);
+      Reducer::accumulate_inplace(shared_data[thread_index], shared_data[thread_index + 128]);
     }
     __syncthreads();
   }
   if constexpr (BlockSize >= 128) {
     if (thread_index < 64) {
-      Reducer::accumulate(shared_data[thread_index], shared_data[thread_index + 64]);
+      Reducer::accumulate_inplace(shared_data[thread_index], shared_data[thread_index + 64]);
     }
     __syncthreads();
   }

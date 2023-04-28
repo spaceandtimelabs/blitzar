@@ -37,6 +37,7 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p1p1",
         "//sxt/curve21/type:element_p2",
         "//sxt/curve21/type:element_p3",
+        "//sxt/field51/constant:d",
     ],
 )
 

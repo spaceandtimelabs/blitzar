@@ -60,7 +60,7 @@ compute_multiproduct(basct::span<typename Reducer::value_type> products, bast::r
   // launch kernel
   memmg::managed_array<T> partial_res_gpu{computation_descriptor.num_blocks, &resource};
   auto max_block_size = static_cast<unsigned>(computation_descriptor.max_block_size);
-  auto shared_memory = sizeof(T) * max_block_size;
+  auto shared_memory = sizeof(T) * max_block_size * 2;
   multiproduct_kernel<Reducer>
       <<<computation_descriptor.num_blocks, max_block_size, shared_memory, stream>>>(
           partial_res_gpu.data(), generators.data(), indexes.data(), block_descriptors_gpu.data());
