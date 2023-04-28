@@ -13,7 +13,7 @@ namespace sxt::mtxpi {
 //--------------------------------------------------------------------------------------------------
 // compute_multiproduct_decomposition
 //--------------------------------------------------------------------------------------------------
-xena::future<> compute_multiproduct_decomposition(memmg::managed_array<unsigned>& indexes,
+xena::future<> compute_multiproduct_decomposition(memmg::managed_array<int>& indexes,
                                                   basct::span<unsigned> product_sizes,
                                                   bast::raw_stream_t stream,
                                                   mtxb::exponent_sequence exponents) noexcept;

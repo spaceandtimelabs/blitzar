@@ -37,7 +37,7 @@ static xena::future<> async_compute_multiexponentiation_impl(
   res = c21cn::zero_p3_v;
 
   // decompose exponents
-  memmg::managed_array<unsigned> indexes{&resource};
+  memmg::managed_array<int> indexes{&resource};
   memmg::managed_array<unsigned> product_sizes(num_bytes * 8u);
   co_await mtxpi::compute_multiproduct_decomposition(indexes, product_sizes, stream, exponents);
   if (indexes.empty()) {

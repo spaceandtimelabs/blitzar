@@ -26,11 +26,10 @@ namespace sxt::mtxmpg {
 // compute_multiproduct
 //--------------------------------------------------------------------------------------------------
 template <algb::reducer Reducer>
-xena::future<> compute_multiproduct(basct::span<typename Reducer::value_type> products,
-                                    bast::raw_stream_t stream,
-                                    basct::cspan<typename Reducer::value_type> generators,
-                                    basct::cspan<unsigned> indexes,
-                                    basct::cspan<unsigned> product_sizes) noexcept {
+xena::future<>
+compute_multiproduct(basct::span<typename Reducer::value_type> products, bast::raw_stream_t stream,
+                     basct::cspan<typename Reducer::value_type> generators,
+                     basct::cspan<int> indexes, basct::cspan<unsigned> product_sizes) noexcept {
   auto num_products = products.size();
   SXT_DEBUG_ASSERT(
       // clang-format off

@@ -15,7 +15,7 @@ using namespace sxt::mtxpi;
 TEST_CASE("we can compute the decomposition that turns a multi-exponentiation problem into a "
           "multi-product problem") {
   basdv::stream stream;
-  memmg::managed_array<unsigned> indexes{123, memr::get_managed_device_resource()};
+  memmg::managed_array<int> indexes{123, memr::get_managed_device_resource()};
 
   SECTION("we handle the case of no terms") {
     std::vector<uint8_t> exponents_data;
@@ -54,7 +54,7 @@ TEST_CASE("we can compute the decomposition that turns a multi-exponentiation pr
     REQUIRE(fut.ready());
     basdv::synchronize_device();
 
-    memmg::managed_array<unsigned> expected_indexes = {0};
+    memmg::managed_array<int> expected_indexes = {0};
     REQUIRE(indexes == expected_indexes);
 
     memmg::managed_array<unsigned> expected_product_sizes = {1, 0, 0, 0, 0, 0, 0, 0};
@@ -70,7 +70,7 @@ TEST_CASE("we can compute the decomposition that turns a multi-exponentiation pr
     REQUIRE(fut.ready());
     basdv::synchronize_device();
 
-    memmg::managed_array<unsigned> expected_indexes = {0, 0};
+    memmg::managed_array<int> expected_indexes = {0, 0};
     REQUIRE(indexes == expected_indexes);
 
     memmg::managed_array<unsigned> expected_product_sizes = {1, 1, 0, 0, 0, 0, 0, 0};
@@ -102,7 +102,7 @@ TEST_CASE("we can compute the decomposition that turns a multi-exponentiation pr
     REQUIRE(fut.ready());
     basdv::synchronize_device();
 
-    memmg::managed_array<unsigned> expected_indexes = {2, 0, 2, 3};
+    memmg::managed_array<int> expected_indexes = {2, 0, 2, 3};
     REQUIRE(indexes == expected_indexes);
 
     memmg::managed_array<unsigned> expected_product_sizes = {1, 2, 1, 0, 0, 0, 0, 0};

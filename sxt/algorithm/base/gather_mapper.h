@@ -1,5 +1,7 @@
 #pragma once
 
+#include <concepts>
+
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
 
@@ -7,13 +9,13 @@ namespace sxt::algb {
 //--------------------------------------------------------------------------------------------------
 // gather_mapper
 //--------------------------------------------------------------------------------------------------
-template <class T> class gather_mapper {
+template <class T, std::integral Index = unsigned> class gather_mapper {
 public:
   using value_type = T;
 
   gather_mapper() noexcept = default;
 
-  CUDA_CALLABLE gather_mapper(const T* data, const unsigned* indexes) noexcept
+  CUDA_CALLABLE gather_mapper(const T* data, const Index* indexes) noexcept
       : data_{data}, indexes_{indexes} {}
 
   CUDA_CALLABLE void map_index(T& val, unsigned int index) const noexcept {
@@ -26,6 +28,6 @@ public:
 
 private:
   const T* data_ = nullptr;
-  const unsigned* indexes_ = nullptr;
+  const Index* indexes_ = nullptr;
 };
 } // namespace sxt::algb

@@ -45,8 +45,8 @@ static __global__ void count_kernel(unsigned* counters, const uint8_t* data, uns
 //--------------------------------------------------------------------------------------------------
 // decomposition_kernel
 //--------------------------------------------------------------------------------------------------
-static __global__ void decomposition_kernel(unsigned* out, const unsigned* offsets,
-                                            const uint8_t* data, unsigned n) {
+static __global__ void decomposition_kernel(int* out, const unsigned* offsets, const uint8_t* data,
+                                            unsigned n) {
   unsigned element_num_bytes = blockDim.x;
   unsigned element_num_bits = element_num_bytes * 8u;
   unsigned num_blocks = gridDim.x;
@@ -69,7 +69,7 @@ static __global__ void decomposition_kernel(unsigned* out, const unsigned* offse
     auto byte = *data;
     auto is_one = static_cast<unsigned>((byte & mask) != 0);
     if (is_one == 1) {
-      out[count] = i;
+      out[count] = static_cast<int>(i);
     }
     count += is_one;
     data += element_num_bytes;
@@ -79,7 +79,7 @@ static __global__ void decomposition_kernel(unsigned* out, const unsigned* offse
 //--------------------------------------------------------------------------------------------------
 // decompose_exponent_bits
 //--------------------------------------------------------------------------------------------------
-xena::future<> decompose_exponent_bits(basct::span<unsigned> indexes, bast::raw_stream_t stream,
+xena::future<> decompose_exponent_bits(basct::span<int> indexes, bast::raw_stream_t stream,
                                        basct::cspan<unsigned> offsets,
                                        const mtxb::exponent_sequence& exponents) noexcept {
   unsigned element_num_bytes = exponents.element_nbytes;
