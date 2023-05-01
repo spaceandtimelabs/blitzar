@@ -48,9 +48,13 @@ struct sxt_sequence_descriptor {
   uint64_t n;
 
   // pointer to the data for the sequence of elements where there are n elements
-  // in the sequence and each element enocodes a number of element_nbytes bytes
+  // in the sequence and each element encodes a number of element_nbytes bytes
   // represented in the little endian format
   const uint8_t* data;
+
+  // whether the elements are signed
+  // Note: if signed, then element_nbytes must be <= 16
+  int is_signed;
 };
 
 /**

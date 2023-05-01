@@ -17,6 +17,7 @@ int main() {
       n1_num_bytes, // number bytes
       n1,           // number rows
       data_bytes_1, // data pointer
+      0,            // elements are not signed
   };
   const int num_sequences = 1;
   const sxt_sequence_descriptor descriptors[num_sequences] = {descriptor1};

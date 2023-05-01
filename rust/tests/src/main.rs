@@ -59,7 +59,8 @@ mod tests {
                 let descriptor = proofs_gpu_sys::sxt_sequence_descriptor {
                     element_nbytes: n1_num_bytes,  // number bytes
                     n: n1,            // number rows
-                    data: data_bytes[i].as_mut_ptr() as *const u8
+                    data: data_bytes[i].as_mut_ptr() as *const u8, // data
+                    is_signed: 0, // unsigned
                 };
 
                 cbinding_descriptors[i] = descriptor;
