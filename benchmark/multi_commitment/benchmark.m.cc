@@ -45,33 +45,35 @@ struct params {
     if (argc < 7) {
       std::cerr << "Usage: benchmark "
                 << "<cpu|gpu> "
-                << "<num_commitments> <commitment_length> <element_nbytes> "
-                << "<verbose> <num_samples>\n";
+                << "<n> "
+                << "<num_samples> "
+                << "<num_commitments> "
+                << "<element_nbytes> "
+                << "<verbose>\n";
       status = -1;
     }
 
     select_backend_fn(argv[1]);
 
     verbose = is_boolean = false;
-    num_commitments = std::atoi(argv[2]);
-    commitment_length = std::atoi(argv[3]);
-    element_nbytes = std::atoi(argv[4]);
+    commitment_length = std::atoi(argv[2]);
+    num_samples = std::atoi(argv[3]);
+    num_commitments = std::atoi(argv[4]);
+    element_nbytes = std::atoi(argv[5]);
+
+    if (num_commitments <= 0 || commitment_length <= 0 || element_nbytes > 32) {
+      std::cerr << "Restriction: 1 <= num_commitments, "
+                << "1 <= commitment_length, 1 <= element_nbytes <= 32\n";
+      status = -1;
+    }
 
     if (element_nbytes == 0) {
       is_boolean = true;
       element_nbytes = 1;
     }
 
-    if (std::string_view{argv[5]} == "1") {
+    if (std::string_view{argv[6]} == "1") {
       verbose = true;
-    }
-
-    num_samples = std::atoi(argv[6]);
-
-    if (num_commitments <= 0 || commitment_length <= 0 || element_nbytes > 32) {
-      std::cerr << "Restriction: 1 <= num_commitments, "
-                << "1 <= commitment_length, 1 <= element_nbytes <= 32\n";
-      status = -1;
     }
   }
 
