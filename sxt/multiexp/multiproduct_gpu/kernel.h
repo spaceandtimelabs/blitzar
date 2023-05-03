@@ -15,14 +15,14 @@ namespace sxt::mtxmpg {
 template <algb::reducer Reducer>
 __global__ void multiproduct_kernel(typename Reducer::value_type* out,
                                     const typename Reducer::value_type* generators,
-                                    const int* indexes,
+                                    const unsigned* indexes,
                                     const block_computation_descriptor* block_descriptors) {
   using T = typename Reducer::value_type;
   extern __shared__ T shared_data[];
   auto thread_index = threadIdx.x;
   auto block_index = blockIdx.x;
   auto descriptor = block_descriptors[block_index];
-  algb::gather_mapper<T, int> mapper{generators, indexes + descriptor.index_first};
+  algb::gather_mapper<T> mapper{generators, indexes + descriptor.index_first};
   // Note: It's expected that most products will be of similar length and
   // hence share a common block size, but we allow for the same kernel to
   // compute product reductions with varying block sizes.

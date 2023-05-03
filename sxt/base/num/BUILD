@@ -59,7 +59,6 @@ sxt_cc_component(
         ":power2_equality",
         "//sxt/base/bit:count",
         "//sxt/base/error:assert",
-        "//sxt/base/macro:cuda_callable",
     ],
 )
 

@@ -15,7 +15,7 @@ using namespace sxt::mtxpi;
 TEST_CASE("we can compute the decomposition that turns a multi-exponentiation problem into a "
           "multi-product problem") {
   basdv::stream stream;
-  memmg::managed_array<int> indexes{123, memr::get_managed_device_resource()};
+  memmg::managed_array<unsigned> indexes{123, memr::get_managed_device_resource()};
 
   SECTION("we handle the case of no terms") {
     std::vector<uint8_t> exponents_data;
@@ -54,7 +54,7 @@ TEST_CASE("we can compute the decomposition that turns a multi-exponentiation pr
     REQUIRE(fut.ready());
     basdv::synchronize_device();
 
-    memmg::managed_array<int> expected_indexes = {0};
+    memmg::managed_array<unsigned> expected_indexes = {0};
     REQUIRE(indexes == expected_indexes);
 
     memmg::managed_array<unsigned> expected_product_sizes = {1, 0, 0, 0, 0, 0, 0, 0};
@@ -70,7 +70,7 @@ TEST_CASE("we can compute the decomposition that turns a multi-exponentiation pr
     REQUIRE(fut.ready());
     basdv::synchronize_device();
 
-    memmg::managed_array<int> expected_indexes = {0, 0};
+    memmg::managed_array<unsigned> expected_indexes = {0, 0};
     REQUIRE(indexes == expected_indexes);
 
     memmg::managed_array<unsigned> expected_product_sizes = {1, 1, 0, 0, 0, 0, 0, 0};
@@ -102,10 +102,27 @@ TEST_CASE("we can compute the decomposition that turns a multi-exponentiation pr
     REQUIRE(fut.ready());
     basdv::synchronize_device();
 
-    memmg::managed_array<int> expected_indexes = {2, 0, 2, 3};
+    memmg::managed_array<unsigned> expected_indexes = {2, 0, 2, 3};
     REQUIRE(indexes == expected_indexes);
 
     memmg::managed_array<unsigned> expected_product_sizes = {1, 2, 1, 0, 0, 0, 0, 0};
+    REQUIRE(product_sizes == expected_product_sizes);
+  }
+
+  SECTION("we handle signed terms") {
+    std::vector<int8_t> exponents_data = {-1, 0, 3};
+    auto exponents = mtxb::to_exponent_sequence(exponents_data);
+    memmg::managed_array<unsigned> product_sizes(sizeof(exponents_data[0]) * 8u);
+    auto fut = compute_multiproduct_decomposition(indexes, product_sizes, stream, exponents);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+
+    int sign_bit = 1u << 31;
+    memmg::managed_array<unsigned> expected_indexes = {sign_bit, 2, 2};
+    REQUIRE(indexes == expected_indexes);
+
+    memmg::managed_array<unsigned> expected_product_sizes = {2, 1, 0, 0, 0, 0, 0, 0};
     REQUIRE(product_sizes == expected_product_sizes);
   }
 }

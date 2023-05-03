@@ -147,10 +147,10 @@ static void populate_table(bool is_boolean, uint64_t num_commitments, uint64_t c
 
   for (size_t c = 0; c < num_commitments; ++c) {
     auto& data_sequence = data_commitments[c];
-
     data_sequence.n = commitment_length;
     data_sequence.element_nbytes = element_nbytes;
     data_sequence.data = data_table.data() + c * commitment_length * element_nbytes;
+    data_sequence.is_signed = 0;
   }
 }
 

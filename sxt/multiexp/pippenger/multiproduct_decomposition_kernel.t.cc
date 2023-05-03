@@ -20,6 +20,7 @@ TEST_CASE("we can decompose the bits in a multi-exponentiation") {
   basdv::stream stream;
   memmg::managed_array<unsigned> block_counts{memr::get_pinned_resource()};
   memmg::managed_array<uint8_t> exponents_data{memr::get_managed_device_resource()};
+  memmg::managed_array<int32_t> signed_exponents_data{memr::get_managed_device_resource()};
 
   SECTION("we handle the case of no 1 bits") {
     exponents_data = {0};
@@ -32,6 +33,16 @@ TEST_CASE("we can decompose the bits in a multi-exponentiation") {
   SECTION("we handle an exponent with a single bit") {
     exponents_data = {1};
     auto exponents = mtxb::to_exponent_sequence(exponents_data);
+    auto fut = count_exponent_bits(block_counts, stream, exponents);
+    xens::get_scheduler().run();
+    basdv::synchronize_device();
+    REQUIRE(std::count(block_counts.begin(), block_counts.end(), 0) == block_counts.size() - 1);
+    REQUIRE(block_counts[0] == 1);
+  }
+
+  SECTION("we handle an signed exponent with a single bit") {
+    signed_exponents_data = {-1};
+    auto exponents = mtxb::to_exponent_sequence(signed_exponents_data);
     auto fut = count_exponent_bits(block_counts, stream, exponents);
     xens::get_scheduler().run();
     basdv::synchronize_device();

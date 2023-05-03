@@ -13,7 +13,7 @@ namespace sxt::mtxpi {
 //--------------------------------------------------------------------------------------------------
 // decompose_exponent_bits
 //--------------------------------------------------------------------------------------------------
-xena::future<> decompose_exponent_bits(basct::span<int> indexes, bast::raw_stream_t stream,
+xena::future<> decompose_exponent_bits(basct::span<unsigned> indexes, bast::raw_stream_t stream,
                                        basct::cspan<unsigned> offsets,
                                        const mtxb::exponent_sequence& exponents) noexcept;
 

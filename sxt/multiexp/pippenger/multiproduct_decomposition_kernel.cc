@@ -5,7 +5,11 @@
 
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/num/ceil_log2.h"
+#include "sxt/base/num/constexpr_switch.h"
 #include "sxt/base/num/divide_up.h"
+#include "sxt/base/num/power2_equality.h"
+#include "sxt/base/type/int.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/async/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
@@ -43,10 +47,42 @@ static __global__ void count_kernel(unsigned* counters, const uint8_t* data, uns
 }
 
 //--------------------------------------------------------------------------------------------------
+// signed_count_kernel
+//--------------------------------------------------------------------------------------------------
+template <size_t NumBytes>
+static __global__ void signed_count_kernel(unsigned* counters, const uint8_t* data, unsigned n) {
+  unsigned element_num_bytes = blockDim.x;
+  unsigned element_num_bits = element_num_bytes * 8u;
+  unsigned num_blocks = gridDim.x;
+  unsigned block_index = blockIdx.x;
+  unsigned byte_index = threadIdx.x;
+  unsigned bit_offset = threadIdx.y;
+  unsigned bit_index = 8u * byte_index + bit_offset;
+
+  auto k = basn::divide_up(n, num_blocks);
+  auto first = k * block_index;
+  assert(first < n);
+  auto last = umin(first + k, n);
+
+  data += first * element_num_bytes;
+
+  const auto mask = 1u << bit_offset;
+  unsigned count = 0;
+  for (unsigned i = first; i < last; ++i) {
+    // Note: we can assume the data pointer is properly aligned
+    auto element = abs(*reinterpret_cast<const bast::sized_int_t<NumBytes * 8u>*>(data));
+    auto byte = reinterpret_cast<uint8_t*>(&element)[byte_index];
+    count += static_cast<unsigned>((byte & mask) != 0);
+    data += element_num_bytes;
+  }
+  counters[block_index * element_num_bits + bit_index] = count;
+}
+
+//--------------------------------------------------------------------------------------------------
 // decomposition_kernel
 //--------------------------------------------------------------------------------------------------
-static __global__ void decomposition_kernel(int* out, const unsigned* offsets, const uint8_t* data,
-                                            unsigned n) {
+static __global__ void decomposition_kernel(unsigned* out, const unsigned* offsets,
+                                            const uint8_t* data, unsigned n) {
   unsigned element_num_bytes = blockDim.x;
   unsigned element_num_bits = element_num_bytes * 8u;
   unsigned num_blocks = gridDim.x;
@@ -69,7 +105,48 @@ static __global__ void decomposition_kernel(int* out, const unsigned* offsets, c
     auto byte = *data;
     auto is_one = static_cast<unsigned>((byte & mask) != 0);
     if (is_one == 1) {
-      out[count] = static_cast<int>(i);
+      out[count] = i;
+    }
+    count += is_one;
+    data += element_num_bytes;
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+// signed_decomposition_kernel
+//--------------------------------------------------------------------------------------------------
+template <size_t NumBytes>
+static __global__ void signed_decomposition_kernel(unsigned* out, const unsigned* offsets,
+                                                   const uint8_t* data, unsigned n) {
+  unsigned element_num_bytes = blockDim.x;
+  unsigned element_num_bits = element_num_bytes * 8u;
+  unsigned num_blocks = gridDim.x;
+  unsigned block_index = blockIdx.x;
+  unsigned byte_index = threadIdx.x;
+  unsigned bit_offset = threadIdx.y;
+  unsigned bit_index = 8u * byte_index + bit_offset;
+
+  auto k = basn::divide_up(n, num_blocks);
+  auto first = k * block_index;
+  assert(first < n);
+  auto last = umin(first + k, n);
+
+  data += first * element_num_bytes;
+  out = out + offsets[block_index * element_num_bits + bit_index];
+
+  const auto mask = 1u << bit_offset;
+  unsigned count = 0;
+  for (unsigned i = first; i < last; ++i) {
+    // Note: we can assume the data pointer is properly aligned
+    auto element = *reinterpret_cast<const bast::sized_int_t<NumBytes * 8u>*>(data);
+    auto abs_element = abs(element);
+    auto sign_bit = (1u << 31) * static_cast<unsigned>(element != abs_element);
+
+    auto byte = reinterpret_cast<uint8_t*>(&abs_element)[byte_index];
+
+    auto is_one = static_cast<unsigned>((byte & mask) != 0);
+    if (is_one == 1) {
+      out[count] = sign_bit | i;
     }
     count += is_one;
     data += element_num_bytes;
@@ -79,7 +156,7 @@ static __global__ void decomposition_kernel(int* out, const unsigned* offsets, c
 //--------------------------------------------------------------------------------------------------
 // decompose_exponent_bits
 //--------------------------------------------------------------------------------------------------
-xena::future<> decompose_exponent_bits(basct::span<int> indexes, bast::raw_stream_t stream,
+xena::future<> decompose_exponent_bits(basct::span<unsigned> indexes, bast::raw_stream_t stream,
                                        basct::cspan<unsigned> offsets,
                                        const mtxb::exponent_sequence& exponents) noexcept {
   unsigned element_num_bytes = exponents.element_nbytes;
@@ -100,8 +177,20 @@ xena::future<> decompose_exponent_bits(basct::span<int> indexes, bast::raw_strea
   basdv::async_copy_host_to_device(offsets_dev, offsets, stream);
 
   // launch kernel
-  decomposition_kernel<<<dim3(num_blocks, 1, 1), dim3(element_num_bytes, 8, 1), 0, stream>>>(
-      indexes.data(), offsets_dev.data(), exponents.data, static_cast<unsigned>(n));
+  if (exponents.is_signed == 0) {
+    decomposition_kernel<<<dim3(num_blocks, 1, 1), dim3(element_num_bytes, 8, 1), 0, stream>>>(
+        indexes.data(), offsets_dev.data(), exponents.data, static_cast<unsigned>(n));
+  } else {
+    SXT_DEBUG_ASSERT(basn::is_power2(element_num_bytes));
+    basn::constexpr_switch<4>(
+        basn::ceil_log2(element_num_bytes),
+        [&]<unsigned NumBytesLg2>(std::integral_constant<unsigned, NumBytesLg2>) noexcept {
+          static constexpr auto NumBytes = 1ull << NumBytesLg2;
+          signed_decomposition_kernel<NumBytes>
+              <<<dim3(num_blocks, 1, 1), dim3(element_num_bytes, 8, 1), 0, stream>>>(
+                  indexes.data(), offsets_dev.data(), exponents.data, static_cast<unsigned>(n));
+        });
+  }
 
   // set up future
   return xena::await_stream(stream);
@@ -132,8 +221,20 @@ xena::future<> count_exponent_bits(memmg::managed_array<unsigned>& block_counts,
   memmg::managed_array<unsigned> block_counts_dev{block_counts.size(), &resource};
 
   // launch kernel
-  count_kernel<<<dim3(num_blocks, 1, 1), dim3(element_num_bytes, 8, 1), 0, stream>>>(
-      block_counts_dev.data(), exponents.data, static_cast<unsigned>(n));
+  if (exponents.is_signed == 0) {
+    count_kernel<<<dim3(num_blocks, 1, 1), dim3(element_num_bytes, 8, 1), 0, stream>>>(
+        block_counts_dev.data(), exponents.data, static_cast<unsigned>(n));
+  } else {
+    SXT_DEBUG_ASSERT(basn::is_power2(element_num_bytes));
+    basn::constexpr_switch<4>(
+        basn::ceil_log2(element_num_bytes),
+        [&]<unsigned NumBytesLg2>(std::integral_constant<unsigned, NumBytesLg2>) noexcept {
+          static constexpr auto NumBytes = 1ull << NumBytesLg2;
+          signed_count_kernel<NumBytes>
+              <<<dim3(num_blocks, 1, 1), dim3(element_num_bytes, 8, 1), 0, stream>>>(
+                  block_counts_dev.data(), exponents.data, static_cast<unsigned>(n));
+        });
+  }
 
   // transfer counts back to host
   basdv::async_copy_device_to_host(block_counts, block_counts_dev, stream);

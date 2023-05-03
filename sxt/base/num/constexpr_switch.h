@@ -32,7 +32,12 @@ void constexpr_switch_impl(std::integer_sequence<unsigned, First, Rest...>, unsi
 // constexpr_switch
 //--------------------------------------------------------------------------------------------------
 template <unsigned I, unsigned J, class F> void constexpr_switch(unsigned k, F f) {
-  SXT_DEBUG_ASSERT(I <= k && k < J);
+  // Note: use if constexpr to work around spurious compiler warnings
+  if constexpr (I > 0) {
+    SXT_DEBUG_ASSERT(I <= k && k < J);
+  } else {
+    SXT_DEBUG_ASSERT(k < J);
+  }
   detail::constexpr_switch_impl<I>(std::make_integer_sequence<unsigned, J>{}, k, f);
 }
 

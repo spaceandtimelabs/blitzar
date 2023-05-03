@@ -19,10 +19,15 @@ exponent_sequence to_exponent_sequence(const Cont& cont) noexcept
 {
   static_assert(sizeof(T) <= 32, "element is too large");
   const T* data = cont.data();
+  int is_signed = 0;
+  if constexpr (std::is_signed_v<T>) {
+    is_signed = 1;
+  }
   return exponent_sequence{
       .element_nbytes = sizeof(T),
       .n = cont.size(),
       .data = reinterpret_cast<const uint8_t*>(data),
+      .is_signed = is_signed,
   };
 }
 } // namespace sxt::mtxb

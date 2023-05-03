@@ -16,7 +16,7 @@ TEST_CASE("we can compute multiproducts using the GPU") {
   std::iota(generators.begin(), generators.end(), 1);
 
   SECTION("we can compute a single multiproduct with a single term") {
-    memmg::managed_array<int> indexes(1, memr::get_managed_device_resource());
+    memmg::managed_array<unsigned> indexes(1, memr::get_managed_device_resource());
     indexes = {10};
     memmg::managed_array<block_computation_descriptor> block_descriptors{
         memr::get_managed_device_resource()};
@@ -39,7 +39,7 @@ TEST_CASE("we can compute multiproducts using the GPU") {
   }
 
   SECTION("we can compute multiple multiproducts with varying number of terms") {
-    memmg::managed_array<int> indexes(1, memr::get_managed_device_resource());
+    memmg::managed_array<unsigned> indexes(1, memr::get_managed_device_resource());
     indexes = {10, 13, 15, 19, 21};
     memmg::managed_array<block_computation_descriptor> block_descriptors{
         memr::get_managed_device_resource()};
@@ -72,7 +72,7 @@ TEST_CASE("we can compute multiproducts using the GPU") {
   }
 
   SECTION("we can compute a multiproduct with more than a single block") {
-    memmg::managed_array<int> indexes(1, memr::get_managed_device_resource());
+    memmg::managed_array<unsigned> indexes(1, memr::get_managed_device_resource());
     indexes = {1, 3, 5, 7, 14};
     memmg::managed_array<block_computation_descriptor> block_descriptors{
         memr::get_managed_device_resource()};

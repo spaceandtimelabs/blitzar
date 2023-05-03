@@ -117,7 +117,11 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/base/error:assert",
         "//sxt/base/num:divide_up",
+        "//sxt/base/num:constexpr_switch",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/base/num:power2_equality",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/type:int",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",

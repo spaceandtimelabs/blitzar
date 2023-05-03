@@ -17,7 +17,7 @@ TEST_CASE("we can compute multiproducts using the GPU") {
 
   size_t max_generators = 10'000;
   memmg::managed_array<uint64_t> generators{max_generators, memr::get_managed_device_resource()};
-  memmg::managed_array<int> indexes{memr::get_managed_device_resource()};
+  memmg::managed_array<unsigned> indexes{memr::get_managed_device_resource()};
   std::iota(generators.begin(), generators.end(), 1);
 
   SECTION("we can compute a single product with a single element") {
@@ -67,7 +67,7 @@ TEST_CASE("we can compute multiproducts using the GPU") {
 
   SECTION("we can compute products with many terms") {
     unsigned n = 1'000;
-    indexes = memmg::managed_array<int>(n);
+    indexes = memmg::managed_array<unsigned>(n);
     std::iota(indexes.begin(), indexes.end(), 0);
     memmg::managed_array<unsigned> product_sizes = {n};
     memmg::managed_array<uint64_t> res(product_sizes.size());
