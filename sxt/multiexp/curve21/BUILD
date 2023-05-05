@@ -34,7 +34,10 @@ sxt_cc_component(
 sxt_cc_component(
     name = "multiproduct",
     impl_deps = [
+        "//sxt/base/macro:cuda_callable",
+        "//sxt/algorithm/base:gather_mapper",
         "//sxt/curve21/operation:accumulator",
+        "//sxt/curve21/operation:neg",
         "//sxt/execution/async:future",
         "//sxt/multiexp/multiproduct_gpu:multiproduct",
     ],

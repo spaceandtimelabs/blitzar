@@ -2,6 +2,7 @@
 
 #include <numeric>
 
+#include "sxt/algorithm/base/gather_mapper.h"
 #include "sxt/algorithm/reduction/test_reducer.h"
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
@@ -14,6 +15,8 @@ using namespace sxt::mtxmpg;
 TEST_CASE("we can compute multiproducts using the GPU") {
   memmg::managed_array<uint64_t> generators(100, memr::get_managed_device_resource());
   std::iota(generators.begin(), generators.end(), 1);
+
+  using Mapper = algb::gather_mapper<uint64_t>;
 
   SECTION("we can compute a single multiproduct with a single term") {
     memmg::managed_array<unsigned> indexes(1, memr::get_managed_device_resource());
@@ -31,7 +34,7 @@ TEST_CASE("we can compute multiproducts using the GPU") {
     };
     memmg::managed_array<uint64_t> res(block_descriptors.size(),
                                        memr::get_managed_device_resource());
-    multiproduct_kernel<algr::test_add_reducer><<<1, 1, sizeof(uint64_t) * 1>>>(
+    multiproduct_kernel<algr::test_add_reducer, Mapper><<<1, 1, sizeof(uint64_t) * 1>>>(
         res.data(), generators.data(), indexes.data(), block_descriptors.data());
     basdv::synchronize_device();
     memmg::managed_array<uint64_t> expected = {11};
@@ -61,7 +64,7 @@ TEST_CASE("we can compute multiproducts using the GPU") {
     };
     memmg::managed_array<uint64_t> res(block_descriptors.size(),
                                        memr::get_managed_device_resource());
-    multiproduct_kernel<algr::test_add_reducer><<<2, 2, sizeof(uint64_t) * 2>>>(
+    multiproduct_kernel<algr::test_add_reducer, Mapper><<<2, 2, sizeof(uint64_t) * 2>>>(
         res.data(), generators.data(), indexes.data(), block_descriptors.data());
     basdv::synchronize_device();
     memmg::managed_array<uint64_t> expected = {
@@ -94,7 +97,7 @@ TEST_CASE("we can compute multiproducts using the GPU") {
     };
     memmg::managed_array<uint64_t> res(block_descriptors.size(),
                                        memr::get_managed_device_resource());
-    multiproduct_kernel<algr::test_add_reducer><<<2, 1, sizeof(uint64_t) * 1>>>(
+    multiproduct_kernel<algr::test_add_reducer, Mapper><<<2, 1, sizeof(uint64_t) * 1>>>(
         res.data(), generators.data(), indexes.data(), block_descriptors.data());
     basdv::synchronize_device();
     memmg::managed_array<uint64_t> expected = {

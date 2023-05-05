@@ -9,13 +9,27 @@ using namespace sxt::c21o;
 using c21t::operator""_c21;
 
 TEST_CASE("we can negate curve-21 elements") {
-  auto p = 0x123_c21;
-  c21t::element_p3 np;
-  neg(np, p);
-  c21t::element_p3 z;
-  add(z, p, np);
-  auto q = 0x456_c21;
-  c21t::element_p3 qp;
-  add(qp, q, z);
-  REQUIRE(q == qp);
+  SECTION("properties of negatives are satisfied") {
+    auto p = 0x123_c21;
+    c21t::element_p3 np;
+    neg(np, p);
+    c21t::element_p3 z;
+    add(z, p, np);
+    auto q = 0x456_c21;
+    c21t::element_p3 qp;
+    add(qp, q, z);
+    REQUIRE(q == qp);
+  }
+
+  SECTION("we can conditionally negate elements") {
+    auto p = 0x123_c21;
+    c21t::element_p3 np;
+    neg(np, p);
+    c21t::element_p3 z = p;
+    cneg(z, 1);
+    REQUIRE(z == np);
+    z = p;
+    cneg(z, 0);
+    REQUIRE(z == p);
+  }
 }

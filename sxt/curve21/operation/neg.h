@@ -13,4 +13,11 @@ namespace sxt::c21o {
 /* r = -p */
 CUDA_CALLABLE
 void neg(c21t::element_p3& r, const c21t::element_p3& p) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// cneg
+//--------------------------------------------------------------------------------------------------
+/* r = -r if b = 1 else r */
+CUDA_CALLABLE
+void cneg(c21t::element_p3& r, unsigned int b) noexcept;
 } // namespace sxt::c21o

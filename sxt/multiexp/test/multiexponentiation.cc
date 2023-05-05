@@ -24,7 +24,8 @@ namespace sxt::mtxtst {
 //--------------------------------------------------------------------------------------------------
 // exercise_multiexponentiation_fn
 //--------------------------------------------------------------------------------------------------
-void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f) noexcept {
+void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f,
+                                     bool check_sign) noexcept {
   // bespoke test cases
   SECTION("we handle the empty case") {
     std::vector<mtxb::exponent_sequence> sequences;
@@ -67,6 +68,23 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     };
     auto res = f(generators, sequences);
     REQUIRE(res == generators);
+  }
+
+  if (check_sign) {
+    SECTION("we handle an exponent of negative one") {
+      std::vector<int32_t> exponents = {-1};
+      std::vector<mtxb::exponent_sequence> sequences = {
+          mtxb::to_exponent_sequence(exponents),
+      };
+      memmg::managed_array<c21t::element_p3> generators = {
+          0x123_rs,
+      };
+      auto res = f(generators, sequences);
+      memmg::managed_array<c21t::element_p3> expected = {
+          -generators[0],
+      };
+      REQUIRE(res == expected);
+    }
   }
 
   SECTION("we handle an exponent of two") {
@@ -128,6 +146,26 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
         3 * generators[0] + 2 * generators[1],
     };
     REQUIRE(res == expected);
+  }
+
+  if (check_sign) {
+    SECTION("we handle sequences with a mix of positive and negative elements") {
+      std::vector<int> exponents = {3, -2, 4, -1};
+      std::vector<mtxb::exponent_sequence> sequences = {
+          mtxb::to_exponent_sequence(exponents),
+      };
+      memmg::managed_array<c21t::element_p3> generators = {
+          0x123_rs,
+          0x456_rs,
+          0x789_rs,
+          0x101_rs,
+      };
+      auto res = f(generators, sequences);
+      memmg::managed_array<c21t::element_p3> expected = {
+          3 * generators[0] - 2 * generators[1] + 4 * generators[2] - generators[3],
+      };
+      REQUIRE(res == expected);
+    }
   }
 
   SECTION("we handle multiple sequences of length zero") {

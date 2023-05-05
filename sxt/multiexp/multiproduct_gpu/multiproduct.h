@@ -1,7 +1,9 @@
 #pragma once
 
+#include <concepts>
 #include <memory>
 
+#include "sxt/algorithm/base/mapper.h"
 #include "sxt/algorithm/base/reducer.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/device/event.h"
@@ -25,7 +27,9 @@ namespace sxt::mtxmpg {
 //--------------------------------------------------------------------------------------------------
 // compute_multiproduct
 //--------------------------------------------------------------------------------------------------
-template <algb::reducer Reducer>
+template <algb::reducer Reducer, algb::mapper Mapper>
+  requires std::same_as<typename Reducer::value_type, typename Mapper::value_type> &&
+           std::constructible_from<Mapper, const typename Reducer::value_type*, const unsigned*>
 xena::future<> compute_multiproduct(basct::span<typename Reducer::value_type> products,
                                     bast::raw_stream_t stream,
                                     basct::cspan<typename Reducer::value_type> generators,
@@ -62,7 +66,7 @@ xena::future<> compute_multiproduct(basct::span<typename Reducer::value_type> pr
   memmg::managed_array<T> partial_res_gpu{computation_descriptor.num_blocks, &resource};
   auto max_block_size = static_cast<unsigned>(computation_descriptor.max_block_size);
   auto shared_memory = sizeof(T) * max_block_size * 2;
-  multiproduct_kernel<Reducer>
+  multiproduct_kernel<Reducer, Mapper>
       <<<computation_descriptor.num_blocks, max_block_size, shared_memory, stream>>>(
           partial_res_gpu.data(), generators.data(), indexes.data(), block_descriptors_gpu.data());
 

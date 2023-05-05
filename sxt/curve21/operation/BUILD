@@ -64,6 +64,7 @@ sxt_cc_component(
         ":add",
         "//sxt/curve21/type:element_p3",
         "//sxt/field51/operation:neg",
+        "//sxt/field51/operation:cmov",
     ],
     is_cuda = True,
     test_deps = [

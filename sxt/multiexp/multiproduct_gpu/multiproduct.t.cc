@@ -2,6 +2,7 @@
 
 #include <numeric>
 
+#include "sxt/algorithm/base/gather_mapper.h"
 #include "sxt/algorithm/reduction/test_reducer.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/test/unit_test.h"
@@ -15,6 +16,8 @@ using namespace sxt::mtxmpg;
 TEST_CASE("we can compute multiproducts using the GPU") {
   basdv::stream stream;
 
+  using Mapper = algb::gather_mapper<uint64_t>;
+
   size_t max_generators = 10'000;
   memmg::managed_array<uint64_t> generators{max_generators, memr::get_managed_device_resource()};
   memmg::managed_array<unsigned> indexes{memr::get_managed_device_resource()};
@@ -24,8 +27,8 @@ TEST_CASE("we can compute multiproducts using the GPU") {
     indexes = {0};
     memmg::managed_array<unsigned> product_sizes = {1};
     memmg::managed_array<uint64_t> res(product_sizes.size());
-    auto fut = compute_multiproduct<algr::test_add_reducer>(res, stream, generators, indexes,
-                                                            product_sizes);
+    auto fut = compute_multiproduct<algr::test_add_reducer, Mapper>(res, stream, generators,
+                                                                    indexes, product_sizes);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
 
@@ -37,8 +40,8 @@ TEST_CASE("we can compute multiproducts using the GPU") {
     indexes = {0, 2};
     memmg::managed_array<unsigned> product_sizes = {2};
     memmg::managed_array<uint64_t> res(product_sizes.size());
-    auto fut = compute_multiproduct<algr::test_add_reducer>(res, stream, generators, indexes,
-                                                            product_sizes);
+    auto fut = compute_multiproduct<algr::test_add_reducer, Mapper>(res, stream, generators,
+                                                                    indexes, product_sizes);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
 
@@ -52,8 +55,8 @@ TEST_CASE("we can compute multiproducts using the GPU") {
     indexes = {1, 0, 2, 0, 1, 2};
     memmg::managed_array<unsigned> product_sizes = {1, 2, 3};
     memmg::managed_array<uint64_t> res(product_sizes.size());
-    auto fut = compute_multiproduct<algr::test_add_reducer>(res, stream, generators, indexes,
-                                                            product_sizes);
+    auto fut = compute_multiproduct<algr::test_add_reducer, Mapper>(res, stream, generators,
+                                                                    indexes, product_sizes);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
 
@@ -71,8 +74,8 @@ TEST_CASE("we can compute multiproducts using the GPU") {
     std::iota(indexes.begin(), indexes.end(), 0);
     memmg::managed_array<unsigned> product_sizes = {n};
     memmg::managed_array<uint64_t> res(product_sizes.size());
-    auto fut = compute_multiproduct<algr::test_add_reducer>(res, stream, generators, indexes,
-                                                            product_sizes);
+    auto fut = compute_multiproduct<algr::test_add_reducer, Mapper>(res, stream, generators,
+                                                                    indexes, product_sizes);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
 

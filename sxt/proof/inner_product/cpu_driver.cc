@@ -50,6 +50,7 @@ static void multiexponentiate(c21t::element_p3& res, basct::cspan<c21t::element_
       .element_nbytes = 32,
       .n = n,
       .data = reinterpret_cast<const uint8_t*>(x_vector.data()),
+      .is_signed = 0,
   };
   auto values = mtxc21::compute_multiexponentiation(
       g_vector, basct::cspan<mtxb::exponent_sequence>{&exponents, 1});
@@ -64,11 +65,13 @@ static void multiexponentiate(c21t::element_p3 c_commits[2], const c21t::element
           .element_nbytes = 32,
           .n = 1,
           .data = reinterpret_cast<const uint8_t*>(c_values),
+          .is_signed = 0,
       },
       {
           .element_nbytes = 32,
           .n = 1,
           .data = reinterpret_cast<const uint8_t*>(c_values + 1),
+          .is_signed = 0,
       },
   };
   auto values = mtxc21::compute_multiexponentiation({&q_value, 1}, exponents);

@@ -118,7 +118,7 @@ TEST_CASE("we can compute the decomposition that turns a multi-exponentiation pr
     REQUIRE(fut.ready());
     basdv::synchronize_device();
 
-    int sign_bit = 1u << 31;
+    auto sign_bit = 1u << 31;
     memmg::managed_array<unsigned> expected_indexes = {sign_bit, 2, 2};
     REQUIRE(indexes == expected_indexes);
 

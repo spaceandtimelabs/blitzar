@@ -23,5 +23,6 @@ using multiexponentiation_fn = basf::function_ref<memmg::managed_array<c21t::ele
 //--------------------------------------------------------------------------------------------------
 // exercise_multiexponentiation_fn
 //--------------------------------------------------------------------------------------------------
-void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f) noexcept;
+void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f,
+                                     bool check_sign = false) noexcept;
 } // namespace sxt::mtxtst

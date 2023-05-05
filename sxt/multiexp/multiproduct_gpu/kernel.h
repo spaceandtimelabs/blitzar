@@ -1,8 +1,9 @@
 #pragma once
 
 #include <cassert>
+#include <concepts>
 
-#include "sxt/algorithm/base/gather_mapper.h"
+#include "sxt/algorithm/base/mapper.h"
 #include "sxt/algorithm/base/reducer.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
 #include "sxt/execution/kernel/launch.h"
@@ -12,7 +13,9 @@ namespace sxt::mtxmpg {
 //--------------------------------------------------------------------------------------------------
 // multiproduct_kernel
 //--------------------------------------------------------------------------------------------------
-template <algb::reducer Reducer>
+template <algb::reducer Reducer, algb::mapper Mapper>
+  requires std::same_as<typename Reducer::value_type, typename Mapper::value_type> &&
+           std::constructible_from<Mapper, const typename Reducer::value_type*, const unsigned*>
 __global__ void multiproduct_kernel(typename Reducer::value_type* out,
                                     const typename Reducer::value_type* generators,
                                     const unsigned* indexes,
@@ -22,7 +25,7 @@ __global__ void multiproduct_kernel(typename Reducer::value_type* out,
   auto thread_index = threadIdx.x;
   auto block_index = blockIdx.x;
   auto descriptor = block_descriptors[block_index];
-  algb::gather_mapper<T> mapper{generators, indexes + descriptor.index_first};
+  Mapper mapper{generators, indexes + descriptor.index_first};
   // Note: It's expected that most products will be of similar length and
   // hence share a common block size, but we allow for the same kernel to
   // compute product reductions with varying block sizes.

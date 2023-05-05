@@ -35,6 +35,7 @@ static xena::future<> async_compute_multiexponentiation_impl(
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   res = c21cn::zero_p3_v;
+  bool is_signed = static_cast<bool>(exponents.is_signed);
 
   // decompose exponents
   memmg::managed_array<unsigned> indexes{&resource};
@@ -63,7 +64,8 @@ static xena::future<> async_compute_multiexponentiation_impl(
   if (generators_event) {
     basdv::async_wait_on_event(stream, *generators_event);
   }
-  co_await async_compute_multiproduct(products, stream, generators, indexes, product_sizes);
+  co_await async_compute_multiproduct(products, stream, generators, indexes, product_sizes,
+                                      is_signed);
   indexes.reset();
 
   // combine results

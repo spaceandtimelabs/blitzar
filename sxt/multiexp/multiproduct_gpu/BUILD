@@ -56,6 +56,7 @@ sxt_cc_component(
     name = "kernel",
     is_cuda = True,
     test_deps = [
+        "//sxt/algorithm/base:gather_mapper",
         "//sxt/algorithm/reduction:test_reducer",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
@@ -64,7 +65,6 @@ sxt_cc_component(
     ],
     deps = [
         ":block_computation_descriptor",
-        "//sxt/algorithm/base:gather_mapper",
         "//sxt/algorithm/base:reducer",
         "//sxt/algorithm/reduction:thread_reduction",
         "//sxt/execution/kernel:launch",
@@ -75,6 +75,7 @@ sxt_cc_component(
     name = "multiproduct",
     is_cuda = True,
     test_deps = [
+        "//sxt/algorithm/base:gather_mapper",
         "//sxt/algorithm/reduction:test_reducer",
         "//sxt/memory/resource:managed_device_resource",
         "//sxt/base/test:unit_test",
