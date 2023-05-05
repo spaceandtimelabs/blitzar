@@ -15,29 +15,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "bit_position_decode_table",
-    with_test = False,
-)
-
-sxt_cc_component(
-    name = "bit_position",
-    copts = [
-        "-march=native",
-    ],
-    impl_deps = [
-        ":span_op",
-        ":bit_position_decode_table",
-        "//sxt/base/error:assert",
-    ],
-    test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
     name = "count",
     test_deps = [
         "//sxt/base/test:unit_test",
