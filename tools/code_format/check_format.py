@@ -24,6 +24,7 @@ BUILDIFIER_PATH = paths.get_buildifier()
 CLANG_FORMAT_PATH = os.getenv("CLANG_FORMAT", "clang-format-17")
 BUILD_FIXER_PATH = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "build_fixer.py")
 HEADER_ORDER_PATH = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "header_order.py")
+COPYRIGHT_FIXER_PATH = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "copyright_fixer.py")
 
 SUBDIR_SET = set(common.include_dir_order())
 
@@ -221,20 +222,29 @@ class FormatChecker:
         error_messages = []
 
         error_messages += self.fix_header_order(file_path)
-        error_messages += self.clang_format(file_path)
+        error_messages += self.fix_header_copyright(file_path)
+        error_messages += self.fix_clang_format(file_path)
 
         return error_messages
 
     def check_source_path(self, file_path):
         error_messages = self.check_file_contents(file_path, self.check_source_line)
 
+        # check header order
         command = (
             "%s --include_dir_order %s --path %s | diff %s -" %
             (HEADER_ORDER_PATH, self.include_dir_order, file_path, file_path))
-
         error_messages += self.execute_check_command(
             command, "header_order.py check failed", file_path)
 
+        # check header copyright
+        command = (
+            "%s --path %s | diff %s -" %
+            (COPYRIGHT_FIXER_PATH, file_path, file_path))
+        error_messages += self.execute_check_command(
+            command, "copyright_fixer.py check failed", file_path)
+
+        # check clang format
         command = ("%s %s | diff %s -" % (CLANG_FORMAT_PATH, file_path, file_path))
         error_messages += self.execute_check_command(command, "clang-format check failed", file_path)
 
@@ -287,7 +297,16 @@ class FormatChecker:
 
         return []
 
-    def clang_format(self, file_path):
+    def fix_header_copyright(self, file_path):
+        command = "%s --rewrite --path %s" % (
+            COPYRIGHT_FIXER_PATH, file_path)
+
+        if self.execute_fix_command(command, file_path) != 0:
+            return ["copyright_fixer.py rewrite error: %s" % (file_path)]
+
+        return []
+
+    def fix_clang_format(self, file_path):
         command = "%s -i %s" % (CLANG_FORMAT_PATH, file_path)
 
         if self.execute_fix_command(command, file_path) != 0:
