@@ -53,11 +53,12 @@ xena::future<memmg::managed_array<void>> multiexponentiation_cpu_driver::compute
 xena::future<memmg::managed_array<void>>
 multiexponentiation_cpu_driver::combine_multiproduct_outputs(
     xena::future<memmg::managed_array<void>>&& multiproduct,
-    basct::blob_array&& output_digit_or_all) const noexcept {
+    basct::blob_array&& output_digit_or_all,
+    basct::cspan<mtxb::exponent_sequence> exponents) const noexcept {
   SXT_DEBUG_ASSERT(multiproduct.ready());
   auto products = std::move(multiproduct.value().as_array<c21t::element_p3>());
-  memmg::managed_array<c21t::element_p3> res(output_digit_or_all.size());
-  combine_multiproducts(res, output_digit_or_all, products);
+  memmg::managed_array<c21t::element_p3> res(exponents.size());
+  combine_multiproducts(res, output_digit_or_all, products, exponents);
   return xena::make_ready_future<memmg::managed_array<void>>(std::move(res));
 }
 } // namespace sxt::mtxc21

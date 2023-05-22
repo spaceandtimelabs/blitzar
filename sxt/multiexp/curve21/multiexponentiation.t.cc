@@ -45,5 +45,5 @@ TEST_CASE("we can compute async multiexponentiations") {
     return memmg::managed_array<c21t::element_p3>{std::move(fut.value())};
   };
   std::mt19937 rng{893345};
-  mtxtst::exercise_multiexponentiation_fn(rng, f, true);
+  mtxtst::exercise_multiexponentiation_fn(rng, f);
 }

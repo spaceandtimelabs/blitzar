@@ -55,3 +55,13 @@ sxt_cc_component(
         "//sxt/base/iterator:iterator_facade",
     ],
 )
+
+sxt_cc_component(
+    name = "stack_array",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":span",
+    ],
+)

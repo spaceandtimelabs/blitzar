@@ -23,6 +23,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/base/generator_utility.h"
 #include "sxt/multiexp/index/index_table.h"
 
@@ -63,20 +64,30 @@ test_driver::compute_multiproduct(mtxi::index_table&& multiproduct_table,
 //--------------------------------------------------------------------------------------------------
 // combine_multiproduct_outputs
 //--------------------------------------------------------------------------------------------------
-xena::future<memmg::managed_array<void>>
-test_driver::combine_multiproduct_outputs(xena::future<memmg::managed_array<void>>&& multiproduct,
-                                          basct::blob_array&& output_digit_or_all) const noexcept {
+xena::future<memmg::managed_array<void>> test_driver::combine_multiproduct_outputs(
+    xena::future<memmg::managed_array<void>>&& multiproduct,
+    basct::blob_array&& output_digit_or_all,
+    basct::cspan<mtxb::exponent_sequence> exponents) const noexcept {
   auto& multiproduct_array = multiproduct.value();
   basct::cspan<uint64_t> inputs{static_cast<uint64_t*>(multiproduct_array.data()),
                                 multiproduct_array.size()};
-  memmg::managed_array<uint64_t> outputs(output_digit_or_all.size());
+  memmg::managed_array<uint64_t> outputs(exponents.size());
   size_t input_index = 0;
-  for (size_t output_index = 0; output_index < output_digit_or_all.size(); ++output_index) {
-    auto& output = outputs[output_index];
+  size_t multiproduct_index = 0;
+  for (size_t sequence_index = 0; sequence_index < exponents.size(); ++sequence_index) {
+    auto& sequence = exponents[sequence_index];
+    auto& output = outputs[sequence_index];
     output = 0;
-    basbt::for_each_bit(output_digit_or_all[output_index], [&](size_t pos) noexcept {
+    basbt::for_each_bit(output_digit_or_all[multiproduct_index++], [&](size_t pos) noexcept {
       SXT_DEBUG_ASSERT(input_index < inputs.size());
       output += (1ull << pos) * inputs[input_index++];
+    });
+    if (!sequence.is_signed) {
+      continue;
+    }
+    basbt::for_each_bit(output_digit_or_all[multiproduct_index++], [&](size_t pos) noexcept {
+      SXT_DEBUG_ASSERT(input_index < inputs.size());
+      output -= (1ull << pos) * inputs[input_index++];
     });
   }
   return xena::make_ready_future(std::move(static_cast<memmg::managed_array<void>&>(outputs)));

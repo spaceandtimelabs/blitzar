@@ -40,8 +40,7 @@ namespace sxt::mtxtst {
 //--------------------------------------------------------------------------------------------------
 // exercise_multiexponentiation_fn
 //--------------------------------------------------------------------------------------------------
-void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f,
-                                     bool check_sign) noexcept {
+void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f) noexcept {
   // bespoke test cases
   SECTION("we handle the empty case") {
     std::vector<mtxb::exponent_sequence> sequences;
@@ -86,21 +85,19 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     REQUIRE(res == generators);
   }
 
-  if (check_sign) {
-    SECTION("we handle an exponent of negative one") {
-      std::vector<int32_t> exponents = {-1};
-      std::vector<mtxb::exponent_sequence> sequences = {
-          mtxb::to_exponent_sequence(exponents),
-      };
-      memmg::managed_array<c21t::element_p3> generators = {
-          0x123_rs,
-      };
-      auto res = f(generators, sequences);
-      memmg::managed_array<c21t::element_p3> expected = {
-          -generators[0],
-      };
-      REQUIRE(res == expected);
-    }
+  SECTION("we handle an exponent of negative one") {
+    std::vector<int32_t> exponents = {-1};
+    std::vector<mtxb::exponent_sequence> sequences = {
+        mtxb::to_exponent_sequence(exponents),
+    };
+    memmg::managed_array<c21t::element_p3> generators = {
+        0x123_rs,
+    };
+    auto res = f(generators, sequences);
+    memmg::managed_array<c21t::element_p3> expected = {
+        -generators[0],
+    };
+    REQUIRE(res == expected);
   }
 
   SECTION("we handle an exponent of two") {
@@ -164,24 +161,22 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     REQUIRE(res == expected);
   }
 
-  if (check_sign) {
-    SECTION("we handle sequences with a mix of positive and negative elements") {
-      std::vector<int> exponents = {3, -2, 4, -1};
-      std::vector<mtxb::exponent_sequence> sequences = {
-          mtxb::to_exponent_sequence(exponents),
-      };
-      memmg::managed_array<c21t::element_p3> generators = {
-          0x123_rs,
-          0x456_rs,
-          0x789_rs,
-          0x101_rs,
-      };
-      auto res = f(generators, sequences);
-      memmg::managed_array<c21t::element_p3> expected = {
-          3 * generators[0] - 2 * generators[1] + 4 * generators[2] - generators[3],
-      };
-      REQUIRE(res == expected);
-    }
+  SECTION("we handle sequences with a mix of positive and negative elements") {
+    std::vector<int> exponents = {3, -2, 4, -1};
+    std::vector<mtxb::exponent_sequence> sequences = {
+        mtxb::to_exponent_sequence(exponents),
+    };
+    memmg::managed_array<c21t::element_p3> generators = {
+        0x123_rs,
+        0x456_rs,
+        0x789_rs,
+        0x101_rs,
+    };
+    auto res = f(generators, sequences);
+    memmg::managed_array<c21t::element_p3> expected = {
+        3 * generators[0] - 2 * generators[1] + 4 * generators[2] - generators[3],
+    };
+    REQUIRE(res == expected);
   }
 
   SECTION("we handle multiple sequences of length zero") {
@@ -361,6 +356,54 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     };
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
+      auto res = f(generators, sequences);
+      memmg::managed_array<c21t::element_p3> expected(sequences.size());
+      mtxtst::mul_sum_curve21_elements(expected, generators, sequences);
+      REQUIRE(res == expected);
+    }
+  }
+
+  SECTION("we handle multiple products of random sequences of varying signs") {
+    mtxrn::random_multiexponentiation_descriptor descriptor{
+        .min_num_sequences = 1,
+        .max_num_sequences = 10,
+        .min_sequence_length = 1,
+        .max_sequence_length = 100,
+        .min_exponent_num_bytes = 1,
+        .max_exponent_num_bytes = 1,
+    };
+    size_t index = 0;
+    for (int i = 0; i < 10; ++i) {
+      mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
+      for (auto& seq : sequences) {
+        seq.is_signed = index++ % 2;
+      }
+      auto res = f(generators, sequences);
+      memmg::managed_array<c21t::element_p3> expected(sequences.size());
+      mtxtst::mul_sum_curve21_elements(expected, generators, sequences);
+      REQUIRE(res == expected);
+    }
+  }
+
+  SECTION(
+      "we handle multiple products of random sequences of varying signs and varying num_bytes") {
+    mtxrn::random_multiexponentiation_descriptor descriptor{
+        .min_num_sequences = 1,
+        .max_num_sequences = 10,
+        .min_sequence_length = 1,
+        .max_sequence_length = 100,
+        .min_exponent_num_bytes = 1,
+        .max_exponent_num_bytes = 1,
+    };
+    size_t index = 0;
+    for (int i = 0; i < 10; ++i) {
+      auto num_bytes = 1ull << (i % 4);
+      descriptor.min_exponent_num_bytes = num_bytes;
+      descriptor.max_exponent_num_bytes = num_bytes;
+      mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
+      for (auto& seq : sequences) {
+        seq.is_signed = index++ % 2;
+      }
       auto res = f(generators, sequences);
       memmg::managed_array<c21t::element_p3> expected(sequences.size());
       mtxtst::mul_sum_curve21_elements(expected, generators, sequences);

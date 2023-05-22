@@ -166,8 +166,12 @@ sxt_cc_component(
         "//sxt/base/bit:span_op",
         "//sxt/base/error:assert",
         "//sxt/base/container:blob_array",
+        "//sxt/base/container:stack_array",
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/constant:zero",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:neg",
+        "//sxt/multiexp/base:exponent_sequence",
     ],
     with_test = False,
     deps = [

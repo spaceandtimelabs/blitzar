@@ -25,6 +25,7 @@
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/multiexp/base/exponent_sequence_utility.h"
 #include "sxt/multiexp/pippenger/test_driver.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"
 #include "sxt/multiexp/random/random_multiexponentiation_generation.h"
@@ -55,10 +56,18 @@ TEST_CASE("we can compute select multiexponentiations") {
   SECTION("we handle the 1 multiplier case") {
     memmg::managed_array<uint64_t> generators = {123};
     std::vector<uint8_t> exponents = {1};
-    std::vector<mtxb::exponent_sequence> sequences = {
-        {.element_nbytes = 1, .n = 1, .data = exponents.data()}};
+    std::vector<mtxb::exponent_sequence> sequences = {mtxb::to_exponent_sequence(exponents)};
     auto res = compute_multiexponentiation(drv, generators, sequences);
     memmg::managed_array<uint64_t> expected = {123};
+    REQUIRE(res.value().as_array<uint64_t>() == expected);
+  }
+
+  SECTION("we handle the -1 multiplier case") {
+    memmg::managed_array<uint64_t> generators = {123};
+    std::vector<int8_t> exponents = {-1};
+    std::vector<mtxb::exponent_sequence> sequences = {mtxb::to_exponent_sequence(exponents)};
+    auto res = compute_multiexponentiation(drv, generators, sequences);
+    memmg::managed_array<uint64_t> expected = {static_cast<uint64_t>(-123)};
     REQUIRE(res.value().as_array<uint64_t>() == expected);
   }
 
@@ -120,6 +129,22 @@ TEST_CASE("we can compute select multiexponentiations") {
     REQUIRE(res.value().as_array<uint64_t>() == expected);
   }
 
+  SECTION("we handle a mix of signed and unsigned outputs") {
+    memmg::managed_array<uint64_t> generators = {123};
+    std::vector<uint8_t> exponents1 = {2};
+    std::vector<int8_t> exponents2 = {-3};
+    std::vector<mtxb::exponent_sequence> sequences = {
+        mtxb::to_exponent_sequence(exponents1),
+        mtxb::to_exponent_sequence(exponents2),
+    };
+    auto res = compute_multiexponentiation(drv, generators, sequences);
+    memmg::managed_array<uint64_t> expected = {
+        2 * 123,
+        static_cast<uint64_t>(-3 * 123),
+    };
+    REQUIRE(res.value().as_array<uint64_t>() == expected);
+  }
+
   SECTION("we handle multiple outputs and multiple sequences") {
     memmg::managed_array<uint64_t> generators = {123, 321};
     std::vector<uint8_t> exponents1 = {2, 10};
@@ -132,6 +157,22 @@ TEST_CASE("we can compute select multiexponentiations") {
     memmg::managed_array<uint64_t> expected = {
         2 * 123 + 10 * 321,
         3 * 123 + 20 * 321,
+    };
+    REQUIRE(res.value().as_array<uint64_t>() == expected);
+  }
+
+  SECTION("we handle multiple outputs and multiple sequences of different signs") {
+    memmg::managed_array<uint64_t> generators = {123, 321};
+    std::vector<int8_t> exponents1 = {2, -10};
+    std::vector<int8_t> exponents2 = {-3, 20};
+    std::vector<mtxb::exponent_sequence> sequences = {
+        mtxb::to_exponent_sequence(exponents1),
+        mtxb::to_exponent_sequence(exponents2),
+    };
+    auto res = compute_multiexponentiation(drv, generators, sequences);
+    memmg::managed_array<uint64_t> expected = {
+        static_cast<uint64_t>(2 * 123 - 10 * 321),
+        static_cast<uint64_t>(-3 * 123 + 20 * 321),
     };
     REQUIRE(res.value().as_array<uint64_t>() == expected);
   }

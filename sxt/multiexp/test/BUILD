@@ -17,10 +17,15 @@ sxt_cc_component(
 sxt_cc_component(
     name = "curve21_arithmetic",
     impl_deps = [
+        "//sxt/base/container:stack_array",
+        "//sxt/base/num:constexpr_switch",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/base/type:int",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:neg",
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/curve21/property:curve",
     ],

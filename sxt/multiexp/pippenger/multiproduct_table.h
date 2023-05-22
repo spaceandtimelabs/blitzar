@@ -35,8 +35,8 @@ namespace sxt::mtxpi {
 //--------------------------------------------------------------------------------------------------
 // make_digit_index_array
 //--------------------------------------------------------------------------------------------------
-void make_digit_index_array(basct::span<size_t> array, size_t first,
-                            basct::cspan<uint8_t> or_all) noexcept;
+size_t make_digit_index_array(basct::span<size_t> array, size_t first,
+                              basct::cspan<uint8_t> or_all) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // make_multiproduct_table

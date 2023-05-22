@@ -86,6 +86,7 @@ compute_multiexponentiation(const driver& drv, basct::span_cvoid generators,
                             basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   basct::blob_array output_digit_or_all;
   auto multiproduct = compute_multiproduct(output_digit_or_all, drv, generators, exponents);
-  return drv.combine_multiproduct_outputs(std::move(multiproduct), std::move(output_digit_or_all));
+  return drv.combine_multiproduct_outputs(std::move(multiproduct), std::move(output_digit_or_all),
+                                          exponents);
 }
 } // namespace sxt::mtxpi

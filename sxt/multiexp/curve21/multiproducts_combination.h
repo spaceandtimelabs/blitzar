@@ -25,6 +25,10 @@ namespace sxt::c21t {
 struct element_p3;
 }
 
+namespace sxt::mtxb {
+struct exponent_sequence;
+}
+
 namespace sxt::mtxc21 {
 //--------------------------------------------------------------------------------------------------
 // combine_multiproducts
@@ -32,4 +36,9 @@ namespace sxt::mtxc21 {
 void combine_multiproducts(basct::span<c21t::element_p3> outputs,
                            const basct::blob_array& output_digit_or_all,
                            basct::cspan<c21t::element_p3> products) noexcept;
+
+void combine_multiproducts(basct::span<c21t::element_p3> outputs,
+                           basct::blob_array& output_digit_or_all,
+                           basct::span<c21t::element_p3> products,
+                           basct::cspan<mtxb::exponent_sequence> exponents) noexcept;
 } // namespace sxt::mtxc21

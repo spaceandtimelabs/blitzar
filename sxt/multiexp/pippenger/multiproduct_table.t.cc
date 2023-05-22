@@ -21,6 +21,7 @@
 #include "sxt/base/container/blob_array.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/multiexp/base/exponent_sequence_utility.h"
 #include "sxt/multiexp/index/index_table.h"
 
 using namespace sxt;
@@ -70,8 +71,7 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
 
   SECTION("we handle the case of zero entries") {
     std::vector<uint8_t> exponents = {0};
-    std::vector<mtxb::exponent_sequence> sequence = {
-        {.element_nbytes = 1, .n = 1, .data = exponents.data()}};
+    std::vector<mtxb::exponent_sequence> sequence = {mtxb::to_exponent_sequence(exponents)};
     term_or_all.resize(1, 8);
     output_digit_or_all.resize(1, 8);
     REQUIRE(0 ==
@@ -81,8 +81,7 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
 
   SECTION("we handle the case of a single exponentiation of 1") {
     std::vector<uint8_t> exponents = {1};
-    std::vector<mtxb::exponent_sequence> sequence = {
-        {.element_nbytes = 1, .n = 1, .data = exponents.data()}};
+    std::vector<mtxb::exponent_sequence> sequence = {mtxb::to_exponent_sequence(exponents)};
     term_or_all.resize(1, 8);
     output_digit_or_all.resize(1, 8);
     term_or_all[0][0] = 1;
@@ -92,10 +91,33 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     REQUIRE(table == mtxi::index_table{{0, 0, 0}});
   }
 
+  SECTION("we handle the case of a single singed exponentiation of 1") {
+    std::vector<int8_t> exponents = {1};
+    std::vector<mtxb::exponent_sequence> sequence = {mtxb::to_exponent_sequence(exponents)};
+    term_or_all.resize(1, 8);
+    output_digit_or_all.resize(2, 8);
+    term_or_all[0][0] = 1;
+    output_digit_or_all[0][0] = 1;
+    REQUIRE(1 ==
+            make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3));
+    REQUIRE(table == mtxi::index_table{{0, 0, 0}});
+  }
+
+  SECTION("we handle the case of a single singed exponentiation of -1") {
+    std::vector<int8_t> exponents = {-1};
+    std::vector<mtxb::exponent_sequence> sequence = {mtxb::to_exponent_sequence(exponents)};
+    term_or_all.resize(1, 8);
+    output_digit_or_all.resize(2, 8);
+    term_or_all[0][0] = 1;
+    output_digit_or_all[1][0] = 1;
+    REQUIRE(1 ==
+            make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3));
+    REQUIRE(table == mtxi::index_table{{0, 0, 0}});
+  }
+
   SECTION("we handle the case of two exponentiations of 1") {
     std::vector<uint8_t> exponents = {1, 1};
-    std::vector<mtxb::exponent_sequence> sequence = {
-        {.element_nbytes = 1, .n = exponents.size(), .data = exponents.data()}};
+    std::vector<mtxb::exponent_sequence> sequence = {mtxb::to_exponent_sequence(exponents)};
     term_or_all.resize(2, 8);
     term_or_all[0][0] = 1;
     term_or_all[1][0] = 1;
@@ -106,10 +128,23 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
     REQUIRE(table == mtxi::index_table{{0, 0, 0, 1}});
   }
 
+  SECTION("we handle the case of two exponentiations of 1 and -1") {
+    std::vector<int8_t> exponents = {1, -1};
+    std::vector<mtxb::exponent_sequence> sequence = {mtxb::to_exponent_sequence(exponents)};
+    term_or_all.resize(2, 8);
+    term_or_all[0][0] = 1;
+    term_or_all[1][0] = 1;
+    output_digit_or_all.resize(2, 8);
+    output_digit_or_all[0][0] = 1;
+    output_digit_or_all[1][0] = 1;
+    REQUIRE(2 ==
+            make_multiproduct_table(table, sequence, 100, term_or_all, output_digit_or_all, 3));
+    REQUIRE(table == mtxi::index_table{{0, 0, 0}, {1, 0, 1}});
+  }
+
   SECTION("we handle the case of a single exponentiation of 2") {
     std::vector<uint8_t> exponents = {2};
-    std::vector<mtxb::exponent_sequence> sequence = {
-        {.element_nbytes = 1, .n = 1, .data = exponents.data()}};
+    std::vector<mtxb::exponent_sequence> sequence = {mtxb::to_exponent_sequence(exponents)};
     term_or_all.resize(1, 8);
     term_or_all[0][0] = 2;
     output_digit_or_all.resize(1, 8);
@@ -121,8 +156,7 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
 
   SECTION("we handle the case of a single exponentiation of 3") {
     std::vector<uint8_t> exponents = {3};
-    std::vector<mtxb::exponent_sequence> sequence = {
-        {.element_nbytes = 1, .n = 1, .data = exponents.data()}};
+    std::vector<mtxb::exponent_sequence> sequence = {mtxb::to_exponent_sequence(exponents)};
     term_or_all.resize(1, 8);
     term_or_all[0][0] = 3;
     output_digit_or_all.resize(1, 8);
@@ -134,8 +168,7 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
 
   SECTION("we handle the case of two exponentiations of 1 and 2") {
     std::vector<uint8_t> exponents = {1, 2};
-    std::vector<mtxb::exponent_sequence> sequence = {
-        {.element_nbytes = 1, .n = exponents.size(), .data = exponents.data()}};
+    std::vector<mtxb::exponent_sequence> sequence = {mtxb::to_exponent_sequence(exponents)};
     term_or_all.resize(2, 8);
     term_or_all[0][0] = 1;
     term_or_all[1][0] = 2;
@@ -148,8 +181,7 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
 
   SECTION("we handle the case of two digits") {
     std::vector<uint8_t> exponents = {3};
-    std::vector<mtxb::exponent_sequence> sequence = {
-        {.element_nbytes = 1, .n = 1, .data = exponents.data()}};
+    std::vector<mtxb::exponent_sequence> sequence = {mtxb::to_exponent_sequence(exponents)};
     term_or_all.resize(1, 8);
     term_or_all[0][0] = 3;
     output_digit_or_all.resize(1, 8);
@@ -162,11 +194,7 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
   SECTION("we handle digits sizes of multiple bytes") {
     std::vector<uint16_t> exponents = {0b1010111100110100};
     auto exponents_bytes = reinterpret_cast<uint8_t*>(exponents.data());
-    std::vector<mtxb::exponent_sequence> sequence = {{
-        .element_nbytes = 2,
-        .n = 1,
-        .data = exponents_bytes,
-    }};
+    std::vector<mtxb::exponent_sequence> sequence = {mtxb::to_exponent_sequence(exponents)};
 
     term_or_all.resize(1, 16);
     term_or_all[0][0] = exponents_bytes[0];
@@ -192,11 +220,7 @@ TEST_CASE("we can construct a table for the multiproduct computation") {
   SECTION("we handle digits sizes of multiple bytes and multiple digits") {
     std::vector<uint16_t> exponents = {0b1010111100110101};
     auto exponents_bytes = reinterpret_cast<uint8_t*>(exponents.data());
-    std::vector<mtxb::exponent_sequence> sequence = {{
-        .element_nbytes = 2,
-        .n = 1,
-        .data = exponents_bytes,
-    }};
+    std::vector<mtxb::exponent_sequence> sequence = {mtxb::to_exponent_sequence(exponents)};
 
     term_or_all.resize(1, 16);
     term_or_all[0][0] = exponents_bytes[0];

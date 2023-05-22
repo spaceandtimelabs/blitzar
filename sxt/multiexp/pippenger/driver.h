@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "sxt/base/container/span.h"
 #include "sxt/execution/async/future_fwd.h"
 #include "sxt/memory/management/managed_array_fwd.h"
 
@@ -28,7 +29,7 @@ class span_cvoid;
 } // namespace sxt::basct
 
 namespace sxt::mtxb {
-class exponent;
+class exponent_sequence;
 }
 namespace sxt::mtxi {
 class index_table;
@@ -48,6 +49,7 @@ public:
 
   virtual xena::future<memmg::managed_array<void>>
   combine_multiproduct_outputs(xena::future<memmg::managed_array<void>>&& multiproduct,
-                               basct::blob_array&& output_digit_or_all) const noexcept = 0;
+                               basct::blob_array&& output_digit_or_all,
+                               basct::cspan<mtxb::exponent_sequence> exponents) const noexcept = 0;
 };
 } // namespace sxt::mtxpi
