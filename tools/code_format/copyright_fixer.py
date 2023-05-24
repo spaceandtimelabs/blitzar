@@ -91,7 +91,7 @@ def fix_copyright_header(path):
 
     # Update year only if the copyright notice doesn't exist.
     copyright_lines = str(SXT_COPYRIGHT).replace(
-        SXT_COPYRIGHT_YEAR, SXT_COPYRIGHT_KEY + " " + copyright_year
+        SXT_COPYRIGHT_YEAR, SXT_COPYRIGHT_KEY + " " + copyright_year + "-present"
     )
 
     return "\n".join(
@@ -108,10 +108,10 @@ def fix_copyright_header(path):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Header reordering.")
-    parser.add_argument("--path", type=str, help="Specify the path to the header file")
+    parser = argparse.ArgumentParser(description="Copyright notice.")
+    parser.add_argument("--path", type=str, help="Specify the path to the file")
     parser.add_argument(
-        "--rewrite", action="store_true", help="Rewrite header file in-place"
+        "--rewrite", action="store_true", help="Rewrite file in-place"
     )
     return parser.parse_args()
 
