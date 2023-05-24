@@ -17,7 +17,7 @@
 /**
  * Adopted from libsodium
  *
- * Copyright (c) 2013-2022
+ * Copyright (c) 2013-2023
  * Frank Denis <j at pureftpd dot org>
  *
  * See third_party/license/libsodium.LICENSE
