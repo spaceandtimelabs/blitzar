@@ -3,9 +3,9 @@ use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 
-fn build_proofs_gpu_lib() {
+fn build_blitzar_lib() {
     const VERSION: &'static str = env!("CARGO_PKG_VERSION");
-    let reduced_lib_name = "proofs-gpu";
+    let reduced_lib_name = "blitzar";
     let mut lib_name = format!("lib{}-v{}.so", reduced_lib_name, VERSION);
     let lib_name_local = format!("lib{}.so", reduced_lib_name);
 
@@ -47,7 +47,7 @@ fn build_proofs_gpu_lib() {
 }
 
 fn main() {
-    build_proofs_gpu_lib();
+    build_blitzar_lib();
 
     println!("cargo:rerun-if-changed=build.rs");
 }

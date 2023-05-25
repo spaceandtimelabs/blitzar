@@ -17,7 +17,7 @@
 #include <cstddef>
 #include <iostream>
 
-#include "cbindings/proofs_gpu_api.h"
+#include "cbindings/blitzar_api.h"
 
 int main() {
   const sxt_config config = {SXT_GPU_BACKEND};

@@ -1,16 +1,16 @@
-extern crate proofs_gpu_sys;
+extern crate blitzar_sys;
 
 #[cfg(test)]
 mod tests {
     #[test]
     fn compute_commitments_works() {
-        let config: proofs_gpu_sys::sxt_config = proofs_gpu_sys::sxt_config {
-            backend: proofs_gpu_sys::SXT_GPU_BACKEND as i32,
+        let config: blitzar_sys::sxt_config = blitzar_sys::sxt_config {
+            backend: blitzar_sys::SXT_GPU_BACKEND as i32,
             num_precomputed_generators: 10 as u64,
         };
 
         unsafe {
-            let ret_init = proofs_gpu_sys::sxt_init(&config);
+            let ret_init = blitzar_sys::sxt_init(&config);
 
             assert_eq!(ret_init, 0);
         };
@@ -46,9 +46,9 @@ mod tests {
             5,221,57,231,168,9,141,122
         ];
 
-        let mut cbinding_commitments: Vec<proofs_gpu_sys::
+        let mut cbinding_commitments: Vec<blitzar_sys::
             sxt_compressed_ristretto> = Vec::with_capacity(num_commitments);
-        let mut cbinding_descriptors: Vec<proofs_gpu_sys::
+        let mut cbinding_descriptors: Vec<blitzar_sys::
                 sxt_sequence_descriptor> = Vec::with_capacity(num_commitments);
 
         unsafe {
@@ -56,7 +56,7 @@ mod tests {
             cbinding_descriptors.set_len(num_commitments);
             
             for i in 0..num_commitments {
-                let descriptor = proofs_gpu_sys::sxt_sequence_descriptor {
+                let descriptor = blitzar_sys::sxt_sequence_descriptor {
                     element_nbytes: n1_num_bytes,  // number bytes
                     n: n1,            // number rows
                     data: data_bytes[i].as_mut_ptr() as *const u8, // data
@@ -66,7 +66,7 @@ mod tests {
                 cbinding_descriptors[i] = descriptor;
             }
 
-            proofs_gpu_sys::sxt_compute_pedersen_commitments(
+            blitzar_sys::sxt_compute_pedersen_commitments(
                 cbinding_commitments.as_mut_ptr(),
                 num_commitments as u32,
                 cbinding_descriptors.as_mut_ptr(),

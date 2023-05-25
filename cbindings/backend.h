@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include "cbindings/proofs_gpu_api.h"
+#include "cbindings/blitzar_api.h"
 #include "sxt/cbindings/backend/computational_backend.h"
 
 namespace sxt::cbn {

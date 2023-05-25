@@ -16,4 +16,4 @@
  */
 #pragma once
 
-#include "cbindings/proofs_gpu_api.h"
+#include "cbindings/blitzar_api.h"

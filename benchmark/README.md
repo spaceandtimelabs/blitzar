@@ -9,7 +9,7 @@ Given the number of each commitment length, the total number of commitments, and
 To run the whole benchmark on the GPU (update accordingly to use CPU), execute:
 
 ```
-docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v /home/joe/Documents/proofs-gpu/benchmark/multi_commitment:/root/.cache_bazel -v "$PWD":/src -w /src --gpus all --privileged -it joestifler/proofs_gpu:7.0 benchmark/multi_commitment/scripts/run_benchmark.py --backend gpu --output-dir benchmark/multi_commitment/.proof_results --force-rerun-bench 1 --run-bench-callgrind 1 --run-bench 1
+docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v blitzar/benchmark/multi_commitment:/root/.cache_bazel -v "$PWD":/src -w /src --gpus all --privileged -it joestifler/blitzar:7.0 benchmark/multi_commitment/scripts/run_benchmark.py --backend gpu --output-dir benchmark/multi_commitment/.proof_results --force-rerun-bench 1 --run-bench-callgrind 1 --run-bench 1
 ```
 
 Some files are generated in this process. They can be found on `benchmark/multi_commitment/.proof_results/` directory.

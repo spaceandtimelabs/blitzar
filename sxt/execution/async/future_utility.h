@@ -26,7 +26,7 @@ namespace sxt::xena {
 //--------------------------------------------------------------------------------------------------
 // await multiple futures
 //
-// Note: This is to work around https://github.com/spaceandtimelabs/proofs-gpu/issues/200
+// Note: This is to work around https://github.com/spaceandtimelabs/blitzar/issues/200
 future<> await_all(std::vector<future<>> futs) noexcept;
 
 template <class... Tx>

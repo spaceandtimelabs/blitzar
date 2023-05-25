@@ -19,9 +19,9 @@ cuda_dlink(
 )
 
 cc_binary(
-    name = "libproofs-gpu.so",
+    name = "libblitzar.so",
     linkopts = [
-        "-Wl,--version-script=$(location :libproofs-gpu-export-map.ld)",
+        "-Wl,--version-script=$(location :libblitzar-export-map.ld)",
         "-static-libstdc++",
         "-static-libgcc",
     ],
@@ -29,7 +29,7 @@ cc_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":cbindings_device",
-        ":libproofs-gpu-export-map.ld",
+        ":libblitzar-export-map.ld",
     ] + select({
         "//bazel:portable_glibc_build": [
             "//bazel:glibc_version_lib",
@@ -39,7 +39,7 @@ cc_binary(
 )
 
 sxt_cc_component(
-    name = "proofs_gpu_api",
+    name = "blitzar_api",
     with_test = False,
 )
 
@@ -56,7 +56,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        ":proofs_gpu_api",
+        ":blitzar_api",
         "//sxt/cbindings/backend:computational_backend",
     ],
     alwayslink = 1,
@@ -76,7 +76,7 @@ sxt_cc_component(
         "//sxt/seqcommit/generator:base_element",
     ],
     deps = [
-        ":proofs_gpu_api",
+        ":blitzar_api",
     ],
     alwayslink = 1,
 )
@@ -98,7 +98,7 @@ sxt_cc_component(
         "//sxt/curve21/operation:add",
     ],
     deps = [
-        ":proofs_gpu_api",
+        ":blitzar_api",
     ],
     alwayslink = 1,
 )
@@ -125,7 +125,7 @@ sxt_cc_component(
         "//sxt/base/error:assert",
     ],
     deps = [
-        ":proofs_gpu_api",
+        ":blitzar_api",
     ],
     alwayslink = 1,
 )
@@ -157,7 +157,7 @@ sxt_cc_component(
         "//sxt/base/error:assert",
     ],
     deps = [
-        ":proofs_gpu_api",
+        ":blitzar_api",
     ],
     alwayslink = 1,
 )

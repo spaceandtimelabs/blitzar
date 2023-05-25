@@ -14,4 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "cbindings/proofs_gpu_api.h"
+#include "cbindings/blitzar_api.h"

@@ -1,8 +1,8 @@
 [package]
-name = "proofs-gpu-sys"
+name = "blitzar-sys"
 version = "0.0.0" 
 edition = "2021"
-repository = "https://github.com/spaceandtimelabs/proofs-gpu"
+repository = "https://github.com/spaceandtimelabs/blitzar"
 
 exclude = ["/target", "/Cargo.lock"]
 include = ["/src", "build.rs", "Cargo.toml", "*.so*"]

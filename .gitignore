@@ -20,10 +20,10 @@ dist/
 .vscode/
 
 # Ignore rust files
-rust/proofs-gpu-sys/target
-rust/proofs-gpu-sys/Cargo.lock
-rust/proofs-gpu-sys/*.so*
-rust/proofs-gpu-sys/src/bindings.rs
+rust/blitzar-sys/target
+rust/blitzar-sys/Cargo.lock
+rust/blitzar-sys/*.so*
+rust/blitzar-sys/src/bindings.rs
 
 # Ignore benchmark files
 *.pdf
