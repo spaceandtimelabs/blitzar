@@ -16,38 +16,37 @@
  */
 #pragma once
 
-#include "sxt/base/type/raw_stream.h"
+#include "sxt/base/device/property.h"
+#include "sxt/base/error/assert.h"
+#include "sxt/base/macro/max_devices.h"
 
 namespace sxt::basdv {
-struct stream_handle;
-
 //--------------------------------------------------------------------------------------------------
-// stream
+// device_map
 //--------------------------------------------------------------------------------------------------
-/**
- * Wrapper around a pooled CUDA stream.
- */
-class stream {
+template <class T> class device_map {
 public:
-  explicit stream(int device = 0) noexcept;
+  int size() const noexcept { return get_num_devices(); }
 
-  stream(stream&& other) noexcept;
+  T& operator[](int device) noexcept {
+    SXT_DEBUG_ASSERT(0 <= device && device < this->size());
+    return data_[device];
+  }
 
-  ~stream() noexcept;
+  const T& operator[](int device) const noexcept {
+    SXT_DEBUG_ASSERT(0 <= device && device < this->size());
+    return data_[device];
+  }
 
-  stream(const stream&) = delete;
-  stream& operator=(const stream&) = delete;
-  stream& operator=(stream&& other) noexcept;
+  T* begin() noexcept { return data_; }
 
-  stream_handle* release_handle() noexcept;
+  T* end() noexcept { return data_ + this->size(); }
 
-  bast::raw_stream_t raw_stream() const noexcept;
+  const T* begin() const noexcept { return data_; }
 
-  operator bast::raw_stream_t() const noexcept { return this->raw_stream(); }
-
-  int device() const noexcept;
+  const T* end() const noexcept { return data_ + this->size(); }
 
 private:
-  stream_handle* handle_;
+  T data_[SXT_MAX_DEVICES] = {};
 };
 } // namespace sxt::basdv

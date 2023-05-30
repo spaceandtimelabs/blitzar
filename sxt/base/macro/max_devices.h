@@ -16,15 +16,6 @@
  */
 #pragma once
 
-#include "sxt/base/type/raw_stream.h"
-
-namespace sxt::basdv {
-//--------------------------------------------------------------------------------------------------
-// stream_handle
-//--------------------------------------------------------------------------------------------------
-struct stream_handle {
-  int device = 0;
-  bast::raw_stream_t stream = nullptr;
-  stream_handle* next = nullptr;
-};
-} // namespace sxt::basdv
+#ifndef SXT_MAX_DEVICES
+#define SXT_MAX_DEVICES 4
+#endif

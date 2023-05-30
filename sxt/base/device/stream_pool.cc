@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include "sxt/base/device/active_device_guard.h"
 #include "sxt/base/device/stream_handle.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/error/panic.h"
@@ -28,7 +29,8 @@ namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // make_stream_handle
 //--------------------------------------------------------------------------------------------------
-static stream_handle* make_stream_handle() noexcept {
+static stream_handle* make_stream_handle(int device) noexcept {
+  active_device_guard active_guard{device};
   auto res = new stream_handle{};
   auto rcode = cudaStreamCreate(&res->stream);
   if (rcode != cudaSuccess) {
@@ -42,11 +44,13 @@ static stream_handle* make_stream_handle() noexcept {
 // constructor
 //--------------------------------------------------------------------------------------------------
 stream_pool::stream_pool(size_t initial_size) noexcept {
-  head_ = nullptr;
-  while (initial_size-- > 0) {
-    auto handle = make_stream_handle();
-    handle->next = head_;
-    head_ = handle;
+  for (int device = 0; device < heads_.size(); ++device) {
+    auto& head = heads_[device];
+    for (size_t i = 0; i < initial_size; ++i) {
+      auto handle = make_stream_handle(device);
+      handle->next = head;
+      head = handle;
+    }
   }
 }
 
@@ -54,27 +58,29 @@ stream_pool::stream_pool(size_t initial_size) noexcept {
 // destructor
 //--------------------------------------------------------------------------------------------------
 stream_pool::~stream_pool() noexcept {
-  auto handle = head_;
-  while (handle != nullptr) {
-    auto next = handle->next;
-    auto rcode = cudaStreamDestroy(handle->stream);
-    if (rcode != cudaSuccess) {
-      baser::panic("cudaStreamDestroy failed: " + std::string(cudaGetErrorString(rcode)));
+  for (auto handle : heads_) {
+    while (handle != nullptr) {
+      auto next = handle->next;
+      auto rcode = cudaStreamDestroy(handle->stream);
+      if (rcode != cudaSuccess) {
+        baser::panic("cudaStreamDestroy failed: " + std::string(cudaGetErrorString(rcode)));
+      }
+      delete handle;
+      handle = next;
     }
-    delete handle;
-    handle = next;
   }
 }
 
 //--------------------------------------------------------------------------------------------------
 // aquire_handle
 //--------------------------------------------------------------------------------------------------
-stream_handle* stream_pool::aquire_handle() noexcept {
-  if (head_ == nullptr) {
-    return make_stream_handle();
+stream_handle* stream_pool::aquire_handle(int device) noexcept {
+  auto& head = heads_[device];
+  if (head == nullptr) {
+    return make_stream_handle(device);
   }
-  auto res = head_;
-  head_ = res->next;
+  auto res = head;
+  head = res->next;
   res->next = nullptr;
   return res;
 }
@@ -83,9 +89,10 @@ stream_handle* stream_pool::aquire_handle() noexcept {
 // release_handle
 //--------------------------------------------------------------------------------------------------
 void stream_pool::release_handle(stream_handle* handle) noexcept {
-  SXT_DEBUG_ASSERT(handle != nullptr);
-  handle->next = head_;
-  head_ = handle;
+  auto& head = heads_[handle->device];
+  SXT_DEBUG_ASSERT(handle != nullptr && handle->next == nullptr);
+  handle->next = head;
+  head = handle;
 }
 
 //--------------------------------------------------------------------------------------------------

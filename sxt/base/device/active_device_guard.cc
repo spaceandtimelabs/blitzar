@@ -14,40 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/base/device/active_device_guard.h"
 
-#include "sxt/base/type/raw_stream.h"
+#include "sxt/base/device/state.h"
 
 namespace sxt::basdv {
-struct stream_handle;
+//--------------------------------------------------------------------------------------------------
+// constructor
+//--------------------------------------------------------------------------------------------------
+active_device_guard::active_device_guard() noexcept { prev_device_ = get_device(); }
+
+active_device_guard::active_device_guard(int device) noexcept {
+  auto dv = get_device();
+  if (device == dv) {
+    prev_device_ = -1;
+  }
+  prev_device_ = dv;
+  set_device(device);
+}
 
 //--------------------------------------------------------------------------------------------------
-// stream
+// destructor
 //--------------------------------------------------------------------------------------------------
-/**
- * Wrapper around a pooled CUDA stream.
- */
-class stream {
-public:
-  explicit stream(int device = 0) noexcept;
-
-  stream(stream&& other) noexcept;
-
-  ~stream() noexcept;
-
-  stream(const stream&) = delete;
-  stream& operator=(const stream&) = delete;
-  stream& operator=(stream&& other) noexcept;
-
-  stream_handle* release_handle() noexcept;
-
-  bast::raw_stream_t raw_stream() const noexcept;
-
-  operator bast::raw_stream_t() const noexcept { return this->raw_stream(); }
-
-  int device() const noexcept;
-
-private:
-  stream_handle* handle_;
-};
+active_device_guard::~active_device_guard() noexcept {
+  if (prev_device_ == -1) {
+    return;
+  }
+  set_device(prev_device_);
+}
 } // namespace sxt::basdv

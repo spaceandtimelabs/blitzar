@@ -25,16 +25,15 @@ namespace sxt::basdv {
 // get_num_devices
 //--------------------------------------------------------------------------------------------------
 int get_num_devices() noexcept {
-  int num_devices;
-
-  auto rcode = cudaGetDeviceCount(&num_devices);
-
-  if (rcode != cudaSuccess) {
-    std::cerr << "cudaGetDeviceCount failed: " << cudaGetErrorString(rcode) << "\n";
-
-    return 0;
-  }
-
+  static int num_devices = []() noexcept {
+    int res;
+    auto rcode = cudaGetDeviceCount(&res);
+    if (rcode != cudaSuccess) {
+      std::cerr << "cudaGetDeviceCount failed: " << cudaGetErrorString(rcode) << "\n";
+      return 0;
+    }
+    return res;
+  }();
   return num_devices;
 }
 } // namespace sxt::basdv

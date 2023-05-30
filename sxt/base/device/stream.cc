@@ -24,7 +24,7 @@ namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
-stream::stream() noexcept { handle_ = get_stream_pool()->aquire_handle(); }
+stream::stream(int device) noexcept { handle_ = get_stream_pool()->aquire_handle(device); }
 
 stream::stream(stream&& other) noexcept { handle_ = other.release_handle(); }
 
@@ -65,4 +65,9 @@ CUstream_st* stream::raw_stream() const noexcept {
   SXT_DEBUG_ASSERT(handle_ != nullptr);
   return handle_->stream;
 }
+
+//--------------------------------------------------------------------------------------------------
+// device
+//--------------------------------------------------------------------------------------------------
+int stream::device() const noexcept { return handle_->device; }
 } // namespace sxt::basdv

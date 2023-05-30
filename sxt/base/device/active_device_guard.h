@@ -16,38 +16,19 @@
  */
 #pragma once
 
-#include "sxt/base/type/raw_stream.h"
-
 namespace sxt::basdv {
-struct stream_handle;
-
 //--------------------------------------------------------------------------------------------------
-// stream
+// active_device_guard
 //--------------------------------------------------------------------------------------------------
-/**
- * Wrapper around a pooled CUDA stream.
- */
-class stream {
+class active_device_guard {
 public:
-  explicit stream(int device = 0) noexcept;
+  active_device_guard() noexcept;
 
-  stream(stream&& other) noexcept;
+  explicit active_device_guard(int device) noexcept;
 
-  ~stream() noexcept;
-
-  stream(const stream&) = delete;
-  stream& operator=(const stream&) = delete;
-  stream& operator=(stream&& other) noexcept;
-
-  stream_handle* release_handle() noexcept;
-
-  bast::raw_stream_t raw_stream() const noexcept;
-
-  operator bast::raw_stream_t() const noexcept { return this->raw_stream(); }
-
-  int device() const noexcept;
+  ~active_device_guard() noexcept;
 
 private:
-  stream_handle* handle_;
+  int prev_device_;
 };
 } // namespace sxt::basdv

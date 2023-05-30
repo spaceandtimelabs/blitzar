@@ -14,40 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/base/device/state.h"
 
-#include "sxt/base/type/raw_stream.h"
+#include <cuda_runtime.h>
+
+#include <string>
+
+#include "sxt/base/error/panic.h"
 
 namespace sxt::basdv {
-struct stream_handle;
+//--------------------------------------------------------------------------------------------------
+// set_device
+//--------------------------------------------------------------------------------------------------
+void set_device(int device) noexcept {
+  auto rcode = cudaSetDevice(device);
+  if (rcode != cudaSuccess) {
+    baser::panic("cudaSetDevice failed: " + std::string(cudaGetErrorString(rcode)));
+  }
+}
 
 //--------------------------------------------------------------------------------------------------
-// stream
+// get_device
 //--------------------------------------------------------------------------------------------------
-/**
- * Wrapper around a pooled CUDA stream.
- */
-class stream {
-public:
-  explicit stream(int device = 0) noexcept;
-
-  stream(stream&& other) noexcept;
-
-  ~stream() noexcept;
-
-  stream(const stream&) = delete;
-  stream& operator=(const stream&) = delete;
-  stream& operator=(stream&& other) noexcept;
-
-  stream_handle* release_handle() noexcept;
-
-  bast::raw_stream_t raw_stream() const noexcept;
-
-  operator bast::raw_stream_t() const noexcept { return this->raw_stream(); }
-
-  int device() const noexcept;
-
-private:
-  stream_handle* handle_;
-};
+int get_device() noexcept {
+  int device;
+  auto rcode = cudaGetDevice(&device);
+  if (rcode != cudaSuccess) {
+    baser::panic("cudaGetDevice failed: " + std::string(cudaGetErrorString(rcode)));
+  }
+  return device;
+}
 } // namespace sxt::basdv

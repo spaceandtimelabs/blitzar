@@ -18,6 +18,8 @@
 
 #include <cstddef>
 
+#include "sxt/base/device/device_map.h"
+
 namespace sxt::basdv {
 struct stream_handle;
 
@@ -44,12 +46,12 @@ public:
   stream_pool(stream_pool&&) = delete;
   stream_pool& operator=(const stream_pool&) = delete;
 
-  stream_handle* aquire_handle() noexcept;
+  stream_handle* aquire_handle(int device = 0) noexcept;
 
   void release_handle(stream_handle* handle) noexcept;
 
 private:
-  stream_handle* head_;
+  device_map<stream_handle*> heads_;
 };
 
 //--------------------------------------------------------------------------------------------------

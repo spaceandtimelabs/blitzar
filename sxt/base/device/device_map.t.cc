@@ -14,17 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/base/device/device_map.h"
 
-#include "sxt/base/type/raw_stream.h"
+#include "sxt/base/test/unit_test.h"
 
-namespace sxt::basdv {
-//--------------------------------------------------------------------------------------------------
-// stream_handle
-//--------------------------------------------------------------------------------------------------
-struct stream_handle {
-  int device = 0;
-  bast::raw_stream_t stream = nullptr;
-  stream_handle* next = nullptr;
-};
-} // namespace sxt::basdv
+using namespace sxt;
+using namespace sxt::basdv;
+
+TEST_CASE("we can map from devices") {
+  device_map<int> m;
+  REQUIRE(m.size() == get_num_devices());
+  REQUIRE(m.size() > 0);
+  REQUIRE(m[0] == 0);
+  ++m[0];
+  REQUIRE(m[0] == 1);
+}

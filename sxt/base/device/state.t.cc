@@ -14,17 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/base/device/state.h"
 
-#include "sxt/base/type/raw_stream.h"
+#include "sxt/base/device/property.h"
+#include "sxt/base/test/unit_test.h"
 
-namespace sxt::basdv {
-//--------------------------------------------------------------------------------------------------
-// stream_handle
-//--------------------------------------------------------------------------------------------------
-struct stream_handle {
-  int device = 0;
-  bast::raw_stream_t stream = nullptr;
-  stream_handle* next = nullptr;
-};
-} // namespace sxt::basdv
+using namespace sxt;
+using namespace sxt::basdv;
+
+TEST_CASE("we can get/set the global device") {
+  auto dev = get_num_devices() - 1;
+  set_device(dev);
+  REQUIRE(get_device() == dev);
+}

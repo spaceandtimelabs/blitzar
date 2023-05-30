@@ -4,6 +4,17 @@ load(
 )
 
 sxt_cc_component(
+    name = "active_device_guard",
+    impl_deps = [
+        ":state",
+    ],
+    test_deps = [
+        ":property",
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "event",
     impl_deps = [
         "//sxt/base/error:panic",
@@ -29,6 +40,18 @@ sxt_cc_component(
         "//sxt/base/type:raw_stream",
         "@local_config_cuda//cuda:cuda_headers",
         "@local_config_cuda//cuda:cudart_static",
+    ],
+)
+
+sxt_cc_component(
+    name = "device_map",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":property",
+        "//sxt/base/error:assert",
+        "//sxt/base/macro:max_devices",
     ],
 )
 
@@ -92,6 +115,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "stream_pool",
     impl_deps = [
+        ":active_device_guard",
         ":stream_handle",
         "//sxt/base/error:assert",
         "//sxt/base/error:panic",
@@ -99,6 +123,22 @@ sxt_cc_component(
     test_deps = [
         ":stream_handle",
         "//sxt/base/device:property",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":device_map",
+        "@local_config_cuda//cuda:cuda_headers",
+        "@local_config_cuda//cuda:cudart_static",
+    ],
+)
+
+sxt_cc_component(
+    name = "state",
+    impl_deps = [
+        "//sxt/base/error:panic",
+    ],
+    test_deps = [
+        ":property",
         "//sxt/base/test:unit_test",
     ],
     deps = [

@@ -12,3 +12,8 @@ sxt_cc_component(
     name = "cuda_warning",
     with_test = False,
 )
+
+sxt_cc_component(
+    name = "max_devices",
+    with_test = False,
+)

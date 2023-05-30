@@ -14,17 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/base/device/active_device_guard.h"
 
-#include "sxt/base/type/raw_stream.h"
+#include "sxt/base/device/property.h"
+#include "sxt/base/test/unit_test.h"
 
-namespace sxt::basdv {
-//--------------------------------------------------------------------------------------------------
-// stream_handle
-//--------------------------------------------------------------------------------------------------
-struct stream_handle {
-  int device = 0;
-  bast::raw_stream_t stream = nullptr;
-  stream_handle* next = nullptr;
-};
-} // namespace sxt::basdv
+using namespace sxt;
+using namespace sxt::basdv;
+
+TEST_CASE("we can control the active device") {
+  SECTION("we can guard to reset to the previous device upon scope exit") {
+    active_device_guard guard{};
+  }
+
+  SECTION("we can set/unset a specific device") {
+    active_device_guard guard{get_num_devices() - 1};
+  }
+}

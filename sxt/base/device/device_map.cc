@@ -14,17 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
-
-#include "sxt/base/type/raw_stream.h"
-
-namespace sxt::basdv {
-//--------------------------------------------------------------------------------------------------
-// stream_handle
-//--------------------------------------------------------------------------------------------------
-struct stream_handle {
-  int device = 0;
-  bast::raw_stream_t stream = nullptr;
-  stream_handle* next = nullptr;
-};
-} // namespace sxt::basdv
+#include "sxt/base/device/device_map.h"
