@@ -16,37 +16,14 @@
  */
 #pragma once
 
-#include <memory>
+#include <cstdint>
 
-#include "sxt/execution/schedule/active_scheduler.h"
-#include "sxt/execution/schedule/pending_scheduler.h"
+#include "sxt/base/type/raw_stream.h"
 
-namespace sxt::xens {
-class pollable_event;
-class pending_event;
-
+namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
-// scheduler
+// add_for_testing
 //--------------------------------------------------------------------------------------------------
-class scheduler {
-public:
-  scheduler(size_t num_devices, size_t target_max_active) noexcept;
-
-  void run() noexcept;
-
-  void schedule(std::unique_ptr<pollable_event>&& event) noexcept;
-
-  void schedule(std::unique_ptr<pending_event>&& event) noexcept;
-
-  int get_available_device() const noexcept;
-
-private:
-  active_scheduler active_scheduler_;
-  pending_scheduler pending_scheduler_;
-};
-
-//--------------------------------------------------------------------------------------------------
-// get_scheduler
-//--------------------------------------------------------------------------------------------------
-scheduler& get_scheduler() noexcept;
-} // namespace sxt::xens
+void add_for_testing(uint64_t* c, bast::raw_stream_t stream, const uint64_t* a, const uint64_t* b,
+                     int n) noexcept;
+} // namespace sxt::xendv

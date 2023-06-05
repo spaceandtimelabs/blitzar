@@ -23,7 +23,7 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/async/synchronization.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/execution/kernel/kernel_dims.h"
 
 namespace sxt::algi {
@@ -59,7 +59,7 @@ void launch_for_each_kernel(bast::raw_stream_t stream, F f, unsigned n) noexcept
 template <algb::index_functor F>
 xena::future<> for_each(basdv::stream&& stream, F f, unsigned n) noexcept {
   launch_for_each_kernel(stream, f, n);
-  return xena::await_and_own_stream(std::move(stream));
+  return xendv::await_and_own_stream(std::move(stream));
 }
 
 template <algb::index_functor F> xena::future<> for_each(F f, unsigned n) noexcept {

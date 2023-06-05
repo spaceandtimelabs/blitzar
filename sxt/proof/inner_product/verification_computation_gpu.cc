@@ -25,7 +25,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/async/synchronization.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/proof/inner_product/verification_computation.h"
@@ -52,7 +52,7 @@ static xena::future<> compute_g_exponents_gpu(basct::span<s25t::element> g_expon
   basdv::async_copy_host_to_device(g_exponents_dev.subspan(0, g_exponents_host.size()),
                                    g_exponents_host, stream);
   if (num_host_rounds == num_rounds) {
-    co_return co_await xena::await_stream(stream);
+    co_return co_await xendv::await_stream(stream);
   }
   co_await compute_g_exponents_partial(
       g_exponents_dev, stream, x_sq_vector.subspan(0, num_device_rounds + 1), num_host_rounds);
@@ -74,7 +74,7 @@ compute_g_and_product_exponents(basct::span<s25t::element> exponents, const s25t
   basdv::stream stream;
   basdv::async_copy_host_to_device(exponents.subspan(0, 1),
                                    basct::cspan<s25t::element>{&product, 1}, stream);
-  co_await xena::await_stream(stream);
+  co_await xendv::await_stream(stream);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -118,6 +118,6 @@ xena::future<> async_compute_verification_exponents(basct::span<s25t::element> e
   basdv::stream stream;
   basdv::async_copy_host_to_device(exponents.subspan(1 + np), lr_exponents, stream);
   co_await std::move(fut);
-  co_await xena::await_stream(stream);
+  co_await xendv::await_stream(stream);
 }
 } // namespace sxt::prfip

@@ -104,7 +104,6 @@ sxt_cc_component(
         "//sxt/memory/resource:async_device_resource",
         "//sxt/execution/async:future",
         "//sxt/execution/async:coroutine",
-        "//sxt/execution/async:synchronization",
     ],
     test_deps = [
         "//sxt/memory/management:managed_array",
@@ -138,7 +137,7 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/execution/async:future",
-        "//sxt/execution/async:synchronization",
+        "//sxt/execution/device:synchronization",
     ],
     is_cuda = True,
     test_deps = [

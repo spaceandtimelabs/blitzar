@@ -27,7 +27,7 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/async/synchronization.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/execution/kernel/kernel_dims.h"
 #include "sxt/execution/kernel/launch.h"
 #include "sxt/memory/management/managed_array.h"
@@ -73,7 +73,7 @@ xena::future<typename Reducer::value_type> reduce(basdv::stream&& stream, Mapper
   basdv::async_copy_device_to_host(result_array, out_array, stream);
 
   // future
-  return xena::await_and_own_stream(std::move(stream), std::move(result_array))
+  return xendv::await_and_own_stream(std::move(stream), std::move(result_array))
       .then([num_blocks = dims.num_blocks](memmg::managed_array<T>&& result_array) noexcept {
         auto res = result_array[0];
         for (unsigned int i = 1; i < num_blocks; ++i) {

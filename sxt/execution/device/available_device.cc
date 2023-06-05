@@ -14,39 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/execution/device/available_device.h"
 
 #include <memory>
 
-#include "sxt/execution/schedule/active_scheduler.h"
-#include "sxt/execution/schedule/pending_scheduler.h"
+#include "sxt/execution/async/future.h"
+#include "sxt/execution/schedule/pending_event.h"
+#include "sxt/execution/schedule/scheduler.h"
 
-namespace sxt::xens {
-class pollable_event;
-class pending_event;
-
+namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
-// scheduler
+// available_device_awaiter
 //--------------------------------------------------------------------------------------------------
-class scheduler {
+namespace {
+class available_device_awaiter final : public xens::pending_event {
 public:
-  scheduler(size_t num_devices, size_t target_max_active) noexcept;
+  available_device_awaiter(xena::promise<int>&& promise) noexcept : promise_{std::move(promise)} {}
 
-  void run() noexcept;
-
-  void schedule(std::unique_ptr<pollable_event>&& event) noexcept;
-
-  void schedule(std::unique_ptr<pending_event>&& event) noexcept;
-
-  int get_available_device() const noexcept;
+  void invoke(int device) noexcept override { promise_.set_value(device); }
 
 private:
-  active_scheduler active_scheduler_;
-  pending_scheduler pending_scheduler_;
+  xena::promise<int> promise_;
 };
+} // namespace
 
 //--------------------------------------------------------------------------------------------------
-// get_scheduler
+// await_available_device
 //--------------------------------------------------------------------------------------------------
-scheduler& get_scheduler() noexcept;
-} // namespace sxt::xens
+xena::future<int> await_available_device() noexcept {
+  auto& scheduler = xens::get_scheduler();
+  auto device = scheduler.get_available_device();
+  if (device >= 0) {
+    return xena::make_ready_future<int>(std::move(device));
+  }
+  xena::promise<int> promise;
+  xena::future<int> res{promise};
+  scheduler.schedule(std::make_unique<available_device_awaiter>(std::move(promise)));
+  return res;
+}
+} // namespace sxt::xendv

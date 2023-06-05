@@ -16,62 +16,55 @@
  */
 #include "sxt/execution/schedule/scheduler.h"
 
-#include <immintrin.h>
-
+#include "sxt/base/device/property.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/execution/schedule/pollable_event.h"
 
 namespace sxt::xens {
 //--------------------------------------------------------------------------------------------------
+// target_max_active_events_v
+//--------------------------------------------------------------------------------------------------
+static constexpr size_t target_max_active_events_v = 5;
+
+//--------------------------------------------------------------------------------------------------
+// constructor
+//--------------------------------------------------------------------------------------------------
+scheduler::scheduler(size_t num_devices, size_t target_max_active) noexcept
+    : pending_scheduler_{num_devices, target_max_active} {}
+
+//--------------------------------------------------------------------------------------------------
 // run
 //--------------------------------------------------------------------------------------------------
 void scheduler::run() noexcept {
-  // Simple loop to poll and execute ready tasks
-  while (true) {
-    if (head_ == nullptr) {
-      return;
-    }
-    // Note: this code hasn't been informed by benchmarking yet, and
-    // it's likely that it will be adjusted when it does.
-    //
-    // For now, we emit a pause instruction as that frequently leads to
-    // better performance for polling code.
-    //
-    // See https://stackoverflow.com/q/58424276/4447365
-    _mm_pause();
-
-    if (head_->ready()) {
-      auto event = std::move(head_);
-      head_ = event->release_next();
-      event->invoke();
-      continue;
-    }
-    auto event = head_.get();
-    while (event->next() != nullptr) {
-      auto next = event->next();
-      if (next->ready()) {
-        next->invoke();
-        event->set_next(next->release_next());
-      } else {
-        event = next;
-      }
-    }
-  }
+  active_scheduler_.run([&](int device) noexcept { pending_scheduler_.on_event_done(device); });
 }
 
 //--------------------------------------------------------------------------------------------------
 // schedule
 //--------------------------------------------------------------------------------------------------
 void scheduler::schedule(std::unique_ptr<pollable_event>&& event) noexcept {
-  auto head = std::move(head_);
-  head_ = std::move(event);
-  head_->set_next(std::move(head));
+  SXT_DEBUG_ASSERT(static_cast<size_t>(event->device()) < pending_scheduler_.num_devices());
+  pending_scheduler_.on_event_new(event->device());
+  active_scheduler_.schedule(std::move(event));
+}
+
+void scheduler::schedule(std::unique_ptr<pending_event>&& event) noexcept {
+  pending_scheduler_.schedule(std::move(event));
+}
+
+//--------------------------------------------------------------------------------------------------
+// get_available_device
+//--------------------------------------------------------------------------------------------------
+int scheduler::get_available_device() const noexcept {
+  return pending_scheduler_.get_available_device();
 }
 
 //--------------------------------------------------------------------------------------------------
 // get_scheduler
 //--------------------------------------------------------------------------------------------------
 scheduler& get_scheduler() noexcept {
-  static thread_local auto instance = new scheduler{};
+  static thread_local auto instance =
+      new scheduler{static_cast<size_t>(basdv::get_num_devices()), target_max_active_events_v};
   return *instance;
 }
 } // namespace sxt::xens

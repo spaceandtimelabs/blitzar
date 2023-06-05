@@ -22,7 +22,7 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/async/synchronization.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/type/element.h"
 
@@ -57,6 +57,6 @@ xena::future<> compute_g_exponents_partial(basct::span<s25t::element> g_exponent
     algi::launch_for_each_kernel(stream, f, a);
     a *= 2u;
   }
-  return xena::await_stream(stream);
+  return xendv::await_stream(stream);
 }
 } // namespace sxt::prfip

@@ -14,39 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
-
-#include <memory>
-
-#include "sxt/execution/schedule/active_scheduler.h"
-#include "sxt/execution/schedule/pending_scheduler.h"
+#include "sxt/execution/schedule/test_pending_event.h"
 
 namespace sxt::xens {
-class pollable_event;
-class pending_event;
+//--------------------------------------------------------------------------------------------------
+// constructor
+//--------------------------------------------------------------------------------------------------
+test_pending_event::test_pending_event(int id, std::function<void(int, int)> f) noexcept
+    : id_{id}, f_{std::move(f)} {}
 
 //--------------------------------------------------------------------------------------------------
-// scheduler
+// invoke
 //--------------------------------------------------------------------------------------------------
-class scheduler {
-public:
-  scheduler(size_t num_devices, size_t target_max_active) noexcept;
-
-  void run() noexcept;
-
-  void schedule(std::unique_ptr<pollable_event>&& event) noexcept;
-
-  void schedule(std::unique_ptr<pending_event>&& event) noexcept;
-
-  int get_available_device() const noexcept;
-
-private:
-  active_scheduler active_scheduler_;
-  pending_scheduler pending_scheduler_;
-};
-
-//--------------------------------------------------------------------------------------------------
-// get_scheduler
-//--------------------------------------------------------------------------------------------------
-scheduler& get_scheduler() noexcept;
+void test_pending_event::invoke(int device) noexcept {
+  if (f_) {
+    f_(id_, device);
+  }
+}
 } // namespace sxt::xens

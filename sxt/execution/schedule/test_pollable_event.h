@@ -29,6 +29,8 @@ public:
   test_pollable_event(int id, int counter, std::function<void(int)> f = {}) noexcept;
 
   // pollable_event
+  int device() const noexcept override { return id_; }
+
   bool ready() noexcept override;
 
   void invoke() noexcept override;

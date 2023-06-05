@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/execution/async/computation_handle.h"
+#include "sxt/execution/device/computation_handle.h"
 
 #include <random>
 #include <utility>
@@ -24,13 +24,13 @@
 #include "sxt/base/device/stream_handle.h"
 #include "sxt/base/device/stream_pool.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/execution/async/test_kernel.h"
+#include "sxt/execution/device/test_kernel.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 
 using namespace sxt;
-using namespace sxt::xena;
+using namespace sxt::xendv;
 
 static memmg::managed_array<uint64_t> make_random_array(std::mt19937& rng, size_t n) noexcept {
   memmg::managed_array<uint64_t> res{n, memr::get_pinned_resource()};

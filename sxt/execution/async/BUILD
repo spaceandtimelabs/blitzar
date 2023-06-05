@@ -15,41 +15,16 @@ sxt_cc_component(
 sxt_cc_component(
     name = "coroutine",
     test_deps = [
-        ":synchronization",
-        ":test_kernel",
         "//sxt/base/device:event",
         "//sxt/base/device:event_utility",
         "//sxt/memory/management:managed_array",
         "//sxt/base/device:stream",
         "//sxt/base/test:unit_test",
-        "//sxt/execution/schedule:scheduler",
     ],
     deps = [
         ":awaiter",
         ":coroutine_promise",
         ":future",
-    ],
-)
-
-sxt_cc_component(
-    name = "gpu_computation_event",
-    test_deps = [
-        ":future",
-        ":test_kernel",
-        "//sxt/base/device:stream",
-        "//sxt/execution/schedule:scheduler",
-        "//sxt/base/device:event_utility",
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/test:unit_test",
-        "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:async_device_resource",
-        "//sxt/memory/resource:pinned_resource",
-    ],
-    deps = [
-        ":computation_handle",
-        ":promise",
-        "//sxt/base/device:event",
-        "//sxt/execution/schedule:pollable_event",
     ],
 )
 
@@ -74,23 +49,6 @@ sxt_cc_component(
 sxt_cc_component(
     name = "continuation_fn_utility",
     with_test = False,
-)
-
-sxt_cc_component(
-    name = "test_kernel",
-    impl_deps = [
-        "//sxt/base/device:property",
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/num:divide_up",
-        "//sxt/base/device:stream",
-        "//sxt/memory/resource:async_device_resource",
-        "//sxt/memory/management:managed_array",
-    ],
-    is_cuda = True,
-    with_test = False,
-    deps = [
-        "//sxt/base/type:raw_stream",
-    ],
 )
 
 sxt_cc_component(
@@ -127,28 +85,6 @@ sxt_cc_component(
     deps = [
         ":future_state",
         ":task",
-    ],
-)
-
-sxt_cc_component(
-    name = "computation_handle",
-    impl_deps = [
-        "//sxt/base/device:synchronization",
-        "//sxt/base/device:stream_handle",
-        "//sxt/base/device:stream_pool",
-        "//sxt/base/device:stream",
-        "//sxt/base/error:assert",
-    ],
-    test_deps = [
-        ":test_kernel",
-        "//sxt/base/device:stream_handle",
-        "//sxt/base/device:stream_pool",
-        "//sxt/base/device:stream",
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/test:unit_test",
-        "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:device_resource",
-        "//sxt/memory/resource:pinned_resource",
     ],
 )
 
@@ -213,20 +149,5 @@ sxt_cc_component(
     ],
     deps = [
         ":future",
-    ],
-)
-
-sxt_cc_component(
-    name = "synchronization",
-    with_test = False,
-    deps = [
-        ":future",
-        ":gpu_computation_event",
-        ":promise",
-        "//sxt/base/device:event",
-        "//sxt/base/device:event_utility",
-        "//sxt/base/device:stream",
-        "//sxt/base/type:raw_stream",
-        "//sxt/execution/schedule:scheduler",
     ],
 )

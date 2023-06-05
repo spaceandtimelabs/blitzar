@@ -45,7 +45,7 @@ sxt_cc_component(
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/execution/async:future",
-        "//sxt/execution/async:synchronization",
+        "//sxt/execution/device:synchronization",
         "//sxt/execution/kernel:kernel_dims",
         "//sxt/execution/kernel:launch",
         "//sxt/memory/management:managed_array",

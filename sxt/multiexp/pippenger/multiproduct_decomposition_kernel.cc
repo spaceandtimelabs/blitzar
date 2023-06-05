@@ -27,7 +27,7 @@
 #include "sxt/base/num/power2_equality.h"
 #include "sxt/base/type/int.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/async/synchronization.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
@@ -209,7 +209,7 @@ xena::future<> decompose_exponent_bits(basct::span<unsigned> indexes, bast::raw_
   }
 
   // set up future
-  return xena::await_stream(stream);
+  return xendv::await_stream(stream);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -256,6 +256,6 @@ xena::future<> count_exponent_bits(memmg::managed_array<unsigned>& block_counts,
   basdv::async_copy_device_to_host(block_counts, block_counts_dev, stream);
 
   // set up future
-  return xena::await_stream(stream);
+  return xendv::await_stream(stream);
 }
 } // namespace sxt::mtxpi

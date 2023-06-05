@@ -33,7 +33,7 @@ sxt_cc_component(
         "//sxt/base/device:stream",
         "//sxt/base/num:divide_up",
         "//sxt/execution/async:future",
-        "//sxt/execution/async:synchronization",
+        "//sxt/execution/device:synchronization",
         "//sxt/execution/kernel:kernel_dims",
     ],
 )

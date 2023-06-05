@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/execution/async/gpu_computation_event.h"
+#include "sxt/execution/device/computation_event.h"
 
-namespace sxt::xena {
-template class gpu_computation_event<void>;
-} // namespace sxt::xena
+namespace sxt::xendv {
+template class computation_event<void>;
+} // namespace sxt::xendv

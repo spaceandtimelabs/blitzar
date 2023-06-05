@@ -32,6 +32,8 @@ public:
 
   pollable_event* next() noexcept { return next_.get(); }
 
+  virtual int device() const noexcept = 0;
+
   virtual bool ready() noexcept = 0;
 
   virtual void invoke() noexcept = 0;

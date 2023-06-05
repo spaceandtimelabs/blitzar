@@ -26,9 +26,8 @@
 #include "sxt/base/device/event_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
-#include "sxt/execution/async/computation_handle.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/async/synchronization.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
@@ -92,7 +91,7 @@ xena::future<> compute_multiproduct(basct::span<typename Reducer::value_type> pr
 
   // future
   // clang-format off
-  return xena::await_stream(stream).then([
+  return xendv::await_stream(stream).then([
       products,
       block_descriptors = std::move(computation_descriptor.block_descriptors),
       partial_res = std::move(partial_res)

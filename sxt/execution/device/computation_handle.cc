@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/execution/async/computation_handle.h"
+#include "sxt/execution/device/computation_handle.h"
 
 #include "sxt/base/device/stream.h"
 #include "sxt/base/device/stream_handle.h"
@@ -22,7 +22,7 @@
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/error/assert.h"
 
-namespace sxt::xena {
+namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
@@ -73,4 +73,4 @@ void computation_handle::add_stream(basdv::stream&& stream) noexcept {
   handle->next = head_;
   head_ = handle;
 }
-} // namespace sxt::xena
+} // namespace sxt::xendv

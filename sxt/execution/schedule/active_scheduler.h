@@ -18,35 +18,23 @@
 
 #include <memory>
 
-#include "sxt/execution/schedule/active_scheduler.h"
-#include "sxt/execution/schedule/pending_scheduler.h"
+#include "sxt/base/functional/function_ref.h"
 
 namespace sxt::xens {
 class pollable_event;
-class pending_event;
 
 //--------------------------------------------------------------------------------------------------
-// scheduler
+// active_scheduler
 //--------------------------------------------------------------------------------------------------
-class scheduler {
+class active_scheduler {
 public:
-  scheduler(size_t num_devices, size_t target_max_active) noexcept;
+  void run(basf::function_ref<void(int)> on_device_complete) noexcept;
 
   void run() noexcept;
 
   void schedule(std::unique_ptr<pollable_event>&& event) noexcept;
 
-  void schedule(std::unique_ptr<pending_event>&& event) noexcept;
-
-  int get_available_device() const noexcept;
-
 private:
-  active_scheduler active_scheduler_;
-  pending_scheduler pending_scheduler_;
+  std::unique_ptr<pollable_event> head_;
 };
-
-//--------------------------------------------------------------------------------------------------
-// get_scheduler
-//--------------------------------------------------------------------------------------------------
-scheduler& get_scheduler() noexcept;
 } // namespace sxt::xens

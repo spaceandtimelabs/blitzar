@@ -23,7 +23,7 @@
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/async/synchronization.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
@@ -90,7 +90,7 @@ setup_verification_generators(basct::span<c21t::element_p3> generators,
   }
   basdv::async_copy_host_to_device(basct::subspan(generators, np + 1), lr_vector, stream);
 
-  co_await xena::await_stream(stream);
+  co_await xendv::await_stream(stream);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -127,7 +127,7 @@ gpu_driver::make_workspace(const proof_descriptor& descriptor,
   };
   basdv::async_copy_host_to_device(res->g_vector, descriptor.g_vector, stream);
 
-  return xena::await_and_own_stream(std::move(stream), std::unique_ptr<workspace>{std::move(res)});
+  return xendv::await_and_own_stream(std::move(stream), std::unique_ptr<workspace>{std::move(res)});
 }
 
 //--------------------------------------------------------------------------------------------------

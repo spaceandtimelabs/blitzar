@@ -23,7 +23,7 @@ namespace sxt::basdv {
 struct stream_handle;
 }
 
-namespace sxt::xena {
+namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 // computation_handle
 //--------------------------------------------------------------------------------------------------
@@ -47,4 +47,4 @@ public:
 private:
   basdv::stream_handle* head_{nullptr};
 };
-} // namespace sxt::xena
+} // namespace sxt::xendv

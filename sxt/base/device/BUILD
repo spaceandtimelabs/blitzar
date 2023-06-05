@@ -57,10 +57,15 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "property",
+    impl_deps = [
+        "//sxt/base/error:panic",
+    ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
     deps = [
+        "//sxt/base/type:raw_stream",
+        "@local_config_cuda//cuda:cuda_driver",
         "@local_config_cuda//cuda:cuda_headers",
         "@local_config_cuda//cuda:cudart_static",
     ],
@@ -96,7 +101,7 @@ sxt_cc_component(
     test_deps = [
         ":stream_handle",
         ":stream_pool",
-        "//sxt/base/device:property",
+        ":property",
         "//sxt/base/test:unit_test",
     ],
     deps = [

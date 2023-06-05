@@ -16,37 +16,23 @@
  */
 #pragma once
 
-#include <memory>
+#include <functional>
 
-#include "sxt/execution/schedule/active_scheduler.h"
-#include "sxt/execution/schedule/pending_scheduler.h"
+#include "sxt/execution/schedule/pending_event.h"
 
 namespace sxt::xens {
-class pollable_event;
-class pending_event;
-
 //--------------------------------------------------------------------------------------------------
-// scheduler
+// test_pending_event
 //--------------------------------------------------------------------------------------------------
-class scheduler {
+class test_pending_event final : public pending_event {
 public:
-  scheduler(size_t num_devices, size_t target_max_active) noexcept;
+  test_pending_event(int id, std::function<void(int, int)> f = {}) noexcept;
 
-  void run() noexcept;
-
-  void schedule(std::unique_ptr<pollable_event>&& event) noexcept;
-
-  void schedule(std::unique_ptr<pending_event>&& event) noexcept;
-
-  int get_available_device() const noexcept;
+  // pending_event
+  void invoke(int device) noexcept override;
 
 private:
-  active_scheduler active_scheduler_;
-  pending_scheduler pending_scheduler_;
+  int id_;
+  std::function<void(int, int)> f_;
 };
-
-//--------------------------------------------------------------------------------------------------
-// get_scheduler
-//--------------------------------------------------------------------------------------------------
-scheduler& get_scheduler() noexcept;
 } // namespace sxt::xens

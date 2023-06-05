@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/execution/async/test_kernel.h"
+#include "sxt/execution/device/test_kernel.h"
 
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/property.h"
@@ -23,7 +23,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 
-namespace sxt::xena {
+namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 // add_impl
 //--------------------------------------------------------------------------------------------------
@@ -64,4 +64,4 @@ void add_for_testing(uint64_t* c, bast::raw_stream_t stream, const uint64_t* a, 
     basdv::async_memcpy_device_to_host(c, cp, n * sizeof(uint64_t), stream);
   }
 }
-} // namespace sxt::xena
+} // namespace sxt::xendv

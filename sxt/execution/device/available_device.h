@@ -16,14 +16,11 @@
  */
 #pragma once
 
-#include <cstdint>
+#include "sxt/execution/async/future_fwd.h"
 
-#include "sxt/base/type/raw_stream.h"
-
-namespace sxt::xena {
+namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
-// add_for_testing
+// await_available_device
 //--------------------------------------------------------------------------------------------------
-void add_for_testing(uint64_t* c, bast::raw_stream_t stream, const uint64_t* a, const uint64_t* b,
-                     int n) noexcept;
-} // namespace sxt::xena
+xena::future<int> await_available_device() noexcept;
+} // namespace sxt::xendv

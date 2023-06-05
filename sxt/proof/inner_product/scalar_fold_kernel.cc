@@ -21,7 +21,6 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/async/future_utility.h"
-#include "sxt/execution/async/synchronization.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
 #include "sxt/scalar25/type/element.h"
