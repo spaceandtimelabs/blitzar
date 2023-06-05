@@ -229,6 +229,26 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     REQUIRE(res == expected);
   }
 
+  SECTION("we handle multiple sequences with multiple exponents where one is all zero") {
+    std::vector<uint8_t> exponents1 = {0, 0, 0};
+    std::vector<uint16_t> exponents2 = {2, 6, 4};
+    std::vector<mtxb::exponent_sequence> sequences = {
+        mtxb::to_exponent_sequence(exponents1),
+        mtxb::to_exponent_sequence(exponents2),
+    };
+    memmg::managed_array<c21t::element_p3> generators = {
+        0x123_rs,
+        0x456_rs,
+        0x789_rs,
+    };
+    auto res = f(generators, sequences);
+    memmg::managed_array<c21t::element_p3> expected = {
+        c21cn::zero_p3_v,
+        2 * generators[0] + 6 * generators[1] + 4 * generators[2],
+    };
+    REQUIRE(res == expected);
+  }
+
   SECTION("we handle multiple sequences  of varying length") {
     std::vector<uint8_t> exponents1 = {10};
     std::vector<uint16_t> exponents2 = {2, 6, 4};

@@ -123,7 +123,7 @@ void combine_multiproducts(basct::span<c21t::element_p3> outputs,
     auto [output_products, digit_or_all] =
         init_output_products(product_index, input_index, products, output_digit_or_all,
                              static_cast<bool>(sequence.is_signed));
-    if (products.empty()) {
+    if (output_products.empty()) {
       outputs[sequence_index] = c21cn::zero_p3_v;
       continue;
     }
