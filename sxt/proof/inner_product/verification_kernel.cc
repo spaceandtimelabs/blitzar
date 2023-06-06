@@ -31,7 +31,7 @@ namespace sxt::prfip {
 // compute_g_exponents_partial
 //--------------------------------------------------------------------------------------------------
 xena::future<> compute_g_exponents_partial(basct::span<s25t::element> g_exponents,
-                                           bast::raw_stream_t stream,
+                                           const basdv::stream& stream,
                                            basct::cspan<s25t::element> x_sq_vector,
                                            size_t round_first) noexcept {
   auto num_rounds = round_first - 1 + x_sq_vector.size();

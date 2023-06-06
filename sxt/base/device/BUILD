@@ -65,7 +65,6 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/type:raw_stream",
-        "@local_config_cuda//cuda:cuda_driver",
         "@local_config_cuda//cuda:cuda_headers",
         "@local_config_cuda//cuda:cudart_static",
     ],

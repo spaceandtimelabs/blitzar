@@ -98,6 +98,7 @@ sxt_cc_component(
         ":multiproduct_decomposition_kernel",
         "//sxt/base/error:assert",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
         "//sxt/base/num:divide_up",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/memory/management:managed_array",

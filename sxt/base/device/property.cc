@@ -39,29 +39,4 @@ int get_num_devices() noexcept {
   }();
   return num_devices;
 }
-
-//--------------------------------------------------------------------------------------------------
-// get_stream_device
-//--------------------------------------------------------------------------------------------------
-int get_stream_device(bast::raw_stream_t stream) noexcept {
-  CUcontext ctx;
-  auto rcode = cuStreamGetCtx(stream, &ctx);
-  if (rcode != 0) {
-    baser::panic("cuStreamGetCtx failed\n");
-  }
-  rcode = cuCtxPushCurrent(ctx);
-  if (rcode != 0) {
-    baser::panic("cuCtxPushCurrent failed\n");
-  }
-  CUdevice device;
-  rcode = cuCtxGetDevice(&device);
-  if (rcode != 0) {
-    baser::panic("cuCtxGetDevice failed\n");
-  }
-  rcode = cuCtxPopCurrent(&ctx);
-  if (rcode != 0) {
-    baser::panic("cuCtxPopCurrent failed\n");
-  }
-  return device;
-}
 } // namespace sxt::basdv

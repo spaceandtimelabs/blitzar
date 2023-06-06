@@ -34,11 +34,11 @@ namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 // await_stream
 //--------------------------------------------------------------------------------------------------
-xena::future<> await_stream(bast::raw_stream_t stream) noexcept;
+xena::future<> await_stream(const basdv::stream& stream) noexcept;
 
 template <class T>
   requires std::constructible_from<std::optional<std::remove_cvref_t<T>>, T&&>
-xena::future<std::remove_cvref_t<T>> await_stream(T&& val, bast::raw_stream_t stream) noexcept {
+xena::future<std::remove_cvref_t<T>> await_stream(T&& val, const basdv::stream& stream) noexcept {
   using Tp = std::remove_cvref_t<T>;
   xena::future_state<Tp> state;
   state.emplace(std::forward<T>(val));
@@ -46,8 +46,8 @@ xena::future<std::remove_cvref_t<T>> await_stream(T&& val, bast::raw_stream_t st
   xena::future<Tp> res{p, std::move(state)};
   basdv::event event;
   basdv::record_event(event, stream);
-  xens::get_scheduler().schedule(std::make_unique<computation_event<Tp>>(
-      basdv::get_stream_device(stream), std::move(event), std::move(p)));
+  xens::get_scheduler().schedule(
+      std::make_unique<computation_event<Tp>>(stream.device(), std::move(event), std::move(p)));
   return res;
 }
 

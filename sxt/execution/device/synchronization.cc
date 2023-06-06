@@ -20,13 +20,13 @@ namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 // await_stream
 //--------------------------------------------------------------------------------------------------
-xena::future<> await_stream(bast::raw_stream_t stream) noexcept {
+xena::future<> await_stream(const basdv::stream& stream) noexcept {
   xena::promise<> p;
   xena::future<> res{p};
   basdv::event event;
   basdv::record_event(event, stream);
-  xens::get_scheduler().schedule(std::make_unique<computation_event<>>(
-      basdv::get_stream_device(stream), std::move(event), std::move(p)));
+  xens::get_scheduler().schedule(
+      std::make_unique<computation_event<>>(stream.device(), std::move(event), std::move(p)));
   return res;
 }
 

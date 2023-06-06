@@ -172,7 +172,7 @@ static __global__ void signed_decomposition_kernel(unsigned* out, const unsigned
 //--------------------------------------------------------------------------------------------------
 // decompose_exponent_bits
 //--------------------------------------------------------------------------------------------------
-xena::future<> decompose_exponent_bits(basct::span<unsigned> indexes, bast::raw_stream_t stream,
+xena::future<> decompose_exponent_bits(basct::span<unsigned> indexes, const basdv::stream& stream,
                                        basct::cspan<unsigned> offsets,
                                        const mtxb::exponent_sequence& exponents) noexcept {
   unsigned element_num_bytes = exponents.element_nbytes;
@@ -216,7 +216,7 @@ xena::future<> decompose_exponent_bits(basct::span<unsigned> indexes, bast::raw_
 // count_exponent_bits
 //--------------------------------------------------------------------------------------------------
 xena::future<> count_exponent_bits(memmg::managed_array<unsigned>& block_counts,
-                                   bast::raw_stream_t stream,
+                                   const basdv::stream& stream,
                                    const mtxb::exponent_sequence& exponents) noexcept {
   unsigned element_num_bytes = exponents.element_nbytes;
   unsigned element_num_bits = 8u * element_num_bytes;

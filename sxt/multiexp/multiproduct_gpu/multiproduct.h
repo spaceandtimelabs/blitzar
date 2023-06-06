@@ -46,7 +46,7 @@ template <algb::reducer Reducer, algb::mapper Mapper>
   requires std::same_as<typename Reducer::value_type, typename Mapper::value_type> &&
            std::constructible_from<Mapper, const typename Reducer::value_type*, const unsigned*>
 xena::future<> compute_multiproduct(basct::span<typename Reducer::value_type> products,
-                                    bast::raw_stream_t stream,
+                                    const basdv::stream& stream,
                                     basct::cspan<typename Reducer::value_type> generators,
                                     basct::cspan<unsigned> indexes,
                                     basct::cspan<unsigned> product_sizes) noexcept {

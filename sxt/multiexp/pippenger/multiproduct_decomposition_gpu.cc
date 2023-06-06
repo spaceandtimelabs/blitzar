@@ -20,6 +20,7 @@
 #include <memory>
 
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
@@ -35,7 +36,7 @@ namespace sxt::mtxpi {
 //--------------------------------------------------------------------------------------------------
 xena::future<> compute_multiproduct_decomposition(memmg::managed_array<unsigned>& indexes,
                                                   basct::span<unsigned> product_sizes,
-                                                  bast::raw_stream_t stream,
+                                                  const basdv::stream& stream,
                                                   mtxb::exponent_sequence exponents) noexcept {
   auto element_num_bytes = exponents.element_nbytes;
   auto element_num_bits = 8u * element_num_bytes;

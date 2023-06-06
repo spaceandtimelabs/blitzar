@@ -57,9 +57,4 @@ TEST_CASE("stream provides a wrapper around pooled CUDA streams") {
     REQUIRE(s1.release_handle() == nullptr);
     REQUIRE(s2.raw_stream() == ptr);
   }
-
-  SECTION("we can access the device of a stream") {
-    stream s1;
-    REQUIRE(s1.device() == get_stream_device(s1));
-  }
 }
