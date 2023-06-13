@@ -119,6 +119,7 @@ sxt_cc_component(
         "//sxt/curve21/constant:zero",
         "//sxt/ristretto/base:byte_conversion",
         "//sxt/ristretto/operation:add",
+        "//sxt/ristretto/operation:overload",
         "//sxt/ristretto/operation:scalar_multiply",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",

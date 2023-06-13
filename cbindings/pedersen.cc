@@ -46,9 +46,12 @@ static uint64_t populate_exponent_sequence(basct::span<mtxb::exponent_sequence> 
 
     longest_sequence = std::max(longest_sequence, curr_descriptor.n);
 
-    sequences[i] = {.element_nbytes = curr_descriptor.element_nbytes,
-                    .n = curr_descriptor.n,
-                    .data = curr_descriptor.data};
+    sequences[i] = {
+        .element_nbytes = curr_descriptor.element_nbytes,
+        .n = curr_descriptor.n,
+        .data = curr_descriptor.data,
+        .is_signed = curr_descriptor.is_signed,
+    };
   }
 
   return longest_sequence;

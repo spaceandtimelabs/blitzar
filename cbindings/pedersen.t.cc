@@ -16,6 +16,7 @@
  */
 #include "cbindings/pedersen.h"
 
+#include <type_traits>
 #include <vector>
 
 #include "cbindings/backend.h"
@@ -24,6 +25,7 @@
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/operation/add.h"
+#include "sxt/ristretto/operation/overload.h"
 #include "sxt/ristretto/operation/scalar_multiply.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/generator/base_element.h"
@@ -57,9 +59,12 @@ static std::vector<c21t::element_p3> compute_random_generators(uint64_t seq_leng
 //--------------------------------------------------------------------------------------------------
 template <class T>
 static sxt_sequence_descriptor make_sequence_descriptor(const std::vector<T>& data) {
-  return {.element_nbytes = sizeof(T),
-          .n = data.size(),
-          .data = reinterpret_cast<const uint8_t*>(data.data())};
+  return {
+      .element_nbytes = sizeof(T),
+      .n = data.size(),
+      .data = reinterpret_cast<const uint8_t*>(data.data()),
+      .is_signed = std::is_signed_v<T>,
+  };
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -110,6 +115,20 @@ static void test_pedersen_commitments_with_given_backend_and_no_generators(
     sxt_compute_pedersen_commitments(&commitment, num_sequences, &seq_descriptor, offset_gens);
     REQUIRE(rstt::compressed_element() ==
             *reinterpret_cast<rstt::compressed_element*>(&commitment));
+  }
+
+  SECTION("we can compute signed commitments") {
+    const std::vector<int64_t> data1 = {-2};
+    const std::vector<int64_t> data2 = {2};
+    const std::vector<sxt_sequence_descriptor> valid_descriptors = {
+        make_sequence_descriptor(data1),
+        make_sequence_descriptor(data2),
+    };
+    const uint64_t num_sequences = valid_descriptors.size();
+    rstt::compressed_element commitments_data[num_sequences];
+    sxt_compute_pedersen_commitments(reinterpret_cast<sxt_compressed_ristretto*>(commitments_data),
+                                     num_sequences, valid_descriptors.data(), 0);
+    REQUIRE(commitments_data[0] == -commitments_data[1]);
   }
 
   SECTION("We can multiply and add two commitments together, then compare them against the c "
