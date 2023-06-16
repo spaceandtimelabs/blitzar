@@ -56,8 +56,8 @@ xena::future<> compute_multiproduct(basct::span<typename Reducer::value_type> pr
       products.size() == num_products &&
       product_sizes.size() == num_products &&
       basdv::is_host_pointer(products.data()) &&
-      basdv::is_device_pointer(generators.data()) &&
-      basdv::is_device_pointer(indexes.data()) &&
+      basdv::is_active_device_pointer(generators.data()) &&
+      basdv::is_active_device_pointer(indexes.data()) &&
       basdv::is_host_pointer(product_sizes.data())
       // clang-format on
   );

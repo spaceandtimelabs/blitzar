@@ -21,19 +21,12 @@
 #include <iostream>
 #include <string>
 
+#include "sxt/base/device/pointer_attributes.h"
+#include "sxt/base/device/state.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/error/panic.h"
 
 namespace sxt::basdv {
-//--------------------------------------------------------------------------------------------------
-// async_memcpy_host_to_device
-//--------------------------------------------------------------------------------------------------
-void async_memcpy_host_to_device(void* dst, const void* src, size_t count) noexcept {
-  auto rcode = cudaMemcpyAsync(dst, src, count, cudaMemcpyHostToDevice);
-  if (rcode != cudaSuccess) {
-    baser::panic("cudaMemcpyAsync failed: " + std::string(cudaGetErrorString(rcode)));
-  }
-}
-
 //--------------------------------------------------------------------------------------------------
 // memcpy_host_to_device
 //--------------------------------------------------------------------------------------------------
@@ -88,6 +81,33 @@ void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
 }
 
 //--------------------------------------------------------------------------------------------------
+// async_memcpy_peer
+//--------------------------------------------------------------------------------------------------
+void async_memcpy_peer(void* dst, int dst_device, const void* src, int src_device, size_t count,
+                       bast::raw_stream_t stream) noexcept {
+  auto rcode = cudaMemcpyPeerAsync(dst, dst_device, src, src_device, count, stream);
+  if (rcode != cudaSuccess) {
+    baser::panic("cudaMemcpyPeerAsync failed: " + std::string(cudaGetErrorString(rcode)));
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+// async_memcpy_to_device
+//--------------------------------------------------------------------------------------------------
+void async_memcpy_to_device(void* dst, const void* src, size_t count,
+                            const pointer_attributes& attrs, const stream& stream) noexcept {
+  SXT_DEBUG_ASSERT(attrs.device != stream.device());
+  switch (attrs.kind) {
+  case pointer_kind_t::host:
+    return async_memcpy_host_to_device(dst, src, count, stream);
+  case pointer_kind_t::device:
+    return async_memcpy_peer(dst, stream.device(), src, attrs.device, count, stream);
+  case pointer_kind_t::managed:
+    baser::panic("async_memcpy_to_device doesn't support managed pointers");
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
 // async_memset_device
 //--------------------------------------------------------------------------------------------------
 void async_memset_device(void* dst, int val, size_t count, bast::raw_stream_t stream) noexcept {
@@ -108,15 +128,41 @@ void memset_device(void* dst, int value, size_t count) noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
-// is_device_pointer
+// get_pointer_attributes
 //--------------------------------------------------------------------------------------------------
-bool is_device_pointer(const void* ptr) noexcept {
+void get_pointer_attributes(pointer_attributes& attrs, const void* ptr) noexcept {
+  cudaPointerAttributes cuda_attrs;
+  auto rcode = cudaPointerGetAttributes(&cuda_attrs, ptr);
+  if (rcode != cudaSuccess) {
+    baser::panic("cudaPointerGetAttributes failed: " + std::string(cudaGetErrorString(rcode)));
+  }
+  if (cuda_attrs.type == cudaMemoryTypeDevice) {
+    attrs.kind = pointer_kind_t::device;
+    attrs.device = cuda_attrs.device;
+    return;
+  }
+  if (cuda_attrs.type == cudaMemoryTypeManaged) {
+    attrs.kind = pointer_kind_t::managed;
+    attrs.device = cuda_attrs.device;
+    return;
+  }
+  attrs.kind = pointer_kind_t::host;
+  attrs.device = -1;
+}
+
+//--------------------------------------------------------------------------------------------------
+// is_active_device_pointer
+//--------------------------------------------------------------------------------------------------
+bool is_active_device_pointer(const void* ptr) noexcept {
   cudaPointerAttributes attrs;
   auto rcode = cudaPointerGetAttributes(&attrs, ptr);
   if (rcode != cudaSuccess) {
     baser::panic("cudaPointerGetAttributes failed: " + std::string(cudaGetErrorString(rcode)));
   }
-  return attrs.type == cudaMemoryTypeDevice || attrs.type == cudaMemoryTypeManaged;
+  if (attrs.type == cudaMemoryTypeManaged) {
+    return true;
+  }
+  return attrs.type == cudaMemoryTypeDevice && attrs.device == get_device();
 }
 
 //--------------------------------------------------------------------------------------------------

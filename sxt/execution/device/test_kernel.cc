@@ -45,22 +45,22 @@ void add_for_testing(uint64_t* c, bast::raw_stream_t stream, const uint64_t* a, 
   memmg::managed_array<uint64_t> b_dev{&resource};
   memmg::managed_array<uint64_t> c_dev{&resource};
   auto cp = c;
-  if (!basdv::is_device_pointer(a)) {
+  if (!basdv::is_active_device_pointer(a)) {
     a_dev = memmg::managed_array<uint64_t>{static_cast<unsigned>(n), &resource};
     basdv::async_memcpy_host_to_device(a_dev.data(), a, n * sizeof(uint64_t), stream);
     a = a_dev.data();
   }
-  if (!basdv::is_device_pointer(b)) {
+  if (!basdv::is_active_device_pointer(b)) {
     b_dev = memmg::managed_array<uint64_t>{static_cast<unsigned>(n), &resource};
     basdv::async_memcpy_host_to_device(b_dev.data(), b, n * sizeof(uint64_t), stream);
     b = b_dev.data();
   }
-  if (!basdv::is_device_pointer(c)) {
+  if (!basdv::is_active_device_pointer(c)) {
     c_dev = memmg::managed_array<uint64_t>{static_cast<unsigned>(n), &resource};
     cp = c_dev.data();
   }
   add_impl<<<basn::divide_up(n, 256), 256, 0, stream>>>(cp, a, b, n);
-  if (!basdv::is_device_pointer(c)) {
+  if (!basdv::is_active_device_pointer(c)) {
     basdv::async_memcpy_device_to_host(c, cp, n * sizeof(uint64_t), stream);
   }
 }

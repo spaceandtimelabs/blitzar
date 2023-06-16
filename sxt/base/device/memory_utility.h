@@ -24,10 +24,8 @@
 #include "sxt/base/type/raw_stream.h"
 
 namespace sxt::basdv {
-//--------------------------------------------------------------------------------------------------
-// async_memcpy_host_to_device
-//--------------------------------------------------------------------------------------------------
-void async_memcpy_host_to_device(void* dst, const void* src, size_t count) noexcept;
+class stream;
+struct pointer_attributes;
 
 //--------------------------------------------------------------------------------------------------
 // memcpy_host_to_device
@@ -58,9 +56,21 @@ void async_memcpy_device_to_host(void* dst, const void* src, size_t count,
                                  bast::raw_stream_t stream) noexcept;
 
 //--------------------------------------------------------------------------------------------------
+// async_memcpy_peer
+//--------------------------------------------------------------------------------------------------
+void async_memcpy_peer(void* dst, int dst_device, const void* src, int src_device, size_t count,
+                       bast::raw_stream_t stream) noexcept;
+
+//--------------------------------------------------------------------------------------------------
 // async_memset_device
 //--------------------------------------------------------------------------------------------------
 void async_memset_device(void* dst, int val, size_t count, bast::raw_stream_t stream) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// async_memcpy_to_device
+//--------------------------------------------------------------------------------------------------
+void async_memcpy_to_device(void* dst, const void* src, size_t count,
+                            const pointer_attributes& attrs, const stream& stream) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // async_copy_host_to_device
@@ -107,9 +117,14 @@ void async_copy_device_to_device(Dst&& dst, const Src& src, bast::raw_stream_t s
 void memset_device(void* dst, int value, size_t count) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// is_device_pointer
+// get_pointer_attributes
 //--------------------------------------------------------------------------------------------------
-bool is_device_pointer(const void* ptr) noexcept;
+void get_pointer_attributes(pointer_attributes& attrs, const void* ptr) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// is_active_device_pointer
+//--------------------------------------------------------------------------------------------------
+bool is_active_device_pointer(const void* ptr) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // is_host_pointer

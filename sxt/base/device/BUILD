@@ -15,6 +15,19 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "pointer_attributes",
+    with_test = False,
+    deps = [
+        ":pointer_kind",
+    ],
+)
+
+sxt_cc_component(
+    name = "pointer_kind",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "event",
     impl_deps = [
         "//sxt/base/error:panic",
@@ -73,11 +86,16 @@ sxt_cc_component(
 sxt_cc_component(
     name = "memory_utility",
     impl_deps = [
+        ":pointer_attributes",
+        ":stream",
+        ":state",
         "//sxt/base/error:panic",
         "@local_config_cuda//cuda:cuda_headers",
         "@local_config_cuda//cuda:cudart_static",
     ],
     test_deps = [
+        ":pointer_attributes",
+        ":state",
         "//sxt/base/container:span",
         "//sxt/base/test:unit_test",
         "@local_config_cuda//cuda:cuda_headers",

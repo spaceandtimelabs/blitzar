@@ -117,7 +117,7 @@ async_compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
   std::optional<basdv::stream> generators_stream;
   std::optional<basdv::event> generators_event;
   memmg::managed_array<c21t::element_p3> generators_data{memr::get_device_resource()};
-  if (!basdv::is_device_pointer(generators.data())) {
+  if (!basdv::is_active_device_pointer(generators.data())) {
     generators_stream.emplace();
     generators_event.emplace();
     generators_data =

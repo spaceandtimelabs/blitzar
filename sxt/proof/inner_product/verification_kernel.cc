@@ -39,7 +39,7 @@ xena::future<> compute_g_exponents_partial(basct::span<s25t::element> g_exponent
   // clang-format off
   SXT_DEBUG_ASSERT(
       np <= std::numeric_limits<unsigned>::max() &&
-      basdv::is_device_pointer(g_exponents.data()) &&
+      basdv::is_active_device_pointer(g_exponents.data()) &&
       basdv::is_host_pointer(x_sq_vector.data()) &&
       g_exponents.size() == np &&
       !x_sq_vector.empty() &&

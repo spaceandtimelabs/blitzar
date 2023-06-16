@@ -33,7 +33,7 @@ xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector,
                                    basct::cspan<unsigned> decomposition) noexcept {
   SXT_DEBUG_ASSERT(
       // clang-format off
-      basdv::is_device_pointer(g_vector.data()) &&
+      basdv::is_active_device_pointer(g_vector.data()) &&
       basdv::is_host_pointer(decomposition.data()) &&
       g_vector.size() % 2 == 0 && 
       g_vector.size() > 1

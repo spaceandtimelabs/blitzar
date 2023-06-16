@@ -77,7 +77,7 @@ xena::future<> fold_scalars(basct::span<s25t::element> scalars, const s25t::elem
   auto n = scalars.size();
   SXT_DEBUG_ASSERT(
       // clang-format off
-      basdv::is_device_pointer(scalars.data()) &&
+      basdv::is_active_device_pointer(scalars.data()) &&
       0 < mid && 
       mid < n &&
       n <= 2u * mid

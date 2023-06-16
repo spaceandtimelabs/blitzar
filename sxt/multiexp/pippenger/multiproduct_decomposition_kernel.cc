@@ -180,9 +180,9 @@ xena::future<> decompose_exponent_bits(basct::span<unsigned> indexes, const basd
   auto n = exponents.n;
   SXT_DEBUG_ASSERT(
       // clang-format off
-      basdv::is_device_pointer(indexes.data()) &&
+      basdv::is_active_device_pointer(indexes.data()) &&
       basdv::is_host_pointer(offsets.data()) &&
-      basdv::is_device_pointer(exponents.data)
+      basdv::is_active_device_pointer(exponents.data)
       // clang-format on
   );
   auto num_blocks = offsets.size() / element_num_bits;
@@ -221,7 +221,7 @@ xena::future<> count_exponent_bits(memmg::managed_array<unsigned>& block_counts,
   unsigned element_num_bytes = exponents.element_nbytes;
   unsigned element_num_bits = 8u * element_num_bytes;
   auto n = exponents.n;
-  SXT_DEBUG_ASSERT(basdv::is_device_pointer(exponents.data));
+  SXT_DEBUG_ASSERT(basdv::is_active_device_pointer(exponents.data));
   memr::async_device_resource resource{stream};
   auto num_blocks = std::min(n, 128ul);
   auto num_iterations = basn::divide_up(n, num_blocks);

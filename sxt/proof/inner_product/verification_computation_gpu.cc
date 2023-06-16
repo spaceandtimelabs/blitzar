@@ -90,7 +90,7 @@ xena::future<> async_compute_verification_exponents(basct::span<s25t::element> e
   auto np = 1ull << num_rounds;
   // clang-format off
   SXT_DEBUG_ASSERT(
-      basdv::is_device_pointer(exponents.data()) &&
+      basdv::is_active_device_pointer(exponents.data()) &&
       basdv::is_host_pointer(x_vector.data()) &&
       n > 1 &&
       (n == np || n > (1ull << (num_rounds-1))) &&
