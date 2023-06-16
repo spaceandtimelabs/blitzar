@@ -16,26 +16,26 @@
  */
 #pragma once
 
-#include <cstdint>
+#include <random>
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::f12b {
+namespace sxt::basn {
+class fast_random_number_generator;
+}
+namespace sxt::f12t {
+class element;
+}
+
+namespace sxt::f12rn {
 //--------------------------------------------------------------------------------------------------
-// from_bytes
+// generate_random_element
 //--------------------------------------------------------------------------------------------------
 /*
- h = s mod p
- If s represents a above the modulus, the from_bytes function will set the is_below_modulus flag
- to false and return a wrapped the value, h. In this case s != to_bytes(h). Otherwise the
- is_below_modulus flag will be set to true and s == to_bytes(h).
+ Not guaranteed to be uniform. Only random elements generated below the modulus will be accepted.
  */
 CUDA_CALLABLE
-void from_bytes(bool& is_below_modulus, uint64_t h[6], const uint8_t s[48]) noexcept;
+void generate_random_element(f12t::element& e, basn::fast_random_number_generator& rng) noexcept;
 
-//--------------------------------------------------------------------------------------------------
-// to_bytes
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void to_bytes(uint8_t s[48], const uint64_t h[6]) noexcept;
-} // namespace sxt::f12b
+void generate_random_element(f12t::element& e, std::mt19937& rng) noexcept;
+} // namespace sxt::f12rn

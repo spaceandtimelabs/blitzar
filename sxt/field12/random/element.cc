@@ -14,28 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/field12/random/element.h"
 
-#include <cstdint>
+#include "sxt/base/macro/cuda_warning.h"
+#include "sxt/base/num/fast_random_number_generator.h"
+#include "sxt/field12/base/byte_conversion.h"
+#include "sxt/field12/type/element.h"
 
-#include "sxt/base/macro/cuda_callable.h"
-
-namespace sxt::f12b {
+namespace sxt::f12rn {
 //--------------------------------------------------------------------------------------------------
-// from_bytes
+// generate_random_element_impl
 //--------------------------------------------------------------------------------------------------
-/*
- h = s mod p
- If s represents a above the modulus, the from_bytes function will set the is_below_modulus flag
- to false and return a wrapped the value, h. In this case s != to_bytes(h). Otherwise the
- is_below_modulus flag will be set to true and s == to_bytes(h).
- */
+CUDA_DISABLE_HOSTDEV_WARNING
+template <class Rng>
+static CUDA_CALLABLE void generate_random_element_impl(f12t::element& e, Rng& generator) noexcept {
+  uint64_t data[6];
+  for (int i = 0; i < 6; ++i) {
+    data[i] = generator();
+  }
+
+  bool is_below_modulus{false};
+  f12b::from_bytes(is_below_modulus, e.data(), reinterpret_cast<const uint8_t*>(data));
+}
+
+//--------------------------------------------------------------------------------------------------
+// generate_random_element
+//--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void from_bytes(bool& is_below_modulus, uint64_t h[6], const uint8_t s[48]) noexcept;
+void generate_random_element(f12t::element& e, basn::fast_random_number_generator& rng) noexcept {
+  generate_random_element_impl(e, rng);
+}
 
-//--------------------------------------------------------------------------------------------------
-// to_bytes
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void to_bytes(uint8_t s[48], const uint64_t h[6]) noexcept;
-} // namespace sxt::f12b
+void generate_random_element(f12t::element& e, std::mt19937& rng) noexcept {
+  generate_random_element_impl(e, rng);
+}
+} // namespace sxt::f12rn
