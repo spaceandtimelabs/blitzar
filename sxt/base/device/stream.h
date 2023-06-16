@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "sxt/base/device/state.h"
 #include "sxt/base/type/raw_stream.h"
 
 namespace sxt::basdv {
@@ -29,7 +30,7 @@ struct stream_handle;
  */
 class stream {
 public:
-  explicit stream(int device = 0) noexcept;
+  explicit stream(int device = get_device()) noexcept;
 
   stream(stream&& other) noexcept;
 

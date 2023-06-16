@@ -36,6 +36,7 @@ static stream_handle* make_stream_handle(int device) noexcept {
   if (rcode != cudaSuccess) {
     baser::panic("cudaStreamCreate failed: " + std::string(cudaGetErrorString(rcode)));
   }
+  res->device = device;
   res->next = nullptr;
   return res;
 };

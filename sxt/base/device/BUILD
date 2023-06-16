@@ -104,6 +104,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
+        ":state",
         "//sxt/base/type:raw_stream",
     ],
 )
