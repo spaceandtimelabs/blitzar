@@ -19,6 +19,13 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "narrow_cast",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "remove_cvref",
     with_test = False,
 )
