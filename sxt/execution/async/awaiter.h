@@ -16,8 +16,11 @@
  */
 #pragma once
 
+#include <optional>
 #include <type_traits>
 
+#include "sxt/base/device/active_device_guard.h"
+#include "sxt/base/device/property.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/coroutine_promise.h"
 #include "sxt/execution/async/future.h"
@@ -28,7 +31,11 @@ namespace sxt::xena {
 //--------------------------------------------------------------------------------------------------
 template <class T> class awaiter {
 public:
-  explicit awaiter(future<T>&& fut) noexcept : future_{std::move(fut)} {}
+  explicit awaiter(future<T>&& fut) noexcept : future_{std::move(fut)} {
+    if (basdv::get_num_devices() > 0) {
+      active_guard_.emplace();
+    }
+  }
 
   bool await_ready() const noexcept { return future_.ready(); }
 
@@ -50,6 +57,7 @@ public:
 
 private:
   future<T> future_;
+  std::optional<basdv::active_device_guard> active_guard_;
 };
 
 extern template class awaiter<void>;

@@ -9,6 +9,8 @@ sxt_cc_component(
     deps = [
         ":coroutine_promise",
         ":future",
+        "//sxt/base/device:active_device_guard",
+        "//sxt/base/device:property",
     ],
 )
 
@@ -18,7 +20,9 @@ sxt_cc_component(
         "//sxt/base/device:event",
         "//sxt/base/device:event_utility",
         "//sxt/memory/management:managed_array",
-        "//sxt/base/device:stream",
+        "//sxt/base/device:active_device_guard",
+        "//sxt/base/device:property",
+        "//sxt/base/device:state",
         "//sxt/base/test:unit_test",
     ],
     deps = [

@@ -16,16 +16,19 @@
  */
 #include "sxt/execution/async/coroutine.h"
 
-#include "sxt/base/device/stream.h"
+#include "sxt/base/device/active_device_guard.h"
+#include "sxt/base/device/property.h"
+#include "sxt/base/device/state.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/memory/management/managed_array.h"
 
 using namespace sxt;
 using namespace sxt::xena;
 
-static future<> f_v();
-static future<int> f_i();
-static future<int> f_i2();
+static future<> f_v() noexcept;
+static future<int> f_i() noexcept;
+static future<int> f_i2() noexcept;
+static future<int> f_dev(promise<int>& p);
 
 TEST_CASE("futures interoperate with coroutines") {
   SECTION("we can handle a void coroutine") {
@@ -44,13 +47,31 @@ TEST_CASE("futures interoperate with coroutines") {
     REQUIRE(res.ready());
     REQUIRE(res.value() == 124);
   }
+
+  SECTION("coroutines restore the active device") {
+    basdv::active_device_guard active_guard{0};
+    promise<int> p;
+    auto res = f_dev(p);
+    REQUIRE(!res.ready());
+    p.set_value(123);
+    REQUIRE(res.value() == 124);
+    REQUIRE(basdv::get_device() == 0);
+  }
 }
 
-static future<> f_v() { co_return; }
+static future<> f_v() noexcept { co_return; }
 
-static future<int> f_i() { co_return 123; }
+static future<int> f_i() noexcept { co_return 123; }
 
-static future<int> f_i2() {
+static future<int> f_i2() noexcept {
   auto x = co_await f_i();
   co_return x + 1;
+}
+
+static future<int> f_dev(promise<int>& p) {
+  auto device = basdv::get_num_devices() - 1;
+  basdv::active_device_guard active_guard{device};
+  auto val = co_await future<int>{p} + 1;
+  REQUIRE(basdv::get_device() == device);
+  co_return val;
 }
