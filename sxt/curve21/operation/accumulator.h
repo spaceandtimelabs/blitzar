@@ -27,11 +27,6 @@ namespace sxt::c21o {
 struct accumulator {
   using value_type = c21t::element_p3;
 
-  CUDA_CALLABLE static void accumulate_inplace(volatile c21t::element_p3& res,
-                                               volatile c21t::element_p3& e) noexcept {
-    add_inplace(res, e);
-  }
-
   CUDA_CALLABLE static void accumulate_inplace(c21t::element_p3& res,
                                                c21t::element_p3& e) noexcept {
     add_inplace(res, e);

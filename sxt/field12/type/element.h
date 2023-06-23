@@ -37,31 +37,11 @@ public:
   CUDA_CALLABLE constexpr element(const uint64_t x[6]) noexcept
       : data_{x[0], x[1], x[2], x[3], x[4], x[5]} {}
 
-  constexpr element(const element&) noexcept = default;
-
-  CUDA_CALLABLE element(const volatile element& other) noexcept {
-    for (int i = 0; i < 6; ++i) {
-      data_[i] = other.data_[i];
-    }
-  }
-
-  constexpr element& operator=(const element&) noexcept = default;
-
-  constexpr element& operator=(element&&) noexcept = default;
-
   CUDA_CALLABLE constexpr const uint64_t& operator[](int index) const noexcept {
     return data_[index];
   }
 
-  CUDA_CALLABLE constexpr const volatile uint64_t& operator[](int index) const volatile noexcept {
-    return data_[index];
-  }
-
   CUDA_CALLABLE constexpr uint64_t& operator[](int index) noexcept { return data_[index]; }
-
-  CUDA_CALLABLE constexpr volatile uint64_t& operator[](int index) volatile noexcept {
-    return data_[index];
-  }
 
   CUDA_CALLABLE constexpr const uint64_t* data() const noexcept { return data_; }
 

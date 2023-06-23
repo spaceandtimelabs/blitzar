@@ -37,22 +37,11 @@ public:
 
   explicit element(std::initializer_list<uint8_t> values) noexcept;
 
-  element& operator=(const element& rhs) noexcept = default;
-
-  CUDA_CALLABLE void operator=(const element& rhs) volatile noexcept {
-    for (int i = 0; i < 32; ++i) {
-      data_[i] = rhs.data_[i];
-    }
-  }
-
   CUDA_CALLABLE
   uint8_t* data() noexcept { return data_; }
 
   CUDA_CALLABLE
   const uint8_t* data() const noexcept { return data_; }
-
-  CUDA_CALLABLE
-  const volatile uint8_t* data() const volatile noexcept { return data_; }
 
 private:
   uint8_t data_[32] = {};

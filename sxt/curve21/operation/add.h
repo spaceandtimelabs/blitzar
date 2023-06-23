@@ -51,9 +51,7 @@ inline void add(c21t::element_p3& res, const c21t::element_p3& lhs,
 /*
  p = p + q (q value is not preserved)
  */
-template <class T>
-  requires std::same_as<T, c21t::element_p3> || std::same_as<T, volatile c21t::element_p3>
-CUDA_CALLABLE inline void add_inplace(T& p, T& q) noexcept {
+CUDA_CALLABLE inline void add_inplace(c21t::element_p3& p, c21t::element_p3& q) noexcept {
   // convert q into a `c21t::element_cached`
   f51o::add(q.X, q.Y, q.X);
   f51o::add(q.Y, q.Y, q.Y);

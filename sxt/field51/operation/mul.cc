@@ -30,10 +30,10 @@
 
 namespace sxt::f51o {
 //--------------------------------------------------------------------------------------------------
-// mul_impl
+// mul
 //--------------------------------------------------------------------------------------------------
-template <class T1, class T2, class T3>
-CUDA_CALLABLE static void mul_impl(T1& h, const T2& f, const T3& g) noexcept {
+CUDA_CALLABLE
+void mul(f51t::element& h, const f51t::element& f, const f51t::element& g) noexcept {
   const uint64_t mask = 0x7ffffffffffffULL;
   uint128_t r0, r1, r2, r3, r4;
   uint128_t f0, f1, f2, f3, f4;
@@ -92,31 +92,6 @@ CUDA_CALLABLE static void mul_impl(T1& h, const T2& f, const T3& g) noexcept {
   h[2] = r02;
   h[3] = r03;
   h[4] = r04;
-}
-
-//--------------------------------------------------------------------------------------------------
-// mul
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void mul(f51t::element& h, const f51t::element& f, const f51t::element& g) noexcept {
-  mul_impl(h, f, g);
-}
-
-CUDA_CALLABLE
-void mul(volatile f51t::element& h, const f51t::element& f, const f51t::element& g) noexcept {
-  mul_impl(h, f, g);
-}
-
-CUDA_CALLABLE
-void mul(volatile f51t::element& h, const volatile f51t::element& f,
-         const volatile f51t::element& g) noexcept {
-  mul_impl(h, f, g);
-}
-
-CUDA_CALLABLE
-void mul(volatile f51t::element& h, const volatile f51t::element& f,
-         const f51t::element& g) noexcept {
-  mul_impl(h, f, g);
 }
 
 //--------------------------------------------------------------------------------------------------

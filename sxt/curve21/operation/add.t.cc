@@ -44,17 +44,4 @@ TEST_CASE("we can add curve elements") {
     add_inplace(lhs, rhs);
     REQUIRE(lhs == g);
   }
-
-  SECTION("we can add volatile arguments") {
-    volatile c21t::element_p3 lhs{g};
-    volatile c21t::element_p3 rhs = c21cn::zero_p3_v;
-    add_inplace(lhs, rhs);
-    res = {
-        .X{lhs.X},
-        .Y{lhs.Y},
-        .Z{lhs.Z},
-        .T{lhs.T},
-    };
-    REQUIRE(res == g);
-  }
 }

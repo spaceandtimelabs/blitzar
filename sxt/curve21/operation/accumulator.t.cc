@@ -39,17 +39,4 @@ TEST_CASE("accumulator reduces cuve21 elements") {
     accumulator::accumulate_inplace(p1, p2);
     REQUIRE(p1 == 5 * e1);
   }
-
-  SECTION("we can accumulate volatile elements") {
-    volatile auto p1 = 2 * e1;
-    volatile auto p2 = 3 * e1;
-    accumulator::accumulate_inplace(p1, p2);
-    c21t::element_p3 res{
-        .X{p1.X},
-        .Y{p1.Y},
-        .Z{p1.Z},
-        .T{p1.T},
-    };
-    REQUIRE(res == 5 * e1);
-  }
 }

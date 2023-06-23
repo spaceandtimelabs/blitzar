@@ -28,11 +28,10 @@
 
 namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
-// add_impl
+// add
 //--------------------------------------------------------------------------------------------------
-//
-// Modified from libsodium's sodium_add to use only 33 bytes instead of 64
-template <class T> CUDA_CALLABLE void add_impl(s25t::element& z, T& x, T& y) noexcept {
+CUDA_CALLABLE
+void add(s25t::element& z, const s25t::element& x, const s25t::element& y) noexcept {
   auto z_data = z.data();
   auto x_data = x.data();
   auto y_data = y.data();
@@ -48,19 +47,5 @@ template <class T> CUDA_CALLABLE void add_impl(s25t::element& z, T& x, T& y) noe
   }
 
   s25o::reduce33(z, static_cast<uint8_t>(carry));
-}
-
-//--------------------------------------------------------------------------------------------------
-// add
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void add(s25t::element& z, const s25t::element& x, const s25t::element& y) noexcept {
-  add_impl(z, x, y);
-}
-
-CUDA_CALLABLE
-void add(s25t::element& z, const volatile s25t::element& x,
-         const volatile s25t::element& y) noexcept {
-  add_impl(z, x, y);
 }
 } // namespace sxt::s25o

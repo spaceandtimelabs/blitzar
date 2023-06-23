@@ -37,13 +37,6 @@ struct accumulator {
     s25o::muladd(res, e, mapper.rhs_data()[index], res);
   }
 
-  CUDA_CALLABLE static void accumulate_inplace(volatile s25t::element& res,
-                                               volatile s25t::element& e) noexcept {
-    s25t::element res_p;
-    s25o::add(res_p, res, e);
-    res = res_p;
-  }
-
   CUDA_CALLABLE static void accumulate_inplace(s25t::element& res, s25t::element& e) noexcept {
     s25o::add(res, res, e);
   }

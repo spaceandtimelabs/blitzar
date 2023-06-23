@@ -85,9 +85,4 @@ CUDA_CALLABLE
 inline void to_element_p3(element_p3& r, const element_p1p1& p) noexcept {
   detail::to_element_p3_impl(r, p);
 }
-
-CUDA_CALLABLE
-inline void to_element_p3(volatile element_p3& r, const element_p1p1& p) noexcept {
-  detail::to_element_p3_impl(r, p);
-}
 } // namespace sxt::c21t
