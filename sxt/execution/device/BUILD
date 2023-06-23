@@ -4,6 +4,71 @@ load(
 )
 
 sxt_cc_component(
+    name = "device_viewable",
+    test_deps = [
+        "//sxt/base/device:active_device_guard",
+        "//sxt/base/device:property",
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/resource:device_resource",
+        "//sxt/execution/schedule:scheduler",
+    ],
+    deps = [
+        ":event_future",
+        ":synchronization",
+        "//sxt/base/container:span",
+        "//sxt/base/device:event",
+        "//sxt/base/device:event_utility",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:pointer_attributes",
+        "//sxt/base/device:state",
+        "//sxt/base/device:stream",
+        "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
+    ],
+)
+
+sxt_cc_component(
+    name = "event_future",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/management:managed_array",
+        "//sxt/execution/async:coroutine",
+        "//sxt/base/device:event_utility",
+        "//sxt/base/device:stream",
+    ],
+    deps = [
+        ":computation_event",
+        ":computation_handle",
+        "//sxt/base/device:event",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+    ],
+)
+
+sxt_cc_component(
+    name = "for_each",
+    impl_deps = [
+        ":available_device",
+        "//sxt/execution/async:future",
+        "//sxt/execution/async:coroutine",
+        "//sxt/base/device:active_device_guard",
+        "//sxt/base/device:property",
+        "//sxt/base/iterator:index_range",
+        "//sxt/base/iterator:index_range_iterator",
+        "//sxt/base/iterator:index_range_utility",
+    ],
+    test_deps = [
+        "//sxt/execution/async:future",
+        "//sxt/base/iterator:index_range",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/execution/async:future_fwd",
+        "//sxt/execution/schedule:scheduler",
+    ],
+)
+
+sxt_cc_component(
     name = "available_device",
     impl_deps = [
         "//sxt/execution/async:future",
@@ -15,6 +80,7 @@ sxt_cc_component(
         ":synchronization",
         "//sxt/execution/async:coroutine",
         "//sxt/base/test:unit_test",
+        "//sxt/base/device:active_device_guard",
         "//sxt/base/device:stream",
         "//sxt/memory/management:managed_array",
     ],
@@ -85,24 +151,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "event_future",
-    test_deps = [
-        "//sxt/base/test:unit_test",
-        "//sxt/memory/management:managed_array",
-        "//sxt/execution/async:coroutine",
-        "//sxt/base/device:event_utility",
-        "//sxt/base/device:stream",
-    ],
-    deps = [
-        ":computation_event",
-        ":computation_handle",
-        "//sxt/base/device:event",
-        "//sxt/execution/async:future",
-        "//sxt/execution/schedule:scheduler",
-    ],
-)
-
-sxt_cc_component(
     name = "synchronization",
     test_deps = [
         ":test_kernel",
@@ -112,6 +160,7 @@ sxt_cc_component(
     ],
     deps = [
         ":computation_event",
+        ":event_future",
         "//sxt/base/device:event",
         "//sxt/base/device:event_utility",
         "//sxt/base/device:property",
@@ -119,29 +168,6 @@ sxt_cc_component(
         "//sxt/base/type:raw_stream",
         "//sxt/execution/async:future",
         "//sxt/execution/async:promise",
-        "//sxt/execution/schedule:scheduler",
-    ],
-)
-
-sxt_cc_component(
-    name = "for_each",
-    impl_deps = [
-        ":available_device",
-        "//sxt/execution/async:future",
-        "//sxt/execution/async:coroutine",
-        "//sxt/base/device:active_device_guard",
-        "//sxt/base/device:property",
-        "//sxt/base/iterator:index_range",
-        "//sxt/base/iterator:index_range_iterator",
-        "//sxt/base/iterator:index_range_utility",
-    ],
-    test_deps = [
-        "//sxt/execution/async:future",
-        "//sxt/base/iterator:index_range",
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        "//sxt/execution/async:future_fwd",
         "//sxt/execution/schedule:scheduler",
     ],
 )

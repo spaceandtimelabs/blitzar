@@ -18,9 +18,13 @@
 
 #include <cuda_runtime.h>
 
+#include <cstddef>
+#include <cstring>
 #include <iostream>
 #include <string>
+#include <vector>
 
+#include "sxt/base/device/active_device_guard.h"
 #include "sxt/base/device/pointer_attributes.h"
 #include "sxt/base/device/state.h"
 #include "sxt/base/device/stream.h"
@@ -175,5 +179,38 @@ bool is_host_pointer(const void* ptr) noexcept {
     baser::panic("cudaPointerGetAttributes failed: " + std::string(cudaGetErrorString(rcode)));
   }
   return attrs.type != cudaMemoryTypeDevice;
+}
+
+//--------------------------------------------------------------------------------------------------
+// is_equal_for_testing
+//--------------------------------------------------------------------------------------------------
+bool is_equal_for_testing(const void* lhs, const void* rhs, size_t size) noexcept {
+  if (size == 0) {
+    return true;
+  }
+  pointer_attributes attrs;
+
+  // lhs
+  std::vector<std::byte> lhs_data;
+  get_pointer_attributes(attrs, lhs);
+  if (attrs.kind == pointer_kind_t::device) {
+    active_device_guard active_guard{attrs.device};
+    lhs_data.resize(size);
+    memcpy_device_to_host(lhs_data.data(), lhs, size);
+    lhs = lhs_data.data();
+  }
+
+  // rhs
+  std::vector<std::byte> rhs_data;
+  get_pointer_attributes(attrs, rhs);
+  if (attrs.kind == pointer_kind_t::device) {
+    active_device_guard active_guard{attrs.device};
+    rhs_data.resize(size);
+    memcpy_device_to_host(rhs_data.data(), rhs, size);
+    rhs = rhs_data.data();
+  }
+
+  // comparison
+  return std::memcmp(lhs, rhs, size) == 0;
 }
 } // namespace sxt::basdv

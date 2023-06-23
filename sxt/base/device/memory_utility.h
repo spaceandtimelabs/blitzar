@@ -20,6 +20,7 @@
 #include <memory>
 
 #include "sxt/base/concept/memcpyable_ranges.h"
+#include "sxt/base/container/span.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/type/raw_stream.h"
 
@@ -130,4 +131,14 @@ bool is_active_device_pointer(const void* ptr) noexcept;
 // is_host_pointer
 //--------------------------------------------------------------------------------------------------
 bool is_host_pointer(const void* ptr) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// is_equal_for_testing
+//--------------------------------------------------------------------------------------------------
+bool is_equal_for_testing(const void* lhs, const void* rhs, size_t size) noexcept;
+
+template <class T> bool is_equal_for_testing(basct::cspan<T> lhs, basct::cspan<T> rhs) noexcept {
+  return lhs.size() == rhs.size() &&
+         is_equal_for_testing(lhs.data(), rhs.data(), sizeof(T) * lhs.size());
+}
 } // namespace sxt::basdv
