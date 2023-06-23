@@ -85,6 +85,24 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "event_future",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/management:managed_array",
+        "//sxt/execution/async:coroutine",
+        "//sxt/base/device:event_utility",
+        "//sxt/base/device:stream",
+    ],
+    deps = [
+        ":computation_event",
+        ":computation_handle",
+        "//sxt/base/device:event",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+    ],
+)
+
+sxt_cc_component(
     name = "synchronization",
     test_deps = [
         ":test_kernel",

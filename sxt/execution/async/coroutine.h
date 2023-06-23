@@ -22,14 +22,23 @@
 #include "sxt/execution/async/coroutine_promise.h"
 #include "sxt/execution/async/future.h"
 
-namespace sxt::xena {
+namespace sxt {
 //--------------------------------------------------------------------------------------------------
 // operator co_await
 //--------------------------------------------------------------------------------------------------
-template <class T> awaiter<T> operator co_await(future<T>&& fut) noexcept {
-  return awaiter<T>{std::move(fut)};
+template <class T> xena::awaiter<T> operator co_await(xena::future<T>&& fut) noexcept {
+  return xena::awaiter<T>{std::move(fut)};
 }
-} // namespace sxt::xena
+
+template <class Fut>
+  requires requires(Fut fut) {
+    { xena::future<typename Fut::value_type>{std::move(fut)} } noexcept;
+  }
+auto operator co_await(Fut&& fut) noexcept {
+  using T = typename Fut::value_type;
+  return xena::awaiter<T>{xena::future<T>{std::move(fut)}};
+}
+} // namespace sxt
 
 //--------------------------------------------------------------------------------------------------
 // coroutine_traits
