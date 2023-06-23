@@ -104,3 +104,26 @@ sxt_cc_component(
         "//sxt/execution/schedule:scheduler",
     ],
 )
+
+sxt_cc_component(
+    name = "for_each",
+    impl_deps = [
+        ":available_device",
+        "//sxt/execution/async:future",
+        "//sxt/execution/async:coroutine",
+        "//sxt/base/device:active_device_guard",
+        "//sxt/base/device:property",
+        "//sxt/base/iterator:index_range",
+        "//sxt/base/iterator:index_range_iterator",
+        "//sxt/base/iterator:index_range_utility",
+    ],
+    test_deps = [
+        "//sxt/execution/async:future",
+        "//sxt/base/iterator:index_range",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/execution/async:future_fwd",
+        "//sxt/execution/schedule:scheduler",
+    ],
+)
