@@ -17,6 +17,7 @@
 #pragma once
 
 #include "sxt/base/container/span.h"
+#include "sxt/memory/management/managed_array_fwd.h"
 
 namespace sxt::basct {
 class blob_array;
@@ -30,6 +31,14 @@ struct exponent_sequence;
 }
 
 namespace sxt::mtxc21 {
+//--------------------------------------------------------------------------------------------------
+// fold_multiproducts
+//--------------------------------------------------------------------------------------------------
+void fold_multiproducts(memmg::managed_array<c21t::element_p3>& products,
+                        basct::span<uint8_t> digit_or_all,
+                        basct::cspan<c21t::element_p3> products_p,
+                        basct::cspan<uint8_t> digit_or_all_p) noexcept;
+
 //--------------------------------------------------------------------------------------------------
 // combine_multiproducts
 //--------------------------------------------------------------------------------------------------

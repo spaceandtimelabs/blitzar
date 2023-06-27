@@ -28,6 +28,7 @@
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/async/promise.h"
 #include "sxt/execution/device/computation_event.h"
+#include "sxt/execution/device/event_future.h"
 #include "sxt/execution/schedule/scheduler.h"
 
 namespace sxt::xendv {
@@ -73,5 +74,17 @@ xena::future<std::remove_cvref_t<T>> await_and_own_stream(basdv::stream&& stream
   xens::get_scheduler().schedule(std::make_unique<computation_event<Tp>>(
       device, std::move(event), std::move(handle), std::move(p)));
   return res;
+}
+
+//--------------------------------------------------------------------------------------------------
+// synchronize_event
+//--------------------------------------------------------------------------------------------------
+template <class T>
+void synchronize_event(bast::raw_stream_t stream, const event_future<T>& future) noexcept {
+  auto& event_maybe = future.event();
+  if (!event_maybe) {
+    return;
+  }
+  basdv::async_wait_on_event(stream, *event_maybe);
 }
 } // namespace sxt::xendv

@@ -66,12 +66,14 @@ sxt_cc_component(
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:event",
         "//sxt/base/device:event_utility",
+        "//sxt/base/iterator:index_range",
         "//sxt/memory/resource:device_resource",
         "//sxt/memory/resource:async_device_resource",
-        "//sxt/curve21/constant:zero",
         "//sxt/multiexp/pippenger:multiproduct_decomposition_gpu",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:device_viewable",
+        "//sxt/execution/device:for_each",
         "//sxt/base/device:stream",
     ],
     test_deps = [
@@ -172,10 +174,12 @@ sxt_cc_component(
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:neg",
         "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/memory/management:managed_array",
     ],
     with_test = False,
     deps = [
         "//sxt/base/container:span",
+        "//sxt/memory/management:managed_array_fwd",
     ],
 )
 

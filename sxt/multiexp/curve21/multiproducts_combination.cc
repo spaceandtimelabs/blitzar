@@ -26,6 +26,7 @@
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/neg.h"
+#include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/curve21/doubling_reduction.h"
 
@@ -79,6 +80,46 @@ init_output_products(size_t& product_index, size_t& input_index,
 
   input_index += pos_digit_count_one + neg_digit_count_one;
   return {output_products, digit_or_all};
+}
+
+//--------------------------------------------------------------------------------------------------
+// fold_multiproducts
+//--------------------------------------------------------------------------------------------------
+void fold_multiproducts(memmg::managed_array<c21t::element_p3>& products,
+                        basct::span<uint8_t> digit_or_all,
+                        basct::cspan<c21t::element_p3> products_p,
+                        basct::cspan<uint8_t> digit_or_all_p) noexcept {
+  auto num_bytes = digit_or_all.size();
+  // clang-format off
+  SXT_DEBUG_ASSERT(
+      digit_or_all.size() == num_bytes &&
+      basbt::pop_count(digit_or_all) == products.size() &&
+      digit_or_all_p.size() == num_bytes &&
+      basbt::pop_count(digit_or_all_p) == products_p.size()
+  );
+  // clang-format on
+  SXT_STACK_ARRAY(digit_or_all_pp, num_bytes, uint8_t);
+  std::copy(digit_or_all.begin(), digit_or_all.end(), digit_or_all_pp.begin());
+  basbt::or_equal(digit_or_all_pp, digit_or_all_p);
+  auto bit_count = basbt::pop_count(digit_or_all_pp);
+  size_t index = 0;
+  size_t index_p = 0;
+  size_t index_pp = 0;
+  memmg::managed_array<c21t::element_p3> products_pp(bit_count, products.get_allocator());
+  basbt::for_each_bit(digit_or_all_pp, [&](size_t bit_index) noexcept {
+    auto is_set = basbt::test_bit(digit_or_all, bit_index);
+    auto is_set_p = basbt::test_bit(digit_or_all_p, bit_index);
+    SXT_DEBUG_ASSERT(is_set || is_set_p);
+    if (is_set && is_set_p) {
+      c21o::add(products_pp[index_pp++], products[index++], products_p[index_p++]);
+    } else if (is_set) {
+      products_pp[index_pp++] = products[index++];
+    } else {
+      products_pp[index_pp++] = products_p[index_p++];
+    }
+  });
+  std::copy(digit_or_all_pp.begin(), digit_or_all_pp.end(), digit_or_all.begin());
+  products = std::move(products_pp);
 }
 
 //--------------------------------------------------------------------------------------------------

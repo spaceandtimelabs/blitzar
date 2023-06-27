@@ -16,11 +16,13 @@
  */
 #include "sxt/execution/device/available_device.h"
 
+#include "sxt/base/device/active_device_guard.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/execution/device/test_kernel.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 
 using namespace sxt;
@@ -39,13 +41,14 @@ TEST_CASE("we can await available devices") {
   SECTION("if all device are busy the future will not be available") {
     xena::future<int> fut;
     for (int i = 0; i < 10000; ++i) {
-      memmg::managed_array<uint64_t> a = {1, 2, 3};
-      memmg::managed_array<uint64_t> b = {4, 5, 6};
-      auto res = f_gpu2(a, b);
       fut = await_available_device();
       if (!fut.ready()) {
         break;
       }
+      basdv::active_device_guard active_guard{fut.value()};
+      memmg::managed_array<uint64_t> a = {1, 2, 3};
+      memmg::managed_array<uint64_t> b = {4, 5, 6};
+      auto res = f_gpu2(a, b);
     }
     xens::get_scheduler().run();
     REQUIRE(fut.ready());

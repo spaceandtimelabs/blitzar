@@ -25,10 +25,12 @@
 #include "sxt/base/device/event_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
-#include "sxt/curve21/constant/zero.h"
+#include "sxt/base/iterator/index_range.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/device/device_viewable.h"
+#include "sxt/execution/device/for_each.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
@@ -45,12 +47,12 @@ namespace sxt::mtxc21 {
 // async_compute_multiexponentiation_impl
 //--------------------------------------------------------------------------------------------------
 static xena::future<> async_compute_multiexponentiation_impl(
-    c21t::element_p3& res, std::optional<basdv::event>& generators_event,
-    basct::cspan<c21t::element_p3> generators, const mtxb::exponent_sequence& exponents) noexcept {
+    memmg::managed_array<c21t::element_p3>& products, basct::span<uint8_t> or_all,
+    const xendv::event_future<basct::cspan<c21t::element_p3>>& generators_event,
+    mtxb::exponent_sequence exponents) noexcept {
   auto num_bytes = exponents.element_nbytes;
   basdv::stream stream;
   memr::async_device_resource resource{stream};
-  res = c21cn::zero_p3_v;
   bool is_signed = static_cast<bool>(exponents.is_signed);
 
   // decompose exponents
@@ -58,34 +60,61 @@ static xena::future<> async_compute_multiexponentiation_impl(
   memmg::managed_array<unsigned> product_sizes(num_bytes * 8u);
   co_await mtxpi::compute_multiproduct_decomposition(indexes, product_sizes, stream, exponents);
   if (indexes.empty()) {
-    res = c21cn::zero_p3_v;
     co_return;
   }
 
-  // or_all
-  basct::blob_array or_all{1, num_bytes};
+  // or_all_p
+  std::vector<uint8_t> or_all_p(num_bytes);
   size_t bit_index = 0;
   for (size_t byte_index = 0; byte_index < num_bytes; ++byte_index) {
     uint8_t val = 0;
     for (int i = 0; i < 8; ++i) {
       val |= static_cast<uint8_t>(product_sizes[bit_index++] > 0) << i;
     }
-    or_all[0][byte_index] = val;
+    or_all_p[byte_index] = val;
   }
 
   // compute multiproduct
   auto last = std::remove(product_sizes.begin(), product_sizes.end(), 0u);
   product_sizes.shrink(static_cast<size_t>(std::distance(product_sizes.begin(), last)));
-  memmg::managed_array<c21t::element_p3> products(product_sizes.size());
-  if (generators_event) {
-    basdv::async_wait_on_event(stream, *generators_event);
-  }
-  co_await async_compute_multiproduct(products, stream, generators, indexes, product_sizes,
-                                      is_signed);
-  indexes.reset();
+  memmg::managed_array<c21t::element_p3> products_p(product_sizes.size());
+  xendv::synchronize_event(stream, generators_event);
+  co_await async_compute_multiproduct(products_p, stream, generators_event.value(), indexes,
+                                      product_sizes, is_signed);
+  fold_multiproducts(products, or_all, products_p, or_all_p);
+}
 
-  // combine results
-  combine_multiproducts({&res, 1}, or_all, products);
+//--------------------------------------------------------------------------------------------------
+// async_compute_multiexponentiation_partial
+//--------------------------------------------------------------------------------------------------
+static xena::future<> async_compute_multiexponentiation_partial(
+    basct::span<basct::blob_array> or_alls,
+    basct::span<memmg::managed_array<c21t::element_p3>> products,
+    basct::cspan<c21t::element_p3> generators, basct::cspan<mtxb::exponent_sequence> exponents,
+    basit::index_range rng) noexcept {
+  auto num_outputs = or_alls.size();
+  // set up generators
+  memmg::managed_array<c21t::element_p3> generators_data{memr::get_device_resource()};
+  auto generators_event = xendv::make_active_device_viewable(
+      generators_data,
+      generators.subspan(static_cast<size_t>(rng.a()), static_cast<size_t>(rng.size())));
+  std::vector<xena::future<>> futs;
+  futs.reserve(num_outputs);
+  for (size_t output_index = 0; output_index < num_outputs; ++output_index) {
+    auto output_exponents = exponents[output_index];
+    if (static_cast<size_t>(rng.a()) >= output_exponents.n) {
+      continue;
+    }
+    output_exponents.data += output_exponents.element_nbytes * rng.a();
+    output_exponents.n = std::min(static_cast<size_t>(rng.size()), output_exponents.n - rng.a());
+    auto fut = async_compute_multiexponentiation_impl(
+        products[output_index], or_alls[output_index][0], generators_event, output_exponents);
+    futs.emplace_back(std::move(fut));
+  }
+
+  for (auto& fut : futs) {
+    co_await std::move(fut);
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -112,37 +141,23 @@ compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
 xena::future<memmg::managed_array<c21t::element_p3>>
 async_compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
                                   basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
-
-  // set up generators
-  std::optional<basdv::stream> generators_stream;
-  std::optional<basdv::event> generators_event;
-  memmg::managed_array<c21t::element_p3> generators_data{memr::get_device_resource()};
-  if (!basdv::is_active_device_pointer(generators.data())) {
-    generators_stream.emplace();
-    generators_event.emplace();
-    generators_data =
-        memmg::managed_array<c21t::element_p3>{generators.size(), memr::get_device_resource()};
-    basdv::async_copy_host_to_device(generators_data, generators, *generators_stream);
-    basdv::record_event(*generators_event, *generators_stream);
-    generators = {
-        generators_data.data(),
-        generators_data.size(),
-    };
+  auto num_outputs = exponents.size();
+  std::vector<basct::blob_array> or_alls;
+  or_alls.reserve(num_outputs);
+  for (auto& exponent_sequence : exponents) {
+    or_alls.emplace_back(1, exponent_sequence.element_nbytes);
   }
-
-  // compute individual multiexponentiations
-  memmg::managed_array<c21t::element_p3> res(exponents.size());
-  std::vector<xena::future<>> computations;
-  computations.reserve(exponents.size());
-  for (size_t i = 0; i < res.size(); ++i) {
-    auto fut =
-        async_compute_multiexponentiation_impl(res[i], generators_event, generators, exponents[i]);
-    computations.emplace_back(std::move(fut));
+  std::vector<memmg::managed_array<c21t::element_p3>> products(num_outputs);
+  co_await xendv::concurrent_for_each(basit::index_range{0, generators.size()},
+                                      [&](const basit::index_range& rng) noexcept {
+                                        return async_compute_multiexponentiation_partial(
+                                            or_alls, products, generators, exponents, rng);
+                                      });
+  memmg::managed_array<c21t::element_p3> res(num_outputs);
+  for (size_t i = 0; i < num_outputs; ++i) {
+    combine_multiproducts({&res[i], 1}, or_alls[i], products[i]);
   }
-  for (auto& fut : computations) {
-    co_await std::move(fut);
-  }
-  co_return std::move(res);
+  co_return res;
 }
 
 xena::future<c21t::element_p3>
