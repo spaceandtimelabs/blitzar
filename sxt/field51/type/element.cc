@@ -67,7 +67,6 @@ bool operator==(const element& lhs, const element& rhs) noexcept {
   element rhs_p;
   f51b::reduce(rhs_p.data(), rhs.data());
 
-  return lhs_p[0] == rhs_p[0] && lhs_p[1] == rhs_p[1] && lhs_p[2] == rhs_p[2] &&
-         lhs_p[3] == rhs_p[3] && lhs_p[4] == rhs_p[4];
+  return std::equal(lhs_p.data(), lhs_p.data() + element::num_limbs_v, rhs_p.data());
 }
 } // namespace sxt::f51t

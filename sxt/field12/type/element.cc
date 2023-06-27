@@ -62,12 +62,15 @@ std::ostream& operator<<(std::ostream& out, const element& e) noexcept {
 //--------------------------------------------------------------------------------------------------
 bool operator==(const element& lhs, const element& rhs) noexcept {
   element lhs_p;
-  f12b::reduce(lhs_p.data(), lhs.data());
+  std::array<uint64_t, 12> lhs_t = {lhs[0], lhs[1], lhs[2], lhs[3], lhs[4], lhs[5],
+                                    0,      0,      0,      0,      0,      0};
+  f12b::reduce(lhs_p.data(), lhs_t.data());
 
   element rhs_p;
-  f12b::reduce(rhs_p.data(), rhs.data());
+  std::array<uint64_t, 12> rhs_t = {rhs[0], rhs[1], rhs[2], rhs[3], rhs[4], rhs[5],
+                                    0,      0,      0,      0,      0,      0};
+  f12b::reduce(rhs_p.data(), rhs_t.data());
 
-  return lhs_p[0] == rhs_p[0] && lhs_p[1] == rhs_p[1] && lhs_p[2] == rhs_p[2] &&
-         lhs_p[3] == rhs_p[3] && lhs_p[4] == rhs_p[4] && lhs_p[5] == rhs_p[5];
+  return std::equal(lhs_p.data(), lhs_p.data() + element::num_limbs_v, rhs_p.data());
 }
 } // namespace sxt::f12t

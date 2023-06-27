@@ -28,6 +28,8 @@ namespace sxt::f51t {
 //--------------------------------------------------------------------------------------------------
 class element {
 public:
+  static constexpr size_t num_limbs_v = 5;
+
   element() noexcept = default;
 
   CUDA_CALLABLE constexpr element(uint64_t x1, uint64_t x2, uint64_t x3, uint64_t x4,
@@ -45,7 +47,7 @@ public:
   CUDA_CALLABLE constexpr uint64_t* data() noexcept { return data_; }
 
 private:
-  uint64_t data_[5];
+  uint64_t data_[num_limbs_v];
 };
 
 //--------------------------------------------------------------------------------------------------
