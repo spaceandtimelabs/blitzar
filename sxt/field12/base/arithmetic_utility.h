@@ -60,6 +60,5 @@ CUDA_CALLABLE void sbb(uint64_t& ret, uint64_t& borrow, const uint64_t a,
 //--------------------------------------------------------------------------------------------------
 // subtract_p
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE void subtract_p(uint64_t ret[6], const uint64_t a[6],
-                              const uint64_t modulus[6]) noexcept;
+CUDA_CALLABLE void subtract_p(uint64_t ret[6], const uint64_t a[6]) noexcept;
 } // namespace sxt::f12b

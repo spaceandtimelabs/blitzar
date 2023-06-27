@@ -27,6 +27,7 @@
 
 #include "sxt/base/type/int.h"
 #include "sxt/base/type/narrow_cast.h"
+#include "sxt/field12/base/constants.h"
 
 namespace sxt::f12b {
 //--------------------------------------------------------------------------------------------------
@@ -65,15 +66,15 @@ CUDA_CALLABLE void sbb(uint64_t& ret, uint64_t& borrow, const uint64_t a,
 //--------------------------------------------------------------------------------------------------
 // subtract
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE void subtract_p(uint64_t ret[6], const uint64_t a[6],
-                              const uint64_t modulus[6]) noexcept {
+CUDA_CALLABLE void subtract_p(uint64_t ret[6], const uint64_t a[6]) noexcept {
   uint64_t borrow = 0;
-  sbb(ret[0], borrow, a[0], modulus[0]);
-  sbb(ret[1], borrow, a[1], modulus[1]);
-  sbb(ret[2], borrow, a[2], modulus[2]);
-  sbb(ret[3], borrow, a[3], modulus[3]);
-  sbb(ret[4], borrow, a[4], modulus[4]);
-  sbb(ret[5], borrow, a[5], modulus[5]);
+
+  sbb(ret[0], borrow, a[0], p_v[0]);
+  sbb(ret[1], borrow, a[1], p_v[1]);
+  sbb(ret[2], borrow, a[2], p_v[2]);
+  sbb(ret[3], borrow, a[3], p_v[3]);
+  sbb(ret[4], borrow, a[4], p_v[4]);
+  sbb(ret[5], borrow, a[5], p_v[5]);
 
   // If underflow occurred on the final limb, borrow = 0xfff...fff, otherwise
   // borrow = 0x000...000. Thus, we use it as a mask!

@@ -58,7 +58,7 @@ void to_bytes(uint8_t s[48], const uint64_t h[6]) noexcept {
   // Turn into canonical form by computing
   // (a.R) / R = a
   uint64_t t[12] = {h[0], h[1], h[2], h[3], h[4], h[5], 0, 0, 0, 0, 0, 0};
-  uint64_t h_tmp[6] = {0, 0, 0, 0, 0, 0};
+  uint64_t h_tmp[6] = {};
   reduce(h_tmp, t);
 
   basbt::store64_le(s + 0, h_tmp[0]);

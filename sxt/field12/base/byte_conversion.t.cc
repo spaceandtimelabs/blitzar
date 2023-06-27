@@ -116,14 +116,12 @@ TEST_CASE("we can convert from bytes as expected") {
                                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    constexpr std::array<uint64_t, 6> expected = {r_v[0], r_v[1], r_v[2], r_v[3], r_v[4], r_v[5]};
-
     // Convert from bytes to Montgomery form.
     std::array<uint64_t, 6> h;
     bool is_below_modulus = false;
     from_bytes(is_below_modulus, h.data(), s.data());
     REQUIRE(is_below_modulus == true);
-    REQUIRE(expected == h);
+    REQUIRE(r_v == h);
   }
 
   SECTION("generated random 384 bit value above p_v returns false flag") {
@@ -159,27 +157,24 @@ TEST_CASE("we can convert from bytes as expected") {
 
 TEST_CASE("we can convert to bytes as expected") {
   SECTION("the Montgomery form of one returns one") {
-    constexpr std::array<uint64_t, 6> h = {r_v[0], r_v[1], r_v[2], r_v[3], r_v[4], r_v[5]};
-
     constexpr std::array<uint8_t, 48> expect = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     // Convert from Montgomery form to bytes.
     std::array<uint8_t, 48> ret;
-    to_bytes(ret.data(), h.data());
+    to_bytes(ret.data(), r_v.data());
     REQUIRE(expect == ret);
   }
 
   SECTION("the modulus p_v returns zero") {
-    constexpr std::array<uint64_t, 6> modulus = {p_v[0], p_v[1], p_v[2], p_v[3], p_v[4], p_v[5]};
     constexpr std::array<uint8_t, 48> expect = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     // Convert from Montgomery form to bytes.
     std::array<uint8_t, 48> ret;
-    to_bytes(ret.data(), modulus.data());
+    to_bytes(ret.data(), p_v.data());
     REQUIRE(expect == ret);
   }
 }

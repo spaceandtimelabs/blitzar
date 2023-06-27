@@ -25,6 +25,7 @@
  */
 #pragma once
 
+#include <array>
 #include <cstdint>
 
 namespace sxt::f12b {
@@ -37,24 +38,27 @@ namespace sxt::f12b {
      =
  0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab
  */
-static constexpr uint64_t p_v[6] = {0xb9feffffffffaaab, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,
-                                    0x64774b84f38512bf, 0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
+static constexpr std::array<uint64_t, 6> p_v{0xb9feffffffffaaab, 0x1eabfffeb153ffff,
+                                             0x6730d2a0f6b0f624, 0x64774b84f38512bf,
+                                             0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
 //--------------------------------------------------------------------------------------------------
 // r_v
 //--------------------------------------------------------------------------------------------------
 /*
  r_v = 2^384 mod p
  */
-static constexpr uint64_t r_v[6] = {0x760900000002fffd, 0xebf4000bc40c0002, 0x5f48985753c758ba,
-                                    0x77ce585370525745, 0x5c071a97a256ec6d, 0x15f65ec3fa80e493};
+static constexpr std::array<uint64_t, 6> r_v = {0x760900000002fffd, 0xebf4000bc40c0002,
+                                                0x5f48985753c758ba, 0x77ce585370525745,
+                                                0x5c071a97a256ec6d, 0x15f65ec3fa80e493};
 //--------------------------------------------------------------------------------------------------
 // r2_v
 //--------------------------------------------------------------------------------------------------
 /*
  r2_v = 2^(384*2) mod p
  */
-static constexpr uint64_t r2_v[6] = {0xf4df1f341c341746, 0xa76e6a609d104f1,  0x8de5476c4c95b6d5,
-                                     0x67eb88a9939d83c0, 0x9a793e85b519952d, 0x11988fe592cae3aa};
+static constexpr std::array<uint64_t, 6> r2_v = {0xf4df1f341c341746, 0xa76e6a609d104f1,
+                                                 0x8de5476c4c95b6d5, 0x67eb88a9939d83c0,
+                                                 0x9a793e85b519952d, 0x11988fe592cae3aa};
 //--------------------------------------------------------------------------------------------------
 // inv_v
 //--------------------------------------------------------------------------------------------------

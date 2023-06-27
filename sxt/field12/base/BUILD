@@ -14,6 +14,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
+        ":constants",
         "//sxt/base/macro:cuda_callable",
         "//sxt/base/type:int",
     ],

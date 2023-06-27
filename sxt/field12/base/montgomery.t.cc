@@ -24,12 +24,11 @@ using namespace sxt::f12b;
 TEST_CASE("we can do convert to Montgomery form as expected") {
   SECTION("one converts to one in Montgomery form") {
     constexpr std::array<uint64_t, 6> a = {1, 0, 0, 0, 0, 0};
-    constexpr std::array<uint64_t, 6> expected = {r_v[0], r_v[1], r_v[2], r_v[3], r_v[4], r_v[5]};
     std::array<uint64_t, 6> ret;
 
     to_montgomery_form(ret.data(), a.data());
 
-    REQUIRE(expected == ret);
+    REQUIRE(r_v == ret);
   }
 
   SECTION("zero converts to zero") {
@@ -43,11 +42,10 @@ TEST_CASE("we can do convert to Montgomery form as expected") {
   }
 
   SECTION("the modulus converts to zero in Montomery form") {
-    constexpr std::array<uint64_t, 6> p = {p_v[0], p_v[1], p_v[2], p_v[3], p_v[4], p_v[5]};
     constexpr std::array<uint64_t, 6> expect = {0, 0, 0, 0, 0, 0};
     std::array<uint64_t, 6> ret;
 
-    to_montgomery_form(ret.data(), p.data());
+    to_montgomery_form(ret.data(), p_v.data());
 
     REQUIRE(expect == ret);
   }

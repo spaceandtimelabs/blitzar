@@ -19,7 +19,9 @@
 #include <sstream>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/field12/base/constants.h"
 
+using namespace sxt;
 using namespace sxt::f12t;
 
 TEST_CASE("we can do element conversion as expected") {
@@ -39,8 +41,7 @@ TEST_CASE("we can do element conversion as expected") {
   }
 
   SECTION("the modulus p prints as zero") {
-    element e{0xb9feffffffffaaab, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,
-              0x64774b84f38512bf, 0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
+    element e(f12b::p_v.data());
     oss << e;
     REQUIRE(oss.str() == "0x0_f12");
   }

@@ -144,11 +144,10 @@ TEST_CASE("we can do subtraction and borrow (sbb) as expected") {
 TEST_CASE("we can do subtraction the modulous (subtract_p) as expected") {
   SECTION("all zeros return all zeros") {
     constexpr std::array<uint64_t, 6> a = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
-    constexpr std::array<uint64_t, 6> p = {p_v[0], p_v[1], p_v[2], p_v[3], p_v[4], p_v[5]};
     std::array<uint64_t, 6> ret;
     constexpr std::array<uint64_t, 6> expect = a;
 
-    subtract_p(ret.data(), a.data(), p.data());
+    subtract_p(ret.data(), a.data());
 
     REQUIRE(expect == ret);
   }
@@ -157,21 +156,19 @@ TEST_CASE("we can do subtraction the modulous (subtract_p) as expected") {
     constexpr std::array<uint64_t, 6> a = {0xb9feffffffffaaaa, 0x1eabfffeb153ffff,
                                            0x6730d2a0f6b0f624, 0x64774b84f38512bf,
                                            0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
-    constexpr std::array<uint64_t, 6> p = {p_v[0], p_v[1], p_v[2], p_v[3], p_v[4], p_v[5]};
     std::array<uint64_t, 6> ret;
     constexpr std::array<uint64_t, 6> expect = {a[0], a[1], a[2], a[3], a[4], a[5]};
 
-    subtract_p(ret.data(), a.data(), p.data());
+    subtract_p(ret.data(), a.data());
 
     REQUIRE(expect == ret);
   }
 
   SECTION("value equal to the modulus returns zeros") {
-    constexpr std::array<uint64_t, 6> p = {p_v[0], p_v[1], p_v[2], p_v[3], p_v[4], p_v[5]};
-    std::array<uint64_t, 6> ret;
     constexpr std::array<uint64_t, 6> expect = {0, 0, 0, 0, 0, 0};
+    std::array<uint64_t, 6> ret;
 
-    subtract_p(ret.data(), p.data(), p.data());
+    subtract_p(ret.data(), p_v.data());
 
     REQUIRE(expect == ret);
   }
@@ -180,11 +177,10 @@ TEST_CASE("we can do subtraction the modulous (subtract_p) as expected") {
     constexpr std::array<uint64_t, 6> a = {0xb9feffffffffaaae, 0x1eabfffeb153ffff,
                                            0x6730d2a0f6b0f624, 0x64774b84f38512bf,
                                            0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
-    constexpr std::array<uint64_t, 6> p = {p_v[0], p_v[1], p_v[2], p_v[3], p_v[4], p_v[5]};
     std::array<uint64_t, 6> ret;
     constexpr std::array<uint64_t, 6> expect = {0x3, 0x0, 0x0, 0x0, 0x0, 0x0};
 
-    subtract_p(ret.data(), a.data(), p.data());
+    subtract_p(ret.data(), a.data());
 
     REQUIRE(expect == ret);
   }
@@ -193,13 +189,12 @@ TEST_CASE("we can do subtraction the modulous (subtract_p) as expected") {
     constexpr std::array<uint64_t, 6> a = {0xffffffffffffffff, 0xffffffffffffffff,
                                            0xffffffffffffffff, 0xffffffffffffffff,
                                            0xffffffffffffffff, 0xffffffffffffffff};
-    constexpr std::array<uint64_t, 6> b = {p_v[0], p_v[1], p_v[2], p_v[3], p_v[4], p_v[5]};
     std::array<uint64_t, 6> ret;
     constexpr std::array<uint64_t, 6> expect = {0x4601000000005554, 0xe15400014eac0000,
                                                 0x98cf2d5f094f09db, 0x9b88b47b0c7aed40,
                                                 0xb4e45849bcb45328, 0xe5feee15c6801965};
 
-    subtract_p(ret.data(), a.data(), b.data());
+    subtract_p(ret.data(), a.data());
 
     REQUIRE(expect == ret);
   }

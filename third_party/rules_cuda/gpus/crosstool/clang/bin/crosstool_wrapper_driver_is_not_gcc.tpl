@@ -268,6 +268,7 @@ def CompileNvcc(argv, log=False, device_c=False):
   nvccopts += warning_options
   nvccopts += fatbin_options
   nvccopts += ' --extended-lambda'
+  nvccopts += ' --expt-relaxed-constexpr'
 
   if device_c:
     nvccopts += ' --device-c'
