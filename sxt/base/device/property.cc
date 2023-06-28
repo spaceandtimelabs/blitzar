@@ -19,10 +19,6 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#include <iostream>
-
-#include "sxt/base/error/panic.h"
-
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // get_num_devices
@@ -32,7 +28,6 @@ int get_num_devices() noexcept {
     int res;
     auto rcode = cudaGetDeviceCount(&res);
     if (rcode != cudaSuccess) {
-      std::cerr << "cudaGetDeviceCount failed: " << cudaGetErrorString(rcode) << "\n";
       return 0;
     }
     return res;
