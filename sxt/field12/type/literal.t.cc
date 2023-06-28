@@ -22,35 +22,35 @@
 
 using namespace sxt::f12t;
 
-TEST_CASE("we can confirm that literal prints as expected") {
+TEST_CASE("literal element printing") {
   std::ostringstream oss;
 
-  SECTION("zero prints as zero") {
+  SECTION("of zero prints 0x0_f12") {
     oss << 0x0_f12;
     REQUIRE(oss.str() == "0x0_f12");
   }
 
-  SECTION("one prints as one") {
+  SECTION("of one prints 0x1_f12") {
     oss << 0x1_f12;
     REQUIRE(oss.str() == "0x1_f12");
   }
 
-  SECTION("10 prints as 0xa_f12") {
+  SECTION("of 10 prints 0xa_f12") {
     oss << 0xa_f12;
     REQUIRE(oss.str() == "0xa_f12");
   }
 
-  SECTION("16 prints as 0x10_f12") {
+  SECTION("of 16 prints 0x10_f12") {
     oss << 0x10_f12;
     REQUIRE(oss.str() == "0x10_f12");
   }
 
-  SECTION("the modulus p prints as zero") {
+  SECTION("of the modulus prints 0x0_f12") {
     oss << 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab_f12;
     REQUIRE(oss.str() == "0x0_f12");
   }
 
-  SECTION("the modulus p minus one prints as expected") {
+  SECTION("of the modulus minus one prints a pre-computed value") {
     oss << 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaaa_f12;
     REQUIRE(oss.str() == "0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfff"
                          "eb153ffffb9feffffffffaaaa_f12");

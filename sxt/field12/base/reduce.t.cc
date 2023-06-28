@@ -21,12 +21,13 @@
 
 using namespace sxt::f12b;
 
-TEST_CASE("we can do Montgomery reduction as expected") {
-  SECTION("zero reduces to zero") {
-    constexpr uint64_t t[12] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
-    uint64_t h[6];
+TEST_CASE("reducing using Montgomery reduction") {
+  SECTION("with zero returns zero") {
+    constexpr std::array<uint64_t, 12> t = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+                                            0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+    std::array<uint64_t, 6> h;
 
-    reduce(h, t);
+    reduce(h.data(), t.data());
 
     REQUIRE(h[0] == 0x0);
     REQUIRE(h[1] == 0x0);
@@ -36,12 +37,12 @@ TEST_CASE("we can do Montgomery reduction as expected") {
     REQUIRE(h[5] == 0x0);
   }
 
-  SECTION("one in Montgomery form reduces to one") {
-    constexpr uint64_t t[12] = {r_v[0], r_v[1], r_v[2], r_v[3], r_v[4], r_v[5],
-                                0x0,    0x0,    0x0,    0x0,    0x0,    0x0};
-    uint64_t h[6];
+  SECTION("with one in Montgomery form returns one") {
+    constexpr std::array<uint64_t, 12> t = {r_v[0], r_v[1], r_v[2], r_v[3], r_v[4], r_v[5],
+                                            0x0,    0x0,    0x0,    0x0,    0x0,    0x0};
+    std::array<uint64_t, 6> h;
 
-    reduce(h, t);
+    reduce(h.data(), t.data());
 
     REQUIRE(h[0] == 0x1);
     REQUIRE(h[1] == 0x0);
@@ -51,12 +52,12 @@ TEST_CASE("we can do Montgomery reduction as expected") {
     REQUIRE(h[5] == 0x0);
   }
 
-  SECTION("the modulous p_v reduces to zero") {
-    constexpr uint64_t t[12] = {p_v[0], p_v[1], p_v[2], p_v[3], p_v[4], p_v[5],
-                                0x0,    0x0,    0x0,    0x0,    0x0,    0x0};
-    uint64_t h[6];
+  SECTION("with the modulus returns zero") {
+    constexpr std::array<uint64_t, 12> t = {p_v[0], p_v[1], p_v[2], p_v[3], p_v[4], p_v[5],
+                                            0x0,    0x0,    0x0,    0x0,    0x0,    0x0};
+    std::array<uint64_t, 6> h;
 
-    reduce(h, t);
+    reduce(h.data(), t.data());
 
     REQUIRE(h[0] == 0x0);
     REQUIRE(h[1] == 0x0);
@@ -66,22 +67,22 @@ TEST_CASE("we can do Montgomery reduction as expected") {
     REQUIRE(h[5] == 0x0);
   }
 
-  SECTION("pre computed values can be reduced") {
-    constexpr uint64_t t[12] = {0xb9fef13fffffaaaa,
-                                0x1eabffeb153ffff,
-                                0x673062a0f6b0f624,
-                                0x64774bd4f38512bf,
-                                0x4b1ba4b6434bacd7,
-                                0x1a0111ea397fe69a,
-                                0x0,
-                                0x0,
-                                0x0,
-                                0x0,
-                                0x0,
-                                0x0};
-    uint64_t h[6];
+  SECTION("with the modulus minus one returns pre-computed value") {
+    constexpr std::array<uint64_t, 12> t = {0xb9fef13fffffaaaa,
+                                            0x1eabffeb153ffff,
+                                            0x673062a0f6b0f624,
+                                            0x64774bd4f38512bf,
+                                            0x4b1ba4b6434bacd7,
+                                            0x1a0111ea397fe69a,
+                                            0x0,
+                                            0x0,
+                                            0x0,
+                                            0x0,
+                                            0x0,
+                                            0x0};
+    std::array<uint64_t, 6> h;
 
-    reduce(h, t);
+    reduce(h.data(), t.data());
 
     REQUIRE(h[0] == 0x807b0c0a130c339d);
     REQUIRE(h[1] == 0x877169a752e98495);
@@ -91,22 +92,22 @@ TEST_CASE("we can do Montgomery reduction as expected") {
     REQUIRE(h[5] == 0x13cd4d80bfdb157d);
   }
 
-  SECTION("the largest element can be reduced to pre computed values") {
-    constexpr uint64_t t[12] = {0xffffffffffffffff,
-                                0xffffffffffffffff,
-                                0xffffffffffffffff,
-                                0xffffffffffffffff,
-                                0xffffffffffffffff,
-                                0xffffffffffffffff,
-                                0x0,
-                                0x0,
-                                0x0,
-                                0x0,
-                                0x0,
-                                0x0};
-    uint64_t h[6];
+  SECTION("with the maximum value returns pre-computed value") {
+    constexpr std::array<uint64_t, 12> t = {0xffffffffffffffff,
+                                            0xffffffffffffffff,
+                                            0xffffffffffffffff,
+                                            0xffffffffffffffff,
+                                            0xffffffffffffffff,
+                                            0xffffffffffffffff,
+                                            0x0,
+                                            0x0,
+                                            0x0,
+                                            0x0,
+                                            0x0,
+                                            0x0};
+    std::array<uint64_t, 6> h;
 
-    reduce(h, t);
+    reduce(h.data(), t.data());
 
     REQUIRE(h[0] == 0xc52b7da6c7f4628c);
     REQUIRE(h[1] == 0x9ecaed89d8bb0503);
@@ -117,8 +118,8 @@ TEST_CASE("we can do Montgomery reduction as expected") {
   }
 }
 
-TEST_CASE("we can set below modulus flage correctly") {
-  SECTION("above modulus set flag to false") {
+TEST_CASE("the below modulus function") {
+  SECTION("returns false if above the modulus") {
     constexpr std::array<uint64_t, 6> h = {0x7cf2b39786a8ca98, 0x581d46434e7d165d,
                                            0x9e892e2caed9d420, 0xf9d008b1efaa0491,
                                            0x8b69878b1e985eeb, 0xddce78033db614b1};
@@ -126,7 +127,7 @@ TEST_CASE("we can set below modulus flage correctly") {
     REQUIRE(is_below_modulus(h.data()) == false);
   }
 
-  SECTION("below modulus set flag to true") {
+  SECTION("returns true if below the modulus") {
     constexpr std::array<uint64_t, 6> h = {0xacfab39786ab7540, 0x62bd464dc3dd165f,
                                            0x65029924f95222ff, 0xd615ac8a53816e96,
                                            0x328c49d9043af830, 0xdc5e8b171b6dfdf};

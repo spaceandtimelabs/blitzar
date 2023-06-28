@@ -21,17 +21,8 @@
 
 using namespace sxt::f12b;
 
-TEST_CASE("we can do convert to Montgomery form as expected") {
-  SECTION("one converts to one in Montgomery form") {
-    constexpr std::array<uint64_t, 6> a = {1, 0, 0, 0, 0, 0};
-    std::array<uint64_t, 6> ret;
-
-    to_montgomery_form(ret.data(), a.data());
-
-    REQUIRE(r_v == ret);
-  }
-
-  SECTION("zero converts to zero") {
+TEST_CASE("conversion to Montgomery form") {
+  SECTION("with zero returns zero") {
     constexpr std::array<uint64_t, 6> a = {0, 0, 0, 0, 0, 0};
     constexpr std::array<uint64_t, 6> expected = {0, 0, 0, 0, 0, 0};
     std::array<uint64_t, 6> ret;
@@ -41,7 +32,16 @@ TEST_CASE("we can do convert to Montgomery form as expected") {
     REQUIRE(expected == ret);
   }
 
-  SECTION("the modulus converts to zero in Montomery form") {
+  SECTION("with one returns one in Montgomery form") {
+    constexpr std::array<uint64_t, 6> a = {1, 0, 0, 0, 0, 0};
+    std::array<uint64_t, 6> ret;
+
+    to_montgomery_form(ret.data(), a.data());
+
+    REQUIRE(r_v == ret);
+  }
+
+  SECTION("with the modulus returns zero") {
     constexpr std::array<uint64_t, 6> expect = {0, 0, 0, 0, 0, 0};
     std::array<uint64_t, 6> ret;
 
@@ -50,7 +50,7 @@ TEST_CASE("we can do convert to Montgomery form as expected") {
     REQUIRE(expect == ret);
   }
 
-  SECTION("the maximum possible value converts to a pre computed value in Montomery form") {
+  SECTION("with maximum value returns pre-computed value") {
     constexpr std::array<uint64_t, 6> a = {0xffffffffffffffff, 0xffffffffffffffff,
                                            0xffffffffffffffff, 0xffffffffffffffff,
                                            0xffffffffffffffff, 0xffffffffffffffff};

@@ -24,29 +24,29 @@
 using namespace sxt;
 using namespace sxt::f12t;
 
-TEST_CASE("we can do element conversion as expected") {
+TEST_CASE("element conversion") {
   std::ostringstream oss;
 
-  SECTION("zero prints as zero") {
+  SECTION("of zero prints as zero") {
     element e{0, 0, 0, 0, 0, 0};
     oss << e;
     REQUIRE(oss.str() == "0x0_f12");
   }
 
-  SECTION("one in Montgomery form prints as one") {
+  SECTION("of one in Montgomery form prints as one") {
     element e{0x760900000002fffd, 0xebf4000bc40c0002, 0x5f48985753c758ba,
               0x77ce585370525745, 0x5c071a97a256ec6d, 0x15f65ec3fa80e493};
     oss << e;
     REQUIRE(oss.str() == "0x1_f12");
   }
 
-  SECTION("the modulus p prints as zero") {
+  SECTION("of the modulus prints as zero") {
     element e(f12b::p_v.data());
     oss << e;
     REQUIRE(oss.str() == "0x0_f12");
   }
 
-  SECTION("the modulus p minus one prints as a pre computed value") {
+  SECTION("of the modulus minus one prints a pre-computed value") {
     element e{0xb9feffffffffaaaa, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,
               0x64774b84f38512bf, 0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
     oss << e;
@@ -54,7 +54,7 @@ TEST_CASE("we can do element conversion as expected") {
                          "d8bb0503c52b7da6c7f4628b_f12");
   }
 
-  SECTION("conversion works on pre computed values") {
+  SECTION("of a pre-computed value returns a pre-computed value") {
     const uint64_t e_array[6] = {0, 1, 2, 3, 4, 5};
     element e{e_array};
     oss << e;
