@@ -16,22 +16,20 @@
  */
 #pragma once
 
-#include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/constant/one.h"
-#include "sxt/field12/constant/zero.h"
 #include "sxt/field12/type/element.h"
 
-namespace sxt::cg1cn {
+namespace sxt::cg1t {
 //--------------------------------------------------------------------------------------------------
-// identity_affine_v
+// element_p2
 //--------------------------------------------------------------------------------------------------
-static constexpr cg1t::element_affine identity_affine_v{
-    .X{f12cn::zero_v}, .Y{f12cn::one_v}, .infinity{true}};
+struct element_p2 {
+  f12t::element X;
+  f12t::element Y;
+  f12t::element Z;
+};
 
 //--------------------------------------------------------------------------------------------------
-// identity_p2_v
+// operator==
 //--------------------------------------------------------------------------------------------------
-static constexpr cg1t::element_p2 identity_p2_v{
-    .X{f12cn::zero_v}, .Y{f12cn::one_v}, .Z{f12cn::zero_v}};
-} // namespace sxt::cg1cn
+bool operator==(const element_p2& lhs, const element_p2& rhs) noexcept;
+} // namespace sxt::cg1t

@@ -25,11 +25,13 @@
 #pragma once
 
 #include "sxt/curve_g1/type/element_affine.h"
+#include "sxt/curve_g1/type/element_p2.h"
+#include "sxt/field12/constant/one.h"
 #include "sxt/field12/type/element.h"
 
 namespace sxt::cg1cn {
 //--------------------------------------------------------------------------------------------------
-// generator_affine_v
+// generator_x_v
 //--------------------------------------------------------------------------------------------------
 /*
  The generators of G1/G2 are computed by finding the lexicographically smallest valid x coordinate,
@@ -42,10 +44,26 @@ namespace sxt::cg1cn {
  y =
  1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569
  */
+static constexpr f12t::element generator_x_v{0x5cb38790fd530c16, 0x7817fc679976fff5,
+                                             0x154f95c7143ba1c1, 0xf0ae6acdf3d0e747,
+                                             0xedce6ecc21dbf440, 0x120177419e0bfb75};
+
+//--------------------------------------------------------------------------------------------------
+// generator_y_v
+//--------------------------------------------------------------------------------------------------
+static constexpr f12t::element generator_y_v{0xbaac93d50ce72271, 0x8c22631a7918fd8e,
+                                             0xdd595f13570725ce, 0x51ac582950405194,
+                                             0x0e1c8c3fad0059c0, 0x0bbc3efc5008a26a};
+
+//--------------------------------------------------------------------------------------------------
+// generator_affine_v
+//--------------------------------------------------------------------------------------------------
 static constexpr cg1t::element_affine generator_affine_v{
-    .X{0x5cb38790fd530c16, 0x7817fc679976fff5, 0x154f95c7143ba1c1, 0xf0ae6acdf3d0e747,
-       0xedce6ecc21dbf440, 0x120177419e0bfb75},
-    .Y{0xbaac93d50ce72271, 0x8c22631a7918fd8e, 0xdd595f13570725ce, 0x51ac582950405194,
-       0x0e1c8c3fad0059c0, 0x0bbc3efc5008a26a},
-    .infinity{false}};
+    .X{generator_x_v}, .Y{generator_y_v}, .infinity{false}};
+
+//--------------------------------------------------------------------------------------------------
+// generator_p2_v
+//--------------------------------------------------------------------------------------------------
+static constexpr cg1t::element_p2 generator_p2_v{
+    .X{generator_x_v}, .Y{generator_y_v}, .Z{f12cn::one_v}};
 } // namespace sxt::cg1cn
