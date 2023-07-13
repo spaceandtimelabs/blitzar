@@ -30,10 +30,10 @@ TEST_CASE("squaring") {
                               0xe52da61b5953ed17, 0x8ed26f9683921f45, 0x03b2ad9ebab772aa};
 
     f12t::element ret_square;
-    f12o::square(ret_square, a);
+    square(ret_square, a);
 
     f12t::element ret_mul;
-    f12o::mul(ret_mul, a, a);
+    mul(ret_mul, a, a);
 
     REQUIRE(ret_square == ret_mul);
   }

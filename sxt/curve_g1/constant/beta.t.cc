@@ -36,14 +36,14 @@ using namespace sxt::cg1cn;
 
 TEST_CASE("the beta constant") {
   SECTION("should equal the third root of unity") {
-    REQUIRE(cg1cn::beta_v != f12cn::one_v);
+    REQUIRE(beta_v != f12cn::one_v);
 
     f12t::element beta_squared;
-    f12o::mul(beta_squared, cg1cn::beta_v, cg1cn::beta_v);
+    f12o::mul(beta_squared, beta_v, beta_v);
     REQUIRE(beta_squared != f12cn::one_v);
 
     f12t::element beta_cubed;
-    f12o::mul(beta_cubed, beta_squared, cg1cn::beta_v);
+    f12o::mul(beta_cubed, beta_squared, beta_v);
     REQUIRE(beta_cubed == f12cn::one_v);
   }
 
@@ -60,6 +60,6 @@ TEST_CASE("the beta constant") {
 
     const f12t::element expected{h[0], h[1], h[2], h[3], h[4], h[5]};
 
-    REQUIRE(expected == cg1cn::beta_v);
+    REQUIRE(expected == beta_v);
   }
 }

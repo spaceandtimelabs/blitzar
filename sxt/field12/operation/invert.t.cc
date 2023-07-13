@@ -39,11 +39,11 @@ TEST_CASE("inversion") {
                               0xdbeb89b089f08299, 0x5c1fb7a3c186887f, 0x13db2e403f66ba22};
 
     f12t::element a_inv;
-    auto is_zero = f12o::invert(a_inv, a);
+    auto is_zero = invert(a_inv, a);
     REQUIRE(!is_zero);
 
     f12t::element ret_mul;
-    f12o::mul(ret_mul, a, a_inv);
+    mul(ret_mul, a, a_inv);
     REQUIRE(ret_mul == f12cn::one_v);
   }
 
@@ -54,7 +54,7 @@ TEST_CASE("inversion") {
                                      0x19bb16c95219dbd8, 0x14dcacfdfb478693, 0x115ff58afff9a8e1};
 
     f12t::element ret;
-    auto is_zero = f12o::invert(ret, a);
+    auto is_zero = invert(ret, a);
 
     REQUIRE(!is_zero);
     REQUIRE(expected == ret);
@@ -64,7 +64,7 @@ TEST_CASE("inversion") {
     constexpr f12t::element a{0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
 
     f12t::element ret;
-    auto is_zero = f12o::invert(ret, a);
+    auto is_zero = invert(ret, a);
 
     REQUIRE(is_zero);
   }

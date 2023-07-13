@@ -5,8 +5,6 @@ load(
 
 sxt_cc_component(
     name = "add",
-    impl_deps = [
-    ],
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/field12/constant:zero",
@@ -21,15 +19,17 @@ sxt_cc_component(
 sxt_cc_component(
     name = "cmov",
     impl_deps = [
+        "//sxt/field12/type:element",
     ],
+    is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/field12/constant:one",
         "//sxt/field12/constant:zero",
+        "//sxt/field12/type:element",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
-        "//sxt/field12/type:element",
     ],
 )
 
@@ -38,16 +38,17 @@ sxt_cc_component(
     impl_deps = [
         ":pow_vartime",
         "//sxt/field12/property:zero",
+        "//sxt/field12/type:element",
     ],
+    is_cuda = True,
     test_deps = [
         ":mul",
         "//sxt/base/test:unit_test",
         "//sxt/field12/constant:one",
+        "//sxt/field12/type:element",
     ],
     deps = [
-        ":neg",
         "//sxt/base/macro:cuda_callable",
-        "//sxt/field12/type:element",
     ],
 )
 
@@ -56,14 +57,16 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/field12/base:arithmetic_utility",
         "//sxt/field12/base:reduce",
+        "//sxt/field12/type:element",
     ],
+    is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/field12/constant:zero",
+        "//sxt/field12/type:element",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
-        "//sxt/field12/type:element",
     ],
 )
 
@@ -71,14 +74,17 @@ sxt_cc_component(
     name = "neg",
     impl_deps = [
         "//sxt/field12/base:arithmetic_utility",
+        "//sxt/field12/base:constants",
+        "//sxt/field12/type:element",
     ],
+    is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/field12/base:constants",
+        "//sxt/field12/type:element",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
-        "//sxt/field12/base:constants",
-        "//sxt/field12/type:element",
     ],
 )
 
@@ -88,13 +94,15 @@ sxt_cc_component(
         ":mul",
         ":square",
         "//sxt/field12/constant:one",
+        "//sxt/field12/type:element",
     ],
+    is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/field12/type:element",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
-        "//sxt/field12/type:element",
     ],
 )
 
@@ -102,15 +110,17 @@ sxt_cc_component(
     name = "sqrt",
     impl_deps = [
         ":pow_vartime",
+        ":square",
+        "//sxt/field12/type:element",
     ],
+    is_cuda = True,
     test_deps = [
+        ":square",
         "//sxt/base/test:unit_test",
+        "//sxt/field12/type:element",
     ],
     deps = [
-        ":neg",
-        ":square",
         "//sxt/base/macro:cuda_callable",
-        "//sxt/field12/type:element",
     ],
 )
 
@@ -119,14 +129,16 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/field12/base:arithmetic_utility",
         "//sxt/field12/base:reduce",
+        "//sxt/field12/type:element",
     ],
+    is_cuda = True,
     test_deps = [
         ":mul",
         "//sxt/base/test:unit_test",
+        "//sxt/field12/type:element",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
-        "//sxt/field12/type:element",
     ],
 )
 

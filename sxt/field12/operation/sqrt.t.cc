@@ -17,7 +17,6 @@
 #include "sxt/field12/operation/sqrt.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/operation/neg.h"
 #include "sxt/field12/operation/square.h"
 #include "sxt/field12/type/element.h"
 
@@ -31,11 +30,11 @@ TEST_CASE("square root") {
                               0xe52da61b5953ed17, 0x8ed26f9683921f45, 0x03b2ad9ebab772aa};
 
     f12t::element ret_sqrt;
-    auto result_is_correct = f12o::sqrt(ret_sqrt, a);
+    auto result_is_correct = sqrt(ret_sqrt, a);
     REQUIRE(result_is_correct);
 
     f12t::element ret_square;
-    f12o::square(ret_square, ret_sqrt);
+    square(ret_square, ret_sqrt);
     REQUIRE(ret_square == a);
   }
 }

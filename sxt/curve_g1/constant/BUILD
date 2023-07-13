@@ -5,8 +5,6 @@ load(
 
 sxt_cc_component(
     name = "b",
-    impl_deps = [
-    ],
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/field12/base:montgomery",
@@ -18,8 +16,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "beta",
-    impl_deps = [
-    ],
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/field12/base:byte_conversion",
@@ -33,8 +29,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "generator",
-    impl_deps = [
-    ],
     with_test = False,
     deps = [
         "//sxt/curve_g1/type:element_affine",
@@ -46,8 +40,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "identity",
-    impl_deps = [
-    ],
     with_test = False,
     deps = [
         "//sxt/curve_g1/type:element_affine",

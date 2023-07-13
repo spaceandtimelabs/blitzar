@@ -42,10 +42,10 @@ CUDA_CALLABLE bool sqrt(f12t::element& h, const f12t::element& f) noexcept {
   constexpr f12t::element g(0xee7fbfffffffeaab, 0x07aaffffac54ffff, 0xd9cc34a83dac3d89,
                             0xd91dd2e13ce144af, 0x92c6e9ed90d2eb35, 0x0680447a8e5ff9a6);
 
-  f12o::pow_vartime(h, f, g);
+  pow_vartime(h, f, g);
 
   f12t::element h_sq;
-  f12o::square(h_sq, h);
+  square(h_sq, h);
   return h_sq == f;
 }
 } // namespace sxt::f12o

@@ -6,17 +6,17 @@ load(
 sxt_cc_component(
     name = "arithmetic_utility",
     impl_deps = [
+        ":constants",
+        "//sxt/base/type:int",
         "//sxt/base/type:narrow_cast",
     ],
     is_cuda = True,
     test_deps = [
-        ":reduce",
+        ":constants",
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        ":constants",
         "//sxt/base/macro:cuda_callable",
-        "//sxt/base/type:int",
     ],
 )
 
@@ -30,10 +30,10 @@ sxt_cc_component(
     ],
     is_cuda = True,
     test_deps = [
+        ":constants",
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        ":constants",
         "//sxt/base/macro:cuda_callable",
     ],
 )
@@ -47,14 +47,15 @@ sxt_cc_component(
     name = "montgomery",
     impl_deps = [
         ":arithmetic_utility",
+        ":constants",
         ":reduce",
     ],
     is_cuda = True,
     test_deps = [
+        ":constants",
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        ":constants",
         "//sxt/base/macro:cuda_callable",
     ],
 )
@@ -63,14 +64,15 @@ sxt_cc_component(
     name = "reduce",
     impl_deps = [
         ":arithmetic_utility",
+        ":constants",
         "//sxt/base/type:narrow_cast",
     ],
     is_cuda = True,
     test_deps = [
+        ":constants",
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        ":constants",
         "//sxt/base/macro:cuda_callable",
     ],
 )

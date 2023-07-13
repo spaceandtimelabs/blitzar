@@ -18,7 +18,6 @@
 
 #include <array>
 #include <iomanip>
-#include <iostream>
 
 #include "sxt/field12/base/byte_conversion.h"
 #include "sxt/field12/base/reduce.h"

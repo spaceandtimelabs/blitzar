@@ -24,10 +24,10 @@ using namespace sxt::f12p;
 
 TEST_CASE("is zero can identify a zero element") {
   constexpr f12t::element e_zero{0, 0, 0, 0, 0, 0};
-  REQUIRE(f12p::is_zero(e_zero));
+  REQUIRE(is_zero(e_zero));
 }
 
 TEST_CASE("is zero can identify a non-zero element") {
   constexpr f12t::element e_one{1, 0, 0, 0, 0, 0};
-  REQUIRE(!f12p::is_zero(e_one));
+  REQUIRE(!is_zero(e_one));
 }

@@ -38,7 +38,7 @@ TEST_CASE("multiplication") {
                               0x1bcd1f840d3ed0f0, 0xcd14c6f310abdc3d, 0x69d558ed64d6a25f};
     f12t::element ret;
 
-    f12o::mul(ret, a, f12cn::zero_v);
+    mul(ret, a, f12cn::zero_v);
 
     REQUIRE(ret == f12cn::zero_v);
   }
@@ -52,7 +52,7 @@ TEST_CASE("multiplication") {
                                      0x9e34a4f3125c5f83, 0x3fbe0c47ca74c19e, 0x01b06a8bbd4adfe4};
     f12t::element ret;
 
-    f12o::mul(ret, a, b);
+    mul(ret, a, b);
 
     REQUIRE(expected == ret);
   }

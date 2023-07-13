@@ -28,8 +28,8 @@ TEST_CASE("cmov moves elements correctly") {
   f12t::element h{f12cn::zero_v};
   f12t::element g{f12cn::zero_v};
 
-  f12o::cmov(h, f12cn::one_v, 1);
-  f12o::cmov(g, f12cn::one_v, 0);
+  cmov(h, f12cn::one_v, 1);
+  cmov(g, f12cn::one_v, 0);
 
   REQUIRE(h == f12cn::one_v);
   REQUIRE(g == f12cn::zero_v);

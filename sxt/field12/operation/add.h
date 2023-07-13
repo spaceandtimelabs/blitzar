@@ -35,8 +35,8 @@ namespace sxt::f12o {
 //--------------------------------------------------------------------------------------------------
 // add
 //--------------------------------------------------------------------------------------------------
-template <class T1, class T2, class T3>
-CUDA_CALLABLE inline void add(T1& h, const T2& f, const T3& g) noexcept {
+CUDA_CALLABLE inline void add(f12t::element& h, const f12t::element& f,
+                              const f12t::element& g) noexcept {
   uint64_t h_tmp[6] = {};
   uint64_t carry{0};
 

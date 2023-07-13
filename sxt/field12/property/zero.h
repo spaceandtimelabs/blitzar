@@ -16,8 +16,9 @@
  */
 #pragma once
 
+#include "sxt/base/bit/zero_equality.h"
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/field12/constant/zero.h"
+#include "sxt/field12/base/byte_conversion.h"
 #include "sxt/field12/type/element.h"
 
 namespace sxt::f12p {
@@ -25,5 +26,9 @@ namespace sxt::f12p {
 // is_zero
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-inline bool is_zero(const f12t::element& e) noexcept { return e == f12cn::zero_v; }
+inline bool is_zero(const f12t::element& e) noexcept {
+  unsigned char bytes[48];
+  f12b::to_bytes(bytes, e.data());
+  return basbt::is_zero(bytes, sizeof(bytes));
+}
 } // namespace sxt::f12p

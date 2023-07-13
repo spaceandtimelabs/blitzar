@@ -44,10 +44,10 @@ void pow_vartime(f12t::element& h, const f12t::element& f, const f12t::element& 
   for (int i = 5; i >= 0; --i) {
     f12t::element res_tmp;
     for (int j = 63; j >= 0; --j) {
-      f12o::square(res_tmp, res);
+      square(res_tmp, res);
       res = res_tmp;
       if (((g[i] >> j) & 1) == 1) {
-        f12o::mul(res_tmp, f, res);
+        mul(res_tmp, f, res);
         res = res_tmp;
       }
     }

@@ -39,8 +39,8 @@ TEST_CASE("negation") {
     f12t::element ret_zero;
     f12t::element ret_modulus;
 
-    f12o::neg(ret_zero, zero);
-    f12o::neg(ret_modulus, modulus);
+    neg(ret_zero, zero);
+    neg(ret_modulus, modulus);
 
     REQUIRE(ret_zero == ret_modulus);
   }
@@ -52,7 +52,7 @@ TEST_CASE("negation") {
     constexpr f12t::element one{0x1, 0x0, 0x0, 0x0, 0x0, 0x0};
     f12t::element ret;
 
-    f12o::neg(ret, modulus_minus_one);
+    neg(ret, modulus_minus_one);
 
     REQUIRE(ret == one);
   }
@@ -64,7 +64,7 @@ TEST_CASE("negation") {
                                      0x96c52bf1ebf75781, 0x87f841f05c0c658c, 0x08a6e795afc5283e};
     f12t::element ret;
 
-    f12o::neg(ret, a);
+    neg(ret, a);
 
     REQUIRE(expected == ret);
   }

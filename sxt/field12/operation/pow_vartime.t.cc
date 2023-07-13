@@ -34,7 +34,7 @@ TEST_CASE("pow_varitime") {
                                      0xd951e663066576f4, 0xde291a3d41e980d3, 0x815664c7dfe040d};
     f12t::element ret;
 
-    f12o::pow_vartime(ret, a, b);
+    pow_vartime(ret, a, b);
 
     REQUIRE(expected == ret);
   }

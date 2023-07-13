@@ -30,7 +30,7 @@ TEST_CASE("subtraction") {
                               0x9f2941b0ba71fbae, 0xdc01791735636ad0, 0x16049d32722cd303};
 
     f12t::element ret;
-    f12o::sub(ret, a, f12cn::zero_v);
+    sub(ret, a, f12cn::zero_v);
 
     REQUIRE(a == ret);
   }
@@ -45,7 +45,7 @@ TEST_CASE("subtraction") {
                                      0x834b085cab362281, 0x19503698f47fcdc3, 0xd601aa162b48ac0};
 
     f12t::element ret;
-    f12o::sub(ret, a, b);
+    sub(ret, a, b);
 
     REQUIRE(expected == ret);
   }
@@ -56,7 +56,7 @@ TEST_CASE("subtraction") {
                                      0x64774b84f38512bf, 0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
 
     f12t::element ret;
-    f12o::sub(ret, f12cn::zero_v, b);
+    sub(ret, f12cn::zero_v, b);
 
     REQUIRE(expected == ret);
   }
