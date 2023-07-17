@@ -58,12 +58,10 @@ static constexpr f12t::element generator_y_v{0xbaac93d50ce72271, 0x8c22631a7918f
 //--------------------------------------------------------------------------------------------------
 // generator_affine_v
 //--------------------------------------------------------------------------------------------------
-static constexpr cg1t::element_affine generator_affine_v{
-    .X{generator_x_v}, .Y{generator_y_v}, .infinity{false}};
+static constexpr cg1t::element_affine generator_affine_v{generator_x_v, generator_y_v, false};
 
 //--------------------------------------------------------------------------------------------------
 // generator_p2_v
 //--------------------------------------------------------------------------------------------------
-static constexpr cg1t::element_p2 generator_p2_v{
-    .X{generator_x_v}, .Y{generator_y_v}, .Z{f12cn::one_v}};
+static constexpr cg1t::element_p2 generator_p2_v{generator_x_v, generator_y_v, f12cn::one_v};
 } // namespace sxt::cg1cn

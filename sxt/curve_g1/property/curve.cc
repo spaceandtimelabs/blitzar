@@ -79,7 +79,7 @@ bool is_on_curve(const cg1t::element_p2& p) noexcept {
   f12t::element b_z3;
   f12o::square(z2, p.Z);
   f12o::mul(z3, z2, p.Z);
-  f12o::mul(b_z3, cg1cn::b_v, z3);
+  f12o::mul(b_z3, f12t::element{cg1cn::b_v}, z3);
 
   f12t::element x3_b_z3;
   f12o::add(x3_b_z3, x3, b_z3);

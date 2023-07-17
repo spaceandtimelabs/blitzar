@@ -14,24 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/curve_g1/operation/mul_by_3b.h"
 
-#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/base/test/unit_test.h"
+#include "sxt/field12/constant/one.h"
+#include "sxt/field12/type/element.h"
+#include "sxt/field12/type/literal.h"
 
-namespace sxt::cg1t {
-class element_p2;
+using namespace sxt;
+using namespace sxt::cg1o;
+using namespace sxt::f12t;
+
+TEST_CASE("multiply by 3b") {
+  SECTION("returns twelve if one in Montogomery form is the input") {
+    f12t::element ret;
+
+    mul_by_3b(ret, f12cn::one_v);
+
+    REQUIRE(0xc_f12 == ret);
+  }
 }
-
-namespace sxt::cg1o {
-//--------------------------------------------------------------------------------------------------
-// cmov
-//--------------------------------------------------------------------------------------------------
-/*
- Replace (f,g) with (g,g) if b == 1;
- replace (f,g) with (f,g) if b == 0.
- *
- Preconditions: b in {0,1}.
- */
-CUDA_CALLABLE
-void cmov(cg1t::element_p2& f, const cg1t::element_p2& g, unsigned int b) noexcept;
-} // namespace sxt::cg1o

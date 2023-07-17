@@ -20,8 +20,6 @@
 #include "sxt/curve_g1/constant/generator.h"
 #include "sxt/curve_g1/constant/identity.h"
 #include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/constant/one.h"
-#include "sxt/field12/constant/zero.h"
 
 using namespace sxt;
 using namespace sxt::cg1o;

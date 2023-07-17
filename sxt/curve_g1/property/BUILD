@@ -26,7 +26,6 @@ sxt_cc_component(
         "//sxt/field12/constant:one",
         "//sxt/field12/operation:mul",
         "//sxt/field12/operation:neg",
-        "//sxt/field12/type:element",
     ],
 )
 
@@ -38,6 +37,7 @@ sxt_cc_component(
         "//sxt/curve_g1/constant:identity",
     ],
     deps = [
+        "//sxt/base/macro:cuda_callable",
         "//sxt/curve_g1/type:element_affine",
         "//sxt/curve_g1/type:element_p2",
         "//sxt/field12/property:zero",

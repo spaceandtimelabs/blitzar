@@ -17,20 +17,19 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/property/zero.h"
 
-namespace sxt::cg1p {
-//--------------------------------------------------------------------------------------------------
-// is_identity
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-inline bool is_identity(const cg1t::element_affine& p) noexcept { return p.infinity; }
+namespace sxt::f12t {
+struct element;
+}
 
+namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
-// is_identity
+// mul_by_3b
 //--------------------------------------------------------------------------------------------------
+/*
+ For the bls12-381 curve, since b = 4, 3b = 12.
+ See Algorithm 9 for details, https://eprint.iacr.org/2015/1060.pdf
+ */
 CUDA_CALLABLE
-inline bool is_identity(const cg1t::element_p2& p) noexcept { return f12p::is_zero(p.Z); }
-} // namespace sxt::cg1p
+void mul_by_3b(f12t::element& h, const f12t::element& p) noexcept;
+} // namespace sxt::cg1o

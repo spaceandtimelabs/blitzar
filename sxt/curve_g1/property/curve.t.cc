@@ -25,7 +25,6 @@
 #include "sxt/field12/constant/one.h"
 #include "sxt/field12/operation/mul.h"
 #include "sxt/field12/operation/neg.h"
-#include "sxt/field12/type/element.h"
 
 using namespace sxt;
 using namespace sxt::cg1p;

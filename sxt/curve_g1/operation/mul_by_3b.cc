@@ -14,23 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/curve_g1/operation/mul_by_3b.h"
 
-#include "sxt/base/macro/cuda_callable.h"
-#include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/property/zero.h"
+#include "sxt/field12/operation/add.h"
+#include "sxt/field12/type/element.h"
 
-namespace sxt::cg1p {
+namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
-// is_identity
+// mul_by_3b
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-inline bool is_identity(const cg1t::element_affine& p) noexcept { return p.infinity; }
+void mul_by_3b(f12t::element& h, const f12t::element& p) noexcept {
+  f12t::element p2;
+  f12t::element p4;
+  f12t::element p8;
 
-//--------------------------------------------------------------------------------------------------
-// is_identity
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-inline bool is_identity(const cg1t::element_p2& p) noexcept { return f12p::is_zero(p.Z); }
-} // namespace sxt::cg1p
+  f12o::add(p2, p, p);
+  f12o::add(p4, p2, p2);
+  f12o::add(p8, p4, p4);
+  f12o::add(h, p8, p4);
+}
+} // namespace sxt::cg1o

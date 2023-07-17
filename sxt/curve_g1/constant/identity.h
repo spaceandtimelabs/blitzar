@@ -26,12 +26,10 @@ namespace sxt::cg1cn {
 //--------------------------------------------------------------------------------------------------
 // identity_affine_v
 //--------------------------------------------------------------------------------------------------
-static constexpr cg1t::element_affine identity_affine_v{
-    .X{f12cn::zero_v}, .Y{f12cn::one_v}, .infinity{true}};
+static constexpr cg1t::element_affine identity_affine_v{f12cn::zero_v, f12cn::one_v, true};
 
 //--------------------------------------------------------------------------------------------------
 // identity_p2_v
 //--------------------------------------------------------------------------------------------------
-static constexpr cg1t::element_p2 identity_p2_v{
-    .X{f12cn::zero_v}, .Y{f12cn::one_v}, .Z{f12cn::zero_v}};
+static constexpr cg1t::element_p2 identity_p2_v{f12cn::zero_v, f12cn::one_v, f12cn::zero_v};
 } // namespace sxt::cg1cn
