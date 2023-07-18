@@ -60,7 +60,7 @@ std::ostream& operator<<(std::ostream& out, const element& e) noexcept;
 //--------------------------------------------------------------------------------------------------
 // operator==
 //--------------------------------------------------------------------------------------------------
-bool operator==(const element& lhs, const element& rhs) noexcept;
+CUDA_CALLABLE bool operator==(const element& lhs, const element& rhs) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // operator!=

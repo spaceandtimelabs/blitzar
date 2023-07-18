@@ -59,7 +59,12 @@ std::ostream& operator<<(std::ostream& out, const element& e) noexcept {
 //--------------------------------------------------------------------------------------------------
 // operator==
 //--------------------------------------------------------------------------------------------------
-bool operator==(const element& lhs, const element& rhs) noexcept {
-  return std::equal(lhs.data(), lhs.data() + element::num_limbs_v, rhs.data());
+CUDA_CALLABLE bool operator==(const element& lhs, const element& rhs) noexcept {
+  for (size_t i = 0; i < element::num_limbs_v; ++i) {
+    if (lhs[i] != rhs[i]) {
+      return false;
+    }
+  }
+  return true;
 }
 } // namespace sxt::f12t

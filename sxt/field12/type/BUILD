@@ -9,6 +9,7 @@ sxt_cc_component(
         "//sxt/field12/base:byte_conversion",
         "//sxt/field12/base:reduce",
     ],
+    is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/field12/base:constants",
