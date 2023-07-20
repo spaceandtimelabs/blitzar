@@ -96,3 +96,41 @@ sxt_cc_component(
         "//sxt/base/macro:cuda_callable",
     ],
 )
+
+sxt_cc_component(
+    name = "neg",
+    impl_deps = [
+        "//sxt/curve_g1/type:element_p2",
+        "//sxt/field12/operation:neg",
+    ],
+    is_cuda = True,
+    test_deps = [
+        ":add",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve_g1/constant:generator",
+        "//sxt/curve_g1/constant:identity",
+        "//sxt/curve_g1/type:element_p2",
+    ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
+    name = "sub",
+    impl_deps = [
+        ":add",
+        ":neg",
+        "//sxt/curve_g1/type:element_p2",
+    ],
+    is_cuda = True,
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/curve_g1/constant:generator",
+        "//sxt/curve_g1/constant:identity",
+        "//sxt/curve_g1/type:element_p2",
+    ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
