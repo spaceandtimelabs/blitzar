@@ -25,10 +25,11 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/operation/neg.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/multiexp/curve21/doubling_reduction.h"
+#include "sxt/multiexp/curve/doubling_reduction.h"
 
 namespace sxt::mtxc21 {
 //--------------------------------------------------------------------------------------------------
@@ -138,9 +139,9 @@ void combine_multiproducts(basct::span<c21t::element_p3> outputs,
     }
     c21t::element_p3 output;
     SXT_DEBUG_ASSERT(input_index + digit_count_one <= products.size());
-    doubling_reduce(output, digit_or_all,
-                    basct::cspan<c21t::element_p3>{&products[input_index],
-                                                   static_cast<size_t>(digit_count_one)});
+    mtxcrv::doubling_reduce(output, digit_or_all,
+                            basct::cspan<c21t::element_p3>{&products[input_index],
+                                                           static_cast<size_t>(digit_count_one)});
     input_index += digit_count_one;
     outputs[output_index] = output;
   }
@@ -168,7 +169,7 @@ void combine_multiproducts(basct::span<c21t::element_p3> outputs,
       outputs[sequence_index] = c21cn::zero_p3_v;
       continue;
     }
-    doubling_reduce(outputs[sequence_index], digit_or_all, output_products);
+    mtxcrv::doubling_reduce(outputs[sequence_index], digit_or_all, output_products);
   }
 }
 } // namespace sxt::mtxc21

@@ -18,6 +18,7 @@
 
 #include <iosfwd>
 
+#include "sxt/curve21/type/operation_adl_stub.h"
 #include "sxt/field51/type/element.h"
 
 namespace sxt::c21t {
@@ -27,7 +28,13 @@ namespace sxt::c21t {
 /**
  *  (extended): (X:Y:Z:T) satisfying x=X/Z, y=Y/Z, XY=ZT
  */
-struct element_p3 {
+struct element_p3 : c21o::operation_adl_stub {
+  element_p3() noexcept = default;
+
+  constexpr element_p3(const f51t::element& X, const f51t::element& Y, const f51t::element& Z,
+                       const f51t::element& T) noexcept
+      : X{X}, Y{Y}, Z{Z}, T{T} {}
+
   f51t::element X;
   f51t::element Y;
   f51t::element Z;

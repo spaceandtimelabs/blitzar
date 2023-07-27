@@ -14,14 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/curve21/doubling_reduction.h"
+#include "sxt/multiexp/curve/doubling_reduction.h"
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/operation/overload.h"
+#include "sxt/curve21/type/element_p3.h"
 #include "sxt/ristretto/type/literal.h"
 
 using namespace sxt;
-using namespace sxt::mtxc21;
+using namespace sxt::mtxcrv;
 using sxt::rstt::operator""_rs;
 
 TEST_CASE("we can perform the doubling reduction step of a multiexponentiation") {

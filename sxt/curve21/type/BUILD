@@ -4,6 +4,11 @@ load(
 )
 
 sxt_cc_component(
+    name = "operation_adl_stub",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "byte_conversion",
     impl_deps = [
         ":element_p3",
@@ -126,6 +131,7 @@ sxt_cc_component(
     ],
     with_test = False,
     deps = [
+        ":operation_adl_stub",
         "//sxt/field51/type:element",
     ],
 )

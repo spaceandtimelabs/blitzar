@@ -4,25 +4,6 @@ load(
 )
 
 sxt_cc_component(
-    name = "doubling_reduction",
-    impl_deps = [
-        "//sxt/base/bit:count",
-        "//sxt/base/bit:span_op",
-        "//sxt/curve21/operation:add",
-        "//sxt/curve21/operation:double",
-        "//sxt/base/error:assert",
-    ],
-    test_deps = [
-        "//sxt/curve21/operation:overload",
-        "//sxt/ristretto/type:literal",
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
     name = "multiproduct_bitset_operator",
     with_test = False,
     deps = [
@@ -164,7 +145,6 @@ sxt_cc_component(
 sxt_cc_component(
     name = "multiproducts_combination",
     impl_deps = [
-        ":doubling_reduction",
         "//sxt/base/bit:span_op",
         "//sxt/base/error:assert",
         "//sxt/base/container:blob_array",
@@ -172,8 +152,10 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
         "//sxt/curve21/operation:neg",
         "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/multiexp/curve:doubling_reduction",
         "//sxt/memory/management:managed_array",
     ],
     with_test = False,

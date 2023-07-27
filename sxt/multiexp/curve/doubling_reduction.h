@@ -14,20 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/curve21/doubling_reduction.h"
+#pragma once
+
+#include <concepts>
 
 #include "sxt/base/bit/count.h"
 #include "sxt/base/bit/span_op.h"
+#include "sxt/base/curve/element.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/operation/double.h"
 
-namespace sxt::mtxc21 {
+namespace sxt::mtxcrv {
 //--------------------------------------------------------------------------------------------------
 // doubling_reduce
 //--------------------------------------------------------------------------------------------------
-void doubling_reduce(c21t::element_p3& res, basct::cspan<uint8_t> digit_or_all,
-                     basct::cspan<c21t::element_p3> inputs) noexcept {
+template <bascrv::element Element, class Inputs>
+  requires std::constructible_from<basct::cspan<Element>, Inputs>
+void doubling_reduce(Element& res, basct::cspan<uint8_t> digit_or_all,
+                     const Inputs& inputs_convertible) noexcept {
+  basct::cspan<Element> inputs{inputs_convertible};
   SXT_DEBUG_ASSERT(!inputs.empty() && inputs.size() == basbt::pop_count(digit_or_all));
 
   auto input_index = inputs.size();
@@ -41,10 +45,10 @@ void doubling_reduce(c21t::element_p3& res, basct::cspan<uint8_t> digit_or_all,
   // output = 2^{i_0} * a0 + 2^{i_1} * (a1 + 2^{i_2} * (a2 + ..)..),
   // where i_0 <= i_1 <= i_2 <= ... <= i_n.
   while (digit_bit_index-- > 0) {
-    c21o::double_element(res, res);
+    double_element(res, res);
     if (basbt::test_bit(digit_or_all, digit_bit_index)) {
-      c21o::add(res, res, inputs[--input_index]);
+      add(res, res, inputs[--input_index]);
     }
   }
 }
-} // namespace sxt::mtxc21
+} // namespace sxt::mtxcrv
