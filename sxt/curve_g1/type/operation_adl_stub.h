@@ -16,31 +16,13 @@
  */
 #pragma once
 
-#include "sxt/curve_g1/type/operation_adl_stub.h"
-#include "sxt/field12/type/element.h"
-
-namespace sxt::cg1t {
+namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
-// element_p2
+// operation_adl_stub
 //--------------------------------------------------------------------------------------------------
-/*
- Projective coordinates (X,Y,Z). Represents the Affine coordinate point (X/Z,Y/Z).
- Homogeneous form Y^2 * Z = X^3 + (4 * Z^3).
+/**
+ * A stub class that can be inherited so that functions in the cg1o namespace
+ * will participate in ADL.
  */
-struct element_p2 : cg1o::operation_adl_stub {
-  element_p2() noexcept = default;
-
-  constexpr element_p2(const f12t::element& X, const f12t::element& Y,
-                       const f12t::element& Z) noexcept
-      : X{X}, Y{Y}, Z{Z} {}
-
-  f12t::element X;
-  f12t::element Y;
-  f12t::element Z;
-};
-
-//--------------------------------------------------------------------------------------------------
-// operator==
-//--------------------------------------------------------------------------------------------------
-bool operator==(const element_p2& lhs, const element_p2& rhs) noexcept;
-} // namespace sxt::cg1t
+struct operation_adl_stub {};
+}; // namespace sxt::cg1o

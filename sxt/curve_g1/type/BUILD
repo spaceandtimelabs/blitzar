@@ -28,6 +28,12 @@ sxt_cc_component(
         "//sxt/field12/operation:mul",
     ],
     deps = [
+        ":operation_adl_stub",
         "//sxt/field12/type:element",
     ],
+)
+
+sxt_cc_component(
+    name = "operation_adl_stub",
+    with_test = False,
 )
