@@ -16,7 +16,6 @@
  */
 #include "sxt/multiexp/curve21/naive_multiproduct_solver.h"
 
-#include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"

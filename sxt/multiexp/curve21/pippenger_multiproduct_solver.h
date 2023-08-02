@@ -16,13 +16,19 @@
  */
 #pragma once
 
-#include "sxt/multiexp/curve21/multiproduct_solver.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/multiexp/curve/multiproduct_solver.h"
+
+namespace sxt::c21t {
+struct element_p3;
+}
 
 namespace sxt::mtxc21 {
 //--------------------------------------------------------------------------------------------------
 // pippenger_multiproduct_solver
 //--------------------------------------------------------------------------------------------------
-class pippenger_multiproduct_solver final : public multiproduct_solver {
+class pippenger_multiproduct_solver final : public mtxcrv::multiproduct_solver<c21t::element_p3> {
 public:
   // multiproduct_solver
   xena::future<memmg::managed_array<c21t::element_p3>>

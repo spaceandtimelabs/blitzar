@@ -21,7 +21,6 @@
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
-#include "sxt/multiexp/curve21/multiproduct_solver.h"
 #include "sxt/multiexp/curve21/multiproducts_combination.h"
 
 namespace sxt::mtxc21 {
@@ -29,7 +28,7 @@ namespace sxt::mtxc21 {
 // constructor
 //--------------------------------------------------------------------------------------------------
 multiexponentiation_cpu_driver::multiexponentiation_cpu_driver(
-    const multiproduct_solver* solver) noexcept
+    const mtxcrv::multiproduct_solver<c21t::element_p3>* solver) noexcept
     : solver_{solver} {}
 
 //--------------------------------------------------------------------------------------------------

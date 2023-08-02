@@ -14,4 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/curve21/multiproduct_solver.h"
+#include "sxt/multiexp/curve/multiproduct_solver.h"

@@ -16,17 +16,23 @@
  */
 #pragma once
 
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/multiexp/curve/multiproduct_solver.h"
 #include "sxt/multiexp/pippenger/driver.h"
 
-namespace sxt::mtxc21 {
-class multiproduct_solver;
+namespace sxt::c21t {
+struct element_p3;
+}
 
+namespace sxt::mtxc21 {
 //--------------------------------------------------------------------------------------------------
 // multiexponentiation_cpu_driver
 //--------------------------------------------------------------------------------------------------
 class multiexponentiation_cpu_driver final : public mtxpi::driver {
 public:
-  explicit multiexponentiation_cpu_driver(const multiproduct_solver* solver) noexcept;
+  explicit multiexponentiation_cpu_driver(
+      const mtxcrv::multiproduct_solver<c21t::element_p3>* solver) noexcept;
 
   // mtxpi::driver
   xena::future<memmg::managed_array<void>>
@@ -39,6 +45,6 @@ public:
       basct::cspan<mtxb::exponent_sequence> exponents) const noexcept override;
 
 private:
-  const multiproduct_solver* solver_;
+  const mtxcrv::multiproduct_solver<c21t::element_p3>* solver_;
 };
 } // namespace sxt::mtxc21

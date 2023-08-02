@@ -20,3 +20,14 @@ sxt_cc_component(
         "//sxt/base/error:assert",
     ],
 )
+
+sxt_cc_component(
+    name = "multiproduct_solver",
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/curve:element",
+        "//sxt/execution/async:future_fwd",
+        "//sxt/memory/management:managed_array_fwd",
+    ],
+)
