@@ -84,12 +84,12 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
     ],
     test_deps = [
-        ":naive_multiproduct_solver",
         "//sxt/curve21/type:element_p3",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/pippenger:multiexponentiation",
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/curve:naive_multiproduct_solver",
         "//sxt/execution/async:future",
         "//sxt/multiexp/test:multiexponentiation",
     ],
@@ -154,24 +154,6 @@ sxt_cc_component(
     deps = [
         "//sxt/base/container:span",
         "//sxt/memory/management:managed_array_fwd",
-    ],
-)
-
-sxt_cc_component(
-    name = "naive_multiproduct_solver",
-    impl_deps = [
-        "//sxt/execution/async:future",
-        "//sxt/memory/management:managed_array",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/operation:add",
-        "//sxt/multiexp/base:generator_utility",
-        "//sxt/multiexp/index:index_table",
-    ],
-    with_test = False,
-    deps = [
-        "//sxt/curve21/operation:add",
-        "//sxt/curve21/operation:double",
-        "//sxt/multiexp/curve:multiproduct_solver",
     ],
 )
 

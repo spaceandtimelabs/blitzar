@@ -31,3 +31,16 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array_fwd",
     ],
 )
+
+sxt_cc_component(
+    name = "naive_multiproduct_solver",
+    with_test = False,
+    deps = [
+        ":multiproduct_solver",
+        "//sxt/base/curve:element",
+        "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/base:generator_utility",
+        "//sxt/multiexp/index:index_table",
+    ],
+)
