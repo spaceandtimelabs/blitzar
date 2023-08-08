@@ -16,7 +16,6 @@
  */
 #include "benchmark/reduce2/reduce_cpu.h"
 
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
 
@@ -35,7 +34,7 @@ void reduce_cpu(c21t::element_p3* res, int m, int n) noexcept {
 
   for (int mi = 0; mi < m; ++mi) {
     auto& res_mi = res[mi];
-    res_mi = c21cn::zero_p3_v;
+    res_mi = c21t::element_p3::identity();
     for (int i = 0; i < n; ++i) {
       c21o::add(res_mi, res_mi, g);
     }

@@ -42,7 +42,6 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/curve_g1/constant:generator",
-        "//sxt/curve_g1/constant:identity",
         "//sxt/curve_g1/type:element_p2",
     ],
     deps = [
@@ -55,7 +54,6 @@ sxt_cc_component(
     impl_deps = [
         ":cmov",
         ":mul_by_3b",
-        "//sxt/curve_g1/constant:identity",
         "//sxt/curve_g1/property:identity",
         "//sxt/curve_g1/type:element_p2",
         "//sxt/field12/operation:add",
@@ -68,7 +66,6 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/curve_g1/constant:generator",
-        "//sxt/curve_g1/constant:identity",
         "//sxt/curve_g1/property:curve",
         "//sxt/curve_g1/property:identity",
         "//sxt/curve_g1/type:element_p2",
@@ -108,7 +105,6 @@ sxt_cc_component(
         ":add",
         "//sxt/base/test:unit_test",
         "//sxt/curve_g1/constant:generator",
-        "//sxt/curve_g1/constant:identity",
         "//sxt/curve_g1/type:element_p2",
     ],
     deps = [
@@ -127,7 +123,6 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/curve_g1/constant:generator",
-        "//sxt/curve_g1/constant:identity",
         "//sxt/curve_g1/type:element_p2",
     ],
     deps = [
@@ -140,14 +135,12 @@ sxt_cc_component(
     impl_deps = [
         ":add",
         ":double",
-        "//sxt/curve_g1/constant:identity",
         "//sxt/curve_g1/type:element_p2",
     ],
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/curve_g1/constant:generator",
-        "//sxt/curve_g1/constant:identity",
         "//sxt/curve_g1/type:element_p2",
     ],
     deps = [

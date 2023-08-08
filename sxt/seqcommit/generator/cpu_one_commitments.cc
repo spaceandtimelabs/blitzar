@@ -18,7 +18,6 @@
 
 #include <vector>
 
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/seqcommit/generator/precomputed_generators.h"
@@ -28,7 +27,7 @@ namespace sxt::sqcgn {
 // cpu_get_one_commitments
 //--------------------------------------------------------------------------------------------------
 void cpu_get_one_commitments(basct::span<c21t::element_p3> one_commitments) noexcept {
-  auto prev_commit = c21cn::zero_p3_v;
+  auto prev_commit = c21t::element_p3::identity();
 
   auto n = one_commitments.size();
   std::vector<c21t::element_p3> generators_data;
@@ -56,6 +55,6 @@ c21t::element_p3 cpu_get_one_commit(c21t::element_p3 prev_commit, uint64_t n,
 }
 
 c21t::element_p3 cpu_get_one_commit(uint64_t n) noexcept {
-  return cpu_get_one_commit(c21cn::zero_p3_v, n, 0);
+  return cpu_get_one_commit(c21t::element_p3::identity(), n, 0);
 }
 } // namespace sxt::sqcgn

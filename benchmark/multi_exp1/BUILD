@@ -34,7 +34,6 @@ cc_library(
     ],
     deps = [
         ":multiply_add",
-        "//sxt/curve21/constant:zero",
         "//sxt/curve21/type:element_p3",
     ],
 )
@@ -52,7 +51,6 @@ cuda_library(
     ],
     deps = [
         ":multiply_add",
-        "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",

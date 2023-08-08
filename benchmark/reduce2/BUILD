@@ -14,7 +14,6 @@ cc_library(
         "-std=c++20",
     ],
     deps = [
-        "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/type:element_p3",
     ],
@@ -32,7 +31,6 @@ cuda_library(
         "--device-c",
     ],
     deps = [
-        "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/type:element_p3",
     ],

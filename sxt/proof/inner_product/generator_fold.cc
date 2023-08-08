@@ -20,7 +20,6 @@
 #include <cstring>
 
 #include "sxt/base/error/assert.h"
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/type/element_p3.h"
@@ -64,7 +63,7 @@ CUDA_CALLABLE void fold_generators(c21t::element_p3& res, basct::cspan<unsigned>
                                    const c21t::element_p3& g_high) noexcept {
   if (decomposition.empty()) {
     // this should never happen
-    res = c21cn::zero_p3_v;
+    res = c21t::element_p3::identity();
     return;
   }
   c21t::element_p3 terms[3];

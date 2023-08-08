@@ -54,13 +54,11 @@ sxt_cc_component(
         ":precomputed_generators",
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/operation:add",
-        "//sxt/curve21/constant:zero",
     ],
     test_deps = [
         ":cpu_generator",
         "//sxt/base/test:unit_test",
         "//sxt/curve21/operation:add",
-        "//sxt/curve21/constant:zero",
         "//sxt/curve21/type:element_p3",
     ],
     deps = [

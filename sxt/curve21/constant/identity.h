@@ -14,4 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve21/constant/zero.h"
+#pragma once
+
+#include "sxt/curve21/type/element_cached.h"
+#include "sxt/curve21/type/element_p3.h"
+#include "sxt/field51/constant/one.h"
+#include "sxt/field51/constant/zero.h"
+
+namespace sxt::c21cn {
+//--------------------------------------------------------------------------------------------------
+// identity_cached_v
+//--------------------------------------------------------------------------------------------------
+static constexpr c21t::element_cached identity_cached_v{
+    .YplusX{f51cn::one_v},
+    .YminusX{f51cn::one_v},
+    .Z{f51cn::one_v},
+    .T2d{f51cn::zero_v},
+};
+} // namespace sxt::c21cn

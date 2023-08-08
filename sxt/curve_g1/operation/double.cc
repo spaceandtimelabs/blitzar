@@ -25,7 +25,6 @@
  */
 #include "sxt/curve_g1/operation/double.h"
 
-#include "sxt/curve_g1/constant/identity.h"
 #include "sxt/curve_g1/operation/cmov.h"
 #include "sxt/curve_g1/operation/mul_by_3b.h"
 #include "sxt/curve_g1/property/identity.h"
@@ -68,6 +67,6 @@ void double_element(cg1t::element_p2& h, const cg1t::element_p2& p) noexcept {
   h.Y = y3;
   h.Z = z3;
 
-  cmov(h, cg1t::element_p2{cg1cn::identity_p2_v}, cg1p::is_identity(p));
+  cmov(h, cg1t::element_p2::identity(), cg1p::is_identity(p));
 }
 } // namespace sxt::cg1o

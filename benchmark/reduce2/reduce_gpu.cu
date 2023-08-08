@@ -1,6 +1,5 @@
 #include "benchmark/reduce2/reduce_gpu.h"
 
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
 
@@ -23,7 +22,7 @@ __device__ static void compute_reduction(c21t::element_p3& res_mi,
 
   auto tid = threadIdx.x;
   auto& reduction = reductions[tid];
-  reduction = c21cn::zero_p3_v;
+  reduction = c21t::element_p3::identity();
   for (int i=first; i<last; i+=num_threads_v) {
     c21o::add(reduction, reduction, g);
   }

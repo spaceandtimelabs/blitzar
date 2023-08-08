@@ -25,7 +25,6 @@
  */
 #include "sxt/curve_g1/operation/scalar_multiply.h"
 
-#include "sxt/curve_g1/constant/identity.h"
 #include "sxt/curve_g1/operation/add.h"
 #include "sxt/curve_g1/operation/double.h"
 #include "sxt/curve_g1/type/element_p2.h"
@@ -68,7 +67,7 @@ CUDA_CALLABLE
 static void scalar_multiply_impl(cg1t::element_p2& h, const cg1t::element_p2& p,
                                  const uint8_t q[32], const int first_one_byte,
                                  const int first_one_bit) noexcept {
-  cg1t::element_p2 acc{cg1cn::identity_p2_v};
+  cg1t::element_p2 acc{cg1t::element_p2::identity()};
   int starting_bit{first_one_bit};
 
   for (int byte_index = first_one_byte; byte_index >= 0; --byte_index) {
@@ -97,7 +96,7 @@ void scalar_multiply255(cg1t::element_p2& h, const cg1t::element_p2& p,
   if (get_first_one_bit(first_one_byte, first_one_bit, q)) {
     scalar_multiply_impl(h, p, q, first_one_byte, first_one_bit);
   } else {
-    h = cg1cn::identity_p2_v;
+    h = cg1t::element_p2::identity();
   }
 }
 } // namespace sxt::cg1o

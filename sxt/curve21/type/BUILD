@@ -132,6 +132,8 @@ sxt_cc_component(
     with_test = False,
     deps = [
         ":operation_adl_stub",
+        "//sxt/field51/constant:one",
+        "//sxt/field51/constant:zero",
         "//sxt/field51/type:element",
     ],
 )

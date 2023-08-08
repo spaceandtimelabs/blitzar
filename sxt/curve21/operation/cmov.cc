@@ -16,7 +16,7 @@
  */
 #include "sxt/curve21/operation/cmov.h"
 
-#include "sxt/curve21/constant/zero.h"
+#include "sxt/curve21/constant/identity.h"
 #include "sxt/curve21/type/element_cached.h"
 #include "sxt/field51/operation/cmov.h"
 #include "sxt/field51/operation/neg.h"
@@ -71,7 +71,7 @@ CUDA_CALLABLE void cmov8(c21t::element_cached& t, const c21t::element_cached cac
   const unsigned char bnegative = negative(b);
   const unsigned char babs = b - (((-bnegative) & b) * ((signed char)1 << 1));
 
-  t = c21cn::zero_cached_v;
+  t = c21cn::identity_cached_v;
   cmov(t, cached[0], equal(babs, 1));
   cmov(t, cached[1], equal(babs, 2));
   cmov(t, cached[2], equal(babs, 3));

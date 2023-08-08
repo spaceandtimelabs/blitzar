@@ -25,7 +25,6 @@
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/constexpr_switch.h"
 #include "sxt/base/type/int.h"
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
@@ -69,7 +68,7 @@ void sum_curve21_elements(basct::span<c21t::element_p3> result,
   SXT_RELEASE_ASSERT(result.size() == terms.size());
   for (size_t result_index = 0; result_index < result.size(); ++result_index) {
     auto& res_i = result[result_index];
-    res_i = c21cn::zero_p3_v;
+    res_i = c21t::element_p3::identity();
     for (auto term_index : terms[result_index]) {
       SXT_RELEASE_ASSERT(term_index < inputs.size());
       c21o::add(res_i, res_i, inputs[term_index]);
@@ -86,7 +85,7 @@ void mul_sum_curve21_elements(basct::span<c21t::element_p3> result,
   SXT_RELEASE_ASSERT(result.size() == sequences.size());
   SXT_STACK_ARRAY(exponent, 32, uint8_t);
   for (size_t output_index = 0; output_index < result.size(); ++output_index) {
-    c21t::element_p3 output = c21cn::zero_p3_v;
+    c21t::element_p3 output = c21t::element_p3::identity();
     auto sequence = sequences[output_index];
     SXT_RELEASE_ASSERT(sequence.n <= generators.size());
     for (size_t generator_index = 0; generator_index < sequence.n; ++generator_index) {

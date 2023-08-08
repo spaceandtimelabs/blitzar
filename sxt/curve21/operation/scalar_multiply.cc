@@ -19,7 +19,6 @@
 #include <cassert>
 #include <cstring>
 
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/cmov.h"
 #include "sxt/curve21/operation/double.h"
@@ -105,7 +104,7 @@ void scalar_multiply255(c21t::element_p3& h, const unsigned char* a,
   e[63] += carry;
   /* each e[i] is between -8 and 8 */
 
-  h = c21cn::zero_p3_v;
+  h = c21t::element_p3::identity();
 
   for (i = 63; i != 0; i--) {
     cmov8(t, pi, e[i]);

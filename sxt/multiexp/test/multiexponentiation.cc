@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/overload.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
@@ -53,7 +52,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
         {.element_nbytes = 1, .n = 0, .data = nullptr}};
     auto res = f({}, sequences);
     memmg::managed_array<c21t::element_p3> expected = {
-        c21cn::zero_p3_v,
+        c21t::element_p3::identity(),
     };
     REQUIRE(res == expected);
   }
@@ -68,7 +67,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     };
     auto res = f(generators, sequences);
     memmg::managed_array<c21t::element_p3> expected = {
-        c21cn::zero_p3_v,
+        c21t::element_p3::identity(),
     };
     REQUIRE(res == expected);
   }
@@ -185,8 +184,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
         {.element_nbytes = 1, .n = 0, .data = nullptr}};
     auto res = f({}, sequences);
     memmg::managed_array<c21t::element_p3> expected = {
-        c21cn::zero_p3_v,
-        c21cn::zero_p3_v,
+        c21t::element_p3::identity(),
+        c21t::element_p3::identity(),
     };
     REQUIRE(res == expected);
   }
@@ -243,7 +242,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     };
     auto res = f(generators, sequences);
     memmg::managed_array<c21t::element_p3> expected = {
-        c21cn::zero_p3_v,
+        c21t::element_p3::identity(),
         2 * generators[0] + 6 * generators[1] + 4 * generators[2],
     };
     REQUIRE(res == expected);

@@ -14,24 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/operation/neg.h"
-
-#include "sxt/base/test/unit_test.h"
-#include "sxt/curve_g1/constant/generator.h"
-#include "sxt/curve_g1/operation/add.h"
-#include "sxt/curve_g1/type/element_p2.h"
-
-using namespace sxt;
-using namespace sxt::cg1o;
-
-TEST_CASE("negation on projective elements") {
-  SECTION("produces the identity when summing the generator with its negation") {
-    cg1t::element_p2 gen_neg;
-    neg(gen_neg, cg1cn::generator_p2_v);
-
-    cg1t::element_p2 expect_identity;
-    add(expect_identity, cg1cn::generator_p2_v, gen_neg);
-
-    REQUIRE(expect_identity == cg1t::element_p2::identity());
-  }
-}
+#include "sxt/curve21/constant/identity.h"

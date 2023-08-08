@@ -84,7 +84,6 @@ sxt_cc_component(
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
         "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/constant:zero",
     ],
     is_cuda = True,
     test_deps = [

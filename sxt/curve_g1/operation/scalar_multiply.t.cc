@@ -18,7 +18,6 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_g1/constant/generator.h"
-#include "sxt/curve_g1/constant/identity.h"
 #include "sxt/curve_g1/type/element_p2.h"
 
 using namespace sxt;
@@ -33,7 +32,7 @@ TEST_CASE("scalar multiplication returns") {
 
     scalar_multiply255(ret, cg1cn::generator_p2_v, a.data());
 
-    REQUIRE(cg1cn::identity_p2_v == ret);
+    REQUIRE(cg1t::element_p2::identity() == ret);
   }
 
   SECTION("the identity if only the first bit is 1") {
@@ -44,7 +43,7 @@ TEST_CASE("scalar multiplication returns") {
 
     scalar_multiply255(ret, cg1cn::generator_p2_v, a.data());
 
-    REQUIRE(cg1cn::identity_p2_v == ret);
+    REQUIRE(cg1t::element_p2::identity() == ret);
   }
 
   SECTION("the same value if the scalar is one") {

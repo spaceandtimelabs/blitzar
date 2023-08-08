@@ -22,7 +22,7 @@
 #include "cbindings/backend.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/constant/zero.h"
+#include "sxt/curve21/type/element_p3.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/operation/add.h"
 #include "sxt/ristretto/operation/overload.h"
@@ -77,7 +77,7 @@ compute_expected_commitment(const std::vector<T>& data,
   SXT_DEBUG_ASSERT(data.size() == generators.size());
 
   rstt::compressed_element expected_commitment;
-  rstb::to_bytes(expected_commitment.data(), c21cn::zero_p3_v);
+  rstb::to_bytes(expected_commitment.data(), c21t::element_p3::identity());
 
   for (uint64_t i = 0; i < data.size(); ++i) {
     rstt::compressed_element aux_h;

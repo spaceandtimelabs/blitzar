@@ -35,9 +35,9 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/multiexp/curve/multiproducts_combination.h"
 #include "sxt/multiexp/curve21/multiexponentiation_cpu_driver.h"
 #include "sxt/multiexp/curve21/multiproduct.h"
-#include "sxt/multiexp/curve21/multiproducts_combination.h"
 #include "sxt/multiexp/curve21/pippenger_multiproduct_solver.h"
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
 #include "sxt/multiexp/pippenger/multiproduct_decomposition_gpu.h"
@@ -81,7 +81,7 @@ static xena::future<> async_compute_multiexponentiation_impl(
   xendv::synchronize_event(stream, generators_event);
   co_await async_compute_multiproduct(products_p, stream, generators_event.value(), indexes,
                                       product_sizes, is_signed);
-  fold_multiproducts(products, or_all, products_p, or_all_p);
+  mtxcrv::fold_multiproducts<c21t::element_p3>(products, or_all, products_p, or_all_p);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -155,7 +155,7 @@ async_compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
                                       });
   memmg::managed_array<c21t::element_p3> res(num_outputs);
   for (size_t i = 0; i < num_outputs; ++i) {
-    combine_multiproducts({&res[i], 1}, or_alls[i], products[i]);
+    mtxcrv::combine_multiproducts<c21t::element_p3>({&res[i], 1}, or_alls[i], products[i]);
   }
   co_return res;
 }

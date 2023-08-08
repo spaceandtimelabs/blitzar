@@ -18,7 +18,6 @@
 
 #include "sxt/base/container/blob_array.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/overload.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"

@@ -18,6 +18,7 @@
 
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/multiexp/curve/multiproduct_solver.h"
 #include "sxt/multiexp/pippenger/driver.h"
 

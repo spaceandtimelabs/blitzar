@@ -21,7 +21,7 @@
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
-#include "sxt/multiexp/curve21/multiproducts_combination.h"
+#include "sxt/multiexp/curve/multiproducts_combination.h"
 
 namespace sxt::mtxc21 {
 //--------------------------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ multiexponentiation_cpu_driver::combine_multiproduct_outputs(
   SXT_DEBUG_ASSERT(multiproduct.ready());
   auto products = std::move(multiproduct.value().as_array<c21t::element_p3>());
   memmg::managed_array<c21t::element_p3> res(exponents.size());
-  combine_multiproducts(res, output_digit_or_all, products, exponents);
+  mtxcrv::combine_multiproducts<c21t::element_p3>(res, output_digit_or_all, products, exponents);
   return xena::make_ready_future<memmg::managed_array<void>>(std::move(res));
 }
 } // namespace sxt::mtxc21

@@ -70,7 +70,9 @@ TEST_CASE("a projective element") {
     REQUIRE(!is_on_curve(generator_projected));
   }
 
-  SECTION("equal to the identity is on the curve") { REQUIRE(is_on_curve(cg1cn::identity_p2_v)); }
+  SECTION("equal to the identity is on the curve") {
+    REQUIRE(is_on_curve(cg1t::element_p2::identity()));
+  }
 
   SECTION("equal to (1,1,1) is not on the curve") {
     constexpr cg1t::element_p2 one_one{f12cn::one_v, f12cn::one_v, f12cn::one_v};

@@ -19,6 +19,7 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_g1/constant/generator.h"
 #include "sxt/curve_g1/constant/identity.h"
+#include "sxt/curve_g1/type/element_p2.h"
 
 using namespace sxt;
 using namespace sxt::cg1p;
@@ -30,7 +31,7 @@ TEST_CASE("the identity can be identified") {
   }
 
   SECTION("as a projective element") {
-    REQUIRE(is_identity(cg1cn::identity_p2_v));
+    REQUIRE(is_identity(cg1t::element_p2::identity()));
     REQUIRE(!is_identity(cg1cn::generator_p2_v));
   }
 }

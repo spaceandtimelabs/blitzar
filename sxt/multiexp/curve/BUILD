@@ -8,6 +8,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
+        "//sxt/curve21/operation:neg",
         "//sxt/curve21/operation:overload",
         "//sxt/ristretto/type:literal",
         "//sxt/base/test:unit_test",
@@ -18,6 +19,23 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
         "//sxt/base/error:assert",
+    ],
+)
+
+sxt_cc_component(
+    name = "multiproducts_combination",
+    with_test = False,
+    deps = [
+        ":doubling_reduction",
+        "//sxt/base/bit:span_op",
+        "//sxt/base/container:blob_array",
+        "//sxt/base/container:span",
+        "//sxt/base/container:stack_array",
+        "//sxt/base/curve:element",
+        "//sxt/base/error:assert",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/management:managed_array_fwd",
+        "//sxt/multiexp/base:exponent_sequence",
     ],
 )
 

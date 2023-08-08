@@ -17,6 +17,8 @@
 #pragma once
 
 #include "sxt/curve_g1/type/operation_adl_stub.h"
+#include "sxt/field12/constant/one.h"
+#include "sxt/field12/constant/zero.h"
 #include "sxt/field12/type/element.h"
 
 namespace sxt::cg1t {
@@ -37,6 +39,10 @@ struct element_p2 : cg1o::operation_adl_stub {
   f12t::element X;
   f12t::element Y;
   f12t::element Z;
+
+  static constexpr element_p2 identity() noexcept {
+    return element_p2{f12cn::zero_v, f12cn::one_v, f12cn::zero_v};
+  }
 };
 
 //--------------------------------------------------------------------------------------------------

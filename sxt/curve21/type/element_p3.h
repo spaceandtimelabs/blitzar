@@ -19,6 +19,8 @@
 #include <iosfwd>
 
 #include "sxt/curve21/type/operation_adl_stub.h"
+#include "sxt/field51/constant/one.h"
+#include "sxt/field51/constant/zero.h"
 #include "sxt/field51/type/element.h"
 
 namespace sxt::c21t {
@@ -39,6 +41,10 @@ struct element_p3 : c21o::operation_adl_stub {
   f51t::element Y;
   f51t::element Z;
   f51t::element T;
+
+  static constexpr element_p3 identity() noexcept {
+    return element_p3{f51cn::zero_v, f51cn::one_v, f51cn::one_v, f51cn::zero_v};
+  }
 };
 
 //--------------------------------------------------------------------------------------------------

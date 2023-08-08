@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <concepts>
+
 namespace sxt::bascrv {
 //--------------------------------------------------------------------------------------------------
 // element
@@ -24,5 +26,7 @@ template <class T>
 concept element = requires(T& res, const T& e) {
   double_element(res, e);
   add(res, e, e);
+  neg(res, e);
+  { T::identity() } noexcept -> std::same_as<T>;
 };
 } // namespace sxt::bascrv

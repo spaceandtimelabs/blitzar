@@ -1,7 +1,6 @@
 #include "benchmark/multi_exp1/multi_exp_gpu.h"
 
 #include "benchmark/multi_exp1/multiply_add.h"
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
@@ -18,7 +17,7 @@ __device__ static void compute_reduction(c21t::element_p3& res_mi,
                                          int first, int last) {
   auto tid = threadIdx.x;
   auto& reduction = reductions[tid];
-  reduction = c21cn::zero_p3_v;
+  reduction = c21t::element_p3::identity();
   for (int i=first; i<last; i+=num_threads_v) {
     multiply_add(reduction, mi, i);
   }

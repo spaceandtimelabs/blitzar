@@ -21,7 +21,6 @@
 
 #include "sxt/base/container/span_void.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
@@ -111,7 +110,7 @@ void multiproduct_cpu_driver::compute_naive_multiproduct(
     auto& output = outputs[row[0]];
 
     if (row.size() == 2) {
-      output = c21cn::zero_p3_v;
+      output = c21t::element_p3::identity();
       continue;
     }
 

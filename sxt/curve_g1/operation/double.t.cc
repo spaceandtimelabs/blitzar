@@ -18,7 +18,6 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_g1/constant/generator.h"
-#include "sxt/curve_g1/constant/identity.h"
 #include "sxt/curve_g1/property/curve.h"
 #include "sxt/curve_g1/property/identity.h"
 #include "sxt/curve_g1/type/element_p2.h"
@@ -31,7 +30,7 @@ TEST_CASE("doubling a projective element") {
   SECTION("preserves the identity") {
     cg1t::element_p2 identity_double;
 
-    double_element(identity_double, cg1cn::identity_p2_v);
+    double_element(identity_double, cg1t::element_p2::identity());
 
     REQUIRE(cg1p::is_identity(identity_double));
     REQUIRE(cg1p::is_on_curve(identity_double));
@@ -68,6 +67,6 @@ TEST_CASE("doubling a projective element") {
     double_element(expect_identity, p);
 
     REQUIRE(cg1p::is_on_curve(p));
-    REQUIRE(expect_identity == cg1cn::identity_p2_v);
+    REQUIRE(expect_identity == cg1t::element_p2::identity());
   }
 }

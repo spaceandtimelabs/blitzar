@@ -23,7 +23,6 @@ sxt_cc_component(
         "//sxt/base/type:int",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:neg",
         "//sxt/curve21/operation:scalar_multiply",
@@ -51,7 +50,6 @@ sxt_cc_component(
     impl_deps = [
         ":curve21_arithmetic",
         "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:overload",
         "//sxt/ristretto/type:literal",
         "//sxt/ristretto/operation:compression",

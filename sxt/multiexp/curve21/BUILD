@@ -36,13 +36,13 @@ sxt_cc_component(
     impl_deps = [
         ":multiexponentiation_cpu_driver",
         ":multiproduct",
-        ":multiproducts_combination",
         ":pippenger_multiproduct_solver",
         "//sxt/base/container:blob_array",
         "//sxt/curve21/operation:accumulator",
         "//sxt/execution/async:future",
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/curve:multiproducts_combination",
         "//sxt/multiexp/pippenger:multiexponentiation",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:event",
@@ -76,12 +76,12 @@ sxt_cc_component(
 sxt_cc_component(
     name = "multiexponentiation_cpu_driver",
     impl_deps = [
-        ":multiproducts_combination",
         "//sxt/base/container:blob_array",
         "//sxt/base/error:assert",
-        "//sxt/memory/management:managed_array",
-        "//sxt/execution/async:future",
         "//sxt/curve21/type:element_p3",
+        "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/curve:multiproducts_combination",
     ],
     test_deps = [
         "//sxt/curve21/type:element_p3",
@@ -96,6 +96,7 @@ sxt_cc_component(
     deps = [
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
+        "//sxt/curve21/operation:neg",
         "//sxt/multiexp/curve:multiproduct_solver",
         "//sxt/multiexp/pippenger:driver",
     ],
@@ -105,7 +106,6 @@ sxt_cc_component(
     name = "multiproduct_cpu_driver",
     impl_deps = [
         ":multiproduct_bitset_operator",
-        "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:add",
         "//sxt/base/container:span_void",
         "//sxt/curve21/type:element_p3",
@@ -135,29 +135,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "multiproducts_combination",
-    impl_deps = [
-        "//sxt/base/bit:span_op",
-        "//sxt/base/error:assert",
-        "//sxt/base/container:blob_array",
-        "//sxt/base/container:stack_array",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/constant:zero",
-        "//sxt/curve21/operation:add",
-        "//sxt/curve21/operation:double",
-        "//sxt/curve21/operation:neg",
-        "//sxt/multiexp/base:exponent_sequence",
-        "//sxt/multiexp/curve:doubling_reduction",
-        "//sxt/memory/management:managed_array",
-    ],
-    with_test = False,
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/memory/management:managed_array_fwd",
-    ],
-)
-
-sxt_cc_component(
     name = "pippenger_multiproduct_solver",
     impl_deps = [
         ":multiproduct_cpu_driver",
@@ -175,7 +152,6 @@ sxt_cc_component(
         "//sxt/base/container:blob_array",
         "//sxt/multiexp/index:index_table",
         "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/constant:zero",
         "//sxt/curve21/operation:overload",
         "//sxt/ristretto/type:literal",
         "//sxt/base/test:unit_test",
@@ -185,6 +161,7 @@ sxt_cc_component(
     deps = [
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
+        "//sxt/curve21/operation:neg",
         "//sxt/multiexp/curve:multiproduct_solver",
     ],
 )

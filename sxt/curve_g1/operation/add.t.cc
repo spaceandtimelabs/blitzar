@@ -32,7 +32,7 @@ using namespace sxt::cg1o;
 TEST_CASE("addition with projective elements") {
   SECTION("keeps the identity on the curve") {
     cg1t::element_p2 ret;
-    add(ret, cg1cn::identity_p2_v, cg1cn::identity_p2_v);
+    add(ret, cg1t::element_p2::identity(), cg1t::element_p2::identity());
 
     REQUIRE(cg1p::is_identity(ret));
     REQUIRE(cg1p::is_on_curve(ret));
@@ -48,14 +48,14 @@ TEST_CASE("addition with projective elements") {
     const cg1t::element_p2 projected_generator{x, y, z};
     cg1t::element_p2 ret;
 
-    add(ret, cg1cn::identity_p2_v, projected_generator);
+    add(ret, cg1t::element_p2::identity(), projected_generator);
 
     REQUIRE(!cg1p::is_identity(ret));
     REQUIRE(cg1p::is_on_curve(ret));
     REQUIRE(cg1cn::generator_p2_v == ret);
 
     // Switch summands
-    add(ret, projected_generator, cg1cn::identity_p2_v);
+    add(ret, projected_generator, cg1t::element_p2::identity());
 
     REQUIRE(!cg1p::is_identity(ret));
     REQUIRE(cg1p::is_on_curve(ret));
@@ -88,7 +88,7 @@ TEST_CASE("addition with projective elements") {
 TEST_CASE("addition with mixed elements") {
   SECTION("keeps the identity on the curve") {
     cg1t::element_p2 ret;
-    add(ret, cg1cn::identity_p2_v, cg1cn::identity_affine_v);
+    add(ret, cg1t::element_p2::identity(), cg1cn::identity_affine_v);
 
     REQUIRE(cg1p::is_identity(ret));
     REQUIRE(cg1p::is_on_curve(ret));

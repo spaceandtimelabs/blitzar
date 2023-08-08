@@ -4,7 +4,7 @@ load(
 )
 
 sxt_cc_component(
-    name = "zero",
+    name = "identity",
     with_test = False,
     deps = [
         "//sxt/curve21/type:element_cached",

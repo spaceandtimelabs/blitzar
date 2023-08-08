@@ -24,7 +24,6 @@
 #include "cbindings/backend.h"
 #include "cbindings/get_generators.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/type/element_p3.h"
 
@@ -61,9 +60,9 @@ static void verify_one_commit(int backend, uint64_t num_precomputed_els, uint64_
 static void test_one_commit_with_given_backend(int backend) {
   auto generators = initialize_generators(backend, 10);
 
-  SECTION("The first one_commit should be zero") {
+  SECTION("The first one_commit should be the identity") {
     uint64_t num_precomputed_els = 0, one_commit_n = 0;
-    verify_one_commit(backend, num_precomputed_els, one_commit_n, c21cn::zero_p3_v);
+    verify_one_commit(backend, num_precomputed_els, one_commit_n, c21t::element_p3::identity());
   }
 
   SECTION("The second one_commit should be equal to the first generator") {

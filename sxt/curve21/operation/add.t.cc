@@ -17,7 +17,6 @@
 #include "sxt/curve21/operation/add.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/constant/zero.h"
 #include "sxt/curve21/type/element_p3.h"
 
 using namespace sxt;
@@ -33,14 +32,14 @@ TEST_CASE("we can add curve elements") {
 
   c21t::element_p3 res;
 
-  SECTION("adding zero acts as the identity function") {
-    add(res, c21t::element_p3{c21cn::zero_p3_v}, g);
+  SECTION("we can add the identity") {
+    add(res, c21t::element_p3{c21t::element_p3::identity()}, g);
     REQUIRE(res == g);
   }
 
   SECTION("we can add inplace arguments") {
     c21t::element_p3 lhs{g};
-    c21t::element_p3 rhs = c21cn::zero_p3_v;
+    c21t::element_p3 rhs = c21t::element_p3::identity();
     add_inplace(lhs, rhs);
     REQUIRE(lhs == g);
   }

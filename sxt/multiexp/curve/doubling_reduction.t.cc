@@ -19,6 +19,7 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/operation/overload.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/ristretto/type/literal.h"

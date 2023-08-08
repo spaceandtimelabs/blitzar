@@ -28,7 +28,7 @@ namespace sxt::mtxcrv {
 // naive_multiproduct_solver
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element Element>
-class naive_multiproduct_solver final : public mtxcrv::multiproduct_solver<Element> {
+class naive_multiproduct_solver final : public multiproduct_solver<Element> {
 public:
   // multiproduct_solver
   xena::future<memmg::managed_array<Element>> solve(mtxi::index_table&& multiproduct_table,

@@ -27,7 +27,6 @@ sxt_cc_component(
     ],
     is_cuda = True,
     test_deps = [
-        "//sxt/curve21/constant:zero",
         "//sxt/base/test:unit_test",
     ],
     deps = [
@@ -44,7 +43,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "cmov",
     impl_deps = [
-        "//sxt/curve21/constant:zero",
+        "//sxt/curve21/constant:identity",
         "//sxt/curve21/type:element_cached",
         "//sxt/field51/operation:neg",
         "//sxt/field51/operation:cmov",
@@ -108,7 +107,6 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/operation:reduce",
         "//sxt/base/container:span",
-        "//sxt/curve21/constant:zero",
         "//sxt/curve21/type:conversion_utility",
         "//sxt/curve21/type:element_p1p1",
         "//sxt/curve21/type:element_p2",
