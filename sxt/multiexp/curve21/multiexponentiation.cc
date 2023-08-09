@@ -35,8 +35,8 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/multiexp/curve/multiexponentiation_cpu_driver.h"
 #include "sxt/multiexp/curve/multiproducts_combination.h"
-#include "sxt/multiexp/curve21/multiexponentiation_cpu_driver.h"
 #include "sxt/multiexp/curve21/multiproduct.h"
 #include "sxt/multiexp/curve21/pippenger_multiproduct_solver.h"
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
@@ -124,7 +124,7 @@ memmg::managed_array<c21t::element_p3>
 compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
                             basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   pippenger_multiproduct_solver solver;
-  multiexponentiation_cpu_driver driver{&solver};
+  mtxcrv::multiexponentiation_cpu_driver<c21t::element_p3> driver{&solver};
   // Note: the cpu driver is non-blocking so that the future upon return the future is
   // available
   return mtxpi::compute_multiexponentiation(driver,

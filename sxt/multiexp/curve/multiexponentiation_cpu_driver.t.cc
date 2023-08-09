@@ -14,9 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/curve21/multiexponentiation_cpu_driver.h"
+#include "sxt/multiexp/curve/multiexponentiation_cpu_driver.h"
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
@@ -25,11 +28,11 @@
 #include "sxt/multiexp/test/multiexponentiation.h"
 
 using namespace sxt;
-using namespace sxt::mtxc21;
+using namespace sxt::mtxcrv;
 
 TEST_CASE("we can compute multiexponentiations") {
-  mtxcrv::naive_multiproduct_solver<c21t::element_p3> solver;
-  multiexponentiation_cpu_driver drv{&solver};
+  naive_multiproduct_solver<c21t::element_p3> solver;
+  multiexponentiation_cpu_driver<c21t::element_p3> drv{&solver};
   auto f = [&](basct::cspan<c21t::element_p3> generators,
                basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
     return mtxpi::compute_multiexponentiation(drv, generators, exponents)

@@ -34,7 +34,6 @@ sxt_cc_component(
 sxt_cc_component(
     name = "multiexponentiation",
     impl_deps = [
-        ":multiexponentiation_cpu_driver",
         ":multiproduct",
         ":pippenger_multiproduct_solver",
         "//sxt/base/container:blob_array",
@@ -42,6 +41,7 @@ sxt_cc_component(
         "//sxt/execution/async:future",
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/curve:multiexponentiation_cpu_driver",
         "//sxt/multiexp/curve:multiproducts_combination",
         "//sxt/multiexp/pippenger:multiexponentiation",
         "//sxt/base/device:memory_utility",
@@ -70,35 +70,6 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
         "//sxt/memory/management:managed_array_fwd",
-    ],
-)
-
-sxt_cc_component(
-    name = "multiexponentiation_cpu_driver",
-    impl_deps = [
-        "//sxt/base/container:blob_array",
-        "//sxt/base/error:assert",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/execution/async:future",
-        "//sxt/memory/management:managed_array",
-        "//sxt/multiexp/curve:multiproducts_combination",
-    ],
-    test_deps = [
-        "//sxt/curve21/type:element_p3",
-        "//sxt/multiexp/base:exponent_sequence",
-        "//sxt/multiexp/pippenger:multiexponentiation",
-        "//sxt/base/test:unit_test",
-        "//sxt/memory/management:managed_array",
-        "//sxt/multiexp/curve:naive_multiproduct_solver",
-        "//sxt/execution/async:future",
-        "//sxt/multiexp/test:multiexponentiation",
-    ],
-    deps = [
-        "//sxt/curve21/operation:add",
-        "//sxt/curve21/operation:double",
-        "//sxt/curve21/operation:neg",
-        "//sxt/multiexp/curve:multiproduct_solver",
-        "//sxt/multiexp/pippenger:driver",
     ],
 )
 
