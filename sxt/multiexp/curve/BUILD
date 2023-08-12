@@ -48,6 +48,14 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "multiproduct_bitset_operator",
+    with_test = False,
+    deps = [
+        "//sxt/base/curve:element",
+    ],
+)
+
+sxt_cc_component(
     name = "multiproducts_combination",
     with_test = False,
     deps = [

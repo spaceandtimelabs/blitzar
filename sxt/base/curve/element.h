@@ -28,5 +28,7 @@ concept element = requires(T& res, const T& e) {
   add(res, e, e);
   neg(res, e);
   { T::identity() } noexcept -> std::same_as<T>;
+  mark(res);
+  { is_marked(e) } noexcept -> std::same_as<bool>;
 };
 } // namespace sxt::bascrv

@@ -31,7 +31,7 @@ public:
 
   bool is_set(uint64_t value) const noexcept { return value != 0; }
 
-  void add(uint64_t& res, uint64_t lhs, uint64_t rhs) const noexcept {
+  void add_bitwise_entries(uint64_t& res, uint64_t lhs, uint64_t rhs) const noexcept {
     ++*counter_;
     res = lhs + rhs;
   }

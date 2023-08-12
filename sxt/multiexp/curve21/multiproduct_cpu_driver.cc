@@ -22,12 +22,14 @@
 #include "sxt/base/container/span_void.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/bitset_multiprod/multiproduct.h"
 #include "sxt/multiexp/bitset_multiprod/value_cache.h"
 #include "sxt/multiexp/bitset_multiprod/value_cache_utility.h"
-#include "sxt/multiexp/curve21/multiproduct_bitset_operator.h"
+#include "sxt/multiexp/curve/multiproduct_bitset_operator.h"
 #include "sxt/multiexp/index/clump2_descriptor.h"
 #include "sxt/multiexp/index/clump2_marker_utility.h"
 
@@ -46,7 +48,7 @@ void multiproduct_cpu_driver::apply_partition_operation(basct::span_void inout,
 
   std::vector<c21t::element_p3> cache_data(mtxbmp::compute_cache_size(partition_size));
   mtxbmp::value_cache<c21t::element_p3> cache;
-  multiproduct_bitset_operator op;
+  mtxcrv::multiproduct_bitset_operator<c21t::element_p3> op;
   uint64_t partition_index = static_cast<uint64_t>(-1);
   for (size_t marker_index = 0; marker_index < num_inputs_p; ++marker_index) {
     auto marker = partition_markers[marker_index];

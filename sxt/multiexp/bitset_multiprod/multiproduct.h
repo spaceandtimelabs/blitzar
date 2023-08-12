@@ -34,7 +34,8 @@ const T& lookup_or_compute(basct::span<T> cache_side, Op op, uint64_t bitset) no
     return value;
   }
   auto index = basbt::consume_next_bit(bitset);
-  op.add(value, cache_side[(1ull << index) - 1], lookup_or_compute(cache_side, op, bitset));
+  op.add_bitwise_entries(value, cache_side[(1ull << index) - 1],
+                         lookup_or_compute(cache_side, op, bitset));
   return value;
 }
 
@@ -53,8 +54,8 @@ void compute_multiproduct(T& res, value_cache<T> cache, Op op, uint64_t bitset) 
   } else if (right_bitset == 0) {
     res = lookup_or_compute(left_cache, op, left_bitset);
   } else {
-    op.add(res, lookup_or_compute(left_cache, op, left_bitset),
-           lookup_or_compute(right_cache, op, right_bitset));
+    op.add_bitwise_entries(res, lookup_or_compute(left_cache, op, left_bitset),
+                           lookup_or_compute(right_cache, op, right_bitset));
   }
 }
 } // namespace sxt::mtxbmp
