@@ -3,7 +3,6 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <h1 align="center">Blitzar</h1>
 
 <p align="center">
 <img
@@ -50,7 +49,7 @@
   </a>
 
   <p align="center">
-    Space and Time C++ library for running cryptographic zero-knowledge proofs algorithms on the CPU and GPU.
+    Space and Time C++ library for accelerating cryptographic zero-knowledge proofs algorithms on the CPU and GPU.
     <br />
     <a href="https://github.com/spaceandtimelabs/blitzar/issues">Report Bug</a>
     |
@@ -58,20 +57,24 @@
   </p>
 </div>
 
-## About The Project
+#### Background
+Blitzar was created by the core cryptography team at [Space and Time](https://www.spaceandtime.io/) to accelerate Proof of SQL, a novel zero-knowledge proof for SQL operations. After surveying our options for a GPU acceleration framework, we realized that Proof of SQL needed something better… so we built Blitzar. Now, Proof of SQL runs with a 3.2 second proving time against a million-row table on a single GPU, and it’s only getting faster.
+
+We’ve open-sourced Blitzar to provide the Web3 community with a faster and more robust framework for building GPU-accelerated zk-proofs.
+
+Blitzar is what we believe to be one of the highest-performance GPU acceleration frameworks that exists today in open source. We’re excited to open the project to community contributions to expand the scope of Blitzar and lay the foundation for the next wave of lightning fast zk-proofs.
 
 #### Overview
-C++ library for running cryptographic zero-knowledge proof algorithms on the CPU and GPU.  
+Blitzar is a C++ library for accelerating cryptographic zero-knowledge proof algorithms on the CPU and GPU.
 > **Note**  
-> This repo contains the C++ implementation along with cbindings and a Rust sys crate. If you are using Rust, use the crate from the companion [blitzar-rs](https://github.com/spaceandtimelabs/blitzar-rs) repo.
+> This repo contains the C++ implementation along with cbindings and a Rust sys-crate. If you are using Rust, use the crate from the companion [blitzar-rs](https://github.com/spaceandtimelabs/blitzar-rs) repo.
 
 The library provides
 
-* Functions for doing group operations on [Curve-25519](https://en.wikipedia.org/wiki/Curve25519) and  [Ristretto25519](https://ristretto.group/) elements.
+* Functions for doing group operations on [Curve-25519](https://en.wikipedia.org/wiki/Curve25519) and [Ristretto25519](https://ristretto.group/) elements.
 * An implementation of [Pippenger's algorithm](https://cacr.uwaterloo.ca/techreports/2010/cacr2010-26.pdf) for computing multi-scalar multiplications (MSMs) and generalized Pedersen commitments.
 * An implementation of [Inner Product Argument Protocol](https://eprint.iacr.org/2017/1066.pdf) for producing and verifying a compact proof of the inner product of two vectors.
-* A sys-crate and bindings to make commitment computations usable from 
-[Rust](https://github.com/spaceandtimelabs/blitzar-rs).
+* A sys-crate and bindings to make commitment computations usable from [Rust](https://github.com/spaceandtimelabs/blitzar-rs).
 
 The library is adopted from code in [libsodium](https://github.com/jedisct1/libsodium) and extends libsodium's cryptographic functions to support CUDA so that they are usable on GPUs.
 
@@ -79,7 +82,7 @@ The library is adopted from code in [libsodium](https://github.com/jedisct1/libs
 for production use.
 
 #### Computational Backends
-Although the primary goal of this library is to provide GPU acceleration for cryptographic zk proof algorithms, the library also provides CPU support for the sake of testing. So the following backends are supported:
+Although the primary goal of this library is to provide GPU acceleration for cryptographic zk-proof algorithms, the library also provides CPU support for the sake of testing. The following backends are supported:
 
 | Backend            | Implementation                                             | Target Hardware             |
 | :---               | :---                                                       | :---                        |
@@ -104,7 +107,7 @@ Note: we interchangeably use the terms "multi-scalar multiplication" and "multie
 
 The Blitzar implementation allows for computation of multiple, potentially different length, MSMs simultaneously. Additionally, either built-in, precomputed, generators $g_n$ can be used, or they can be provided as needed.
 
-Currently, Blitzar supports Curve25519 as the group. We will be expanding the curves that we support.
+Currently, Blitzar supports Curve25519 as the group. We're always working to expand the curves that we support, so check back for updates.
 
 #### Inner Product Argument
 
@@ -126,7 +129,7 @@ This version of the inner product argument can be used in the context of a broad
 
 #### Other Features to Come
 
-If there is a particular feature that you would like to see, please [reach out](https://github.com/spaceandtimelabs/blitzar/issues). We are looking to broaden support.
+If there is a particular feature that you would like to see, please [reach out](https://github.com/spaceandtimelabs/blitzar/issues). Blitzar is a community-first project, and we want to hear from you.
 
 ## Performance ([associated commit hash](https://github.com/spaceandtimelabs/blitzar/commit/a03f80bae30546c0b02d7e968056e3473be3a851))
 
@@ -266,7 +269,7 @@ Alternatively, compile this example code with g++:
 # Build the shared library
 bazel build -c opt --config=portable_glibc //cbindings:libblitzar.so
 
-# Compile the c++ example code
+# Compile the C++ example code
 g++ example/cbindings1/main.cc -o main -I . -L bazel-bin/cbindings/ -lblitzar
 
 # Execute the example code
@@ -342,7 +345,7 @@ bazel run -c opt //benchmark/inner_product_proof:benchmark -- gpu 1000 5
 
 ## Contributing
 
-We are not accepting community Pull Requests yet due to logistic reasons. However, feel free to contribute with any suggestion, idea, or bugfix on our [Issues](https://github.com/spaceandtimelabs/blitzar/issues) panel. Also, see [contribution guide](CONTRIBUTING.md).
+We're excited to open Blitzar to the community, but are not accepting community Pull Requests yet due to logistic reasons. However, feel free to contribute with any suggestion, idea, or bugfix on our [Issues](https://github.com/spaceandtimelabs/blitzar/issues) panel. Also, see [contribution guide](CONTRIBUTING.md).
 
 ## Community & support
 
@@ -354,4 +357,4 @@ This project is released under the [Apache 2 License](LICENSE).
   
 ## Rust crate
 
-This repo contains the C++ implementation along with cbindings and a rust sys crate. If you are using rust, use the crate from the companion repo here: https://github.com/spaceandtimelabs/blitzar-rs.
+This repo contains the C++ implementation along with cbindings and a Rust sys-crate. If you are using Rust, use the crate from the companion repo here: https://github.com/spaceandtimelabs/blitzar-rs.
