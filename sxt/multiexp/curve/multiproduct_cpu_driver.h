@@ -14,17 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/curve21/multiproduct_cpu_driver.h"
+#pragma once
 
 #include <algorithm>
 #include <vector>
 
 #include "sxt/base/container/span_void.h"
+#include "sxt/base/curve/element.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/operation/double.h"
-#include "sxt/curve21/operation/neg.h"
-#include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/bitset_multiprod/multiproduct.h"
 #include "sxt/multiexp/bitset_multiprod/value_cache.h"
@@ -32,23 +29,46 @@
 #include "sxt/multiexp/curve/multiproduct_bitset_operator.h"
 #include "sxt/multiexp/index/clump2_descriptor.h"
 #include "sxt/multiexp/index/clump2_marker_utility.h"
+#include "sxt/multiexp/pippenger_multiprod/driver.h"
 
-namespace sxt::mtxc21 {
+namespace sxt::mtxcrv {
+//--------------------------------------------------------------------------------------------------
+// multiproduct_cpu_driver
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element Element> class multiproduct_cpu_driver final : public mtxpmp::driver {
+public:
+  void apply_partition_operation(basct::span_void inout, basct::cspan<uint64_t> partition_markers,
+                                 size_t partition_size) const noexcept override;
+
+  void apply_clump2_operation(basct::span_void inout, basct::cspan<uint64_t> markers,
+                              const mtxi::clump2_descriptor& descriptor) const noexcept override;
+
+  void compute_naive_multiproduct(basct::span_void inout,
+                                  basct::cspan<basct::cspan<uint64_t>> products,
+                                  size_t num_inactive_inputs) const noexcept override;
+
+  void permute_inputs(basct::span_void inout,
+                      basct::cspan<uint64_t> permutation) const noexcept override;
+
+private:
+};
+
 //--------------------------------------------------------------------------------------------------
 // apply_partition_operation
 //--------------------------------------------------------------------------------------------------
-void multiproduct_cpu_driver::apply_partition_operation(basct::span_void inout,
-                                                        basct::cspan<uint64_t> partition_markers,
-                                                        size_t partition_size) const noexcept {
+template <bascrv::element Element>
+void multiproduct_cpu_driver<Element>::apply_partition_operation(
+    basct::span_void inout, basct::cspan<uint64_t> partition_markers,
+    size_t partition_size) const noexcept {
   auto num_inputs = inout.size();
   auto num_inputs_p = partition_markers.size();
 
-  basct::span<c21t::element_p3> inputs{static_cast<c21t::element_p3*>(inout.data()), num_inputs};
-  memmg::managed_array<c21t::element_p3> inputs_p(num_inputs_p);
+  basct::span<Element> inputs{static_cast<Element*>(inout.data()), num_inputs};
+  memmg::managed_array<Element> inputs_p(num_inputs_p);
 
-  std::vector<c21t::element_p3> cache_data(mtxbmp::compute_cache_size(partition_size));
-  mtxbmp::value_cache<c21t::element_p3> cache;
-  mtxcrv::multiproduct_bitset_operator<c21t::element_p3> op;
+  std::vector<Element> cache_data(mtxbmp::compute_cache_size(partition_size));
+  mtxbmp::value_cache<Element> cache;
+  multiproduct_bitset_operator<Element> op;
   uint64_t partition_index = static_cast<uint64_t>(-1);
   for (size_t marker_index = 0; marker_index < num_inputs_p; ++marker_index) {
     auto marker = partition_markers[marker_index];
@@ -58,8 +78,7 @@ void multiproduct_cpu_driver::apply_partition_operation(basct::span_void inout,
       partition_index = partition_index_p;
       cache = {cache_data.data(), std::min(partition_size, num_inputs - partition_first)};
       mtxbmp::init_value_cache(
-          cache, op,
-          basct::cspan<c21t::element_p3>{inputs.subspan(partition_first, cache.num_terms())});
+          cache, op, basct::cspan<Element>{inputs.subspan(partition_first, cache.num_terms())});
     }
     auto bitset = marker ^ (partition_index << partition_size);
     mtxbmp::compute_multiproduct(inputs_p[marker_index], cache, op, bitset);
@@ -70,14 +89,15 @@ void multiproduct_cpu_driver::apply_partition_operation(basct::span_void inout,
 //--------------------------------------------------------------------------------------------------
 // apply_clump2_operation
 //--------------------------------------------------------------------------------------------------
-void multiproduct_cpu_driver::apply_clump2_operation(
+template <bascrv::element Element>
+void multiproduct_cpu_driver<Element>::apply_clump2_operation(
     basct::span_void inout, basct::cspan<uint64_t> markers,
     const mtxi::clump2_descriptor& descriptor) const noexcept {
   auto num_inputs = inout.size();
   auto num_inputs_p = markers.size();
 
-  basct::span<c21t::element_p3> inputs{static_cast<c21t::element_p3*>(inout.data()), num_inputs};
-  memmg::managed_array<c21t::element_p3> inputs_p(num_inputs_p);
+  basct::span<Element> inputs{static_cast<Element*>(inout.data()), num_inputs};
+  memmg::managed_array<Element> inputs_p(num_inputs_p);
 
   for (size_t marker_index = 0; marker_index < num_inputs_p; ++marker_index) {
     auto marker = markers[marker_index];
@@ -89,7 +109,7 @@ void multiproduct_cpu_driver::apply_clump2_operation(
     SXT_DEBUG_ASSERT(index1 <= index2);
 
     if (index1 != index2) {
-      c21o::add(reduction, reduction, inputs[clump_first + index2]);
+      add(reduction, reduction, inputs[clump_first + index2]);
     }
 
     inputs_p[marker_index] = reduction;
@@ -101,18 +121,19 @@ void multiproduct_cpu_driver::apply_clump2_operation(
 //--------------------------------------------------------------------------------------------------
 // compute_naive_multiproduct
 //--------------------------------------------------------------------------------------------------
-void multiproduct_cpu_driver::compute_naive_multiproduct(
+template <bascrv::element Element>
+void multiproduct_cpu_driver<Element>::compute_naive_multiproduct(
     basct::span_void inout, basct::cspan<basct::cspan<uint64_t>> products,
     size_t num_inactive_inputs) const noexcept {
-  basct::span<c21t::element_p3> inputs{static_cast<c21t::element_p3*>(inout.data()), inout.size()};
-  memmg::managed_array<c21t::element_p3> outputs(products.size());
+  basct::span<Element> inputs{static_cast<Element*>(inout.data()), inout.size()};
+  memmg::managed_array<Element> outputs(products.size());
 
   for (auto row : products) {
     SXT_DEBUG_ASSERT(row.size() >= 2 && row.size() >= 2 + row[1]);
     auto& output = outputs[row[0]];
 
     if (row.size() == 2) {
-      output = c21t::element_p3::identity();
+      output = Element::identity();
       continue;
     }
 
@@ -125,7 +146,7 @@ void multiproduct_cpu_driver::compute_naive_multiproduct(
 
       // add inactive entries
       for (size_t inactive_index = 3; inactive_index < 2 + num_inactive_entries; ++inactive_index) {
-        c21o::add(output, output, inputs[row[inactive_index]]);
+        add(output, output, inputs[row[inactive_index]]);
       }
     } else {
       active_index = 3;
@@ -134,7 +155,7 @@ void multiproduct_cpu_driver::compute_naive_multiproduct(
 
     // add active entries
     for (; active_index < row.size(); ++active_index) {
-      c21o::add(output, output, inputs[num_inactive_inputs + row[active_index]]);
+      add(output, output, inputs[num_inactive_inputs + row[active_index]]);
     }
   }
 
@@ -144,13 +165,14 @@ void multiproduct_cpu_driver::compute_naive_multiproduct(
 //--------------------------------------------------------------------------------------------------
 // permute_inputs
 //--------------------------------------------------------------------------------------------------
-void multiproduct_cpu_driver::permute_inputs(basct::span_void inout,
-                                             basct::cspan<uint64_t> permutation) const noexcept {
+template <bascrv::element Element>
+void multiproduct_cpu_driver<Element>::permute_inputs(
+    basct::span_void inout, basct::cspan<uint64_t> permutation) const noexcept {
   auto n = permutation.size();
   SXT_DEBUG_ASSERT(n <= inout.size());
 
-  memmg::managed_array<c21t::element_p3> inputs_p(n);
-  basct::span<c21t::element_p3> inputs{static_cast<c21t::element_p3*>(inout.data()), n};
+  memmg::managed_array<Element> inputs_p(n);
+  basct::span<Element> inputs{static_cast<Element*>(inout.data()), n};
 
   for (size_t index = 0; index < n; ++index) {
     auto index_p = permutation[index];
@@ -159,4 +181,4 @@ void multiproduct_cpu_driver::permute_inputs(basct::span_void inout,
 
   std::copy_n(inputs_p.data(), n, inputs.data());
 }
-} // namespace sxt::mtxc21
+} // namespace sxt::mtxcrv

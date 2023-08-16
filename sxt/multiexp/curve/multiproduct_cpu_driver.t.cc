@@ -14,12 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/curve21/multiproduct_cpu_driver.h"
+#include "sxt/multiexp/curve/multiproduct_cpu_driver.h"
 
 #include <random>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/index/index_table.h"
@@ -30,12 +33,12 @@
 #include "sxt/ristretto/random/element.h"
 
 using namespace sxt;
-using namespace sxt::mtxc21;
+using namespace sxt::mtxcrv;
 
 static void verify_random_example(std::mt19937& rng,
                                   const mtxrn::random_multiproduct_descriptor& descriptor) {
   mtxi::index_table products;
-  multiproduct_cpu_driver drv;
+  multiproduct_cpu_driver<c21t::element_p3> drv;
   size_t num_inputs, num_entries;
 
   mtxrn::generate_random_multiproduct(products, num_inputs, num_entries, rng, descriptor);
@@ -55,7 +58,7 @@ static void verify_random_example(std::mt19937& rng,
 
 TEST_CASE("we can compute curve21 multiproducts") {
   std::mt19937 rng{2022};
-  multiproduct_cpu_driver drv;
+  multiproduct_cpu_driver<c21t::element_p3> drv;
 
   SECTION("we handle the empty case") {
     memmg::managed_array<c21t::element_p3> inout;

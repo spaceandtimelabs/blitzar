@@ -17,9 +17,12 @@
 #include <iostream>
 
 #include "sxt/base/profile/callgrind.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
-#include "sxt/multiexp/curve21/multiproduct_cpu_driver.h"
+#include "sxt/multiexp/curve/multiproduct_cpu_driver.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger_multiprod/multiproduct.h"
 #include "sxt/ristretto/random/element.h"
@@ -94,7 +97,7 @@ int main() {
   memmg::managed_array<c21t::element_p3> inout(num_entries);
   std::mt19937 rng{0};
   rstrn::generate_random_elements(inout, rng);
-  mtxc21::multiproduct_cpu_driver drv;
+  mtxcrv::multiproduct_cpu_driver<c21t::element_p3> drv;
   SXT_TOGGLE_COLLECT;
   mtxpmp::compute_multiproduct(inout, products.header(), drv, 6);
   SXT_TOGGLE_COLLECT;

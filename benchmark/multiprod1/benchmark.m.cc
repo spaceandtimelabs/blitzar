@@ -21,9 +21,12 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/profile/callgrind.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
-#include "sxt/multiexp/curve21/multiproduct_cpu_driver.h"
+#include "sxt/multiexp/curve/multiproduct_cpu_driver.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger_multiprod/multiproduct.h"
 #include "sxt/multiexp/random/random_multiproduct_descriptor.h"
@@ -59,7 +62,7 @@ int main(int argc, char* argv[]) {
 
   mtxi::index_table products;
   size_t num_inputs, num_entries;
-  mtxc21::multiproduct_cpu_driver drv;
+  mtxcrv::multiproduct_cpu_driver<c21t::element_p3> drv;
 
   std::vector<double> elapsed_times;
   double mean_elapsed_time = 0;

@@ -25,7 +25,7 @@
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/generator_utility.h"
-#include "sxt/multiexp/curve21/multiproduct_cpu_driver.h"
+#include "sxt/multiexp/curve/multiproduct_cpu_driver.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/index/reindex.h"
 #include "sxt/multiexp/pippenger_multiprod/active_offset.h"
@@ -47,7 +47,7 @@ xena::future<memmg::managed_array<c21t::element_p3>> pippenger_multiproduct_solv
   memmg::managed_array<c21t::element_p3> res(entry_count);
   mtxb::filter_generators<c21t::element_p3>(basct::span<c21t::element_p3>{res.data(), num_inputs},
                                             generators, masks);
-  mtxc21::multiproduct_cpu_driver driver;
+  mtxcrv::multiproduct_cpu_driver<c21t::element_p3> driver;
   mtxpmp::compute_multiproduct(res, multiproduct_table.header(), driver, num_inputs);
   return xena::make_ready_future(std::move(res));
 }
