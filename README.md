@@ -60,9 +60,10 @@
 #### Background
 Blitzar was created by the core cryptography team at [Space and Time](https://www.spaceandtime.io/) to accelerate Proof of SQL, a novel zero-knowledge proof for SQL operations. After surveying our options for a GPU acceleration framework, we realized that Proof of SQL needed something better… so we built Blitzar. Now, Proof of SQL runs with a 3.2 second proving time against a million-row table on a single GPU, and it’s only getting faster.
 
-We’ve open-sourced Blitzar to provide the Web3 community with a faster and more robust framework for building GPU-accelerated zk-proofs.
-
-Blitzar is what we believe to be one of the highest-performance GPU acceleration frameworks that exists today in open source. We’re excited to open the project to community contributions to expand the scope of Blitzar and lay the foundation for the next wave of lightning fast zk-proofs.
+We’ve open-sourced Blitzar to provide the Web3 community with a faster and more
+robust framework for building GPU-accelerated zk-proofs. We’re excited to open
+the project to community contributions to expand the scope of Blitzar and lay
+the foundation for the next wave of lightning fast zk-proofs.
 
 #### Overview
 Blitzar is a C++ library for accelerating cryptographic zero-knowledge proof algorithms on the CPU and GPU.
@@ -72,7 +73,6 @@ Blitzar is a C++ library for accelerating cryptographic zero-knowledge proof alg
 The library provides
 
 * Functions for doing group operations on [Curve-25519](https://en.wikipedia.org/wiki/Curve25519) and [Ristretto25519](https://ristretto.group/) elements.
-* An implementation of [Pippenger's algorithm](https://cacr.uwaterloo.ca/techreports/2010/cacr2010-26.pdf) for computing multi-scalar multiplications (MSMs) and generalized Pedersen commitments.
 * An implementation of [Inner Product Argument Protocol](https://eprint.iacr.org/2017/1066.pdf) for producing and verifying a compact proof of the inner product of two vectors.
 * A sys-crate and bindings to make commitment computations usable from [Rust](https://github.com/spaceandtimelabs/blitzar-rs).
 
