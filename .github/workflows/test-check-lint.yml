@@ -13,17 +13,17 @@ concurrency:
 
 jobs:
   format-code:
-    name: Check Code
+    name: Check code
     runs-on: self-hosted
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Run Check
+      - name: Run check
         run: docker run --rm -v "$PWD":/src -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-0 /bin/bash -c "PYTHONDONTWRITEBYTECODE=1 ./tools/code_format/check_format.py check"
 
   test-cpp:
-    name: C++ Code
+    name: C++ code
     runs-on: self-hosted
     steps:
       - name: Checkout Code
@@ -33,7 +33,7 @@ jobs:
         run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-0 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test //..."
 
   test-cpp-asan:
-    name: C++ Code with Address Sanitizer
+    name: C++ code with address sanitizer
     runs-on: self-hosted
     steps:
       - name: Checkout Code
