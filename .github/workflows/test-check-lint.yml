@@ -1,0 +1,43 @@
+name: Test-Check-Lint
+
+on:
+  workflow_call:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format-code:
+    name: Check Code
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run Check
+        run: docker run --rm -v "$PWD":/src -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-0 /bin/bash -c "PYTHONDONTWRITEBYTECODE=1 ./tools/code_format/check_format.py check"
+
+  test-cpp:
+    name: C++ Code
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run cpp tests
+        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-0 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test //..."
+
+  test-cpp-asan:
+    name: C++ Code with Address Sanitizer
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      
+      - name: Run cpp-asan tests
+        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test_asan:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-0 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test --config=asan //..."
