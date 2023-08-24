@@ -21,7 +21,7 @@ import shutil
 import paths
 
 BUILDIFIER_PATH = paths.get_buildifier()
-CLANG_FORMAT_PATH = os.getenv("CLANG_FORMAT", "clang-format-17")
+CLANG_FORMAT_PATH = os.getenv("CLANG_FORMAT", "clang-format")
 BUILD_FIXER_PATH = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "build_fixer.py")
 HEADER_ORDER_PATH = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "header_order.py")
 COPYRIGHT_FIXER_PATH = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "copyright_fixer.py")
