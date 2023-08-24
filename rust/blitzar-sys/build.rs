@@ -32,12 +32,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .success()
         );
     } else {
-        const REPO_NAME: &'static str = "blitzar";
-        const REPO_OWNER: &'static str = "spaceandtimelabs";
-
         // Download the shared library from GitHub releases and place it in the `OUT_DIR`.
         let mut lib_file = File::create(&lib_path)?;
-        let release_url = format!("http://github.com/{REPO_OWNER}/{REPO_NAME}/releases/download/v{PKG_VERSION}/{SHARED_LIB}");
+        let release_url = format!("http://github.com/spaceandtimelabs/blitzar/releases/download/v{PKG_VERSION}/{SHARED_LIB}");
         let mut response = reqwest::blocking::get(release_url)?;
         copy(&mut response, &mut lib_file)?;
 
