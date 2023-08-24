@@ -8,4 +8,4 @@ edition = "2021"
 [dependencies]
 
 [dependencies.blitzar-sys]
-path = "../blitzar-sys/"
+path = "../blitzar-sys/" # DO NOT CHANGE

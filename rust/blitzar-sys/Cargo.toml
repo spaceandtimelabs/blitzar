@@ -1,10 +1,23 @@
 [package]
 name = "blitzar-sys"
-version = "0.0.0" 
+version = "0.0.0" # DO NOT CHANGE
 edition = "2021"
+rust-version = "1.71.1"
+license = "Apache-2.0"
+description = "Rust bindings for the Blitzar library"
 repository = "https://github.com/spaceandtimelabs/blitzar"
+keywords = ["gpu-cryptography", "gpu-crypto", "gpu-ristretto", "gpu-curve25519", "gpu-ristretto255"]
 
-exclude = ["/target", "/Cargo.lock"]
-include = ["/src", "build.rs", "Cargo.toml", "*.so*"]
+exclude = [
+    "**/.gitignore",
+    ".gitignore",
+    "/target",
+    "/Cargo.lock",
+    "*.so*"
+]
+include = ["/src", "build.rs", "Cargo.toml"]
 
 [dependencies]
+
+[build-dependencies]
+reqwest = { version = "0.11.18", default-features = false, features = ["blocking", "rustls-tls"] }
