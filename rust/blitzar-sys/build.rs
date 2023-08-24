@@ -13,8 +13,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         panic!("Unsupported architecture. Only x86_64 is supported.");
     }
 
-    const LIB_NAME: &'static str = "blitzar";
-    const SHARED_LIB: &'static str = "libblitzar.so";
+    const LIB_NAME: &'static str = "blitzar-linux-amd64";
+    const SHARED_LIB: &'static str = "libblitzar-linux-amd64.so";
     const PKG_VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
     let out_dir = PathBuf::from(env::var("OUT_DIR")?);
