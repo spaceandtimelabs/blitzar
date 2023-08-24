@@ -1,6 +1,6 @@
 [package]
 name = "blitzar-sys"
-version = "0.0.1" # DO NOT CHANGE
+version = "0.0.0" # DO NOT CHANGE
 edition = "2021"
 rust-version = "1.71.1"
 license = "Apache-2.0"
