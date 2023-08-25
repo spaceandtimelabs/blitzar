@@ -41,4 +41,4 @@ jobs:
         run: |
           sleep 5
           sed -i 's,path = "../blitzar-sys/" # DO NOT CHANGE,version = "*" # DO NOT CHANGE,' rust/tests/Cargo.toml
-          cargo test --manifest-path rust/tests/Cargo.toml
+          /root/.cargo/bin/cargo test --manifest-path rust/tests/Cargo.toml
