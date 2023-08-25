@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - main
+      - feat/setup-semantic-release-PROOF-609
 
 jobs:
   test-check-lint:
