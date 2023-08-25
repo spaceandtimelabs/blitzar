@@ -7,7 +7,7 @@
     },
     "release": {
         "branches": [
-            "feat/setup-semantic-release-PROOF-609"
+            "main"
         ],
         "plugins": [
             [

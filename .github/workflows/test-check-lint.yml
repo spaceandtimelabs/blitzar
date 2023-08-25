@@ -2,10 +2,10 @@ name: Test-Check-Lint
 
 on:
   workflow_call:
-  # pull_request:
-  #   types:
-  #     - opened
-  #     - synchronize
+  pull_request:
+    types:
+      - opened
+      - synchronize
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

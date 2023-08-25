@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - feat/setup-semantic-release-PROOF-609
+      - main
 
 jobs:
   test-check-lint:
@@ -35,4 +35,4 @@ jobs:
           npx semantic-release
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }} # TODO: enable once blitzar is open source
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
