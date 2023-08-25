@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-check-lint:
+    uses: ./.github/workflows/test-check-lint.yml
+
+  release:
+    name: Build Publish Library - Linux-x86_64
+    runs-on: ubuntu-latest
+    needs: [test-check-lint]
+    environment: deploy #!! DO NOT CHANGE THIS LINE !! #
+    container:
+      image: spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-0
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+
+      - run: git config --global --add safe.directory $(realpath .)
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+
+      - name: Semantic relase
+        run: |
+          npm install semantic-release
+          npx semantic-release
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}

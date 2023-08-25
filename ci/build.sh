@@ -34,3 +34,24 @@ fi
 
 # Update the version in the blitzar-sys/Cargo.toml
 sed -i 's/version = "*.*.*" # DO NOT CHANGE/version = "'${NEW_VERSION}'" # DO NOT CHANGE/' ${RUST_PATH}/${LIB_PATH}/Cargo.toml
+
+# Generate the release assets and publish the crate to crates.io
+if [ "$#" -eq 3 ]; then
+    if [[ $3 == "--with-release" ]]
+    then
+        DIST_PATH="$(pwd)/dist"
+
+        mkdir -p ${DIST_PATH}
+        cp -f $DST_SO_LIB_PATH ${DIST_PATH}/$(basename "$DST_SO_LIB_PATH")
+        cp -f ${INCLUDE_PATH}/${INCLUDE_FILE}.h ${DIST_PATH}/${INCLUDE_FILE}.h
+
+        cd ${RUST_PATH}/${LIB_PATH}
+        cargo clean
+        cd ..
+        zip -r ${DIST_PATH}/blitzar-sys-v${NEW_VERSION}.zip ${LIB_PATH}
+        tar -czvf ${DIST_PATH}/blitzar-sys-v${NEW_VERSION}.tar.gz ${LIB_PATH}
+
+        cd ${LIB_PATH}
+        cargo publish --allow-dirty --token ${CRATES_TOKEN}
+    fi
+fi
