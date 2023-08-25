@@ -33,7 +33,7 @@
             [
                 "@semantic-release/exec",
                 {
-                    "prepareCmd": "bash libblitzar-linux-x86_64.so ${nextRelease.version} --with-release"
+                    "prepareCmd": "bash ./ci/build.sh libblitzar-linux-x86_64.so ${nextRelease.version} --with-release"
                 }
             ],
             [
