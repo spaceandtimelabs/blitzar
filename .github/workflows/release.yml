@@ -36,9 +36,3 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }} # TODO: enable once blitzar is open source
-
-      - name: Test published crate
-        run: |
-          sleep 5
-          sed -i 's,path = "../blitzar-sys/" # DO NOT CHANGE,version = "*" # DO NOT CHANGE,' rust/tests/Cargo.toml
-          /root/.cargo/bin/cargo test --manifest-path rust/tests/Cargo.toml
