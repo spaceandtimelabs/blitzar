@@ -79,7 +79,12 @@ def sxt_cc_component(
                 srcs = [
                     name + ".t.cc",
                 ],
-                copts = sxt_copts() + copts,
+                copts = sxt_copts() + copts + [
+                    "-x",
+                    "cuda",
+                    "-DGOOGLE_CUDA=1",
+                    "--no-cuda-include-ptx=all", 
+                ],
                 deps = deps_p + [
                     ":" + device_test_name,
                 ],
