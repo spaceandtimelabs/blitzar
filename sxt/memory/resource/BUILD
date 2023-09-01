@@ -14,8 +14,7 @@ sxt_cc_component(
     with_test = False,
     deps = [
         "//sxt/base/type:raw_stream",
-        "@local_config_cuda//cuda:cuda_headers",
-        "@local_config_cuda//cuda:cudart_static",
+        "@rules_cuda//cuda:runtime",
     ],
 )
 
@@ -28,8 +27,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        "@local_config_cuda//cuda:cuda_headers",
-        "@local_config_cuda//cuda:cudart_static",
+        "@rules_cuda//cuda:runtime",
     ],
 )
 
@@ -43,8 +41,7 @@ sxt_cc_component(
     ],
     with_test = False,
     deps = [
-        "@local_config_cuda//cuda:cuda_headers",
-        "@local_config_cuda//cuda:cudart_static",
+        "@rules_cuda//cuda:runtime",
     ],
 )
 
@@ -57,7 +54,6 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        "@local_config_cuda//cuda:cuda_headers",
-        "@local_config_cuda//cuda:cudart_static",
+        "@rules_cuda//cuda:runtime",
     ],
 )

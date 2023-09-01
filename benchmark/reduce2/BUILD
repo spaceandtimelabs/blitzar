@@ -1,5 +1,5 @@
 load("//bazel:sxt_benchmark.bzl", "sxt_cc_benchmark")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("@rules_cuda//cuda:defs.bzl", "cuda_library")
 
 cc_library(
     name = "reduce_cpu",
@@ -28,7 +28,6 @@ cuda_library(
         "reduce_gpu.h",
     ],
     copts = [
-        "--device-c",
     ],
     deps = [
         "//sxt/curve21/operation:add",

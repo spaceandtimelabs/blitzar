@@ -1,0 +1,53 @@
+# This becomes the BUILD file for @local_cuda//toolchain/ under Windows.
+
+load(
+    "@rules_cuda//cuda:defs.bzl",
+    "cuda_toolchain",
+    "cuda_toolkit",
+    cuda_toolchain_config = "cuda_toolchain_config_nvcc_msvc",
+)
+
+cuda_toolkit(
+    name = "cuda-toolkit",
+    bin2c = "%{bin2c_label}",
+    fatbinary = "%{fatbinary_label}",
+    link_stub = "%{link_stub_label}",
+    nvlink = "%{nvlink_label}",
+    path = "%{cuda_path}",
+    version = "%{cuda_version}",
+)
+
+cuda_toolchain_config(
+    name = "nvcc-local-config",
+    cuda_toolkit = ":cuda-toolkit",
+    msvc_env_tmp = "%{env_tmp}",
+    # int("%{foo}") instead of %{foo} to make the file valid syntactically.
+    nvcc_version_major = int("%{nvcc_version_major}"),
+    nvcc_version_minor = int("%{nvcc_version_minor}"),
+    toolchain_identifier = "nvcc",
+)
+
+cuda_toolchain(
+    name = "nvcc-local",
+    compiler_executable = "%{cuda_path}/bin/nvcc.exe",
+    toolchain_config = ":nvcc-local-config",
+)
+
+toolchain(
+    name = "nvcc-local-toolchain",
+    exec_compatible_with = [
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_64",
+    ],
+    target_compatible_with = [
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_64",
+    ],
+    target_settings = [
+        "@rules_cuda//cuda:is_enabled",
+        "@rules_cuda//cuda:compiler_is_nvcc",
+    ],
+    toolchain = ":nvcc-local",
+    toolchain_type = "@rules_cuda//cuda:toolchain_type",
+    visibility = ["//visibility:public"],
+)

@@ -1,5 +1,5 @@
 load("//bazel:sxt_benchmark.bzl", "sxt_cc_benchmark")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("@rules_cuda//cuda:defs.bzl", "cuda_library")
 
 cc_library(
     name = "multiply_add",
@@ -12,7 +12,6 @@ cc_library(
     copts = [
         "-x",
         "cuda",
-        "--device-c",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
@@ -47,7 +46,6 @@ cuda_library(
         "multi_exp_gpu.h",
     ],
     copts = [
-        "--device-c",
     ],
     deps = [
         ":multiply_add",

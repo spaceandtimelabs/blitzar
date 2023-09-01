@@ -1,0 +1,6 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "ignorePaths": ["MODULE.bazel"],
+  "schedule": ["on the first day of the month"]
+}

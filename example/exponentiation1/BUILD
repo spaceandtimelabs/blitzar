@@ -1,19 +1,17 @@
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("@rules_cuda//cuda:defs.bzl", "cuda_library")
 
 cuda_library(
     name = "exponentiate_gpu",
     srcs = ["exponentiate_gpu.cu"],
     hdrs = ["exponentiate_gpu.h"],
-    copts = [
-        "--device-c",
-    ],
+    copts = [],
     visibility = ["//visibility:public"],
     deps = [
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/curve21/type:element_p3",
         "//sxt/field51/type:element",
-        "@local_config_cuda//cuda",
+        "@local_cuda//:cuda",
     ],
 )
 

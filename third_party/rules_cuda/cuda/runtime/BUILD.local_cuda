@@ -1,0 +1,526 @@
+load("@rules_cuda//cuda:defs.bzl", "cc_import_versioned_sos", "if_linux", "if_windows")
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "compiler_deps",
+    srcs = [
+        "cuda/version.txt",
+        ":_cuda_header_files",
+    ] + glob([
+        "cuda/bin/**",
+        "cuda/lib64/**",
+        "cuda/nvvm/**",
+    ]),
+)
+
+filegroup(
+    name = "_cuda_header_files",
+    srcs = glob(["cuda/include/**"]),
+    visibility = ["//visibility:private"],
+)
+
+cc_library(
+    name = "cuda_headers",
+    hdrs = [":_cuda_header_files"],
+    includes = ["cuda/include"],
+)
+
+cc_library(
+    name = "cuda_stub",
+    srcs = ["cuda/lib64/stubs/libcuda.so"],
+    linkopts = if_linux([
+        "-ldl",
+        "-lpthread",
+        "-lrt",
+    ]),
+)
+
+cc_import_versioned_sos(
+    name = "cudart_so",
+    shared_library = "cuda/lib64/libcudart.so",
+)
+
+cc_library(
+    name = "cudadevrt_a",
+    srcs = ["cuda/lib64/libcudadevrt.a"],
+    target_compatible_with = ["@platforms//os:linux"],
+)
+
+cc_import(
+    name = "cudart_lib",
+    interface_library = "cuda/lib/x64/cudart.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_import(
+    name = "cudadevrt_lib",
+    interface_library = "cuda/lib/x64/cudadevrt.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+# Note: do not use this target directly, use the configurable label_flag
+# @rules_cuda//cuda:runtime instead.
+cc_library(
+    name = "cuda_runtime",
+    linkopts = if_linux([
+        "-ldl",
+        "-lpthread",
+        "-lrt",
+    ]),
+    deps = [
+        ":cuda_headers",
+    ] + if_linux([
+        # devrt is require for jit linking when rdc is enabled
+        ":cudadevrt_a",
+        ":cudart_so",
+    ]) + if_windows([
+        # devrt is require for jit linking when rdc is enabled
+        ":cudadevrt_lib",
+        ":cudart_lib",
+    ]),
+    # FIXME:
+    # visibility = ["@rules_cuda//cuda:__pkg__"],
+)
+
+# Note: do not use this target directly, use the configurable label_flag
+# @rules_cuda//cuda:runtime instead.
+cc_library(
+    name = "cuda_runtime_static",
+    srcs = ["cuda/lib64/libcudart_static.a"],
+    hdrs = [":_cuda_header_files"],
+    includes = ["cuda/include"],
+    linkopts = if_linux([
+        "-ldl",
+        "-lpthread",
+        "-lrt",
+    ]),
+    deps = [":cudadevrt_a"],
+    # FIXME:
+    # visibility = ["@rules_cuda//cuda:__pkg__"],
+)
+
+cc_library(
+    name = "no_cuda_runtime",
+    # FIXME:
+    # visibility = ["@rules_cuda//cuda:__pkg__"],
+)
+
+cc_import(
+    name = "cuda_so",
+    shared_library = "cuda/lib64/stubs/libcuda.so",
+    target_compatible_with = ["@platforms//os:linux"],
+)
+
+cc_import(
+    name = "cuda_lib",
+    interface_library = "cuda/lib/x64/cuda.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "cuda",
+    deps = [
+        ":cuda_headers",
+    ] + if_linux([
+        ":cuda_so",
+    ]) + if_windows([
+        ":cuda_lib",
+    ]),
+)
+
+cc_import_versioned_sos(
+    name = "cublas_so",
+    shared_library = "cuda/lib64/libcublas.so",
+)
+
+cc_import_versioned_sos(
+    name = "cublasLt_so",
+    shared_library = "cuda/lib64/libcublasLt.so",
+)
+
+cc_import(
+    name = "cublas_lib",
+    interface_library = "cuda/lib/x64/cublas.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_import(
+    name = "cublasLt_lib",
+    interface_library = "cuda/lib/x64/cublasLt.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "cublas",
+    deps = [
+        ":cuda_headers",
+    ] + if_linux([
+        ":cublasLt_so",
+        ":cublas_so",
+    ]) + if_windows([
+        ":cublasLt_lib",
+        ":cublas_lib",
+    ]),
+)
+
+cc_library(
+    name = "cub",
+    hdrs = glob(["cuda/include/cub/**"]),
+    includes = [
+        "cuda/include",
+    ],
+)
+
+cc_library(
+    name = "thrust",
+    hdrs = glob(["cuda/include/thrust/**"]),
+    includes = [
+        "cuda/include",
+    ],
+    deps = [":cub"],
+)
+
+# CUPTI
+cc_import_versioned_sos(
+    name = "cupti_so",
+    shared_library = "cuda/lib64/libcupti.so",
+)
+
+cc_import(
+    name = "cupti_lib",
+    interface_library = "cuda/extras/CUPTI/lib64/cupti.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "cupti_headers",
+    hdrs = glob(["cuda/extras/CUPTI/include/*.h"]),
+    includes = ["cuda/extras/CUPTI/include"],
+)
+
+cc_library(
+    name = "cupti",
+    deps = [
+        ":cuda_headers",
+    ] + if_linux([
+        ":cupti_so",
+    ]) + if_windows([
+        ":cupti_headers",
+        ":cupti_lib",
+    ]),
+)
+
+# nvperf
+cc_import(
+    name = "nvperf_host_so",
+    shared_library = "cuda/lib64/libnvperf_host.so",
+    target_compatible_with = ["@platforms//os:linux"],
+)
+
+cc_import(
+    name = "nvperf_host_lib",
+    interface_library = "cuda/extras/CUPTI/lib64/nvperf_host.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "nvperf_host",
+    deps = [
+        ":cuda_headers",
+    ] + if_linux([
+        ":nvperf_host_so",
+    ]) + if_windows([
+        ":cupti_headers",
+        ":nvperf_host_lib",
+    ]),
+)
+
+cc_import(
+    name = "nvperf_target_so",
+    shared_library = "cuda/lib64/libnvperf_target.so",
+    target_compatible_with = ["@platforms//os:linux"],
+)
+
+cc_import(
+    name = "nvperf_target_lib",
+    interface_library = "cuda/extras/CUPTI/lib64/nvperf_target.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "nvperf_target",
+    deps = [
+        ":cuda_headers",
+    ] + if_linux([
+        ":nvperf_target_so",
+    ]) + if_windows([
+        ":cupti_headers",
+        ":nvperf_target_lib",
+    ]),
+)
+
+# NVML
+cc_import(
+    name = "nvidia-ml_so",
+    shared_library = "cuda/lib64/stubs/libnvidia-ml.so",
+    target_compatible_with = ["@platforms//os:linux"],
+)
+
+cc_import(
+    name = "nvml_lib",
+    interface_library = "cuda/lib/x64/nvml.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "nvml",
+    deps = [
+        ":cuda_headers",
+    ] + if_linux([
+        ":nvidia-ml_so",
+    ]) + if_windows([
+        ":nvml_lib",
+    ]),
+)
+
+# curand
+cc_import_versioned_sos(
+    name = "curand_so",
+    shared_library = "cuda/lib64/libcurand.so",
+)
+
+cc_import(
+    name = "curand_lib",
+    interface_library = "cuda/lib/x64/curand.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "curand",
+    deps = [
+        ":cuda_headers",
+    ] + if_linux([
+        ":curand_so",
+    ]) + if_windows([
+        ":curand_lib",
+    ]),
+)
+
+# nvptxcompiler
+cc_import(
+    name = "nvptxcompiler_so",
+    static_library = "cuda/lib64/libnvptxcompiler_static.a",
+    target_compatible_with = ["@platforms//os:linux"],
+)
+
+cc_import(
+    name = "nvptxcompiler_lib",
+    interface_library = "cuda/lib/x64/nvptxcompiler_static.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "nvptxcompiler",
+    srcs = [],
+    hdrs = glob([
+        "cuda/include/fatbinary_section.h",
+        "cuda/include/nvPTXCompiler.h",
+        "cuda/include/crt/*",
+    ]),
+    includes = [
+        "cuda/include",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [] + if_linux([
+        ":nvptxcompiler_so",
+    ]) + if_windows([
+        ":nvptxcompiler_lib",
+    ]),
+)
+
+# cufft
+cc_import_versioned_sos(
+    name = "cufft_so",
+    shared_library = "cuda/lib64/libcufft.so",
+)
+
+cc_import(
+    name = "cufft_lib",
+    interface_library = "cuda/lib/x64/cufft.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_import_versioned_sos(
+    name = "cufftw_so",
+    shared_library = "cuda/lib64/libcufftw.so",
+)
+
+cc_import(
+    name = "cufftw_lib",
+    interface_library = "cuda/lib/x64/cufftw.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "cufft",
+    deps = [
+        ":cuda_headers",
+    ] + if_linux([
+        ":cufft_so",
+        ":cufftw_so",
+    ]) + if_windows([
+        ":cufft_lib",
+        ":cufftw_lib",
+    ]),
+)
+
+# cusolver
+cc_import_versioned_sos(
+    name = "cusolver_so",
+    shared_library = "cuda/lib64/libcusolver.so",
+)
+
+cc_import(
+    name = "cusolver_lib",
+    interface_library = "cuda/lib/x64/cusolver.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "cusolver",
+    deps = [
+        ":cuda_headers",
+    ] + if_linux([
+        ":cusolver_so",
+    ]) + if_windows([
+        ":cusolver_lib",
+    ]),
+)
+
+# cusparse
+cc_import_versioned_sos(
+    name = "cusparse_so",
+    shared_library = "cuda/lib64/libcusparse.so",
+)
+
+cc_import(
+    name = "cusparse_lib",
+    interface_library = "cuda/lib/x64/cusparse.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "cusparse",
+    deps = [
+        ":cuda_headers",
+    ] + if_linux([
+        ":cusparse_so",
+    ]) + if_windows([
+        ":cusparse_lib",
+    ]),
+)
+
+# nvtx
+cc_import_versioned_sos(
+    name = "nvtx_so",
+    shared_library = "cuda/lib64/libnvToolsExt.so",
+)
+
+cc_import(
+    name = "nvtx_lib",
+    interface_library = "cuda/lib/x64/libnvToolsExt.lib",
+    system_provided = 1,
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "nvtx",
+    deps = [
+        ":cuda_headers",
+    ] + if_linux([
+        ":nvtx_so",
+    ]) + if_windows([
+        ":nvtx_lib",
+    ]),
+)
+
+# NPP
+_NPP_LIBS = {
+    "nppc": [
+        "npp.h",
+        "nppcore.h",
+        "nppdefs.h",
+    ],
+    "nppial": ["nppi_arithmetic_and_logical_operations.h"],
+    "nppicc": ["nppi_color_conversion.h"],
+    "nppidei": ["nppi_data_exchange_and_initialization.h"],
+    "nppif": ["nppi_filtering_functions.h"],
+    "nppig": ["nppi_geometry_transforms.h"],
+    "nppim": ["nppi_morphological_operations.h"],
+    "nppist": [
+        "nppi_statistics_functions.h",
+        "nppi_linear_transforms.h",
+    ],
+    "nppisu": ["nppi_support_functions.h"],
+    "nppitc": ["nppi_threshold_and_compare_operations.h"],
+    "npps": [
+        "npps_arithmetic_and_logical_operations.h",
+        "npps_conversion_functions.h",
+        "npps_filtering_functions.h",
+        "npps.h",
+        "npps_initialization.h",
+        "npps_statistics_functions.h",
+        "npps_support_functions.h",
+    ],
+}
+
+[
+    cc_import_versioned_sos(
+        name = name + "_so",
+        shared_library = "cuda/lib64/lib{}.so".format(name),
+    )
+    for name in _NPP_LIBS.keys()
+]
+
+[
+    cc_import(
+        name = name + "_lib",
+        interface_library = "cuda/lib/x64/{}.lib".format(name),
+        system_provided = 1,
+        target_compatible_with = ["@platforms//os:windows"],
+    )
+    for name in _NPP_LIBS.keys()
+]
+
+[
+    cc_library(
+        name = name,
+        hdrs = ["cuda/include/" + hdr for hdr in hdrs],
+        includes = ["cuda/include"],
+        visibility = ["//visibility:public"],
+        deps = ([":nppc"] if name != "nppc" else []) + if_linux([
+            ":{}_so".format(name),
+        ]) + if_windows([
+            ":{}_lib".format(name),
+        ]),
+    )
+    for name, hdrs in _NPP_LIBS.items()
+]
