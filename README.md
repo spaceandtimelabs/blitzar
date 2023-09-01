@@ -44,7 +44,7 @@
   </a>
 
   <a href="https://developer.nvidia.com/cuda-downloads">
-    <img alt="CUDA" src="https://img.shields.io/badge/CUDA-12.1-green?style=flat&logo=nvidia">
+    <img alt="CUDA" src="https://img.shields.io/badge/CUDA-12.2-green?style=flat&logo=nvidia">
     </a>
   </a>
 
@@ -171,7 +171,7 @@ See the [example](./example) folder for some examples.
 
 * `x86_64` Linux instance.
 * Docker installed (check [install guidelines](https://docs.docker.com/engine/install/ubuntu/)).
-* Nvidia GPU capable of run CUDA 12.1 code.
+* Nvidia GPU capable of run CUDA 12.2 code.
 * Recommended Nvidia Toolkit Driver Version: >= 530.30.02 (check the [compatibility list here](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html)).
 * [Nvidia container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) (necessary only if you intend to run tests and benchmarks on the GPU).
 
