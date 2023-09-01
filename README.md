@@ -232,9 +232,6 @@ Note: some tests will fail in case you don't have a GPU available.
 ```bash
 ./ci/docker/run_docker_gpu.sh
 
-# build the c++/cuda shared library and generate the rust bindings
-./ci/build.sh 0.0.0
-
 # run the sys-crate tests
 cargo test --manifest-path rust/blitzar-sys/Cargo.toml
 ```
@@ -285,8 +282,6 @@ See the Rust example here: [rust/tests/src/main.rs](./rust/tests/src/main.rs). T
 
 ```bash
 ./ci/docker/run_docker_gpu.sh
-
-./ci/build.sh 0.0.0
 
 cargo test --manifest-path rust/tests/Cargo.toml
 ```
