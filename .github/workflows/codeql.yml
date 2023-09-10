@@ -26,6 +26,8 @@ jobs:
         languages: 'cpp'
 
     - run: bazel build //...
+      env:
+        PYTHONDONTWRITEBYTECODE: 1
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
