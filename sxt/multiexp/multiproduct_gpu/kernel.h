@@ -37,7 +37,8 @@ __global__ void multiproduct_kernel(typename Reducer::value_type* out,
                                     const unsigned* indexes,
                                     const block_computation_descriptor* block_descriptors) {
   using T = typename Reducer::value_type;
-  extern __shared__ T shared_data[];
+  extern __shared__ T shared_data_p[];
+  T* shared_data = shared_data_p;
   auto thread_index = threadIdx.x;
   auto block_index = blockIdx.x;
   auto descriptor = block_descriptors[block_index];
