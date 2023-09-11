@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <compare>
 #include <cstdint>
 
 #include "sxt/execution/kernel/block_size.h"
