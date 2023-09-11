@@ -40,6 +40,7 @@ sxt_cc_component(
     name = "inner_product",
     impl_deps = [
         ":accumulator",
+        ":add",
         ":mul",
         ":muladd",
         ":product_mapper",
