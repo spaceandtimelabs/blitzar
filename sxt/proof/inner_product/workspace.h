@@ -19,7 +19,7 @@
 #include "sxt/execution/async/future_fwd.h"
 
 namespace sxt::s25t {
-struct element;
+class element;
 }
 
 namespace sxt::prfip {

@@ -22,7 +22,7 @@ namespace sxt::c21t {
 struct element_p3;
 }
 namespace sxt::rstt {
-struct compressed_element;
+class compressed_element;
 }
 
 namespace sxt::rsto {

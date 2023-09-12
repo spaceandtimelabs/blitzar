@@ -25,7 +25,7 @@ namespace sxt::basct {
 class blob_array;
 }
 namespace sxt::mtxb {
-class exponent_sequence;
+struct exponent_sequence;
 } // namespace sxt::mtxb
 namespace sxt::mtxi {
 class index_table;
