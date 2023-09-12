@@ -1,8 +1,4 @@
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library", "cuda_test")
-load(
-    "//bazel:cuda_dlink.bzl",
-    "cuda_dlink",
-)
+load("@rules_cuda//cuda:defs.bzl", "cuda_library")
 
 # We add this -std=c++20 flag, because
 # benchmarks could not be compiled without it.
@@ -12,7 +8,6 @@ load(
 def sxt_copts():
     return [
         "-std=c++20",
-        "-fcoroutines",
     ]
 
 def sxt_cc_component(
@@ -34,17 +29,10 @@ def sxt_cc_component(
             srcs = [
                 name + ".cc",
             ],
-            copts = sxt_copts() + [
-                "--device-c",
-                "-x",
-                "cuda",
-            ],
+            rdc = True,
+            copts = sxt_copts(),
             alwayslink = alwayslink,
-            linkstatic = 1,
-            deps = deps + impl_deps + [
-                "@local_config_cuda//cuda:cuda_headers",
-                "@local_config_cuda//cuda:cudart_static",
-            ],
+            deps = deps + impl_deps,
             visibility = ["//visibility:public"],
             **kwargs
         )
@@ -72,20 +60,27 @@ def sxt_cc_component(
         deps_p = [
             ":" + name,
         ] + deps + test_deps
-        device_test_name = name + "-device.t"
-        cuda_dlink(
-            name = device_test_name,
-            deps = deps_p,
-        )
+        is_cuda = True
         if is_cuda:
-            cuda_test(
-                name = name + ".t",
+            cuda_library(
+                name = name + "-test-lib",
                 srcs = [
                     name + ".t.cc",
                 ],
+                rdc = True,
+                copts = sxt_copts(),
+                alwayslink = alwayslink,
+                deps = depset(deps_p),
+                visibility = ["//visibility:public"],
+                **kwargs
+            )
+            device_test_name = name + "-device.t"
+            native.cc_test(
+                name = name + ".t",
+                srcs = [],
                 copts = sxt_copts() + copts,
-                deps = deps_p + [
-                    ":" + device_test_name,
+                deps = [
+                  ":" + name + "-test-lib",
                 ],
                 visibility = ["//visibility:public"],
                 **kwargs
@@ -97,9 +92,7 @@ def sxt_cc_component(
                     name + ".t.cc",
                 ],
                 copts = sxt_copts() + copts,
-                deps = deps_p + [
-                    ":" + device_test_name,
-                ],
+                deps = deps_p,
                 visibility = ["//visibility:public"],
                 **kwargs
             )

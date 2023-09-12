@@ -1,4 +1,4 @@
-workspace(name = "dev_spaceandtime_blitzar")
+workspace(name = "rls_bltzr_cd")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
@@ -11,14 +11,15 @@ http_archive(
     ],
 )
 
-local_repository(
-    name = "build_bazel_rules_cuda",
-    path = "third_party/rules_cuda",
+git_repository(
+    name = "rules_cuda",
+    commit = "e772553",
+    remote = "https://github.com/bazel-contrib/rules_cuda",
 )
 
-load("@build_bazel_rules_cuda//gpus:cuda_configure.bzl", "cuda_configure")
-
-cuda_configure(name = "local_config_cuda")
+load("@rules_cuda//cuda:repositories.bzl", "register_detected_cuda_toolchains", "rules_cuda_dependencies")
+rules_cuda_dependencies()
+register_detected_cuda_toolchains()
 
 git_repository(
     name = "com_github_catchorg_catch2",

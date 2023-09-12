@@ -40,3 +40,6 @@ vgcore.*
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Clang files
+llvm*
