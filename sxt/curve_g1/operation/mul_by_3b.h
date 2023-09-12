@@ -19,7 +19,7 @@
 #include "sxt/base/macro/cuda_callable.h"
 
 namespace sxt::f12t {
-struct element;
+class element;
 }
 
 namespace sxt::cg1o {

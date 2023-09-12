@@ -29,7 +29,7 @@ class span_cvoid;
 } // namespace sxt::basct
 
 namespace sxt::mtxb {
-class exponent_sequence;
+struct exponent_sequence;
 }
 namespace sxt::mtxi {
 class index_table;

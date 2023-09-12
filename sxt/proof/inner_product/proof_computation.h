@@ -26,7 +26,7 @@ namespace sxt::rstt {
 class compressed_element;
 }
 namespace sxt::s25t {
-struct element;
+class element;
 }
 namespace sxt::prft {
 class transcript;

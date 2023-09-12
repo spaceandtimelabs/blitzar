@@ -34,7 +34,7 @@ namespace sxt::c21t {
 struct element_p3;
 }
 namespace sxt::s25t {
-struct element;
+class element;
 }
 
 namespace sxt::c21o {

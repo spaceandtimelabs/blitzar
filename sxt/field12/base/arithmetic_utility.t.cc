@@ -116,8 +116,8 @@ TEST_CASE("sbb (subtraction and borrow) can handle computation") {
     uint64_t borrow{0};
     uint64_t ret{0};
     sbb(ret, borrow, a, b);
-    REQUIRE(ret == 1378099289637323008);
-    REQUIRE(borrow == 18446744073709551615);
+    REQUIRE(ret == 0x131ffe00a00d0100);
+    REQUIRE(borrow == 0xffffffffffffffff);
   }
 
   SECTION("with left summand less than than right summand and borrow") {
@@ -126,8 +126,8 @@ TEST_CASE("sbb (subtraction and borrow) can handle computation") {
     uint64_t borrow{0xdd5902076eb30a06};
     uint64_t ret{0};
     sbb(ret, borrow, a, b);
-    REQUIRE(ret == 2496962287454975480);
-    REQUIRE(borrow == 18446744073709551615);
+    REQUIRE(ret == 0x22a6fdf8914cf5f8);
+    REQUIRE(borrow == 0xffffffffffffffff);
   }
 
   SECTION("with left summand greater than right summand and no borrow") {
@@ -136,7 +136,7 @@ TEST_CASE("sbb (subtraction and borrow) can handle computation") {
     uint64_t borrow{0};
     uint64_t ret{0};
     sbb(ret, borrow, a, b);
-    REQUIRE(ret == 17068644784072228608);
+    REQUIRE(ret == 0xece001ff5ff2ff00);
     REQUIRE(borrow == 0);
   }
 
@@ -146,8 +146,8 @@ TEST_CASE("sbb (subtraction and borrow) can handle computation") {
     uint64_t borrow{0xdd5902076eb30a06};
     uint64_t ret{0};
     sbb(ret, borrow, a, b);
-    REQUIRE(ret == 15949781786254576134);
-    REQUIRE(borrow == 0);
+    REQUIRE(ret == 0xdd5902076eb30a06);
+    REQUIRE(borrow == 0x0);
   }
 }
 
