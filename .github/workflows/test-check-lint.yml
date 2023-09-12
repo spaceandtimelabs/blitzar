@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run check
-        run: docker run --rm -v "$PWD":/src -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-0 /bin/bash -c "PYTHONDONTWRITEBYTECODE=1 ./tools/code_format/check_format.py check"
+        run: docker run --rm -v "$PWD":/src -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 /bin/bash -c "PYTHONDONTWRITEBYTECODE=1 ./tools/code_format/check_format.py check"
 
   test-cpp:
     name: C++ code
@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run cpp tests
-        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-0 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test //..."
+        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test //..."
 
   test-cpp-asan:
     name: C++ code with address sanitizer
@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v3
       
       - name: Run cpp-asan tests
-        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test_asan:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-0 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test --config=asan //..."
+        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test_asan:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test --config=asan //..."
 
   test-rust:
     name: Rust Sys Crate
@@ -50,4 +50,4 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run rust tests
-        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test_rust:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-0 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; source /root/.cargo/env; /root/.cargo/bin/cargo test --manifest-path rust/blitzar-sys/Cargo.toml; /root/.cargo/bin/cargo test --manifest-path rust/tests/Cargo.toml"
+        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test_rust:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; source /root/.cargo/env; /root/.cargo/bin/cargo test --manifest-path rust/blitzar-sys/Cargo.toml; /root/.cargo/bin/cargo test --manifest-path rust/tests/Cargo.toml"

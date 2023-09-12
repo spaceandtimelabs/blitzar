@@ -15,7 +15,7 @@ jobs:
     needs: [test-check-lint]
     environment: deploy #!! DO NOT CHANGE THIS LINE !! #
     container:
-      image: spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-0
+      image: spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
