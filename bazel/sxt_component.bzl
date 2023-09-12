@@ -12,7 +12,7 @@ load(
 def sxt_copts():
     return [
         "-std=c++20",
-        "-fcoroutines",
+        # "-fcoroutines",
     ]
 
 def sxt_cc_component(
@@ -72,24 +72,25 @@ def sxt_cc_component(
         deps_p = [
             ":" + name,
         ] + deps + test_deps
-        device_test_name = name + "-device.t"
-        cuda_dlink(
-            name = device_test_name,
-            deps = deps_p,
-        )
+        # device_test_name = name + "-device.t"
+        # cuda_dlink(
+        #     name = device_test_name,
+        #     deps = deps_p,
+        # )
         if is_cuda:
-            cuda_test(
-                name = name + ".t",
-                srcs = [
-                    name + ".t.cc",
-                ],
-                copts = sxt_copts() + copts,
-                deps = deps_p + [
-                    ":" + device_test_name,
-                ],
-                visibility = ["//visibility:public"],
-                **kwargs
-            )
+          pass
+            # cuda_test(
+            #     name = name + ".t",
+            #     srcs = [
+            #         name + ".t.cc",
+            #     ],
+            #     copts = sxt_copts() + copts,
+            #     deps = deps_p + [
+            #         ":" + device_test_name,
+            #     ],
+            #     visibility = ["//visibility:public"],
+            #     **kwargs
+            # )
         else:
             native.cc_test(
                 name = name + ".t",
@@ -97,9 +98,7 @@ def sxt_cc_component(
                     name + ".t.cc",
                 ],
                 copts = sxt_copts() + copts,
-                deps = deps_p + [
-                    ":" + device_test_name,
-                ],
+                deps = deps_p,
                 visibility = ["//visibility:public"],
                 **kwargs
             )

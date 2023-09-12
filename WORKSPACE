@@ -25,3 +25,12 @@ git_repository(
     commit = "6f21a3609cea360846a0ca93be55877cca14c86d",
     remote = "https://github.com/catchorg/Catch2",
 )
+
+git_repository(
+    name = "rules_cuda",
+    commit = "22a46e6",
+    remote = "https://github.com/bazel-contrib/rules_cuda",
+)
+load("@rules_cuda//cuda:repositories.bzl", "register_detected_cuda_toolchains", "rules_cuda_dependencies")
+rules_cuda_dependencies()
+register_detected_cuda_toolchains()
