@@ -2,12 +2,15 @@ load(
     "//bazel:sxt_component.bzl",
     "sxt_cc_component",
 )
-load(
-    "//bazel:cuda_dlink.bzl",
-    "cuda_dlink",
+load("@rules_cuda//cuda:defs.bzl", 
+     "cuda_library", 
 )
+# load(
+#     "//bazel:cuda_dlink.bzl",
+#     "cuda_dlink",
+# )
 
-cuda_dlink(
+cuda_library(
     name = "cbindings_device",
     deps = [
         ":backend",
