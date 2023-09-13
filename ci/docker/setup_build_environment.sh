@@ -30,6 +30,14 @@ apt-get install --no-install-recommends --no-install-suggests -y \
                 gcc-10 g++-10 cpp-10
 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
 
+# Upgrade to clang-18
+# See https://linux.how2shout.com/how-to-install-clang-on-ubuntu-linux/
+wget https://apt.llvm.org/llvm.sh
+chmod +x llvm.sh
+./llvm.sh 18
+update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100
+update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
+
 # Install benchmark dependencies
 pip install gprof2dot===2022.7.29
 pip install matplotlib===3.7.0
