@@ -24,8 +24,6 @@ cc_binary(
     name = "libblitzar.so",
     linkopts = [
         "-Wl,--version-script=$(location :libblitzar-export-map.ld)",
-        "-static-libstdc++",
-        "-static-libgcc",
     ],
     linkshared = 1,
     visibility = ["//visibility:public"],

@@ -5,10 +5,6 @@ sxt_cc_benchmark(
     srcs = [
         "benchmark.m.cc",
     ],
-    linkopts = [
-        "-x",
-        "cuda",
-    ],
     visibility = ["//visibility:public"],
     deps = [
         "//sxt/base/container:span",
