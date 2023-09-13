@@ -2,7 +2,6 @@ build --experimental_cc_implementation_deps
 
 build --copt -fPIC
 
-build:portable_glibc --copt -fPIC
 build:portable_glibc --define SXT_PORTABLE_GLIBC=1
 build:portable_glibc --action_env=BAZEL_LINKLIBS='-l%:libstdc++.a'
 build:portable_glibc --action_env=BAZEL_LINKOPTS='-static-libstdc++ -static-libgcc'
@@ -17,14 +16,11 @@ build --enable_cuda=True
 # Use --config=clang to build with clang instead of gcc and nvcc.
 build:clang --repo_env=CC=clang
 build:clang --@rules_cuda//cuda:compiler=clang
-build:clang --copt=-std=c++20
 build:clang --copt=-stdlib=libstdc++
 build --config=clang
 build --action_env CC=/usr/bin/clang-18
 build --action_env CXX=/usr/bin/clang++-18
 build --@rules_cuda//cuda:runtime=@local_cuda//:cuda_runtime_static
-
-# build --config=cuda
 
 # For asan to work with cuda, we need to add this option
 # See https://github.com/google/sanitizers/issues/629#issuecomment-161357276
