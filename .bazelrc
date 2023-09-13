@@ -6,6 +6,8 @@ build --copt -fPIC
 
 build:portable_glibc --copt -fPIC
 build:portable_glibc --define SXT_PORTABLE_GLIBC=1
+build:portable_glibc --action_env=BAZEL_LINKLIBS='-l%:libstdc++.a'
+build:portable_glibc --action_env=BAZEL_LINKOPTS='-static-libstdc++ -static-libgcc'
 
 build:asan --copt -fsanitize=address
 build:asan --linkopt -fsanitize=address
