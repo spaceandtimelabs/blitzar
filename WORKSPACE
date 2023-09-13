@@ -11,15 +11,6 @@ http_archive(
     ],
 )
 
-local_repository(
-    name = "build_bazel_rules_cuda",
-    path = "third_party/rules_cuda",
-)
-
-load("@build_bazel_rules_cuda//gpus:cuda_configure.bzl", "cuda_configure")
-
-cuda_configure(name = "local_config_cuda")
-
 git_repository(
     name = "com_github_catchorg_catch2",
     commit = "6f21a3609cea360846a0ca93be55877cca14c86d",

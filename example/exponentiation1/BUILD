@@ -9,7 +9,6 @@ sxt_cc_library(
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/curve21/type:element_p3",
         "//sxt/field51/type:element",
-        "@local_config_cuda//cuda",
     ],
 )
 
