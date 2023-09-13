@@ -1,18 +1,13 @@
 load("//bazel:sxt_benchmark.bzl", "sxt_cc_benchmark")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//bazel:sxt_component.bzl", "sxt_cc_library")
 
-cc_library(
+sxt_cc_library(
     name = "multiply_add",
     srcs = [
         "multiply_add.cc",
     ],
     hdrs = [
         "multiply_add.h",
-    ],
-    copts = [
-        "-x",
-        "cuda",
-        "--device-c",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
@@ -24,7 +19,7 @@ cc_library(
     ],
 )
 
-cc_library(
+sxt_cc_library(
     name = "multi_exp_cpu",
     srcs = [
         "multi_exp_cpu.cc",
@@ -38,16 +33,13 @@ cc_library(
     ],
 )
 
-cuda_library(
+sxt_cc_library(
     name = "multi_exp_gpu",
     srcs = [
         "multi_exp_gpu.cu",
     ],
     hdrs = [
         "multi_exp_gpu.h",
-    ],
-    copts = [
-        "--device-c",
     ],
     deps = [
         ":multiply_add",
@@ -62,10 +54,6 @@ sxt_cc_benchmark(
     name = "benchmark",
     srcs = [
         "benchmark.m.cc",
-    ],
-    linkopts = [
-        "-x",
-        "cuda",
     ],
     visibility = ["//visibility:public"],
     deps = [
