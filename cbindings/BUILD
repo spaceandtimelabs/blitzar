@@ -5,10 +5,6 @@ load(
 load("@rules_cuda//cuda:defs.bzl", 
      "cuda_library", 
 )
-# load(
-#     "//bazel:cuda_dlink.bzl",
-#     "cuda_dlink",
-# )
 
 cuda_library(
     name = "cbindings_device",
@@ -19,6 +15,8 @@ cuda_library(
         ":inner_product_proof",
         ":pedersen",
     ],
+    alwayslink = 1,
+    rdc = 1,
 )
 
 cc_binary(

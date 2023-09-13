@@ -1,5 +1,6 @@
 build --cxxopt -std=c++20
 build --experimental_cc_implementation_deps
+build --experimental_cc_shared_library
 
 build --copt -fPIC
 
