@@ -1,11 +1,8 @@
 # load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library", "cuda_test")
-load("@rules_cuda//cuda:defs.bzl", 
-     "cuda_library", 
-     "cuda_objects", 
-)
 load(
-    "//bazel:cuda_dlink.bzl",
-    "cuda_dlink",
+    "@rules_cuda//cuda:defs.bzl",
+    "cuda_library",
+    "cuda_objects",
 )
 
 # We add this -std=c++20 flag, because
@@ -30,49 +27,49 @@ def sxt_cc_component(
         deps = [],
         impl_deps = [],
         **kwargs):
-  cuda_objects(
-      name = name,
-      hdrs = [
-          name + ".h",
-      ],
-      srcs = [
-          name + ".cc",
-      ],
-      copts = sxt_copts(),
-      deps = deps + impl_deps + [
-          "@local_cuda//:cuda_runtime_static",
-      ],
-      visibility = ["//visibility:public"],
-      **kwargs
-  )
-  if with_test:
-    test_lib = name + ".t-lib"
-    deps_p = [
-        ":" + name,
-    ] + deps + test_deps
-    cuda_library(
-      name = test_lib,
-      copts = sxt_copts(),
-      deps = [
-        ":" + name,
-      ] + test_deps,
-      srcs = [
-        name + ".t.cc",
-      ],
-      rdc = True,
-    )
-    native.cc_test(
-        name = name + ".t",
-        copts = sxt_copts() + copts,
-        deps = [
-          ":" + test_lib,
-        ] + test_deps + [
-          "@com_github_catchorg_catch2//:catch2",
-          "@com_github_catchorg_catch2//:catch2_main",
+    cuda_objects(
+        name = name,
+        hdrs = [
+            name + ".h",
+        ],
+        srcs = [
+            name + ".cc",
+        ],
+        copts = sxt_copts(),
+        deps = deps + impl_deps + [
+            "@local_cuda//:cuda_runtime_static",
         ],
         visibility = ["//visibility:public"],
         **kwargs
     )
+    if with_test:
+        test_lib = name + ".t-lib"
+        deps_p = [
+            ":" + name,
+        ] + deps + test_deps
+        cuda_library(
+            name = test_lib,
+            copts = sxt_copts(),
+            deps = [
+                ":" + name,
+            ] + test_deps,
+            srcs = [
+                name + ".t.cc",
+            ],
+            rdc = True,
+        )
+        native.cc_test(
+            name = name + ".t",
+            copts = sxt_copts() + copts,
+            deps = [
+                ":" + test_lib,
+            ] + test_deps + [
+                "@com_github_catchorg_catch2//:catch2",
+                "@com_github_catchorg_catch2//:catch2_main",
+            ],
+            visibility = ["//visibility:public"],
+            **kwargs
+        )
 
 def sxt_cc_library(
         name,
@@ -80,13 +77,13 @@ def sxt_cc_library(
         deps = [],
         impl_deps = [],
         **kwargs):
-  cuda_objects(
-      name = name,
-      copts = sxt_copts(),
-      deps = deps + impl_deps,
-      visibility = ["//visibility:public"],
-      **kwargs
-  )
+    cuda_objects(
+        name = name,
+        copts = sxt_copts(),
+        deps = deps + impl_deps,
+        visibility = ["//visibility:public"],
+        **kwargs
+    )
 
 def sxt_cc_binary(
         name,
@@ -94,19 +91,19 @@ def sxt_cc_binary(
         copts = [],
         deps = [],
         **kwargs):
-  libname = name + '-lib'
-  cuda_library(
-      name = libname,
-      srcs = srcs,
-      copts = sxt_copts() + copts,
-      deps = deps,
-      rdc = True,
-      **kwargs
-  )
-  native.cc_binary(
-    name = name,
-    deps = [
-      ":" + libname,
-    ] + deps,
-    **kwargs
-  )
+    libname = name + "-lib"
+    cuda_library(
+        name = libname,
+        srcs = srcs,
+        copts = sxt_copts() + copts,
+        deps = deps,
+        rdc = True,
+        **kwargs
+    )
+    native.cc_binary(
+        name = name,
+        deps = [
+            ":" + libname,
+        ] + deps,
+        **kwargs
+    )

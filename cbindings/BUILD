@@ -2,12 +2,14 @@ load(
     "//bazel:sxt_component.bzl",
     "sxt_cc_component",
 )
-load("@rules_cuda//cuda:defs.bzl", 
-     "cuda_library", 
+load(
+    "@rules_cuda//cuda:defs.bzl",
+    "cuda_library",
 )
 
 cuda_library(
     name = "cbindings_device",
+    rdc = 1,
     deps = [
         ":backend",
         ":get_generators",
@@ -16,7 +18,6 @@ cuda_library(
         ":pedersen",
     ],
     alwayslink = 1,
-    rdc = 1,
 )
 
 cc_binary(

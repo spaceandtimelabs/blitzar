@@ -1,4 +1,3 @@
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//bazel:sxt_component.bzl", "sxt_cc_binary", "sxt_cc_library")
 
 sxt_cc_library(

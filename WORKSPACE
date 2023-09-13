@@ -31,6 +31,9 @@ git_repository(
     commit = "22a46e6",
     remote = "https://github.com/bazel-contrib/rules_cuda",
 )
+
 load("@rules_cuda//cuda:repositories.bzl", "register_detected_cuda_toolchains", "rules_cuda_dependencies")
+
 rules_cuda_dependencies()
+
 register_detected_cuda_toolchains()
