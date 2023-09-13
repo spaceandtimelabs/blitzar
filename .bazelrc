@@ -29,6 +29,7 @@ build:clang --copt=-stdlib=libstdc++
 build --config=clang
 build --action_env CC=/usr/bin/clang-18
 build --action_env CXX=/usr/bin/clang++-18
+build --@rules_cuda//cuda:runtime=@local_cuda//:cuda_runtime_static
 
 # build --config=cuda
 

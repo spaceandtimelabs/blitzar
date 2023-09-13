@@ -129,7 +129,6 @@ def sxt_cc_component(
       ],
       copts = sxt_copts(),
       deps = deps + impl_deps + [
-          "@local_cuda//:cuda_headers",
           "@local_cuda//:cuda_runtime_static",
       ],
       visibility = ["//visibility:public"],
