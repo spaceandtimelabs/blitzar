@@ -1,4 +1,4 @@
-load("//bazel:sxt_component.bzl", "sxt_cc_binary", "sxt_cc_library")
+load("//bazel:sxt_build_system.bzl", "sxt_cc_binary", "sxt_cc_library")
 
 sxt_cc_library(
     name = "exponentiate_gpu",

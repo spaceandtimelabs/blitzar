@@ -1,5 +1,5 @@
 load(
-    "//bazel:sxt_component.bzl",
+    "//bazel:sxt_build_system.bzl",
     "sxt_cc_component",
 )
 load(

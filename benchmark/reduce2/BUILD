@@ -1,5 +1,5 @@
 load("//bazel:sxt_benchmark.bzl", "sxt_cc_benchmark")
-load("//bazel:sxt_component.bzl", "sxt_cc_library")
+load("//bazel:sxt_build_system.bzl", "sxt_cc_library")
 
 sxt_cc_library(
     name = "reduce_cpu",
