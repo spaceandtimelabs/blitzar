@@ -93,14 +93,13 @@ def sxt_cc_binary(
         srcs = [],
         copts = [],
         deps = [],
-        impl_deps = [],
         **kwargs):
   libname = name + '-lib'
   cuda_library(
       name = libname,
       srcs = srcs,
       copts = sxt_copts() + copts,
-      deps = deps + impl_deps,
+      deps = deps,
       rdc = True,
       **kwargs
   )
@@ -108,6 +107,6 @@ def sxt_cc_binary(
     name = name,
     deps = [
       ":" + libname,
-    ],
+    ] + deps,
     **kwargs
   )
