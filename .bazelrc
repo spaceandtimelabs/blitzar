@@ -1,5 +1,4 @@
 build --experimental_cc_implementation_deps
-build --experimental_cc_shared_library
 
 build --copt -fPIC
 
@@ -10,13 +9,6 @@ build:portable_glibc --action_env=BAZEL_LINKOPTS='-static-libstdc++ -static-libg
 
 build:asan --copt -fsanitize=address
 build:asan --linkopt -fsanitize=address
-
-build --flag_alias=enable_cuda=@rules_cuda//cuda:enable
-build --flag_alias=cuda_archs=@rules_cuda//cuda:archs
-build --flag_alias=cuda_compiler=@rules_cuda//cuda:compiler
-build --flag_alias=cuda_copts=@rules_cuda//cuda:copts
-build --flag_alias=cuda_host_copts=@rules_cuda//cuda:host_copts
-build --flag_alias=cuda_runtime=@rules_cuda//cuda:runtime
 
 build --@rules_cuda//cuda:archs=compute_70:compute_70,sm_70
 
