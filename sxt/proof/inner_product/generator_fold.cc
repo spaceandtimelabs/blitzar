@@ -33,6 +33,7 @@ void decompose_generator_fold(basct::span<unsigned>& res, const s25t::element& m
                               const s25t::element& m_high) noexcept {
   SXT_DEBUG_ASSERT(res.size() == s25cn::max_bits_v);
   size_t bit_index = 0;
+  volatile auto data = res.data();
   for (size_t i = 0; i < 4; ++i) {
     uint64_t x, y;
     std::memcpy(&x, reinterpret_cast<const char*>(&m_low) + sizeof(uint64_t) * i, sizeof(uint64_t));
@@ -41,7 +42,7 @@ void decompose_generator_fold(basct::span<unsigned>& res, const s25t::element& m
     auto m = std::min(s25cn::max_bits_v - bit_index, 64ul);
     for (size_t bit_offset = 0; bit_offset < m; ++bit_offset) {
       auto mask = 1ull << bit_index;
-      res[bit_index++] =
+      data[bit_index++] =
           static_cast<unsigned>((x & mask) != 0) + 2u * static_cast<unsigned>((y & mask) != 0);
     }
   }
@@ -58,9 +59,9 @@ void decompose_generator_fold(basct::span<unsigned>& res, const s25t::element& m
 //--------------------------------------------------------------------------------------------------
 // fold_generators
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE void fold_generators(c21t::element_p3& res, basct::cspan<unsigned> decomposition,
-                                   const c21t::element_p3& g_low,
-                                   const c21t::element_p3& g_high) noexcept {
+CUDA_CALLABLE
+void fold_generators(c21t::element_p3& res, basct::cspan<unsigned> decomposition,
+                     const c21t::element_p3& g_low, const c21t::element_p3& g_high) noexcept {
   if (decomposition.empty()) {
     // this should never happen
     res = c21t::element_p3::identity();
