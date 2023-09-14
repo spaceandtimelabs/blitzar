@@ -70,7 +70,6 @@ sxt_cc_component(
         "//sxt/execution/async:future",
     ],
     deps = [
-        "//sxt/curve21/operation:accumulator",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
         "//sxt/curve21/operation:neg",

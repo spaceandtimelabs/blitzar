@@ -62,7 +62,7 @@ private:
 // async_compute_multiproduct
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element Element>
-inline xena::future<>
+xena::future<>
 async_compute_multiproduct(basct::span<Element> products, const basdv::stream& stream,
                            basct::cspan<Element> generators, basct::cspan<unsigned> indexes,
                            basct::cspan<unsigned> product_sizes, bool is_signed) noexcept {

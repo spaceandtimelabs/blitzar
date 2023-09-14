@@ -16,8 +16,6 @@
  */
 #pragma once
 
-#include <concepts>
-
 #include "sxt/base/macro/cuda_callable.h"
 
 namespace sxt::algb {

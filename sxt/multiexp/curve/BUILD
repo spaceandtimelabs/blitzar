@@ -57,8 +57,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "multiproduct",
-    impl_deps = [
-    ],
     with_test = False,
     deps = [
         "//sxt/algorithm/base:accumulator",
