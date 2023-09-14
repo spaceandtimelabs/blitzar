@@ -1,3 +1,8 @@
+load(
+    "//bazel:sxt_build_system.bzl",
+    "sxt_cc_binary",
+)
+
 # Taken from https://github.com/bazelbuild/bazel/issues/2670#issuecomment-369674735
 # with modifications.
 def sxt_private_include_copts(includes, is_system = False):
@@ -76,7 +81,7 @@ def sxt_cc_benchmark(
         cmd_bash = "$(location //tools/benchmark:bench_profile) callgrind $$PWD/$(location :%s) $@" % name,
     )
 
-    native.cc_binary(
+    sxt_cc_binary(
         name = name,
         srcs = srcs,
         copts = copts + sxt_copts() + select({

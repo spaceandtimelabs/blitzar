@@ -1,27 +1,21 @@
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//bazel:sxt_build_system.bzl", "sxt_cc_binary", "sxt_cc_library")
 
-cuda_library(
+sxt_cc_library(
     name = "exponentiate_gpu",
     srcs = ["exponentiate_gpu.cu"],
     hdrs = ["exponentiate_gpu.h"],
-    copts = [
-        "--device-c",
-    ],
-    visibility = ["//visibility:public"],
     deps = [
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/curve21/operation:scalar_multiply",
         "//sxt/curve21/type:element_p3",
         "//sxt/field51/type:element",
-        "@local_config_cuda//cuda",
     ],
 )
 
-cc_library(
+sxt_cc_library(
     name = "exponentiate_cpu",
     srcs = ["exponentiate_cpu.cc"],
     hdrs = ["exponentiate_cpu.h"],
-    visibility = ["//visibility:public"],
     deps = [
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/curve21/operation:scalar_multiply",
@@ -30,15 +24,10 @@ cc_library(
     ],
 )
 
-cc_binary(
+sxt_cc_binary(
     name = "exponentiate",
     srcs = [
         "main.cc",
-    ],
-    linkopts = [
-        "-x",
-        "cuda",
-        "--cudalog",
     ],
     deps = [
         ":exponentiate_cpu",

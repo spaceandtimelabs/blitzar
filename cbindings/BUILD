@@ -1,14 +1,15 @@
 load(
-    "//bazel:sxt_component.bzl",
+    "//bazel:sxt_build_system.bzl",
     "sxt_cc_component",
 )
 load(
-    "//bazel:cuda_dlink.bzl",
-    "cuda_dlink",
+    "@rules_cuda//cuda:defs.bzl",
+    "cuda_library",
 )
 
-cuda_dlink(
+cuda_library(
     name = "cbindings_device",
+    rdc = 1,
     deps = [
         ":backend",
         ":get_generators",
@@ -16,14 +17,13 @@ cuda_dlink(
         ":inner_product_proof",
         ":pedersen",
     ],
+    alwayslink = 1,
 )
 
 cc_binary(
     name = "libblitzar.so",
     linkopts = [
         "-Wl,--version-script=$(location :libblitzar-export-map.ld)",
-        "-static-libstdc++",
-        "-static-libgcc",
     ],
     linkshared = 1,
     visibility = ["//visibility:public"],

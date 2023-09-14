@@ -1,11 +1,31 @@
-build --cxxopt -std=c++20
-build --config=cuda
 build --experimental_cc_implementation_deps
 
 build --copt -fPIC
 
-build:portable_glibc --copt -fPIC
 build:portable_glibc --define SXT_PORTABLE_GLIBC=1
+build:portable_glibc --action_env=BAZEL_LINKLIBS='-l%:libstdc++.a'
+build:portable_glibc --action_env=BAZEL_LINKOPTS='-static-libstdc++ -static-libgcc'
+
+build --flag_alias=enable_cuda=@rules_cuda//cuda:enable
+build --flag_alias=cuda_archs=@rules_cuda//cuda:archs
+build --flag_alias=cuda_compiler=@rules_cuda//cuda:compiler
+build --flag_alias=cuda_copts=@rules_cuda//cuda:copts
+build --flag_alias=cuda_host_copts=@rules_cuda//cuda:host_copts
+build --flag_alias=cuda_runtime=@rules_cuda//cuda:runtime
+
+build --@rules_cuda//cuda:archs=compute_70:compute_70,sm_70
+build --@rules_cuda//cuda:runtime=@local_cuda//:cuda_runtime_static
+
+build --enable_cuda=True
+
+# Use --config=clang to build with clang instead of gcc and nvcc.
+build:clang --repo_env=CC=clang
+build:clang --@rules_cuda//cuda:compiler=clang
+build:clang --copt=-stdlib=libstdc++
+build:clang --action_env CC=/usr/bin/clang-18
+build:clang --action_env CXX=/usr/bin/clang++-18
+build --config=clang
+
 
 build:asan --copt -fsanitize=address
 build:asan --linkopt -fsanitize=address
@@ -22,29 +42,6 @@ build:asan --workspace_status_command=./ci/lsan_hack.sh
 run:asan --action_env=LSAN_OPTIONS=suppressions=/tmp/sxt-blitzar-lsan.supp
 test:asan --action_env=LSAN_OPTIONS=suppressions=/tmp/sxt-blitzar-lsan.supp
 
-build:cuda --crosstool_top=@local_config_cuda//crosstool:toolchain
-build:cuda --define=using_cuda=true --define=using_cuda_nvcc=true --define=using_cuda_clang=false
-
-build:cuda_clang --crosstool_top=@local_config_cuda//crosstool:toolchain
-build:cuda_clang --define=using_cuda=true --define=using_cuda_clang=true
-
-build:win-cuda --define=using_cuda=true --define=using_cuda_nvcc=true
-
-build:opt --cxxopt=-march=native --copt=-march=native
-build --action_env TF_NEED_CUDA="1"
-build --action_env TF_NEED_OPENCL="1"
-build --action_env TF_CUDA_CLANG="0"
-build --action_env HOST_CXX_COMPILER="/usr/bin/gcc"
-build --action_env HOST_C_COMPILER="/usr/bin/gcc"
-build --action_env GCC_HOST_COMPILER_PATH="/usr/bin/gcc"
-
-build --action_env CUDA_TOOLKIT_PATH="/usr/local/cuda"
-build --action_env PYTHON_BIN_PATH="/usr/bin/python3"
-build --action_env TF_CUDA_VERSION="12.2"
-build --action_env TF_CUDA_COMPUTE_CAPABILITIES="7.0"
-build --action_env COMPUTECPP_TOOLKIT_PATH="/usr/local/computecpp"
-build --action_env TMP="/tmp"
-
 # For machines with many cpu cores available, we could not compile
 # the code. Many times (not always) the following error was launched:
 # `ptxas /tmp/tmpfxt_00000017_00000000-0, line 1; fatal : Missing .version...`
@@ -52,5 +49,6 @@ build --action_env TMP="/tmp"
 # for more information.
 # To fix the problem, we added the following line:
 build --sandbox_add_mount_pair=.:/tmp
+build --spawn_strategy local
 
 test --test_output=errors

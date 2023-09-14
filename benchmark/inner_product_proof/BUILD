@@ -1,5 +1,5 @@
 load(
-    "//bazel:sxt_component.bzl",
+    "//bazel:sxt_build_system.bzl",
     "sxt_cc_component",
 )
 load("//bazel:sxt_benchmark.bzl", "sxt_cc_benchmark")
@@ -22,10 +22,6 @@ sxt_cc_benchmark(
     name = "benchmark",
     srcs = [
         "benchmark.m.cc",
-    ],
-    linkopts = [
-        "-x",
-        "cuda",
     ],
     visibility = ["//visibility:public"],
     deps = [

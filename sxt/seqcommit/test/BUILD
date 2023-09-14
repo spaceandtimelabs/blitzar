@@ -1,4 +1,4 @@
-load("//bazel:sxt_component.bzl", "sxt_cc_component")
+load("//bazel:sxt_build_system.bzl", "sxt_cc_component")
 
 sxt_cc_component(
     name = "test_generators",

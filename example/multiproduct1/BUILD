@@ -5,10 +5,6 @@ sxt_cc_benchmark(
     srcs = [
         "main.cc",
     ],
-    linkopts = [
-        "-x",
-        "cuda",
-    ],
     deps = [
         "//sxt/base/profile:callgrind",
         "//sxt/curve21/operation:add",
