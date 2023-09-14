@@ -14,7 +14,6 @@ def sxt_copts():
     return [
         "-std=c++20",
         "-Wno-unknown-cuda-version",
-        "-Wno-unused-command-line-argument",
     ]
 
 def sxt_cc_component(

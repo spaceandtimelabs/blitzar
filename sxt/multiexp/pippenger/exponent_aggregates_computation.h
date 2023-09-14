@@ -21,7 +21,7 @@
 #include "sxt/base/container/span.h"
 
 namespace sxt::mtxb {
-class exponent_sequence;
+struct exponent_sequence;
 }
 
 namespace sxt::mtxpi {

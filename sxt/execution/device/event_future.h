@@ -38,7 +38,7 @@ public:
 
   ~event_future() noexcept {
     if (event_) {
-      xena::future<T>{std::move(*this)};
+      (void)xena::future<T>{std::move(*this)};
     }
   }
 
