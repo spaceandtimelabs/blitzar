@@ -3,13 +3,9 @@ build --experimental_cc_implementation_deps
 
 build --copt -fPIC
 
-build:portable_glibc --copt -fPIC
 build:portable_glibc --define SXT_PORTABLE_GLIBC=1
 build:portable_glibc --action_env=BAZEL_LINKLIBS='-l%:libstdc++.a'
 build:portable_glibc --action_env=BAZEL_LINKOPTS='-static-libstdc++ -static-libgcc'
-
-build:asan --copt -fsanitize=address
-build:asan --linkopt -fsanitize=address
 
 build --flag_alias=enable_cuda=@rules_cuda//cuda:enable
 build --flag_alias=cuda_archs=@rules_cuda//cuda:archs
@@ -32,7 +28,9 @@ build --action_env CC=/usr/bin/clang-18
 build --action_env CXX=/usr/bin/clang++-18
 build --@rules_cuda//cuda:runtime=@local_cuda//:cuda_runtime_static
 
-# build --config=cuda
+
+build:asan --copt -fsanitize=address
+build:asan --linkopt -fsanitize=address
 
 # For asan to work with cuda, we need to add this option
 # See https://github.com/google/sanitizers/issues/629#issuecomment-161357276
