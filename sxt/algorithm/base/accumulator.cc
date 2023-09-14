@@ -14,22 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
-
-#include <concepts>
-
-namespace sxt::bascrv {
-//--------------------------------------------------------------------------------------------------
-// element
-//--------------------------------------------------------------------------------------------------
-template <class T>
-concept element = requires(T& res, const T& e) {
-  double_element(res, e);
-  add(res, e, e);
-  neg(res, e);
-  add_inplace(res, res);
-  { T::identity() } noexcept -> std::same_as<T>;
-  mark(res);
-  { is_marked(e) } noexcept -> std::same_as<bool>;
-};
-} // namespace sxt::bascrv
+#include "sxt/algorithm/base/accumulator.h"

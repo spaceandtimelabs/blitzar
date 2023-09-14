@@ -61,11 +61,11 @@ sxt_cc_component(
     ],
     with_test = False,
     deps = [
+        "//sxt/algorithm/base:accumulator",
         "//sxt/algorithm/base:gather_mapper",
         "//sxt/base/container:span",
         "//sxt/base/macro:cuda_callable",
         "//sxt/base/type:raw_stream",
-        "//sxt/curve21/operation:accumulator",
         "//sxt/execution/async:future",
         "//sxt/execution/async:future_fwd",
         "//sxt/multiexp/multiproduct_gpu:multiproduct",

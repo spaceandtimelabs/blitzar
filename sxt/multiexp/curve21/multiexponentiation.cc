@@ -79,8 +79,8 @@ static xena::future<> async_compute_multiexponentiation_impl(
   product_sizes.shrink(static_cast<size_t>(std::distance(product_sizes.begin(), last)));
   memmg::managed_array<c21t::element_p3> products_p(product_sizes.size());
   xendv::synchronize_event(stream, generators_event);
-  co_await mtxcrv::async_compute_multiproduct<c21t::element_p3>(products_p, stream, generators_event.value(), indexes,
-                                                                product_sizes, is_signed);
+  co_await mtxcrv::async_compute_multiproduct<c21t::element_p3>(
+      products_p, stream, generators_event.value(), indexes, product_sizes, is_signed);
   mtxcrv::fold_multiproducts<c21t::element_p3>(products, or_all, products_p, or_all_p);
 }
 
