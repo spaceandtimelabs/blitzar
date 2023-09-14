@@ -1,9 +1,4 @@
-# load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library", "cuda_test")
-load(
-    "@rules_cuda//cuda:defs.bzl",
-    "cuda_library",
-    "cuda_objects",
-)
+load("@rules_cuda//cuda:defs.bzl", "cuda_library", "cuda_objects")
 
 # We add this -std=c++20 flag, because
 # benchmarks could not be compiled without it.
