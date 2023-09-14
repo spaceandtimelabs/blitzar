@@ -4,28 +4,8 @@ load(
 )
 
 sxt_cc_component(
-    name = "multiproduct",
-    impl_deps = [
-        "//sxt/base/macro:cuda_callable",
-        "//sxt/algorithm/base:gather_mapper",
-        "//sxt/curve21/operation:accumulator",
-        "//sxt/curve21/operation:neg",
-        "//sxt/execution/async:future",
-        "//sxt/multiexp/multiproduct_gpu:multiproduct",
-    ],
-    is_cuda = True,
-    with_test = False,
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/base/type:raw_stream",
-        "//sxt/execution/async:future_fwd",
-    ],
-)
-
-sxt_cc_component(
     name = "multiexponentiation",
     impl_deps = [
-        ":multiproduct",
         ":pippenger_multiproduct_solver",
         "//sxt/base/container:blob_array",
         "//sxt/curve21/operation:accumulator",
@@ -33,6 +13,7 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/curve:multiexponentiation_cpu_driver",
+        "//sxt/multiexp/curve:multiproduct",
         "//sxt/multiexp/curve:multiproducts_combination",
         "//sxt/multiexp/pippenger:multiexponentiation",
         "//sxt/base/device:memory_utility",
@@ -89,6 +70,7 @@ sxt_cc_component(
         "//sxt/execution/async:future",
     ],
     deps = [
+        "//sxt/curve21/operation:accumulator",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
         "//sxt/curve21/operation:neg",
