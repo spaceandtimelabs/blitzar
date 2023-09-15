@@ -5,7 +5,15 @@ load(
 
 sxt_cc_component(
     name = "accumulator",
-    with_test = False,
+    test_deps = [
+        "//sxt/algorithm/base:reducer",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
+        "//sxt/curve21/operation:neg",
+        "//sxt/curve21/operation:overload",
+        "//sxt/curve21/type:element_p3",
+    ],
     deps = [
         "//sxt/base/curve:element",
         "//sxt/base/macro:cuda_callable",

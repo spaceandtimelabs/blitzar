@@ -8,7 +8,6 @@ sxt_cc_component(
     impl_deps = [
         ":pippenger_multiproduct_solver",
         "//sxt/base/container:blob_array",
-        "//sxt/curve21/operation:accumulator",
         "//sxt/execution/async:future",
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",

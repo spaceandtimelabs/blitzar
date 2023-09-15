@@ -4,20 +4,6 @@ load(
 )
 
 sxt_cc_component(
-    name = "accumulator",
-    test_deps = [
-        ":overload",
-        "//sxt/algorithm/base:reducer",
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        ":add",
-        "//sxt/base/macro:cuda_callable",
-        "//sxt/curve21/type:element_p3",
-    ],
-)
-
-sxt_cc_component(
     name = "add",
     impl_deps = [
         "//sxt/field51/type:element",
