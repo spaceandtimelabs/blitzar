@@ -16,13 +16,13 @@
  */
 #pragma once
 
-#include "sxt/algorithm/base/accumulator.h"
 #include "sxt/algorithm/base/gather_mapper.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/async/future_fwd.h"
+#include "sxt/multiexp/curve/accumulator.h"
 #include "sxt/multiexp/multiproduct_gpu/multiproduct.h"
 
 namespace sxt::mtxcrv {
@@ -68,10 +68,10 @@ async_compute_multiproduct(basct::span<Element> products, const basdv::stream& s
                            basct::cspan<unsigned> product_sizes, bool is_signed) noexcept {
   if (!is_signed) {
     using Mapper = algb::gather_mapper<Element>;
-    return mtxmpg::compute_multiproduct<algb::accumulator<Element>, Mapper>(
-        products, stream, generators, indexes, product_sizes);
+    return mtxmpg::compute_multiproduct<accumulator<Element>, Mapper>(products, stream, generators,
+                                                                      indexes, product_sizes);
   }
-  return mtxmpg::compute_multiproduct<algb::accumulator<Element>, signed_mapper<Element>>(
+  return mtxmpg::compute_multiproduct<accumulator<Element>, signed_mapper<Element>>(
       products, stream, generators, indexes, product_sizes);
 }
 } // namespace sxt::mtxcrv

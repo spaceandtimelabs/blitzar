@@ -14,4 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/algorithm/base/accumulator.h"
+#include "sxt/multiexp/curve/accumulator.h"

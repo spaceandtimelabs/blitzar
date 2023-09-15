@@ -4,14 +4,6 @@ load(
 )
 
 sxt_cc_component(
-    name = "accumulator",
-    with_test = False,
-    deps = [
-        "//sxt/base/macro:cuda_callable",
-    ],
-)
-
-sxt_cc_component(
     name = "index_functor",
     with_test = False,
 )

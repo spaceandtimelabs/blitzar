@@ -16,16 +16,19 @@
  */
 #pragma once
 
+#include "sxt/base/curve/element.h"
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::algb {
+namespace sxt::mtxcrv {
 //--------------------------------------------------------------------------------------------------
 // accumulator
 //--------------------------------------------------------------------------------------------------
-template <class T> class accumulator {
+template <bascrv::element Element> class accumulator {
 public:
-  using value_type = T;
+  using value_type = Element;
 
-  CUDA_CALLABLE static void accumulate_inplace(T& res, T& e) noexcept { add_inplace(res, e); }
+  CUDA_CALLABLE static void accumulate_inplace(Element& res, Element& e) noexcept {
+    add_inplace(res, e);
+  }
 };
-} // namespace sxt::algb
+} // namespace sxt::mtxcrv
