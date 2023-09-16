@@ -34,10 +34,6 @@ void decompose_generator_fold(basct::span<unsigned>& res, const s25t::element& m
   SXT_DEBUG_ASSERT(res.size() == s25cn::max_bits_v);
   size_t bit_index = 0;
 
-  // workaround for clang bug
-  // see https://github.com/llvm/llvm-project/issues/66568
-  volatile auto data = res.data();
-
   for (size_t i = 0; i < 4; ++i) {
     uint64_t x, y;
     std::memcpy(&x, reinterpret_cast<const char*>(&m_low) + sizeof(uint64_t) * i, sizeof(uint64_t));
@@ -45,8 +41,8 @@ void decompose_generator_fold(basct::span<unsigned>& res, const s25t::element& m
                 sizeof(uint64_t));
     auto m = std::min(s25cn::max_bits_v - bit_index, 64ul);
     for (size_t bit_offset = 0; bit_offset < m; ++bit_offset) {
-      auto mask = 1ull << bit_index;
-      data[bit_index++] =
+      auto mask = 1ull << (bit_index - i * 64);
+      res[bit_index++] =
           static_cast<unsigned>((x & mask) != 0) + 2u * static_cast<unsigned>((y & mask) != 0);
     }
   }
