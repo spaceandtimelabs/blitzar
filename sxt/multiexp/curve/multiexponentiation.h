@@ -30,11 +30,9 @@
 #include "sxt/base/iterator/index_range.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/async/future_fwd.h"
 #include "sxt/execution/device/device_viewable.h"
 #include "sxt/execution/device/for_each.h"
 #include "sxt/memory/management/managed_array.h"
-#include "sxt/memory/management/managed_array_fwd.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
@@ -44,10 +42,6 @@
 #include "sxt/multiexp/curve/pippenger_multiproduct_solver.h"
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
 #include "sxt/multiexp/pippenger/multiproduct_decomposition_gpu.h"
-
-namespace sxt::mtxb {
-struct exponent_sequence;
-}
 
 namespace sxt::mtxcrv {
 //--------------------------------------------------------------------------------------------------
