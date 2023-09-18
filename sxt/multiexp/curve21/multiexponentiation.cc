@@ -26,6 +26,9 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/iterator/index_range.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
@@ -38,7 +41,7 @@
 #include "sxt/multiexp/curve/multiexponentiation_cpu_driver.h"
 #include "sxt/multiexp/curve/multiproduct.h"
 #include "sxt/multiexp/curve/multiproducts_combination.h"
-#include "sxt/multiexp/curve21/pippenger_multiproduct_solver.h"
+#include "sxt/multiexp/curve/pippenger_multiproduct_solver.h"
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
 #include "sxt/multiexp/pippenger/multiproduct_decomposition_gpu.h"
 
@@ -123,7 +126,7 @@ static xena::future<> async_compute_multiexponentiation_partial(
 memmg::managed_array<c21t::element_p3>
 compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
                             basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
-  pippenger_multiproduct_solver solver;
+  mtxcrv::pippenger_multiproduct_solver<c21t::element_p3> solver;
   mtxcrv::multiexponentiation_cpu_driver<c21t::element_p3> driver{&solver};
   // Note: the cpu driver is non-blocking so that the future upon return the future is
   // available
