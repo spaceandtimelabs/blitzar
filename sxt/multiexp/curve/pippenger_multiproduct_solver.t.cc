@@ -14,10 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/curve21/pippenger_multiproduct_solver.h"
+#include "sxt/multiexp/curve/pippenger_multiproduct_solver.h"
 
 #include "sxt/base/container/blob_array.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/operation/overload.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
@@ -25,12 +28,12 @@
 #include "sxt/ristretto/type/literal.h"
 
 using namespace sxt;
-using namespace sxt::mtxc21;
+using namespace sxt::mtxcrv;
 using sxt::rstt::operator""_rs;
 
 TEST_CASE("we can use pippenger's algorithm to solve the multiproduct subproblem in "
           "multiexponentiation") {
-  pippenger_multiproduct_solver solver;
+  pippenger_multiproduct_solver<c21t::element_p3> solver;
 
   SECTION("we handle the empty case") {
     mtxi::index_table products;
