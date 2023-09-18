@@ -19,12 +19,15 @@
 #include <vector>
 
 #include "sxt/base/error/assert.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/multiexp/curve21/multiexponentiation.h"
+#include "sxt/multiexp/curve/multiexponentiation.h"
 #include "sxt/proof/inner_product/gpu_driver.h"
 #include "sxt/proof/inner_product/proof_computation.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
@@ -54,7 +57,8 @@ static void pre_initialize_gpu() noexcept {
           .data = data.data(),
       },
   };
-  auto fut = mtxc21::async_compute_multiexponentiation(generators, value_sequences);
+  auto fut =
+      mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(generators, value_sequences);
   xens::get_scheduler().run();
 }
 
@@ -69,7 +73,8 @@ gpu_backend::gpu_backend() noexcept { pre_initialize_gpu(); }
 void gpu_backend::compute_commitments(basct::span<rstt::compressed_element> commitments,
                                       basct::cspan<mtxb::exponent_sequence> value_sequences,
                                       basct::cspan<c21t::element_p3> generators) const noexcept {
-  auto fut = mtxc21::async_compute_multiexponentiation(generators, value_sequences);
+  auto fut =
+      mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(generators, value_sequences);
   xens::get_scheduler().run();
   rsto::batch_compress(commitments, fut.value());
 }

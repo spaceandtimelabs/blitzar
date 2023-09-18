@@ -14,27 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/curve21/multiexponentiation.h"
+#pragma once
 
 #include <algorithm>
 #include <iterator>
 #include <optional>
 
 #include "sxt/base/container/blob_array.h"
+#include "sxt/base/container/span.h"
+#include "sxt/base/curve/element.h"
 #include "sxt/base/device/event.h"
 #include "sxt/base/device/event_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/iterator/index_range.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/operation/double.h"
-#include "sxt/curve21/operation/neg.h"
-#include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/async/future_fwd.h"
 #include "sxt/execution/device/device_viewable.h"
 #include "sxt/execution/device/for_each.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/management/managed_array_fwd.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
@@ -45,13 +45,18 @@
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
 #include "sxt/multiexp/pippenger/multiproduct_decomposition_gpu.h"
 
-namespace sxt::mtxc21 {
+namespace sxt::mtxb {
+struct exponent_sequence;
+}
+
+namespace sxt::mtxcrv {
 //--------------------------------------------------------------------------------------------------
 // async_compute_multiexponentiation_impl
 //--------------------------------------------------------------------------------------------------
+template <bascrv::element Element>
 static xena::future<> async_compute_multiexponentiation_impl(
-    memmg::managed_array<c21t::element_p3>& products, basct::span<uint8_t> or_all,
-    const xendv::event_future<basct::cspan<c21t::element_p3>>& generators_event,
+    memmg::managed_array<Element>& products, basct::span<uint8_t> or_all,
+    const xendv::event_future<basct::cspan<Element>>& generators_event,
     mtxb::exponent_sequence exponents) noexcept {
   auto num_bytes = exponents.element_nbytes;
   basdv::stream stream;
@@ -80,24 +85,24 @@ static xena::future<> async_compute_multiexponentiation_impl(
   // compute multiproduct
   auto last = std::remove(product_sizes.begin(), product_sizes.end(), 0u);
   product_sizes.shrink(static_cast<size_t>(std::distance(product_sizes.begin(), last)));
-  memmg::managed_array<c21t::element_p3> products_p(product_sizes.size());
+  memmg::managed_array<Element> products_p(product_sizes.size());
   xendv::synchronize_event(stream, generators_event);
-  co_await mtxcrv::async_compute_multiproduct<c21t::element_p3>(
-      products_p, stream, generators_event.value(), indexes, product_sizes, is_signed);
-  mtxcrv::fold_multiproducts<c21t::element_p3>(products, or_all, products_p, or_all_p);
+  co_await async_compute_multiproduct<Element>(products_p, stream, generators_event.value(),
+                                               indexes, product_sizes, is_signed);
+  fold_multiproducts<Element>(products, or_all, products_p, or_all_p);
 }
 
 //--------------------------------------------------------------------------------------------------
 // async_compute_multiexponentiation_partial
 //--------------------------------------------------------------------------------------------------
+template <bascrv::element Element>
 static xena::future<> async_compute_multiexponentiation_partial(
-    basct::span<basct::blob_array> or_alls,
-    basct::span<memmg::managed_array<c21t::element_p3>> products,
-    basct::cspan<c21t::element_p3> generators, basct::cspan<mtxb::exponent_sequence> exponents,
+    basct::span<basct::blob_array> or_alls, basct::span<memmg::managed_array<Element>> products,
+    basct::cspan<Element> generators, basct::cspan<mtxb::exponent_sequence> exponents,
     basit::index_range rng) noexcept {
   auto num_outputs = or_alls.size();
   // set up generators
-  memmg::managed_array<c21t::element_p3> generators_data{memr::get_device_resource()};
+  memmg::managed_array<Element> generators_data{memr::get_device_resource()};
   auto generators_event = xendv::make_active_device_viewable(
       generators_data,
       generators.subspan(static_cast<size_t>(rng.a()), static_cast<size_t>(rng.size())));
@@ -123,26 +128,28 @@ static xena::future<> async_compute_multiexponentiation_partial(
 //--------------------------------------------------------------------------------------------------
 // compute_multiexponentiation
 //--------------------------------------------------------------------------------------------------
-memmg::managed_array<c21t::element_p3>
-compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
+template <bascrv::element Element>
+memmg::managed_array<Element>
+compute_multiexponentiation(basct::cspan<Element> generators,
                             basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
-  mtxcrv::pippenger_multiproduct_solver<c21t::element_p3> solver;
-  mtxcrv::multiexponentiation_cpu_driver<c21t::element_p3> driver{&solver};
+  pippenger_multiproduct_solver<Element> solver;
+  multiexponentiation_cpu_driver<Element> driver{&solver};
   // Note: the cpu driver is non-blocking so that the future upon return the future is
   // available
-  return mtxpi::compute_multiexponentiation(driver,
-                                            {static_cast<const void*>(generators.data()),
-                                             generators.size(), sizeof(c21t::element_p3)},
-                                            exponents)
+  return mtxpi::compute_multiexponentiation(
+             driver,
+             {static_cast<const void*>(generators.data()), generators.size(), sizeof(Element)},
+             exponents)
       .value()
-      .as_array<c21t::element_p3>();
+      .template as_array<Element>();
 }
 
 //--------------------------------------------------------------------------------------------------
 // async_compute_multiexponentiation
 //--------------------------------------------------------------------------------------------------
-xena::future<memmg::managed_array<c21t::element_p3>>
-async_compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
+template <bascrv::element Element>
+xena::future<memmg::managed_array<Element>>
+async_compute_multiexponentiation(basct::cspan<Element> generators,
                                   basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   auto num_outputs = exponents.size();
   std::vector<basct::blob_array> or_alls;
@@ -150,23 +157,24 @@ async_compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
   for (auto& exponent_sequence : exponents) {
     or_alls.emplace_back(1, exponent_sequence.element_nbytes);
   }
-  std::vector<memmg::managed_array<c21t::element_p3>> products(num_outputs);
+  std::vector<memmg::managed_array<Element>> products(num_outputs);
   co_await xendv::concurrent_for_each(basit::index_range{0, generators.size()},
                                       [&](const basit::index_range& rng) noexcept {
-                                        return async_compute_multiexponentiation_partial(
+                                        return async_compute_multiexponentiation_partial<Element>(
                                             or_alls, products, generators, exponents, rng);
                                       });
-  memmg::managed_array<c21t::element_p3> res(num_outputs);
+  memmg::managed_array<Element> res(num_outputs);
   for (size_t i = 0; i < num_outputs; ++i) {
-    mtxcrv::combine_multiproducts<c21t::element_p3>({&res[i], 1}, or_alls[i], products[i]);
+    combine_multiproducts<Element>({&res[i], 1}, or_alls[i], products[i]);
   }
   co_return res;
 }
 
-xena::future<c21t::element_p3>
-async_compute_multiexponentiation(basct::cspan<c21t::element_p3> generators,
+template <bascrv::element Element>
+xena::future<Element>
+async_compute_multiexponentiation(basct::cspan<Element> generators,
                                   const mtxb::exponent_sequence& exponents) noexcept {
-  auto res = co_await async_compute_multiexponentiation(generators, {&exponents, 1});
+  auto res = co_await async_compute_multiexponentiation<Element>(generators, {&exponents, 1});
   co_return res[0];
 }
-} // namespace sxt::mtxc21
+} // namespace sxt::mtxcrv
