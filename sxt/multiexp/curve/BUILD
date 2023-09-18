@@ -158,3 +158,29 @@ sxt_cc_component(
         "//sxt/multiexp/index:index_table",
     ],
 )
+
+sxt_cc_component(
+    name = "pippenger_multiproduct_solver",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
+        "//sxt/curve21/operation:neg",
+        "//sxt/curve21/operation:overload",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/ristretto/type:literal",
+    ],
+    deps = [
+        ":multiproduct_cpu_driver",
+        ":multiproduct_solver",
+        "//sxt/base/container:blob_array",
+        "//sxt/base/curve:element",
+        "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/base:generator_utility",
+        "//sxt/multiexp/index:index_table",
+        "//sxt/multiexp/index:reindex",
+        "//sxt/multiexp/pippenger_multiprod:active_offset",
+        "//sxt/multiexp/pippenger_multiprod:multiproduct",
+    ],
+)
