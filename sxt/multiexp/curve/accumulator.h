@@ -16,25 +16,19 @@
  */
 #pragma once
 
-#include "sxt/base/container/span.h"
-#include "sxt/execution/async/future_fwd.h"
+#include "sxt/base/curve/element.h"
+#include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::c21t {
-struct element_p3;
-}
-
-namespace sxt::basdv {
-class stream;
-}
-
-namespace sxt::mtxc21 {
+namespace sxt::mtxcrv {
 //--------------------------------------------------------------------------------------------------
-// async_compute_multiproduct
+// accumulator
 //--------------------------------------------------------------------------------------------------
-xena::future<> async_compute_multiproduct(basct::span<c21t::element_p3> products,
-                                          const basdv::stream& stream,
-                                          basct::cspan<c21t::element_p3> generators,
-                                          basct::cspan<unsigned> indexes,
-                                          basct::cspan<unsigned> product_sizes,
-                                          bool is_signed) noexcept;
-} // namespace sxt::mtxc21
+template <bascrv::element Element> class accumulator {
+public:
+  using value_type = Element;
+
+  CUDA_CALLABLE static void accumulate_inplace(Element& res, Element& e) noexcept {
+    add_inplace(res, e);
+  }
+};
+} // namespace sxt::mtxcrv

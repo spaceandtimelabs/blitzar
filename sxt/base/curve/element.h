@@ -27,6 +27,7 @@ concept element = requires(T& res, const T& e) {
   double_element(res, e);
   add(res, e, e);
   neg(res, e);
+  add_inplace(res, res);
   { T::identity() } noexcept -> std::same_as<T>;
   mark(res);
   { is_marked(e) } noexcept -> std::same_as<bool>;

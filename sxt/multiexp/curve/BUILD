@@ -4,6 +4,23 @@ load(
 )
 
 sxt_cc_component(
+    name = "accumulator",
+    test_deps = [
+        "//sxt/algorithm/base:reducer",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
+        "//sxt/curve21/operation:neg",
+        "//sxt/curve21/operation:overload",
+        "//sxt/curve21/type:element_p3",
+    ],
+    deps = [
+        "//sxt/base/curve:element",
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
     name = "doubling_reduction",
     test_deps = [
         "//sxt/curve21/operation:add",
@@ -52,6 +69,21 @@ sxt_cc_component(
     with_test = False,
     deps = [
         "//sxt/base/curve:element",
+    ],
+)
+
+sxt_cc_component(
+    name = "multiproduct",
+    with_test = False,
+    deps = [
+        ":accumulator",
+        "//sxt/algorithm/base:gather_mapper",
+        "//sxt/base/container:span",
+        "//sxt/base/macro:cuda_callable",
+        "//sxt/base/type:raw_stream",
+        "//sxt/execution/async:future",
+        "//sxt/execution/async:future_fwd",
+        "//sxt/multiexp/multiproduct_gpu:multiproduct",
     ],
 )
 
