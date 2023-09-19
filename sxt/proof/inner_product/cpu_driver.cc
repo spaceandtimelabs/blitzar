@@ -22,11 +22,13 @@
 
 #include "sxt/base/error/assert.h"
 #include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/multiexp/curve21/multiexponentiation.h"
+#include "sxt/multiexp/curve/multiexponentiation.h"
 #include "sxt/proof/inner_product/cpu_workspace.h"
 #include "sxt/proof/inner_product/fold.h"
 #include "sxt/proof/inner_product/generator_fold.h"
@@ -68,7 +70,7 @@ static void multiexponentiate(c21t::element_p3& res, basct::cspan<c21t::element_
       .data = reinterpret_cast<const uint8_t*>(x_vector.data()),
       .is_signed = 0,
   };
-  auto values = mtxc21::compute_multiexponentiation(
+  auto values = mtxcrv::compute_multiexponentiation<c21t::element_p3>(
       g_vector, basct::cspan<mtxb::exponent_sequence>{&exponents, 1});
   res = values[0];
 }
@@ -90,7 +92,7 @@ static void multiexponentiate(c21t::element_p3 c_commits[2], const c21t::element
           .is_signed = 0,
       },
   };
-  auto values = mtxc21::compute_multiexponentiation({&q_value, 1}, exponents);
+  auto values = mtxcrv::compute_multiexponentiation<c21t::element_p3>({&q_value, 1}, exponents);
   c_commits[0] = values[0];
   c_commits[1] = values[1];
 }
@@ -262,7 +264,8 @@ xena::future<void> cpu_driver::compute_expected_commitment(
       .n = num_exponents,
       .data = reinterpret_cast<const uint8_t*>(exponents.data()),
   };
-  auto commits = mtxc21::compute_multiexponentiation(generators, {&exponent_sequence, 1});
+  auto commits =
+      mtxcrv::compute_multiexponentiation<c21t::element_p3>(generators, {&exponent_sequence, 1});
   rsto::compress(commit, commits[0]);
 
   return xena::make_ready_future();

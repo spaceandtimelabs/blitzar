@@ -40,6 +40,42 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "multiexponentiation",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
+        "//sxt/curve21/operation:neg",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/multiexp/test:multiexponentiation",
+    ],
+    deps = [
+        ":multiexponentiation_cpu_driver",
+        ":multiproduct",
+        ":multiproducts_combination",
+        ":pippenger_multiproduct_solver",
+        "//sxt/base/container:blob_array",
+        "//sxt/base/container:span",
+        "//sxt/base/device:event",
+        "//sxt/base/device:event_utility",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/iterator:index_range",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/execution/device:device_viewable",
+        "//sxt/execution/device:for_each",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:device_resource",
+        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/multiexp/pippenger:multiexponentiation",
+        "//sxt/multiexp/pippenger:multiproduct_decomposition_gpu",
+    ],
+)
+
+sxt_cc_component(
     name = "multiexponentiation_cpu_driver",
     test_deps = [
         ":naive_multiproduct_solver",

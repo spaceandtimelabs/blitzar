@@ -20,6 +20,8 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
@@ -28,7 +30,7 @@
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/base/exponent_sequence_utility.h"
-#include "sxt/multiexp/curve21/multiexponentiation.h"
+#include "sxt/multiexp/curve/multiexponentiation.h"
 #include "sxt/proof/inner_product/cpu_driver.h"
 #include "sxt/proof/inner_product/generator_fold.h"
 #include "sxt/proof/inner_product/generator_fold_kernel.h"
@@ -51,7 +53,7 @@ static xena::future<void> commit_to_fold_partial(rstt::compressed_element& commi
                                                  const c21t::element_p3& q_value,
                                                  basct::cspan<s25t::element> u_vector,
                                                  basct::cspan<s25t::element> v_vector) noexcept {
-  auto u_commit_fut = mtxc21::async_compute_multiexponentiation(
+  auto u_commit_fut = mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(
       g_vector.subspan(0, u_vector.size()), mtxb::to_exponent_sequence(u_vector));
   auto product_fut = s25o::async_inner_product(u_vector, v_vector);
   c21t::element_p3 commit_p;
@@ -227,7 +229,7 @@ xena::future<void> gpu_driver::compute_expected_commitment(
 
   // commitment
   co_await std::move(fut);
-  auto commit_p = co_await mtxc21::async_compute_multiexponentiation(
+  auto commit_p = co_await mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(
       generators, mtxb::to_exponent_sequence(exponents));
   rsto::compress(commit, commit_p);
 }
