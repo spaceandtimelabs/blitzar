@@ -34,8 +34,9 @@ __global__ void bucket_accumulate(typename Reducer::value_type* bucket_sums,
   auto generator_index = block_index * num_generators_per_block;
   auto generator_last = min(generator_index + num_generators_per_block, num_generators);
 
-  bucket_sums +=
-      bucket_size * scalar_byte_index + bucket_size * num_buckets_per_generator * output_index;
+  bucket_sums += bucket_size * scalar_byte_index +
+                 bucket_size * num_buckets_per_generator * block_index +
+                 bucket_size * num_buckets_per_generator * num_blocks * output_index;
 
   for (int i=0; i<bucket_size; ++i) {
     bucket_sums[i] = Reducer::identity();
