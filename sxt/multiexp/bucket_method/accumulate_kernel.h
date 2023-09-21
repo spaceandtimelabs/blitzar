@@ -23,6 +23,7 @@ __global__ void bucket_accumulate(typename Reducer::value_type* bucket_sums,
   auto num_blocks = gridDim.x;
   auto output_index = blockDim.y;
   auto num_buckets_per_generator = blockDim.x;
+  static constexpr int bucket_size = 255;
 
   for (unsigned i=0; i<output_index; ++i) {
     scalars += *lengths++ * scalar_num_bytes;
@@ -33,11 +34,13 @@ __global__ void bucket_accumulate(typename Reducer::value_type* bucket_sums,
   auto generator_index = block_index * num_generators_per_block;
   auto generator_last = min(generator_index + num_generators_per_block, num_generators);
 
-  T g;
-  T sums[255];
-  for (auto& elem : sums) {
-    elem = T::identity();
+  bucket_sums +=
+      bucket_size * scalar_byte_index + bucket_size * num_buckets_per_generator * output_index;
+
+  for (int i=0; i<bucket_size; ++i) {
+    bucket_sums[i] = T::identity();
   }
+  T g;
   for (; generator_index<generator_last; ++generator_index) {
     generator_mapper.map_index(g, generator_index);
     auto scalar = scalars + generator_index * scalar_num_bytes;
@@ -45,13 +48,7 @@ __global__ void bucket_accumulate(typename Reducer::value_type* bucket_sums,
     if (val == 0) {
       continue;
     }
-    Reducer::accumulate_inplace(sums[val-1], g);
+    Reducer::accumulate_inplace(bucket_sums[val-1], g);
   }
-  (void)num_blocks;
-  (void)num_buckets_per_generator;
-
-  (void)bucket_sums;
-  (void)scalars;
-  (void)num_generators;
 }
 } // namespace sxt::mtxbk
