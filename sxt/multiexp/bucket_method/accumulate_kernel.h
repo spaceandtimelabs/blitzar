@@ -38,14 +38,16 @@ __global__ void bucket_accumulate(typename Reducer::value_type* bucket_sums,
                  bucket_size * num_buckets_per_generator * block_index +
                  bucket_size * num_buckets_per_generator * num_blocks * output_index;
 
+  scalars += scalar_byte_index + generator_index * scalar_num_bytes;
+
   for (int i=0; i<bucket_size; ++i) {
     bucket_sums[i] = Reducer::identity();
   }
   T g;
   for (; generator_index<generator_last; ++generator_index) {
     generator_mapper.map_index(g, generator_index);
-    auto scalar = scalars + generator_index * scalar_num_bytes;
-    auto val = scalar[scalar_byte_index];
+    auto val = *scalars;
+    scalars += scalar_num_bytes;
     if (val == 0) {
       continue;
     }
