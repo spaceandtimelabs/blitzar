@@ -43,13 +43,14 @@ def sxt_cc_component(
         ] + deps + test_deps
         cuda_library(
             name = test_lib,
-            copts = sxt_copts(),
+            copts = sxt_copts() + copts,
             deps = [
                 ":" + name,
             ] + test_deps,
             srcs = [
                 name + ".t.cc",
             ],
+            alwayslink = 1,
             rdc = True,
         )
         native.cc_test(
