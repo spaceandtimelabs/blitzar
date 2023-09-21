@@ -23,6 +23,7 @@
 #include "sxt/scalar25/operation/muladd.h"
 #include "sxt/scalar25/operation/product_mapper.h"
 #include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/constant/zero.h"
 
 namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
@@ -30,6 +31,8 @@ namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
 struct accumulator {
   using value_type = s25t::element;
+
+  static constexpr value_type identity() noexcept { return s25cn::zero_v; }
 
   CUDA_CALLABLE static void accumulate_inplace(s25t::element& res, s25t::element& e,
                                                product_mapper mapper, unsigned int index) noexcept {

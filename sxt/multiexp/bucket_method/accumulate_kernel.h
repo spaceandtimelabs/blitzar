@@ -38,7 +38,7 @@ __global__ void bucket_accumulate(typename Reducer::value_type* bucket_sums,
       bucket_size * scalar_byte_index + bucket_size * num_buckets_per_generator * output_index;
 
   for (int i=0; i<bucket_size; ++i) {
-    bucket_sums[i] = T::identity();
+    bucket_sums[i] = Reducer::identity();
   }
   T g;
   for (; generator_index<generator_last; ++generator_index) {

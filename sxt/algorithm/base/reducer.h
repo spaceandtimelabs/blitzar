@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <concepts>
+
 namespace sxt::algb {
 //--------------------------------------------------------------------------------------------------
 // reducer
@@ -26,6 +28,7 @@ namespace sxt::algb {
  */
 template <class R>
 concept reducer = requires(typename R::value_type& x, typename R::value_type& z) {
+  { R::identity() } noexcept -> std::convertible_to<typename R::value_type>;
   { R::accumulate_inplace(x, z) } noexcept;
 };
 } // namespace sxt::algb

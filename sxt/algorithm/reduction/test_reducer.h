@@ -27,6 +27,10 @@ namespace sxt::algr {
 struct test_add_reducer {
   using value_type = uint64_t;
 
+  static constexpr uint64_t identity() noexcept {
+    return 0;
+  }
+
   template <class T> static inline CUDA_CALLABLE void accumulate(T& res, uint64_t x) noexcept {
     res = res + x;
   }
