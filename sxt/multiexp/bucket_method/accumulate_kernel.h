@@ -15,7 +15,7 @@ template <algb::reducer Reducer, algb::mapper Mapper>
   requires std::same_as<typename Reducer::value_type, typename Mapper::value_type>
 __global__ void bucket_accumulate(typename Reducer::value_type* bucket_sums,
                                   Mapper generator_mapper, const uint8_t* scalars,
-                                  const unsigned* lengths) {
+                                  unsigned length) {
   using T = typename Reducer::value_type;
   auto block_index = blockIdx.x;
   auto scalar_byte_index = threadIdx.x;
@@ -25,11 +25,8 @@ __global__ void bucket_accumulate(typename Reducer::value_type* bucket_sums,
   auto num_buckets_per_generator = blockDim.x;
   static constexpr int bucket_size = 255;
 
-  for (unsigned i=0; i<output_index; ++i) {
-    scalars += *lengths++ * scalar_num_bytes;
-  }
-
-  auto num_generators = *lengths;
+  scalars += length * scalar_num_bytes * output_index;
+  auto num_generators = length;
   auto num_generators_per_block = basn::divide_up(num_generators, num_blocks);
   auto generator_index = block_index * num_generators_per_block;
   auto generator_last = min(generator_index + num_generators_per_block, num_generators);

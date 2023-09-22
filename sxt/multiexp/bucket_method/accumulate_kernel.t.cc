@@ -13,13 +13,11 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
   memmg::managed_array<uint64_t> bucket_sums(255, memr::get_managed_device_resource());
   memmg::managed_array<uint8_t> scalars(memr::get_managed_device_resource());
   memmg::managed_array<uint64_t> generators(memr::get_managed_device_resource());
-  memmg::managed_array<unsigned> lengths(memr::get_managed_device_resource());
 
   SECTION("we handle the empty case") {
-    lengths = {0};
     bucket_accumulate<algr::test_add_reducer><<<1, 1>>>(bucket_sums.data(),
                                                         algb::identity_mapper{generators.data()},
-                                                        scalars.data(), lengths.data());
+                                                        scalars.data(), 0);
     basdv::synchronize_device();
     for (unsigned i = 0; i < bucket_sums.size(); ++i) {
       REQUIRE(bucket_sums[i] == 0);
@@ -28,11 +26,10 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
 
   SECTION("we handle an accumulation with a single element") {
     scalars = {2};
-    lengths = {1};
     generators = {123};
     bucket_accumulate<algr::test_add_reducer><<<1, 1>>>(bucket_sums.data(),
                                                         algb::identity_mapper{generators.data()},
-                                                        scalars.data(), lengths.data());
+                                                        scalars.data(), 1);
     basdv::synchronize_device();
     for (unsigned i=0; i<bucket_sums.size(); ++i) {
       if (i + 1 != scalars[0]) {
@@ -45,11 +42,9 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
 
   SECTION("we ignore zero scalars") {
     scalars = {0};
-    lengths = {1};
     generators = {123};
-    bucket_accumulate<algr::test_add_reducer><<<1, 1>>>(bucket_sums.data(),
-                                                        algb::identity_mapper{generators.data()},
-                                                        scalars.data(), lengths.data());
+    bucket_accumulate<algr::test_add_reducer>
+        <<<1, 1>>>(bucket_sums.data(), algb::identity_mapper{generators.data()}, scalars.data(), 1);
     basdv::synchronize_device();
     for (unsigned i = 0; i < bucket_sums.size(); ++i) {
       REQUIRE(bucket_sums[i] == 0);
