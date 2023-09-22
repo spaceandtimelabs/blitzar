@@ -11,7 +11,7 @@ namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 // bucket_accumulate
 //--------------------------------------------------------------------------------------------------
-template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Mapper>
+template <algb::reducer Reducer, algb::mapper Mapper>
   requires std::same_as<typename Reducer::value_type, typename Mapper::value_type>
 __global__ void bucket_accumulate(typename Reducer::value_type* bucket_sums,
                                   Mapper generator_mapper, const uint8_t* scalars,
@@ -21,7 +21,7 @@ __global__ void bucket_accumulate(typename Reducer::value_type* bucket_sums,
   auto scalar_byte_index = threadIdx.x;
   auto scalar_num_bytes = blockDim.x;
   auto num_blocks = gridDim.x;
-  auto output_index = blockDim.y;
+  auto output_index = blockIdx.y;
   auto num_buckets_per_generator = blockDim.x;
   static constexpr int bucket_size = 255;
 
