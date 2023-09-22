@@ -26,13 +26,8 @@
 #include "sxt/curve_g1/operation/add.h"
 
 #include "sxt/curve_g1/operation/cmov.h"
-#include "sxt/curve_g1/operation/mul_by_3b.h"
 #include "sxt/curve_g1/property/identity.h"
 #include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/operation/add.h"
-#include "sxt/field12/operation/mul.h"
-#include "sxt/field12/operation/sub.h"
 
 namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
