@@ -29,24 +29,6 @@ struct element_affine;
 
 namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
-// add
-//--------------------------------------------------------------------------------------------------
-/*
- Algorithm 7, https://eprint.iacr.org/2015/1060.pdf
- */
-CUDA_CALLABLE
-void add(cg1t::element_p2& h, const cg1t::element_p2& p, const cg1t::element_p2& q) noexcept;
-
-//--------------------------------------------------------------------------------------------------
-// add
-//--------------------------------------------------------------------------------------------------
-/*
- Algorithm 8, https://eprint.iacr.org/2015/1060.pdf
- */
-CUDA_CALLABLE
-void add(cg1t::element_p2& h, const cg1t::element_p2& p, const cg1t::element_affine& q) noexcept;
-
-//--------------------------------------------------------------------------------------------------
 // add_inplace
 //--------------------------------------------------------------------------------------------------
 /*
@@ -90,4 +72,26 @@ CUDA_CALLABLE inline void add_inplace(cg1t::element_p2& p, cg1t::element_p2& q) 
   f12o::mul(p.Z, p.Z, t4);
   f12o::add(p.Z, p.Z, t0);
 }
+
+//--------------------------------------------------------------------------------------------------
+// add
+//--------------------------------------------------------------------------------------------------
+/*
+ Algorithm 7, https://eprint.iacr.org/2015/1060.pdf
+ */
+CUDA_CALLABLE
+void inline add(cg1t::element_p2& h, const cg1t::element_p2& p, const cg1t::element_p2& q) noexcept {
+  h = p;
+  cg1t::element_p2 q_tmp{q};
+  add_inplace(h, q_tmp);
+}
+
+//--------------------------------------------------------------------------------------------------
+// add
+//--------------------------------------------------------------------------------------------------
+/*
+ Algorithm 8, https://eprint.iacr.org/2015/1060.pdf
+ */
+CUDA_CALLABLE
+void add(cg1t::element_p2& h, const cg1t::element_p2& p, const cg1t::element_affine& q) noexcept;
 } // namespace sxt::cg1o
