@@ -21,8 +21,8 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
                                                         algb::identity_mapper{generators.data()},
                                                         scalars.data(), lengths.data());
     basdv::synchronize_device();
-    for (auto sum : bucket_sums) {
-      REQUIRE(sum == 0);
+    for (unsigned i = 0; i < bucket_sums.size(); ++i) {
+      REQUIRE(bucket_sums[i] == 0);
     }
   }
 
@@ -40,6 +40,19 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
       } else {
         REQUIRE(bucket_sums[i] == generators[0]);
       }
+    }
+  }
+
+  SECTION("we ignore zero scalars") {
+    scalars = {0};
+    lengths = {1};
+    generators = {123};
+    bucket_accumulate<algr::test_add_reducer><<<1, 1>>>(bucket_sums.data(),
+                                                        algb::identity_mapper{generators.data()},
+                                                        scalars.data(), lengths.data());
+    basdv::synchronize_device();
+    for (unsigned i = 0; i < bucket_sums.size(); ++i) {
+      REQUIRE(bucket_sums[i] == 0);
     }
   }
 }
