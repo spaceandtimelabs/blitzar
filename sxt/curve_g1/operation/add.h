@@ -32,9 +32,9 @@ namespace sxt::cg1o {
 // add_inplace
 //--------------------------------------------------------------------------------------------------
 /*
- p = p + q (q value is preserved but not const to satisfy concept requirements)
+ p = p + q
  */
-CUDA_CALLABLE inline void add_inplace(cg1t::element_p2& p, cg1t::element_p2& q) noexcept {
+CUDA_CALLABLE inline void add_inplace(cg1t::element_p2& p, const cg1t::element_p2& q) noexcept {
   f12t::element t0, t1, t2, t3, t4;
   const f12t::element px{p.X};
 
@@ -83,8 +83,7 @@ CUDA_CALLABLE
 void inline add(cg1t::element_p2& h, const cg1t::element_p2& p,
                 const cg1t::element_p2& q) noexcept {
   h = p;
-  cg1t::element_p2 q_tmp{q};
-  add_inplace(h, q_tmp);
+  add_inplace(h, q);
 }
 
 //--------------------------------------------------------------------------------------------------
