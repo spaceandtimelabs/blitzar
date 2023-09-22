@@ -19,7 +19,7 @@ __global__ void combine_partial_bucket_sums(typename Reducer::value_type* out,
   auto num_buckets_per_generator = gridDim.x;
   auto output_index = blockIdx.y;
   partial_bucket_sums += num_partial_buckets * num_buckets_per_generator * output_index;
-  partial_bucket_sums += bucket_index;
+  partial_bucket_sums += num_partial_buckets * bucket_index;
   __shared__ T shared_data[BlockSize];
   shared_data[thread_index] = partial_bucket_sums[thread_index];
   auto index = thread_index + BlockSize;
