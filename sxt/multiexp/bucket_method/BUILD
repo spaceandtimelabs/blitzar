@@ -32,6 +32,7 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/algorithm/base:reducer",
+        "//sxt/algorithm/reduction:warp_reduction",
         "//sxt/base/num:divide_up",
     ],
 )
