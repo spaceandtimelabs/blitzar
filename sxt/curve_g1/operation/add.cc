@@ -26,62 +26,10 @@
 #include "sxt/curve_g1/operation/add.h"
 
 #include "sxt/curve_g1/operation/cmov.h"
-#include "sxt/curve_g1/operation/mul_by_3b.h"
 #include "sxt/curve_g1/property/identity.h"
 #include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/operation/add.h"
-#include "sxt/field12/operation/mul.h"
-#include "sxt/field12/operation/sub.h"
 
 namespace sxt::cg1o {
-//--------------------------------------------------------------------------------------------------
-// add
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void add(cg1t::element_p2& h, const cg1t::element_p2& p, const cg1t::element_p2& q) noexcept {
-  f12t::element t0, t1, t2, t3, t4;
-  f12t::element x3, y3, z3;
-
-  f12o::mul(t0, p.X, q.X);
-  f12o::mul(t1, p.Y, q.Y);
-  f12o::mul(t2, p.Z, q.Z);
-  f12o::add(t3, p.X, p.Y);
-  f12o::add(t4, q.X, q.Y);
-  f12o::mul(t3, t3, t4);
-  f12o::add(t4, t0, t1);
-  f12o::sub(t3, t3, t4);
-  f12o::add(t4, p.Y, p.Z);
-  f12o::add(x3, q.Y, q.Z);
-  f12o::mul(t4, t4, x3);
-  f12o::add(x3, t1, t2);
-  f12o::sub(t4, t4, x3);
-  f12o::add(x3, p.X, p.Z);
-  f12o::add(y3, q.X, q.Z);
-  f12o::mul(x3, x3, y3);
-  f12o::add(y3, t0, t2);
-  f12o::sub(y3, x3, y3);
-  f12o::add(x3, t0, t0);
-  f12o::add(t0, x3, t0);
-  mul_by_3b(t2, t2);
-  f12o::add(z3, t1, t2);
-  f12o::sub(t1, t1, t2);
-  mul_by_3b(y3, y3);
-  f12o::mul(x3, t4, y3);
-  f12o::mul(t2, t3, t1);
-  f12o::sub(x3, t2, x3);
-  f12o::mul(y3, y3, t0);
-  f12o::mul(t1, t1, z3);
-  f12o::add(y3, t1, y3);
-  f12o::mul(t0, t0, t3);
-  f12o::mul(z3, z3, t4);
-  f12o::add(z3, z3, t0);
-
-  h.X = x3;
-  h.Y = y3;
-  h.Z = z3;
-}
-
 //--------------------------------------------------------------------------------------------------
 // add
 //--------------------------------------------------------------------------------------------------

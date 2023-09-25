@@ -7,13 +7,8 @@ sxt_cc_component(
     name = "add",
     impl_deps = [
         ":cmov",
-        ":mul_by_3b",
         "//sxt/curve_g1/property:identity",
         "//sxt/curve_g1/type:element_affine",
-        "//sxt/curve_g1/type:element_p2",
-        "//sxt/field12/operation:add",
-        "//sxt/field12/operation:mul",
-        "//sxt/field12/operation:sub",
     ],
     is_cuda = True,
     test_deps = [
@@ -23,12 +18,15 @@ sxt_cc_component(
         "//sxt/curve_g1/constant:identity",
         "//sxt/curve_g1/property:curve",
         "//sxt/curve_g1/property:identity",
-        "//sxt/curve_g1/type:element_p2",
-        "//sxt/field12/operation:mul",
         "//sxt/field12/type:element",
     ],
     deps = [
+        ":mul_by_3b",
         "//sxt/base/macro:cuda_callable",
+        "//sxt/curve_g1/type:element_p2",
+        "//sxt/field12/operation:add",
+        "//sxt/field12/operation:mul",
+        "//sxt/field12/operation:sub",
     ],
 )
 

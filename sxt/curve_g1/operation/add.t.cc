@@ -83,6 +83,15 @@ TEST_CASE("addition with projective elements") {
     REQUIRE(cg1p::is_on_curve(d));
     REQUIRE(c == d);
   }
+
+  SECTION("can be done inplace") {
+    cg1t::element_p2 lhs{cg1t::element_p2::identity()};
+    cg1t::element_p2 rhs{cg1cn::generator_p2_v};
+
+    add_inplace(lhs, rhs);
+
+    REQUIRE(lhs == cg1cn::generator_p2_v);
+  }
 }
 
 TEST_CASE("addition with mixed elements") {
