@@ -30,7 +30,17 @@ TEST_CASE("we can combine partial bucket sums") {
     REQUIRE(bucket_sums[0] == 579);
   }
 
-  SECTION("we handle more than one bucket") {
+  SECTION("we handle a bucket group size > 1") {
+    partial_bucket_sums = {123, 456, 7, 3};
+    bucket_sums = {0, 0};
+    combine_partial_bucket_sums<algr::test_add_reducer>
+        <<<1, 2>>>(bucket_sums.data(), partial_bucket_sums.data(), 2);
+    basdv::synchronize_device();
+    REQUIRE(bucket_sums[0] == 130);
+    REQUIRE(bucket_sums[1] == 459);
+  }
+
+  SECTION("we handle more than one bucket group") {
     partial_bucket_sums = {123, 456, 7, 3};
     bucket_sums = {0, 0};
     combine_partial_bucket_sums<algr::test_add_reducer>
