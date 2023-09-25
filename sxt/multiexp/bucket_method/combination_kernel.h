@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sxt/algorithm/base/reducer.h"
-#include "sxt/algorithm/reduction/warp_reduction.h"
+#include "sxt/base/curve/element.h"
 #include "sxt/base/num/divide_up.h"
 
 namespace sxt::mtxbk {
@@ -30,6 +30,34 @@ __global__ void combine_partial_bucket_sums(typename Reducer::value_type* out,
   for (unsigned i = 1; i < num_partial_buckets; ++i) {
     Reducer::accumulate_inplace(sum, *partial_bucket_sums);
     partial_bucket_sums += bucket_group_size * num_bucket_groups;
+  }
+
+  *out = sum;
+}
+
+//--------------------------------------------------------------------------------------------------
+// combine_bucket_groups
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T, unsigned BucketGroupSize, unsigned NumBucketGroups>
+__global__ void combine_partial_bucket_sums(T* out, T* bucket_sums) {
+  auto thread_index = threadIdx.x;
+  auto block_index = blockIdx.x;
+  auto num_threads = blockDim.x;
+  auto bucket_index = thread_index + block_index * num_threads;
+  if (bucket_index < BucketGroupSize) {
+    return;
+  }
+
+  auto output_index = blockIdx.y;
+
+  bucket_sums += bucket_index;
+  out += bucket_index + BucketGroupSize * NumBucketGroups * output_index;
+
+  unsigned i = NumBucketGroups - 1;
+  T sum = bucket_sums[(NumBucketGroups - 1) * BucketGroupSize];
+  while (i-- > 0) {
+    double_element(sum, sum);
+    add_inplace(sum, bucket_sums[BucketGroupSize * i]);
   }
 
   *out = sum;
