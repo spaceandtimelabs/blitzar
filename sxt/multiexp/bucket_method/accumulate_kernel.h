@@ -22,8 +22,8 @@ __global__ void bucket_accumulate(typename Reducer::value_type* bucket_sums,
   auto scalar_num_bytes = blockDim.x;
   auto num_blocks = gridDim.x;
   auto output_index = blockIdx.y;
-  auto num_buckets_per_generator = blockDim.x;
-  static constexpr int bucket_size = 255;
+  auto num_bucket_groups = blockDim.x;
+  static constexpr int bucket_group_size = 255;
 
   scalars += length * scalar_num_bytes * output_index;
   auto num_generators = length;
@@ -31,13 +31,13 @@ __global__ void bucket_accumulate(typename Reducer::value_type* bucket_sums,
   auto generator_index = block_index * num_generators_per_block;
   auto generator_last = min(generator_index + num_generators_per_block, num_generators);
 
-  bucket_sums += bucket_size * scalar_byte_index +
-                 bucket_size * num_buckets_per_generator * block_index +
-                 bucket_size * num_buckets_per_generator * num_blocks * output_index;
+  bucket_sums += bucket_group_size * scalar_byte_index +
+                 bucket_group_size * num_bucket_groups * block_index +
+                 bucket_group_size * num_bucket_groups * num_blocks * output_index;
 
   scalars += scalar_byte_index + generator_index * scalar_num_bytes;
 
-  for (int i=0; i<bucket_size; ++i) {
+  for (int i=0; i<bucket_group_size; ++i) {
     bucket_sums[i] = Reducer::identity();
   }
   T g;

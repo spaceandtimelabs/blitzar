@@ -15,7 +15,7 @@ TEST_CASE("we can combine partial bucket sums") {
   SECTION("we handle the case of a single bucket") {
     partial_bucket_sums = {123};
     bucket_sums = {0};
-    combine_partial_bucket_sums<algr::test_add_reducer, 1>
+    combine_partial_bucket_sums<algr::test_add_reducer>
         <<<1, 1>>>(bucket_sums.data(), partial_bucket_sums.data(), 1);
     basdv::synchronize_device();
     REQUIRE(bucket_sums[0] == 123);
@@ -24,8 +24,8 @@ TEST_CASE("we can combine partial bucket sums") {
   SECTION("we handle a bucket with two sums") {
     partial_bucket_sums = {123, 456};
     bucket_sums = {0};
-    combine_partial_bucket_sums<algr::test_add_reducer, 2>
-        <<<1, 2>>>(bucket_sums.data(), partial_bucket_sums.data(), 2);
+    combine_partial_bucket_sums<algr::test_add_reducer>
+        <<<1, 1>>>(bucket_sums.data(), partial_bucket_sums.data(), 2);
     basdv::synchronize_device();
     REQUIRE(bucket_sums[0] == 579);
   }
@@ -33,10 +33,10 @@ TEST_CASE("we can combine partial bucket sums") {
   SECTION("we handle more than one bucket") {
     partial_bucket_sums = {123, 456, 7, 3};
     bucket_sums = {0, 0};
-    combine_partial_bucket_sums<algr::test_add_reducer, 2>
-        <<<2, 2>>>(bucket_sums.data(), partial_bucket_sums.data(), 2);
+    combine_partial_bucket_sums<algr::test_add_reducer>
+        <<<2, 1>>>(bucket_sums.data(), partial_bucket_sums.data(), 2);
     basdv::synchronize_device();
-    REQUIRE(bucket_sums[0] == 579);
-    REQUIRE(bucket_sums[1] == 10);
+    REQUIRE(bucket_sums[0] == 130);
+    REQUIRE(bucket_sums[1] == 459);
   }
 }
