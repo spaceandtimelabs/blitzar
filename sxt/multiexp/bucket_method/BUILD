@@ -36,3 +36,7 @@ sxt_cc_component(
         "//sxt/base/curve:element",
     ],
 )
+
+sxt_cc_component(
+    name = "bucket_accumulation",
+)
