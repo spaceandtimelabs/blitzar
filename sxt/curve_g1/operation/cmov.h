@@ -19,8 +19,9 @@
 #include "sxt/base/macro/cuda_callable.h"
 
 namespace sxt::cg1t {
+struct element_affine;
 struct element_p2;
-}
+} // namespace sxt::cg1t
 
 namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
@@ -34,4 +35,16 @@ namespace sxt::cg1o {
  */
 CUDA_CALLABLE
 void cmov(cg1t::element_p2& f, const cg1t::element_p2& g, unsigned int b) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// cmov
+//--------------------------------------------------------------------------------------------------
+/*
+ Replace (f,g) with (g,g) if b == 1;
+ replace (f,g) with (f,g) if b == 0.
+ *
+ Preconditions: b in {0,1}.
+ */
+CUDA_CALLABLE
+void cmov(cg1t::element_affine& f, const cg1t::element_affine& g, unsigned int b) noexcept;
 } // namespace sxt::cg1o

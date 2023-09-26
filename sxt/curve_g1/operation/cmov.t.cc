@@ -18,18 +18,33 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_g1/constant/generator.h"
+#include "sxt/curve_g1/constant/identity.h"
+#include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
 
 using namespace sxt;
 using namespace sxt::cg1o;
 
-TEST_CASE("cmov returns expected perspective coordinates") {
-  cg1t::element_p2 expect_generator{cg1cn::generator_p2_v};
-  cg1t::element_p2 expect_identity{cg1t::element_p2::identity()};
+TEST_CASE("cmov returns the expected") {
+  SECTION("perspective coordinates") {
+    cg1t::element_p2 expect_generator{cg1cn::generator_p2_v};
+    cg1t::element_p2 expect_identity{cg1t::element_p2::identity()};
 
-  cg1o::cmov(expect_generator, cg1t::element_p2::identity(), 0);
-  cg1o::cmov(expect_identity, cg1t::element_p2::identity(), 1);
+    cg1o::cmov(expect_generator, cg1t::element_p2::identity(), 0);
+    cg1o::cmov(expect_identity, cg1t::element_p2::identity(), 1);
 
-  REQUIRE(expect_generator == cg1cn::generator_p2_v);
-  REQUIRE(expect_identity == cg1t::element_p2::identity());
+    REQUIRE(expect_generator == cg1cn::generator_p2_v);
+    REQUIRE(expect_identity == cg1t::element_p2::identity());
+  }
+
+  SECTION("affine coordinates") {
+    cg1t::element_affine expect_generator{cg1cn::generator_affine_v};
+    cg1t::element_affine expect_identity{cg1cn::identity_affine_v};
+
+    cg1o::cmov(expect_generator, cg1cn::identity_affine_v, 0);
+    cg1o::cmov(expect_identity, cg1cn::identity_affine_v, 1);
+
+    REQUIRE(expect_generator == cg1cn::generator_affine_v);
+    REQUIRE(expect_identity == cg1cn::identity_affine_v);
+  }
 }

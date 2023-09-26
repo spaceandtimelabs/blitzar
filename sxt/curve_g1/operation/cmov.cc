@@ -16,6 +16,7 @@
  */
 #include "sxt/curve_g1/operation/cmov.h"
 
+#include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
 #include "sxt/field12/operation/cmov.h"
 
@@ -28,5 +29,15 @@ void cmov(cg1t::element_p2& f, const cg1t::element_p2& g, unsigned int b) noexce
   f12o::cmov(f.X, g.X, b);
   f12o::cmov(f.Y, g.Y, b);
   f12o::cmov(f.Z, g.Z, b);
+}
+
+//--------------------------------------------------------------------------------------------------
+// cmov
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+void cmov(cg1t::element_affine& f, const cg1t::element_affine& g, unsigned int b) noexcept {
+  f12o::cmov(f.X, g.X, b);
+  f12o::cmov(f.Y, g.Y, b);
+  f12o::cmov(f.infinity, g.infinity, b);
 }
 } // namespace sxt::cg1o
