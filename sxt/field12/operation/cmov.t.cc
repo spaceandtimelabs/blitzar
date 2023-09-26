@@ -24,13 +24,26 @@
 using namespace sxt;
 using namespace sxt::f12o;
 
-TEST_CASE("cmov moves elements correctly") {
-  f12t::element h{f12cn::zero_v};
-  f12t::element g{f12cn::zero_v};
+TEST_CASE("cmov correctly moves") {
+  SECTION("field elements") {
+    f12t::element h{f12cn::zero_v};
+    f12t::element g{f12cn::zero_v};
 
-  cmov(h, f12cn::one_v, 1);
-  cmov(g, f12cn::one_v, 0);
+    cmov(h, f12cn::one_v, 1);
+    cmov(g, f12cn::one_v, 0);
 
-  REQUIRE(h == f12cn::one_v);
-  REQUIRE(g == f12cn::zero_v);
+    REQUIRE(h == f12cn::one_v);
+    REQUIRE(g == f12cn::zero_v);
+  }
+
+  SECTION("uint8_t elements") {
+    uint8_t h{0};
+    uint8_t g{0};
+
+    cmov(h, 1, 1);
+    cmov(g, 1, 0);
+
+    REQUIRE(h == 1);
+    REQUIRE(g == 0);
+  }
 }
