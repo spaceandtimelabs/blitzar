@@ -40,6 +40,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "bucket_accumulation",
     deps = [
+      "//sxt/base/error:assert",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
     ],
