@@ -2,17 +2,35 @@
 
 #include <cstddef>
 
-#include "sxt/base/error/assert.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
+#include "sxt/base/error/assert.h"
+#include "sxt/base/iterator/index_range.h"
+#include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/async/future.h"
+#include "sxt/execution/device/for_each.h"
 
 namespace sxt::mtxbk {
+//--------------------------------------------------------------------------------------------------
+// accumulate_buckets_impl
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<T> generators,
+                                       basct::cspan<const uint8_t*> exponents,
+                                       basit::index_range rng) noexcept {
+  (void)bucket_sums;
+  (void)generators;
+  (void)exponents;
+  (void)rng;
+  return {};
+}
+
 //--------------------------------------------------------------------------------------------------
 // accumulate_buckets
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-void accumulate_buckets(basct::span<T> bucket_sums, basct::cspan<T> generators,
-                        basct::cspan<const uint8_t*> exponents) noexcept {
+xena::future<> accumulate_buckets(basct::span<T> bucket_sums, basct::cspan<T> generators,
+                                  basct::cspan<const uint8_t*> exponents) noexcept {
   constexpr size_t bucket_group_size = 255;
   constexpr size_t num_bucket_groups = 32;
   auto num_outputs = exponents.size();
@@ -22,8 +40,9 @@ void accumulate_buckets(basct::span<T> bucket_sums, basct::cspan<T> generators,
   for (auto& e : bucket_sums) {
     e = T::identity();
   }
-  (void)bucket_sums;
-  (void)generators;
-  (void)exponents;
+  co_await xendv::concurrent_for_each(
+      basit::index_range{0, generators.size()}, [&](const basit::index_range& rng) noexcept {
+        return accumulate_buckets_impl(bucket_sums, generators, exponents, rng);
+      });
 }
 } // namespace sxt::mtxbk
