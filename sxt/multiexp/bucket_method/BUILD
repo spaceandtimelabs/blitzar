@@ -16,6 +16,7 @@ sxt_cc_component(
     deps = [
         "//sxt/algorithm/base:mapper",
         "//sxt/algorithm/base:reducer",
+        "//sxt/base/curve:element",
         "//sxt/base/num:divide_up",
     ],
 )
