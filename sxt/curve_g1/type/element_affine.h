@@ -40,7 +40,7 @@ namespace sxt::cg1t {
 struct element_affine {
   f12t::element X;
   f12t::element Y;
-  bool infinity;
+  uint8_t infinity;
 
   bool operator==(const element_affine& rhs) const noexcept = default;
 };
