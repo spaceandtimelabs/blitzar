@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "sxt/base/macro/cuda_callable.h"
+
 namespace sxt::bascrv {
 //--------------------------------------------------------------------------------------------------
 // element97
@@ -10,50 +12,52 @@ struct element97 {
   uint32_t value;
   bool marked = false;
 
-  static element97 identity() noexcept {
+  static constexpr element97 identity() noexcept {
     return {0};
   }
+
+  bool operator==(const element97&) const noexcept = default;
 };
 
 //--------------------------------------------------------------------------------------------------
 // double_element
 //--------------------------------------------------------------------------------------------------
-inline void double_element(element97& res, const element97& e) noexcept {
+inline CUDA_CALLABLE void double_element(element97& res, const element97& e) noexcept {
   res.value = (e.value + e.value) % 97u;
 }
 
 //--------------------------------------------------------------------------------------------------
 // neg
 //--------------------------------------------------------------------------------------------------
-inline void neg(element97& res, const element97& e) noexcept {
+inline CUDA_CALLABLE void neg(element97& res, const element97& e) noexcept {
   res.value = (97u - e.value) % 97u;
 }
 
 //--------------------------------------------------------------------------------------------------
 // add
 //--------------------------------------------------------------------------------------------------
-inline void add(element97& res, const element97& x, const element97& y) noexcept {
+inline CUDA_CALLABLE void add(element97& res, const element97& x, const element97& y) noexcept {
   res.value = (x.value + y.value) % 97u;
 }
 
 //--------------------------------------------------------------------------------------------------
 // add_inplace
 //--------------------------------------------------------------------------------------------------
-inline void add_inplace(element97& res, const element97& x) noexcept {
+inline CUDA_CALLABLE void add_inplace(element97& res, const element97& x) noexcept {
   res.value = (res.value + x.value) % 97u;
 }
 
 //--------------------------------------------------------------------------------------------------
 // mark
 //--------------------------------------------------------------------------------------------------
-inline void mark(element97& res) noexcept {
+inline CUDA_CALLABLE void mark(element97& res) noexcept {
   res.marked = true;
 }
 
 //--------------------------------------------------------------------------------------------------
 // is_marked
 //--------------------------------------------------------------------------------------------------
-inline bool is_marked(const element97& e) noexcept {
+inline CUDA_CALLABLE bool is_marked(const element97& e) noexcept {
   return e.marked;
 }
 } // namespace sxt::bascrv
