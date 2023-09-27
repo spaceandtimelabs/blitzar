@@ -51,6 +51,34 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "convert",
+    impl_deps = [
+        "//sxt/curve_g1/constant:identity",
+        "//sxt/curve_g1/type:element_affine",
+        "//sxt/curve_g1/type:element_p2",
+        "//sxt/curve_g1/operation:cmov",
+        "//sxt/field12/operation:cmov",
+        "//sxt/field12/operation:invert",
+        "//sxt/field12/operation:mul",
+        "//sxt/field12/type:element",
+    ],
+    is_cuda = True,
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/curve_g1/constant:generator",
+        "//sxt/curve_g1/constant:identity",
+        "//sxt/curve_g1/property:curve",
+        "//sxt/curve_g1/type:element_affine",
+        "//sxt/curve_g1/type:element_p2",
+        "//sxt/field12/operation:mul",
+        "//sxt/field12/type:element",
+    ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
     name = "double",
     impl_deps = [
         ":cmov",
