@@ -19,6 +19,14 @@
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
+// make_exponents_viewable
+//--------------------------------------------------------------------------------------------------
+basct::cspan<const uint8_t*>
+make_exponents_viewable(memmg::managed_array<uint8_t>& exponents_viewable_data,
+                        basct::cspan<const uint8_t*> exponents,
+                        const basit::index_range& rng) noexcept;
+
+//--------------------------------------------------------------------------------------------------
 // accumulate_buckets_impl
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
@@ -27,6 +35,7 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
                                        basit::index_range rng) noexcept {
   unsigned n = rng.size();
   auto num_blocks = std::min(192u, n);
+  static constexpr int num_bytes = 32; // hard code to 32 for now
 
   basdv::stream stream;
 
@@ -40,14 +49,14 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
       generators_viewable_data, generators.subspan(rng.a(), rng.size()));
 
   // exponents_viewable
-  (void)generators_viewable;
+  memmg::managed_array<uint8_t> exponents_viewable_data{&resource};
+  auto exponents_viewable = make_exponents_viewable(exponents_viewable_data, exponents, rng);
+
+  // partial bucket accumulation kernel
+  bucket_accumulate<<<dim3(num_blocks, exponents.size(), 1), num_bytes>>>(
+      partial_bucket_sums.data(), generators_viewable.data(), exponents_viewable.data(), n);
 
 
-  /* xendv::synchronize_event(stream, generators_event); */
-  /* template <bascrv::element T> */
-  /* __global__ void bucket_accumulate(T* bucket_sums, const T* generators, const uint8_t* scalars,
-   */
-  /*                                   unsigned length) { */
   (void)bucket_sums;
   (void)generators;
   (void)exponents;
