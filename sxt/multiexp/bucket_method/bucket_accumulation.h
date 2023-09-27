@@ -8,7 +8,12 @@
 #include "sxt/base/iterator/index_range.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/device/device_viewable.h"
 #include "sxt/execution/device/for_each.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/memory/resource/managed_device_resource.h"
+#include "sxt/multiexp/bucket_method/accumulate_kernel.h"
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
@@ -18,6 +23,7 @@ template <bascrv::element T>
 xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<T> generators,
                                        basct::cspan<const uint8_t*> exponents,
                                        basit::index_range rng) noexcept {
+
   (void)bucket_sums;
   (void)generators;
   (void)exponents;
