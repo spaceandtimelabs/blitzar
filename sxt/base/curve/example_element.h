@@ -12,6 +12,10 @@ struct element97 {
   uint32_t value;
   bool marked = false;
 
+  element97() noexcept = default;
+
+  constexpr element97(uint32_t val) noexcept : value{val % 97u} {}
+
   static constexpr element97 identity() noexcept {
     return {0};
   }

@@ -6,8 +6,6 @@ load(
 sxt_cc_component(
     name = "accumulate_kernel",
     test_deps = [
-        "//sxt/algorithm/base:identity_mapper",
-        "//sxt/algorithm/reduction:test_reducer",
         "//sxt/base/curve:example_element",
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
@@ -15,8 +13,6 @@ sxt_cc_component(
         "//sxt/base/device:synchronization",
     ],
     deps = [
-        "//sxt/algorithm/base:mapper",
-        "//sxt/algorithm/base:reducer",
         "//sxt/base/curve:element",
         "//sxt/base/num:divide_up",
     ],
