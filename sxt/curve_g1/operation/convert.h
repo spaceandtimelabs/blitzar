@@ -28,8 +28,17 @@ namespace sxt::cg1o {
 // convert
 //--------------------------------------------------------------------------------------------------
 /*
- Converts cg1t::element_p2 to cg1t::element_affine.
+ Converts projective (cg1t::element_p2) to affine (cg1t::element_affine) element.
  */
 CUDA_CALLABLE
 void convert(cg1t::element_affine& f, const cg1t::element_p2& g) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// convert
+//--------------------------------------------------------------------------------------------------
+/*
+ Converts affine (cg1t::element_affine) to projective (cg1t::element_p2) element.
+ */
+CUDA_CALLABLE
+void convert(cg1t::element_p2& p, const cg1t::element_affine& a) noexcept;
 } // namespace sxt::cg1o

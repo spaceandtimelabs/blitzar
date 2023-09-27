@@ -54,4 +54,15 @@ void convert(cg1t::element_affine& a, const cg1t::element_p2& p) noexcept {
 
   cmov(a, cg1cn::identity_affine_v, is_zero);
 }
+
+//--------------------------------------------------------------------------------------------------
+// convert
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+void convert(cg1t::element_p2& p, const cg1t::element_affine& a) noexcept {
+  p.X = a.X;
+  p.Y = a.Y;
+  p.Z = f12cn::one_v;
+  f12o::cmov(p.Z, f12cn::zero_v, a.infinity);
+}
 } // namespace sxt::cg1o

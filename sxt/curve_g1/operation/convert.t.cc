@@ -26,6 +26,7 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_g1/constant/generator.h"
+#include "sxt/curve_g1/constant/identity.h"
 #include "sxt/curve_g1/property/curve.h"
 #include "sxt/curve_g1/property/identity.h"
 #include "sxt/curve_g1/type/element_affine.h"
@@ -74,5 +75,28 @@ TEST_CASE("conversion from projective to affine elements") {
 
     REQUIRE(cg1p::is_on_curve(affine_pt));
     REQUIRE(affine_pt == cg1cn::generator_affine_v);
+  }
+}
+
+TEST_CASE("conversion from affine to projective elements") {
+  cg1t::element_affine generator_affine{cg1cn::generator_affine_v};
+  cg1t::element_affine identity_affine{cg1cn::identity_affine_v};
+
+  SECTION("keeps the generator on the curve") {
+    cg1t::element_p2 generator_projective;
+
+    convert(generator_projective, generator_affine);
+
+    REQUIRE(cg1p::is_on_curve(generator_projective));
+    REQUIRE(!cg1p::is_identity(generator_projective));
+  }
+
+  SECTION("keeps the identity on the curve") {
+    cg1t::element_p2 identity_projective;
+
+    convert(identity_projective, identity_affine);
+
+    REQUIRE(cg1p::is_on_curve(identity_projective));
+    REQUIRE(cg1p::is_identity(identity_projective));
   }
 }
