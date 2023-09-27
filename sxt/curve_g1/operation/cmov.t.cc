@@ -26,7 +26,7 @@ using namespace sxt;
 using namespace sxt::cg1o;
 
 TEST_CASE("cmov returns the expected") {
-  SECTION("perspective coordinates") {
+  SECTION("projective coordinates") {
     cg1t::element_p2 expect_generator{cg1cn::generator_p2_v};
     cg1t::element_p2 expect_identity{cg1t::element_p2::identity()};
 
