@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "sxt/base/device/active_device_guard.h"
-#include "sxt/base/device/pointer_attributes.h"
 #include "sxt/base/device/state.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/panic.h"

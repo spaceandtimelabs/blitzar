@@ -1,9 +1,11 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range.h"
 #include "sxt/execution/async/coroutine.h"
@@ -23,7 +25,29 @@ template <bascrv::element T>
 xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<T> generators,
                                        basct::cspan<const uint8_t*> exponents,
                                        basit::index_range rng) noexcept {
+  unsigned n = rng.size();
+  auto num_blocks = std::min(192u, n);
 
+  basdv::stream stream;
+
+  // partial_bucket_sums
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> partial_bucket_sums{bucket_sums.size() * num_blocks, &resource};
+
+  // generators_viewable
+  memmg::managed_array<T> generators_viewable_data{&resource};
+  auto generators_viewable = xendv::make_active_device_viewable(
+      generators_viewable_data, generators.subspan(rng.a(), rng.size()));
+
+  // exponents_viewable
+  (void)generators_viewable;
+
+
+  /* xendv::synchronize_event(stream, generators_event); */
+  /* template <bascrv::element T> */
+  /* __global__ void bucket_accumulate(T* bucket_sums, const T* generators, const uint8_t* scalars,
+   */
+  /*                                   unsigned length) { */
   (void)bucket_sums;
   (void)generators;
   (void)exponents;

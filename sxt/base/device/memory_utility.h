@@ -21,6 +21,7 @@
 
 #include "sxt/base/concept/memcpyable_ranges.h"
 #include "sxt/base/container/span.h"
+#include "sxt/base/device/pointer_attributes.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/type/raw_stream.h"
 
@@ -84,6 +85,22 @@ void async_copy_host_to_device(Dst&& dst, const Src& src, bast::raw_stream_t str
   using T = std::remove_cvref_t<decltype(*dst_data)>;
   async_memcpy_host_to_device(dst_data, std::to_address(std::begin(src)), sizeof(T) * dst.size(),
                               stream);
+}
+
+//--------------------------------------------------------------------------------------------------
+// async_copy_to_device
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+template <class Dst, class Src>
+  requires bascpt::memcpyable_ranges<Dst, Src>
+void async_copy_to_device(Dst&& dst, const Src& src, bast::raw_stream_t stream) noexcept {
+  SXT_DEBUG_ASSERT(dst.size() == src.size());
+  auto dst_data = std::to_address(std::begin(dst));
+  using T = std::remove_cvref_t<decltype(*dst_data)>;
+  pointer_attributes src_attrs;
+  auto src_ptr = src.data();
+  get_pointer_attributes(src_attrs, src_ptr);
+  async_memcpy_to_device(dst.data(), src_ptr, sizeof(T) * dst.size(), stream);
 }
 
 //--------------------------------------------------------------------------------------------------

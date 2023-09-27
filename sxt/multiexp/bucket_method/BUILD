@@ -42,6 +42,7 @@ sxt_cc_component(
       "//sxt/base/error:assert",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
+        "//sxt/base/device:stream",
         "//sxt/base/iterator:index_range",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
