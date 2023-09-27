@@ -52,6 +52,6 @@ void convert(cg1t::element_affine& a, const cg1t::element_p2& p) noexcept {
   a.Y = y;
   a.infinity = false;
 
-  cg1o::cmov(a, cg1cn::identity_affine_v, is_zero);
+  cmov(a, cg1cn::identity_affine_v, is_zero);
 }
 } // namespace sxt::cg1o
