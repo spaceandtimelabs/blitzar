@@ -16,6 +16,7 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/managed_device_resource.h"
 #include "sxt/multiexp/bucket_method/accumulate_kernel.h"
+#include "sxt/multiexp/bucket_method/combination_kernel.h"
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
@@ -59,6 +60,14 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
   exponents_viewable_data.reset();
 
 
+  // combine partial sums
+  memmg::managed_array<T> bucket_sums_dev{bucket_sums.size(), &resource};
+  (void)bucket_sums_dev;
+  /* combine_partial_bucket_sums<<< */
+/* template <algb::reducer Reducer> */
+/* __global__ void combine_partial_bucket_sums(typename Reducer::value_type* out, */
+/*                                             typename Reducer::value_type* partial_bucket_sums, */
+/*                                             unsigned num_partial_buckets) { */
   (void)bucket_sums;
   (void)generators;
   (void)exponents;

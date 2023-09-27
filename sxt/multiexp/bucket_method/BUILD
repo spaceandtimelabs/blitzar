@@ -39,6 +39,7 @@ sxt_cc_component(
     name = "bucket_accumulation",
     deps = [
       ":accumulate_kernel",
+      ":combination_kernel",
       "//sxt/base/error:assert",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
