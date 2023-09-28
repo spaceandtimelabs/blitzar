@@ -25,7 +25,6 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/curve_g1/constant/identity.h"
 #include "sxt/curve_g1/operation/cmov.h"
 #include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
@@ -56,7 +55,7 @@ inline void to_element_affine(cg1t::element_affine& a, const cg1t::element_p2& p
   a.Y = y;
   a.infinity = false;
 
-  cmov(a, cg1cn::identity_affine_v, is_zero);
+  cmov(a, cg1t::element_affine::identity(), is_zero);
 }
 
 //--------------------------------------------------------------------------------------------------

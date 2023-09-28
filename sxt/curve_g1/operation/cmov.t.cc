@@ -18,7 +18,6 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_g1/constant/generator.h"
-#include "sxt/curve_g1/constant/identity.h"
 #include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
 
@@ -39,12 +38,12 @@ TEST_CASE("cmov returns the expected") {
 
   SECTION("affine coordinates") {
     cg1t::element_affine expect_generator{cg1cn::generator_affine_v};
-    cg1t::element_affine expect_identity{cg1cn::identity_affine_v};
+    cg1t::element_affine expect_identity{cg1t::element_affine::identity()};
 
-    cg1o::cmov(expect_generator, cg1cn::identity_affine_v, 0);
-    cg1o::cmov(expect_identity, cg1cn::identity_affine_v, 1);
+    cg1o::cmov(expect_generator, cg1t::element_affine::identity(), 0);
+    cg1o::cmov(expect_identity, cg1t::element_affine::identity(), 1);
 
     REQUIRE(expect_generator == cg1cn::generator_affine_v);
-    REQUIRE(expect_identity == cg1cn::identity_affine_v);
+    REQUIRE(expect_identity == cg1t::element_affine::identity());
   }
 }

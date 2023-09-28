@@ -25,6 +25,8 @@
  */
 #pragma once
 
+#include "sxt/field12/constant/one.h"
+#include "sxt/field12/constant/zero.h"
 #include "sxt/field12/type/element.h"
 
 namespace sxt::cg1t {
@@ -41,6 +43,10 @@ struct element_affine {
   f12t::element X;
   f12t::element Y;
   uint8_t infinity;
+
+  static constexpr element_affine identity() noexcept {
+    return element_affine{f12cn::zero_v, f12cn::one_v, true};
+  }
 
   bool operator==(const element_affine& rhs) const noexcept = default;
 };
