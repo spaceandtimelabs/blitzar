@@ -22,7 +22,7 @@
  *
  * See third_party/license/zcash.LICENSE
  */
-#include "sxt/curve_g1/operation/convert.h"
+#include "sxt/curve_g1/operation/conversion_utility.h"
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_g1/constant/generator.h"
@@ -44,7 +44,7 @@ TEST_CASE("conversion from projective to affine elements") {
   SECTION("keeps the generator on the curve") {
     cg1t::element_affine generator_affine;
 
-    convert(generator_affine, generator_projective);
+    to_element_affine(generator_affine, generator_projective);
 
     REQUIRE(cg1p::is_on_curve(generator_affine));
     REQUIRE(!cg1p::is_identity(generator_affine));
@@ -53,7 +53,7 @@ TEST_CASE("conversion from projective to affine elements") {
   SECTION("keeps the identity on the curve") {
     cg1t::element_affine identity_affine;
 
-    convert(identity_affine, identity_projective);
+    to_element_affine(identity_affine, identity_projective);
 
     REQUIRE(cg1p::is_on_curve(identity_affine));
     REQUIRE(cg1p::is_identity(identity_affine));
@@ -71,7 +71,7 @@ TEST_CASE("conversion from projective to affine elements") {
 
     cg1t::element_affine affine_pt;
 
-    convert(affine_pt, projective_pt);
+    to_element_affine(affine_pt, projective_pt);
 
     REQUIRE(cg1p::is_on_curve(affine_pt));
     REQUIRE(affine_pt == cg1cn::generator_affine_v);
@@ -85,7 +85,7 @@ TEST_CASE("conversion from affine to projective elements") {
   SECTION("keeps the generator on the curve") {
     cg1t::element_p2 generator_projective;
 
-    convert(generator_projective, generator_affine);
+    to_element_p2(generator_projective, generator_affine);
 
     REQUIRE(cg1p::is_on_curve(generator_projective));
     REQUIRE(!cg1p::is_identity(generator_projective));
@@ -94,7 +94,7 @@ TEST_CASE("conversion from affine to projective elements") {
   SECTION("keeps the identity on the curve") {
     cg1t::element_p2 identity_projective;
 
-    convert(identity_projective, identity_affine);
+    to_element_p2(identity_projective, identity_affine);
 
     REQUIRE(cg1p::is_on_curve(identity_projective));
     REQUIRE(cg1p::is_identity(identity_projective));
