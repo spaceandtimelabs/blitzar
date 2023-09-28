@@ -5,6 +5,7 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range.h"
@@ -35,6 +36,7 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
                                        basct::cspan<const uint8_t*> exponents,
                                        basit::index_range rng) noexcept {
   unsigned n = rng.size();
+  auto num_outputs = exponents.size();
   auto num_blocks = std::min(192u, n);
   static constexpr int num_bytes = 32; // hard code to 32 for now
 
@@ -54,7 +56,7 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
   auto exponents_viewable = make_exponents_viewable(exponents_viewable_data, exponents, rng);
 
   // partial bucket accumulation kernel
-  bucket_accumulate<<<dim3(num_blocks, exponents.size(), 1), num_bytes, 0, stream>>>(
+  bucket_accumulate<<<dim3(num_blocks, num_outputs, 1), num_bytes, 0, stream>>>(
       partial_bucket_sums.data(), generators_viewable.data(), exponents_viewable.data(), n);
   generators_viewable_data.reset();
   exponents_viewable_data.reset();
@@ -62,17 +64,17 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
 
   // combine partial sums
   memmg::managed_array<T> bucket_sums_dev{bucket_sums.size(), &resource};
-  (void)bucket_sums_dev;
-  /* combine_partial_bucket_sums<<< */
-/* template <algb::reducer Reducer> */
-/* __global__ void combine_partial_bucket_sums(typename Reducer::value_type* out, */
-/*                                             typename Reducer::value_type* partial_bucket_sums, */
-/*                                             unsigned num_partial_buckets) { */
-  (void)bucket_sums;
-  (void)generators;
-  (void)exponents;
-  (void)rng;
-  return {};
+  combine_partial_bucket_sums<<<dim3(num_bytes, num_outputs, 1), num_blocks, 0, stream>>>(
+      bucket_sums_dev.data(), partial_bucket_sums.data(), num_blocks);
+  partial_bucket_sums.reset();
+
+  // add buckets
+  memmg::managed_array<T> bucket_sums_host{bucket_sums.size(), memr::get_managed_device_resource()};
+  basdv::async_copy_device_to_host(bucket_sums_host, bucket_sums_dev, stream);
+  co_await xendv::await_stream(stream);
+  for (size_t bucket_index=0; bucket_index<bucket_sums.size(); ++bucket_index) {
+    add_inplace(bucket_sums[bucket_index], bucket_sums_host[bucket_index]);
+  }
 }
 
 //--------------------------------------------------------------------------------------------------

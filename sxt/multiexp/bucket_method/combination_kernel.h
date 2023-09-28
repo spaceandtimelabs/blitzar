@@ -11,7 +11,7 @@ namespace sxt::mtxbk {
 template <algb::reducer Reducer>
 __global__ void combine_partial_bucket_sums(typename Reducer::value_type* out,
                                             typename Reducer::value_type* partial_bucket_sums,
-                                            unsigned num_partial_buckets) {
+                                            unsigned num_partials) {
   using T = typename Reducer::value_type;
   auto bucket_group_size = gridDim.x;
   auto bucket_group_index = threadIdx.x;
@@ -20,14 +20,14 @@ __global__ void combine_partial_bucket_sums(typename Reducer::value_type* out,
   auto output_index = blockIdx.y;
 
   partial_bucket_sums += bucket_index + bucket_group_size * bucket_group_index +
-                         bucket_group_size * num_bucket_groups * num_partial_buckets * output_index;
+                         bucket_group_size * num_bucket_groups * num_partials * output_index;
 
   out += bucket_index + bucket_group_size * bucket_group_index +
          bucket_group_size * num_bucket_groups * output_index;
 
   T sum = *partial_bucket_sums;
   partial_bucket_sums += bucket_group_size * num_bucket_groups;
-  for (unsigned i = 1; i < num_partial_buckets; ++i) {
+  for (unsigned i = 1; i < num_partials; ++i) {
     Reducer::accumulate_inplace(sum, *partial_bucket_sums);
     partial_bucket_sums += bucket_group_size * num_bucket_groups;
   }
