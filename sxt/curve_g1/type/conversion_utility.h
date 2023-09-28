@@ -25,7 +25,6 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/curve_g1/operation/cmov.h"
 #include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
 #include "sxt/field12/operation/cmov.h"
@@ -33,15 +32,15 @@
 #include "sxt/field12/operation/mul.h"
 #include "sxt/field12/type/element.h"
 
-namespace sxt::cg1o {
+namespace sxt::cg1t {
 //--------------------------------------------------------------------------------------------------
 // to_element_affine
 //--------------------------------------------------------------------------------------------------
 /*
- Converts projective (cg1t::element_p2) to affine (cg1t::element_affine) element.
+ Converts projective to affine element.
  */
 CUDA_CALLABLE
-inline void to_element_affine(cg1t::element_affine& a, const cg1t::element_p2& p) noexcept {
+inline void to_element_affine(element_affine& a, const element_p2& p) noexcept {
   f12t::element z_inv;
   const bool is_zero{f12o::invert(z_inv, p.Z)};
   f12o::cmov(z_inv, f12cn::zero_v, is_zero);
@@ -55,20 +54,22 @@ inline void to_element_affine(cg1t::element_affine& a, const cg1t::element_p2& p
   a.Y = y;
   a.infinity = false;
 
-  cmov(a, cg1t::element_affine::identity(), is_zero);
+  f12o::cmov(a.X, element_affine::identity().X, is_zero);
+  f12o::cmov(a.Y, element_affine::identity().Y, is_zero);
+  f12o::cmov(a.infinity, element_affine::identity().infinity, is_zero);
 }
 
 //--------------------------------------------------------------------------------------------------
 // to_element_p2
 //--------------------------------------------------------------------------------------------------
 /*
- Converts affine (cg1t::element_affine) to projective (cg1t::element_p2) element.
+ Converts affine to projective element.
  */
 CUDA_CALLABLE
-inline void to_element_p2(cg1t::element_p2& p, const cg1t::element_affine& a) noexcept {
+inline void to_element_p2(element_p2& p, const element_affine& a) noexcept {
   p.X = a.X;
   p.Y = a.Y;
   p.Z = f12cn::one_v;
   f12o::cmov(p.Z, f12cn::zero_v, a.infinity);
 }
-} // namespace sxt::cg1o
+} // namespace sxt::cg1t
