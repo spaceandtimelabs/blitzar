@@ -93,14 +93,14 @@ void async_copy_host_to_device(Dst&& dst, const Src& src, bast::raw_stream_t str
 //--------------------------------------------------------------------------------------------------
 template <class Dst, class Src>
   requires bascpt::memcpyable_ranges<Dst, Src>
-void async_copy_to_device(Dst&& dst, const Src& src, bast::raw_stream_t stream) noexcept {
+void async_copy_to_device(Dst&& dst, const Src& src, const stream& stream) noexcept {
   SXT_DEBUG_ASSERT(dst.size() == src.size());
   auto dst_data = std::to_address(std::begin(dst));
   using T = std::remove_cvref_t<decltype(*dst_data)>;
   pointer_attributes src_attrs;
   auto src_ptr = src.data();
   get_pointer_attributes(src_attrs, src_ptr);
-  async_memcpy_to_device(dst.data(), src_ptr, sizeof(T) * dst.size(), stream);
+  async_memcpy_to_device(dst.data(), src_ptr, sizeof(T) * dst.size(), src_attrs, stream);
 }
 
 //--------------------------------------------------------------------------------------------------

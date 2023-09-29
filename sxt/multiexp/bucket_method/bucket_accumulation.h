@@ -23,10 +23,10 @@ namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 // make_exponents_viewable
 //--------------------------------------------------------------------------------------------------
-basct::cspan<const uint8_t*>
+basct::cspan<const uint8_t>
 make_exponents_viewable(memmg::managed_array<uint8_t>& exponents_viewable_data,
-                        basct::cspan<const uint8_t*> exponents,
-                        const basit::index_range& rng) noexcept;
+                        basct::cspan<const uint8_t*> exponents, const basit::index_range& rng,
+                        const basdv::stream& stream) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // accumulate_buckets_impl
@@ -53,7 +53,8 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
 
   // exponents_viewable
   memmg::managed_array<uint8_t> exponents_viewable_data{&resource};
-  auto exponents_viewable = make_exponents_viewable(exponents_viewable_data, exponents, rng);
+  auto exponents_viewable =
+      make_exponents_viewable(exponents_viewable_data, exponents, rng, stream);
 
   // partial bucket accumulation kernel
   bucket_accumulate<<<dim3(num_blocks, num_outputs, 1), num_bytes, 0, stream>>>(
