@@ -46,7 +46,7 @@ void neg(cg1t::element_p2& r, const cg1t::element_p2& p) noexcept {
 //--------------------------------------------------------------------------------------------------
 /* r = -r if b = 1 else r */
 CUDA_CALLABLE
-void neg(cg1t::element_p2& r, unsigned int b) noexcept {
+void cneg(cg1t::element_p2& r, unsigned int b) noexcept {
   f12t::element t;
   f12o::neg(t, r.Y);
   f12o::cmov(r.Y, t, b);
