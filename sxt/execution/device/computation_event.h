@@ -51,5 +51,7 @@ private:
   xena::promise<T> promise_;
 };
 
-extern template class computation_event<void>;
+// Disable explicit instantiation. Workaround to
+// https://developer.nvidia.com/bugs/4288496
+/* extern template class computation_event<void>; */
 } // namespace sxt::xendv

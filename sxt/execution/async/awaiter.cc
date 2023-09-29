@@ -17,5 +17,7 @@
 #include "sxt/execution/async/awaiter.h"
 
 namespace sxt::xena {
-template class awaiter<void>;
+// Disable explicit instantiation. Workaround to
+// https://developer.nvidia.com/bugs/4288496
+/* template class awaiter<void>; */
 } // namespace sxt::xena

@@ -43,7 +43,7 @@ jobs:
           #       See https://developer.nvidia.com/bugs/4288496
           #       As a simple workaround, I'm disabling for now
       - name: Run cpp tests with optimization flags on
-        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel_opt -v $HOME/.cache_bazel_test_opt:/root/.cache_bazel_opt -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test -c opt //... -- -//sxt/multiexp/multiproduct_gpu:* -//sxt/algorithm/iteration:*"
+        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel_opt -v $HOME/.cache_bazel_test_opt:/root/.cache_bazel_opt -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test -c opt //..."
 
   test-cpp-asan:
     name: C++ code with address sanitizer
