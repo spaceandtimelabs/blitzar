@@ -83,5 +83,7 @@ private:
   task* continuation_{nullptr};
 };
 
+// Disable explicit instantiation. Workaround to
+// https://developer.nvidia.com/bugs/4288496
 /* extern template class promise<void>; */
 } // namespace sxt::xena

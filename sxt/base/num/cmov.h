@@ -14,10 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/execution/async/awaiter.h"
+#pragma once
 
-namespace sxt::xena {
-// Disable explicit instantiation. Workaround to
-// https://developer.nvidia.com/bugs/4288496
-/* template class awaiter<void>; */
-} // namespace sxt::xena
+#include "sxt/base/macro/cuda_callable.h"
+
+namespace sxt::basn {
+//--------------------------------------------------------------------------------------------------
+// cmov
+//--------------------------------------------------------------------------------------------------
+/*
+ Replace (f,g) with (g,g) if b == 1.
+ Replace (f,g) with (f,g) if b == 0.
+ *
+ Preconditions: b in {0,1}.
+ */
+template <std::integral T>
+CUDA_CALLABLE inline void cmov(T& f, const T g, unsigned int b) noexcept {
+  const T mask = static_cast<T>(-static_cast<T>(b));
+  f = f ^ (mask & (f ^ g));
+}
+} // namespace sxt::basn

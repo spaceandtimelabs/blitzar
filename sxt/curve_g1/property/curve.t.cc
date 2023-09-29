@@ -19,7 +19,6 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_g1/constant/b.h"
 #include "sxt/curve_g1/constant/generator.h"
-#include "sxt/curve_g1/constant/identity.h"
 #include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
 #include "sxt/field12/constant/one.h"
@@ -35,7 +34,7 @@ TEST_CASE("an affine element") {
   }
 
   SECTION("equal to the identity is on the curve") {
-    REQUIRE(is_on_curve(cg1cn::identity_affine_v));
+    REQUIRE(is_on_curve(cg1t::element_affine::identity()));
   }
 
   SECTION("equal to (1,1) is not on the curve") {

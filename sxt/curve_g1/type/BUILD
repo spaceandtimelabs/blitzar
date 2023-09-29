@@ -4,13 +4,30 @@ load(
 )
 
 sxt_cc_component(
+    name = "conversion_utility",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":element_affine",
+        ":element_p2",
+        "//sxt/base/macro:cuda_callable",
+        "//sxt/base/num:cmov",
+        "//sxt/field12/operation:cmov",
+        "//sxt/field12/operation:invert",
+        "//sxt/field12/operation:mul",
+        "//sxt/field12/type:element",
+    ],
+)
+
+sxt_cc_component(
     name = "element_affine",
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/field12/constant:one",
-        "//sxt/field12/constant:zero",
     ],
     deps = [
+        "//sxt/field12/constant:one",
+        "//sxt/field12/constant:zero",
         "//sxt/field12/type:element",
     ],
 )

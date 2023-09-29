@@ -18,12 +18,13 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_g1/constant/generator.h"
+#include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
 
 using namespace sxt;
 using namespace sxt::cg1o;
 
-TEST_CASE("cmov returns expected perspective coordinates") {
+TEST_CASE("cmov returns the expected projective coordinates") {
   cg1t::element_p2 expect_generator{cg1cn::generator_p2_v};
   cg1t::element_p2 expect_identity{cg1t::element_p2::identity()};
 

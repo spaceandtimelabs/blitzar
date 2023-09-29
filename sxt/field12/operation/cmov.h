@@ -27,8 +27,8 @@ namespace sxt::f12o {
 // cmov
 //--------------------------------------------------------------------------------------------------
 /*
- Replace (f,g) with (g,g) if b == 1;
- replace (f,g) with (f,g) if b == 0.
+ Replace (f,g) with (g,g) if b == 1.
+ Replace (f,g) with (f,g) if b == 0.
  *
  Preconditions: b in {0,1}.
  */

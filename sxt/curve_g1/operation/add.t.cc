@@ -18,10 +18,10 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_g1/constant/generator.h"
-#include "sxt/curve_g1/constant/identity.h"
 #include "sxt/curve_g1/operation/double.h"
 #include "sxt/curve_g1/property/curve.h"
 #include "sxt/curve_g1/property/identity.h"
+#include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
 #include "sxt/field12/operation/mul.h"
 #include "sxt/field12/type/element.h"
@@ -83,12 +83,21 @@ TEST_CASE("addition with projective elements") {
     REQUIRE(cg1p::is_on_curve(d));
     REQUIRE(c == d);
   }
+
+  SECTION("can be done inplace") {
+    cg1t::element_p2 lhs{cg1t::element_p2::identity()};
+    cg1t::element_p2 rhs{cg1cn::generator_p2_v};
+
+    add_inplace(lhs, rhs);
+
+    REQUIRE(lhs == cg1cn::generator_p2_v);
+  }
 }
 
 TEST_CASE("addition with mixed elements") {
   SECTION("keeps the identity on the curve") {
     cg1t::element_p2 ret;
-    add(ret, cg1t::element_p2::identity(), cg1cn::identity_affine_v);
+    add(ret, cg1t::element_p2::identity(), cg1t::element_affine::identity());
 
     REQUIRE(cg1p::is_identity(ret));
     REQUIRE(cg1p::is_on_curve(ret));
@@ -104,7 +113,7 @@ TEST_CASE("addition with mixed elements") {
     const cg1t::element_p2 projected_generator{x, y, z};
     cg1t::element_p2 ret;
 
-    add(ret, projected_generator, cg1cn::identity_affine_v);
+    add(ret, projected_generator, cg1t::element_affine::identity());
 
     REQUIRE(!cg1p::is_identity(ret));
     REQUIRE(cg1p::is_on_curve(ret));
