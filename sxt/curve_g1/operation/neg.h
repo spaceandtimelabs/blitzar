@@ -32,7 +32,9 @@ void neg(cg1t::element_p2& r, const cg1t::element_p2& p) noexcept;
 //--------------------------------------------------------------------------------------------------
 // cneg
 //--------------------------------------------------------------------------------------------------
-/* r = -r if b = 1 else r */
+/*
+ r = -r if b = 1 else r
+ */
 CUDA_CALLABLE
 void cneg(cg1t::element_p2& r, unsigned int b) noexcept;
 } // namespace sxt::cg1o
