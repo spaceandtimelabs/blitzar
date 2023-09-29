@@ -77,7 +77,7 @@ public:
   void return_void() noexcept { this->promise_.make_ready(); }
 };
 
-// Disable explicit instantiation. Workaround to 
+// Disable explicit instantiation. Workaround to
 // https://developer.nvidia.com/bugs/4288496
 /* extern template class coroutine_promise<void>; */
 } // namespace sxt::xena

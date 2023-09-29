@@ -60,7 +60,7 @@ private:
   std::optional<basdv::active_device_guard> active_guard_;
 };
 
-// Disable explicit instantiation. Workaround to 
+// Disable explicit instantiation. Workaround to
 // https://developer.nvidia.com/bugs/4288496
 /* extern template class awaiter<void>; */
 } // namespace sxt::xena

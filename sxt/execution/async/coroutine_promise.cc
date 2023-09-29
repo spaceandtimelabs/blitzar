@@ -17,7 +17,7 @@
 #include "sxt/execution/async/coroutine_promise.h"
 
 namespace sxt::xena {
-// Disable explicit instantiation. Workaround to 
+// Disable explicit instantiation. Workaround to
 // https://developer.nvidia.com/bugs/4288496
 /* template class coroutine_promise<void>; */
 } // namespace sxt::xena

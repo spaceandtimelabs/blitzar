@@ -17,7 +17,7 @@
 #include "sxt/execution/device/computation_event.h"
 
 namespace sxt::xendv {
-// Disable explicit instantiation. Workaround to 
+// Disable explicit instantiation. Workaround to
 // https://developer.nvidia.com/bugs/4288496
 /* template class computation_event<void>; */
 } // namespace sxt::xendv
