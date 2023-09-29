@@ -17,5 +17,8 @@
 #include "sxt/execution/async/promise.h"
 
 namespace sxt::xena {
-template class promise<void>;
+// Disable explicit instantiation. Workaround to 
+// https://developer.nvidia.com/bugs/4288496
+/* extern template class promise<void>; */
+/* template class promise<void>; */
 } // namespace sxt::xena

@@ -17,7 +17,9 @@
 #include "sxt/execution/async/future.h"
 
 namespace sxt::xena {
-template class future<void>;
+// Disable explicit instantiation. Workaround to 
+// https://developer.nvidia.com/bugs/4288496
+/* template class future<void>; */
 
 //--------------------------------------------------------------------------------------------------
 // make_ready_future

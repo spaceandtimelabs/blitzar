@@ -145,7 +145,9 @@ private:
   }
 };
 
-extern template class future<void>;
+// Disable explicit instantiation. Workaround to 
+// https://developer.nvidia.com/bugs/4288496
+/* extern template class future<void>; */
 
 //--------------------------------------------------------------------------------------------------
 // make_ready_future
