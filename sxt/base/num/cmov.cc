@@ -14,23 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
-
-#include "sxt/base/macro/cuda_callable.h"
-
-namespace sxt::f12t {
-class element;
-}
-
-namespace sxt::f12o {
-//--------------------------------------------------------------------------------------------------
-// cmov
-//--------------------------------------------------------------------------------------------------
-/*
- Replace (f,g) with (g,g) if b == 1.
- Replace (f,g) with (f,g) if b == 0.
- *
- Preconditions: b in {0,1}.
- */
-CUDA_CALLABLE void cmov(f12t::element& f, const f12t::element& g, unsigned int b) noexcept;
-} // namespace sxt::f12o
+#include "sxt/base/num/cmov.h"

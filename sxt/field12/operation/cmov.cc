@@ -28,14 +28,4 @@ CUDA_CALLABLE void cmov(f12t::element& f, const f12t::element& g, unsigned int b
     f[i] = f[i] ^ (mask & (f[i] ^ g[i]));
   }
 }
-
-//--------------------------------------------------------------------------------------------------
-// cmov
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE void cmov(uint8_t& f, const uint8_t g, unsigned int b) noexcept {
-  // If choice = 0, mask = (-0) = 0000...0000
-  // If choice = 1, mask = (-1) = 1111...1111
-  const uint8_t mask = static_cast<uint8_t>(-static_cast<uint8_t>(b));
-  f = f ^ (mask & (f ^ g));
-}
 } // namespace sxt::f12o

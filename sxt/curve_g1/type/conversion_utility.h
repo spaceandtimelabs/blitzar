@@ -25,6 +25,7 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/base/num/cmov.h"
 #include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
 #include "sxt/field12/operation/cmov.h"
@@ -56,7 +57,7 @@ inline void to_element_affine(element_affine& a, const element_p2& p) noexcept {
 
   f12o::cmov(a.X, element_affine::identity().X, is_zero);
   f12o::cmov(a.Y, element_affine::identity().Y, is_zero);
-  f12o::cmov(a.infinity, element_affine::identity().infinity, is_zero);
+  basn::cmov(a.infinity, element_affine::identity().infinity, is_zero);
 }
 
 //--------------------------------------------------------------------------------------------------

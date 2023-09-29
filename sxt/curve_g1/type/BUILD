@@ -12,6 +12,7 @@ sxt_cc_component(
         ":element_affine",
         ":element_p2",
         "//sxt/base/macro:cuda_callable",
+        "//sxt/base/num:cmov",
         "//sxt/field12/operation:cmov",
         "//sxt/field12/operation:invert",
         "//sxt/field12/operation:mul",

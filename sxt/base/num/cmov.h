@@ -18,11 +18,7 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::f12t {
-class element;
-}
-
-namespace sxt::f12o {
+namespace sxt::basn {
 //--------------------------------------------------------------------------------------------------
 // cmov
 //--------------------------------------------------------------------------------------------------
@@ -32,5 +28,9 @@ namespace sxt::f12o {
  *
  Preconditions: b in {0,1}.
  */
-CUDA_CALLABLE void cmov(f12t::element& f, const f12t::element& g, unsigned int b) noexcept;
-} // namespace sxt::f12o
+template <std::integral T>
+CUDA_CALLABLE inline void cmov(T& f, const T g, unsigned int b) noexcept {
+  const T mask = static_cast<T>(-static_cast<T>(b));
+  f = f ^ (mask & (f ^ g));
+}
+} // namespace sxt::basn
