@@ -56,6 +56,7 @@ sxt_cc_component(
     ],
     test_deps = [
       "//sxt/base/curve:example_element",
+      "//sxt/execution/schedule:scheduler",
       "//sxt/base/test:unit_test",
     ],
 )
