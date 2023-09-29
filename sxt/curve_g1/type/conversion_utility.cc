@@ -14,17 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
-
-#include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/constant/one.h"
-#include "sxt/field12/constant/zero.h"
-#include "sxt/field12/type/element.h"
-
-namespace sxt::cg1cn {
-//--------------------------------------------------------------------------------------------------
-// identity_affine_v
-//--------------------------------------------------------------------------------------------------
-static constexpr cg1t::element_affine identity_affine_v{f12cn::zero_v, f12cn::one_v, true};
-} // namespace sxt::cg1cn
+#include "sxt/curve_g1/type/conversion_utility.h"

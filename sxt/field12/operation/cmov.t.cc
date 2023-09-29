@@ -24,7 +24,7 @@
 using namespace sxt;
 using namespace sxt::f12o;
 
-TEST_CASE("cmov moves elements correctly") {
+TEST_CASE("cmov correctly moves field elements") {
   f12t::element h{f12cn::zero_v};
   f12t::element g{f12cn::zero_v};
 
