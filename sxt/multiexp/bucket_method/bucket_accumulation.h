@@ -57,8 +57,9 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
       make_exponents_viewable(exponents_viewable_data, exponents, rng, stream);
 
   // partial bucket accumulation kernel
+  xendv::synchronize_event(stream, generators_viewable);
   bucket_accumulate<<<dim3(num_blocks, num_outputs, 1), num_bytes, 0, stream>>>(
-      partial_bucket_sums.data(), generators_viewable.data(), exponents_viewable.data(), n);
+      partial_bucket_sums.data(), generators_viewable.value().data(), exponents_viewable.data(), n);
   generators_viewable_data.reset();
   exponents_viewable_data.reset();
 

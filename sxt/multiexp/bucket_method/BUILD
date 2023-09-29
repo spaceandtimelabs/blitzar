@@ -54,4 +54,8 @@ sxt_cc_component(
         "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:managed_device_resource",
     ],
+    test_deps = [
+      "//sxt/base/curve:example_element",
+      "//sxt/base/test:unit_test",
+    ],
 )

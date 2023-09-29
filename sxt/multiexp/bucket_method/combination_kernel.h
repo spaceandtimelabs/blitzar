@@ -35,6 +35,30 @@ __global__ void combine_partial_bucket_sums(typename Reducer::value_type* out,
   *out = sum;
 }
 
+template <bascrv::element T>
+__global__ void combine_partial_bucket_sums(T* out, T* partial_bucket_sums, unsigned num_partials) {
+  auto bucket_group_size = gridDim.x;
+  auto bucket_group_index = threadIdx.x;
+  auto num_bucket_groups = blockDim.x;
+  auto bucket_index = blockIdx.x;
+  auto output_index = blockIdx.y;
+
+  partial_bucket_sums += bucket_index + bucket_group_size * bucket_group_index +
+                         bucket_group_size * num_bucket_groups * num_partials * output_index;
+
+  out += bucket_index + bucket_group_size * bucket_group_index +
+         bucket_group_size * num_bucket_groups * output_index;
+
+  T sum = *partial_bucket_sums;
+  partial_bucket_sums += bucket_group_size * num_bucket_groups;
+  for (unsigned i = 1; i < num_partials; ++i) {
+    add_inplace(sum, *partial_bucket_sums);
+    partial_bucket_sums += bucket_group_size * num_bucket_groups;
+  }
+
+  *out = sum;
+}
+
 //--------------------------------------------------------------------------------------------------
 // combine_bucket_groups
 //--------------------------------------------------------------------------------------------------
