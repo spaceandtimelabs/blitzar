@@ -8,10 +8,11 @@ using namespace sxt::mtxbk;
 
 TEST_CASE("we can perform a bucket accumulation pass") {
   using E = bascrv::element97;
-  memmg::managed_array<E> buckets(255 * 32);
+  memmg::managed_array<E> bucket_sums(255 * 32);
 
   SECTION("OtTH", "we handle the empty case") {
-    auto fut = accumulate_buckets<E>(buckets, {}, {});    
+    bucket_sums.reset();
+    auto fut = accumulate_buckets<E>(bucket_sums, {}, {});    
     REQUIRE(fut.ready());
   }
 }
