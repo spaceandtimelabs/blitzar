@@ -30,4 +30,24 @@ TEST_CASE("we can perform a bucket accumulation pass") {
       REQUIRE(val == 0);
     }
   }
+
+  SECTION("we handle a case with a single element of 1") {
+    uint8_t scalar[32] = {};
+    scalar[0] = 1;
+    const uint8_t* scalars[] = {
+      scalar
+    };
+    E generators[] = {7};
+    auto fut = accumulate_buckets<E>(bucket_sums, generators, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    for (size_t i=0; i<bucket_sums.size(); ++i) {
+      auto val = bucket_sums[i];
+      if (i == 0) {
+        REQUIRE(val == 7);
+      } else {
+        REQUIRE(val == 0);
+      }
+    }
+  }
 }
