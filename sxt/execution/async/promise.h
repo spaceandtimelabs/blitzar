@@ -83,5 +83,5 @@ private:
   task* continuation_{nullptr};
 };
 
-extern template class promise<void>;
+/* extern template class promise<void>; */
 } // namespace sxt::xena
