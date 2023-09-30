@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
 
 #include "sxt/base/macro/cuda_callable.h"
 
@@ -22,6 +23,14 @@ struct element97 {
 
   bool operator==(const element97&) const noexcept = default;
 };
+
+//--------------------------------------------------------------------------------------------------
+// operator<<
+//--------------------------------------------------------------------------------------------------
+inline std::ostream& operator<<(std::ostream& out, const element97& e) noexcept {
+  out << e.value;
+  return out;
+}
 
 //--------------------------------------------------------------------------------------------------
 // double_element

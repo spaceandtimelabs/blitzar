@@ -94,4 +94,28 @@ TEST_CASE("we can perform a bucket accumulation pass") {
       }
     }
   }
+
+  SECTION("we handle multiple outputs") {
+    bucket_sums = memmg::managed_array<E>(255 * 32 * 2);
+    uint8_t scalar_data1[32] = {};
+    scalar_data1[0] = 2;
+    uint8_t scalar_data2[32] = {};
+    scalar_data2[0] = 2;
+    const uint8_t* scalars[] = {
+      scalar_data1,
+      scalar_data2,
+    };
+    E generators[] = {7};
+    auto fut = accumulate_buckets<E>(bucket_sums, generators, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    for (size_t i=0; i<bucket_sums.size(); ++i) {
+      auto val = bucket_sums[i];
+      if (i == 1 || i == 255 * 32 + 1) {
+        REQUIRE(val == 7);
+      } else {
+        REQUIRE(val == 0);
+      }
+    }
+  }
 }
