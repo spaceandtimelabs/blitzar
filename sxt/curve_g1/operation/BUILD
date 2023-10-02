@@ -98,7 +98,9 @@ sxt_cc_component(
     name = "neg",
     impl_deps = [
         "//sxt/curve_g1/type:element_p2",
+        "//sxt/field12/operation:cmov",
         "//sxt/field12/operation:neg",
+        "//sxt/field12/type:element",
     ],
     is_cuda = True,
     test_deps = [
