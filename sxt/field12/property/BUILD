@@ -4,6 +4,25 @@ load(
 )
 
 sxt_cc_component(
+    name = "lexicographically_largest",
+    impl_deps = [
+        "//sxt/field12/base:arithmetic_utility",
+        "//sxt/field12/base:reduce",
+        "//sxt/field12/type:element",
+    ],
+    is_cuda = True,
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/field12/constant:one",
+        "//sxt/field12/constant:zero",
+        "//sxt/field12/type:element",
+    ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
     name = "zero",
     test_deps = [
         "//sxt/base/test:unit_test",
