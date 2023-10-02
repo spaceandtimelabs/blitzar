@@ -30,12 +30,11 @@ namespace sxt::xendv {
 // concurrent_for_each
 //--------------------------------------------------------------------------------------------------
 xena::future<>
-concurrent_for_each(basit::index_range rng,
+concurrent_for_each(basit::index_range_iterator first, basit::index_range_iterator last,
                     std::function<xena::future<>(const basit::index_range&)> f) noexcept {
-  auto [it, last] = basit::split(rng, basdv::get_num_devices());
   std::vector<xena::future<>> futs;
-  futs.reserve(std::distance(it, last));
-  for (; it != last; ++it) {
+  futs.reserve(std::distance(first, last));
+  for (auto it = first; it != last; ++it) {
     auto device = co_await await_available_device();
     basdv::active_device_guard guard{device};
     futs.emplace_back(f(*it));
@@ -43,5 +42,12 @@ concurrent_for_each(basit::index_range rng,
   for (auto& fut : futs) {
     co_await std::move(fut);
   }
+}
+
+xena::future<>
+concurrent_for_each(basit::index_range rng,
+                    std::function<xena::future<>(const basit::index_range&)> f) noexcept {
+  auto [first, last] = basit::split(rng, basdv::get_num_devices());
+  return concurrent_for_each(first, last, f);
 }
 } // namespace sxt::xendv
