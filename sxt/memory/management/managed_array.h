@@ -175,6 +175,10 @@ public:
 
   void reset() noexcept { data_.reset(); }
 
+  void resize(size_t size_p) noexcept {
+    *this = memmg::managed_array<T>{size_p, this->get_allocator()};
+  }
+
   // operator[]
   T& operator[](size_t index) noexcept {
     SXT_DEBUG_ASSERT(index < this->size());
