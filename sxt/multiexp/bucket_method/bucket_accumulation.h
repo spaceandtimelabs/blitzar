@@ -76,12 +76,10 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
   co_await xendv::await_stream(stream);
 }
 
-//--------------------------------------------------------------------------------------------------
-// accumulate_buckets
-//--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-xena::future<> accumulate_buckets(basct::span<T> bucket_sums, basct::cspan<T> generators,
-                                  basct::cspan<const uint8_t*> exponents) noexcept {
+xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<T> generators,
+                                  basct::cspan<const uint8_t*> exponents,
+                                  size_t split_factor) noexcept {
   constexpr size_t bucket_group_size = 255;
   constexpr size_t num_bucket_groups = 32;
   static constexpr unsigned num_bytes = 32; // hard code to 32 for now
@@ -91,7 +89,7 @@ xena::future<> accumulate_buckets(basct::span<T> bucket_sums, basct::cspan<T> ge
       (bucket_sums.empty() || basdv::is_active_device_pointer(bucket_sums.data()))
   );
   auto [first, last] =
-      basit::split(basit::index_range{0, generators.size()}, basdv::get_num_devices());
+      basit::split(basit::index_range{0, generators.size()}, split_factor);
   auto num_chunks = std::distance(first, last);
 
   basdv::stream stream;
@@ -117,5 +115,14 @@ xena::future<> accumulate_buckets(basct::span<T> bucket_sums, basct::cspan<T> ge
   combine_partial_bucket_sums<<<dim3(255, num_outputs, 1), num_bytes, 0, stream>>>(
       bucket_sums.data(), partial_bucket_sums.data(), num_chunks);
   co_await xendv::await_stream(stream);
+}
+
+//--------------------------------------------------------------------------------------------------
+// accumulate_buckets
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+xena::future<> accumulate_buckets(basct::span<T> bucket_sums, basct::cspan<T> generators,
+                                  basct::cspan<const uint8_t*> exponents) noexcept {
+  return accumulate_buckets_impl(bucket_sums, generators, exponents, basdv::get_num_devices());
 }
 } // namespace sxt::mtxbk

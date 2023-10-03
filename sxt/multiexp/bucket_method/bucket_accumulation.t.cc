@@ -79,6 +79,30 @@ TEST_CASE("we can perform a bucket accumulation pass") {
     }
   }
 
+  SECTION("we handle multiple chunks") {
+    uint8_t scalar_data[32 * 4] = {};
+    scalar_data[0] = 1;
+    scalar_data[32] = 1;
+    scalar_data[32*2] = 1;
+    scalar_data[32*3] = 1;
+    const uint8_t* scalars[] = {
+      scalar_data
+    };
+    E generators[] = {7, 5, 3, 1};
+    auto fut = accumulate_buckets<E>(bucket_sums, generators, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    for (size_t i=0; i<bucket_sums.size(); ++i) {
+      auto val = bucket_sums[i];
+      if (i == 0) {
+        REQUIRE(val == 16);
+      } else {
+        REQUIRE(val == 0);
+      }
+    }
+  }
+
   SECTION("we handle two scalars of the same value") {
     uint8_t scalar_data[64] = {};
     scalar_data[0] = 2;
