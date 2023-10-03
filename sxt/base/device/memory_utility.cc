@@ -99,7 +99,6 @@ void async_memcpy_peer(void* dst, int dst_device, const void* src, int src_devic
 //--------------------------------------------------------------------------------------------------
 void async_memcpy_to_device(void* dst, const void* src, size_t count,
                             const pointer_attributes& attrs, const stream& stream) noexcept {
-  SXT_DEBUG_ASSERT(attrs.device != stream.device());
   switch (attrs.kind) {
   case pointer_kind_t::host:
     return async_memcpy_host_to_device(dst, src, count, stream);

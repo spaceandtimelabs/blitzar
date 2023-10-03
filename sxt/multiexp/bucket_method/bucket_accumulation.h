@@ -171,10 +171,10 @@ xena::future<> accumulate_buckets2(basct::span<T> bucket_sums, basct::cspan<T> g
     partial_bucket_sums = bucket_sums;
   }
 
-  size_t step = bucket_group_size * num_bucket_groups;
+  size_t step = bucket_group_size * num_bucket_groups * num_outputs;
   size_t i = 0;
   co_await xendv::concurrent_for_each(first, last, [&](const basit::index_range& rng) noexcept {
-    return accumulate_buckets_impl2(partial_bucket_sums.subspan(i++ * step, step), generators,
+    return accumulate_buckets_impl2(partial_bucket_sums.subspan(step * i++, step), generators,
                                     exponents, rng);
   });
   if (num_chunks <= 1) {

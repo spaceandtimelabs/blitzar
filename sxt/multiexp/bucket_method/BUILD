@@ -59,6 +59,7 @@ sxt_cc_component(
     ],
     test_deps = [
         "//sxt/memory/resource:managed_device_resource",
+        "//sxt/base/device:synchronization",
       "//sxt/base/curve:example_element",
       "//sxt/execution/schedule:scheduler",
       "//sxt/base/test:unit_test",
