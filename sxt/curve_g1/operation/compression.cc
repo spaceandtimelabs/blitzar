@@ -14,6 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+ * Adopted from zkcrypto/bls12_381
+ *
+ * Copyright (c) 2021
+ * Sean Bowe <ewillbefull@gmail.com>
+ * Jack Grigg <thestr4d@gmail.com>
+ *
+ * See third_party/license/zkcrypto.LICENSE
+ */
 #include "sxt/curve_g1/operation/compression.h"
 
 #include "sxt/base/error/assert.h"
