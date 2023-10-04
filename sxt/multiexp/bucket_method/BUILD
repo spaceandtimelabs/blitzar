@@ -65,3 +65,26 @@ sxt_cc_component(
       "//sxt/base/test:unit_test",
     ],
 )
+
+sxt_cc_component(
+    name = "multiexponentiation",
+    deps = [
+      ":bucket_accumulation",
+      ":combination_kernel",
+        "//sxt/base/container:span",
+        "//sxt/base/curve:element",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/execution/device:device_viewable",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:pinned_resource",
+    ],
+    test_deps = [
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/base/device:synchronization",
+      "//sxt/base/curve:example_element",
+      "//sxt/execution/schedule:scheduler",
+      "//sxt/base/test:unit_test",
+    ],
+)
