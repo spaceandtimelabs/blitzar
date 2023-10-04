@@ -63,7 +63,7 @@ __global__ void combine_partial_bucket_sums(T* out, T* partial_bucket_sums, unsi
 // combine_bucket_groups
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, unsigned BucketGroupSize, unsigned NumBucketGroups>
-__global__ void combine_partial_bucket_sums(T* out, T* bucket_sums) {
+__global__ void combine_bucket_groups(T* out, T* bucket_sums) {
   auto thread_index = threadIdx.x;
   auto block_index = blockIdx.x;
   auto num_threads = blockDim.x;

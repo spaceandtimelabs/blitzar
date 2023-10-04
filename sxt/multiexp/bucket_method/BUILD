@@ -71,8 +71,10 @@ sxt_cc_component(
     deps = [
       ":bucket_accumulation",
       ":combination_kernel",
+        "//sxt/base/device:stream",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
+        "//sxt/base/num:divide_up",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
         "//sxt/execution/device:device_viewable",
