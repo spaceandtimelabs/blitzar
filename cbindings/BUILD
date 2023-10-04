@@ -24,6 +24,7 @@ cc_binary(
     name = "libblitzar.so",
     linkopts = [
         "-Wl,--version-script=$(location :libblitzar-export-map.ld)",
+        "-lm",
     ],
     linkshared = 1,
     visibility = ["//visibility:public"],
