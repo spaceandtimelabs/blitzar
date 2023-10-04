@@ -22,6 +22,8 @@
 #include "sxt/curve_g1/type/element_p2.h"
 #include "sxt/field12/constant/one.h"
 #include "sxt/field12/constant/zero.h"
+#include "sxt/field12/operation/mul.h"
+#include "sxt/field12/type/element.h"
 
 using namespace sxt;
 using namespace sxt::cg1o;
@@ -97,5 +99,35 @@ TEST_CASE("batch compression correctly marks bits related to the") {
       REQUIRE(!((results[i].data()[47] & infinity_bit) >> 6));
       REQUIRE(!((results[i].data()[47] & lexicographically_largest_bit) >> 5));
     }
+  }
+}
+
+TEST_CASE("compression of two G1 curve elements that are") {
+  SECTION("different remain different") {
+    cg1t::compressed_element ce1;
+    cg1t::compressed_element ce2;
+
+    compress(ce1, cg1cn::generator_p2_v);
+    compress(ce2, cg1t::element_p2::identity());
+
+    REQUIRE(ce1 != ce2);
+  }
+
+  SECTION("projected remain the same") {
+    cg1t::compressed_element ce1;
+    cg1t::compressed_element ce2;
+
+    constexpr f12t::element z{0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
+                              0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e};
+    f12t::element gpx_z;
+    f12t::element gpy_z;
+    f12o::mul(gpx_z, cg1cn::generator_p2_v.X, z);
+    f12o::mul(gpy_z, cg1cn::generator_p2_v.Y, z);
+    cg1t::element_p2 projected_generator{gpx_z, gpy_z, z};
+
+    compress(ce1, cg1cn::generator_p2_v);
+    compress(ce2, projected_generator);
+
+    REQUIRE(ce1 == ce2);
   }
 }
