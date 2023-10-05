@@ -68,11 +68,20 @@ TEST_CASE("we can reduce bucket groups") {
     REQUIRE(reduced_bucket_sums[1] == 34u);
   }
 
-  SECTION("we can do a reduction with a group size of 1 and two groups") {
+  SECTION("we can do a reduction with a group size of 1 and 2 groups") {
     bucket_sums = {12u, 34u};
     reduced_bucket_sums.resize(1);
     combine_bucket_groups<1, 2><<<1, 1>>>(reduced_bucket_sums.data(), bucket_sums.data());
     basdv::synchronize_device();
     REQUIRE(reduced_bucket_sums[0] == 12u + 34u * 2u);
+  }
+  
+  SECTION("we can do a reduction with a group size of 2 and 2 groups") {
+    bucket_sums = {12u, 34u, 78u, 91u};
+    reduced_bucket_sums.resize(2);
+    combine_bucket_groups<2, 2><<<1, 2>>>(reduced_bucket_sums.data(), bucket_sums.data());
+    basdv::synchronize_device();
+    REQUIRE(reduced_bucket_sums[0] == 12u + 78u * 2u);
+    REQUIRE(reduced_bucket_sums[1] == 34u + 91u * 2u);
   }
 }
