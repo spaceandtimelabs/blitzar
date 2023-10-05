@@ -51,11 +51,20 @@ TEST_CASE("we can reduce bucket groups") {
   memmg::managed_array<bascrv::element97> bucket_sums(memr::get_managed_device_resource());
   memmg::managed_array<bascrv::element97> reduced_bucket_sums(memr::get_managed_device_resource());
 
-  SECTION("iaZr", "we can do a reduction with only a single element") {
+  SECTION("we can do a reduction with only a single element") {
     bucket_sums = {12u};
     reduced_bucket_sums.resize(1);
     combine_bucket_groups<1, 1><<<1, 1>>>(reduced_bucket_sums.data(), bucket_sums.data());
     basdv::synchronize_device();
     REQUIRE(reduced_bucket_sums[0] == 12u);
+  }
+
+  SECTION("we can do a reduction with two elements and a single group") {
+    bucket_sums = {12u, 34u};
+    reduced_bucket_sums.resize(2);
+    combine_bucket_groups<2, 1><<<2, 1>>>(reduced_bucket_sums.data(), bucket_sums.data());
+    basdv::synchronize_device();
+    REQUIRE(reduced_bucket_sums[0] == 12u);
+    REQUIRE(reduced_bucket_sums[1] == 34u);
   }
 }
