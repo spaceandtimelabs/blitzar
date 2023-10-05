@@ -34,13 +34,13 @@ __global__ void combine_partial_bucket_sums(T* out, T* partial_bucket_sums, unsi
 //--------------------------------------------------------------------------------------------------
 // combine_bucket_groups
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T, unsigned BucketGroupSize, unsigned NumBucketGroups>
+template <unsigned BucketGroupSize, unsigned NumBucketGroups, bascrv::element T>
 __global__ void combine_bucket_groups(T* out, T* bucket_sums) {
   auto thread_index = threadIdx.x;
   auto block_index = blockIdx.x;
   auto num_threads = blockDim.x;
   auto bucket_index = thread_index + block_index * num_threads;
-  if (bucket_index < BucketGroupSize) {
+  if (bucket_index >= BucketGroupSize) {
     return;
   }
 
@@ -50,7 +50,7 @@ __global__ void combine_bucket_groups(T* out, T* bucket_sums) {
   out += bucket_index + BucketGroupSize * NumBucketGroups * output_index;
 
   unsigned i = NumBucketGroups - 1;
-  T sum = bucket_sums[(NumBucketGroups - 1) * BucketGroupSize];
+  T sum = bucket_sums[i * BucketGroupSize];
   while (i-- > 0) {
     double_element(sum, sum);
     add_inplace(sum, bucket_sums[BucketGroupSize * i]);

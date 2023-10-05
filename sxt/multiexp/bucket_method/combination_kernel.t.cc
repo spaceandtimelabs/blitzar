@@ -48,6 +48,14 @@ TEST_CASE("we can combine partial bucket sums") {
 }
 
 TEST_CASE("we can reduce bucket groups") {
+  memmg::managed_array<bascrv::element97> bucket_sums(memr::get_managed_device_resource());
+  memmg::managed_array<bascrv::element97> reduced_bucket_sums(memr::get_managed_device_resource());
+
+  SECTION("iaZr", "we can do a reduction with only a single element") {
+    bucket_sums = {12u};
+    reduced_bucket_sums.resize(1);
+    combine_bucket_groups<1, 1><<<1, 1>>>(reduced_bucket_sums.data(), bucket_sums.data());
+    basdv::synchronize_device();
+    REQUIRE(reduced_bucket_sums[0] == 12u);
+  }
 }
-/* template <bascrv::element T, unsigned BucketGroupSize, unsigned NumBucketGroups> */
-/* __global__ void combine_bucket_groups(T* out, T* bucket_sums) { */
