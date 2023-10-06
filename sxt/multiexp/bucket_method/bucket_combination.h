@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sxt/base/error/assert.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/error/assert.h"
@@ -26,7 +27,7 @@ template <bascrv::element T>
 void combine_buckets(basct::span<T> sums, basct::cspan<T> bucket_sums) noexcept {
   auto num_outputs = sums.size();
   auto bucket_group_size = bucket_sums.size() / num_outputs;
-  SXT_ASSERT(
+  SXT_DEBUG_ASSERT(
       // clang-format off
       sums.size() == num_outputs && 
       bucket_sums.size() == num_outputs * bucket_group_size

@@ -71,6 +71,10 @@ sxt_cc_component(
     "//sxt/base/error:assert",
     "//sxt/base/curve:element",
   ],
+  test_deps = [
+      "//sxt/base/curve:example_element",
+      "//sxt/base/test:unit_test",
+  ],
 )
 
 sxt_cc_component(
