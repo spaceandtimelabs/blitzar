@@ -29,13 +29,17 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
   SXT_DEBUG_ASSERT(
       res.size() == num_outputs
   );
+  if (res.empty()) {
+    co_return;
+  }
+
   basdv::stream stream;
 
   // accumulate
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> bucket_sums{bucket_group_size * num_bucket_groups * num_outputs,
                                       &resource};
-  co_await accumulate_buckets(bucket_sums, generators, exponents);
+  co_await accumulate_buckets<T>(bucket_sums, generators, exponents);
 
   // reduce buckets
   memmg::managed_array<T> reduced_buckets_dev{bucket_group_size * num_outputs, &resource};
@@ -44,7 +48,7 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
   combine_bucket_groups<bucket_group_size, num_bucket_groups>
       <<<block_dims, num_threads, 0, stream>>>(reduced_buckets_dev.data(), bucket_sums.data());
   memmg::managed_array<T> reduced_buckets{reduced_buckets_dev.size(), memr::get_pinned_resource()};
-  basdv::async_copy_device_to_host(reduced_buckets, reduced_buckets_dev);
+  basdv::async_copy_device_to_host(reduced_buckets, reduced_buckets_dev, stream);
   co_await xendv::await_stream(stream);
   reduced_buckets_dev.reset();
 
