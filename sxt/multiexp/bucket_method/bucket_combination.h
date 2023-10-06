@@ -10,8 +10,13 @@ namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 void combine_buckets_impl(T& sum, basct::cspan<T> bucket_sums) noexcept {
-  (void)sum;
-  (void)bucket_sums;
+  auto i = bucket_sums.size() - 1u;
+  T t = bucket_sums[i];
+  sum = bucket_sums[i];
+  while (i-- > 0) {
+    add_inplace(t, bucket_sums[i]);
+    add_inplace(sum, t);
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
