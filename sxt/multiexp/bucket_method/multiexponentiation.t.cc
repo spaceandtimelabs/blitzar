@@ -19,4 +19,36 @@ TEST_CASE("we can compute a multiexponentiation") {
     auto fut = multiexponentiate<bascrv::element97>(res, generators, exponents);
     REQUIRE(fut.ready());
   }
+
+  SECTION("we can compute a multiexponentiation with a single zero element") {
+    uint8_t scalar1[32] = {};
+    exponents.push_back(scalar1);
+    generators = {12u};
+    auto fut = multiexponentiate<bascrv::element97>(res, generators, exponents);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 0u);
+  }
+
+  SECTION("we can compute a multiexponentiation with a single element of 1") {
+    uint8_t scalar1[32] = {};
+    scalar1[0] = 1;
+    exponents.push_back(scalar1);
+    generators = {12u};
+    auto fut = multiexponentiate<bascrv::element97>(res, generators, exponents);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 12u);
+  }
+
+  SECTION("we can compute a multiexponentiation with a single element of 2") {
+    uint8_t scalar1[32] = {};
+    scalar1[0] = 2;
+    exponents.push_back(scalar1);
+    generators = {12u};
+    auto fut = multiexponentiate<bascrv::element97>(res, generators, exponents);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 24u);
+  }
 }
