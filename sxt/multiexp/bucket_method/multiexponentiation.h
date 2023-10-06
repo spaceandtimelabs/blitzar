@@ -1,16 +1,19 @@
 #pragma once
 
-#include "sxt/base/num/divide_up.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/bucket_method/bucket_accumulation.h"
+#include "sxt/multiexp/bucket_method/bucket_combination.h"
 #include "sxt/multiexp/bucket_method/combination_kernel.h"
 
 namespace sxt::mtxbk {
@@ -40,12 +43,12 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
   dim3 block_dims(basn::divide_up(bucket_group_size, num_threads), num_outputs, 1);
   combine_bucket_groups<bucket_group_size, num_bucket_groups>
       <<<block_dims, num_threads, 0, stream>>>(reduced_buckets_dev.data(), bucket_sums.data());
+  memmg::managed_array<T> reduced_buckets{reduced_buckets_dev.size(), memr::get_pinned_resource()};
+  basdv::async_copy_device_to_host(reduced_buckets, reduced_buckets_dev);
+  co_await xendv::await_stream(stream);
+  reduced_buckets_dev.reset();
 
-  (void)reduced_buckets_dev;
-  (void)bucket_sums;
-
-  (void)res;
-  (void)generators;
-  (void)exponents;
+  // combine buckets
+  combine_buckets<T>(res, reduced_buckets);
 }
 } // namespace sxt::mtxbk
