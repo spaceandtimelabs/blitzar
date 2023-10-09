@@ -41,7 +41,7 @@ static std::ostream& print_impl(std::ostream& out, const std::array<uint8_t, 48>
 //--------------------------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& out, const element& e) noexcept {
   std::array<uint8_t, 48> bytes = {};
-  f12b::to_bytes(bytes.data(), e.data());
+  f12b::to_bytes_le(bytes.data(), e.data());
   auto flags = out.flags();
   out << "0x";
   for (int i = 48; i-- > 0;) {
