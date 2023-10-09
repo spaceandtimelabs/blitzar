@@ -36,6 +36,7 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/multiexp/bucket_method/multiexponentiation.h"
 #include "sxt/multiexp/curve/multiexponentiation_cpu_driver.h"
 #include "sxt/multiexp/curve/multiproduct.h"
 #include "sxt/multiexp/curve/multiproducts_combination.h"
@@ -145,6 +146,13 @@ template <bascrv::element Element>
 xena::future<memmg::managed_array<Element>>
 async_compute_multiexponentiation(basct::cspan<Element> generators,
                                   basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
+  // try bucket method first
+  auto res_maybe = co_await mtxbk::try_multiexponentiate(generators, exponents);
+  if (!res_maybe.empty()) {
+    co_return res_maybe;
+  }
+
+  // use more general method
   auto num_outputs = exponents.size();
   std::vector<basct::blob_array> or_alls;
   or_alls.reserve(num_outputs);

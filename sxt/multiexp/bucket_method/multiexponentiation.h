@@ -69,6 +69,7 @@ try_multiexponentiate(basct::cspan<Element> generators,
                       basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   auto num_outputs = exponents.size();
   memmg::managed_array<Element> res;
+  co_return res;
   uint64_t min_n = std::numeric_limits<uint64_t>::max();
   uint64_t max_n = 0;
   for (auto& exponent : exponents) {
@@ -76,7 +77,7 @@ try_multiexponentiate(basct::cspan<Element> generators,
       co_return res;
     }
     min_n = std::min(min_n, exponent.n);
-    max_n = std::min(max_n, exponent.n);
+    max_n = std::max(max_n, exponent.n);
   }
   if (min_n != max_n) {
       co_return res;
@@ -94,7 +95,7 @@ try_multiexponentiate(basct::cspan<Element> generators,
     exponents_p[output_index] = exponents[output_index].data;
   }
   res.resize(num_outputs);
-  co_await multiexponentiate(res, generators, exponents_p);
+  co_await multiexponentiate<Element>(res, generators, exponents_p);
   co_return res;
 }
 } // namespace sxt::mtxbk

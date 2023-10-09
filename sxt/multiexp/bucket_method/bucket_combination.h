@@ -10,7 +10,7 @@ namespace sxt::mtxbk {
 // combine_buckets_impl 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-void combine_buckets_impl(T& sum, basct::cspan<T> bucket_sums) noexcept {
+void combine_buckets_impl(T& sum, basct::span<T> bucket_sums) noexcept {
   auto i = bucket_sums.size() - 1u;
   T t = bucket_sums[i];
   sum = bucket_sums[i];
@@ -24,7 +24,7 @@ void combine_buckets_impl(T& sum, basct::cspan<T> bucket_sums) noexcept {
 // combine_buckets 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-void combine_buckets(basct::span<T> sums, basct::cspan<T> bucket_sums) noexcept {
+void combine_buckets(basct::span<T> sums, basct::span<T> bucket_sums) noexcept {
   auto num_outputs = sums.size();
   auto bucket_group_size = bucket_sums.size() / num_outputs;
   SXT_DEBUG_ASSERT(
