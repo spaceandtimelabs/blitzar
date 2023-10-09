@@ -52,7 +52,9 @@ __global__ void combine_bucket_groups(T* out, T* bucket_sums) {
   unsigned i = NumBucketGroups - 1;
   T sum = bucket_sums[i * BucketGroupSize];
   while (i-- > 0) {
-    double_element(sum, sum);
+    for (int j=0; j<8; ++j) {
+      double_element(sum, sum);
+    }
     add_inplace(sum, bucket_sums[BucketGroupSize * i]);
   }
 

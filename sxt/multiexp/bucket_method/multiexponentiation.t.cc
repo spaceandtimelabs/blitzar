@@ -61,6 +61,17 @@ TEST_CASE("we can compute a multiexponentiation") {
     REQUIRE(res[0] == 24u);
   }
 
+  SECTION("we can compute a multiexponentiation with a single element of 256") {
+    uint8_t scalar_data[32] = {};
+    scalar_data[1] = 1;
+    exponents.push_back(scalar_data);
+    generators = {12u};
+    auto fut = multiexponentiate<bascrv::element97>(res, generators, exponents);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 256u * 12u);
+  }
+
   SECTION("we can compute a multiexponentiation with 2 generators") {
     uint8_t scalar_data[64] = {};
     scalar_data[0] = 2;
