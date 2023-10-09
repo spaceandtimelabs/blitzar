@@ -6,8 +6,15 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
 #include "sxt/execution/schedule/scheduler.h"
+
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
+#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve21/type/literal.h"
 using namespace sxt;
 using namespace sxt::mtxbk;
+using c21t::operator""_c21;
 
 TEST_CASE("we can compute a multiexponentiation") {
   std::vector<bascrv::element97> res(1);
@@ -65,4 +72,23 @@ TEST_CASE("we can compute a multiexponentiation") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 2u * 12u + 3u * 34u);
   }
+}
+
+TEST_CASE("we can compute multiexponentiations with curve-21") {
+  std::vector<c21t::element_p3> res(1);
+  std::vector<c21t::element_p3> generators;
+  std::vector<const uint8_t*> exponents;
+
+#if 0
+  SECTION("we can compute a multiexponentiation with a single element of 1") {
+    uint8_t scalar_data[32] = {};
+    scalar_data[0] = 1;
+    exponents.push_back(scalar_data);
+    generators = {0x123_c21};
+    auto fut = multiexponentiate<c21t::element_p3>(res, generators, exponents);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 0x123_c21);
+  }
+#endif
 }
