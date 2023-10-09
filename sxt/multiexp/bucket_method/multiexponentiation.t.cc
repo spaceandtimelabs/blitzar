@@ -12,9 +12,11 @@
 #include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/curve21/type/literal.h"
+#include "sxt/field51/type/literal.h"
 using namespace sxt;
 using namespace sxt::mtxbk;
 using c21t::operator""_c21;
+using f51t::operator""_f51;
 
 TEST_CASE("we can compute a multiexponentiation") {
   std::vector<bascrv::element97> res(1);
@@ -79,7 +81,6 @@ TEST_CASE("we can compute multiexponentiations with curve-21") {
   std::vector<c21t::element_p3> generators;
   std::vector<const uint8_t*> exponents;
 
-#if 0
   SECTION("we can compute a multiexponentiation with a single element of 1") {
     uint8_t scalar_data[32] = {};
     scalar_data[0] = 1;
@@ -90,5 +91,4 @@ TEST_CASE("we can compute multiexponentiations with curve-21") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 0x123_c21);
   }
-#endif
 }

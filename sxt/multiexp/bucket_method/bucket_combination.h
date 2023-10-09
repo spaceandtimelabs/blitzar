@@ -16,7 +16,7 @@ void combine_buckets_impl(T& sum, basct::span<T> bucket_sums) noexcept {
   sum = bucket_sums[i];
   while (i-- > 0) {
     add_inplace(t, bucket_sums[i]);
-    add_inplace(sum, t);
+    add(sum, sum, t);
   }
 }
 

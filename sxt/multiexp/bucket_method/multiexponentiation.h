@@ -56,11 +56,6 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
   co_await xendv::await_stream(stream);
   reduced_buckets_dev.reset();
 
-  /* int cnt = 0; */
-  /* for (auto& e : reduced_buckets) { */
-  /*   std::cerr << "bucket[" << cnt++ << "] = " << e << std::endl; */
-  /* } */
-
   // combine buckets
   combine_buckets<T>(res, reduced_buckets);
 }
@@ -88,10 +83,6 @@ try_multiexponentiate(basct::cspan<Element> generators,
       co_return res;
   }
   auto n = max_n;
-  std::cerr << "n = " << n << std::endl;
-  /* if (n < 10000) { */
-  /*     co_return res; */
-  /* } */
   SXT_DEBUG_ASSERT(
       generators.size() >= n
   );
@@ -102,7 +93,6 @@ try_multiexponentiate(basct::cspan<Element> generators,
   }
   res.resize(num_outputs);
   co_await multiexponentiate<Element>(res, generators, exponents_p);
-  std::cerr << "res = " << res[0] << std::endl;
   co_return res;
 }
 } // namespace sxt::mtxbk

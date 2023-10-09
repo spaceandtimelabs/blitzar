@@ -66,7 +66,6 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
   generators_viewable_data.reset();
   exponents_viewable_data.reset();
 
-
   // combine partial sums
   memmg::managed_array<T> bucket_sums_dev{bucket_sums.size(), &resource};
   combine_partial_bucket_sums<<<dim3(255, num_outputs, 1), num_bytes, 0, stream>>>(

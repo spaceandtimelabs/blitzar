@@ -56,8 +56,9 @@ inline CUDA_CALLABLE void add(element97& res, const element97& x, const element9
 //--------------------------------------------------------------------------------------------------
 // add_inplace
 //--------------------------------------------------------------------------------------------------
-inline CUDA_CALLABLE void add_inplace(element97& res, const element97& x) noexcept {
+inline CUDA_CALLABLE void add_inplace(element97& res, element97& x) noexcept {
   res.value = (res.value + x.value) % 97u;
+  x = 13; // simulate a destructive add by setting x to an arbitrary value 
 }
 
 //--------------------------------------------------------------------------------------------------
