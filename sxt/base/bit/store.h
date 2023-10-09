@@ -37,7 +37,6 @@ inline void store64_le(uint8_t dst[8], uint64_t w) noexcept {
 CUDA_CALLABLE
 inline void store64_be(uint8_t dst[8], uint64_t w) noexcept {
   // note: assume the architecture is little endian
-  uint64_t w_le{__builtin_bswap64(w)};
-  std::memcpy(static_cast<void*>(dst), static_cast<const void*>(&w_le), sizeof(w_le));
+  store64_le(dst, __builtin_bswap64(w));
 }
 } // namespace sxt::basbt
