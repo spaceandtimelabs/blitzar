@@ -59,7 +59,6 @@ TEST_CASE("we can prove and verify an inner product") {
   auto& b_vector = descriptor.b_vector;
   auto& g_vector = descriptor.g_vector;
 
-#if 0
   SECTION("we can prove and verify with a single element") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 1);
     std::vector<rstt::compressed_element> l_vector, r_vector;
@@ -88,7 +87,6 @@ TEST_CASE("we can prove and verify an inner product") {
     xens::get_scheduler().run();
     REQUIRE(!v_fut.value());
   }
-#endif
 
   SECTION("we can verify a proof with 2 elements") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 2);
@@ -121,7 +119,6 @@ TEST_CASE("we can prove and verify an inner product") {
     REQUIRE(!v_fut.value());
   }
 
-#if 0
   SECTION("we can prove and verify random proofs of varying size") {
     for (size_t n = 1; n <= 9; ++n) {
       generate_random_product(descriptor, a_vector, rng, &alloc, n);
@@ -263,5 +260,4 @@ static void exercise_prove_verify(const driver& drv, const proof_descriptor& des
   if (v_fut.value()) {
     baser::panic("verification should fail");
   }
-#endif
 }

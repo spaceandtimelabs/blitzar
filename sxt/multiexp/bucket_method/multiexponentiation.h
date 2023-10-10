@@ -69,7 +69,7 @@ try_multiexponentiate(basct::cspan<Element> generators,
                       basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   auto num_outputs = exponents.size();
   memmg::managed_array<Element> res;
-  co_return res;
+  /* co_return res; */
   uint64_t min_n = std::numeric_limits<uint64_t>::max();
   uint64_t max_n = 0;
   for (auto& exponent : exponents) {
