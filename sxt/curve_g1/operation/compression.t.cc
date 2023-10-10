@@ -38,9 +38,9 @@ TEST_CASE("compression correctly marks bits related to the") {
 
     compress(result, cg1cn::generator_p2_v);
 
-    REQUIRE((result.data()[47] & compressed_bit) >> 7);
-    REQUIRE(!((result.data()[47] & infinity_bit) >> 6));
-    REQUIRE(!((result.data()[47] & lexicographically_largest_bit) >> 5));
+    REQUIRE((result.data()[0] & compressed_bit) >> 7);
+    REQUIRE(!((result.data()[0] & infinity_bit) >> 6));
+    REQUIRE(!((result.data()[0] & lexicographically_largest_bit) >> 5));
   }
 
   SECTION("point at infinity") {
@@ -50,9 +50,9 @@ TEST_CASE("compression correctly marks bits related to the") {
 
     compress(result, inf_elm);
 
-    REQUIRE((result.data()[47] & compressed_bit) >> 7);
-    REQUIRE((result.data()[47] & infinity_bit) >> 6);
-    REQUIRE(!((result.data()[47] & lexicographically_largest_bit) >> 5));
+    REQUIRE((result.data()[0] & compressed_bit) >> 7);
+    REQUIRE((result.data()[0] & infinity_bit) >> 6);
+    REQUIRE(!((result.data()[0] & lexicographically_largest_bit) >> 5));
   }
 
   SECTION("lexicographically largest element") {
@@ -65,18 +65,18 @@ TEST_CASE("compression correctly marks bits related to the") {
 
     compress(result, ll_elm);
 
-    REQUIRE((result.data()[47] & compressed_bit) >> 7);
-    REQUIRE(!((result.data()[47] & infinity_bit) >> 6));
-    REQUIRE(((result.data()[47] & lexicographically_largest_bit) >> 5));
+    REQUIRE((result.data()[0] & compressed_bit) >> 7);
+    REQUIRE(!((result.data()[0] & infinity_bit) >> 6));
+    REQUIRE(((result.data()[0] & lexicographically_largest_bit) >> 5));
 
     // Make point at infinity.
     ll_elm.Z = f12cn::zero_v;
 
     compress(result, ll_elm);
 
-    REQUIRE((result.data()[47] & compressed_bit) >> 7);
-    REQUIRE((result.data()[47] & infinity_bit) >> 6);
-    REQUIRE(!((result.data()[47] & lexicographically_largest_bit) >> 5));
+    REQUIRE((result.data()[0] & compressed_bit) >> 7);
+    REQUIRE((result.data()[0] & infinity_bit) >> 6);
+    REQUIRE(!((result.data()[0] & lexicographically_largest_bit) >> 5));
   }
 }
 
@@ -95,9 +95,9 @@ TEST_CASE("batch compression correctly marks bits related to the") {
     batch_compress(results, generators);
 
     for (size_t i = 0; i < generators.size(); ++i) {
-      REQUIRE((results[i].data()[47] & compressed_bit) >> 7);
-      REQUIRE(!((results[i].data()[47] & infinity_bit) >> 6));
-      REQUIRE(!((results[i].data()[47] & lexicographically_largest_bit) >> 5));
+      REQUIRE((results[i].data()[0] & compressed_bit) >> 7);
+      REQUIRE(!((results[i].data()[0] & infinity_bit) >> 6));
+      REQUIRE(!((results[i].data()[0] & lexicographically_largest_bit) >> 5));
     }
   }
 }
