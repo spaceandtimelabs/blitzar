@@ -47,7 +47,7 @@ mod tests {
         ];
 
         let mut cbinding_commitments: Vec<blitzar_sys::
-            sxt_compressed_ristretto> = Vec::with_capacity(num_commitments);
+            sxt_ristretto255_compressed> = Vec::with_capacity(num_commitments);
         let mut cbinding_descriptors: Vec<blitzar_sys::
                 sxt_sequence_descriptor> = Vec::with_capacity(num_commitments);
 
@@ -66,7 +66,7 @@ mod tests {
                 cbinding_descriptors[i] = descriptor;
             }
 
-            blitzar_sys::sxt_compute_pedersen_commitments(
+            blitzar_sys::sxt_curve25519_compute_pedersen_commitments(
                 cbinding_commitments.as_mut_ptr(),
                 num_commitments as u32,
                 cbinding_descriptors.as_mut_ptr(),

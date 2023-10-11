@@ -31,22 +31,22 @@ struct sxt_config {
   uint64_t num_precomputed_generators;
 };
 
-struct sxt_compressed_ristretto {
+struct sxt_ristretto255_compressed {
   // encodes an element of the ristretto255 group
   uint8_t ristretto_bytes[32];
 };
 
-struct sxt_scalar {
+struct sxt_curve25519_scalar {
   // encodes an element of the finite field modulo (2^252 + 27742317777372353535851937790883648493)
   uint8_t bytes[32];
 };
 
-struct sxt_transcript {
+struct sxt_curve25519_transcript {
   // encodes a strobe-based transcript
   uint8_t bytes[203];
 };
 
-struct sxt_ristretto {
+struct sxt_ristretto255 {
   // encodes an element of the curve255 group
   uint64_t X[5];
   uint64_t Y[5];
@@ -88,7 +88,7 @@ struct sxt_sequence_descriptor {
 int sxt_init(const struct sxt_config* config);
 
 /**
- * Compute the pedersen commitments for sequences of values
+ * Compute the Pedersen commitments for sequences of values
  *
  * Denote an element of a sequence by a_ij where i represents the sequence index
  * and j represents the element index. Let * represent the operator for the
@@ -127,13 +127,13 @@ int sxt_init(const struct sxt_config* config);
  *
  * - num_sequences equal to 0 will skip the computation
  */
-void sxt_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitments,
-                                      uint32_t num_sequences,
-                                      const struct sxt_sequence_descriptor* descriptors,
-                                      uint64_t offset_generators);
+void sxt_curve25519_compute_pedersen_commitments(struct sxt_ristretto255_compressed* commitments,
+                                                 uint32_t num_sequences,
+                                                 const struct sxt_sequence_descriptor* descriptors,
+                                                 uint64_t offset_generators);
 
 /**
- * Compute the pedersen commitments for sequences of values
+ * Compute the Pedersen commitments for sequences of values
  *
  * Denote an element of a sequence by a_ij where i represents the sequence index
  * and j represents the element index. Let * represent the operator for the
@@ -168,15 +168,15 @@ void sxt_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitmen
  *
  * - num_sequences equal to 0 will skip the computation
  */
-void sxt_compute_pedersen_commitments_with_generators(
-    struct sxt_compressed_ristretto* commitments, uint32_t num_sequences,
-    const struct sxt_sequence_descriptor* descriptors, const struct sxt_ristretto* generators);
+void sxt_curve25519_compute_pedersen_commitments_with_generators(
+    struct sxt_ristretto255_compressed* commitments, uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors, const struct sxt_ristretto255* generators);
 
 /**
  * Gets the pre-specified random generated elements used for the Pedersen commitments in the
- * `sxt_compute_pedersen_commitments` function
+ * `sxt_curve25519_compute_pedersen_commitments` function
  *
- * sxt_get_generators(generators, num_generators, offset_generators) →
+ * sxt_ristretto255_get_generators(generators, num_generators, offset_generators) →
  *     generators\[0] = generate_random_ristretto(0 + offset_generators)
  *     generators\[1] = generate_random_ristretto(1 + offset_generators)
  *     generators\[2] = generate_random_ristretto(2 + offset_generators)
@@ -206,8 +206,8 @@ void sxt_compute_pedersen_commitments_with_generators(
  *
  * - num_generators equal to 0 will skip the computation
  */
-int sxt_get_generators(struct sxt_ristretto* generators, uint64_t offset_generators,
-                       uint64_t num_generators);
+int sxt_ristretto255_get_generators(struct sxt_ristretto255* generators, uint64_t offset_generators,
+                                    uint64_t num_generators);
 
 /**
  * Gets the n-th ristretto point defined as:
@@ -220,14 +220,15 @@ int sxt_get_generators(struct sxt_ristretto* generators, uint64_t offset_generat
  *
  * where
  *
- * struct sxt_ristretto ristretto_identity = {
+ * struct sxt_ristretto255 ristretto_identity = {
  *    {0, 0, 0, 0, 0},
  *    {1, 0, 0, 0, 0},
  *    {1, 0, 0, 0, 0},
  *    {0, 0, 0, 0, 0},
  * };
  *
- * and `g[i]` is the i-th generator provided by `sxt_get_generators` function at offset 0.
+ * and `g[i]` is the i-th generator provided by `sxt_ristretto255_get_generators` function at offset
+ * 0.
  *
  * # Return:
  *
@@ -237,13 +238,13 @@ int sxt_get_generators(struct sxt_ristretto* generators, uint64_t offset_generat
  *
  * - one_commit == nullptr
  */
-int sxt_get_one_commit(struct sxt_ristretto* one_commit, uint64_t n);
+int sxt_curve25519_get_one_commit(struct sxt_ristretto255* one_commit, uint64_t n);
 
 /**
  * Creates an inner product proof
  *
  * The proof is created with respect to the base G, provided by
- * `sxt_get_generators(G, generators_offset, 1ull << ceil(log2(n)))`.
+ * `sxt_ristretto255_get_generators(G, generators_offset, 1ull << ceil(log2(n)))`.
  *
  * The `verifier` transcript is passed in as a parameter so that the
  * challenges depend on the *entire* transcript (including parent
@@ -326,17 +327,19 @@ int sxt_get_one_commit(struct sxt_ristretto* one_commit, uint64_t n);
  * - n is zero
  * - n is non-zero, but l_vector or r_vector is nullptr
  */
-void sxt_prove_inner_product(struct sxt_compressed_ristretto* l_vector,
-                             struct sxt_compressed_ristretto* r_vector, struct sxt_scalar* ap_value,
-                             struct sxt_transcript* transcript, uint64_t n,
-                             uint64_t generators_offset, const struct sxt_scalar* a_vector,
-                             const struct sxt_scalar* b_vector);
+void sxt_curve25519_prove_inner_product(struct sxt_ristretto255_compressed* l_vector,
+                                        struct sxt_ristretto255_compressed* r_vector,
+                                        struct sxt_curve25519_scalar* ap_value,
+                                        struct sxt_curve25519_transcript* transcript, uint64_t n,
+                                        uint64_t generators_offset,
+                                        const struct sxt_curve25519_scalar* a_vector,
+                                        const struct sxt_curve25519_scalar* b_vector);
 
 /**
  * Verifies an inner product proof
  *
  * The proof is verified with respect to the base G, provided by
- * `sxt_get_generators(G, generators_offset, 1ull << ceil(log2(n)))`.
+ * `sxt_ristretto255_get_generators(G, generators_offset, 1ull << ceil(log2(n)))`.
  *
  * Note that we don't have any restriction to the `n` value, other than
  * it has to be non-zero.
@@ -346,17 +349,17 @@ void sxt_prove_inner_product(struct sxt_compressed_ristretto* l_vector,
  * - transcript (in/out): a single strobe-based transcript
  * - n (in): non-zero length for the input arrays
  * - generators_offset (in): offset used to fetch the bases
- * - b_vector (in): array with length n, the same one used by `sxt_prove_inner_product`
+ * - b_vector (in): array with length n, the same one used by `sxt_curve25519_prove_inner_product`
  * - product (in): a single scalar, represented by <a, b>,
  *                 the inner product of the two vectors `a` and `b` used by
- * `sxt_prove_inner_product`
+ * `sxt_curve25519_prove_inner_product`
  * - a_commit (in): a single ristretto point, represented by <a, G> (the inner product of the two
  * vectors)
  * - l_vector (in): transcript point array with length `ceil(log2(n))`, generated by
- * `sxt_prove_inner_product`
+ * `sxt_curve25519_prove_inner_product`
  * - r_vector (in): transcript point array with length `ceil(log2(n))`, generated by
- * `sxt_prove_inner_product`
- * - ap_value (in): a single scalar, generated by `sxt_prove_inner_product`
+ * `sxt_curve25519_prove_inner_product`
+ * - ap_value (in): a single scalar, generated by `sxt_curve25519_prove_inner_product`
  *
  * # Return:
  *
@@ -368,12 +371,14 @@ void sxt_prove_inner_product(struct sxt_compressed_ristretto* l_vector,
  * - n is zero
  * - n is non-zero, but l_vector or r_vector is nullptr
  */
-int sxt_verify_inner_product(struct sxt_transcript* transcript, uint64_t n,
-                             uint64_t generators_offset, const struct sxt_scalar* b_vector,
-                             const struct sxt_scalar* product, const struct sxt_ristretto* a_commit,
-                             const struct sxt_compressed_ristretto* l_vector,
-                             const struct sxt_compressed_ristretto* r_vector,
-                             const struct sxt_scalar* ap_value);
+int sxt_curve25519_verify_inner_product(struct sxt_curve25519_transcript* transcript, uint64_t n,
+                                        uint64_t generators_offset,
+                                        const struct sxt_curve25519_scalar* b_vector,
+                                        const struct sxt_curve25519_scalar* product,
+                                        const struct sxt_ristretto255* a_commit,
+                                        const struct sxt_ristretto255_compressed* l_vector,
+                                        const struct sxt_ristretto255_compressed* r_vector,
+                                        const struct sxt_curve25519_scalar* ap_value);
 
 #ifdef __cplusplus
 } // extern "C"

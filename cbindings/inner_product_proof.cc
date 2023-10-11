@@ -31,72 +31,76 @@ namespace sxt::cbn {
 //--------------------------------------------------------------------------------------------------
 // check_prove_inner_product_input
 //--------------------------------------------------------------------------------------------------
-static void check_prove_inner_product_input(sxt_compressed_ristretto* l_vector,
-                                            sxt_compressed_ristretto* r_vector,
-                                            sxt_scalar* ap_value, sxt_transcript* transcript,
-                                            uint64_t n, const sxt_scalar* b_vector,
-                                            const sxt_scalar* a_vector) noexcept {
+static void check_prove_inner_product_input(sxt_ristretto255_compressed* l_vector,
+                                            sxt_ristretto255_compressed* r_vector,
+                                            sxt_curve25519_scalar* ap_value,
+                                            sxt_curve25519_transcript* transcript, uint64_t n,
+                                            const sxt_curve25519_scalar* b_vector,
+                                            const sxt_curve25519_scalar* a_vector) noexcept {
   SXT_RELEASE_ASSERT(
       transcript != nullptr,
-      "transcript must not be null in the `sxt_prove_inner_product` c binding function");
+      "transcript must not be null in the `sxt_curve25519_prove_inner_product` c binding function");
   SXT_RELEASE_ASSERT(
       ap_value != nullptr,
-      "ap_value must not be null in the `sxt_prove_inner_product` c binding function");
+      "ap_value must not be null in the `sxt_curve25519_prove_inner_product` c binding function");
   SXT_RELEASE_ASSERT(
       b_vector != nullptr,
-      "b_vector must not be null in the `sxt_prove_inner_product` c binding function");
+      "b_vector must not be null in the `sxt_curve25519_prove_inner_product` c binding function");
   SXT_RELEASE_ASSERT(
       a_vector != nullptr,
-      "a_vector must not be null in the `sxt_prove_inner_product` c binding function");
+      "a_vector must not be null in the `sxt_curve25519_prove_inner_product` c binding function");
   SXT_RELEASE_ASSERT(n > 0, "a_vector and b_vector lengths must be greater than zero in the "
-                            "`sxt_prove_inner_product` c binding function");
+                            "`sxt_curve25519_prove_inner_product` c binding function");
   SXT_RELEASE_ASSERT(n == 1 || (l_vector != nullptr && r_vector != nullptr),
                      "l_vector and r_vector lengths must not be null when a_vector size is bigger "
-                     "than one in the `sxt_prove_inner_product` c binding function");
+                     "than one in the `sxt_curve25519_prove_inner_product` c binding function");
 }
 
 //--------------------------------------------------------------------------------------------------
 // check_verify_inner_product_input
 //--------------------------------------------------------------------------------------------------
-static void check_verify_inner_product_input(sxt_transcript* transcript, uint64_t n,
-                                             const sxt_scalar* b_vector, const sxt_scalar* product,
-                                             const sxt_ristretto* a_commit,
-                                             const sxt_compressed_ristretto* l_vector,
-                                             const sxt_compressed_ristretto* r_vector,
-                                             const sxt_scalar* ap_value) noexcept {
-  SXT_RELEASE_ASSERT(
-      transcript != nullptr,
-      "transcript must not be null in the `sxt_verify_inner_product` c binding function");
+static void check_verify_inner_product_input(sxt_curve25519_transcript* transcript, uint64_t n,
+                                             const sxt_curve25519_scalar* b_vector,
+                                             const sxt_curve25519_scalar* product,
+                                             const sxt_ristretto255* a_commit,
+                                             const sxt_ristretto255_compressed* l_vector,
+                                             const sxt_ristretto255_compressed* r_vector,
+                                             const sxt_curve25519_scalar* ap_value) noexcept {
+  SXT_RELEASE_ASSERT(transcript != nullptr,
+                     "transcript must not be null in the `sxt_curve25519_verify_inner_product` c "
+                     "binding function");
   SXT_RELEASE_ASSERT(
       ap_value != nullptr,
-      "ap_value must not be null in the `sxt_verify_inner_product` c binding function");
+      "ap_value must not be null in the `sxt_curve25519_verify_inner_product` c binding function");
   SXT_RELEASE_ASSERT(
       product != nullptr,
-      "product must not be null in the `sxt_verify_inner_product` c binding function");
+      "product must not be null in the `sxt_curve25519_verify_inner_product` c binding function");
   SXT_RELEASE_ASSERT(
       a_commit != nullptr,
-      "a_commit must not be null in the `sxt_verify_inner_product` c binding function");
+      "a_commit must not be null in the `sxt_curve25519_verify_inner_product` c binding function");
   SXT_RELEASE_ASSERT(
       b_vector != nullptr,
-      "b_vector must not be null in the `sxt_verify_inner_product` c binding function");
+      "b_vector must not be null in the `sxt_curve25519_verify_inner_product` c binding function");
   SXT_RELEASE_ASSERT(n > 0, "b_vector length must be greater than zero in the "
-                            "`sxt_verify_inner_product` c binding function");
+                            "`sxt_curve25519_verify_inner_product` c binding function");
   SXT_RELEASE_ASSERT(
       n == 1 || (l_vector != nullptr && r_vector != nullptr),
       "l_vector and r_vector lengths must not be null when a_vector "
-      "size is bigger than one in the `sxt_verify_inner_product` c binding function");
+      "size is bigger than one in the `sxt_curve25519_verify_inner_product` c binding function");
 }
 
 } // namespace sxt::cbn
 
 //--------------------------------------------------------------------------------------------------
-// sxt_prove_inner_product
+// sxt_curve25519_prove_inner_product
 //--------------------------------------------------------------------------------------------------
-void sxt_prove_inner_product(struct sxt_compressed_ristretto* l_vector,
-                             struct sxt_compressed_ristretto* r_vector, struct sxt_scalar* ap_value,
-                             struct sxt_transcript* transcript, uint64_t n,
-                             uint64_t generators_offset, const struct sxt_scalar* a_vector,
-                             const struct sxt_scalar* b_vector) {
+void sxt_curve25519_prove_inner_product(struct sxt_ristretto255_compressed* l_vector,
+                                        struct sxt_ristretto255_compressed* r_vector,
+                                        struct sxt_curve25519_scalar* ap_value,
+                                        struct sxt_curve25519_transcript* transcript, uint64_t n,
+                                        uint64_t generators_offset,
+                                        const struct sxt_curve25519_scalar* a_vector,
+                                        const struct sxt_curve25519_scalar* b_vector) {
   sxt::cbn::check_prove_inner_product_input(l_vector, r_vector, ap_value, transcript, n, b_vector,
                                             a_vector);
 
@@ -122,14 +126,16 @@ void sxt_prove_inner_product(struct sxt_compressed_ristretto* l_vector,
 }
 
 //--------------------------------------------------------------------------------------------------
-// sxt_verify_inner_product
+// sxt_curve25519_verify_inner_product
 //--------------------------------------------------------------------------------------------------
-int sxt_verify_inner_product(struct sxt_transcript* transcript, uint64_t n,
-                             uint64_t generators_offset, const struct sxt_scalar* b_vector,
-                             const struct sxt_scalar* product, const struct sxt_ristretto* a_commit,
-                             const struct sxt_compressed_ristretto* l_vector,
-                             const struct sxt_compressed_ristretto* r_vector,
-                             const struct sxt_scalar* ap_value) {
+int sxt_curve25519_verify_inner_product(struct sxt_curve25519_transcript* transcript, uint64_t n,
+                                        uint64_t generators_offset,
+                                        const struct sxt_curve25519_scalar* b_vector,
+                                        const struct sxt_curve25519_scalar* product,
+                                        const struct sxt_ristretto255* a_commit,
+                                        const struct sxt_ristretto255_compressed* l_vector,
+                                        const struct sxt_ristretto255_compressed* r_vector,
+                                        const struct sxt_curve25519_scalar* ap_value) {
   // Even though the input should not be trusted,
   // we abort here in case of invalid input parameters
   sxt::cbn::check_verify_inner_product_input(transcript, n, b_vector, product, a_commit, l_vector,

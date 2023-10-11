@@ -60,7 +60,7 @@ static uint64_t populate_exponent_sequence(basct::span<mtxb::exponent_sequence> 
 //--------------------------------------------------------------------------------------------------
 // process_compute_pedersen_commitments
 //--------------------------------------------------------------------------------------------------
-static void process_compute_pedersen_commitments(struct sxt_compressed_ristretto* commitments,
+static void process_compute_pedersen_commitments(struct sxt_ristretto255_compressed* commitments,
                                                  basct::cspan<sxt_sequence_descriptor> descriptors,
                                                  const c21t::element_p3* generators,
                                                  uint64_t offset_generators) {
@@ -69,7 +69,7 @@ static void process_compute_pedersen_commitments(struct sxt_compressed_ristretto
 
   SXT_RELEASE_ASSERT(commitments != nullptr);
   SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized());
-  static_assert(sizeof(rstt::compressed_element) == sizeof(sxt_compressed_ristretto),
+  static_assert(sizeof(rstt::compressed_element) == sizeof(sxt_ristretto255_compressed),
                 "types must be ABI compatible");
 
   memmg::managed_array<mtxb::exponent_sequence> sequences(descriptors.size());
@@ -93,22 +93,23 @@ static void process_compute_pedersen_commitments(struct sxt_compressed_ristretto
 } // namespace sxt::cbn
 
 //--------------------------------------------------------------------------------------------------
-// sxt_compute_pedersen_commitments_with_generators
+// sxt_curve25519_compute_pedersen_commitments_with_generators
 //--------------------------------------------------------------------------------------------------
-void sxt_compute_pedersen_commitments_with_generators(
-    struct sxt_compressed_ristretto* commitments, uint32_t num_sequences,
-    const struct sxt_sequence_descriptor* descriptors, const struct sxt_ristretto* generators) {
+void sxt_curve25519_compute_pedersen_commitments_with_generators(
+    struct sxt_ristretto255_compressed* commitments, uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors, const struct sxt_ristretto255* generators) {
   cbn::process_compute_pedersen_commitments(commitments, {descriptors, num_sequences},
                                             reinterpret_cast<const c21t::element_p3*>(generators),
                                             0);
 }
 
 //--------------------------------------------------------------------------------------------------
-// sxt_compute_pedersen_commitments
+// sxt_curve25519_compute_pedersen_commitments
 //--------------------------------------------------------------------------------------------------
-void sxt_compute_pedersen_commitments(sxt_compressed_ristretto* commitments, uint32_t num_sequences,
-                                      const sxt_sequence_descriptor* descriptors,
-                                      uint64_t offset_generators) {
+void sxt_curve25519_compute_pedersen_commitments(sxt_ristretto255_compressed* commitments,
+                                                 uint32_t num_sequences,
+                                                 const sxt_sequence_descriptor* descriptors,
+                                                 uint64_t offset_generators) {
   cbn::process_compute_pedersen_commitments(commitments, {descriptors, num_sequences}, nullptr,
                                             offset_generators);
 }
