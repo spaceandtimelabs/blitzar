@@ -37,7 +37,7 @@ __global__ void multiproduct_kernel(typename Reducer::value_type* out,
                                     const unsigned* indexes,
                                     const block_computation_descriptor* block_descriptors) {
   using T = typename Reducer::value_type;
-  extern __shared__ T shared_data_p[];
+  extern __shared__ char shared_data_p[];
   // Creating a object that points to shared_data_p to pass to the algr::thread_reduce
   // function is a workaround for this issue https://github.com/llvm/llvm-project/issues/65806.
   // According to the related PR fix that is currently open
@@ -45,7 +45,7 @@ __global__ void multiproduct_kernel(typename Reducer::value_type* out,
   // host device functions in global var __clang_gpu_used_external. This behavior was due to
   // https://reviews.llvm.org/D123441. However, clang should not do that for extern shared vars
   // since their addresses are per warp, therefore cannot be accessed by host code."
-  T* shared_data = shared_data_p;
+  T* shared_data = reinterpret_cast<T*>(shared_data_p);
   auto thread_index = threadIdx.x;
   auto block_index = blockIdx.x;
   auto descriptor = block_descriptors[block_index];
