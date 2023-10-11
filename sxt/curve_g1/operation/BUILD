@@ -50,6 +50,35 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "compression",
+    impl_deps = [
+        "//sxt/base/error:assert",
+        "//sxt/base/num:cmov",
+        "//sxt/curve_g1/type:conversion_utility",
+        "//sxt/curve_g1/type:compressed_element",
+        "//sxt/curve_g1/type:element_affine",
+        "//sxt/curve_g1/type:element_p2",
+        "//sxt/field12/base:byte_conversion",
+        "//sxt/field12/constant:zero",
+        "//sxt/field12/operation:cmov",
+        "//sxt/field12/property:lexicographically_largest",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/curve_g1/constant:generator",
+        "//sxt/curve_g1/type:compressed_element",
+        "//sxt/curve_g1/type:element_p2",
+        "//sxt/field12/constant:one",
+        "//sxt/field12/constant:zero",
+        "//sxt/field12/operation:mul",
+        "//sxt/field12/type:element",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "double",
     impl_deps = [
         ":cmov",
