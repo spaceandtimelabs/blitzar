@@ -54,6 +54,13 @@ struct sxt_ristretto255 {
   uint64_t T[5];
 };
 
+struct sxt_g1 {
+  // encodes an element of the bls12-381 G1 group
+  uint64_t X[6];
+  uint64_t Y[6];
+  uint64_t Z[6];
+};
+
 /** describes a sequence of values **/
 struct sxt_sequence_descriptor {
   // the number of bytes used to represent an element in the sequence

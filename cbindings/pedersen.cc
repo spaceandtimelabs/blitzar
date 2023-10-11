@@ -21,6 +21,8 @@
 #include "cbindings/backend.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve_g1/type/compressed_element.h"
+#include "sxt/curve_g1/type/element_p2.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/ristretto/type/compressed_element.h"
@@ -90,6 +92,60 @@ static void process_compute_pedersen_commitments(struct sxt_ristretto255_compres
       {reinterpret_cast<rstt::compressed_element*>(commitments), descriptors.size()}, sequences,
       generators_span);
 }
+
+//--------------------------------------------------------------------------------------------------
+// process_compute_pedersen_commitments_bls12_381_g1
+//--------------------------------------------------------------------------------------------------
+static void process_compute_pedersen_commitments_bls12_381_g1(
+    struct sxt_compressed_g1* commitments, basct::cspan<sxt_sequence_descriptor> descriptors,
+    const cg1t::element_p2* generators, uint64_t offset_generators) {
+  if (descriptors.size() == 0)
+    return;
+
+  SXT_RELEASE_ASSERT(commitments != nullptr);
+  SXT_RELEASE_ASSERT(generators == nullptr);
+  SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized());
+  static_assert(sizeof(cg1t::compressed_element) == sizeof(sxt_compressed_g1),
+                "types must be ABI compatible");
+
+  memmg::managed_array<mtxb::exponent_sequence> sequences(descriptors.size());
+  auto num_generators = populate_exponent_sequence(sequences, descriptors);
+
+  auto backend = cbn::get_backend();
+  std::vector<cg1t::element_p2> temp_generators;
+  basct::cspan<cg1t::element_p2> generators_span{generators, num_generators};
+
+  backend->compute_commitments(
+      {reinterpret_cast<cg1t::compressed_element*>(commitments), descriptors.size()}, sequences,
+      generators_span);
+}
+
+//--------------------------------------------------------------------------------------------------
+// process_compute_pedersen_commitments_bls12_381_g1
+//--------------------------------------------------------------------------------------------------
+static void process_compute_pedersen_commitments_bls12_381_g1(
+    struct sxt_compressed_g1* commitments, basct::cspan<sxt_sequence_descriptor> descriptors,
+    const cg1t::element_p2* generators, uint64_t offset_generators) {
+  if (descriptors.size() == 0)
+    return;
+
+  SXT_RELEASE_ASSERT(commitments != nullptr);
+  SXT_RELEASE_ASSERT(generators == nullptr);
+  SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized());
+  static_assert(sizeof(cg1t::compressed_element) == sizeof(sxt_compressed_g1),
+                "types must be ABI compatible");
+
+  memmg::managed_array<mtxb::exponent_sequence> sequences(descriptors.size());
+  auto num_generators = populate_exponent_sequence(sequences, descriptors);
+
+  auto backend = cbn::get_backend();
+  std::vector<cg1t::element_p2> temp_generators;
+  basct::cspan<cg1t::element_p2> generators_span{generators, num_generators};
+
+  backend->compute_commitments(
+      {reinterpret_cast<cg1t::compressed_element*>(commitments), descriptors.size()}, sequences,
+      generators_span);
+}
 } // namespace sxt::cbn
 
 //--------------------------------------------------------------------------------------------------
@@ -104,7 +160,18 @@ void sxt_curve25519_compute_pedersen_commitments_with_generators(
 }
 
 //--------------------------------------------------------------------------------------------------
-// sxt_curve25519_compute_pedersen_commitments
+// sxt_compute_pedersen_commitments_with_bls12_381_g1_generators
+//--------------------------------------------------------------------------------------------------
+void sxt_compute_pedersen_commitments_with_bls12_381_g1_generators(
+    struct sxt_compressed_g1* commitments, uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors, const struct sxt_g1* generators) {
+  cbn::process_compute_pedersen_commitments_bls12_381_g1(
+      commitments, {descriptors, num_sequences},
+      reinterpret_cast<const cg1t::element_p2*>(generators), 0);
+}
+
+//--------------------------------------------------------------------------------------------------
+// sxt_compute_pedersen_commitments
 //--------------------------------------------------------------------------------------------------
 void sxt_curve25519_compute_pedersen_commitments(sxt_ristretto255_compressed* commitments,
                                                  uint32_t num_sequences,

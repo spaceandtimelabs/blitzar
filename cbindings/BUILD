@@ -108,6 +108,8 @@ sxt_cc_component(
     impl_deps = [
         ":backend",
         "//sxt/base/error:assert",
+        "//sxt/curve_g1/type:compressed_element",
+        "//sxt/curve_g1/type:element_p2",
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/base:exponent_sequence",
