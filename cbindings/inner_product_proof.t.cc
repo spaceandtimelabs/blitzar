@@ -90,7 +90,7 @@ static void test_prove_and_verify_with_given_n(uint64_t n, uint64_t generators_o
       reinterpret_cast<sxt_ristretto255_compressed*>(l_vector.data()),
       reinterpret_cast<sxt_ristretto255_compressed*>(r_vector.data()),
       reinterpret_cast<sxt_curve25519_scalar*>(&ap_value),
-      reinterpret_cast<sxt_curve25519_transcript*>(&transcript), n, generators_offset,
+      reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
       reinterpret_cast<const sxt_curve25519_scalar*>(a_vector.data()),
       reinterpret_cast<const sxt_curve25519_scalar*>(b_vector.data()));
 
@@ -105,7 +105,7 @@ static void test_prove_and_verify_with_given_n(uint64_t n, uint64_t generators_o
   SECTION("We can verify a proof using valid input data") {
     transcript = prft::transcript{"abc"};
     REQUIRE(sxt_curve25519_verify_inner_product(
-                reinterpret_cast<sxt_curve25519_transcript*>(&transcript), n, generators_offset,
+                reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
                 reinterpret_cast<const sxt_curve25519_scalar*>(b_vector.data()),
                 reinterpret_cast<const sxt_curve25519_scalar*>(&product),
                 reinterpret_cast<const sxt_ristretto255*>(&a_commit),
@@ -118,7 +118,7 @@ static void test_prove_and_verify_with_given_n(uint64_t n, uint64_t generators_o
     transcript = prft::transcript{"abc"};
     auto a_commit_p = 0x123_s25 * g_vector[0];
     REQUIRE(sxt_curve25519_verify_inner_product(
-                reinterpret_cast<sxt_curve25519_transcript*>(&transcript), n, generators_offset,
+                reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
                 reinterpret_cast<const sxt_curve25519_scalar*>(b_vector.data()),
                 reinterpret_cast<const sxt_curve25519_scalar*>(&product),
                 reinterpret_cast<const sxt_ristretto255*>(&a_commit_p),
@@ -131,7 +131,7 @@ static void test_prove_and_verify_with_given_n(uint64_t n, uint64_t generators_o
     transcript = prft::transcript{"abc"};
     auto product_p = product + 0x123_s25;
     REQUIRE(sxt_curve25519_verify_inner_product(
-                reinterpret_cast<sxt_curve25519_transcript*>(&transcript), n, generators_offset,
+                reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
                 reinterpret_cast<const sxt_curve25519_scalar*>(b_vector.data()),
                 reinterpret_cast<const sxt_curve25519_scalar*>(&product_p),
                 reinterpret_cast<const sxt_ristretto255*>(&a_commit),
@@ -143,7 +143,7 @@ static void test_prove_and_verify_with_given_n(uint64_t n, uint64_t generators_o
   SECTION("We cannot verify a proof using an invalid b vector") {
     transcript = prft::transcript{"abc"};
     REQUIRE(sxt_curve25519_verify_inner_product(
-                reinterpret_cast<sxt_curve25519_transcript*>(&transcript), n, generators_offset,
+                reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
                 reinterpret_cast<const sxt_curve25519_scalar*>(a_vector.data()),
                 reinterpret_cast<const sxt_curve25519_scalar*>(&product),
                 reinterpret_cast<const sxt_ristretto255*>(&a_commit),
@@ -157,7 +157,7 @@ static void test_prove_and_verify_with_given_n(uint64_t n, uint64_t generators_o
     SECTION("We cannot verify a proof using an invalid transcript") {
       transcript = prft::transcript{"wrong_transcript"};
       REQUIRE(sxt_curve25519_verify_inner_product(
-                  reinterpret_cast<sxt_curve25519_transcript*>(&transcript), n, generators_offset,
+                  reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
                   reinterpret_cast<const sxt_curve25519_scalar*>(a_vector.data()),
                   reinterpret_cast<const sxt_curve25519_scalar*>(&product),
                   reinterpret_cast<const sxt_ristretto255*>(&a_commit),

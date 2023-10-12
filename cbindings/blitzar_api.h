@@ -41,7 +41,7 @@ struct sxt_curve25519_scalar {
   uint8_t bytes[32];
 };
 
-struct sxt_curve25519_transcript {
+struct sxt_transcript {
   // encodes a strobe-based transcript
   uint8_t bytes[203];
 };
@@ -330,7 +330,7 @@ int sxt_curve25519_get_one_commit(struct sxt_ristretto255* one_commit, uint64_t 
 void sxt_curve25519_prove_inner_product(struct sxt_ristretto255_compressed* l_vector,
                                         struct sxt_ristretto255_compressed* r_vector,
                                         struct sxt_curve25519_scalar* ap_value,
-                                        struct sxt_curve25519_transcript* transcript, uint64_t n,
+                                        struct sxt_transcript* transcript, uint64_t n,
                                         uint64_t generators_offset,
                                         const struct sxt_curve25519_scalar* a_vector,
                                         const struct sxt_curve25519_scalar* b_vector);
@@ -371,7 +371,7 @@ void sxt_curve25519_prove_inner_product(struct sxt_ristretto255_compressed* l_ve
  * - n is zero
  * - n is non-zero, but l_vector or r_vector is nullptr
  */
-int sxt_curve25519_verify_inner_product(struct sxt_curve25519_transcript* transcript, uint64_t n,
+int sxt_curve25519_verify_inner_product(struct sxt_transcript* transcript, uint64_t n,
                                         uint64_t generators_offset,
                                         const struct sxt_curve25519_scalar* b_vector,
                                         const struct sxt_curve25519_scalar* product,

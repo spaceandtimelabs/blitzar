@@ -34,7 +34,7 @@ namespace sxt::cbn {
 static void check_prove_inner_product_input(sxt_ristretto255_compressed* l_vector,
                                             sxt_ristretto255_compressed* r_vector,
                                             sxt_curve25519_scalar* ap_value,
-                                            sxt_curve25519_transcript* transcript, uint64_t n,
+                                            sxt_transcript* transcript, uint64_t n,
                                             const sxt_curve25519_scalar* b_vector,
                                             const sxt_curve25519_scalar* a_vector) noexcept {
   SXT_RELEASE_ASSERT(
@@ -59,7 +59,7 @@ static void check_prove_inner_product_input(sxt_ristretto255_compressed* l_vecto
 //--------------------------------------------------------------------------------------------------
 // check_verify_inner_product_input
 //--------------------------------------------------------------------------------------------------
-static void check_verify_inner_product_input(sxt_curve25519_transcript* transcript, uint64_t n,
+static void check_verify_inner_product_input(sxt_transcript* transcript, uint64_t n,
                                              const sxt_curve25519_scalar* b_vector,
                                              const sxt_curve25519_scalar* product,
                                              const sxt_ristretto255* a_commit,
@@ -97,7 +97,7 @@ static void check_verify_inner_product_input(sxt_curve25519_transcript* transcri
 void sxt_curve25519_prove_inner_product(struct sxt_ristretto255_compressed* l_vector,
                                         struct sxt_ristretto255_compressed* r_vector,
                                         struct sxt_curve25519_scalar* ap_value,
-                                        struct sxt_curve25519_transcript* transcript, uint64_t n,
+                                        struct sxt_transcript* transcript, uint64_t n,
                                         uint64_t generators_offset,
                                         const struct sxt_curve25519_scalar* a_vector,
                                         const struct sxt_curve25519_scalar* b_vector) {
@@ -128,7 +128,7 @@ void sxt_curve25519_prove_inner_product(struct sxt_ristretto255_compressed* l_ve
 //--------------------------------------------------------------------------------------------------
 // sxt_curve25519_verify_inner_product
 //--------------------------------------------------------------------------------------------------
-int sxt_curve25519_verify_inner_product(struct sxt_curve25519_transcript* transcript, uint64_t n,
+int sxt_curve25519_verify_inner_product(struct sxt_transcript* transcript, uint64_t n,
                                         uint64_t generators_offset,
                                         const struct sxt_curve25519_scalar* b_vector,
                                         const struct sxt_curve25519_scalar* product,
