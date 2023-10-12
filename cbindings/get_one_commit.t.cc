@@ -38,8 +38,8 @@ static std::vector<c21t::element_p3> initialize_generators(int backend, uint64_t
   initialize_backend(backend, 0);
 
   std::vector<c21t::element_p3> generators(num_generators);
-  REQUIRE(sxt_get_generators(reinterpret_cast<sxt_ristretto*>(generators.data()), num_generators,
-                             0) == 0);
+  REQUIRE(sxt_ristretto255_get_generators(reinterpret_cast<sxt_ristretto255*>(generators.data()),
+                                          num_generators, 0) == 0);
 
   sxt::cbn::reset_backend_for_testing();
 
@@ -50,8 +50,8 @@ static void verify_one_commit(int backend, uint64_t num_precomputed_els, uint64_
                               const c21t::element_p3& expected_element) {
   initialize_backend(backend, num_precomputed_els);
 
-  sxt_ristretto one_commitment;
-  REQUIRE(sxt_get_one_commit(&one_commitment, n) == 0);
+  sxt_ristretto255 one_commitment;
+  REQUIRE(sxt_curve25519_get_one_commit(&one_commitment, n) == 0);
   REQUIRE(reinterpret_cast<c21t::element_p3*>(&one_commitment)[0] == expected_element);
 
   sxt::cbn::reset_backend_for_testing();

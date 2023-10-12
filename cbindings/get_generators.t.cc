@@ -32,20 +32,21 @@ static void initialize_backend(int backend, uint64_t precomputed_elements) {
   REQUIRE(sxt_init(&config) == 0);
 }
 
-static std::vector<sxt_ristretto> initialize_generators(int backend,
-                                                        uint64_t num_precomputed_elements,
-                                                        uint64_t num_generators, uint64_t offset) {
+static std::vector<sxt_ristretto255> initialize_generators(int backend,
+                                                           uint64_t num_precomputed_elements,
+                                                           uint64_t num_generators,
+                                                           uint64_t offset) {
   initialize_backend(backend, num_precomputed_elements);
 
-  std::vector<sxt_ristretto> generators(num_generators);
-  REQUIRE(sxt_get_generators(generators.data(), num_generators, offset) == 0);
+  std::vector<sxt_ristretto255> generators(num_generators);
+  REQUIRE(sxt_ristretto255_get_generators(generators.data(), num_generators, offset) == 0);
 
   reset_backend_for_testing();
 
   return generators;
 }
 
-static void verify_generator(const std::vector<sxt_ristretto>& generators, uint64_t index,
+static void verify_generator(const std::vector<sxt_ristretto255>& generators, uint64_t index,
                              uint64_t offset) {
   SXT_DEBUG_ASSERT(generators.size() > index);
 
@@ -58,14 +59,14 @@ static void test_generators_with_given_backend(int backend) {
   SECTION("We cannot fetch more than zero generators when we have a null pointer input") {
     initialize_backend(backend, 0);
     uint64_t num_generators = 3, offset_generators = 0;
-    REQUIRE(sxt_get_generators(nullptr, num_generators, offset_generators) != 0);
+    REQUIRE(sxt_ristretto255_get_generators(nullptr, num_generators, offset_generators) != 0);
     reset_backend_for_testing();
   }
 
   SECTION("We can fetch zero generators with null pointer input") {
     initialize_backend(backend, 0);
     uint64_t num_generators = 0, offset_generators = 0;
-    REQUIRE(sxt_get_generators(nullptr, num_generators, offset_generators) == 0);
+    REQUIRE(sxt_ristretto255_get_generators(nullptr, num_generators, offset_generators) == 0);
     reset_backend_for_testing();
   }
 

@@ -100,8 +100,9 @@ static void test_pedersen_commitments_with_given_backend_and_no_generators(
     const uint64_t offset_gens = 0;
     const uint32_t num_sequences = 0;
     const sxt_sequence_descriptor* invalid_descriptor = nullptr;
-    sxt_compressed_ristretto commitment{1u};
-    sxt_compute_pedersen_commitments(&commitment, num_sequences, invalid_descriptor, offset_gens);
+    sxt_ristretto255_compressed commitment{1u};
+    sxt_curve25519_compute_pedersen_commitments(&commitment, num_sequences, invalid_descriptor,
+                                                offset_gens);
     REQUIRE(rstt::compressed_element{1u} ==
             *reinterpret_cast<rstt::compressed_element*>(&commitment));
   }
@@ -111,8 +112,9 @@ static void test_pedersen_commitments_with_given_backend_and_no_generators(
     const std::vector<uint8_t> data(0);
     const auto seq_descriptor = make_sequence_descriptor(data);
     const uint32_t num_sequences = 1;
-    sxt_compressed_ristretto commitment;
-    sxt_compute_pedersen_commitments(&commitment, num_sequences, &seq_descriptor, offset_gens);
+    sxt_ristretto255_compressed commitment;
+    sxt_curve25519_compute_pedersen_commitments(&commitment, num_sequences, &seq_descriptor,
+                                                offset_gens);
     REQUIRE(rstt::compressed_element() ==
             *reinterpret_cast<rstt::compressed_element*>(&commitment));
   }
@@ -126,8 +128,9 @@ static void test_pedersen_commitments_with_given_backend_and_no_generators(
     };
     const uint64_t num_sequences = valid_descriptors.size();
     rstt::compressed_element commitments_data[num_sequences];
-    sxt_compute_pedersen_commitments(reinterpret_cast<sxt_compressed_ristretto*>(commitments_data),
-                                     num_sequences, valid_descriptors.data(), 0);
+    sxt_curve25519_compute_pedersen_commitments(
+        reinterpret_cast<sxt_ristretto255_compressed*>(commitments_data), num_sequences,
+        valid_descriptors.data(), 0);
     REQUIRE(commitments_data[0] == -commitments_data[1]);
   }
 
@@ -149,8 +152,9 @@ static void test_pedersen_commitments_with_given_backend_and_no_generators(
 
     // we verify that `c = scal * a + b` implies that `commit_c = scal * commit_a + commit_b`
     rstt::compressed_element commitments_data[num_sequences];
-    sxt_compute_pedersen_commitments(reinterpret_cast<sxt_compressed_ristretto*>(commitments_data),
-                                     num_sequences, valid_descriptors.data(), offset_gens);
+    sxt_curve25519_compute_pedersen_commitments(
+        reinterpret_cast<sxt_ristretto255_compressed*>(commitments_data), num_sequences,
+        valid_descriptors.data(), offset_gens);
 
     auto commit_a = commitments_data[0], commit_b = commitments_data[1],
          commit_c = commitments_data[0];
@@ -167,8 +171,9 @@ static void test_pedersen_commitments_with_given_backend_and_no_generators(
     const auto descriptor = make_sequence_descriptor(data);
 
     rstt::compressed_element commitments_data;
-    sxt_compute_pedersen_commitments(reinterpret_cast<sxt_compressed_ristretto*>(&commitments_data),
-                                     1, &descriptor, offset_gens);
+    sxt_curve25519_compute_pedersen_commitments(
+        reinterpret_cast<sxt_ristretto255_compressed*>(&commitments_data), 1, &descriptor,
+        offset_gens);
 
     const auto generators = compute_random_generators(data.size(), offset_gens);
     const auto expected_commitment = compute_expected_commitment(data, generators);
@@ -194,10 +199,10 @@ test_pedersen_commitments_with_given_backend_and_generators(int backend,
     const auto generators = compute_random_generators(data.size(), 10);
     const auto expected_commitment = compute_expected_commitment(data, generators);
 
-    sxt_compressed_ristretto commitments_data;
-    sxt_compute_pedersen_commitments_with_generators(
+    sxt_ristretto255_compressed commitments_data;
+    sxt_curve25519_compute_pedersen_commitments_with_generators(
         &commitments_data, num_sequences, &seq_descriptor,
-        reinterpret_cast<const sxt_ristretto*>(generators.data()));
+        reinterpret_cast<const sxt_ristretto255*>(generators.data()));
     REQUIRE(*reinterpret_cast<rstt::compressed_element*>(&commitments_data) == expected_commitment);
   }
 

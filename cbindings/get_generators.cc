@@ -27,12 +27,13 @@
 using namespace sxt;
 
 //--------------------------------------------------------------------------------------------------
-// sxt_get_generators
+// sxt_ristretto255_get_generators
 //--------------------------------------------------------------------------------------------------
-int sxt_get_generators(struct sxt_ristretto* generators, uint64_t num_generators,
-                       uint64_t offset_generators) {
-  SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized(),
-                     "backend uninitialized in the `sxt_get_generators` c binding function");
+int sxt_ristretto255_get_generators(struct sxt_ristretto255* generators, uint64_t num_generators,
+                                    uint64_t offset_generators) {
+  SXT_RELEASE_ASSERT(
+      sxt::cbn::is_backend_initialized(),
+      "backend uninitialized in the `sxt_ristretto255_get_generators` c binding function");
 
   // we ignore the function call when zero generators are specified.
   // in this case, generators can be null
