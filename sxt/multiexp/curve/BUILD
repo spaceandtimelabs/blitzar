@@ -62,6 +62,7 @@ sxt_cc_component(
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/iterator:index_range",
+        "//sxt/base/num:divide_up",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
         "//sxt/execution/device:device_viewable",

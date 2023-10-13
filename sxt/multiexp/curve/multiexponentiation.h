@@ -28,6 +28,7 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/iterator/index_range.h"
+#include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/device_viewable.h"
@@ -160,11 +161,16 @@ async_compute_multiexponentiation(basct::cspan<Element> generators,
     or_alls.emplace_back(1, exponent_sequence.element_nbytes);
   }
   std::vector<memmg::managed_array<Element>> products(num_outputs);
-  co_await xendv::concurrent_for_each(basit::index_range{0, generators.size()},
-                                      [&](const basit::index_range& rng) noexcept {
-                                        return async_compute_multiexponentiation_partial<Element>(
-                                            or_alls, products, generators, exponents, rng);
-                                      });
+  size_t max_chunk_size = 1ull << 20u;
+  if (num_outputs > 0) {
+    max_chunk_size = basn::divide_up(max_chunk_size, num_outputs);
+  }
+  co_await xendv::concurrent_for_each(
+      basit::index_range{0, generators.size()}.max_chunk_size(max_chunk_size),
+      [&](const basit::index_range& rng) noexcept {
+        return async_compute_multiexponentiation_partial<Element>(or_alls, products, generators,
+                                                                  exponents, rng);
+      });
   memmg::managed_array<Element> res(num_outputs);
   for (size_t i = 0; i < num_outputs; ++i) {
     combine_multiproducts<Element>({&res[i], 1}, or_alls[i], products[i]);
