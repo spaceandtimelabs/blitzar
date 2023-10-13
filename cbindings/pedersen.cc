@@ -94,45 +94,19 @@ static void process_compute_pedersen_commitments(struct sxt_ristretto255_compres
 }
 
 //--------------------------------------------------------------------------------------------------
-// process_compute_pedersen_commitments_bls12_381_g1
+// process_compute_pedersen_commitments
 //--------------------------------------------------------------------------------------------------
-static void process_compute_pedersen_commitments_bls12_381_g1(
-    struct sxt_compressed_g1* commitments, basct::cspan<sxt_sequence_descriptor> descriptors,
-    const cg1t::element_p2* generators, uint64_t offset_generators) {
+static void process_compute_pedersen_commitments(struct sxt_bls12_381_g1_compressed* commitments,
+                                                 basct::cspan<sxt_sequence_descriptor> descriptors,
+                                                 const cg1t::element_p2* generators,
+                                                 uint64_t offset_generators) {
   if (descriptors.size() == 0)
     return;
 
   SXT_RELEASE_ASSERT(commitments != nullptr);
   SXT_RELEASE_ASSERT(generators == nullptr);
   SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized());
-  static_assert(sizeof(cg1t::compressed_element) == sizeof(sxt_compressed_g1),
-                "types must be ABI compatible");
-
-  memmg::managed_array<mtxb::exponent_sequence> sequences(descriptors.size());
-  auto num_generators = populate_exponent_sequence(sequences, descriptors);
-
-  auto backend = cbn::get_backend();
-  std::vector<cg1t::element_p2> temp_generators;
-  basct::cspan<cg1t::element_p2> generators_span{generators, num_generators};
-
-  backend->compute_commitments(
-      {reinterpret_cast<cg1t::compressed_element*>(commitments), descriptors.size()}, sequences,
-      generators_span);
-}
-
-//--------------------------------------------------------------------------------------------------
-// process_compute_pedersen_commitments_bls12_381_g1
-//--------------------------------------------------------------------------------------------------
-static void process_compute_pedersen_commitments_bls12_381_g1(
-    struct sxt_compressed_g1* commitments, basct::cspan<sxt_sequence_descriptor> descriptors,
-    const cg1t::element_p2* generators, uint64_t offset_generators) {
-  if (descriptors.size() == 0)
-    return;
-
-  SXT_RELEASE_ASSERT(commitments != nullptr);
-  SXT_RELEASE_ASSERT(generators == nullptr);
-  SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized());
-  static_assert(sizeof(cg1t::compressed_element) == sizeof(sxt_compressed_g1),
+  static_assert(sizeof(cg1t::compressed_element) == sizeof(sxt_bls12_381_g1_compressed),
                 "types must be ABI compatible");
 
   memmg::managed_array<mtxb::exponent_sequence> sequences(descriptors.size());
@@ -160,14 +134,14 @@ void sxt_curve25519_compute_pedersen_commitments_with_generators(
 }
 
 //--------------------------------------------------------------------------------------------------
-// sxt_compute_pedersen_commitments_with_bls12_381_g1_generators
+// sxt_bls12_381_g1_compute_pedersen_commitments_with_generators
 //--------------------------------------------------------------------------------------------------
-void sxt_compute_pedersen_commitments_with_bls12_381_g1_generators(
-    struct sxt_compressed_g1* commitments, uint32_t num_sequences,
-    const struct sxt_sequence_descriptor* descriptors, const struct sxt_g1* generators) {
-  cbn::process_compute_pedersen_commitments_bls12_381_g1(
-      commitments, {descriptors, num_sequences},
-      reinterpret_cast<const cg1t::element_p2*>(generators), 0);
+void sxt_bls12_381_g1_compute_pedersen_commitments_with_generators(
+    struct sxt_bls12_381_g1_compressed* commitments, uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors, const struct sxt_bls12_381_g1* generators) {
+  cbn::process_compute_pedersen_commitments(commitments, {descriptors, num_sequences},
+                                            reinterpret_cast<const cg1t::element_p2*>(generators),
+                                            0);
 }
 
 //--------------------------------------------------------------------------------------------------
