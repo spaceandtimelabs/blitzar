@@ -161,16 +161,20 @@ async_compute_multiexponentiation(basct::cspan<Element> generators,
     or_alls.emplace_back(1, exponent_sequence.element_nbytes);
   }
   std::vector<memmg::managed_array<Element>> products(num_outputs);
+  size_t min_chunk_size = 1ull << 10u;
   size_t max_chunk_size = 1ull << 20u;
   if (num_outputs > 0) {
     max_chunk_size = basn::divide_up(max_chunk_size, num_outputs);
+    min_chunk_size *= num_outputs;
+    min_chunk_size = std::min(max_chunk_size, min_chunk_size);
   }
-  co_await xendv::concurrent_for_each(
-      basit::index_range{0, generators.size()}.max_chunk_size(max_chunk_size),
-      [&](const basit::index_range& rng) noexcept {
-        return async_compute_multiexponentiation_partial<Element>(or_alls, products, generators,
-                                                                  exponents, rng);
-      });
+  auto rng = basit::index_range{0, generators.size()}
+                 .min_chunk_size(min_chunk_size)
+                 .max_chunk_size(max_chunk_size);
+  co_await xendv::concurrent_for_each(rng, [&](const basit::index_range& rng) noexcept {
+    return async_compute_multiexponentiation_partial<Element>(or_alls, products, generators,
+                                                              exponents, rng);
+  });
   memmg::managed_array<Element> res(num_outputs);
   for (size_t i = 0; i < num_outputs; ++i) {
     combine_multiproducts<Element>({&res[i], 1}, or_alls[i], products[i]);
