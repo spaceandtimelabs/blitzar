@@ -14,23 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/curve_g1/type/compressed_element.h"
 
-#include <concepts>
+#include "sxt/base/test/unit_test.h"
 
-namespace sxt::bascrv {
-//--------------------------------------------------------------------------------------------------
-// element
-//--------------------------------------------------------------------------------------------------
-template <class T>
-concept element = requires(T& res, const T& e) {
-  double_element(res, e);
-  add(res, e, e);
-  neg(res, e);
-  cneg(res, 0);
-  add_inplace(res, res);
-  { T::identity() } noexcept -> std::same_as<T>;
-  mark(res);
-  { is_marked(e) } noexcept -> std::same_as<bool>;
-};
-} // namespace sxt::bascrv
+using namespace sxt::cg1t;
+
+TEST_CASE("compressed_element is comparable") {
+  compressed_element c1{};
+  compressed_element c2{1, 2};
+  REQUIRE(c1 == c1);
+  REQUIRE(c2 == c2);
+  REQUIRE(c1 != c2);
+}

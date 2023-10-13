@@ -34,4 +34,18 @@ TEST_CASE("negation on projective elements") {
 
     REQUIRE(expect_identity == cg1t::element_p2::identity());
   }
+
+  SECTION("can be done inplace") {
+    cg1t::element_p2 ng;
+    neg(ng, cg1cn::generator_p2_v);
+    cg1t::element_p2 g{cg1cn::generator_p2_v};
+    cneg(g, 1);
+
+    REQUIRE(g == ng);
+
+    g = cg1cn::generator_p2_v;
+    cneg(g, 0);
+
+    REQUIRE(g == cg1cn::generator_p2_v);
+  }
 }

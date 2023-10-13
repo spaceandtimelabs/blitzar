@@ -4,6 +4,16 @@ load(
 )
 
 sxt_cc_component(
+    name = "compressed_element",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
     name = "conversion_utility",
     test_deps = [
         "//sxt/base/test:unit_test",

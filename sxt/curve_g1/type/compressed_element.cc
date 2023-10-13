@@ -14,27 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/curve_g1/type/compressed_element.h"
 
-#include "sxt/base/macro/cuda_callable.h"
+#include <cstring>
+#include <iostream>
 
 namespace sxt::cg1t {
-struct element_p2;
+//--------------------------------------------------------------------------------------------------
+// constructor
+//--------------------------------------------------------------------------------------------------
+compressed_element::compressed_element(std::initializer_list<uint8_t> values) noexcept : data_{} {
+  std::memcpy(static_cast<void*>(data_), static_cast<const void*>(&(*values.begin())),
+              values.size());
 }
 
-namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
-// neg
+// opeator<<
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void neg(cg1t::element_p2& r, const cg1t::element_p2& p) noexcept;
-
-//--------------------------------------------------------------------------------------------------
-// cneg
-//--------------------------------------------------------------------------------------------------
-/*
- r = -r if b = 1 else r
- */
-CUDA_CALLABLE
-void cneg(cg1t::element_p2& r, unsigned int b) noexcept;
-} // namespace sxt::cg1o
+std::ostream& operator<<(std::ostream& out, const compressed_element& c) noexcept {
+  out << "{";
+  auto data = c.data();
+  for (int i = 0; i < 48; ++i) {
+    out << static_cast<int>(data[i]);
+    if (i != 48) {
+      out << ",";
+    }
+  }
+  out << "}";
+  return out;
+}
+} // namespace sxt::cg1t

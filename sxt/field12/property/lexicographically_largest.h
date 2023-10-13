@@ -16,21 +16,19 @@
  */
 #pragma once
 
-#include <concepts>
+#include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::bascrv {
+namespace sxt::f12t {
+class element;
+}
+
+namespace sxt::f12p {
 //--------------------------------------------------------------------------------------------------
-// element
+// lexicographically_largest
 //--------------------------------------------------------------------------------------------------
-template <class T>
-concept element = requires(T& res, const T& e) {
-  double_element(res, e);
-  add(res, e, e);
-  neg(res, e);
-  cneg(res, 0);
-  add_inplace(res, res);
-  { T::identity() } noexcept -> std::same_as<T>;
-  mark(res);
-  { is_marked(e) } noexcept -> std::same_as<bool>;
-};
-} // namespace sxt::bascrv
+/*
+ Returns whether or not this element is strictly lexicographically larger than its negation.
+ */
+CUDA_CALLABLE
+bool lexicographically_largest(const f12t::element& e) noexcept;
+} // namespace sxt::f12p

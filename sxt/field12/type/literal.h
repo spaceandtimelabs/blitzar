@@ -31,7 +31,7 @@ template <char... Chars> element operator"" _f12() noexcept {
   bast::parse_literal<6, Chars...>(bytes);
   element res;
   bool is_below;
-  f12b::from_bytes(is_below, res.data(), reinterpret_cast<const uint8_t*>(bytes.data()));
+  f12b::from_bytes_le(is_below, res.data(), reinterpret_cast<const uint8_t*>(bytes.data()));
   return res;
 }
 } // namespace sxt::f12t

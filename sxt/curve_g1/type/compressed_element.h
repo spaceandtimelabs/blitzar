@@ -16,25 +16,34 @@
  */
 #pragma once
 
+#include <iosfwd>
+
 #include "sxt/base/macro/cuda_callable.h"
 
 namespace sxt::cg1t {
-struct element_p2;
-}
+//--------------------------------------------------------------------------------------------------
+// compressed_element
+//--------------------------------------------------------------------------------------------------
+class compressed_element {
+public:
+  compressed_element() noexcept = default;
 
-namespace sxt::cg1o {
-//--------------------------------------------------------------------------------------------------
-// neg
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void neg(cg1t::element_p2& r, const cg1t::element_p2& p) noexcept;
+  explicit compressed_element(std::initializer_list<uint8_t> values) noexcept;
+
+  CUDA_CALLABLE
+  uint8_t* data() noexcept { return data_; }
+
+  CUDA_CALLABLE
+  const uint8_t* data() const noexcept { return data_; }
+
+  auto operator<=>(const compressed_element&) const noexcept = default;
+
+private:
+  uint8_t data_[48] = {};
+};
 
 //--------------------------------------------------------------------------------------------------
-// cneg
+// opeator<<
 //--------------------------------------------------------------------------------------------------
-/*
- r = -r if b = 1 else r
- */
-CUDA_CALLABLE
-void cneg(cg1t::element_p2& r, unsigned int b) noexcept;
-} // namespace sxt::cg1o
+std::ostream& operator<<(std::ostream& out, const compressed_element& c) noexcept;
+} // namespace sxt::cg1t

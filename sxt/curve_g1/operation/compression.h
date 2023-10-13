@@ -16,25 +16,22 @@
  */
 #pragma once
 
-#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/base/container/span.h"
 
 namespace sxt::cg1t {
+class compressed_element;
 struct element_p2;
-}
+} // namespace sxt::cg1t
 
 namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
-// neg
+// compress
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void neg(cg1t::element_p2& r, const cg1t::element_p2& p) noexcept;
+void compress(cg1t::compressed_element& e_c, const cg1t::element_p2& e_p) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// cneg
+// batch_compress
 //--------------------------------------------------------------------------------------------------
-/*
- r = -r if b = 1 else r
- */
-CUDA_CALLABLE
-void cneg(cg1t::element_p2& r, unsigned int b) noexcept;
+void batch_compress(basct::span<cg1t::compressed_element> ex_c,
+                    basct::cspan<cg1t::element_p2> ex_p) noexcept;
 } // namespace sxt::cg1o

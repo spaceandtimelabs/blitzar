@@ -37,8 +37,8 @@ int main() {
   };
   const int num_sequences = 1;
   const sxt_sequence_descriptor descriptors[num_sequences] = {descriptor1};
-  sxt_compressed_ristretto commitments[num_sequences];
-  sxt_compute_pedersen_commitments(commitments, num_sequences, descriptors, 0);
+  sxt_ristretto255_compressed commitments[num_sequences];
+  sxt_curve25519_compute_pedersen_commitments(commitments, num_sequences, descriptors, 0);
   auto commitments_data = reinterpret_cast<unsigned char*>(commitments);
   for (size_t i = 0; i < sizeof(commitments); ++i) {
     std::cout << std::hex << static_cast<unsigned>(commitments_data[i]);

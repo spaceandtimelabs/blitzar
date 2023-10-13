@@ -67,8 +67,8 @@ static void generate_inner_product_input(std::vector<s25t::element>& a_vector,
   auto np = 1ull << n_lg2;
   g_vector.resize(np);
 
-  REQUIRE(sxt_get_generators(reinterpret_cast<sxt_ristretto*>(g_vector.data()), np,
-                             generators_offset) == 0);
+  REQUIRE(sxt_ristretto255_get_generators(reinterpret_cast<sxt_ristretto255*>(g_vector.data()), np,
+                                          generators_offset) == 0);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -86,12 +86,13 @@ static void test_prove_and_verify_with_given_n(uint64_t n, uint64_t generators_o
   generate_inner_product_input(a_vector, b_vector, g_vector, l_vector, r_vector, n,
                                generators_offset);
 
-  sxt_prove_inner_product(reinterpret_cast<sxt_compressed_ristretto*>(l_vector.data()),
-                          reinterpret_cast<sxt_compressed_ristretto*>(r_vector.data()),
-                          reinterpret_cast<sxt_scalar*>(&ap_value),
-                          reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
-                          reinterpret_cast<const sxt_scalar*>(a_vector.data()),
-                          reinterpret_cast<const sxt_scalar*>(b_vector.data()));
+  sxt_curve25519_prove_inner_product(
+      reinterpret_cast<sxt_ristretto255_compressed*>(l_vector.data()),
+      reinterpret_cast<sxt_ristretto255_compressed*>(r_vector.data()),
+      reinterpret_cast<sxt_curve25519_scalar*>(&ap_value),
+      reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
+      reinterpret_cast<const sxt_curve25519_scalar*>(a_vector.data()),
+      reinterpret_cast<const sxt_curve25519_scalar*>(b_vector.data()));
 
   auto product = a_vector[0] * b_vector[0];
   auto a_commit = a_vector[0] * g_vector[0];
@@ -103,66 +104,66 @@ static void test_prove_and_verify_with_given_n(uint64_t n, uint64_t generators_o
 
   SECTION("We can verify a proof using valid input data") {
     transcript = prft::transcript{"abc"};
-    REQUIRE(sxt_verify_inner_product(
+    REQUIRE(sxt_curve25519_verify_inner_product(
                 reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
-                reinterpret_cast<const sxt_scalar*>(b_vector.data()),
-                reinterpret_cast<const sxt_scalar*>(&product),
-                reinterpret_cast<const sxt_ristretto*>(&a_commit),
-                reinterpret_cast<const sxt_compressed_ristretto*>(l_vector.data()),
-                reinterpret_cast<const sxt_compressed_ristretto*>(r_vector.data()),
-                reinterpret_cast<const sxt_scalar*>(&ap_value)) == 1);
+                reinterpret_cast<const sxt_curve25519_scalar*>(b_vector.data()),
+                reinterpret_cast<const sxt_curve25519_scalar*>(&product),
+                reinterpret_cast<const sxt_ristretto255*>(&a_commit),
+                reinterpret_cast<const sxt_ristretto255_compressed*>(l_vector.data()),
+                reinterpret_cast<const sxt_ristretto255_compressed*>(r_vector.data()),
+                reinterpret_cast<const sxt_curve25519_scalar*>(&ap_value)) == 1);
   }
 
   SECTION("We cannot verify a proof using an invalid a_commit") {
     transcript = prft::transcript{"abc"};
     auto a_commit_p = 0x123_s25 * g_vector[0];
-    REQUIRE(sxt_verify_inner_product(
+    REQUIRE(sxt_curve25519_verify_inner_product(
                 reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
-                reinterpret_cast<const sxt_scalar*>(b_vector.data()),
-                reinterpret_cast<const sxt_scalar*>(&product),
-                reinterpret_cast<const sxt_ristretto*>(&a_commit_p),
-                reinterpret_cast<const sxt_compressed_ristretto*>(l_vector.data()),
-                reinterpret_cast<const sxt_compressed_ristretto*>(r_vector.data()),
-                reinterpret_cast<const sxt_scalar*>(&ap_value)) == 0);
+                reinterpret_cast<const sxt_curve25519_scalar*>(b_vector.data()),
+                reinterpret_cast<const sxt_curve25519_scalar*>(&product),
+                reinterpret_cast<const sxt_ristretto255*>(&a_commit_p),
+                reinterpret_cast<const sxt_ristretto255_compressed*>(l_vector.data()),
+                reinterpret_cast<const sxt_ristretto255_compressed*>(r_vector.data()),
+                reinterpret_cast<const sxt_curve25519_scalar*>(&ap_value)) == 0);
   }
 
   SECTION("We cannot verify a proof using an invalid product") {
     transcript = prft::transcript{"abc"};
     auto product_p = product + 0x123_s25;
-    REQUIRE(sxt_verify_inner_product(
+    REQUIRE(sxt_curve25519_verify_inner_product(
                 reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
-                reinterpret_cast<const sxt_scalar*>(b_vector.data()),
-                reinterpret_cast<const sxt_scalar*>(&product_p),
-                reinterpret_cast<const sxt_ristretto*>(&a_commit),
-                reinterpret_cast<const sxt_compressed_ristretto*>(l_vector.data()),
-                reinterpret_cast<const sxt_compressed_ristretto*>(r_vector.data()),
-                reinterpret_cast<const sxt_scalar*>(&ap_value)) == 0);
+                reinterpret_cast<const sxt_curve25519_scalar*>(b_vector.data()),
+                reinterpret_cast<const sxt_curve25519_scalar*>(&product_p),
+                reinterpret_cast<const sxt_ristretto255*>(&a_commit),
+                reinterpret_cast<const sxt_ristretto255_compressed*>(l_vector.data()),
+                reinterpret_cast<const sxt_ristretto255_compressed*>(r_vector.data()),
+                reinterpret_cast<const sxt_curve25519_scalar*>(&ap_value)) == 0);
   }
 
   SECTION("We cannot verify a proof using an invalid b vector") {
     transcript = prft::transcript{"abc"};
-    REQUIRE(sxt_verify_inner_product(
+    REQUIRE(sxt_curve25519_verify_inner_product(
                 reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
-                reinterpret_cast<const sxt_scalar*>(a_vector.data()),
-                reinterpret_cast<const sxt_scalar*>(&product),
-                reinterpret_cast<const sxt_ristretto*>(&a_commit),
-                reinterpret_cast<const sxt_compressed_ristretto*>(l_vector.data()),
-                reinterpret_cast<const sxt_compressed_ristretto*>(r_vector.data()),
-                reinterpret_cast<const sxt_scalar*>(&ap_value)) == 0);
+                reinterpret_cast<const sxt_curve25519_scalar*>(a_vector.data()),
+                reinterpret_cast<const sxt_curve25519_scalar*>(&product),
+                reinterpret_cast<const sxt_ristretto255*>(&a_commit),
+                reinterpret_cast<const sxt_ristretto255_compressed*>(l_vector.data()),
+                reinterpret_cast<const sxt_ristretto255_compressed*>(r_vector.data()),
+                reinterpret_cast<const sxt_curve25519_scalar*>(&ap_value)) == 0);
   }
 
   // we use the `transcript` only with inputs having at least two elements
   if (n > 1) {
     SECTION("We cannot verify a proof using an invalid transcript") {
       transcript = prft::transcript{"wrong_transcript"};
-      REQUIRE(sxt_verify_inner_product(
+      REQUIRE(sxt_curve25519_verify_inner_product(
                   reinterpret_cast<sxt_transcript*>(&transcript), n, generators_offset,
-                  reinterpret_cast<const sxt_scalar*>(a_vector.data()),
-                  reinterpret_cast<const sxt_scalar*>(&product),
-                  reinterpret_cast<const sxt_ristretto*>(&a_commit),
-                  reinterpret_cast<const sxt_compressed_ristretto*>(l_vector.data()),
-                  reinterpret_cast<const sxt_compressed_ristretto*>(r_vector.data()),
-                  reinterpret_cast<const sxt_scalar*>(&ap_value)) == 0);
+                  reinterpret_cast<const sxt_curve25519_scalar*>(a_vector.data()),
+                  reinterpret_cast<const sxt_curve25519_scalar*>(&product),
+                  reinterpret_cast<const sxt_ristretto255*>(&a_commit),
+                  reinterpret_cast<const sxt_ristretto255_compressed*>(l_vector.data()),
+                  reinterpret_cast<const sxt_ristretto255_compressed*>(r_vector.data()),
+                  reinterpret_cast<const sxt_curve25519_scalar*>(&ap_value)) == 0);
     }
   }
 }
