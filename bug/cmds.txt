@@ -1,0 +1,31 @@
+root@3e9dde0bac0e:/src# bazel build -s //sxt/multiexp/bucket_method:t
+INFO: Analyzed target //sxt/multiexp/bucket_method:t (40 packages loaded, 2066 targets configured).
+INFO: Found 1 target...
+SUBCOMMAND: # //sxt/multiexp/bucket_method:t-lib [action 'Compiling sxt/multiexp/bucket_method/t.cc', configuration: 0526c7eca1689fb201d1356d5cdb9c543f8e1c3ba73cc3add1da2f5b23ebdc78, execution platform: @local_config_platform//:host]
+(cd /root/.cache/bazel/_bazel_root/f8087e59fd95af1ae29e8fcb7ff1a3dc/execroot/dev_spaceandtime_blitzar && \
+  exec env - \
+  /usr/bin/clang -x cu '--cuda-gpu-arch=sm_70' '--cuda-gpu-arch=sm_70' -fcuda-rdc '--cuda-path=/usr/local/cuda' '-frandom-seed=bazel-out/k8-fastbuild/bin/sxt/multiexp/bucket_method/_objs/t-lib/t.rdc.pic.o' -iquote . -iquote bazel-out/k8-fastbuild/bin -iquote external/local_cuda -iquote bazel-out/k8-fastbuild/bin/external/local_cuda -isystem external/local_cuda/cuda/include -isystem bazel-out/k8-fastbuild/bin/external/local_cuda/cuda/include -U_FORTIFY_SOURCE -fstack-protector -Wall -Wthread-safety -Wself-assign -Wunused-but-set-parameter -Wno-free-nonheap-object -fcolor-diagnostics -fno-omit-frame-pointer '-std=c++20' -Wno-unknown-cuda-version -c sxt/multiexp/bucket_method/t.cc -o bazel-out/k8-fastbuild/bin/sxt/multiexp/bucket_method/_objs/t-lib/t.rdc.pic.o -fPIC)
+# Configuration: 0526c7eca1689fb201d1356d5cdb9c543f8e1c3ba73cc3add1da2f5b23ebdc78
+# Execution platform: @local_config_platform//:host
+INFO: From Compiling sxt/multiexp/bucket_method/t.cc:
+
+SUBCOMMAND: # //sxt/multiexp/bucket_method:t-lib [action 'nvlink sxt/multiexp/bucket_method/_dlink_pic/t-lib/t-lib_register_sm_70.h', configuration: 0526c7eca1689fb201d1356d5cdb9c543f8e1c3ba73cc3add1da2f5b23ebdc78, execution platform: @local_config_platform//:host]
+(cd /root/.cache/bazel/_bazel_root/f8087e59fd95af1ae29e8fcb7ff1a3dc/execroot/dev_spaceandtime_blitzar && \
+  exec env - \
+  external/local_cuda/cuda/bin/nvlink '--arch=sm_70' '--register-link-binaries=bazel-out/k8-fastbuild/bin/sxt/multiexp/bucket_method/_dlink_pic/t-lib/t-lib_register_sm_70.h' '--output-file=bazel-out/k8-fastbuild/bin/sxt/multiexp/bucket_method/_dlink_pic/t-lib/t-lib_sm_70.cubin' bazel-out/k8-fastbuild/bin/sxt/multiexp/bucket_method/_objs/t-lib/t.rdc.pic.o)
+# Configuration: 0526c7eca1689fb201d1356d5cdb9c543f8e1c3ba73cc3add1da2f5b23ebdc78
+# Execution platform: @local_config_platform//:host
+
+SUBCOMMAND: # //sxt/multiexp/bucket_method:t-lib [action 'fatbinary sxt/multiexp/bucket_method/_dlink_pic/t-lib/t-lib.fatbin', configuration: 0526c7eca1689fb201d1356d5cdb9c543f8e1c3ba73cc3add1da2f5b23ebdc78, execution platform: @local_config_platform//:host]
+(cd /root/.cache/bazel/_bazel_root/f8087e59fd95af1ae29e8fcb7ff1a3dc/execroot/dev_spaceandtime_blitzar && \
+  exec env - \
+  external/local_cuda/cuda/bin/fatbinary -64 '--cmdline=--compile-only' --link --compress-all '--create=bazel-out/k8-fastbuild/bin/sxt/multiexp/bucket_method/_dlink_pic/t-lib/t-lib.fatbin' '--embedded-fatbin=bazel-out/k8-fastbuild/bin/sxt/multiexp/bucket_method/_dlink_pic/t-lib/t-lib_fatbin.h' '--image=profile=sm_70,file=bazel-out/k8-fastbuild/bin/sxt/multiexp/bucket_method/_dlink_pic/t-lib/t-lib_sm_70.cubin')
+# Configuration: 0526c7eca1689fb201d1356d5cdb9c543f8e1c3ba73cc3add1da2f5b23ebdc78
+# Execution platform: @local_config_platform//:host
+
+SUBCOMMAND: # //sxt/multiexp/bucket_method:t-lib [action 'Compiling bazel-out/k8-fastbuild/bin/sxt/multiexp/bucket_method/_dlink_pic/t-lib/t-lib.cu', configuration: 0526c7eca1689fb201d1356d5cdb9c543f8e1c3ba73cc3add1da2f5b23ebdc78, execution platform: @local_config_platform//:host]
+(cd /root/.cache/bazel/_bazel_root/f8087e59fd95af1ae29e8fcb7ff1a3dc/execroot/dev_spaceandtime_blitzar && \
+  exec env - \
+  /usr/bin/clang -x cu '--cuda-gpu-arch=sm_70' '--cuda-gpu-arch=sm_70' -fcuda-rdc '--cuda-path=/usr/local/cuda' '-frandom-seed=bazel-out/k8-fastbuild/bin/sxt/multiexp/bucket_method/_objs/_dlink/t-lib/t-lib.rdc.pic.o' -D__CUDA_INCLUDE_COMPILER_INTERNAL_HEADERS__ '-D__NV_EXTRA_INITIALIZATION=' '-D__NV_EXTRA_FINALIZATION=' -iquote . -iquote bazel-out/k8-fastbuild/bin -iquote external/local_cuda -iquote bazel-out/k8-fastbuild/bin/external/local_cuda -isystem external/local_cuda/cuda/include -isystem bazel-out/k8-fastbuild/bin/external/local_cuda/cuda/include -U_FORTIFY_SOURCE -fstack-protector -Wall -Wthread-safety -Wself-assign -Wunused-but-set-parameter -Wno-free-nonheap-object -fcolor-diagnostics -fno-omit-frame-pointer -x c++ -c bazel-out/k8-fastbuild/bin/sxt/multiexp/bucket_method/_dlink_pic/t-lib/t-lib.cu -o bazel-out/k8-fastbuild/bin/sxt/multiexp/bucket_method/_objs/_dlink/t-lib/t-lib.rdc.pic.o -fPIC)
+# Configuration: 0526c7eca1689fb201d1356d5cdb9c543f8e1c3ba73cc3add1da2f5b23ebdc78
+# Execution platform: @local_config_platform//:host

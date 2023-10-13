@@ -1,0 +1,21 @@
+build --copt -fPIC
+
+build --flag_alias=enable_cuda=@rules_cuda//cuda:enable
+build --flag_alias=cuda_archs=@rules_cuda//cuda:archs
+build --flag_alias=cuda_compiler=@rules_cuda//cuda:compiler
+build --flag_alias=cuda_copts=@rules_cuda//cuda:copts
+build --flag_alias=cuda_host_copts=@rules_cuda//cuda:host_copts
+build --flag_alias=cuda_runtime=@rules_cuda//cuda:runtime
+
+build --@rules_cuda//cuda:archs=compute_70:compute_70,sm_70
+build --@rules_cuda//cuda:runtime=@local_cuda//:cuda_runtime_static
+
+build --enable_cuda=True
+
+# Use --config=clang to build with clang instead of gcc and nvcc.
+build:clang --repo_env=CC=clang
+build:clang --@rules_cuda//cuda:compiler=clang
+build:clang --copt=-stdlib=libstdc++
+build:clang --action_env CC=/usr/bin/clang-18
+build:clang --action_env CXX=/usr/bin/clang++-18
+build --config=clang

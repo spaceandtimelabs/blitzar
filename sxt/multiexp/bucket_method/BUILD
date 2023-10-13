@@ -1,6 +1,7 @@
 load(
     "//bazel:sxt_build_system.bzl",
     "sxt_cc_component",
+    "sxt_cc_binary",
 )
 
 sxt_cc_component(
@@ -109,4 +110,11 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/type:literal",
     ],
+)
+
+sxt_cc_binary(
+  name = "t",
+  srcs = [
+    "t.cc",
+  ],
 )
