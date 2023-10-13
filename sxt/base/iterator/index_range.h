@@ -17,6 +17,7 @@
 #pragma once
 
 #include <cstddef>
+#include <limits>
 
 namespace sxt::basit {
 //--------------------------------------------------------------------------------------------------
@@ -28,6 +29,8 @@ public:
 
   index_range(size_t a, size_t b) noexcept;
 
+  index_range(size_t a, size_t b, size_t min_chunk_size, size_t max_chunk_size) noexcept;
+
   size_t a() const noexcept { return a_; }
   size_t b() const noexcept { return b_; }
 
@@ -35,8 +38,17 @@ public:
 
   bool operator==(const index_range&) const noexcept = default;
 
+  size_t min_chunk_size() const noexcept { return min_chunk_size_; }
+  size_t max_chunk_size() const noexcept { return max_chunk_size_; }
+
+  [[nodiscard]] index_range min_chunk_size(size_t val) const noexcept;
+
+  [[nodiscard]] index_range max_chunk_size(size_t val) const noexcept;
+
 private:
   size_t a_{0};
   size_t b_{0};
+  size_t min_chunk_size_{1};
+  size_t max_chunk_size_{std::numeric_limits<size_t>::max()};
 };
 } // namespace sxt::basit
