@@ -1,7 +1,0 @@
-clang -x cu '--cuda-gpu-arch=sm_70' -fcuda-rdc '-frandom-seed=t.rdc.o' -c t.cc -o t.rdc.o -fPIC
-
-nvlink '--arch=sm_70' '--register-link-binaries=t-reg.h' '--output-file=t-reg.cubin' t.rdc.o
-
-fatbinary -64 '--cmdline=--compile-only' --link --compress-all '--create=t.fatbin' '--embedded-fatbin=t-fatbin.h' '--image=profile=sm_70,file=t-reg.cubin'
-
-clang -x cu '--cuda-gpu-arch=sm_70' -fcuda-rdc '-frandom-seed=t.rdc.o' -D__CUDA_INCLUDE_COMPILER_INTERNAL_HEADERS__ '-D__NV_EXTRA_INITIALIZATION=' '-D__NV_EXTRA_FINALIZATION=' -x c++ -c t-lib.cu -o t-lib.rdc.o -fPIC
