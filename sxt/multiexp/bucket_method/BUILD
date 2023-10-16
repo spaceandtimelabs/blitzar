@@ -111,10 +111,3 @@ sxt_cc_component(
         "//sxt/curve21/type:literal",
     ],
 )
-
-sxt_cc_binary(
-  name = "t",
-  srcs = [
-    "t.cc",
-  ],
-)
