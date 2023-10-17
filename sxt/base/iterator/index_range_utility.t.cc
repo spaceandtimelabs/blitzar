@@ -60,4 +60,20 @@ TEST_CASE("we can split an index_range") {
     REQUIRE(*iter++ == index_range{2, 3});
     REQUIRE(iter == last);
   }
+
+  SECTION("we respect the min chunk size") {
+    auto [iter, last] = split(index_range{0, 4}.min_chunk_size(2), 4);
+    REQUIRE(std::distance(iter, last) == 2);
+    REQUIRE(*iter++ == index_range{0, 2});
+    REQUIRE(*iter++ == index_range{2, 4});
+    REQUIRE(iter == last);
+  }
+
+  SECTION("we respect the max chunk size") {
+    auto [iter, last] = split(index_range{0, 4}.max_chunk_size(2), 1);
+    REQUIRE(std::distance(iter, last) == 2);
+    REQUIRE(*iter++ == index_range{0, 2});
+    REQUIRE(*iter++ == index_range{2, 4});
+    REQUIRE(iter == last);
+  }
 }
