@@ -104,7 +104,7 @@ static void process_compute_pedersen_commitments(struct sxt_bls12_381_g1_compres
     return;
 
   SXT_RELEASE_ASSERT(commitments != nullptr);
-  SXT_RELEASE_ASSERT(generators == nullptr);
+  SXT_RELEASE_ASSERT(generators != nullptr);
   SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized());
   static_assert(sizeof(cg1t::compressed_element) == sizeof(sxt_bls12_381_g1_compressed),
                 "types must be ABI compatible");
