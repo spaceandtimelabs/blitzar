@@ -39,10 +39,10 @@ static void make_dataset(memmg::managed_array<s25t::element>& a_host,
                          memmg::managed_array<s25t::element>& a_dev,
                          memmg::managed_array<s25t::element>& b_dev,
                          basn::fast_random_number_generator& rng, size_t n) noexcept {
-  a_host = memmg::managed_array<s25t::element>(n);
-  b_host = memmg::managed_array<s25t::element>(n);
-  a_dev = memmg::managed_array<s25t::element>(n, memr::get_device_resource());
-  b_dev = memmg::managed_array<s25t::element>(n, memr::get_device_resource());
+  a_host.resize(n);
+  b_host.resize(n);
+  a_dev.resize(n);
+  b_dev.resize(n);
   s25rn::generate_random_elements(a_host, rng);
   s25rn::generate_random_elements(b_host, rng);
   basdv::memcpy_host_to_device(a_dev.data(), a_host.data(), n * sizeof(s25t::element));
