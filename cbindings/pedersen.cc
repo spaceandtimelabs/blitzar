@@ -113,7 +113,6 @@ static void process_compute_pedersen_commitments(struct sxt_bls12_381_g1_compres
   auto num_generators = populate_exponent_sequence(sequences, descriptors);
 
   auto backend = cbn::get_backend();
-  std::vector<cg1t::element_p2> temp_generators;
   basct::cspan<cg1t::element_p2> generators_span{generators, num_generators};
 
   backend->compute_commitments(
