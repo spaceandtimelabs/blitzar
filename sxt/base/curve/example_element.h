@@ -25,6 +25,12 @@ namespace sxt::bascrv {
 //--------------------------------------------------------------------------------------------------
 // element97
 //--------------------------------------------------------------------------------------------------
+/**
+ * Integer arithmetic mod 97.
+ *
+ * Provides a minimal implementation of the curve element concent that can be used for writing
+ * tests.
+ */
 struct element97 {
   uint32_t value;
   bool marked = false;
