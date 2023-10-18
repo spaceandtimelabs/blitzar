@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <chrono>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
@@ -40,10 +41,15 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
   basdv::stream stream;
 
   // accumulate
+  auto t1 = std::chrono::steady_clock::now();
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> bucket_sums{bucket_group_size * num_bucket_groups * num_outputs,
                                       &resource};
   co_await accumulate_buckets<T>(bucket_sums, generators, exponents);
+  auto t2 = std::chrono::steady_clock::now();
+  std::cout << "accumulation: "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() / 1000.0
+            << std::endl;
 
   // reduce buckets
   memmg::managed_array<T> reduced_buckets_dev{bucket_group_size * num_outputs, &resource};
@@ -58,6 +64,10 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
 
   // combine buckets
   combine_buckets<T>(res, reduced_buckets);
+  auto t3 = std::chrono::steady_clock::now();
+  std::cout << "rest: "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count() / 1000.0
+            << std::endl;
 }
 
 //--------------------------------------------------------------------------------------------------
