@@ -58,7 +58,7 @@ xena::future<s25t::element> async_inner_product(basct::cspan<s25t::element> lhs,
   auto is_device_rhs = basdv::is_active_device_pointer(rhs.data());
   buffer_size = (static_cast<size_t>(!is_device_lhs) + static_cast<size_t>(!is_device_rhs)) * n;
   if (buffer_size > 0) {
-    device_data = memmg::managed_array<s25t::element>{buffer_size, &resource};
+    device_data.resize(buffer_size);
   }
   auto data = device_data.data();
   if (!is_device_lhs) {
