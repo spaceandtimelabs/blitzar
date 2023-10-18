@@ -63,6 +63,11 @@ static std::vector<c21t::element_p3> compute_random_curve25519_generators(uint64
 //--------------------------------------------------------------------------------------------------
 // get_bls12_381_g1_generators
 //--------------------------------------------------------------------------------------------------
+/*
+ This is a placeholder method. This method will be updated to behave like the
+ compute_random_curve25519_generators method after random element generation is implemented inside
+ the curve_g1 package group.
+ */
 static std::vector<cg1t::element_p2> get_bls12_381_g1_generators(uint64_t seq_length,
                                                                  uint64_t offset) {
   std::vector<cg1t::element_p2> generators(seq_length);
