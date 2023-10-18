@@ -23,6 +23,12 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve_g1/constant/generator.h"
+#include "sxt/curve_g1/operation/add.h"
+#include "sxt/curve_g1/operation/compression.h"
+#include "sxt/curve_g1/operation/scalar_multiply.h"
+#include "sxt/curve_g1/type/compressed_element.h"
+#include "sxt/curve_g1/type/element_p2.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/operation/add.h"
 #include "sxt/ristretto/operation/overload.h"
@@ -41,14 +47,33 @@ static void initialize_backend(int backend, uint64_t precomputed_elements) {
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_random_generators
+// compute_random_curve25519_generators
 //--------------------------------------------------------------------------------------------------
-static std::vector<c21t::element_p3> compute_random_generators(uint64_t seq_length,
-                                                               uint64_t offset) {
+static std::vector<c21t::element_p3> compute_random_curve25519_generators(uint64_t seq_length,
+                                                                          uint64_t offset) {
   std::vector<c21t::element_p3> generators(seq_length);
 
   for (uint64_t i = 0; i < seq_length; ++i) {
     sqcgn::compute_base_element(generators[i], offset + i);
+  }
+
+  return generators;
+}
+
+//--------------------------------------------------------------------------------------------------
+// get_bls12_381_g1_generators
+//--------------------------------------------------------------------------------------------------
+/*
+ This is a placeholder method. This method will be updated to behave like the
+ compute_random_curve25519_generators method after random element generation is implemented inside
+ the curve_g1 package group.
+ */
+static std::vector<cg1t::element_p2> get_bls12_381_g1_generators(uint64_t seq_length,
+                                                                 uint64_t offset) {
+  std::vector<cg1t::element_p2> generators(seq_length);
+
+  for (uint64_t i = 0; i < seq_length; ++i) {
+    generators[i] = cg1cn::generator_p2_v;
   }
 
   return generators;
@@ -68,12 +93,12 @@ static sxt_sequence_descriptor make_sequence_descriptor(const std::vector<T>& da
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_expected_commitment
+// compute_expected_ristretto255_commitment
 //--------------------------------------------------------------------------------------------------
 template <class T>
 static rstt::compressed_element
-compute_expected_commitment(const std::vector<T>& data,
-                            const std::vector<c21t::element_p3>& generators) {
+compute_expected_ristretto255_commitment(const std::vector<T>& data,
+                                         const std::vector<c21t::element_p3>& generators) {
   SXT_DEBUG_ASSERT(data.size() == generators.size());
 
   rstt::compressed_element expected_commitment;
@@ -90,9 +115,32 @@ compute_expected_commitment(const std::vector<T>& data,
 }
 
 //--------------------------------------------------------------------------------------------------
-// test_pedersen_commitments_with_given_backend_and_no_generators
+// compute_expected_bls12_381_g1_commitment
 //--------------------------------------------------------------------------------------------------
-static void test_pedersen_commitments_with_given_backend_and_no_generators(
+template <class T>
+static cg1t::compressed_element
+compute_expected_bls12_381_g1_commitment(const std::vector<T>& data,
+                                         const std::vector<cg1t::element_p2>& generators) {
+  SXT_DEBUG_ASSERT(data.size() == generators.size());
+
+  cg1t::element_p2 expected_commitment{cg1t::element_p2::identity()};
+
+  for (uint64_t i = 0; i < data.size(); ++i) {
+    cg1t::element_p2 aux_h{generators[i]};
+    cg1o::scalar_multiply255(aux_h, aux_h, data[i].data());
+    cg1o::add(expected_commitment, expected_commitment, aux_h);
+  }
+
+  cg1t::compressed_element expected_commitment_compressed;
+  cg1o::compress(expected_commitment_compressed, expected_commitment);
+
+  return expected_commitment_compressed;
+}
+
+//--------------------------------------------------------------------------------------------------
+// test_ristretto255_pedersen_commitments_with_given_backend_and_no_generators
+//--------------------------------------------------------------------------------------------------
+static void test_ristretto255_pedersen_commitments_with_given_backend_and_no_generators(
     int backend, uint64_t num_precomputed_generators) {
   initialize_backend(backend, num_precomputed_generators);
 
@@ -175,8 +223,8 @@ static void test_pedersen_commitments_with_given_backend_and_no_generators(
         reinterpret_cast<sxt_ristretto255_compressed*>(&commitments_data), 1, &descriptor,
         offset_gens);
 
-    const auto generators = compute_random_generators(data.size(), offset_gens);
-    const auto expected_commitment = compute_expected_commitment(data, generators);
+    const auto generators = compute_random_curve25519_generators(data.size(), offset_gens);
+    const auto expected_commitment = compute_expected_ristretto255_commitment(data, generators);
 
     REQUIRE(commitments_data == expected_commitment);
   }
@@ -185,19 +233,18 @@ static void test_pedersen_commitments_with_given_backend_and_no_generators(
 }
 
 //--------------------------------------------------------------------------------------------------
-// test_pedersen_commitments_with_given_backend_and_generators
+// test_ristretto255_pedersen_commitments_with_given_backend_and_generators
 //--------------------------------------------------------------------------------------------------
-static void
-test_pedersen_commitments_with_given_backend_and_generators(int backend,
-                                                            uint64_t num_precomputed_generators) {
+static void test_ristretto255_pedersen_commitments_with_given_backend_and_generators(
+    int backend, uint64_t num_precomputed_generators) {
   initialize_backend(backend, num_precomputed_generators);
 
   SECTION("We verify that using the correct generators will produce correct results") {
     const std::vector<uint32_t> data = {2000, 7500};
     const auto seq_descriptor = make_sequence_descriptor(data);
     const uint64_t num_sequences = 1;
-    const auto generators = compute_random_generators(data.size(), 10);
-    const auto expected_commitment = compute_expected_commitment(data, generators);
+    const auto generators = compute_random_curve25519_generators(data.size(), 10);
+    const auto expected_commitment = compute_expected_ristretto255_commitment(data, generators);
 
     sxt_ristretto255_compressed commitments_data;
     sxt_curve25519_compute_pedersen_commitments_with_generators(
@@ -210,38 +257,116 @@ test_pedersen_commitments_with_given_backend_and_generators(int backend,
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_commitments_with_specified_precomputed_elements
+// test_bls12_381_g1_pedersen_commitments_with_given_backend_and_generators
 //--------------------------------------------------------------------------------------------------
-static void compute_commitments_with_specified_precomputed_elements(int backend,
-                                                                    uint64_t num_precomputed_els) {
+static void test_bls12_381_g1_pedersen_commitments_with_given_backend_and_generators(
+    int backend, uint64_t num_precomputed_generators) {
+  initialize_backend(backend, num_precomputed_generators);
+
+  SECTION("We verify that using the correct generators will produce correct results") {
+    constexpr std::array<uint8_t, 32> a{0x1b, 0xa7, 0x6d, 0xa5, 0x98, 0x82, 0x56, 0x2b,
+                                        0xd2, 0x19, 0xf5, 0xe,  0xc8, 0xfa, 0x5,  0x85,
+                                        0x91, 0xe7, 0x1d, 0x5e, 0xd2, 0x60, 0x22, 0x10,
+                                        0x6a, 0xdc, 0x18, 0xfd, 0xfc, 0xf8, 0x9a, 0xc};
+    constexpr std::array<uint8_t, 32> b{0x01, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+                                        0x0,  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+                                        0x0,  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+
+    const std::vector<std::array<uint8_t, 32>> data = {a, b};
+    const auto seq_descriptor = make_sequence_descriptor(data);
+    constexpr uint64_t num_sequences{1};
+    const auto generators = get_bls12_381_g1_generators(data.size(), 10);
+    const auto expected_commitment = compute_expected_bls12_381_g1_commitment(data, generators);
+
+    sxt_bls12_381_g1_compressed commitments_data;
+    sxt_bls12_381_g1_compute_pedersen_commitments_with_generators(
+        &commitments_data, num_sequences, &seq_descriptor,
+        reinterpret_cast<const sxt_bls12_381_g1*>(generators.data()));
+    REQUIRE(*reinterpret_cast<cg1t::compressed_element*>(&commitments_data) == expected_commitment);
+  }
+
+  cbn::reset_backend_for_testing();
+}
+
+//--------------------------------------------------------------------------------------------------
+// compute_ristretto255_commitments_with_specified_precomputed_elements
+//--------------------------------------------------------------------------------------------------
+static void
+compute_ristretto255_commitments_with_specified_precomputed_elements(int backend,
+                                                                     uint64_t num_precomputed_els) {
   SECTION("We can compute commitments without any provided generators") {
-    test_pedersen_commitments_with_given_backend_and_no_generators(backend, num_precomputed_els);
+    test_ristretto255_pedersen_commitments_with_given_backend_and_no_generators(
+        backend, num_precomputed_els);
   }
 
   SECTION("We can compute commitments providing generators as input") {
-    test_pedersen_commitments_with_given_backend_and_generators(backend, num_precomputed_els);
+    test_ristretto255_pedersen_commitments_with_given_backend_and_generators(backend,
+                                                                             num_precomputed_els);
   }
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_commitments_with_given_backend
+// compute_bls12_381_g1_commitments_with_specified_precomputed_elements
 //--------------------------------------------------------------------------------------------------
-static void compute_commitments_with_given_backend(int backend) {
+static void
+compute_bls12_381_g1_commitments_with_specified_precomputed_elements(int backend,
+                                                                     uint64_t num_precomputed_els) {
+  SECTION("We can compute commitments providing generators as input") {
+    test_bls12_381_g1_pedersen_commitments_with_given_backend_and_generators(backend,
+                                                                             num_precomputed_els);
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+// compute_ristretto255_commitments_with_given_backend
+//--------------------------------------------------------------------------------------------------
+static void compute_ristretto255_commitments_with_given_backend(int backend) {
   SECTION("We can compute commitments without precomputing elements") {
     uint64_t num_precomputed_els = 0;
-    compute_commitments_with_specified_precomputed_elements(backend, num_precomputed_els);
+    compute_ristretto255_commitments_with_specified_precomputed_elements(backend,
+                                                                         num_precomputed_els);
   }
 
   SECTION("We can compute commitments using non-zero precomputed elements") {
-    uint64_t num_precomputed_els = 10;
-    compute_commitments_with_specified_precomputed_elements(backend, num_precomputed_els);
+    uint64_t num_precomputed_els{10};
+    compute_ristretto255_commitments_with_specified_precomputed_elements(backend,
+                                                                         num_precomputed_els);
   }
 }
 
-TEST_CASE("We can compute pedersen commitments using the naive gpu backend") {
-  compute_commitments_with_given_backend(SXT_GPU_BACKEND);
+//--------------------------------------------------------------------------------------------------
+// compute_bls12_381_g1_commitments_with_given_backend
+//--------------------------------------------------------------------------------------------------
+static void compute_bls12_381_g1_commitments_with_given_backend(int backend) {
+  SECTION("We can compute commitments without precomputing elements") {
+    uint64_t num_precomputed_els{0};
+    compute_bls12_381_g1_commitments_with_specified_precomputed_elements(backend,
+                                                                         num_precomputed_els);
+  }
+
+  SECTION("We can compute commitments using non-zero precomputed elements") {
+    uint64_t num_precomputed_els{10};
+    compute_bls12_381_g1_commitments_with_specified_precomputed_elements(backend,
+                                                                         num_precomputed_els);
+  }
 }
 
-TEST_CASE("We can compute pedersen commitments using the pippenger cpu backend") {
-  compute_commitments_with_given_backend(SXT_CPU_BACKEND);
+TEST_CASE(
+    "We can compute pedersen commitments with ristretto255 elements using the naive gpu backend") {
+  compute_ristretto255_commitments_with_given_backend(SXT_GPU_BACKEND);
+}
+
+TEST_CASE("We can compute pedersen commitments with ristretto255 elements using the pippenger cpu "
+          "backend") {
+  compute_ristretto255_commitments_with_given_backend(SXT_CPU_BACKEND);
+}
+
+TEST_CASE(
+    "We can compute pedersen commitments with bls12-381 G1 elements using the naive gpu backend") {
+  compute_bls12_381_g1_commitments_with_given_backend(SXT_GPU_BACKEND);
+}
+
+TEST_CASE("We can compute pedersen commitments with bls12-381 G1 elements using the pippenger cpu "
+          "backend") {
+  compute_bls12_381_g1_commitments_with_given_backend(SXT_CPU_BACKEND);
 }

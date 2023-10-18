@@ -25,12 +25,19 @@
 namespace sxt::mtxb {
 struct exponent_sequence;
 }
+
 namespace sxt::rstt {
 class compressed_element;
 }
+
 namespace sxt::c21t {
 struct element_p3;
 }
+
+namespace sxt::cg1t {
+class compressed_element;
+struct element_p3;
+} // namespace sxt::cg1t
 
 namespace sxt::s25t {
 class element;
@@ -56,6 +63,10 @@ public:
   void compute_commitments(basct::span<rstt::compressed_element> commitments,
                            basct::cspan<mtxb::exponent_sequence> value_sequences,
                            basct::cspan<c21t::element_p3> generators) const noexcept override;
+
+  void compute_commitments(basct::span<cg1t::compressed_element> commitments,
+                           basct::cspan<mtxb::exponent_sequence> value_sequences,
+                           basct::cspan<cg1t::element_p2> generators) const noexcept override;
 
   basct::cspan<c21t::element_p3>
   get_precomputed_generators(std::vector<c21t::element_p3>& temp_generators, uint64_t n,
