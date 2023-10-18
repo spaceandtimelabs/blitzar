@@ -58,10 +58,7 @@ xena::future<> compute_multiproduct_decomposition(memmg::managed_array<unsigned>
   // set up exponents
   memmg::managed_array<uint8_t> exponents_data{&resource};
   if (!basdv::is_active_device_pointer(exponents.data)) {
-    exponents_data = memmg::managed_array<uint8_t>{
-        n * element_num_bytes,
-        &resource,
-    };
+    exponents_data.resize(n * element_num_bytes);
     basdv::async_memcpy_host_to_device(exponents_data.data(), exponents.data, n * element_num_bytes,
                                        stream);
     exponents.data = exponents_data.data();
@@ -88,10 +85,7 @@ xena::future<> compute_multiproduct_decomposition(memmg::managed_array<unsigned>
   }
 
   // rearrange indexes
-  indexes = memmg::managed_array<unsigned>{
-      num_one_bits,
-      indexes.get_allocator(),
-  };
+  indexes.resize(num_one_bits);
   SXT_DEBUG_ASSERT(basdv::is_active_device_pointer(indexes.data()));
   co_await decompose_exponent_bits(indexes, stream, block_counts, exponents);
 }

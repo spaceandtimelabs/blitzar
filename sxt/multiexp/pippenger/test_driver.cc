@@ -42,7 +42,7 @@ test_driver::compute_multiproduct(mtxi::index_table&& multiproduct_table,
   if (num_inputs == generators.size()) {
     inputs = generators_p;
   } else {
-    inputs_data = memmg::managed_array<uint64_t>(num_inputs);
+    inputs_data.resize(num_inputs);
     mtxb::filter_generators<uint64_t>(inputs_data, generators_p, masks);
     inputs = inputs_data;
   }

@@ -40,7 +40,7 @@ public:
     if (num_inputs == generators.size()) {
       inputs = generators;
     } else {
-      inputs_data = memmg::managed_array<Element>(num_inputs);
+      inputs_data.resize(num_inputs);
       mtxb::filter_generators<Element>(inputs_data, generators, masks);
       inputs = inputs_data;
     }

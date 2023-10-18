@@ -227,10 +227,7 @@ xena::future<> count_exponent_bits(memmg::managed_array<unsigned>& block_counts,
   auto num_iterations = basn::divide_up(n, num_blocks);
   num_blocks = basn::divide_up(n, num_iterations);
 
-  block_counts = memmg::managed_array<unsigned>{
-      num_blocks * element_num_bits,
-      block_counts.get_allocator(),
-  };
+  block_counts.resize(num_blocks * element_num_bits);
   SXT_DEBUG_ASSERT(basdv::is_host_pointer(block_counts.data()));
 
   // set up block_counts_dev
