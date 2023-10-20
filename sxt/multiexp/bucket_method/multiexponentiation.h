@@ -95,12 +95,11 @@ try_multiexponentiate(basct::cspan<Element> generators,
     exponents_p[output_index] = exponents[output_index].data;
   }
   res.resize(num_outputs);
-  static constexpr size_t max_output_chunk = 128;
+  static constexpr size_t max_output_chunk = 8;
   auto output_chunks =
       basit::split(basit::index_range{0, num_outputs}.max_chunk_size(max_output_chunk), 1);
   for (auto chunk_iter = output_chunks.first; chunk_iter != output_chunks.second; ++chunk_iter) {
     auto chunk = *chunk_iter;
-    std::cout << "chunk: " << chunk.a() << " " << chunk.b() << " " << chunk.size() << std::endl;
     co_await multiexponentiate<Element>(basct::subspan(res, chunk.a(), chunk.size()), generators,
                                         basct::subspan(exponents_p, chunk.a(), chunk.size()));
   }
