@@ -5,13 +5,13 @@ load(
 
 sxt_cc_component(
     name = "active_count",
-    with_test = False,
     impl_deps = [
         "//sxt/base/error:assert",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/container:span",
     ],
@@ -116,13 +116,13 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "multiproduct_params_computation",
-    with_test = False,
     impl_deps = [
         ":multiproduct_params",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
 )
 
 sxt_cc_component(

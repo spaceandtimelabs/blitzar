@@ -5,7 +5,6 @@ load(
 
 sxt_cc_component(
     name = "reduce",
-    with_test = False,
     impl_deps = [
         "//sxt/base/bit:load",
     ],
@@ -13,4 +12,5 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
 )

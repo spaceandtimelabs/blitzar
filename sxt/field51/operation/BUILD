@@ -5,10 +5,10 @@ load(
 
 sxt_cc_component(
     name = "abs",
-    with_test = False,
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         ":cneg",
         "//sxt/base/macro:cuda_callable",
@@ -19,10 +19,10 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "add",
-    with_test = False,
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
         "//sxt/field51/type:element",
@@ -31,11 +31,11 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "cmov",
-    with_test = False,
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
         "//sxt/field51/type:element",
@@ -44,10 +44,10 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "neg",
-    with_test = False,
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         ":sub",
         "//sxt/base/macro:cuda_callable",
@@ -58,10 +58,10 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "cneg",
-    with_test = False,
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         ":cmov",
         ":neg",
@@ -72,11 +72,11 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "sub",
-    with_test = False,
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
         "//sxt/field51/type:element",
@@ -117,7 +117,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "pow22523",
-    with_test = False,
     impl_deps = [
         ":mul",
         ":sq",
@@ -127,6 +126,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
     ],
@@ -134,7 +134,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "sq",
-    with_test = False,
     impl_deps = [
         "//sxt/base/type:int",
         "//sxt/field51/type:element",
@@ -143,6 +142,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
     ],

@@ -43,7 +43,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "exponent_aggregates_computation",
-    with_test = False,
     impl_deps = [
         ":exponent_aggregates",
         "//sxt/base/num:constexpr_switch",
@@ -57,6 +56,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/container:span",
     ],

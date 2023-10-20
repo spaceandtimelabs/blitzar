@@ -19,11 +19,11 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "keccakf",
-    with_test = False,
     impl_deps = [],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [],
 )
 

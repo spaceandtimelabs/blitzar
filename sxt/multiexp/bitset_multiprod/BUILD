@@ -5,10 +5,10 @@ load(
 
 sxt_cc_component(
     name = "value_cache",
-    with_test = False,
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/container:span",
     ],
@@ -16,10 +16,10 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "value_cache_utility",
-    with_test = False,
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         ":value_cache",
         "//sxt/base/container:span",

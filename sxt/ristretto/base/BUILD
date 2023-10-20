@@ -60,7 +60,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "sqrt_ratio_m1",
-    with_test = False,
     impl_deps = [
         "//sxt/curve21/type:element_p3",
         "//sxt/field51/constant:sqrtm1",
@@ -77,6 +76,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
     ],

@@ -19,13 +19,13 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "device_resource",
-    with_test = False,
     impl_deps = [
         "//sxt/base/error:panic",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
 )
 
 sxt_cc_component(
@@ -41,11 +41,11 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "managed_device_resource",
-    with_test= False,
     impl_deps = [
         "//sxt/base/error:panic",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
 )

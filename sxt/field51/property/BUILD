@@ -5,10 +5,10 @@ load(
 
 sxt_cc_component(
     name = "sign",
-    with_test = False,
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
         "//sxt/field51/base:byte_conversion",
