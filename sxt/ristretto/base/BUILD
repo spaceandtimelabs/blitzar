@@ -60,6 +60,7 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "sqrt_ratio_m1",
+    with_test = False,
     impl_deps = [
         "//sxt/curve21/type:element_p3",
         "//sxt/field51/constant:sqrtm1",

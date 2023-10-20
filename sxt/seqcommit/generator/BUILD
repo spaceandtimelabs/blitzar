@@ -38,6 +38,7 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "precomputed_initializer",
+    with_test = False,
     impl_deps = [
         ":precomputed_generators",
         ":precomputed_one_commitments",

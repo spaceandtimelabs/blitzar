@@ -7,7 +7,6 @@ load("@rules_cuda//cuda:defs.bzl", "cuda_library", "cuda_objects")
 # However, this flag is relevant to some modules.
 def sxt_copts():
     return [
-        "-std=c++20",
         "-Wno-unknown-cuda-version",
     ]
 

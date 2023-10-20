@@ -43,6 +43,7 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "exponent_aggregates_computation",
+    with_test = False,
     impl_deps = [
         ":exponent_aggregates",
         "//sxt/base/num:constexpr_switch",

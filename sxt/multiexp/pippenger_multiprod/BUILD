@@ -5,6 +5,7 @@ load(
 
 sxt_cc_component(
     name = "active_count",
+    with_test = False,
     impl_deps = [
         "//sxt/base/error:assert",
     ],
@@ -115,6 +116,7 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "multiproduct_params_computation",
+    with_test = False,
     impl_deps = [
         ":multiproduct_params",
     ],

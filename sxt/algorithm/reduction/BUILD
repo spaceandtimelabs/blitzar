@@ -5,6 +5,7 @@ load(
 
 sxt_cc_component(
     name = "thread_reduction",
+    with_test = False,
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",

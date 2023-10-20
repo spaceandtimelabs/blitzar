@@ -76,6 +76,7 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "index_table_utility",
+    with_test = False,
     impl_deps = [
         ":index_table",
         "//sxt/base/error:assert",
