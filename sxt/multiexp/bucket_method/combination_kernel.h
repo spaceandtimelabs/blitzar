@@ -46,8 +46,8 @@ __global__ void combine_bucket_groups(T* out, T* bucket_sums) {
 
   auto output_index = blockIdx.y;
 
-  bucket_sums += bucket_index;
-  out += bucket_index + BucketGroupSize * NumBucketGroups * output_index;
+  bucket_sums += bucket_index + BucketGroupSize * NumBucketGroups * output_index;
+  out += bucket_index + BucketGroupSize * output_index;
 
   unsigned i = NumBucketGroups - 1;
   T sum = bucket_sums[i * BucketGroupSize];

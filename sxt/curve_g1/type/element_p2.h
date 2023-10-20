@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <iostream>
+
 #include "sxt/curve_g1/type/operation_adl_stub.h"
 #include "sxt/field12/constant/one.h"
 #include "sxt/field12/constant/zero.h"
@@ -44,6 +46,10 @@ struct element_p2 : cg1o::operation_adl_stub {
     return element_p2{f12cn::zero_v, f12cn::one_v, f12cn::zero_v};
   }
 };
+
+inline std::ostream& operator<<(std::ostream& out, const element_p2&) noexcept {
+  return out;
+}
 
 //--------------------------------------------------------------------------------------------------
 // mark

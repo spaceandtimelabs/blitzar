@@ -11,8 +11,7 @@ make_exponents_viewable(memmg::managed_array<uint8_t>& exponents_viewable_data,
   static constexpr size_t exponent_size = 32; // hard coded for now
   auto num_outputs = exponents.size();
   auto n = rng.size();
-  exponents_viewable_data = memmg::managed_array<uint8_t>{exponent_size * n * num_outputs,
-                                                          exponents_viewable_data.get_allocator()};
+  exponents_viewable_data.resize(exponent_size * n * num_outputs);
   auto out = exponents_viewable_data.data();
   for (size_t output_index=0; output_index<num_outputs; ++output_index) {
     basdv::async_copy_to_device(
