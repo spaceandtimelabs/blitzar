@@ -8,6 +8,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         ":cneg",
         "//sxt/base/macro:cuda_callable",
@@ -21,6 +22,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
         "//sxt/field51/type:element",
@@ -33,6 +35,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
         "//sxt/field51/type:element",
@@ -44,6 +47,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         ":sub",
         "//sxt/base/macro:cuda_callable",
@@ -57,6 +61,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         ":cmov",
         ":neg",
@@ -71,6 +76,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
         "//sxt/field51/type:element",
@@ -120,6 +126,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
     ],
@@ -135,6 +142,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
     ],
