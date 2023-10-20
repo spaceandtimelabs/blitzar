@@ -22,11 +22,15 @@ build --enable_cuda=True
 # Use --config=clang to build with clang instead of gcc and nvcc.
 build:clang --repo_env=CC=clang
 build:clang --@rules_cuda//cuda:compiler=clang
-build:clang --copt=-stdlib=libstdc++
+build:clang --copt=-stdlib=libc++
+build:clang --linkopt=-stdlib=libc++
+build:clang --linkopt=-static-libstdc++
 build:clang --action_env CC=/usr/bin/clang-18
 build:clang --action_env CXX=/usr/bin/clang++-18
 build --@rules_cuda//cuda:copts=-std=c++20
 build --@rules_cuda//cuda:host_copts=-std=c++20
+build --@rules_cuda//cuda:copts=-stdlib=libc++
+build --@rules_cuda//cuda:host_copts=-stdlib=libc++
 build --config=clang
 
 
