@@ -103,7 +103,6 @@ gpu_driver::make_workspace(const proof_descriptor& descriptor,
                            basct::cspan<s25t::element> a_vector) const noexcept {
   auto res = std::make_unique<gpu_workspace>();
   basdv::stream stream;
-  auto alloc = res->a_vector.get_allocator();
 
   res->descriptor = &descriptor;
   res->round_index = 0;
