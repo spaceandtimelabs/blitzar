@@ -18,17 +18,8 @@
 
 #include "sxt/base/curve/element.h"
 #include "sxt/base/test/unit_test.h"
-<<<<<<< HEAD
-using namespace sxt;
-using namespace sxt::bascrv;
-
-TEST_CASE("element97 satifies the curve concept") {
-  REQUIRE(bascrv::element<element97>);
-}
-=======
 
 using namespace sxt;
 using namespace sxt::bascrv;
 
 TEST_CASE("element97 satifies the curve concept") { REQUIRE(bascrv::element<element97>); }
->>>>>>> 717fe89b07c804f114843c360e19535d9690f629

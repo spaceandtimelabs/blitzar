@@ -25,15 +25,12 @@ namespace sxt::bascrv {
 //--------------------------------------------------------------------------------------------------
 // element97
 //--------------------------------------------------------------------------------------------------
-<<<<<<< HEAD
-=======
 /**
  * Integer arithmetic mod 97.
  *
  * Provides a minimal implementation of the curve element concent that can be used for writing
  * tests.
  */
->>>>>>> 717fe89b07c804f114843c360e19535d9690f629
 struct element97 {
   uint32_t value;
   bool marked = false;
@@ -42,13 +39,7 @@ struct element97 {
 
   constexpr element97(uint32_t val) noexcept : value{val % 97u} {}
 
-<<<<<<< HEAD
-  static constexpr element97 identity() noexcept {
-    return {0};
-  }
-=======
   static constexpr element97 identity() noexcept { return {0}; }
->>>>>>> 717fe89b07c804f114843c360e19535d9690f629
 
   bool operator==(const element97&) const noexcept = default;
 };
@@ -96,32 +87,16 @@ inline CUDA_CALLABLE void add(element97& res, const element97& x, const element9
 //--------------------------------------------------------------------------------------------------
 inline CUDA_CALLABLE void add_inplace(element97& res, element97& x) noexcept {
   res.value = (res.value + x.value) % 97u;
-<<<<<<< HEAD
-  x = 13; // simulate a destructive add by setting x to an arbitrary value 
-=======
   x = 13; // simulate a destructive add by setting x to an arbitrary value
->>>>>>> 717fe89b07c804f114843c360e19535d9690f629
 }
 
 //--------------------------------------------------------------------------------------------------
 // mark
 //--------------------------------------------------------------------------------------------------
-<<<<<<< HEAD
-inline CUDA_CALLABLE void mark(element97& res) noexcept {
-  res.marked = true;
-}
-=======
 inline CUDA_CALLABLE void mark(element97& res) noexcept { res.marked = true; }
->>>>>>> 717fe89b07c804f114843c360e19535d9690f629
 
 //--------------------------------------------------------------------------------------------------
 // is_marked
 //--------------------------------------------------------------------------------------------------
-<<<<<<< HEAD
-inline CUDA_CALLABLE bool is_marked(const element97& e) noexcept {
-  return e.marked;
-}
-=======
 inline CUDA_CALLABLE bool is_marked(const element97& e) noexcept { return e.marked; }
->>>>>>> 717fe89b07c804f114843c360e19535d9690f629
 } // namespace sxt::bascrv
