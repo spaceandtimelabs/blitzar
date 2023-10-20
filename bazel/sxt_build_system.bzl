@@ -7,7 +7,6 @@ load("@rules_cuda//cuda:defs.bzl", "cuda_library", "cuda_objects")
 # However, this flag is relevant to some modules.
 def sxt_copts():
     return [
-        "-std=c++20",
         "-Wno-unknown-cuda-version",
     ]
 
@@ -58,10 +57,7 @@ def sxt_cc_component(
             copts = sxt_copts() + copts,
             deps = [
                 ":" + test_lib,
-            ] + test_deps + [
-                "@com_github_catchorg_catch2//:catch2",
-                "@com_github_catchorg_catch2//:catch2_main",
-            ],
+            ] + test_deps,
             visibility = ["//visibility:public"],
             **kwargs
         )
