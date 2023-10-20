@@ -30,6 +30,13 @@ namespace sxt::memmg {
 //--------------------------------------------------------------------------------------------------
 // managed_array
 //--------------------------------------------------------------------------------------------------
+/**
+ * managed_array is similar to std::pmr::vector except that it doesn't do initialization and
+ * doesn't have a capacity that's separate from size.
+ *
+ * It's intended to be used for device-allocated memory that the host doesn't necessarily have
+ * access to.
+ */
 // void
 template <> class managed_array<void> {
 public:

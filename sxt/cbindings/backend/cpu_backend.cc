@@ -23,6 +23,12 @@
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/operation/neg.h"
+#include "sxt/curve_g1/operation/add.h"
+#include "sxt/curve_g1/operation/compression.h"
+#include "sxt/curve_g1/operation/double.h"
+#include "sxt/curve_g1/operation/neg.h"
+#include "sxt/curve_g1/type/compressed_element.h"
+#include "sxt/curve_g1/type/element_p2.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
@@ -45,6 +51,16 @@ void cpu_backend::compute_commitments(basct::span<rstt::compressed_element> comm
                                       basct::cspan<c21t::element_p3> generators) const noexcept {
   auto values = mtxcrv::compute_multiexponentiation<c21t::element_p3>(generators, value_sequences);
   rsto::batch_compress(commitments, values);
+}
+
+//--------------------------------------------------------------------------------------------------
+// compute_commitments
+//--------------------------------------------------------------------------------------------------
+void cpu_backend::compute_commitments(basct::span<cg1t::compressed_element> commitments,
+                                      basct::cspan<mtxb::exponent_sequence> value_sequences,
+                                      basct::cspan<cg1t::element_p2> generators) const noexcept {
+  auto values = mtxcrv::compute_multiexponentiation<cg1t::element_p2>(generators, value_sequences);
+  cg1o::batch_compress(commitments, values);
 }
 
 //--------------------------------------------------------------------------------------------------

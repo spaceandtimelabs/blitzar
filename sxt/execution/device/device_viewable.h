@@ -48,7 +48,7 @@ event_future<basct::cspan<T>> make_active_device_viewable(memmg::managed_array<T
   if (attrs.device == active_device || attrs.kind == basdv::pointer_kind_t::managed) {
     return event_future<basct::cspan<T>>{std::move(data)};
   }
-  data_p = memmg::managed_array<T>{data.size(), data_p.get_allocator()};
+  data_p.resize(data.size());
   basdv::stream stream;
   basdv::async_memcpy_to_device(data_p.data(), data.data(), sizeof(T) * data.size(), attrs, stream);
   basdv::event event;

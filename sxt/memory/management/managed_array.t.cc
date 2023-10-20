@@ -58,4 +58,10 @@ TEST_CASE("managed_array is an allocator-aware container manages an array of "
     managed_array<int> expected{1, 2};
     REQUIRE(arr == expected);
   }
+
+  SECTION("we can resize an array") {
+    managed_array<int> arr{1, 2, 3};
+    arr.resize(4);
+    REQUIRE(arr.size() == 4);
+  }
 }

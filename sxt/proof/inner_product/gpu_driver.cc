@@ -109,24 +109,15 @@ gpu_driver::make_workspace(const proof_descriptor& descriptor,
   res->round_index = 0;
 
   // a_vector
-  res->a_vector = memmg::managed_array<s25t::element>{
-      a_vector.size(),
-      alloc,
-  };
+  res->a_vector.resize(a_vector.size());
   basdv::async_copy_host_to_device(res->a_vector, a_vector, stream);
 
   // b_vector
-  res->b_vector = memmg::managed_array<s25t::element>{
-      descriptor.b_vector.size(),
-      alloc,
-  };
+  res->b_vector.resize(descriptor.b_vector.size());
   basdv::async_copy_host_to_device(res->b_vector, descriptor.b_vector, stream);
 
   // g_vector
-  res->g_vector = memmg::managed_array<c21t::element_p3>{
-      descriptor.g_vector.size(),
-      alloc,
-  };
+  res->g_vector.resize(descriptor.g_vector.size());
   basdv::async_copy_host_to_device(res->g_vector, descriptor.g_vector, stream);
 
   return xendv::await_and_own_stream(std::move(stream), std::unique_ptr<workspace>{std::move(res)});
