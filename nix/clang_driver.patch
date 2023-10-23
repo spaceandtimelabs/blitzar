@@ -1,0 +1,58 @@
+diff --git a/clang/lib/Driver/ToolChains/CommonArgs.cpp b/clang/lib/Driver/ToolChains/CommonArgs.cpp
+index 7b2966f70bf6..e31145124c2d 100644
+--- a/clang/lib/Driver/ToolChains/CommonArgs.cpp
++++ b/clang/lib/Driver/ToolChains/CommonArgs.cpp
+@@ -1802,14 +1802,7 @@ enum class LibGccType { UnspecifiedLibGcc, StaticLibGcc, SharedLibGcc };
+ 
+ static LibGccType getLibGccType(const ToolChain &TC, const Driver &D,
+                                 const ArgList &Args) {
+-  if (Args.hasArg(options::OPT_static_libgcc) ||
+-      Args.hasArg(options::OPT_static) || Args.hasArg(options::OPT_static_pie) ||
+-      // The Android NDK only provides libunwind.a, not libunwind.so.
+-      TC.getTriple().isAndroid())
+-    return LibGccType::StaticLibGcc;
+-  if (Args.hasArg(options::OPT_shared_libgcc))
+-    return LibGccType::SharedLibGcc;
+-  return LibGccType::UnspecifiedLibGcc;
++  return LibGccType::StaticLibGcc;
+ }
+ 
+ // Gcc adds libgcc arguments in various ways:
+diff --git a/clang/lib/Driver/ToolChains/Gnu.cpp b/clang/lib/Driver/ToolChains/Gnu.cpp
+index cdd911af9a73..d629ff8abb27 100644
+--- a/clang/lib/Driver/ToolChains/Gnu.cpp
++++ b/clang/lib/Driver/ToolChains/Gnu.cpp
+@@ -467,8 +467,7 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
+     if (!Args.hasArg(options::OPT_shared) && !IsStaticPIE &&
+         !Args.hasArg(options::OPT_r)) {
+       CmdArgs.push_back("-dynamic-linker");
+-      CmdArgs.push_back(Args.MakeArgString(Twine(D.DyldPrefix) +
+-                                           ToolChain.getDynamicLinker(Args)));
++      CmdArgs.push_back(Args.MakeArgString(Twine("GLIBC_PATH_ABC123/ld-linux-x86-64.so.2")));
+     }
+   }
+ 
+@@ -490,10 +489,12 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
+           crt1 = "crt1.o";
+       }
+       if (crt1)
+-        CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath(crt1)));
++        CmdArgs.push_back(Args.MakeArgString(Twine("GLIBC_PATH_ABC123/") + crt1));
+ 
+-      CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath("crti.o")));
++      CmdArgs.push_back(Args.MakeArgString(Twine("GLIBC_PATH_ABC123/") + "crti.o"));
+     }
++    CmdArgs.push_back("-L");
++    CmdArgs.push_back("GLIBC_PATH_ABC123");
+ 
+     if (IsVE) {
+       CmdArgs.push_back("-z");
+@@ -671,7 +672,7 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
+         CmdArgs.push_back(Args.MakeArgString(P));
+       }
+       if (!isAndroid)
+-        CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath("crtn.o")));
++        CmdArgs.push_back(Args.MakeArgString(Twine("GLIBC_PATH_ABC123/") + "crtn.o"));
+     }
+   }
+ 
