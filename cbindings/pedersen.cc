@@ -22,6 +22,8 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/curve_g1/type/compressed_element.h"
+#include "sxt/curve_g1/type/conversion_utility.h"
+#include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
@@ -98,7 +100,7 @@ static void process_compute_pedersen_commitments(struct sxt_ristretto255_compres
 //--------------------------------------------------------------------------------------------------
 static void process_compute_pedersen_commitments(struct sxt_bls12_381_g1_compressed* commitments,
                                                  basct::cspan<sxt_sequence_descriptor> descriptors,
-                                                 const cg1t::element_p2* generators,
+                                                 const cg1t::element_affine* generators,
                                                  uint64_t offset_generators) {
   if (descriptors.size() == 0)
     return;
@@ -113,7 +115,12 @@ static void process_compute_pedersen_commitments(struct sxt_bls12_381_g1_compres
   auto num_generators = populate_exponent_sequence(sequences, descriptors);
 
   auto backend = cbn::get_backend();
-  basct::cspan<cg1t::element_p2> generators_span{generators, num_generators};
+
+  // Convert from affine to projective elements
+  memmg::managed_array<cg1t::element_p2> generators_span_array(num_generators);
+  basct::span<cg1t::element_p2> generators_span{generators_span_array.data(), num_generators};
+  basct::cspan<cg1t::element_affine> generators_span_affine{generators, num_generators};
+  cg1t::batch_to_element_p2(generators_span, generators_span_affine);
 
   backend->compute_commitments(
       {reinterpret_cast<cg1t::compressed_element*>(commitments), descriptors.size()}, sequences,
@@ -138,9 +145,9 @@ void sxt_curve25519_compute_pedersen_commitments_with_generators(
 void sxt_bls12_381_g1_compute_pedersen_commitments_with_generators(
     struct sxt_bls12_381_g1_compressed* commitments, uint32_t num_sequences,
     const struct sxt_sequence_descriptor* descriptors, const struct sxt_bls12_381_g1* generators) {
-  cbn::process_compute_pedersen_commitments(commitments, {descriptors, num_sequences},
-                                            reinterpret_cast<const cg1t::element_p2*>(generators),
-                                            0);
+  cbn::process_compute_pedersen_commitments(
+      commitments, {descriptors, num_sequences},
+      reinterpret_cast<const cg1t::element_affine*>(generators), 0);
 }
 
 //--------------------------------------------------------------------------------------------------

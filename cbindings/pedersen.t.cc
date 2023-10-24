@@ -28,7 +28,9 @@
 #include "sxt/curve_g1/operation/compression.h"
 #include "sxt/curve_g1/operation/scalar_multiply.h"
 #include "sxt/curve_g1/type/compressed_element.h"
-#include "sxt/curve_g1/type/element_p2.h"
+#include "sxt/curve_g1/type/conversion_utility.h"
+#include "sxt/curve_g1/type/element_affine.h"
+#include "sxt/memory/management/managed_array.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/operation/add.h"
 #include "sxt/ristretto/operation/overload.h"
@@ -68,12 +70,12 @@ static std::vector<c21t::element_p3> compute_random_curve25519_generators(uint64
  compute_random_curve25519_generators method after random element generation is implemented inside
  the curve_g1 package group.
  */
-static std::vector<cg1t::element_p2> get_bls12_381_g1_generators(uint64_t seq_length,
-                                                                 uint64_t offset) {
-  std::vector<cg1t::element_p2> generators(seq_length);
+static std::vector<cg1t::element_affine> get_bls12_381_g1_generators(uint64_t seq_length,
+                                                                     uint64_t offset) {
+  std::vector<cg1t::element_affine> generators(seq_length);
 
   for (uint64_t i = 0; i < seq_length; ++i) {
-    generators[i] = cg1cn::generator_p2_v;
+    generators[i] = cg1cn::generator_affine_v;
   }
 
   return generators;
@@ -120,13 +122,19 @@ compute_expected_ristretto255_commitment(const std::vector<T>& data,
 template <class T>
 static cg1t::compressed_element
 compute_expected_bls12_381_g1_commitment(const std::vector<T>& data,
-                                         const std::vector<cg1t::element_p2>& generators) {
+                                         const std::vector<cg1t::element_affine>& generators) {
   SXT_DEBUG_ASSERT(data.size() == generators.size());
+
+  // Convert from affine to projective elements
+  memmg::managed_array<cg1t::element_p2> generators_span_array(generators.size());
+  basct::span<cg1t::element_p2> generators_span{generators_span_array.data(), generators.size()};
+  basct::cspan<cg1t::element_affine> generators_span_affine{generators.data(), generators.size()};
+  cg1t::batch_to_element_p2(generators_span, generators_span_affine);
 
   cg1t::element_p2 expected_commitment{cg1t::element_p2::identity()};
 
   for (uint64_t i = 0; i < data.size(); ++i) {
-    cg1t::element_p2 aux_h{generators[i]};
+    cg1t::element_p2 aux_h{generators_span[i]};
     cg1o::scalar_multiply255(aux_h, aux_h, data[i].data());
     cg1o::add(expected_commitment, expected_commitment, aux_h);
   }
