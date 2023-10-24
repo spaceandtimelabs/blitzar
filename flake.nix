@@ -12,7 +12,7 @@
     in
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
-      devShells.${system}.default = import ./shell.nix {
+      devShells.${system}.default = import ./nix/shell.nix {
         inherit pkgs;
       };
     };

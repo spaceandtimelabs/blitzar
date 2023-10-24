@@ -1,6 +1,6 @@
 { pkgs }:
 let
-  clang = import ./nix/clang.nix { inherit pkgs; };
+  clang = import ./clang.nix { inherit pkgs; };
 in
 with pkgs;
 mkShell {
