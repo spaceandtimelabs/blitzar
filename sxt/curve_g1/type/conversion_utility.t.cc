@@ -24,6 +24,7 @@
  */
 #include "sxt/curve_g1/type/conversion_utility.h"
 
+#include "sxt/base/container/span.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
@@ -95,5 +96,33 @@ TEST_CASE("conversion from affine to projective elements") {
     to_element_p2(result_projective, identity_affine);
 
     REQUIRE(result_projective == identity_projective);
+  }
+}
+
+TEST_CASE("batch conversion from affine to projective elements") {
+  SECTION("does not change the generator") {
+    std::vector<element_p2> res_vec{element_p2{}, element_p2{}};
+    basct::span<element_p2> results{res_vec};
+    const std::vector<element_affine> gen_vec{generator_affine, generator_affine};
+    basct::cspan<element_affine> generators{gen_vec};
+
+    batch_to_element_p2(results, generators);
+
+    REQUIRE(results.size() == 2);
+    REQUIRE(results[0] == generator_projective);
+    REQUIRE(results[1] == generator_projective);
+  }
+
+  SECTION("does not change the identity") {
+    std::vector<element_p2> res_vec{element_p2{}, element_p2{}};
+    basct::span<element_p2> results{res_vec};
+    const std::vector<element_affine> gen_vec{identity_affine, identity_affine};
+    basct::cspan<element_affine> generators{gen_vec};
+
+    batch_to_element_p2(results, generators);
+
+    REQUIRE(results.size() == 2);
+    REQUIRE(results[0] == identity_projective);
+    REQUIRE(results[1] == identity_projective);
   }
 }
