@@ -13,12 +13,21 @@ pkgs.stdenvNoCC.mkDerivation {
   ];
 
   unpackPhase = "true";
+  buildPhase = "";
 
   installPhase = ''
-    mkdir -p $out/bin
-    mkdir -p $out/lib64
-    ln -s ${toolkit}/bin/* $out/bin
-    ln -s ${toolkit}/lib/* $out/lib64
+    mkdir $out
+    for f in `ls -1 ${toolkit}`
+    do
+      if [[ $f != "lib64" && $f != "lib" ]]; then
+        ln -s ${toolkit}/$f $out/$f
+      fi
+    done
+    mkdir $out/lib64
+    for f in `ls -1 ${toolkit}/lib`
+    do
+      ln -s ${toolkit}/lib/$f $out/lib64/$f
+    done
     ln -s ${toolkit-lib}/lib/libcudart_static.a $out/lib64/libcudart_static.a
   '';
 }
