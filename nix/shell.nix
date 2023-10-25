@@ -14,6 +14,10 @@ mkShell {
     clangWrap.clangpp
     cuda
   ];
+  LD_LIBRARY_PATH = lib.makeLibraryPath [
+    "/usr/lib/wsl"
+    linuxPackages.nvidia_x11
+  ];
   shellHook = ''
   '';
 }
