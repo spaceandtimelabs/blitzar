@@ -82,8 +82,8 @@ inline void to_element_p2(element_p2& p, const element_affine& a) noexcept {
  Batch converts affine to projective element.
  */
 CUDA_CALLABLE
-inline void batch_to_element_p2(basct::span<cg1t::element_p2>& p,
-                                basct::cspan<cg1t::element_affine>& a) noexcept {
+inline void batch_to_element_p2(basct::span<cg1t::element_p2> p,
+                                basct::cspan<cg1t::element_affine> a) noexcept {
   SXT_DEBUG_ASSERT(a.size() == p.size());
   for (size_t i = 0; i < a.size(); ++i) {
     to_element_p2(p[i], a[i]);
