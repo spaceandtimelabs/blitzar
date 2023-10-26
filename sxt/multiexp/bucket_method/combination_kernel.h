@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <cassert>
+
 #include "sxt/base/curve/element.h"
 #include "sxt/base/num/divide_up.h"
 
@@ -23,8 +25,20 @@ namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 // combine_partial_bucket_sums
 //--------------------------------------------------------------------------------------------------
+/**
+ * Suppose we have a multi-dimensional array of partial bucket sums
+ *
+ *     Bp[bucket_index, bucket_group_index, output_index, partial_sum_index]
+ *
+ * Then this kernel combines all of the partial sums to produce the result
+ *
+ *     B[bucket_index, bucket_group_index, output_index] = 
+ *                sum_{partial_sum_index} Bp[bucket_index, bucket_group_index, output_index]
+ */
 template <bascrv::element T>
 __global__ void combine_partial_bucket_sums(T* out, T* partial_bucket_sums, unsigned num_partials) {
+  assert(num_partials > 0);
+
   auto bucket_group_size = gridDim.x;
   auto bucket_group_index = threadIdx.x;
   auto num_bucket_groups = blockDim.x;
@@ -50,8 +64,20 @@ __global__ void combine_partial_bucket_sums(T* out, T* partial_bucket_sums, unsi
 //--------------------------------------------------------------------------------------------------
 // combine_bucket_groups
 //--------------------------------------------------------------------------------------------------
+/**
+ * Suppose we have a multi-dimensional array of grouped buckets
+ *   
+ *    B[bucket_index, bucket_group_index, output_index]
+ *
+ * This kernel combines the bucket groups to produce
+ *
+ *    B'[bucket_index, output_index] = 
+ *            sum_{bucket_group_index} 
+*                    2^{8 * bucket_group_index} * B[bucket_index, bucket_group_index, output_index]
+ */
 template <unsigned BucketGroupSize, unsigned NumBucketGroups, bascrv::element T>
 __global__ void combine_bucket_groups(T* out, T* bucket_sums) {
+  assert(NumBucketGroups > 0);
   auto thread_index = threadIdx.x;
   auto block_index = blockIdx.x;
   auto num_threads = blockDim.x;
