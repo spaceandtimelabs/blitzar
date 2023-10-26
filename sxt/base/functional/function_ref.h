@@ -66,10 +66,8 @@ public:
   function_ref() noexcept = default;
 
   template <
-      class F,
-      std::enable_if_t<!std::is_same<function_ref, typename std::decay<F>::type>{}>* = nullptr,
-      std::enable_if_t<std::is_convertible<typename std::result_of<F&(Args...)>::type, R>{}>* =
-          nullptr>
+      class F, std::enable_if_t<!std::is_same<function_ref, std::decay_t<F>>{}>* = nullptr,
+      std::enable_if_t<std::is_convertible<std::invoke_result_t<F&, Args...>, R>{}>* = nullptr>
   function_ref(F&& f) {
     bind_to(f); // not forward
   }

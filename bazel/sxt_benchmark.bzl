@@ -89,6 +89,6 @@ def sxt_cc_benchmark(
             "//conditions:default": [],
         }),
         deps = deps,
-        linkopts = linkopts,
+        linkopts = linkopts + ["-lm"],
         visibility = visibility,
     )

@@ -16,11 +16,13 @@ sxt_cc_component(
 sxt_cc_component(
     name = "conversion_utility",
     test_deps = [
+        "//sxt/base/container:span",
         "//sxt/base/test:unit_test",
     ],
     deps = [
         ":element_affine",
         ":element_p2",
+        "//sxt/base/container:span",
         "//sxt/base/macro:cuda_callable",
         "//sxt/base/num:cmov",
         "//sxt/field12/operation:cmov",
