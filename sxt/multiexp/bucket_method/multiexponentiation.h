@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2023-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <algorithm>
@@ -32,9 +48,7 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
   constexpr unsigned bucket_group_size = 255;
   constexpr unsigned num_bucket_groups = 32;
   auto num_outputs = exponents.size();
-  SXT_DEBUG_ASSERT(
-      res.size() == num_outputs
-  );
+  SXT_DEBUG_ASSERT(res.size() == num_outputs);
   if (res.empty()) {
     co_return;
   }
@@ -63,7 +77,7 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
 }
 
 //--------------------------------------------------------------------------------------------------
-// try_multiexponentiate 
+// try_multiexponentiate
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element Element>
 xena::future<memmg::managed_array<Element>>
@@ -81,15 +95,13 @@ try_multiexponentiate(basct::cspan<Element> generators,
     max_n = std::max(max_n, exponent.n);
   }
   if (min_n != max_n) {
-      co_return res;
+    co_return res;
   }
   auto n = max_n;
-  SXT_DEBUG_ASSERT(
-      generators.size() >= n
-  );
+  SXT_DEBUG_ASSERT(generators.size() >= n);
   generators = generators.subspan(0, n);
   memmg::managed_array<const uint8_t*> exponents_p(num_outputs);
-  for(size_t output_index=0; output_index<num_outputs; ++output_index) {
+  for (size_t output_index = 0; output_index < num_outputs; ++output_index) {
     exponents_p[output_index] = exponents[output_index].data;
   }
   res.resize(num_outputs);

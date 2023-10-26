@@ -19,11 +19,11 @@
 #include <cstring>
 
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/scalar25/constant/zero.h"
 #include "sxt/scalar25/operation/add.h"
 #include "sxt/scalar25/operation/muladd.h"
 #include "sxt/scalar25/operation/product_mapper.h"
 #include "sxt/scalar25/type/element.h"
-#include "sxt/scalar25/constant/zero.h"
 
 namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------

@@ -47,9 +47,7 @@ struct element_p2 : cg1o::operation_adl_stub {
   }
 };
 
-inline std::ostream& operator<<(std::ostream& out, const element_p2&) noexcept {
-  return out;
-}
+inline std::ostream& operator<<(std::ostream& out, const element_p2&) noexcept { return out; }
 
 //--------------------------------------------------------------------------------------------------
 // mark

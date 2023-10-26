@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2023-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <algorithm>
@@ -36,8 +52,8 @@ make_exponents_viewable(memmg::managed_array<uint8_t>& exponents_viewable_data,
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<T> generators,
-                                        basct::cspan<const uint8_t*> exponents,
-                                        basit::index_range rng) noexcept {
+                                       basct::cspan<const uint8_t*> exponents,
+                                       basit::index_range rng) noexcept {
   unsigned n = rng.size();
   auto num_outputs = exponents.size();
   auto num_blocks = std::min(192u, n);
@@ -77,18 +93,15 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
 
 template <bascrv::element T>
 xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<T> generators,
-                                  basct::cspan<const uint8_t*> exponents,
-                                  size_t split_factor) noexcept {
+                                       basct::cspan<const uint8_t*> exponents,
+                                       size_t split_factor) noexcept {
   constexpr size_t bucket_group_size = 255;
   constexpr size_t num_bucket_groups = 32;
   static constexpr unsigned num_bytes = 32; // hard code to 32 for now
   auto num_outputs = exponents.size();
-  SXT_DEBUG_ASSERT(
-      bucket_sums.size() == bucket_group_size * num_bucket_groups * num_outputs &&
-      (bucket_sums.empty() || basdv::is_active_device_pointer(bucket_sums.data()))
-  );
-  auto [first, last] =
-      basit::split(basit::index_range{0, generators.size()}, split_factor);
+  SXT_DEBUG_ASSERT(bucket_sums.size() == bucket_group_size * num_bucket_groups * num_outputs &&
+                   (bucket_sums.empty() || basdv::is_active_device_pointer(bucket_sums.data())));
+  auto [first, last] = basit::split(basit::index_range{0, generators.size()}, split_factor);
   auto num_chunks = std::distance(first, last);
 
   basdv::stream stream;
@@ -106,7 +119,7 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
   size_t i = 0;
   co_await xendv::concurrent_for_each(first, last, [&](const basit::index_range& rng) noexcept {
     return accumulate_buckets_impl(partial_bucket_sums.subspan(step * i++, step), generators,
-                                    exponents, rng);
+                                   exponents, rng);
   });
   if (num_chunks <= 1) {
     co_return;

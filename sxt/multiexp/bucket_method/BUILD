@@ -1,7 +1,6 @@
 load(
     "//bazel:sxt_build_system.bzl",
     "sxt_cc_component",
-    "sxt_cc_binary",
 )
 
 sxt_cc_component(
@@ -29,68 +28,80 @@ sxt_cc_component(
         "//sxt/base/device:synchronization",
     ],
     deps = [
-        "//sxt/base/num:divide_up",
         "//sxt/base/curve:element",
+        "//sxt/base/num:divide_up",
     ],
 )
 
 sxt_cc_component(
     name = "bucket_accumulation",
+    test_deps = [
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/curve:example_element",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/base/test:unit_test",
+    ],
     deps = [
-      ":accumulate_kernel",
-      ":combination_kernel",
-      "//sxt/base/error:assert",
+        ":accumulate_kernel",
+        ":combination_kernel",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
-        "//sxt/base/device:stream",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:property",
+        "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
         "//sxt/base/iterator:index_range",
         "//sxt/base/iterator:index_range_iterator",
         "//sxt/base/iterator:index_range_utility",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
-        "//sxt/execution/device:for_each",
         "//sxt/execution/device:device_viewable",
+        "//sxt/execution/device:for_each",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:pinned_resource",
     ],
+)
+
+sxt_cc_component(
+    name = "combination",
     test_deps = [
-        "//sxt/memory/resource:managed_device_resource",
-        "//sxt/base/device:synchronization",
-      "//sxt/base/curve:example_element",
-      "//sxt/execution/schedule:scheduler",
-      "//sxt/base/test:unit_test",
+        "//sxt/base/curve:example_element",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/curve:element",
+        "//sxt/base/error:assert",
     ],
 )
 
 sxt_cc_component(
-  name = "combination",
-  deps = [
-    "//sxt/base/container:span",
-    "//sxt/base/error:assert",
-    "//sxt/base/curve:element",
-  ],
-  test_deps = [
-      "//sxt/base/curve:example_element",
-      "//sxt/base/test:unit_test",
-  ],
-)
-
-sxt_cc_component(
     name = "multiexponentiation",
+    test_deps = [
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/curve:example_element",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
+        "//sxt/curve21/operation:neg",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/type:literal",
+    ],
     deps = [
-      ":bucket_accumulation",
-      ":combination",
-      ":combination_kernel",
-        "//sxt/base/device:stream",
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/iterator:index_range",
-        "//sxt/base/iterator:index_range_utility",
+        ":bucket_accumulation",
+        ":combination",
+        ":combination_kernel",
         "//sxt/base/container:span",
         "//sxt/base/container:span_utility",
         "//sxt/base/curve:element",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/iterator:index_range",
+        "//sxt/base/iterator:index_range_utility",
         "//sxt/base/num:divide_up",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
@@ -100,17 +111,5 @@ sxt_cc_component(
         "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:pinned_resource",
         "//sxt/multiexp/base:exponent_sequence",
-    ],
-    test_deps = [
-        "//sxt/memory/resource:managed_device_resource",
-        "//sxt/base/device:synchronization",
-      "//sxt/base/curve:example_element",
-      "//sxt/execution/schedule:scheduler",
-      "//sxt/base/test:unit_test",
-        "//sxt/curve21/operation:add",
-        "//sxt/curve21/operation:double",
-        "//sxt/curve21/operation:neg",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/type:literal",
     ],
 )

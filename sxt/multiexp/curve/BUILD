@@ -71,9 +71,9 @@ sxt_cc_component(
         "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:device_resource",
         "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/multiexp/bucket_method:multiexponentiation",
         "//sxt/multiexp/pippenger:multiexponentiation",
         "//sxt/multiexp/pippenger:multiproduct_decomposition_gpu",
-        "//sxt/multiexp/bucket_method:multiexponentiation",
     ],
 )
 

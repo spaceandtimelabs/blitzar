@@ -23,7 +23,7 @@
 namespace sxt::basit {
 class index_range;
 class index_range_iterator;
-}
+} // namespace sxt::basit
 
 namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
