@@ -65,9 +65,9 @@ template <class R, class... Args> class function_ref<R(Args...)> {
 public:
   function_ref() noexcept = default;
 
-  template <class F, std::enable_if_t<!std::is_same<function_ref, std::decay_t<F>>{}>* = nullptr,
-            std::enable_if_t<
-                std::is_convertible<typename std::invoke_result_t<F&, Args...>, R>{}>* = nullptr>
+  template <
+      class F, std::enable_if_t<!std::is_same<function_ref, std::decay_t<F>>{}>* = nullptr,
+      std::enable_if_t<std::is_convertible<std::invoke_result_t<F&, Args...>, R>{}>* = nullptr>
   function_ref(F&& f) {
     bind_to(f); // not forward
   }
