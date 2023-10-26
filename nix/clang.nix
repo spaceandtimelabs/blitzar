@@ -39,6 +39,9 @@ stdenvNoCC.mkDerivation {
     "-DLLVM_BUILTIN_TARGETS=\"x86_64-unknown-linux-gnu\""
     "-DLLVM_RUNTIME_TARGETS=\"x86_64-unknown-linux-gnu\""
     "-DLLVM_ENABLE_PROJECTS=\"clang;clang-tools-extra\""
+
+    # TODO(rnburn): build with compiler-rt so that we have access to
+    # sanitizers after this issue gets resolved: https://github.com/llvm/llvm-project/issues/69056#issuecomment-1781423887.
     #"-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
     "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind\""
     "-DRUNTIMES_x86_64-unknown-linux-gnu_CMAKE_BUILD_TYPE=Release"
