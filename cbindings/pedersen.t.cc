@@ -126,15 +126,13 @@ compute_expected_bls12_381_g1_commitment(const std::vector<T>& data,
   SXT_DEBUG_ASSERT(data.size() == generators.size());
 
   // Convert from affine to projective elements
-  memmg::managed_array<cg1t::element_p2> generators_span_array(generators.size());
-  cg1t::batch_to_element_p2(
-      basct::span<cg1t::element_p2>{generators_span_array.data(), generators.size()},
-      basct::cspan<cg1t::element_affine>{generators.data(), generators.size()});
+  memmg::managed_array<cg1t::element_p2> generators_p(generators.size());
+  cg1t::batch_to_element_p2(generators_p, generators);
 
   cg1t::element_p2 expected_commitment{cg1t::element_p2::identity()};
 
   for (uint64_t i = 0; i < data.size(); ++i) {
-    cg1t::element_p2 aux_h{generators_span_array[i]};
+    cg1t::element_p2 aux_h{generators_p[i]};
     cg1o::scalar_multiply255(aux_h, aux_h, data[i].data());
     cg1o::add(expected_commitment, expected_commitment, aux_h);
   }

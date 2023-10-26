@@ -117,13 +117,13 @@ static void process_compute_pedersen_commitments(struct sxt_bls12_381_g1_compres
   auto backend = cbn::get_backend();
 
   // Convert from affine to projective elements
-  memmg::managed_array<cg1t::element_p2> generators_span(num_generators);
-  cg1t::batch_to_element_p2(basct::span<cg1t::element_p2>{generators_span.data(), num_generators},
+  memmg::managed_array<cg1t::element_p2> generators_p(num_generators);
+  cg1t::batch_to_element_p2(generators_p,
                             basct::cspan<cg1t::element_affine>{generators, num_generators});
 
   backend->compute_commitments(
       {reinterpret_cast<cg1t::compressed_element*>(commitments), descriptors.size()}, sequences,
-      generators_span);
+      generators_p);
 }
 } // namespace sxt::cbn
 
