@@ -66,7 +66,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-  name = "bucket_combination",
+  name = "combination",
   deps = [
     "//sxt/base/container:span",
     "//sxt/base/error:assert",
@@ -82,7 +82,7 @@ sxt_cc_component(
     name = "multiexponentiation",
     deps = [
       ":bucket_accumulation",
-      ":bucket_combination",
+      ":combination",
       ":combination_kernel",
         "//sxt/base/device:stream",
         "//sxt/base/device:memory_utility",

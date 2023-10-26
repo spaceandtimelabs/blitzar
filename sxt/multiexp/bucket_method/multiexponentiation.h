@@ -20,8 +20,7 @@
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/bucket_method/bucket_accumulation.h"
-#include "sxt/multiexp/bucket_method/bucket_combination.h"
-#include "sxt/multiexp/bucket_method/combination_kernel.h"
+#include "sxt/multiexp/bucket_method/combination.h"
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
@@ -72,7 +71,6 @@ try_multiexponentiate(basct::cspan<Element> generators,
                       basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   auto num_outputs = exponents.size();
   memmg::managed_array<Element> res;
-  /* co_return res; */
   uint64_t min_n = std::numeric_limits<uint64_t>::max();
   uint64_t max_n = 0;
   for (auto& exponent : exponents) {

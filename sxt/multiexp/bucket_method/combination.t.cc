@@ -1,4 +1,4 @@
-#include "sxt/multiexp/bucket_method/bucket_combination.h"
+#include "sxt/multiexp/bucket_method/combination.h"
 
 #include <vector>
 
