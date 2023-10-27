@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <cstdint>
 #include <concepts>
+#include <cstdint>
 
 #include "sxt/base/container/span.h"
 
@@ -35,8 +35,7 @@ double log2p1(basct::cspan<uint8_t> x) noexcept;
 //--------------------------------------------------------------------------------------------------
 // log2p1
 //--------------------------------------------------------------------------------------------------
-template <std::integral T>
-consteval T log2p1(T x) noexcept {
+template <std::integral T> consteval T log2p1(T x) noexcept {
   T res = 0;
   T y = 1;
   while (y <= x) {

@@ -105,7 +105,8 @@ TEST_CASE("we can reduce bucket groups") {
   SECTION("we can do a reduction with multiple outputs") {
     bucket_sums = {12u, 34u, 78u, 91u};
     reduced_bucket_sums.resize(2);
-    combine_bucket_groups<1, 2><<<dim3(1, 2, 1), 1>>>(reduced_bucket_sums.data(), bucket_sums.data());
+    combine_bucket_groups<1, 2>
+        <<<dim3(1, 2, 1), 1>>>(reduced_bucket_sums.data(), bucket_sums.data());
     basdv::synchronize_device();
     REQUIRE(reduced_bucket_sums[0] == 12u + 34u * 2u);
     REQUIRE(reduced_bucket_sums[1] == 78u + 91u * 2u);

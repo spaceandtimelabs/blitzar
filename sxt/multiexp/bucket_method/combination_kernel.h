@@ -33,7 +33,7 @@ namespace sxt::mtxbk {
  *
  * Then this kernel combines all of the partial sums to produce the result
  *
- *     B[bucket_index, bucket_group_index, output_index] = 
+ *     B[bucket_index, bucket_group_index, output_index] =
  *                sum_{partial_sum_index} Bp[bucket_index, bucket_group_index, output_index]
  */
 template <bascrv::element T>
@@ -67,14 +67,15 @@ __global__ void combine_partial_bucket_sums(T* out, T* partial_bucket_sums, unsi
 //--------------------------------------------------------------------------------------------------
 /**
  * Suppose we have a multi-dimensional array of grouped buckets
- *   
+ *
  *    B[bucket_index, bucket_group_index, output_index]
  *
  * This kernel combines the bucket groups to produce
  *
- *    B'[bucket_index, output_index] = 
- *            sum_{bucket_group_index} 
-*                    2^{log2(BucketGroupSize+1) * bucket_group_index} * B[bucket_index, bucket_group_index, output_index]
+ *    B'[bucket_index, output_index] =
+ *            sum_{bucket_group_index}
+ *                    2^{log2(BucketGroupSize+1) * bucket_group_index} * B[bucket_index,
+ * bucket_group_index, output_index]
  */
 template <unsigned BucketGroupSize, unsigned NumBucketGroups, bascrv::element T>
 __global__ void combine_bucket_groups(T* out, T* bucket_sums) {
