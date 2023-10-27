@@ -20,6 +20,7 @@
 
 #include "sxt/base/curve/element.h"
 #include "sxt/base/num/divide_up.h"
+#include "sxt/base/num/log2p1.h"
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
@@ -73,7 +74,7 @@ __global__ void combine_partial_bucket_sums(T* out, T* partial_bucket_sums, unsi
  *
  *    B'[bucket_index, output_index] = 
  *            sum_{bucket_group_index} 
-*                    2^{8 * bucket_group_index} * B[bucket_index, bucket_group_index, output_index]
+*                    2^{log2(BucketGroupSize+1) * bucket_group_index} * B[bucket_index, bucket_group_index, output_index]
  */
 template <unsigned BucketGroupSize, unsigned NumBucketGroups, bascrv::element T>
 __global__ void combine_bucket_groups(T* out, T* bucket_sums) {
@@ -93,8 +94,9 @@ __global__ void combine_bucket_groups(T* out, T* bucket_sums) {
 
   unsigned i = NumBucketGroups - 1;
   T sum = bucket_sums[i * BucketGroupSize];
+  constexpr auto bucket_group_size_log2p1 = basn::log2p1(BucketGroupSize);
   while (i-- > 0) {
-    for (int j = 0; j < 8; ++j) {
+    for (int j = 0; j < bucket_group_size_log2p1; ++j) {
       double_element(sum, sum);
     }
     add_inplace(sum, bucket_sums[BucketGroupSize * i]);

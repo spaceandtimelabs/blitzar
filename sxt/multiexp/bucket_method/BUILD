@@ -29,6 +29,7 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/curve:element",
+        "//sxt/base/num:log2p1",
         "//sxt/base/num:divide_up",
     ],
 )

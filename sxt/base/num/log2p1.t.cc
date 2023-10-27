@@ -80,3 +80,33 @@ TEST_CASE("we can take the base 2 logarithmic of arbitrary numbers") {
                                                                .data()),
                                 127)) == Approx(1016.));
 }
+
+TEST_CASE("we can compute log2p1 at compile-time") {
+  SECTION("we handle 0") {
+    REQUIRE(log2p1(0) == 0);
+  }
+
+  SECTION("we handle 1") {
+    REQUIRE(log2p1(1) == 1);
+  }
+
+  SECTION("we handle 2") {
+    REQUIRE(log2p1(2) == 2);
+  }
+
+  SECTION("we handle 3") {
+    REQUIRE(log2p1(3) == 2);
+  }
+
+  SECTION("we handle 4") {
+    REQUIRE(log2p1(4) == 3);
+  }
+
+  SECTION("we handle 121") {
+    REQUIRE(log2p1(121) == 7);
+  }
+
+  SECTION("we handle 255") {
+    REQUIRE(log2p1(255) == 8);
+  }
+}
