@@ -30,9 +30,9 @@ pkgs.writeShellScriptBin "bazel" ''
      --@rules_cuda//cuda:host_copts=-stdlib=libc++ \
      --action_env CC=${clang}/bin/clang \
      --action_env CXX=${clang}/bin/clang++ \
-     --action_env PATH="${path}:/nix/store/18bs92p6yf6w2wwxhbplgx02y6anq092-gcc-wrapper-12.3.0/bin" \
+     --action_env PATH="${path}" \
      --action_env=BAZEL_LINKLIBS='-l%:libc++.a' \
-     --action_env=BAZEL_LINKOPTS='-L${clang}/lib -static-libstdc++' \
+     --action_env=BAZEL_LINKOPTS='-L${clang}/lib' \
      ''${@:2}
   else
     exec ${bazel} $@
