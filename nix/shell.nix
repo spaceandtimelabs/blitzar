@@ -1,9 +1,7 @@
 { pkgs }:
 let
   clang = import ./clang.nix { inherit pkgs; };
-  wrap-clang = import ./clang-wrapper.nix { inherit pkgs; inherit clang; name = "clang"; };
-  wrap-clangpp = import ./clang-wrapper.nix { inherit pkgs; inherit clang; name = "clang++"; };
-  bazel = import ./bazel.nix { inherit pkgs; clang = wrap-clang; clangpp = wrap-clangpp; };
+  bazel = import ./bazel.nix { inherit pkgs; inherit clang; };
   cuda = import ./cuda.nix { inherit pkgs; };
 in
 with pkgs;
@@ -11,8 +9,6 @@ mkShell {
   buildInputs = [
     pkgs.python3
     bazel
-    wrap-clang
-    wrap-clangpp
     clang
     cuda
   ];
