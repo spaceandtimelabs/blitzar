@@ -22,12 +22,17 @@
 
 namespace sxt::basit {
 class index_range;
-}
+class index_range_iterator;
+} // namespace sxt::basit
 
 namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 // concurrent_for_each
 //--------------------------------------------------------------------------------------------------
+xena::future<>
+concurrent_for_each(basit::index_range_iterator first, basit::index_range_iterator last,
+                    std::function<xena::future<>(const basit::index_range&)> f) noexcept;
+
 xena::future<>
 concurrent_for_each(basit::index_range rng,
                     std::function<xena::future<>(const basit::index_range&)> f) noexcept;

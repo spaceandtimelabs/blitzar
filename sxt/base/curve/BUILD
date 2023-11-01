@@ -12,6 +12,7 @@ sxt_cc_component(
     name = "example_element",
     test_deps = [
         ":element",
+        "//sxt/base/test:unit_test",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",

@@ -78,7 +78,6 @@ sxt_cc_component(
     name = "memory_utility",
     impl_deps = [
         ":active_device_guard",
-        ":pointer_attributes",
         ":stream",
         ":state",
         "//sxt/base/error:panic",
@@ -89,6 +88,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
+        ":pointer_attributes",
         "//sxt/base/concept:memcpyable_ranges",
         "//sxt/base/container:span",
         "//sxt/base/error:assert",
