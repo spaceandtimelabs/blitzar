@@ -27,8 +27,6 @@ template <bascrv::element Element> class accumulator {
 public:
   using value_type = Element;
 
-  static constexpr Element identity() noexcept { return Element::identity(); }
-
   CUDA_CALLABLE static void accumulate_inplace(Element& res, Element& e) noexcept {
     add_inplace(res, e);
   }
