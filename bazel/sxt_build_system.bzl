@@ -45,7 +45,10 @@ def sxt_cc_component(
             copts = sxt_copts() + copts,
             deps = [
                 ":" + name,
-            ] + test_deps,
+            ] + test_deps + [
+                "@com_github_catchorg_catch2//:catch2",
+                "@com_github_catchorg_catch2//:catch2_main",
+            ],
             srcs = [
                 name + ".t.cc",
             ],
@@ -56,8 +59,12 @@ def sxt_cc_component(
             name = name + ".t",
             copts = sxt_copts() + copts,
             deps = [
-                ":" + test_lib,
-            ] + test_deps,
+                       ":" + test_lib,
+                   ] + test_deps +
+                   [
+                       "@com_github_catchorg_catch2//:catch2",
+                       "@com_github_catchorg_catch2//:catch2_main",
+                   ],
             visibility = ["//visibility:public"],
             **kwargs
         )
