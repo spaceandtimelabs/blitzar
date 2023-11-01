@@ -85,6 +85,7 @@ sxt_cc_component(
     test_deps = [
         ":pointer_attributes",
         ":state",
+        ":stream",
         "//sxt/base/test:unit_test",
     ],
     deps = [
