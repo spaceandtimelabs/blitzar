@@ -16,7 +16,6 @@ sxt_cc_component(
         ":muladd",
         ":product_mapper",
         "//sxt/base/macro:cuda_callable",
-        "//sxt/scalar25/constant:zero",
         "//sxt/scalar25/type:element",
     ],
 )
