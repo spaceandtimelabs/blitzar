@@ -43,14 +43,7 @@ struct element_p3 : c21o::operation_adl_stub {
   f51t::element T;
 
   static constexpr element_p3 identity() noexcept {
-    f51t::element zero = {0, 0, 0, 0, 0};
-    f51t::element one = {1, 0, 0, 0, 0};
-    return element_p3{
-        zero,
-        one,
-        one,
-        zero,
-    };
+    return element_p3{f51cn::zero_v, f51cn::one_v, f51cn::one_v, f51cn::zero_v};
   }
 };
 
