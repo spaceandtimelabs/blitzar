@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/bucket_method/bucket_accumulation.h"
+#include "sxt/multiexp/bucket_method/accumulation.h"
 
 #include "sxt/base/curve/example_element.h"
 #include "sxt/base/device/synchronization.h"

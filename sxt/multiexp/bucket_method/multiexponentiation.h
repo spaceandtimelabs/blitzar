@@ -35,7 +35,7 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/multiexp/bucket_method/bucket_accumulation.h"
+#include "sxt/multiexp/bucket_method/accumulation.h"
 #include "sxt/multiexp/bucket_method/combination.h"
 
 namespace sxt::mtxbk {

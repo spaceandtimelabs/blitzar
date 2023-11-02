@@ -35,7 +35,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "bucket_accumulation",
+    name = "accumulation",
     test_deps = [
         "//sxt/memory/resource:managed_device_resource",
         "//sxt/base/device:synchronization",
@@ -93,7 +93,7 @@ sxt_cc_component(
         "//sxt/curve21/type:literal",
     ],
     deps = [
-        ":bucket_accumulation",
+        ":accumulation",
         ":combination",
         ":combination_kernel",
         "//sxt/base/container:span",
