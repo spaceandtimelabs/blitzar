@@ -35,7 +35,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
-#include "sxt/multiexp/bucket_method/accumulate_kernel.h"
+#include "sxt/multiexp/bucket_method/accumulation_kernel.h"
 #include "sxt/multiexp/bucket_method/combination_kernel.h"
 
 namespace sxt::mtxbk {

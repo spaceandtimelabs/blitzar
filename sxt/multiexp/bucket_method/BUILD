@@ -4,7 +4,7 @@ load(
 )
 
 sxt_cc_component(
-    name = "accumulate_kernel",
+    name = "accumulation_kernel",
     test_deps = [
         "//sxt/base/curve:example_element",
         "//sxt/base/test:unit_test",
@@ -44,7 +44,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        ":accumulate_kernel",
+        ":accumulation_kernel",
         ":combination_kernel",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
