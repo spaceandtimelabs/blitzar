@@ -76,4 +76,21 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
       }
     }
   }
+
+  SECTION("we can do an accumulation with multiple blocks") {
+    bucket_sums.resize(255 * 2);
+    scalars = {2, 2};
+    generators = {123, 456};
+    bucket_accumulate<<<2, 1>>>(bucket_sums.data(), generators.data(), scalars.data(), 2);
+    basdv::synchronize_device();
+    for (unsigned i = 0; i < bucket_sums.size(); ++i) {
+      if (i == 1) {
+        REQUIRE(bucket_sums[i] == 123);
+      } else if (i == 255 + 1) {
+        REQUIRE(bucket_sums[i] == 456);
+      } else {
+        REQUIRE(bucket_sums[i] == 0);
+      }
+    }
+  }
 }
