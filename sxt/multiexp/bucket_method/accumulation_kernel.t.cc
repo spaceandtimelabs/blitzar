@@ -98,7 +98,8 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
     bucket_sums.resize(255 * 2);
     scalars = {2, 3};
     generators = {123};
-    bucket_accumulate<<<dim3(1, 2, 1), 1>>>(bucket_sums.data(), generators.data(), scalars.data(), 1);
+    bucket_accumulate<<<dim3(1, 2, 1), 1>>>(bucket_sums.data(), generators.data(), scalars.data(),
+                                            1);
     basdv::synchronize_device();
     for (unsigned i = 0; i < bucket_sums.size(); ++i) {
       if (i == 1) {

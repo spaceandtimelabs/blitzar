@@ -26,6 +26,14 @@ namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 // bucket_accumulate
 //--------------------------------------------------------------------------------------------------
+/**
+ * Accumulate generators into buckets.
+ *
+ * This corresponds roughly to the 1st loop of Algorithm 1 described in
+ *
+ *    PipeMSM: Hardware Acceleration for Multi-Scalar Multiplication
+ *    https://eprint.iacr.org/2022/999.pdf
+ */
 template <bascrv::element T>
 __global__ void bucket_accumulate(T* bucket_sums, const T* generators, const uint8_t* scalars,
                                   unsigned length) {
