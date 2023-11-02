@@ -1,4 +1,4 @@
-{ pkgs, clang }:
+{ pkgs, clang, cuda }:
 let
   # Set PATH so that it only includes things bazel needs.
   path = pkgs.lib.strings.concatStringsSep ":" [
@@ -31,6 +31,7 @@ pkgs.writeShellScriptBin "bazel" ''
      --action_env CC=${clang}/bin/clang \
      --action_env CXX=${clang}/bin/clang++ \
      --action_env PATH="${path}" \
+     --action_env CUDA_PATH="${cuda}" \
      --action_env=BAZEL_LINKLIBS='-l%:libc++.a' \
      --action_env=BAZEL_LINKOPTS='-L${clang}/lib' \
      ''${@:2}
