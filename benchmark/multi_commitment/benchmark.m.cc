@@ -143,8 +143,7 @@ static void populate_table(bool is_boolean, uint64_t num_commitments, uint64_t c
                            memmg::managed_array<mtxb::exponent_sequence>& data_commitments,
                            memmg::managed_array<c21t::element_p3>& generators) {
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
+  std::mt19937 gen{0};
   std::uniform_int_distribution<uint8_t> distribution;
 
   if (is_boolean) {
