@@ -24,12 +24,15 @@
 #include "sxt/base/container/span.h"
 #include "sxt/base/device/pointer_attributes.h"
 #include "sxt/base/device/state.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/test/unit_test.h"
 
 using namespace sxt;
 using namespace sxt::basdv;
 
 TEST_CASE("we can determine if a pointer is device or host") {
+  stream stream;
+
   SECTION("we handle host-side pointers") {
     auto ptr = std::make_unique<int>(123);
     REQUIRE(!is_active_device_pointer(ptr.get()));
@@ -62,13 +65,23 @@ TEST_CASE("we can determine if a pointer is device or host") {
     int* data;
     REQUIRE(cudaMalloc(&data, sizeof(int) * v.size()) == cudaSuccess);
     basct::span<int> buffer{data, v.size()};
-    cudaStream_t stream;
-    REQUIRE(cudaStreamCreate(&stream) == cudaSuccess);
     async_copy_host_to_device(buffer, v, stream);
     async_copy_device_to_host(w, buffer, stream);
     REQUIRE(cudaStreamSynchronize(stream) == cudaSuccess);
     REQUIRE(w == v);
-    REQUIRE(cudaStreamDestroy(stream) == cudaSuccess);
+    REQUIRE(cudaFree(data) == cudaSuccess);
+  }
+
+  SECTION("we can copy a host or device point to device memory") {
+    std::vector<int> v = {1, 2, 3};
+    std::vector<int> w(v.size());
+    int* data;
+    REQUIRE(cudaMalloc(&data, sizeof(int) * v.size()) == cudaSuccess);
+    basct::span<int> buffer{data, v.size()};
+    async_copy_to_device(buffer, v, stream);
+    async_copy_device_to_host(w, buffer, stream);
+    REQUIRE(cudaStreamSynchronize(stream) == cudaSuccess);
+    REQUIRE(w == v);
     REQUIRE(cudaFree(data) == cudaSuccess);
   }
 }

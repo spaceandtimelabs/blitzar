@@ -46,7 +46,7 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
     basdv::synchronize_device();
     for (unsigned i = 0; i < bucket_sums.size(); ++i) {
       if (i + 1 != scalars[0]) {
-        REQUIRE(bucket_sums[i] == 0);
+        REQUIRE(bucket_sums[i] == E::identity());
       } else {
         REQUIRE(bucket_sums[i] == generators[0]);
       }
@@ -59,7 +59,73 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
     bucket_accumulate<<<1, 1>>>(bucket_sums.data(), generators.data(), scalars.data(), 1);
     basdv::synchronize_device();
     for (unsigned i = 0; i < bucket_sums.size(); ++i) {
-      REQUIRE(bucket_sums[i] == 0);
+      REQUIRE(bucket_sums[i] == E::identity());
+    }
+  }
+
+  SECTION("we can accumulate multiple elements") {
+    scalars = {2, 2};
+    generators = {123, 456};
+    bucket_accumulate<<<1, 1>>>(bucket_sums.data(), generators.data(), scalars.data(), 2);
+    basdv::synchronize_device();
+    for (unsigned i = 0; i < bucket_sums.size(); ++i) {
+      if (i == 1) {
+        REQUIRE(bucket_sums[i] == (123 + 456));
+      } else {
+        REQUIRE(bucket_sums[i] == E::identity());
+      }
+    }
+  }
+
+  SECTION("we can do an accumulation with multiple blocks") {
+    bucket_sums.resize(255 * 2);
+    scalars = {2, 2};
+    generators = {123, 456};
+    bucket_accumulate<<<2, 1>>>(bucket_sums.data(), generators.data(), scalars.data(), 2);
+    basdv::synchronize_device();
+    for (unsigned i = 0; i < bucket_sums.size(); ++i) {
+      if (i == 1) {
+        REQUIRE(bucket_sums[i] == 123);
+      } else if (i == 255 + 1) {
+        REQUIRE(bucket_sums[i] == 456);
+      } else {
+        REQUIRE(bucket_sums[i] == E::identity());
+      }
+    }
+  }
+
+  SECTION("we can do an accumulation with multiple outputs") {
+    bucket_sums.resize(255 * 2);
+    scalars = {2, 3};
+    generators = {123};
+    bucket_accumulate<<<dim3(1, 2, 1), 1>>>(bucket_sums.data(), generators.data(), scalars.data(),
+                                            1);
+    basdv::synchronize_device();
+    for (unsigned i = 0; i < bucket_sums.size(); ++i) {
+      if (i == 1) {
+        REQUIRE(bucket_sums[i] == 123);
+      } else if (i == 255 + 2) {
+        REQUIRE(bucket_sums[i] == 123);
+      } else {
+        REQUIRE(bucket_sums[i] == E::identity());
+      }
+    }
+  }
+
+  SECTION("we can accumulate with multiple bytes") {
+    bucket_sums.resize(255 * 2);
+    scalars = {2, 3};
+    generators = {123};
+    bucket_accumulate<<<1, 2>>>(bucket_sums.data(), generators.data(), scalars.data(), 1);
+    basdv::synchronize_device();
+    for (unsigned i = 0; i < bucket_sums.size(); ++i) {
+      if (i == 1) {
+        REQUIRE(bucket_sums[i] == 123);
+      } else if (i == 255 + 2) {
+        REQUIRE(bucket_sums[i] == 123);
+      } else {
+        REQUIRE(bucket_sums[i] == E::identity());
+      }
     }
   }
 }
