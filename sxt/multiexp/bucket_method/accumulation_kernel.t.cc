@@ -46,7 +46,7 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
     basdv::synchronize_device();
     for (unsigned i = 0; i < bucket_sums.size(); ++i) {
       if (i + 1 != scalars[0]) {
-        REQUIRE(bucket_sums[i] == 0);
+        REQUIRE(bucket_sums[i] == E::identity());
       } else {
         REQUIRE(bucket_sums[i] == generators[0]);
       }
@@ -59,7 +59,7 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
     bucket_accumulate<<<1, 1>>>(bucket_sums.data(), generators.data(), scalars.data(), 1);
     basdv::synchronize_device();
     for (unsigned i = 0; i < bucket_sums.size(); ++i) {
-      REQUIRE(bucket_sums[i] == 0);
+      REQUIRE(bucket_sums[i] == E::identity());
     }
   }
 
@@ -72,7 +72,7 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
       if (i == 1) {
         REQUIRE(bucket_sums[i] == (123 + 456));
       } else {
-        REQUIRE(bucket_sums[i] == 0);
+        REQUIRE(bucket_sums[i] == E::identity());
       }
     }
   }
@@ -89,7 +89,7 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
       } else if (i == 255 + 1) {
         REQUIRE(bucket_sums[i] == 456);
       } else {
-        REQUIRE(bucket_sums[i] == 0);
+        REQUIRE(bucket_sums[i] == E::identity());
       }
     }
   }
@@ -107,7 +107,7 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
       } else if (i == 255 + 2) {
         REQUIRE(bucket_sums[i] == 123);
       } else {
-        REQUIRE(bucket_sums[i] == 0);
+        REQUIRE(bucket_sums[i] == E::identity());
       }
     }
   }
@@ -124,7 +124,7 @@ TEST_CASE("we can accumulate the buckets for a multi-exponentiation") {
       } else if (i == 255 + 2) {
         REQUIRE(bucket_sums[i] == 123);
       } else {
-        REQUIRE(bucket_sums[i] == 0);
+        REQUIRE(bucket_sums[i] == E::identity());
       }
     }
   }

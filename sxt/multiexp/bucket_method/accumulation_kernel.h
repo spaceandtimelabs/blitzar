@@ -57,10 +57,13 @@ __global__ void bucket_accumulate(T* bucket_sums, const T* generators, const uin
 
   scalars += scalar_byte_index + generator_index * scalar_num_bytes;
 
+  // Note: initializing this way to work around
+  //    https://github.com/llvm/llvm-project/issues/69033#issuecomment-1765041056
   auto identity = T::identity();
   for (int i = 0; i < bucket_group_size; ++i) {
     bucket_sums[i] = identity;
   }
+
   for (; generator_index < generator_last; ++generator_index) {
     auto val = *scalars;
     scalars += scalar_num_bytes;
