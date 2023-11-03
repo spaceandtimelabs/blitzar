@@ -7,8 +7,8 @@ stdenvNoCC.mkDerivation {
   name = "clang";
   src = pkgs.fetchgit {
     url = "https://github.com/llvm/llvm-project";
-    rev = "6768a3d";
-    hash = "sha256-xxw+v1VTT9W4WFGRVL3BGZpc1raeSV0vch5YksHzKck=";
+    rev = "a396fb2";
+    hash = "sha256-BUgfgs46LqrwZy3/vQbw9vgH2dTVlguaxoFOAqATadI=";
   };
   nativeBuildInputs = [
     cmake
@@ -44,6 +44,7 @@ stdenvNoCC.mkDerivation {
     # sanitizers after this issue gets resolved: https://github.com/llvm/llvm-project/issues/69056#issuecomment-1781423887.
     #"-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
     "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind\""
+    "-DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_CMAKE_BUILD_TYPE=Release"
 
     # libcxx
