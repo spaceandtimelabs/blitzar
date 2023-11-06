@@ -24,8 +24,8 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
         "//sxt/base/device:synchronization",
         "//sxt/base/curve:example_element",
-        "//sxt/execution/schedule:scheduler",
         "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
     ],
     deps = [
         ":accumulation_kernel",
