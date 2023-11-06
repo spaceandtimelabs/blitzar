@@ -42,10 +42,6 @@ concurrent_for_each(basit::index_range_iterator first, basit::index_range_iterat
  * work across the number of available devices.
  */
 xena::future<>
-concurrent_for_each(basit::index_range_iterator first, basit::index_range_iterator last,
-                    std::function<xena::future<>(const basit::index_range&)> f) noexcept;
-
-xena::future<>
 concurrent_for_each(basit::index_range rng,
                     std::function<xena::future<>(const basit::index_range&)> f) noexcept;
 } // namespace sxt::xendv
