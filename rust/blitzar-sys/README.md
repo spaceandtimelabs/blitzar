@@ -64,7 +64,7 @@ Blitzar was created by the core cryptography team at [Space and Time](https://ww
 
 #### Overview
 
-The `blitzar-sys` crate provides Rust bindings for the [Blitzar C++ Library](https://github.com/spaceandtimelabs/blitzar). The crate is used by Space and Time's companion crate, [`blitzar`](https://crates.io/crates/blitzar), that provide a High-Level Rust wrapper for accelerating cryptographic zero-knowledge proof algorithms on the CPU and GPU.
+The `blitzar-sys` crate provides Rust bindings for the [Blitzar C++ Library](https://github.com/spaceandtimelabs/blitzar). The crate is used by Space and Time's companion crate, [`blitzar`](https://crates.io/crates/blitzar), that provides a High-Level Rust wrapper for accelerating cryptographic zero-knowledge proof algorithms on the CPU and GPU.
 
 More information about the cryptographic primitives are available on the [Blitzar Github repo](https://github.com/spaceandtimelabs/blitzar). More information about the Rust bindings are available on the [`blitzar`](https://crates.io/crates/blitzar) crates.io page.
 
