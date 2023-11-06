@@ -99,8 +99,12 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
   constexpr size_t num_bucket_groups = 32;
   static constexpr unsigned num_bytes = 32; // hard code to 32 for now
   auto num_outputs = exponents.size();
-  SXT_DEBUG_ASSERT(bucket_sums.size() == bucket_group_size * num_bucket_groups * num_outputs &&
-                   (bucket_sums.empty() || basdv::is_active_device_pointer(bucket_sums.data())));
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      bucket_sums.size() == bucket_group_size * num_bucket_groups * num_outputs &&
+      (bucket_sums.empty() || basdv::is_active_device_pointer(bucket_sums.data()))
+      // clang-format on
+  );
   auto [first, last] = basit::split(basit::index_range{0, generators.size()}, split_factor);
   auto num_chunks = std::distance(first, last);
 

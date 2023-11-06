@@ -45,7 +45,7 @@ TEST_CASE("we can perform a bucket accumulation pass") {
     REQUIRE(fut.ready());
     basdv::synchronize_device();
     for (auto val : bucket_sums) {
-      REQUIRE(val == 0);
+      REQUIRE(val == E::identity());
     }
   }
 
@@ -63,7 +63,7 @@ TEST_CASE("we can perform a bucket accumulation pass") {
       if (i == 0) {
         REQUIRE(val == 7);
       } else {
-        REQUIRE(val == 0);
+        REQUIRE(val == E::identity());
       }
     }
   }
@@ -85,7 +85,7 @@ TEST_CASE("we can perform a bucket accumulation pass") {
       } else if (i == 1) {
         REQUIRE(val == 5);
       } else {
-        REQUIRE(val == 0);
+        REQUIRE(val == E::identity());
       }
     }
   }
@@ -107,7 +107,7 @@ TEST_CASE("we can perform a bucket accumulation pass") {
       if (i == 0) {
         REQUIRE(val == 16);
       } else {
-        REQUIRE(val == 0);
+        REQUIRE(val == E::identity());
       }
     }
   }
@@ -127,7 +127,7 @@ TEST_CASE("we can perform a bucket accumulation pass") {
       if (i == 1) {
         REQUIRE(val == 12);
       } else {
-        REQUIRE(val == 0);
+        REQUIRE(val == E::identity());
       }
     }
   }
@@ -152,7 +152,7 @@ TEST_CASE("we can perform a bucket accumulation pass") {
       if (i == 1 || i == 255 * 32 + 1) {
         REQUIRE(val == 7);
       } else {
-        REQUIRE(val == 0);
+        REQUIRE(val == E::identity());
       }
     }
   }
