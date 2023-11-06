@@ -154,6 +154,14 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
 //--------------------------------------------------------------------------------------------------
 // accumulate_buckets
 //--------------------------------------------------------------------------------------------------
+/**
+ * Accumulate generators into buckets, splitting the work across available devices.
+ *
+ * This function corresponds roughly to the 1st loop of Algorithm 1 described in
+ *
+ *    PipeMSM: Hardware Acceleration for Multi-Scalar Multiplication
+ *    https://eprint.iacr.org/2022/999.pdf
+ */
 template <bascrv::element T>
 xena::future<> accumulate_buckets(basct::span<T> bucket_sums, basct::cspan<T> generators,
                                   basct::cspan<const uint8_t*> exponents) noexcept {
