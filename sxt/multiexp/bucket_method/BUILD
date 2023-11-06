@@ -55,6 +55,7 @@ sxt_cc_component(
         "//sxt/base/iterator:index_range",
         "//sxt/base/iterator:index_range_iterator",
         "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/num:divide_up",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
         "//sxt/execution/device:device_viewable",
