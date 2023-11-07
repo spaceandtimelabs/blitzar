@@ -19,8 +19,8 @@ sxt_cc_component(
         "//sxt/field51/operation:notsquare",
     ],
     test_deps = [
-        "//sxt/field51/type:element",
         "//sxt/base/test:unit_test",
+        "//sxt/field51/type:element",
     ],
 )
 

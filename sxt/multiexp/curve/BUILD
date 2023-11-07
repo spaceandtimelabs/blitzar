@@ -23,12 +23,12 @@ sxt_cc_component(
 sxt_cc_component(
     name = "doubling_reduction",
     test_deps = [
+        "//sxt/base/test:unit_test",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
         "//sxt/curve21/operation:neg",
         "//sxt/curve21/operation:overload",
         "//sxt/ristretto/type:literal",
-        "//sxt/base/test:unit_test",
     ],
     deps = [
         "//sxt/base/bit:count",

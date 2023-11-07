@@ -105,9 +105,9 @@ sxt_cc_component(
         "//sxt/base/error:assert",
     ],
     test_deps = [
+        ":property",
         ":stream_handle",
         ":stream_pool",
-        ":property",
         "//sxt/base/test:unit_test",
     ],
     deps = [
