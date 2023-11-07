@@ -65,3 +65,16 @@ sxt_cc_component(
         "//sxt/base/num:log2p1",
     ],
 )
+
+sxt_cc_component(
+    name = "combination",
+    test_deps = [
+        "//sxt/base/curve:example_element",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/curve:element",
+        "//sxt/base/error:assert",
+    ],
+)
