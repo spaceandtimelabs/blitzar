@@ -45,4 +45,12 @@ TEST_CASE("we can sum up bucket entries") {
     combine_buckets<bascrv::element97>(sums, bucket_sums);
     REQUIRE(sums[0] == 2u + 2u * 3u + 3u * 7u);
   }
+
+  SECTION("we handle multiple outputs") {
+    sums.resize(2);
+    bucket_sums = {12u, 13u};
+    combine_buckets<bascrv::element97>(sums, bucket_sums);
+    REQUIRE(sums[0] == 12u);
+    REQUIRE(sums[1] == 13u);
+  }
 }
