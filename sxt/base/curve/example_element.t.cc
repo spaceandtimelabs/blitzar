@@ -22,4 +22,4 @@
 using namespace sxt;
 using namespace sxt::bascrv;
 
-TEST_CASE("element97 satifies the curve concept") { REQUIRE(bascrv::element<element97>); }
+TEST_CASE("element97 satisfies the curve concept") { REQUIRE(bascrv::element<element97>); }
