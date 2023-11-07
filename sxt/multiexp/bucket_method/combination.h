@@ -38,6 +38,14 @@ void combine_buckets_impl(T& sum, basct::span<T> bucket_sums) noexcept {
 //--------------------------------------------------------------------------------------------------
 // combine_buckets
 //--------------------------------------------------------------------------------------------------
+/**
+ * Combine buckets for a multi-exponentiation.
+ *
+ * This function corresponds roughly to the 2nd loop of Algorithm 1 described in
+ *
+ *    PipeMSM: Hardware Acceleration for Multi-Scalar Multiplication
+ *    https://eprint.iacr.org/2022/999.pdf
+ */
 template <bascrv::element T>
 void combine_buckets(basct::span<T> sums, basct::span<T> bucket_sums) noexcept {
   auto num_outputs = sums.size();
