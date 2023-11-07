@@ -58,7 +58,10 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
   unsigned n = rng.size();
   auto num_outputs = exponents.size();
   auto num_blocks = std::min(192u, n);
-  static constexpr int num_bytes = 32; // hard code to 32 for now
+
+  // hard code parameters for now
+  static constexpr unsigned num_bucket_groups = 32;
+  static constexpr unsigned bucket_group_size = 255;
 
   basdv::stream stream;
   memr::async_device_resource resource{stream};
@@ -76,15 +79,16 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
   // accumulate generators into buckets of partial sums
   xendv::synchronize_event(stream, generators_viewable);
   memmg::managed_array<T> partial_bucket_sums{bucket_sums.size() * num_blocks, &resource};
-  bucket_accumulate<<<dim3(num_blocks, num_outputs, 1), num_bytes, 0, stream>>>(
+  bucket_accumulate<<<dim3(num_blocks, num_outputs, 1), num_bucket_groups, 0, stream>>>(
       partial_bucket_sums.data(), generators_viewable.value().data(), exponents_viewable.data(), n);
   generators_viewable_data.reset();
   exponents_viewable_data.reset();
 
   // combine partial sums
   memmg::managed_array<T> bucket_sums_dev{bucket_sums.size(), &resource};
-  combine_partial_bucket_sums<<<dim3(255, num_outputs, 1), num_bytes, 0, stream>>>(
-      bucket_sums_dev.data(), partial_bucket_sums.data(), num_blocks);
+  combine_partial_bucket_sums<<<dim3(bucket_group_size, num_outputs, 1), num_bucket_groups, 0,
+                                stream>>>(bucket_sums_dev.data(), partial_bucket_sums.data(),
+                                          num_blocks);
   partial_bucket_sums.reset();
   basdv::async_copy_to_device(bucket_sums, bucket_sums_dev, stream);
   co_await xendv::await_stream(stream);
@@ -94,9 +98,10 @@ template <bascrv::element T>
 xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<T> generators,
                                        basct::cspan<const uint8_t*> exponents,
                                        size_t split_factor) noexcept {
-  constexpr size_t bucket_group_size = 255;
-  constexpr size_t num_bucket_groups = 32;
-  static constexpr unsigned num_bytes = 32; // hard code to 32 for now
+  // hard code parameters for now
+  static constexpr unsigned bucket_group_size = 255;
+  static constexpr unsigned num_bucket_groups = 32;
+
   auto num_outputs = exponents.size();
   SXT_DEBUG_ASSERT(
       // clang-format off
@@ -146,8 +151,9 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
   if (num_chunks <= 1) {
     co_return;
   }
-  combine_partial_bucket_sums<<<dim3(255, num_outputs, 1), num_bytes, 0, stream>>>(
-      bucket_sums.data(), partial_bucket_sums.data(), num_chunks);
+  combine_partial_bucket_sums<<<dim3(bucket_group_size, num_outputs, 1), num_bucket_groups, 0,
+                                stream>>>(bucket_sums.data(), partial_bucket_sums.data(),
+                                          num_chunks);
   co_await xendv::await_stream(stream);
 }
 
