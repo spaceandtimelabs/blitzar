@@ -101,6 +101,28 @@ TEST_CASE("we can compute a multiexponentiation") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 2u * 12u + 3u * 34u);
   }
+
+  SECTION("we can compute a multiexponetiation with multiple outputs") {
+    res.resize(2);
+
+    uint8_t scalar_data1[64] = {};
+    scalar_data1[0] = 2;
+    scalar_data1[32] = 3;
+    exponents.push_back(scalar_data1);
+
+    uint8_t scalar_data2[64] = {};
+    scalar_data2[0] = 7;
+    scalar_data2[32] = 4;
+    exponents.push_back(scalar_data2);
+
+    generators = {12u, 34u};
+
+    auto fut = multiexponentiate<bascrv::element97>(res, generators, exponents);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 2u * 12u + 3u * 34u);
+    REQUIRE(res[1] == 7u * 12u + 4u * 34u);
+  }
 }
 
 TEST_CASE("we can compute multiexponentiations with curve-21") {
