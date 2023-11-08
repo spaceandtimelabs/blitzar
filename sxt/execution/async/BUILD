@@ -17,13 +17,13 @@ sxt_cc_component(
 sxt_cc_component(
     name = "coroutine",
     test_deps = [
+        "//sxt/base/device:active_device_guard",
         "//sxt/base/device:event",
         "//sxt/base/device:event_utility",
-        "//sxt/memory/management:managed_array",
-        "//sxt/base/device:active_device_guard",
         "//sxt/base/device:property",
         "//sxt/base/device:state",
         "//sxt/base/test:unit_test",
+        "//sxt/memory/management:managed_array",
     ],
     deps = [
         ":awaiter",

@@ -30,8 +30,8 @@ sxt_cc_component(
 sxt_cc_component(
     name = "multiproduct",
     test_deps = [
-        ":value_cache_utility",
         ":test_operator",
+        ":value_cache_utility",
         "//sxt/base/test:unit_test",
     ],
     deps = [

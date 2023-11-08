@@ -7,10 +7,10 @@ sxt_cc_component(
     name = "accumulation_kernel",
     test_deps = [
         "//sxt/base/curve:example_element",
+        "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
-        "//sxt/base/device:synchronization",
     ],
     deps = [
         "//sxt/base/curve:element",
@@ -21,11 +21,11 @@ sxt_cc_component(
 sxt_cc_component(
     name = "accumulation",
     test_deps = [
-        "//sxt/memory/resource:managed_device_resource",
-        "//sxt/base/device:synchronization",
         "//sxt/base/curve:example_element",
+        "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
         "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
         ":accumulation_kernel",
@@ -54,10 +54,10 @@ sxt_cc_component(
     name = "combination_kernel",
     test_deps = [
         "//sxt/base/curve:example_element",
+        "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
-        "//sxt/base/device:synchronization",
     ],
     deps = [
         "//sxt/base/curve:element",

@@ -148,9 +148,9 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/index:index_table",
+        "//sxt/multiexp/random:int_generation",
         "//sxt/multiexp/random:random_multiproduct_descriptor",
         "//sxt/multiexp/random:random_multiproduct_generation",
-        "//sxt/multiexp/random:int_generation",
         "//sxt/multiexp/test:add_ints",
     ],
     deps = [

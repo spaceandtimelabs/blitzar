@@ -53,15 +53,15 @@ sxt_cc_component(
     is_cuda = True,
     test_deps = [
         ":overload",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
-        "//sxt/scalar25/type:literal",
-        "//sxt/scalar25/random:element",
         "//sxt/execution/async:future",
         "//sxt/execution/schedule:scheduler",
-        "//sxt/base/num:fast_random_number_generator",
-        "//sxt/base/device:memory_utility",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:device_resource",
+        "//sxt/scalar25/random:element",
+        "//sxt/scalar25/type:literal",
     ],
     deps = [
         "//sxt/base/container:span",
@@ -232,8 +232,8 @@ sxt_cc_component(
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/scalar25/type:literal",
         "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
     ],
 )
 
@@ -242,8 +242,8 @@ sxt_cc_component(
     test_deps = [
         ":overload",
         "//sxt/base/test:unit_test",
-        "//sxt/scalar25/type:literal",
         "//sxt/memory/management:managed_array",
+        "//sxt/scalar25/type:literal",
     ],
     deps = [
         ":mul",

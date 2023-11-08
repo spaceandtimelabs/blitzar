@@ -1,10 +1,10 @@
 load(
-    "//bazel:sxt_build_system.bzl",
-    "sxt_cc_component",
-)
-load(
     "@rules_cuda//cuda:defs.bzl",
     "cuda_library",
+)
+load(
+    "//bazel:sxt_build_system.bzl",
+    "sxt_cc_component",
 )
 
 cuda_library(
@@ -94,8 +94,8 @@ sxt_cc_component(
         ":backend",
         ":get_generators",
         "//sxt/base/test:unit_test",
-        "//sxt/curve21/type:element_p3",
         "//sxt/curve21/operation:add",
+        "//sxt/curve21/type:element_p3",
     ],
     deps = [
         ":blitzar_api",
@@ -121,6 +121,7 @@ sxt_cc_component(
         ":backend",
         "//sxt/base/error:assert",
         "//sxt/base/test:unit_test",
+        "//sxt/curve21/type:element_p3",
         "//sxt/curve_g1/constant:generator",
         "//sxt/curve_g1/operation:add",
         "//sxt/curve_g1/operation:compression",
@@ -128,7 +129,6 @@ sxt_cc_component(
         "//sxt/curve_g1/type:compressed_element",
         "//sxt/curve_g1/type:conversion_utility",
         "//sxt/curve_g1/type:element_affine",
-        "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
         "//sxt/ristretto/base:byte_conversion",
         "//sxt/ristretto/operation:add",
@@ -156,18 +156,18 @@ sxt_cc_component(
     test_deps = [
         ":backend",
         ":get_generators",
-        "//sxt/base/test:unit_test",
-        "//sxt/scalar25/type:element",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/proof/transcript:transcript",
-        "//sxt/ristretto/type:compressed_element",
-        "//sxt/base/num:ceil_log2",
-        "//sxt/scalar25/type:literal",
-        "//sxt/scalar25/operation:overload",
-        "//sxt/curve21/operation:overload",
-        "//sxt/base/num:fast_random_number_generator",
-        "//sxt/scalar25/random:element",
         "//sxt/base/error:assert",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:overload",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/proof/transcript",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/random:element",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
     ],
     deps = [
         ":blitzar_api",

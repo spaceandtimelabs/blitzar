@@ -18,8 +18,8 @@ sxt_cc_component(
     is_cuda = True,
     test_deps = [
         "//sxt/base/num:fast_random_number_generator",
-        "//sxt/curve21/property:curve",
         "//sxt/base/test:unit_test",
+        "//sxt/curve21/property:curve",
     ],
     deps = [
         "//sxt/base/container:span",

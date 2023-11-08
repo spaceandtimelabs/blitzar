@@ -12,8 +12,8 @@ sxt_cc_component(
     ],
     test_deps = [
         ":base_element",
-        "//sxt/curve21/type:element_p3",
         "//sxt/base/test:unit_test",
+        "//sxt/curve21/type:element_p3",
     ],
     deps = [
         "//sxt/base/container:span",
@@ -92,8 +92,8 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
     ],
     test_deps = [
-        "//sxt/seqcommit/test:test_generators",
         "//sxt/base/test:unit_test",
+        "//sxt/seqcommit/test:test_generators",
     ],
     deps = [
         "//sxt/base/container:span",
@@ -112,8 +112,8 @@ sxt_cc_component(
     ],
     is_cuda = True,
     test_deps = [
-        "//sxt/seqcommit/test:test_generators",
         "//sxt/base/test:unit_test",
+        "//sxt/seqcommit/test:test_generators",
     ],
     deps = [
         "//sxt/base/container:span",

@@ -53,8 +53,8 @@ sxt_cc_component(
     ],
     is_cuda = True,
     test_deps = [
-        "//sxt/curve21/type:literal",
         "//sxt/base/test:unit_test",
+        "//sxt/curve21/type:literal",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
@@ -105,8 +105,8 @@ sxt_cc_component(
     is_cuda = True,
     test_deps = [
         ":add",
-        "//sxt/curve21/type:element_p3",
         "//sxt/base/test:unit_test",
+        "//sxt/curve21/type:element_p3",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
@@ -124,8 +124,8 @@ sxt_cc_component(
         "//sxt/scalar25/operation:overload",
     ],
     test_deps = [
+        "//sxt/base/test:unit_test",
         "//sxt/curve21/type:element_p3",
         "//sxt/scalar25/type:literal",
-        "//sxt/base/test:unit_test",
     ],
 )

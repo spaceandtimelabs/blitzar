@@ -12,8 +12,8 @@ sxt_cc_component(
     ],
     test_deps = [
         "//sxt/base/num:divide_up",
-        "//sxt/execution/kernel:kernel_dims",
         "//sxt/base/test:unit_test",
+        "//sxt/execution/kernel:kernel_dims",
     ],
 )
 
@@ -21,11 +21,11 @@ sxt_cc_component(
     name = "for_each",
     is_cuda = True,
     test_deps = [
-        "//sxt/base/test:unit_test",
         "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
-        "//sxt/execution/schedule:scheduler",
     ],
     deps = [
         ":kernel_fit",

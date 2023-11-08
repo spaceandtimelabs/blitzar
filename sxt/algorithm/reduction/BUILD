@@ -32,8 +32,8 @@ sxt_cc_component(
     is_cuda = True,
     test_deps = [
         ":test_reducer",
-        "//sxt/base/test:unit_test",
         "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
         "//sxt/execution/schedule:scheduler",
         "//sxt/memory/resource:managed_device_resource",
     ],
@@ -71,7 +71,7 @@ sxt_cc_component(
         "//sxt/base/error:assert",
     ],
     test_deps = [
-        "//sxt/execution/kernel:kernel_dims",
         "//sxt/base/test:unit_test",
+        "//sxt/execution/kernel:kernel_dims",
     ],
 )
