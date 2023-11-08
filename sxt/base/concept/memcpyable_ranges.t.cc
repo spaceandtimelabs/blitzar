@@ -25,7 +25,7 @@
 using namespace sxt;
 using namespace sxt::bascpt;
 
-TEST_CASE("we can distingish types for ranges that are memcpyable") {
+TEST_CASE("we can distinguish types for ranges that are memcpyable") {
   SECTION("we handle two vectors") {
     REQUIRE(memcpyable_ranges<std::vector<int>&, std::vector<int>>);
   }
