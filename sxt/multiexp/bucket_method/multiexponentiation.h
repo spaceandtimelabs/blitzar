@@ -42,6 +42,17 @@ namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 // multiexponentiate
 //--------------------------------------------------------------------------------------------------
+/**
+ * Compute a multi-exponentiation using a simple version of the bucket method based off of Algorithm
+ * 1 in
+ *
+ *    PipeMSM: Hardware Acceleration for Multi-Scalar Multiplication
+ *    https://eprint.iacr.org/2022/999.pdf
+ *
+ * For now, the bucket size and other parameters are fixed. It's not expected that this version
+ * of the algorithm will give the best performance, but it should give an improvement over naive
+ * versions of multi-exponentiation.
+ */
 template <bascrv::element T>
 xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
                                  basct::cspan<const uint8_t*> exponents) noexcept {
@@ -79,6 +90,10 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
 //--------------------------------------------------------------------------------------------------
 // try_multiexponentiate
 //--------------------------------------------------------------------------------------------------
+/**
+ * Attempt to compute a multi-exponentiation using the bucket method if the problem dimensions
+ * suggest it will give a performance benefit; otherwise, return an empty array.
+ */
 template <bascrv::element Element>
 xena::future<memmg::managed_array<Element>>
 try_multiexponentiate(basct::cspan<Element> generators,
