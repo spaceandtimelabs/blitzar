@@ -1,8 +1,8 @@
+load("//bazel:sxt_benchmark.bzl", "sxt_cc_benchmark")
 load(
     "//bazel:sxt_build_system.bzl",
     "sxt_cc_component",
 )
-load("//bazel:sxt_benchmark.bzl", "sxt_cc_benchmark")
 
 sxt_cc_component(
     name = "params",

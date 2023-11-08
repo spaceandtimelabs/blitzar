@@ -16,8 +16,8 @@ sxt_cc_component(
 sxt_cc_component(
     name = "literal",
     test_deps = [
-        "//sxt/curve21/property:curve",
         "//sxt/base/test:unit_test",
+        "//sxt/curve21/property:curve",
     ],
     deps = [
         ":compressed_element",

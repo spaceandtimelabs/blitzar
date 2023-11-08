@@ -44,8 +44,8 @@ sxt_cc_component(
     ],
     test_deps = [
         ":multiproduct_computation_descriptor",
-        "//sxt/memory/management:managed_array",
         "//sxt/base/test:unit_test",
+        "//sxt/memory/management:managed_array",
     ],
     deps = [
         "//sxt/base/container:span",
@@ -58,10 +58,10 @@ sxt_cc_component(
     test_deps = [
         "//sxt/algorithm/base:gather_mapper",
         "//sxt/algorithm/reduction:test_reducer",
-        "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:managed_device_resource",
         "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
         ":block_computation_descriptor",
@@ -77,9 +77,9 @@ sxt_cc_component(
     test_deps = [
         "//sxt/algorithm/base:gather_mapper",
         "//sxt/algorithm/reduction:test_reducer",
-        "//sxt/memory/resource:managed_device_resource",
         "//sxt/base/test:unit_test",
         "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
         ":block_computation_descriptor",

@@ -7,6 +7,7 @@ in
 with pkgs;
 mkShell {
   buildInputs = [
+    pkgs.bazel-buildtools
     pkgs.python3
     bazel
     clang

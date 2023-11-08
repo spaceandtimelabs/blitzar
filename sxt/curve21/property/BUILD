@@ -16,7 +16,7 @@ sxt_cc_component(
         "//sxt/field51/property:zero",
     ],
     test_deps = [
-        "//sxt/curve21/type:literal",
         "//sxt/base/test:unit_test",
+        "//sxt/curve21/type:literal",
     ],
 )

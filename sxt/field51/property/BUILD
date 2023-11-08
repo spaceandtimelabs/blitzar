@@ -19,8 +19,8 @@ sxt_cc_component(
 sxt_cc_component(
     name = "zero",
     test_deps = [
-        "//sxt/field51/type:literal",
         "//sxt/base/test:unit_test",
+        "//sxt/field51/type:literal",
     ],
     deps = [
         "//sxt/base/bit:zero_equality",

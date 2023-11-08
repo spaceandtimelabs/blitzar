@@ -65,7 +65,7 @@ sxt_cc_component(
         ":compression",
         "//sxt/base/test:unit_test",
         "//sxt/curve21/operation:overload",
-        "//sxt/scalar25/type:literal",
         "//sxt/ristretto/type:literal",
+        "//sxt/scalar25/type:literal",
     ],
 )
