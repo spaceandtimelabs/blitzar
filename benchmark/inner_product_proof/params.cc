@@ -31,7 +31,10 @@ namespace sxt::bncip {
 //--------------------------------------------------------------------------------------------------
 void read_params(params& params, int argc, char* argv[]) noexcept {
   if (argc < 4) {
-    std::cerr << "Usage: benchmark " << "<cpu|gpu> " << "<n> " << "<num_samples>\n";
+    std::cerr << "Usage: benchmark "
+              << "<cpu|gpu> "
+              << "<n> "
+              << "<num_samples>\n";
     std::exit(-1);
   }
   std::string_view backend{argv[1]};
