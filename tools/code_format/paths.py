@@ -5,4 +5,7 @@ import os.path
 import shutil
 
 def get_buildifier():
-    return shutil.which('buildifier')
+    res = shutil.which('buildifier')
+    if res:
+        return res
+    return "/usr/local/go/bin/buildifier"
