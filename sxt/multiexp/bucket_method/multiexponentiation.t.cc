@@ -141,3 +141,33 @@ TEST_CASE("we can compute multiexponentiations with curve-21") {
     REQUIRE(res[0] == 0x123_c21);
   }
 }
+
+TEST_CASE("we can compute multiexponentiations with exponent sequences") {
+  std::vector<bascrv::element97> generators = {2u, 5u};
+  std::vector<mtxb::exponent_sequence> exponents;
+  size_t min_length = 0;
+
+  SECTION("exponentiation fails if the exponent sequences are not 32 bytes") {
+    exponents.push_back({
+        .element_nbytes = 1,
+        .n = 1,
+    });
+    auto fut = try_multiexponentiate<bascrv::element97>(generators, exponents, min_length);
+    REQUIRE(fut.ready());
+    REQUIRE(fut.value().empty());
+  }
+
+  SECTION("exponentiation fails if the exponent sequences are different lengths") {
+    exponents.push_back({
+        .element_nbytes = 32,
+        .n = 1,
+    });
+    exponents.push_back({
+        .element_nbytes = 32,
+        .n = 2,
+    });
+    auto fut = try_multiexponentiate<bascrv::element97>(generators, exponents, min_length);
+    REQUIRE(fut.ready());
+    REQUIRE(fut.value().empty());
+  }
+}

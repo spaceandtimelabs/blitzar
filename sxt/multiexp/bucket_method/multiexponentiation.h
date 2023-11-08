@@ -82,7 +82,8 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
 template <bascrv::element Element>
 xena::future<memmg::managed_array<Element>>
 try_multiexponentiate(basct::cspan<Element> generators,
-                      basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
+                      basct::cspan<mtxb::exponent_sequence> exponents,
+                      size_t min_length = 10000) noexcept {
   auto num_outputs = exponents.size();
   memmg::managed_array<Element> res;
   uint64_t min_n = std::numeric_limits<uint64_t>::max();
@@ -94,7 +95,7 @@ try_multiexponentiate(basct::cspan<Element> generators,
     min_n = std::min(min_n, exponent.n);
     max_n = std::max(max_n, exponent.n);
   }
-  if (min_n != max_n) {
+  if (min_n != max_n || min_n < min_length) {
     co_return res;
   }
   auto n = max_n;
