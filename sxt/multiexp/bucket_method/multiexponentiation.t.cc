@@ -143,7 +143,6 @@ TEST_CASE("we can compute multiexponentiations with curve-21") {
 }
 
 TEST_CASE("we can compute multiexponentiations with exponent sequences") {
-  std::vector<bascrv::element97> generators = {2u, 5u};
   std::vector<mtxb::exponent_sequence> exponents;
   size_t min_length = 0;
 
@@ -152,6 +151,7 @@ TEST_CASE("we can compute multiexponentiations with exponent sequences") {
         .element_nbytes = 1,
         .n = 1,
     });
+    std::vector<bascrv::element97> generators = {2u};
     auto fut = try_multiexponentiate<bascrv::element97>(generators, exponents, min_length);
     REQUIRE(fut.ready());
     REQUIRE(fut.value().empty());
@@ -166,8 +166,36 @@ TEST_CASE("we can compute multiexponentiations with exponent sequences") {
         .element_nbytes = 32,
         .n = 2,
     });
+    std::vector<bascrv::element97> generators = {2u, 5u};
     auto fut = try_multiexponentiate<bascrv::element97>(generators, exponents, min_length);
     REQUIRE(fut.ready());
     REQUIRE(fut.value().empty());
+  }
+
+  SECTION("exponentiation fails if the exponent sequences are too small") {
+    exponents.push_back({
+        .element_nbytes = 32,
+        .n = 1,
+    });
+    std::vector<bascrv::element97> generators = {2u};
+    auto fut = try_multiexponentiate<bascrv::element97>(generators, exponents, 2);
+    REQUIRE(fut.ready());
+    REQUIRE(fut.value().empty());
+  }
+
+  SECTION("exponentiation succeeds if preconditions are met") {
+    uint8_t scalar_data[32] = {};
+    scalar_data[0] = 12;
+    exponents.push_back({
+        .element_nbytes = 32,
+        .n = 1,
+        .data = scalar_data,
+    });
+    std::vector<bascrv::element97> generators = {2u};
+    auto fut = try_multiexponentiate<bascrv::element97>(generators, exponents, min_length);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(fut.value().size() == 1);
+    REQUIRE(fut.value()[0] == 2u * 12u);
   }
 }
