@@ -7,8 +7,8 @@ stdenvNoCC.mkDerivation {
   name = "clang";
   src = pkgs.fetchgit {
     url = "https://github.com/llvm/llvm-project";
-    rev = "a396fb2";
-    hash = "sha256-BUgfgs46LqrwZy3/vQbw9vgH2dTVlguaxoFOAqATadI=";
+    rev = "fdbff88";
+    hash = "sha256-kipkrgqzSgdsHwYz5P2NpUo6miulE/Nd9zRgeKAHeHM=";
   };
   nativeBuildInputs = [
     cmake
@@ -24,6 +24,7 @@ stdenvNoCC.mkDerivation {
   CFLAGS = "-B${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -B${gcc13.libc}/lib";
   patches = [
     ./clang_driver.patch
+    ./compiler_rt.patch
   ];
   postPatch = ''
     substituteInPlace clang/lib/Driver/ToolChains/Gnu.cpp \
@@ -42,8 +43,8 @@ stdenvNoCC.mkDerivation {
 
     # TODO(rnburn): build with compiler-rt so that we have access to
     # sanitizers after this issue gets resolved: https://github.com/llvm/llvm-project/issues/69056#issuecomment-1781423887.
-    #"-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
-    "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind\""
+    "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
+    # "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind\""
     "-DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_CMAKE_BUILD_TYPE=Release"
 
@@ -63,7 +64,9 @@ stdenvNoCC.mkDerivation {
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ENABLE_STATIC=ON"
 
     # compiler-rt
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_CXX_LIBRARY=libcxx"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_USE_LLVM_UNWINDER=ON"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED=OFF"
 
     "-DCMAKE_BUILD_TYPE=Release"
     "-DCMAKE_INSTALL_PREFIX=\"$out\""
