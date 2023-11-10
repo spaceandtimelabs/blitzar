@@ -1,5 +1,5 @@
 diff --git a/compiler-rt/lib/asan/CMakeLists.txt b/compiler-rt/lib/asan/CMakeLists.txt
-index 48d0e91052d7..05dfb1171db2 100644
+index 48d0e91052d7..323e0441daea 100644
 --- a/compiler-rt/lib/asan/CMakeLists.txt
 +++ b/compiler-rt/lib/asan/CMakeLists.txt
 @@ -183,22 +183,22 @@ if(APPLE)
@@ -41,6 +41,51 @@ index 48d0e91052d7..05dfb1171db2 100644
  
    add_compiler_rt_runtime(clang_rt.asan_static
      STATIC
+@@ -291,25 +291,25 @@ else()
+           SanitizerCommonWeakInterception)
+     endif()
+ 
+-    add_compiler_rt_runtime(clang_rt.asan
+-      SHARED
+-      ARCHS ${arch}
+-      OBJECT_LIBS ${ASAN_COMMON_RUNTIME_OBJECT_LIBS}
+-              RTAsan_dynamic
+-              # The only purpose of RTAsan_dynamic_version_script_dummy is to
+-              # carry a dependency of the shared runtime on the version script.
+-              # Replacing it with a straightforward
+-              # add_dependencies(clang_rt.asan-dynamic-${arch} clang_rt.asan-dynamic-${arch}-version-list)
+-              # generates an order-only dependency in ninja.
+-              RTAsan_dynamic_version_script_dummy
+-              RTUbsan_cxx
+-              ${ASAN_DYNAMIC_WEAK_INTERCEPTION}
+-      CFLAGS ${ASAN_DYNAMIC_CFLAGS}
+-      LINK_FLAGS ${ASAN_DYNAMIC_LINK_FLAGS}
+-                ${VERSION_SCRIPT_FLAG}
+-      LINK_LIBS ${ASAN_DYNAMIC_LIBS}
+-      DEFS ${ASAN_DYNAMIC_DEFINITIONS}
+-      PARENT_TARGET asan)
++    # add_compiler_rt_runtime(clang_rt.asan
++    #   SHARED
++    #   ARCHS ${arch}
++    #   OBJECT_LIBS ${ASAN_COMMON_RUNTIME_OBJECT_LIBS}
++    #           RTAsan_dynamic
++    #           # The only purpose of RTAsan_dynamic_version_script_dummy is to
++    #           # carry a dependency of the shared runtime on the version script.
++    #           # Replacing it with a straightforward
++    #           # add_dependencies(clang_rt.asan-dynamic-${arch} clang_rt.asan-dynamic-${arch}-version-list)
++    #           # generates an order-only dependency in ninja.
++    #           RTAsan_dynamic_version_script_dummy
++    #           RTUbsan_cxx
++    #           ${ASAN_DYNAMIC_WEAK_INTERCEPTION}
++    #   CFLAGS ${ASAN_DYNAMIC_CFLAGS}
++    #   LINK_FLAGS ${ASAN_DYNAMIC_LINK_FLAGS}
++    #             ${VERSION_SCRIPT_FLAG}
++    #   LINK_LIBS ${ASAN_DYNAMIC_LIBS}
++    #   DEFS ${ASAN_DYNAMIC_DEFINITIONS}
++    #   PARENT_TARGET asan)
+ 
+     if (SANITIZER_USE_SYMBOLS AND NOT ${arch} STREQUAL "i386")
+       add_sanitizer_rt_symbols(clang_rt.asan_cxx
 diff --git a/compiler-rt/lib/scudo/standalone/CMakeLists.txt b/compiler-rt/lib/scudo/standalone/CMakeLists.txt
 index 60092005cc33..72c2b83a2dad 100644
 --- a/compiler-rt/lib/scudo/standalone/CMakeLists.txt
