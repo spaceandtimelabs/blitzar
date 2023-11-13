@@ -24,6 +24,9 @@ stdenvNoCC.mkDerivation {
   CFLAGS = "-B${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -B${gcc13.libc}/lib";
   patches = [
     ./clang_driver.patch
+
+    # Patch compiler_rt so that only the static library version of the sanitizers are build.
+    # This is a workaround to https://github.com/llvm/llvm-project/issues/69056#issuecomment-1781423887.
     ./compiler_rt.patch
   ];
   postPatch = ''
@@ -41,10 +44,7 @@ stdenvNoCC.mkDerivation {
     "-DLLVM_RUNTIME_TARGETS=\"x86_64-unknown-linux-gnu\""
     "-DLLVM_ENABLE_PROJECTS=\"clang;clang-tools-extra\""
 
-    # TODO(rnburn): build with compiler-rt so that we have access to
-    # sanitizers after this issue gets resolved: https://github.com/llvm/llvm-project/issues/69056#issuecomment-1781423887.
     "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
-    # "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind\""
     "-DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_CMAKE_BUILD_TYPE=Release"
 
