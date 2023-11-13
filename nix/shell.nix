@@ -12,7 +12,6 @@ mkShell {
     pkgs.python3
     bazel
     clang
-    # compiler-rt
     cuda
   ];
   LD_LIBRARY_PATH = lib.makeLibraryPath [
