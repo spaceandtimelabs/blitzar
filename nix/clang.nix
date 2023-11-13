@@ -25,7 +25,7 @@ stdenvNoCC.mkDerivation {
   patches = [
     ./clang_driver.patch
 
-    # Patch compiler_rt so that only the static library version of the sanitizers are build.
+    # Patch compiler_rt so that only the static library versions of the sanitizers are build.
     # This is a workaround to https://github.com/llvm/llvm-project/issues/69056#issuecomment-1781423887.
     ./compiler_rt.patch
   ];
