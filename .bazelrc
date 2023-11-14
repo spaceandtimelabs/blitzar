@@ -30,6 +30,13 @@ build --@rules_cuda//cuda:host_copts=-std=c++20
 build --config=clang
 
 
+# Add options from
+#   https://stackoverflow.com/a/57733619
+build:asan --strip=never
+build:asan --copt -DADDRESS_SANITIZER
+build:asan --copt -O1
+build:asan --copt -g
+build:asan --copt -fno-omit-frame-pointer
 build:asan --copt -fsanitize=address
 build:asan --linkopt -fsanitize=address
 
