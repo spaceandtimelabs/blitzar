@@ -49,6 +49,8 @@ sxt_cc_component(
         "//sxt/algorithm/reduction:reduction",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:device_viewable",
     ],
     is_cuda = True,
     test_deps = [

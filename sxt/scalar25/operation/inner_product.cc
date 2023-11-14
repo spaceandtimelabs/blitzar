@@ -22,6 +22,8 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/device_viewable.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/scalar25/operation/accumulator.h"
@@ -30,6 +32,24 @@
 #include "sxt/scalar25/operation/product_mapper.h"
 
 namespace sxt::s25o {
+//--------------------------------------------------------------------------------------------------
+// async_inner_product_impl
+//--------------------------------------------------------------------------------------------------
+static xena::future<s25t::element>
+async_inner_product_impl(basct::cspan<s25t::element> lhs,
+                         basct::cspan<s25t::element> rhs) noexcept {
+  auto n = lhs.size();
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<s25t::element> device_data{&resource};
+  auto lhs_fut = xendv::make_active_device_viewable(device_data, lhs);
+  auto rhs_dev = co_await xendv::make_active_device_viewable(device_data, rhs);
+  auto lhs_dev = co_await std::move(lhs_fut);
+  co_return co_await algr::reduce<accumulator>(std::move(stream),
+                                               product_mapper{lhs_dev.data(), rhs_dev.data()},
+                                               static_cast<unsigned int>(n));
+}
+
 //--------------------------------------------------------------------------------------------------
 // inner_product
 //--------------------------------------------------------------------------------------------------
@@ -74,5 +94,13 @@ xena::future<s25t::element> async_inner_product(basct::cspan<s25t::element> lhs,
   }
   return algr::reduce<accumulator>(std::move(stream), product_mapper{lhs.data(), rhs.data()},
                                    static_cast<unsigned int>(n));
+}
+
+xena::future<s25t::element> async_inner_product2(basct::cspan<s25t::element> lhs,
+                                                 basct::cspan<s25t::element> rhs) noexcept {
+  (void)async_inner_product_impl;
+  (void)lhs;
+  (void)rhs;
+  return {};
 }
 } // namespace sxt::s25o

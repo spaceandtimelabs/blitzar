@@ -35,4 +35,7 @@ void inner_product(s25t::element& res, basct::cspan<s25t::element> lhs,
 //--------------------------------------------------------------------------------------------------
 xena::future<s25t::element> async_inner_product(basct::cspan<s25t::element> lhs,
                                                 basct::cspan<s25t::element> rhs) noexcept;
+
+xena::future<s25t::element> async_inner_product2(basct::cspan<s25t::element> lhs,
+                                                 basct::cspan<s25t::element> rhs) noexcept;
 } // namespace sxt::s25o
