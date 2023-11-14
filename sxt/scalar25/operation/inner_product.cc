@@ -22,8 +22,10 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/iterator/index_range.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/device_viewable.h"
+#include "sxt/execution/device/for_each.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/scalar25/operation/accumulator.h"
@@ -33,11 +35,11 @@
 
 namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
-// async_inner_product_impl
+// async_inner_product_partial
 //--------------------------------------------------------------------------------------------------
 static xena::future<s25t::element>
-async_inner_product_impl(basct::cspan<s25t::element> lhs,
-                         basct::cspan<s25t::element> rhs) noexcept {
+async_inner_product_partial(basct::cspan<s25t::element> lhs,
+                            basct::cspan<s25t::element> rhs) noexcept {
   auto n = lhs.size();
   basdv::stream stream;
   memr::async_device_resource resource{stream};
@@ -61,6 +63,24 @@ void inner_product(s25t::element& res, basct::cspan<s25t::element> lhs,
   for (size_t i = 1; i < n; ++i) {
     s25o::muladd(res, lhs[i], rhs[i], res);
   }
+}
+
+//--------------------------------------------------------------------------------------------------
+// async_inner_product_impl
+//--------------------------------------------------------------------------------------------------
+xena::future<s25t::element> async_inner_product_impl(basct::cspan<s25t::element> lhs,
+                                                     basct::cspan<s25t::element> rhs,
+                                                     size_t split_factor) noexcept {
+  auto n = std::min(lhs.size(), rhs.size());
+  SXT_DEBUG_ASSERT(n > 0);
+  s25t::element res = s25t::element::identity();
+  co_await xendv::concurrent_for_each(
+      basit::index_range{0, n}, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+        s25t::element partial_res = co_await async_inner_product_partial(
+            lhs.subspan(rng.a(), rng.size()), rhs.subspan(rng.a(), rng.size()));
+        s25o::add(res, res, partial_res);
+      });
+  co_return res;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -98,7 +118,7 @@ xena::future<s25t::element> async_inner_product(basct::cspan<s25t::element> lhs,
 
 xena::future<s25t::element> async_inner_product2(basct::cspan<s25t::element> lhs,
                                                  basct::cspan<s25t::element> rhs) noexcept {
-  (void)async_inner_product_impl;
+  (void)async_inner_product_partial;
   (void)lhs;
   (void)rhs;
   return {};

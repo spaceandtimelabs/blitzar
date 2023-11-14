@@ -46,11 +46,13 @@ sxt_cc_component(
         ":product_mapper",
         "//sxt/base/error:assert",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/iterator:index_range",
         "//sxt/algorithm/reduction:reduction",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:device_viewable",
+        "//sxt/execution/device:for_each",
     ],
     is_cuda = True,
     test_deps = [

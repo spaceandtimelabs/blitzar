@@ -23,15 +23,6 @@
 
 namespace sxt::s25t {
 //--------------------------------------------------------------------------------------------------
-// constructor
-//--------------------------------------------------------------------------------------------------
-element::element(std::initializer_list<uint8_t> values) noexcept : data_{} {
-  SXT_DEBUG_ASSERT(values.size() <= 32);
-  std::memcpy(static_cast<void*>(data_), static_cast<const void*>(&(*values.begin())),
-              values.size());
-}
-
-//--------------------------------------------------------------------------------------------------
 // operator==
 //--------------------------------------------------------------------------------------------------
 bool operator==(const element& lhs, const element& rhs) noexcept {
