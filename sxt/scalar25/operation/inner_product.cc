@@ -20,6 +20,7 @@
 
 #include "sxt/algorithm/reduction/reduction.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range.h"
@@ -72,20 +73,11 @@ void inner_product(s25t::element& res, basct::cspan<s25t::element> lhs,
 //--------------------------------------------------------------------------------------------------
 xena::future<s25t::element> async_inner_product_impl(basct::cspan<s25t::element> lhs,
                                                      basct::cspan<s25t::element> rhs,
-                                                     size_t split_factor) noexcept {
+                                                     size_t split_factor, size_t min_chunk_size,
+                                                     size_t max_chunk_size) noexcept {
   auto n = std::min(lhs.size(), rhs.size());
   SXT_DEBUG_ASSERT(n > 0);
   s25t::element res = s25t::element::identity();
-
-  // Pick some reasonable values for min and max chunk size so that
-  // we don't run out of GPU memory or split computations that are
-  // too small.
-  //
-  // Note: These haven't been informed by much benchmarking. I'm
-  // sure there are better values. This is just putting in some
-  // ballpark estimates to get started.
-  size_t min_chunk_size = 8ull << 10u;
-  size_t max_chunk_size = 8ull << 20u;
 
   auto [chunk_first, chunk_last] = basit::split(
       basit::index_range{0, n}.min_chunk_size(min_chunk_size).max_chunk_size(max_chunk_size),
@@ -135,9 +127,18 @@ xena::future<s25t::element> async_inner_product(basct::cspan<s25t::element> lhs,
 
 xena::future<s25t::element> async_inner_product2(basct::cspan<s25t::element> lhs,
                                                  basct::cspan<s25t::element> rhs) noexcept {
-  (void)async_inner_product_partial;
-  (void)lhs;
-  (void)rhs;
-  return {};
+
+  // Pick some reasonable values for min and max chunk size so that
+  // we don't run out of GPU memory or split computations that are
+  // too small.
+  //
+  // Note: These haven't been informed by much benchmarking. I'm
+  // sure there are better values. This is just putting in some
+  // ballpark estimates to get started.
+  size_t min_chunk_size = 8ull << 10u;
+  size_t max_chunk_size = 8ull << 20u;
+
+  return async_inner_product_impl(lhs, rhs, basdv::get_num_devices(), min_chunk_size,
+                                  max_chunk_size);
 }
 } // namespace sxt::s25o

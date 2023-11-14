@@ -45,6 +45,7 @@ sxt_cc_component(
         ":muladd",
         ":product_mapper",
         "//sxt/base/error:assert",
+        "//sxt/base/device:property",
         "//sxt/base/device:memory_utility",
         "//sxt/base/iterator:index_range",
         "//sxt/base/iterator:index_range_iterator",
