@@ -47,6 +47,8 @@ sxt_cc_component(
         "//sxt/base/error:assert",
         "//sxt/base/device:memory_utility",
         "//sxt/base/iterator:index_range",
+        "//sxt/base/iterator:index_range_iterator",
+        "//sxt/base/iterator:index_range_utility",
         "//sxt/algorithm/reduction:reduction",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",

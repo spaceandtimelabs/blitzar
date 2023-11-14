@@ -23,6 +23,8 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range.h"
+#include "sxt/base/iterator/index_range_iterator.h"
+#include "sxt/base/iterator/index_range_utility.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/device_viewable.h"
 #include "sxt/execution/device/for_each.h"
@@ -74,10 +76,11 @@ xena::future<s25t::element> async_inner_product_impl(basct::cspan<s25t::element>
   auto n = std::min(lhs.size(), rhs.size());
   SXT_DEBUG_ASSERT(n > 0);
   s25t::element res = s25t::element::identity();
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}, split_factor);
   co_await xendv::concurrent_for_each(
-      basit::index_range{0, n}, [&](const basit::index_range& rng) noexcept -> xena::future<> {
-        s25t::element partial_res = co_await async_inner_product_partial(
-            lhs.subspan(rng.a(), rng.size()), rhs.subspan(rng.a(), rng.size()));
+      chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+        auto partial_res = co_await async_inner_product_partial(lhs.subspan(rng.a(), rng.size()),
+                                                                rhs.subspan(rng.a(), rng.size()));
         s25o::add(res, res, partial_res);
       });
   co_return res;
