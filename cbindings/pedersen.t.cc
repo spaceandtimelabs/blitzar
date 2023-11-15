@@ -202,7 +202,7 @@ static void test_ristretto255_pedersen_commitments_with_given_backend_and_no_gen
         make_sequence_descriptor(data_2),
         make_sequence_descriptor(data_3),
     };
-    const uint64_t num_sequences = std::size(valid_descriptors);
+    constexpr uint64_t num_sequences = std::size(valid_descriptors);
 
     // we verify that `c = scal * a + b` implies that `commit_c = scal * commit_a + commit_b`
     rstt::compressed_element commitments_data[num_sequences];
