@@ -37,9 +37,7 @@ class element {
 public:
   element() noexcept = default;
 
-  explicit constexpr element(std::initializer_list<uint8_t> values) noexcept 
-    : data_{}
-  {
+  explicit constexpr element(std::initializer_list<uint8_t> values) noexcept : data_{} {
     assert(values.size() <= 32);
     size_t i = 0;
     for (auto iter = values.begin(); iter != values.end(); ++iter) {
@@ -53,9 +51,7 @@ public:
   CUDA_CALLABLE
   const uint8_t* data() const noexcept { return data_; }
 
-  static constexpr element identity() noexcept {
-    return element{};
-  };
+  static constexpr element identity() noexcept { return element{}; };
 
 private:
   uint8_t data_[32];
