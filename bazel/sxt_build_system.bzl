@@ -1,5 +1,28 @@
 load("@rules_cuda//cuda:defs.bzl", "cuda_library", "cuda_objects")
 
+CUDA_TOOLS_BUILD_FILE = """
+package(default_visibility = [ "//visibility:public" ])
+
+filegroup(
+   name = "compute_sanitizer",
+   srcs = [
+     "{cuda_path}/bin/compute-sanitizer",
+   ],
+)
+"""
+
+def _cuda_tools_impl(ctx):
+  cuda_path = ctx.os.environ.get("CUDA_PATH").replace("\\", "/")
+  ctx.file("BUILD", CUDA_TOOLS_BUILD_FILE.format(cuda_path = cuda_path))
+
+cuda_tools = repository_rule(
+  implementation = _cuda_tools_impl,
+  attrs = {"toolkit_path": attr.string(mandatory = False)},
+  configure = True,
+  local = True,
+  environ = ["CUDA_PATH"],
+)
+
 # We add this -std=c++20 flag, because
 # benchmarks could not be compiled without it.
 # The `build --cxxopt -std=c++20` flag set in the
@@ -67,6 +90,19 @@ def sxt_cc_component(
                    ],
             visibility = ["//visibility:public"],
             **kwargs
+        )
+        native.sh_test(
+          name = name + "_sanitize.t",
+          srcs = [
+            "//bazel:sanitize_test.sh",
+          ],
+          args = [
+            "$(location @cuda_tools//:compute_sanitizer)", 
+            "2",
+          ],
+          data = [
+            "@cuda_tools//:compute_sanitizer",
+          ],
         )
 
 def sxt_cc_library(
