@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <algorithm>
+#include <cassert>
 #include <cstdint>
 #include <initializer_list>
 #include <iosfwd>
@@ -35,13 +37,21 @@ class element {
 public:
   element() noexcept = default;
 
-  explicit element(std::initializer_list<uint8_t> values) noexcept;
+  explicit constexpr element(std::initializer_list<uint8_t> values) noexcept : data_{} {
+    assert(values.size() <= 32);
+    size_t i = 0;
+    for (auto iter = values.begin(); iter != values.end(); ++iter) {
+      data_[i++] = *iter;
+    }
+  }
 
   CUDA_CALLABLE
   uint8_t* data() noexcept { return data_; }
 
   CUDA_CALLABLE
   const uint8_t* data() const noexcept { return data_; }
+
+  static constexpr element identity() noexcept { return element{}; };
 
 private:
   uint8_t data_[32];

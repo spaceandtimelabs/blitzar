@@ -31,6 +31,14 @@ void inner_product(s25t::element& res, basct::cspan<s25t::element> lhs,
                    basct::cspan<s25t::element> rhs) noexcept;
 
 //--------------------------------------------------------------------------------------------------
+// async_inner_product_impl
+//--------------------------------------------------------------------------------------------------
+xena::future<s25t::element> async_inner_product_impl(basct::cspan<s25t::element> lhs,
+                                                     basct::cspan<s25t::element> rhs,
+                                                     size_t split_factor, size_t min_chunk_size,
+                                                     size_t max_chunk_size) noexcept;
+
+//--------------------------------------------------------------------------------------------------
 // async_inner_product
 //--------------------------------------------------------------------------------------------------
 xena::future<s25t::element> async_inner_product(basct::cspan<s25t::element> lhs,
