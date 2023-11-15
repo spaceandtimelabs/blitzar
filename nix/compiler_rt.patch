@@ -1,0 +1,266 @@
+diff --git a/compiler-rt/lib/asan/CMakeLists.txt b/compiler-rt/lib/asan/CMakeLists.txt
+index 48d0e91052d7..323e0441daea 100644
+--- a/compiler-rt/lib/asan/CMakeLists.txt
++++ b/compiler-rt/lib/asan/CMakeLists.txt
+@@ -183,22 +183,22 @@ if(APPLE)
+   add_weak_symbols("sanitizer_common" WEAK_SYMBOL_LINK_FLAGS)
+   add_weak_symbols("xray" WEAK_SYMBOL_LINK_FLAGS)
+ 
+-  add_compiler_rt_runtime(clang_rt.asan
+-    SHARED
+-    OS ${SANITIZER_COMMON_SUPPORTED_OS}
+-    ARCHS ${ASAN_SUPPORTED_ARCH}
+-    OBJECT_LIBS RTAsan_dynamic
+-                RTInterception
+-                RTSanitizerCommon
+-                RTSanitizerCommonLibc
+-                RTSanitizerCommonCoverage
+-                RTSanitizerCommonSymbolizer
+-                RTLSanCommon
+-                RTUbsan
+-    CFLAGS ${ASAN_DYNAMIC_CFLAGS}
+-    LINK_FLAGS ${WEAK_SYMBOL_LINK_FLAGS}
+-    DEFS ${ASAN_DYNAMIC_DEFINITIONS}
+-    PARENT_TARGET asan)
++  # add_compiler_rt_runtime(clang_rt.asan
++  #   SHARED
++  #   OS ${SANITIZER_COMMON_SUPPORTED_OS}
++  #   ARCHS ${ASAN_SUPPORTED_ARCH}
++  #   OBJECT_LIBS RTAsan_dynamic
++  #               RTInterception
++  #               RTSanitizerCommon
++  #               RTSanitizerCommonLibc
++  #               RTSanitizerCommonCoverage
++  #               RTSanitizerCommonSymbolizer
++  #               RTLSanCommon
++  #               RTUbsan
++  #   CFLAGS ${ASAN_DYNAMIC_CFLAGS}
++  #   LINK_FLAGS ${WEAK_SYMBOL_LINK_FLAGS}
++  #   DEFS ${ASAN_DYNAMIC_DEFINITIONS}
++  #   PARENT_TARGET asan)
+ 
+   add_compiler_rt_runtime(clang_rt.asan_static
+     STATIC
+@@ -291,25 +291,25 @@ else()
+           SanitizerCommonWeakInterception)
+     endif()
+ 
+-    add_compiler_rt_runtime(clang_rt.asan
+-      SHARED
+-      ARCHS ${arch}
+-      OBJECT_LIBS ${ASAN_COMMON_RUNTIME_OBJECT_LIBS}
+-              RTAsan_dynamic
+-              # The only purpose of RTAsan_dynamic_version_script_dummy is to
+-              # carry a dependency of the shared runtime on the version script.
+-              # Replacing it with a straightforward
+-              # add_dependencies(clang_rt.asan-dynamic-${arch} clang_rt.asan-dynamic-${arch}-version-list)
+-              # generates an order-only dependency in ninja.
+-              RTAsan_dynamic_version_script_dummy
+-              RTUbsan_cxx
+-              ${ASAN_DYNAMIC_WEAK_INTERCEPTION}
+-      CFLAGS ${ASAN_DYNAMIC_CFLAGS}
+-      LINK_FLAGS ${ASAN_DYNAMIC_LINK_FLAGS}
+-                ${VERSION_SCRIPT_FLAG}
+-      LINK_LIBS ${ASAN_DYNAMIC_LIBS}
+-      DEFS ${ASAN_DYNAMIC_DEFINITIONS}
+-      PARENT_TARGET asan)
++    # add_compiler_rt_runtime(clang_rt.asan
++    #   SHARED
++    #   ARCHS ${arch}
++    #   OBJECT_LIBS ${ASAN_COMMON_RUNTIME_OBJECT_LIBS}
++    #           RTAsan_dynamic
++    #           # The only purpose of RTAsan_dynamic_version_script_dummy is to
++    #           # carry a dependency of the shared runtime on the version script.
++    #           # Replacing it with a straightforward
++    #           # add_dependencies(clang_rt.asan-dynamic-${arch} clang_rt.asan-dynamic-${arch}-version-list)
++    #           # generates an order-only dependency in ninja.
++    #           RTAsan_dynamic_version_script_dummy
++    #           RTUbsan_cxx
++    #           ${ASAN_DYNAMIC_WEAK_INTERCEPTION}
++    #   CFLAGS ${ASAN_DYNAMIC_CFLAGS}
++    #   LINK_FLAGS ${ASAN_DYNAMIC_LINK_FLAGS}
++    #             ${VERSION_SCRIPT_FLAG}
++    #   LINK_LIBS ${ASAN_DYNAMIC_LIBS}
++    #   DEFS ${ASAN_DYNAMIC_DEFINITIONS}
++    #   PARENT_TARGET asan)
+ 
+     if (SANITIZER_USE_SYMBOLS AND NOT ${arch} STREQUAL "i386")
+       add_sanitizer_rt_symbols(clang_rt.asan_cxx
+diff --git a/compiler-rt/lib/hwasan/CMakeLists.txt b/compiler-rt/lib/hwasan/CMakeLists.txt
+index 6f75baa7e354..dbe1e69487b1 100644
+--- a/compiler-rt/lib/hwasan/CMakeLists.txt
++++ b/compiler-rt/lib/hwasan/CMakeLists.txt
+@@ -192,32 +192,32 @@ function(add_hwasan_runtimes arch use_aliases)
+   endif()
+ 
+ 
+-  add_compiler_rt_runtime(${hwasan_runtime}
+-    SHARED
+-    ARCHS ${arch}
+-    OBJECT_LIBS
+-            ${hwasan_object_dyn_lib}
+-            RTInterception
+-            RTSanitizerCommon
+-            RTSanitizerCommonLibc
+-            RTSanitizerCommonCoverage
+-            RTSanitizerCommonSymbolizer
+-            RTSanitizerCommonSymbolizerInternal
+-            RTLSanCommon
+-            RTUbsan
+-            RTUbsan_cxx
+-            # The only purpose of RTHWAsan_dynamic_version_script_dummy is to
+-            # carry a dependency of the shared runtime on the version script.
+-            # Replacing it with a straightforward
+-            # add_dependencies(clang_rt.asan-dynamic-${arch} clang_rt.asan-dynamic-${arch}-version-list)
+-            # generates an order-only dependency in ninja.
+-            RTHwasan_dynamic_version_script_dummy
+-    CFLAGS ${hwasan_dyn_flags}
+-    LINK_FLAGS ${HWASAN_DYNAMIC_LINK_FLAGS}
+-              ${VERSION_SCRIPT_FLAG}
+-    LINK_LIBS ${HWASAN_DYNAMIC_LIBS}
+-    DEFS ${ASAN_DYNAMIC_DEFINITIONS}
+-    PARENT_TARGET hwasan)
++  # add_compiler_rt_runtime(${hwasan_runtime}
++  #   SHARED
++  #   ARCHS ${arch}
++  #   OBJECT_LIBS
++  #           ${hwasan_object_dyn_lib}
++  #           RTInterception
++  #           RTSanitizerCommon
++  #           RTSanitizerCommonLibc
++  #           RTSanitizerCommonCoverage
++  #           RTSanitizerCommonSymbolizer
++  #           RTSanitizerCommonSymbolizerInternal
++  #           RTLSanCommon
++  #           RTUbsan
++  #           RTUbsan_cxx
++  #           # The only purpose of RTHWAsan_dynamic_version_script_dummy is to
++  #           # carry a dependency of the shared runtime on the version script.
++  #           # Replacing it with a straightforward
++  #           # add_dependencies(clang_rt.asan-dynamic-${arch} clang_rt.asan-dynamic-${arch}-version-list)
++  #           # generates an order-only dependency in ninja.
++  #           RTHwasan_dynamic_version_script_dummy
++  #   CFLAGS ${hwasan_dyn_flags}
++  #   LINK_FLAGS ${HWASAN_DYNAMIC_LINK_FLAGS}
++  #             ${VERSION_SCRIPT_FLAG}
++  #   LINK_LIBS ${HWASAN_DYNAMIC_LIBS}
++  #   DEFS ${ASAN_DYNAMIC_DEFINITIONS}
++  #   PARENT_TARGET hwasan)
+ 
+   if(SANITIZER_USE_SYMBOLS)
+     add_sanitizer_rt_symbols(${hwasan_runtime}
+diff --git a/compiler-rt/lib/scudo/standalone/CMakeLists.txt b/compiler-rt/lib/scudo/standalone/CMakeLists.txt
+index 60092005cc33..72c2b83a2dad 100644
+--- a/compiler-rt/lib/scudo/standalone/CMakeLists.txt
++++ b/compiler-rt/lib/scudo/standalone/CMakeLists.txt
+@@ -232,19 +232,19 @@ if(COMPILER_RT_HAS_SCUDO_STANDALONE)
+     DEPS ${SCUDO_DEPS}
+     PARENT_TARGET scudo_standalone)
+ 
+-  if(COMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED)
+-    add_compiler_rt_runtime(clang_rt.scudo_standalone
+-      SHARED
+-      ARCHS ${SCUDO_STANDALONE_SUPPORTED_ARCH}
+-      SOURCES ${SCUDO_SOURCES} ${SCUDO_SOURCES_C_WRAPPERS} ${SCUDO_SOURCES_CXX_WRAPPERS}
+-      ADDITIONAL_HEADERS ${SCUDO_HEADERS}
+-      CFLAGS ${SCUDO_CFLAGS}
+-      DEPS ${SCUDO_DEPS}
+-      OBJECT_LIBS ${SCUDO_OBJECT_LIBS}
+-      LINK_FLAGS ${SCUDO_LINK_FLAGS}
+-      LINK_LIBS ${SCUDO_LINK_LIBS}
+-      PARENT_TARGET scudo_standalone)
+-  endif()
++  # if(COMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED)
++  #   add_compiler_rt_runtime(clang_rt.scudo_standalone
++  #     SHARED
++  #     ARCHS ${SCUDO_STANDALONE_SUPPORTED_ARCH}
++  #     SOURCES ${SCUDO_SOURCES} ${SCUDO_SOURCES_C_WRAPPERS} ${SCUDO_SOURCES_CXX_WRAPPERS}
++  #     ADDITIONAL_HEADERS ${SCUDO_HEADERS}
++  #     CFLAGS ${SCUDO_CFLAGS}
++  #     DEPS ${SCUDO_DEPS}
++  #     OBJECT_LIBS ${SCUDO_OBJECT_LIBS}
++  #     LINK_FLAGS ${SCUDO_LINK_FLAGS}
++  #     LINK_LIBS ${SCUDO_LINK_LIBS}
++  #     PARENT_TARGET scudo_standalone)
++  # endif()
+ 
+   add_subdirectory(benchmarks)
+   if(COMPILER_RT_INCLUDE_TESTS)
+diff --git a/compiler-rt/lib/ubsan/CMakeLists.txt b/compiler-rt/lib/ubsan/CMakeLists.txt
+index 3f1e12ed9ac6..33c371c5131b 100644
+--- a/compiler-rt/lib/ubsan/CMakeLists.txt
++++ b/compiler-rt/lib/ubsan/CMakeLists.txt
+@@ -103,19 +103,19 @@ if(APPLE)
+     add_weak_symbols("ubsan" WEAK_SYMBOL_LINK_FLAGS)
+     add_weak_symbols("sanitizer_common" WEAK_SYMBOL_LINK_FLAGS)
+ 
+-    add_compiler_rt_runtime(clang_rt.ubsan
+-      SHARED
+-      OS ${UBSAN_SUPPORTED_OS}
+-      ARCHS ${UBSAN_SUPPORTED_ARCH}
+-      OBJECT_LIBS RTUbsan
+-                  RTUbsan_standalone
+-                  RTSanitizerCommon
+-                  RTSanitizerCommonLibc
+-                  RTSanitizerCommonCoverage
+-                  RTSanitizerCommonSymbolizer
+-                  RTInterception
+-      LINK_FLAGS ${WEAK_SYMBOL_LINK_FLAGS}
+-      PARENT_TARGET ubsan)
++    # add_compiler_rt_runtime(clang_rt.ubsan
++    #   SHARED
++    #   OS ${UBSAN_SUPPORTED_OS}
++    #   ARCHS ${UBSAN_SUPPORTED_ARCH}
++    #   OBJECT_LIBS RTUbsan
++    #               RTUbsan_standalone
++    #               RTSanitizerCommon
++    #               RTSanitizerCommonLibc
++    #               RTSanitizerCommonCoverage
++    #               RTSanitizerCommonSymbolizer
++    #               RTInterception
++    #   LINK_FLAGS ${WEAK_SYMBOL_LINK_FLAGS}
++    #   PARENT_TARGET ubsan)
+ 
+     if (NOT APPLE)
+       add_compiler_rt_runtime(clang_rt.ubsan
+@@ -245,23 +245,23 @@ else()
+           APPEND PROPERTY
+           OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/clang_rt.ubsan_standalone-dynamic-${arch}.vers)
+ 
+-        add_compiler_rt_runtime(clang_rt.ubsan_standalone
+-          SHARED
+-          ARCHS ${arch}
+-          OBJECT_LIBS RTSanitizerCommon
+-                RTSanitizerCommonLibc
+-                RTSanitizerCommonCoverage
+-                RTSanitizerCommonSymbolizer
+-                RTSanitizerCommonSymbolizerInternal
+-                RTUbsan
+-                RTUbsan_cxx
+-                RTUbsan_standalone
+-                RTInterception
+-                RTUbsan_dynamic_version_script_dummy
+-          CFLAGS ${UBSAN_CFLAGS}
+-          LINK_FLAGS ${UBSAN_LINK_FLAGS} ${VERSION_SCRIPT_FLAG}
+-          LINK_LIBS ${UBSAN_DYNAMIC_LIBS}
+-          PARENT_TARGET ubsan)
++        # add_compiler_rt_runtime(clang_rt.ubsan_standalone
++        #   SHARED
++        #   ARCHS ${arch}
++        #   OBJECT_LIBS RTSanitizerCommon
++        #         RTSanitizerCommonLibc
++        #         RTSanitizerCommonCoverage
++        #         RTSanitizerCommonSymbolizer
++        #         RTSanitizerCommonSymbolizerInternal
++        #         RTUbsan
++        #         RTUbsan_cxx
++        #         RTUbsan_standalone
++        #         RTInterception
++        #         RTUbsan_dynamic_version_script_dummy
++        #   CFLAGS ${UBSAN_CFLAGS}
++        #   LINK_FLAGS ${UBSAN_LINK_FLAGS} ${VERSION_SCRIPT_FLAG}
++        #   LINK_LIBS ${UBSAN_DYNAMIC_LIBS}
++        #   PARENT_TARGET ubsan)
+       endforeach()
+ 
+       set(ARCHS_FOR_SYMBOLS ${UBSAN_SUPPORTED_ARCH})

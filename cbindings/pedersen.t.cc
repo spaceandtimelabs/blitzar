@@ -176,15 +176,15 @@ static void test_ristretto255_pedersen_commitments_with_given_backend_and_no_gen
   SECTION("we can compute signed commitments") {
     const std::vector<int64_t> data1 = {-2};
     const std::vector<int64_t> data2 = {2};
-    const std::vector<sxt_sequence_descriptor> valid_descriptors = {
+    sxt_sequence_descriptor valid_descriptors[] = {
         make_sequence_descriptor(data1),
         make_sequence_descriptor(data2),
     };
-    const uint64_t num_sequences = valid_descriptors.size();
+    constexpr uint64_t num_sequences = std::size(valid_descriptors);
     rstt::compressed_element commitments_data[num_sequences];
     sxt_curve25519_compute_pedersen_commitments(
         reinterpret_cast<sxt_ristretto255_compressed*>(commitments_data), num_sequences,
-        valid_descriptors.data(), 0);
+        valid_descriptors, 0);
     REQUIRE(commitments_data[0] == -commitments_data[1]);
   }
 
@@ -197,18 +197,18 @@ static void test_ristretto255_pedersen_commitments_with_given_backend_and_no_gen
     const std::vector<uint64_t> data_3 = {
         scal * data_1[0] + data_2[0], scal * data_1[1] + data_2[1], scal * data_1[2] + data_2[2],
         scal * data_1[3] + data_2[3]};
-    const std::vector<sxt_sequence_descriptor> valid_descriptors = {
+    const sxt_sequence_descriptor valid_descriptors[] = {
         make_sequence_descriptor(data_1),
         make_sequence_descriptor(data_2),
         make_sequence_descriptor(data_3),
     };
-    const uint64_t num_sequences = valid_descriptors.size();
+    const uint64_t num_sequences = std::size(valid_descriptors);
 
     // we verify that `c = scal * a + b` implies that `commit_c = scal * commit_a + commit_b`
     rstt::compressed_element commitments_data[num_sequences];
     sxt_curve25519_compute_pedersen_commitments(
         reinterpret_cast<sxt_ristretto255_compressed*>(commitments_data), num_sequences,
-        valid_descriptors.data(), offset_gens);
+        valid_descriptors, offset_gens);
 
     auto commit_a = commitments_data[0], commit_b = commitments_data[1],
          commit_c = commitments_data[0];
