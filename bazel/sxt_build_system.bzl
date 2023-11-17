@@ -1,5 +1,5 @@
 load("@rules_cuda//cuda:defs.bzl", "cuda_library", "cuda_objects")
-load("//bazel:cuda_test.bzl", "cuda_test")
+load("//bazel:cuda_test.bzl", "compute_sanitize_test")
 
 # CUDA_TOOLS_BUILD_FILE = """
 # package(default_visibility = [ "//visibility:public" ])
@@ -103,8 +103,9 @@ def sxt_cc_component(
             visibility = ["//visibility:public"],
             **kwargs
         )
-        cuda_test(
+        compute_sanitize_test(
           name = name + "_sanitize.t",
+          data = [name + ".t"],
         )
         # native.sh_test(
         #   name = name + "_sanitize.t",
