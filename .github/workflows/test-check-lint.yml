@@ -31,6 +31,16 @@ jobs:
 
       - name: Run cpp tests
         run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test //..."
+
+  test-cpp-compute-sanitizer:
+    name: C++ code with compute sanitizer
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run cpp tests
+        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test --run_under /src_tmp/tools/cuda/compute_sanitizer_wrapper.sh //..."
           
   test-cpp-opt:
     name: C++ code with optimizations
