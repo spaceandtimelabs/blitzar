@@ -105,7 +105,7 @@ def sxt_cc_component(
         )
         compute_sanitize_test(
           name = name + "_sanitize.t",
-          data = [name + ".t"],
+          data = name + ".t",
         )
 
 def sxt_cc_library(
