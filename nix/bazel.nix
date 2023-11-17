@@ -12,6 +12,7 @@ let
     "${pkgs.gnused}/bin"
     "${pkgs.gnugrep}/bin"
     "${pkgs.bash}/bin"
+    "${cuda}/bin"
   ];
   bazel = "${pkgs.bazel_6}/bin/bazel";
 in
