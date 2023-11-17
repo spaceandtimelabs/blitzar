@@ -53,7 +53,7 @@ jobs:
           -v $HOME/.cache_bazel_test:/root/.cache_bazel 
           -v "$PWD":/src:ro -w /src --gpus all 
           --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 
-          /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test --run_under /src_tmp/tools/cuda/compute_sanitizer_wrapper.sh //... -//cbindings:inner_product_proof.t -//sxt/multiexp/multiproduct_gpu:kernel.t"
+          /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test --run_under /src_tmp/tools/cuda/compute_sanitizer_wrapper.sh //... -- -//cbindings:inner_product_proof.t -//sxt/multiexp/multiproduct_gpu:kernel.t"
           
   test-cpp-opt:
     name: C++ code with optimizations
