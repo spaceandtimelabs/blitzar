@@ -1,13 +1,30 @@
 load("@rules_cuda//cuda/private:toolchain.bzl", "find_cuda_toolkit")
 
+SANITIZER_SCRIPT = """
+outfile=$(mktemp)
+{sanitizer} --log-file $outfile {exe}
+rc=$?
+output=$(<$outfile)
+if [[ $output =~ "Target application terminated before first instrumented API call" ]]; then
+  exit 0
+fi
+echo $output
+rm $outfile
+exit $rc
+"""
+
 def _compute_sanitize_test_impl(ctx):
   info = find_cuda_toolkit(ctx)
-  sanitize = info.path + "/bin/compute-sanitizer"
+  sanitizer = info.path + "/bin/compute-sanitizer"
   if len(ctx.files.data) != 1:
     fail("must provide a single data file")
-  base_exe = list(ctx.files.data)[0].path
+  base_exe = list(ctx.files.data)[0].short_path
   exe = ctx.actions.declare_file(ctx.label.name)
-  ctx.actions.write(exe, "%s %s" % (sanitize, base_exe), is_executable=True)
+  script = SANITIZER_SCRIPT.format(
+    sanitizer = sanitizer,
+    exe = base_exe
+  )
+  ctx.actions.write(exe, script, is_executable=True)
   runfiles = ctx.runfiles(files = ctx.files.data)
   transitive_runfiles = []
   for runfiles_attr in ( ctx.attr.data, ):

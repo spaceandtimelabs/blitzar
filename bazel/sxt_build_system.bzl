@@ -107,19 +107,6 @@ def sxt_cc_component(
           name = name + "_sanitize.t",
           data = [name + ".t"],
         )
-        # native.sh_test(
-        #   name = name + "_sanitize.t",
-        #   srcs = [
-        #     "//bazel:sanitize_test.sh",
-        #   ],
-        #   args = [
-        #     "$(location @cuda_tools//:compute_sanitizer)", 
-        #     "2",
-        #   ],
-        #   data = [
-        #     "@cuda_tools//:compute_sanitizer",
-        #   ],
-        # )
 
 def sxt_cc_library(
         name,
