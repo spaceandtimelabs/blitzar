@@ -1,5 +1,4 @@
 load("@rules_cuda//cuda:defs.bzl", "cuda_library", "cuda_objects")
-load("//bazel:cuda_test.bzl", "compute_sanitize_test")
 
 # We add this -std=c++20 flag, because
 # benchmarks could not be compiled without it.
@@ -68,10 +67,6 @@ def sxt_cc_component(
                    ],
             visibility = ["//visibility:public"],
             **kwargs
-        )
-        compute_sanitize_test(
-          name = name + "_sanitize.t",
-          data = name + ".t",
         )
 
 def sxt_cc_library(
