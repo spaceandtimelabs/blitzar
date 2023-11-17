@@ -3,6 +3,11 @@ config_setting(
     values = {"define": "SXT_PORTABLE_GLIBC=1"},
 )
 
+config_setting(
+    name = "compute_sanitize",
+    values = {"define": "COMPUTE_SANITIZE=1"},
+)
+
 # Uses method described in this stackoverflow post
 # https://stackoverflow.com/a/5977518/4447365
 # and https://github.com/lightstep/lightstep-tracer-cpp/blob/master/bazel/BUILD#L20-L36

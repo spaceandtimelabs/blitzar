@@ -40,6 +40,8 @@ build:asan --copt -fno-omit-frame-pointer
 build:asan --copt -fsanitize=address
 build:asan --linkopt -fsanitize=address
 
+build:csan --copt -DCOMPUTE_SANITIZER=1
+
 # For asan to work with cuda, we need to add this option
 # See https://github.com/google/sanitizers/issues/629#issuecomment-161357276
 test:asan --action_env=ASAN_OPTIONS=protect_shadow_gap=0
