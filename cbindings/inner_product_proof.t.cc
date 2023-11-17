@@ -184,7 +184,7 @@ test_prove_and_verify_with_given_generators_offset(uint64_t generators_offset) n
   }
 
   SECTION("We can prove and verify random proofs of varying size") {
-    for (size_t n : {3, 7}) {
+    for (size_t n = 3; n <= 9; ++n) {
       test_prove_and_verify_with_given_n(n, generators_offset);
     }
   }
