@@ -5,11 +5,10 @@ outfile=$(mktemp)
 {sanitizer} --log-file $outfile {exe}
 rc=$?
 output=$(<$outfile)
+rm $outfile
 if [[ $output =~ "Target application terminated before first instrumented API call" ]]; then
   exit 0
 fi
-echo $output
-rm $outfile
 exit $rc
 """
 
