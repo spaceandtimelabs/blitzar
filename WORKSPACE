@@ -25,8 +25,6 @@ git_repository(
 )
 
 load("@rules_cuda//cuda:repositories.bzl", "register_detected_cuda_toolchains", "rules_cuda_dependencies")
-# load("//bazel:sxt_build_system.bzl", "cuda_tools")
-# cuda_tools(name = "cuda_tools")
 
 rules_cuda_dependencies()
 
