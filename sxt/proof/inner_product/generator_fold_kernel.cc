@@ -23,6 +23,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/proof/inner_product/generator_fold.h"
@@ -53,12 +54,26 @@ static xena::future<> fold_generators_partial(basct::span<c21t::element_p3> g_ve
   auto decomposition_data = decomposition_gpu.data();
   auto decomposition_size = static_cast<unsigned>(decomposition.size());
 
-  // f
+  // launch kernel
+  auto data = partial_g_vector.data();
+  auto f = [
+               // clang-format off
+    data,
+    decomposition_data,
+    decomposition_size
+               // clang-format on
+  ] __device__
+           __host__(unsigned partial_size, unsigned i) noexcept {
+             fold_generators(data[i],
+                             basct::cspan<unsigned>{decomposition_data, decomposition_size},
+                             data[i], data[i + partial_size]);
+           };
+  algi::launch_for_each_kernel(stream, f, partial_size);
 
-  (void)g_vector;
-  (void)g_vector_p;
-  (void)decomposition;
-  return {};
+  // copy result
+  basdv::async_copy_device_to_host(g_vector_p.subspan(rng.a(), partial_size), partial_g_vector,
+                                   stream);
+  return xendv::await_and_own_stream(std::move(stream));
 }
 
 //--------------------------------------------------------------------------------------------------
