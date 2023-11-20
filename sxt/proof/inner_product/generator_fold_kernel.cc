@@ -17,15 +17,50 @@
 #include "sxt/proof/inner_product/generator_fold_kernel.h"
 
 #include "sxt/algorithm/iteration/for_each.h"
+#include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/iterator/index_range.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/proof/inner_product/generator_fold.h"
 
 namespace sxt::prfip {
+//--------------------------------------------------------------------------------------------------
+// fold_generators_partial 
+//--------------------------------------------------------------------------------------------------
+static xena::future<> fold_generators_partial(basct::span<c21t::element_p3> g_vector_p,
+                                              basct::cspan<c21t::element_p3> g_vector,
+                                              basct::cspan<unsigned> decomposition,
+                                              basit::index_range rng) noexcept {
+  auto n = g_vector.size();
+  auto partial_size = rng.size();
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+
+  // partial_g_vector
+  memmg::managed_array<c21t::element_p3> partial_g_vector{2u * partial_size, &resource};
+  basdv::async_copy_host_to_device(basct::subspan(partial_g_vector, 0, partial_size),
+                                   g_vector.subspan(rng.a(), partial_size), stream);
+  basdv::async_copy_host_to_device(basct::subspan(partial_g_vector, partial_size),
+                                   g_vector.subspan(rng.a() + n, partial_size), stream);
+
+  // decomposition_gpu
+  memmg::managed_array<unsigned> decomposition_gpu{decomposition.size(), &resource};
+  basdv::async_copy_host_to_device(decomposition_gpu, decomposition, stream);
+  auto decomposition_data = decomposition_gpu.data();
+  auto decomposition_size = static_cast<unsigned>(decomposition.size());
+
+  // f
+
+  (void)g_vector;
+  (void)g_vector_p;
+  (void)decomposition;
+  return {};
+}
+
 //--------------------------------------------------------------------------------------------------
 // fold_generators
 //--------------------------------------------------------------------------------------------------
@@ -60,5 +95,26 @@ xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector,
                              data[i], data[i + n]);
            };
   return algi::for_each(std::move(stream), f, n);
+}
+
+xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector_p,
+                                   basct::cspan<c21t::element_p3> g_vector,
+                                   basct::cspan<unsigned> decomposition) noexcept {
+  auto n = g_vector_p.size();
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      n > 0 &&
+      g_vector_p.size() == n &&
+      g_vector.size() == 2u * n &&
+      basdv::is_host_pointer(g_vector_p.data()) &&
+      basdv::is_host_pointer(g_vector.data()) &&
+      basdv::is_host_pointer(decomposition.data())
+      // clang-format on
+  );
+  (void)g_vector_p;
+  (void)g_vector;
+  (void)decomposition;
+  (void)fold_generators_partial;
+  return {};
 }
 } // namespace sxt::prfip

@@ -108,9 +108,11 @@ sxt_cc_component(
     impl_deps = [
         ":generator_fold",
         "//sxt/algorithm/iteration:for_each",
+        "//sxt/base/container:span_utility",
         "//sxt/base/device:memory_utility",
         "//sxt/base/error:assert",
         "//sxt/base/device:stream",
+        "//sxt/base/iterator:index_range",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/curve21/type:element_p3",
