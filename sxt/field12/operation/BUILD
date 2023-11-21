@@ -10,6 +10,7 @@ sxt_cc_component(
         "//sxt/field12/constant:zero",
     ],
     deps = [
+        "//sxt/base/field:arithmetic_utility",
         "//sxt/base/macro:cuda_callable",
         "//sxt/field12/base:arithmetic_utility",
         "//sxt/field12/type:element",
@@ -55,7 +56,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "mul",
     impl_deps = [
-        "//sxt/field12/base:arithmetic_utility",
+        "//sxt/base/field:arithmetic_utility",
         "//sxt/field12/base:reduce",
         "//sxt/field12/type:element",
     ],
@@ -73,7 +74,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "neg",
     impl_deps = [
-        "//sxt/field12/base:arithmetic_utility",
+        "//sxt/base/field:arithmetic_utility",
         "//sxt/field12/base:constants",
         "//sxt/field12/type:element",
     ],
@@ -127,6 +128,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "square",
     impl_deps = [
+        "//sxt/base/field:arithmetic_utility",
         "//sxt/field12/base:arithmetic_utility",
         "//sxt/field12/base:reduce",
         "//sxt/field12/type:element",

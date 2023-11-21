@@ -25,66 +25,23 @@
  */
 #pragma once
 
+#include "sxt/base/field/arithmetic_utility.h"
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/base/type/int.h"
-#include "sxt/base/type/narrow_cast.h"
 #include "sxt/field12/base/constants.h"
 
 namespace sxt::f12b {
-//--------------------------------------------------------------------------------------------------
-// mac
-//--------------------------------------------------------------------------------------------------
-/*
- Compute a + (b * c) + carry, returning the result and the new carry over.
- */
-CUDA_CALLABLE void inline mac(uint64_t& ret, uint64_t& carry, const uint64_t a, const uint64_t b,
-                              const uint64_t c) noexcept {
-  uint128_t ret_tmp = uint128_t{a} + (uint128_t{b} * uint128_t{c}) + uint128_t{carry};
-
-  ret = bast::narrow_cast<uint64_t>(ret_tmp);
-  carry = bast::narrow_cast<uint64_t>((ret_tmp >> 64));
-}
-
-//--------------------------------------------------------------------------------------------------
-// adc
-//--------------------------------------------------------------------------------------------------
-/*
- Compute a + b + carry, returning the result and the new carry over.
- */
-CUDA_CALLABLE void inline adc(uint64_t& ret, uint64_t& carry, const uint64_t a, const uint64_t b,
-                              const uint64_t c) noexcept {
-  uint128_t ret_tmp = uint128_t{a} + uint128_t{b} + uint128_t{c};
-
-  ret = bast::narrow_cast<uint64_t>(ret_tmp);
-  carry = bast::narrow_cast<uint64_t>(ret_tmp >> 64);
-}
-
-//--------------------------------------------------------------------------------------------------
-// sbb
-//--------------------------------------------------------------------------------------------------
-/*
- Compute a - (b + borrow), returning the result and the new borrow.
- */
-CUDA_CALLABLE void inline sbb(uint64_t& ret, uint64_t& borrow, const uint64_t a,
-                              const uint64_t b) noexcept {
-  uint128_t ret_tmp = uint128_t{a} - (uint128_t{b} + uint128_t{(borrow >> 63)});
-
-  ret = bast::narrow_cast<uint64_t>(ret_tmp);
-  borrow = bast::narrow_cast<uint64_t>(ret_tmp >> 64);
-}
-
 //--------------------------------------------------------------------------------------------------
 // subtract_p
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE inline void subtract_p(uint64_t ret[6], const uint64_t a[6]) noexcept {
   uint64_t borrow{0};
 
-  sbb(ret[0], borrow, a[0], p_v[0]);
-  sbb(ret[1], borrow, a[1], p_v[1]);
-  sbb(ret[2], borrow, a[2], p_v[2]);
-  sbb(ret[3], borrow, a[3], p_v[3]);
-  sbb(ret[4], borrow, a[4], p_v[4]);
-  sbb(ret[5], borrow, a[5], p_v[5]);
+  basf::sbb(ret[0], borrow, a[0], p_v[0]);
+  basf::sbb(ret[1], borrow, a[1], p_v[1]);
+  basf::sbb(ret[2], borrow, a[2], p_v[2]);
+  basf::sbb(ret[3], borrow, a[3], p_v[3]);
+  basf::sbb(ret[4], borrow, a[4], p_v[4]);
+  basf::sbb(ret[5], borrow, a[5], p_v[5]);
 
   // If underflow occurred on the final limb, borrow = 0xfff...fff, otherwise
   // borrow = 0x000...000. Thus, we use it as a mask!
