@@ -13,11 +13,18 @@
         config.allowUnfree = true;
         config.cudaSupport = true;
       };
+      shell = import ./nix/shell.nix { inherit pkgs; };
     in
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
-      devShells.${system}.default = import ./nix/shell.nix {
-        inherit pkgs;
+      devShells.${system}.default = shell;
+      packages.${system}.docker = pkgs.dockerTools.buildImage {
+        name = "blitzar";
+        config = {
+          Cmd = [
+            "${pkgs.bash}/bin/bash"
+          ];
+        };
       };
     };
 }
