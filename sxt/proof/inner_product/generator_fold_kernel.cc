@@ -23,7 +23,11 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range.h"
+#include "sxt/base/iterator/index_range_iterator.h"
+#include "sxt/base/iterator/index_range_utility.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/for_each.h"
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
@@ -95,8 +99,25 @@ xena::future<void> fold_generators_impl(basct::span<c21t::element_p3> g_vector_p
       basdv::is_host_pointer(decomposition.data())
       // clang-format on
   );
-  (void)split_factor;
-  return {};
+
+  // Pick some reasonable values for min and max chunk size so that
+  // we don't run out of GPU memory or split computations that are
+  // too small.
+  //
+  // Note: These haven't been informed by much benchmarking. I'm
+  // sure there are better values. This is just putting in some
+  // ballpark estimates to get started.
+  size_t min_chunk_size = 1ull << 9u;
+  size_t max_chunk_size = 1ull << 18u;
+
+  auto [first, last] = basit::split(
+      basit::index_range{0, n}.min_chunk_size(min_chunk_size).max_chunk_size(max_chunk_size),
+      split_factor);
+
+  co_await xendv::concurrent_for_each(
+      first, last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+        co_await fold_generators_partial(g_vector_p, g_vector, decomposition, rng);
+      });
 }
 
 //--------------------------------------------------------------------------------------------------
