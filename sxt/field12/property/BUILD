@@ -6,7 +6,7 @@ load(
 sxt_cc_component(
     name = "lexicographically_largest",
     impl_deps = [
-        "//sxt/field12/base:arithmetic_utility",
+        "//sxt/base/field:arithmetic_utility",
         "//sxt/field12/base:reduce",
         "//sxt/field12/type:element",
     ],

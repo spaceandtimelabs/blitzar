@@ -10,9 +10,8 @@ sxt_cc_component(
     ],
     deps = [
         ":constants",
+        "//sxt/base/field:arithmetic_utility",
         "//sxt/base/macro:cuda_callable",
-        "//sxt/base/type:int",
-        "//sxt/base/type:narrow_cast",
     ],
 )
 
@@ -42,9 +41,9 @@ sxt_cc_component(
 sxt_cc_component(
     name = "montgomery",
     impl_deps = [
-        ":arithmetic_utility",
         ":constants",
         ":reduce",
+        "//sxt/base/field:arithmetic_utility",
     ],
     is_cuda = True,
     test_deps = [
@@ -61,6 +60,7 @@ sxt_cc_component(
     impl_deps = [
         ":arithmetic_utility",
         ":constants",
+        "//sxt/base/field:arithmetic_utility",
         "//sxt/base/type:narrow_cast",
     ],
     is_cuda = True,
