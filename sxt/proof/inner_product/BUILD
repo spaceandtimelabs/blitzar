@@ -110,6 +110,7 @@ sxt_cc_component(
         "//sxt/algorithm/iteration:for_each",
         "//sxt/base/container:span_utility",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/device:property",
         "//sxt/base/error:assert",
         "//sxt/base/device:stream",
         "//sxt/base/iterator:index_range",

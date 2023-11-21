@@ -19,6 +19,7 @@
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range.h"
@@ -77,6 +78,28 @@ static xena::future<> fold_generators_partial(basct::span<c21t::element_p3> g_ve
 }
 
 //--------------------------------------------------------------------------------------------------
+// fold_generators_impl 
+//--------------------------------------------------------------------------------------------------
+xena::future<void> fold_generators_impl(basct::span<c21t::element_p3> g_vector_p,
+                                        basct::cspan<c21t::element_p3> g_vector,
+                                        basct::cspan<unsigned> decomposition,
+                                        size_t split_factor) noexcept {
+  auto n = g_vector_p.size();
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      n > 0 &&
+      g_vector_p.size() == n &&
+      g_vector.size() == 2u * n &&
+      basdv::is_host_pointer(g_vector_p.data()) &&
+      basdv::is_host_pointer(g_vector.data()) &&
+      basdv::is_host_pointer(decomposition.data())
+      // clang-format on
+  );
+  (void)split_factor;
+  return {};
+}
+
+//--------------------------------------------------------------------------------------------------
 // fold_generators
 //--------------------------------------------------------------------------------------------------
 xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector,
@@ -115,21 +138,6 @@ xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector,
 xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector_p,
                                    basct::cspan<c21t::element_p3> g_vector,
                                    basct::cspan<unsigned> decomposition) noexcept {
-  auto n = g_vector_p.size();
-  SXT_DEBUG_ASSERT(
-      // clang-format off
-      n > 0 &&
-      g_vector_p.size() == n &&
-      g_vector.size() == 2u * n &&
-      basdv::is_host_pointer(g_vector_p.data()) &&
-      basdv::is_host_pointer(g_vector.data()) &&
-      basdv::is_host_pointer(decomposition.data())
-      // clang-format on
-  );
-  (void)g_vector_p;
-  (void)g_vector;
-  (void)decomposition;
-  (void)fold_generators_partial;
-  return {};
+  return fold_generators_impl(g_vector_p, g_vector, decomposition, basdv::get_num_devices());
 }
 } // namespace sxt::prfip
