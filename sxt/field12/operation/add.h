@@ -27,6 +27,7 @@
 
 #include <cstdint>
 
+#include "sxt/base/field/arithmetic_utility.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/field12/base/arithmetic_utility.h"
 #include "sxt/field12/type/element.h"
@@ -40,12 +41,12 @@ CUDA_CALLABLE inline void add(f12t::element& h, const f12t::element& f,
   uint64_t h_tmp[6] = {};
   uint64_t carry{0};
 
-  f12b::adc(h_tmp[0], carry, f[0], g[0], carry);
-  f12b::adc(h_tmp[1], carry, f[1], g[1], carry);
-  f12b::adc(h_tmp[2], carry, f[2], g[2], carry);
-  f12b::adc(h_tmp[3], carry, f[3], g[3], carry);
-  f12b::adc(h_tmp[4], carry, f[4], g[4], carry);
-  f12b::adc(h_tmp[5], carry, f[5], g[5], carry);
+  basf::adc(h_tmp[0], carry, f[0], g[0], carry);
+  basf::adc(h_tmp[1], carry, f[1], g[1], carry);
+  basf::adc(h_tmp[2], carry, f[2], g[2], carry);
+  basf::adc(h_tmp[3], carry, f[3], g[3], carry);
+  basf::adc(h_tmp[4], carry, f[4], g[4], carry);
+  basf::adc(h_tmp[5], carry, f[5], g[5], carry);
 
   f12b::subtract_p(h.data(), h_tmp);
 }
