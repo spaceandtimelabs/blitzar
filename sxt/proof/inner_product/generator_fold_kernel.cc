@@ -87,7 +87,9 @@ static xena::future<> fold_generators_partial(basct::span<c21t::element_p3> g_ve
 xena::future<void> fold_generators_impl(basct::span<c21t::element_p3> g_vector_p,
                                         basct::cspan<c21t::element_p3> g_vector,
                                         basct::cspan<unsigned> decomposition,
-                                        size_t split_factor) noexcept {
+                                        size_t split_factor,
+                                        size_t min_chunk_size,
+                                        size_t max_chunk_size) noexcept {
   auto n = g_vector_p.size();
   SXT_DEBUG_ASSERT(
       // clang-format off
@@ -99,16 +101,6 @@ xena::future<void> fold_generators_impl(basct::span<c21t::element_p3> g_vector_p
       basdv::is_host_pointer(decomposition.data())
       // clang-format on
   );
-
-  // Pick some reasonable values for min and max chunk size so that
-  // we don't run out of GPU memory or split computations that are
-  // too small.
-  //
-  // Note: These haven't been informed by much benchmarking. I'm
-  // sure there are better values. This is just putting in some
-  // ballpark estimates to get started.
-  size_t min_chunk_size = 1ull << 9u;
-  size_t max_chunk_size = 1ull << 18u;
 
   auto [first, last] = basit::split(
       basit::index_range{0, n}.min_chunk_size(min_chunk_size).max_chunk_size(max_chunk_size),
@@ -159,6 +151,17 @@ xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector,
 xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector_p,
                                    basct::cspan<c21t::element_p3> g_vector,
                                    basct::cspan<unsigned> decomposition) noexcept {
-  return fold_generators_impl(g_vector_p, g_vector, decomposition, basdv::get_num_devices());
+
+  // Pick some reasonable values for min and max chunk size so that
+  // we don't run out of GPU memory or split computations that are
+  // too small.
+  //
+  // Note: These haven't been informed by much benchmarking. I'm
+  // sure there are better values. This is just putting in some
+  // ballpark estimates to get started.
+  size_t min_chunk_size = 1ull << 9u;
+  size_t max_chunk_size = 1ull << 18u;
+  return fold_generators_impl(g_vector_p, g_vector, decomposition, basdv::get_num_devices(),
+                              min_chunk_size, max_chunk_size);
 }
 } // namespace sxt::prfip
