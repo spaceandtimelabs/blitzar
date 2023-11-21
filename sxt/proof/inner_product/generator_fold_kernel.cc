@@ -41,7 +41,7 @@ static xena::future<> fold_generators_partial(basct::span<c21t::element_p3> g_ve
                                               basct::cspan<c21t::element_p3> g_vector,
                                               basct::cspan<unsigned> decomposition,
                                               basit::index_range rng) noexcept {
-  auto n = g_vector.size();
+  auto n = g_vector_p.size();
   auto partial_size = rng.size();
   basdv::stream stream;
   memr::async_device_resource resource{stream};
@@ -76,8 +76,8 @@ static xena::future<> fold_generators_partial(basct::span<c21t::element_p3> g_ve
   algi::launch_for_each_kernel(stream, f, partial_size);
 
   // copy result
-  basdv::async_copy_device_to_host(g_vector_p.subspan(rng.a(), partial_size), partial_g_vector,
-                                   stream);
+  basdv::async_copy_device_to_host(g_vector_p.subspan(rng.a(), partial_size),
+                                   basct::subspan(partial_g_vector, 0, partial_size), stream);
   return xendv::await_and_own_stream(std::move(stream));
 }
 

@@ -124,10 +124,21 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
     ],
     is_cuda = True,
-    with_test = False,
     deps = [
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
+    ],
+    test_deps = [
+        ":generator_fold",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/scalar25/constant:max_bits",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:overload",
+        "//sxt/ristretto/operation:compression",
+        "//sxt/ristretto/type:literal",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:literal",
     ],
 )
 
