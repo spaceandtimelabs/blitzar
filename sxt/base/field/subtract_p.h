@@ -40,7 +40,7 @@ CUDA_CALLABLE inline void subtract_p(uint64_t* ret, const uint64_t* const a,
                                      const uint64_t* const p) noexcept {
   uint64_t borrow{0};
 
-  for (size_t limb{0}; limb < limbs; ++limb) {
+  for (size_t limb = 0; limb < limbs; ++limb) {
     sbb(ret[limb], borrow, a[limb], p[limb]);
   }
 
@@ -48,7 +48,7 @@ CUDA_CALLABLE inline void subtract_p(uint64_t* ret, const uint64_t* const a,
   // borrow = 0x000...000. Thus, we use it as a mask!
   uint64_t mask{borrow == 0x0 ? (borrow - 1) : 0x0};
 
-  for (size_t limb{0}; limb < limbs; ++limb) {
+  for (size_t limb = 0; limb < limbs; ++limb) {
     ret[limb] = (a[limb] & borrow) | (ret[limb] & mask);
   }
 }
