@@ -18,7 +18,7 @@
 
 #include "sxt/base/test/unit_test.h"
 
-using namespace sxt::basf;
+using namespace sxt::basfld;
 
 TEST_CASE("mac (multiplication and carry) can handle computation") {
   SECTION("with minimum values") {

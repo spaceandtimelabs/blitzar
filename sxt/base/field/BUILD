@@ -14,3 +14,14 @@ sxt_cc_component(
         "//sxt/base/type:narrow_cast",
     ],
 )
+
+sxt_cc_component(
+    name = "subtract_p",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":arithmetic_utility",
+        "//sxt/base/macro:cuda_callable",
+    ],
+)

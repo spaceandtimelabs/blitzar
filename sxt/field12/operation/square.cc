@@ -26,7 +26,6 @@
 #include "sxt/field12/operation/square.h"
 
 #include "sxt/base/field/arithmetic_utility.h"
-#include "sxt/field12/base/arithmetic_utility.h"
 #include "sxt/field12/base/reduce.h"
 #include "sxt/field12/type/element.h"
 
@@ -39,33 +38,33 @@ void square(f12t::element& h, const f12t::element& f) noexcept {
   uint64_t t[12] = {};
   uint64_t carry{0};
 
-  basf::mac(t[1], carry, 0, f[0], f[1]);
-  basf::mac(t[2], carry, 0, f[0], f[2]);
-  basf::mac(t[3], carry, 0, f[0], f[3]);
-  basf::mac(t[4], carry, 0, f[0], f[4]);
-  basf::mac(t[5], carry, 0, f[0], f[5]);
+  basfld::mac(t[1], carry, 0, f[0], f[1]);
+  basfld::mac(t[2], carry, 0, f[0], f[2]);
+  basfld::mac(t[3], carry, 0, f[0], f[3]);
+  basfld::mac(t[4], carry, 0, f[0], f[4]);
+  basfld::mac(t[5], carry, 0, f[0], f[5]);
   t[6] = carry;
   carry = 0;
 
-  basf::mac(t[3], carry, t[3], f[1], f[2]);
-  basf::mac(t[4], carry, t[4], f[1], f[3]);
-  basf::mac(t[5], carry, t[5], f[1], f[4]);
-  basf::mac(t[6], carry, t[6], f[1], f[5]);
+  basfld::mac(t[3], carry, t[3], f[1], f[2]);
+  basfld::mac(t[4], carry, t[4], f[1], f[3]);
+  basfld::mac(t[5], carry, t[5], f[1], f[4]);
+  basfld::mac(t[6], carry, t[6], f[1], f[5]);
   t[7] = carry;
   carry = 0;
 
-  basf::mac(t[5], carry, t[5], f[2], f[3]);
-  basf::mac(t[6], carry, t[6], f[2], f[4]);
-  basf::mac(t[7], carry, t[7], f[2], f[5]);
+  basfld::mac(t[5], carry, t[5], f[2], f[3]);
+  basfld::mac(t[6], carry, t[6], f[2], f[4]);
+  basfld::mac(t[7], carry, t[7], f[2], f[5]);
   t[8] = carry;
   carry = 0;
 
-  basf::mac(t[7], carry, t[7], f[3], f[4]);
-  basf::mac(t[8], carry, t[8], f[3], f[5]);
+  basfld::mac(t[7], carry, t[7], f[3], f[4]);
+  basfld::mac(t[8], carry, t[8], f[3], f[5]);
   t[9] = carry;
   carry = 0;
 
-  basf::mac(t[9], carry, t[9], f[4], f[5]);
+  basfld::mac(t[9], carry, t[9], f[4], f[5]);
   t[10] = carry;
   carry = 0;
 
@@ -81,18 +80,18 @@ void square(f12t::element& h, const f12t::element& f) noexcept {
   t[2] = (t[2] << 1) | (t[1] >> 63);
   t[1] = t[1] << 1;
 
-  basf::mac(t[0], carry, 0, f[0], f[0]);
-  basf::adc(t[1], carry, t[1], 0, carry);
-  basf::mac(t[2], carry, t[2], f[1], f[1]);
-  basf::adc(t[3], carry, t[3], 0, carry);
-  basf::mac(t[4], carry, t[4], f[2], f[2]);
-  basf::adc(t[5], carry, t[5], 0, carry);
-  basf::mac(t[6], carry, t[6], f[3], f[3]);
-  basf::adc(t[7], carry, t[7], 0, carry);
-  basf::mac(t[8], carry, t[8], f[4], f[4]);
-  basf::adc(t[9], carry, t[9], 0, carry);
-  basf::mac(t[10], carry, t[10], f[5], f[5]);
-  basf::adc(t[11], carry, t[11], 0, carry);
+  basfld::mac(t[0], carry, 0, f[0], f[0]);
+  basfld::adc(t[1], carry, t[1], 0, carry);
+  basfld::mac(t[2], carry, t[2], f[1], f[1]);
+  basfld::adc(t[3], carry, t[3], 0, carry);
+  basfld::mac(t[4], carry, t[4], f[2], f[2]);
+  basfld::adc(t[5], carry, t[5], 0, carry);
+  basfld::mac(t[6], carry, t[6], f[3], f[3]);
+  basfld::adc(t[7], carry, t[7], 0, carry);
+  basfld::mac(t[8], carry, t[8], f[4], f[4]);
+  basfld::adc(t[9], carry, t[9], 0, carry);
+  basfld::mac(t[10], carry, t[10], f[5], f[5]);
+  basfld::adc(t[11], carry, t[11], 0, carry);
 
   f12b::reduce(h.data(), t);
 }

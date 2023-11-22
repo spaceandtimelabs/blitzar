@@ -4,18 +4,6 @@ load(
 )
 
 sxt_cc_component(
-    name = "arithmetic_utility",
-    test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        ":constants",
-        "//sxt/base/field:arithmetic_utility",
-        "//sxt/base/macro:cuda_callable",
-    ],
-)
-
-sxt_cc_component(
     name = "byte_conversion",
     impl_deps = [
         ":montgomery",
@@ -58,9 +46,9 @@ sxt_cc_component(
 sxt_cc_component(
     name = "reduce",
     impl_deps = [
-        ":arithmetic_utility",
         ":constants",
         "//sxt/base/field:arithmetic_utility",
+        "//sxt/base/field:subtract_p",
         "//sxt/base/type:narrow_cast",
     ],
     is_cuda = True,
