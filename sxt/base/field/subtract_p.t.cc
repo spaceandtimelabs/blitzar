@@ -14,19 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field12/base/arithmetic_utility.h"
+#include "sxt/base/field/subtract_p.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/base/constants.h"
 
-using namespace sxt::f12b;
+using namespace sxt::basf;
 
 TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
+  constexpr std::array<uint64_t, 6> p{0xb9feffffffffaaab, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,
+                                      0x64774b84f38512bf, 0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
+
   SECTION("with minimum value") {
     constexpr std::array<uint64_t, 6> a = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
     std::array<uint64_t, 6> ret;
 
-    subtract_p(ret.data(), a.data());
+    subtract_p<6>(ret.data(), a.data(), p.data());
 
     REQUIRE(ret == a);
   }
@@ -37,7 +39,7 @@ TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
                                            0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
     std::array<uint64_t, 6> ret;
 
-    subtract_p(ret.data(), a.data());
+    subtract_p<6>(ret.data(), a.data(), p.data());
 
     REQUIRE(ret == a);
   }
@@ -46,7 +48,7 @@ TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
     constexpr std::array<uint64_t, 6> expect = {0, 0, 0, 0, 0, 0};
     std::array<uint64_t, 6> ret;
 
-    subtract_p(ret.data(), p_v.data());
+    subtract_p<6>(ret.data(), p.data(), p.data());
 
     REQUIRE(expect == ret);
   }
@@ -58,7 +60,7 @@ TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
     constexpr std::array<uint64_t, 6> expect = {0x3, 0x0, 0x0, 0x0, 0x0, 0x0};
     std::array<uint64_t, 6> ret;
 
-    subtract_p(ret.data(), a.data());
+    subtract_p<6>(ret.data(), a.data(), p.data());
 
     REQUIRE(expect == ret);
   }
@@ -72,7 +74,7 @@ TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
                                                 0xb4e45849bcb45328, 0xe5feee15c6801965};
     std::array<uint64_t, 6> ret;
 
-    subtract_p(ret.data(), a.data());
+    subtract_p<6>(ret.data(), a.data(), p.data());
 
     REQUIRE(expect == ret);
   }

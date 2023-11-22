@@ -26,8 +26,8 @@
 #include "sxt/field12/base/reduce.h"
 
 #include "sxt/base/field/arithmetic_utility.h"
+#include "sxt/base/field/subtract_p.h"
 #include "sxt/base/type/narrow_cast.h"
-#include "sxt/field12/base/arithmetic_utility.h"
 #include "sxt/field12/base/constants.h"
 
 namespace sxt::f12b {
@@ -101,7 +101,7 @@ CUDA_CALLABLE void reduce(uint64_t h[6], const uint64_t t[12]) noexcept {
   // Attempt to subtract the modulus,
   // to ensure the value is smaller than the modulus.
   uint64_t a[6] = {ret[6], ret[7], ret[8], ret[9], ret[10], ret[11]};
-  subtract_p(h, a);
+  basf::subtract_p<6>(h, a, p_v.data());
 }
 
 //--------------------------------------------------------------------------------------------------

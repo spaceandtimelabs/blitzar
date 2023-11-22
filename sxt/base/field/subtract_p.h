@@ -27,30 +27,29 @@
 
 #include "sxt/base/field/arithmetic_utility.h"
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/field12/base/constants.h"
 
-namespace sxt::f12b {
+namespace sxt::basf {
 //--------------------------------------------------------------------------------------------------
 // subtract_p
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE inline void subtract_p(uint64_t ret[6], const uint64_t a[6]) noexcept {
+/*
+ Compute ret = a - p, where p is the modulus.
+ */
+template <const size_t limbs>
+CUDA_CALLABLE inline void subtract_p(uint64_t* ret, const uint64_t* const a,
+                                     const uint64_t* const p) noexcept {
   uint64_t borrow{0};
 
-  basf::sbb(ret[0], borrow, a[0], p_v[0]);
-  basf::sbb(ret[1], borrow, a[1], p_v[1]);
-  basf::sbb(ret[2], borrow, a[2], p_v[2]);
-  basf::sbb(ret[3], borrow, a[3], p_v[3]);
-  basf::sbb(ret[4], borrow, a[4], p_v[4]);
-  basf::sbb(ret[5], borrow, a[5], p_v[5]);
+  for (size_t limb{0}; limb < limbs; ++limb) {
+    sbb(ret[limb], borrow, a[limb], p[limb]);
+  }
 
   // If underflow occurred on the final limb, borrow = 0xfff...fff, otherwise
   // borrow = 0x000...000. Thus, we use it as a mask!
   uint64_t mask{borrow == 0x0 ? (borrow - 1) : 0x0};
-  ret[0] = (a[0] & borrow) | (ret[0] & mask);
-  ret[1] = (a[1] & borrow) | (ret[1] & mask);
-  ret[2] = (a[2] & borrow) | (ret[2] & mask);
-  ret[3] = (a[3] & borrow) | (ret[3] & mask);
-  ret[4] = (a[4] & borrow) | (ret[4] & mask);
-  ret[5] = (a[5] & borrow) | (ret[5] & mask);
+
+  for (size_t limb{0}; limb < limbs; ++limb) {
+    ret[limb] = (a[limb] & borrow) | (ret[limb] & mask);
+  }
 }
-} // namespace sxt::f12b
+} // namespace sxt::basf

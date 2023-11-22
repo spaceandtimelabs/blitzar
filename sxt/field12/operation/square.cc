@@ -26,7 +26,6 @@
 #include "sxt/field12/operation/square.h"
 
 #include "sxt/base/field/arithmetic_utility.h"
-#include "sxt/field12/base/arithmetic_utility.h"
 #include "sxt/field12/base/reduce.h"
 #include "sxt/field12/type/element.h"
 
