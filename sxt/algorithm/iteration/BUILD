@@ -44,5 +44,9 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
+      "//sxt/algorithm/base:transform_functor",
+      "//sxt/base/container:span",
+      "//sxt/base/iterator:chunk_options",
+      "//sxt/base/type:value_type",
     ],
 )

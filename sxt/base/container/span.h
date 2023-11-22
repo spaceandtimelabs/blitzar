@@ -39,6 +39,8 @@ namespace sxt::basct {
  */
 template <class T> class span {
 public:
+  using value_type = T;
+
   CUDA_CALLABLE
   span() noexcept : size_{0}, data_{nullptr} {}
 
