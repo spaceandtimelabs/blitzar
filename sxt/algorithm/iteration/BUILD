@@ -37,3 +37,12 @@ sxt_cc_component(
         "//sxt/execution/kernel:kernel_dims",
     ],
 )
+
+sxt_cc_component(
+    name = "transform",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+    ],
+)
