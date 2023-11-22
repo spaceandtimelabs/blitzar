@@ -42,13 +42,13 @@ CUDA_CALLABLE inline void add(f12t::element& h, const f12t::element& f,
   uint64_t h_tmp[6] = {};
   uint64_t carry{0};
 
-  basf::adc(h_tmp[0], carry, f[0], g[0], carry);
-  basf::adc(h_tmp[1], carry, f[1], g[1], carry);
-  basf::adc(h_tmp[2], carry, f[2], g[2], carry);
-  basf::adc(h_tmp[3], carry, f[3], g[3], carry);
-  basf::adc(h_tmp[4], carry, f[4], g[4], carry);
-  basf::adc(h_tmp[5], carry, f[5], g[5], carry);
+  basfld::adc(h_tmp[0], carry, f[0], g[0], carry);
+  basfld::adc(h_tmp[1], carry, f[1], g[1], carry);
+  basfld::adc(h_tmp[2], carry, f[2], g[2], carry);
+  basfld::adc(h_tmp[3], carry, f[3], g[3], carry);
+  basfld::adc(h_tmp[4], carry, f[4], g[4], carry);
+  basfld::adc(h_tmp[5], carry, f[5], g[5], carry);
 
-  basf::subtract_p<6>(h.data(), h_tmp, f12b::p_v.data());
+  basfld::subtract_p<6>(h.data(), h_tmp, f12b::p_v.data());
 }
 } // namespace sxt::f12o

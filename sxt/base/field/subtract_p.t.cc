@@ -18,7 +18,7 @@
 
 #include "sxt/base/test/unit_test.h"
 
-using namespace sxt::basf;
+using namespace sxt::basfld;
 
 TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
   constexpr std::array<uint64_t, 6> p{0xb9feffffffffaaab, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,

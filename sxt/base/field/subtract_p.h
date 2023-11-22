@@ -28,7 +28,7 @@
 #include "sxt/base/field/arithmetic_utility.h"
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::basf {
+namespace sxt::basfld {
 //--------------------------------------------------------------------------------------------------
 // subtract_p
 //--------------------------------------------------------------------------------------------------
@@ -51,4 +51,4 @@ CUDA_CALLABLE inline void subtract_p(uint64_t* ret, const uint64_t* a, const uin
     ret[limb] = (a[limb] & borrow) | (ret[limb] & mask);
   }
 }
-} // namespace sxt::basf
+} // namespace sxt::basfld
