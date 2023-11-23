@@ -31,7 +31,8 @@
             name = "image-root";
             paths = [
               bazel
-              bash
+              bashInteractive
+              binutils
             ];
             pathsToLink = ["/bin"];
           };
