@@ -18,13 +18,29 @@
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
       devShells.${system}.default = shell;
-      packages.${system}.docker = pkgs.dockerTools.buildImage {
-        name = "blitzar";
-        config = {
-          Cmd = [
-            "${pkgs.bash}/bin/bash"
-          ];
+      packages.${system}.docker = 
+        let
+          clang = import ./nix/clang.nix { inherit pkgs; };
+          cuda = import ./nix/cuda.nix { inherit pkgs; };
+          bazel = import ./nix/bazel.nix { inherit pkgs; inherit clang; inherit cuda; };
+        in
+        with pkgs;
+        pkgs.dockerTools.buildImage {
+          name = "blitzar";
+          copyToRoot = pkgs.buildEnv {
+            name = "image-root";
+            paths = [
+              bazel
+              bash
+            ];
+            pathsToLink = ["/bin"];
+          };
+
+          config = {
+            Cmd = [
+              "/bin/bash"
+            ];
+          };
         };
-      };
     };
 }
