@@ -17,6 +17,7 @@
 #pragma once
 
 #include <concepts>
+#include <memory_resource>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/device/event.h"
@@ -70,6 +71,23 @@ event_future<basct::cspan<T>> make_active_device_viewable(memmg::managed_array<T
   auto do_allocate = [&](size_t n) noexcept {
     data_p.resize(n);
     return data_p.data();
+  };
+  return detail::make_active_device_viewable_impl<T>(do_allocate, cont);
+}
+
+/**
+ * Use winked-out allocations.
+ *
+ * Note: Be sure to use this with a compatible allocator.
+ * See section 3 of https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0089r1.pdf
+ */
+template <class T, class Cont>
+  requires std::convertible_to<Cont, basct::cspan<T>>
+event_future<basct::cspan<T>> make_active_device_viewable(std::pmr::polymorphic_allocator<> alloc,
+                                                          const Cont& cont) noexcept {
+  auto do_allocate = [&](size_t n) noexcept {
+    auto ptr = alloc.allocate_bytes(sizeof(T) * n, alignof(T));
+    return static_cast<T*>(ptr); 
   };
   return detail::make_active_device_viewable_impl<T>(do_allocate, cont);
 }

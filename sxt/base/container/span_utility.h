@@ -53,6 +53,7 @@ span<T> subspan(Cont&& cont, size_t offset, size_t size) noexcept
 /**
  * Convenience function for winked-out allocations.
  *
+ * Note: Be sure to use this with a compatible allocator.
  * See section 3 of https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0089r1.pdf
  */
 template <class T>
