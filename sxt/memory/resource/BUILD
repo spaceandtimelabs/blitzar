@@ -42,6 +42,11 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "counting_resource",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "chained_resource",
     impl_deps = [
         "//sxt/base/error:panic",
