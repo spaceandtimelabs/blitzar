@@ -18,6 +18,8 @@
 
 #include <concepts>
 
+#include "sxt/execution/async/future.h"
+
 namespace sxt::algb {
 //--------------------------------------------------------------------------------------------------
 // index_functor
@@ -27,6 +29,29 @@ concept index_functor = std::copy_constructible<F> &&
                         // clang-format off
   requires(const F f, unsigned n, unsigned i) {
     { f(n, i) } noexcept;
+  };
+// clang-format on
+
+//--------------------------------------------------------------------------------------------------
+// index_functor_factory
+//--------------------------------------------------------------------------------------------------
+namespace detail {
+template <class T> struct match_index_functor_future {
+  static constexpr bool value = false;
+};
+
+template <class F>
+  requires index_functor<F>
+struct match_index_functor_future<xena::future<F>> {
+  static constexpr bool value = true;
+};
+} // namespace detail
+
+template <class F>
+concept index_functor_factory = 
+                        // clang-format off
+  requires(const F f) {
+    requires detail::match_index_functor_future<decltype(f())>::value;
   };
 // clang-format on
 } // namespace sxt::algb
