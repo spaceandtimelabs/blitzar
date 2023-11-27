@@ -12,7 +12,9 @@ public:
 
   explicit counting_resource(std::pmr::memory_resource* upstream) noexcept;
 
-  ~counting_resource() noexcept;
+  size_t bytes_allocated() const noexcept { return bytes_allocated_; }
+
+  size_t bytes_deallocated() const noexcept { return bytes_deallocated_; }
 
 private:
   std::pmr::memory_resource* upstream_;
@@ -21,7 +23,7 @@ private:
 
   void* do_allocate(size_t bytes, size_t alignment) noexcept override;
 
-  void do_deallocate(void* ptr, size_t bytes, size_t alignment) noexcept;
+  void do_deallocate(void* ptr, size_t bytes, size_t alignment) noexcept override;
 
   bool do_is_equal(const std::pmr::memory_resource& other) const noexcept override;
 };

@@ -52,6 +52,7 @@ sxt_cc_component(
         "//sxt/base/error:panic",
     ],
     test_deps = [
+        ":counting_resource",
         "//sxt/base/test:unit_test",
     ],
 )

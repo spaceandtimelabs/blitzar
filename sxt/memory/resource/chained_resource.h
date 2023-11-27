@@ -22,7 +22,7 @@ private:
 
   void* do_allocate(size_t bytes, size_t alignment) noexcept override;
 
-  void do_deallocate(void* /*ptr*/, size_t /*bytes*/, size_t /*alignment*/) noexcept {
+  void do_deallocate(void* /*ptr*/, size_t /*bytes*/, size_t /*alignment*/) noexcept override {
     // destructor does bulk deallocation
   }
 
