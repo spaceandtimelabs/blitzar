@@ -32,12 +32,13 @@
 
 namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
-// make_active_device_viewable
+// make_active_device_viewable_impl
 //--------------------------------------------------------------------------------------------------
-template <class T, class Cont>
+namespace detail {
+template <class T, class F, class Cont>
   requires std::convertible_to<Cont, basct::cspan<T>>
-event_future<basct::cspan<T>> make_active_device_viewable(memmg::managed_array<T>& data_p,
-                                                          const Cont& cont) noexcept {
+event_future<basct::cspan<T>> make_active_device_viewable_impl(F do_allocate,
+                                                               const Cont& cont) noexcept {
   basct::cspan<T> data{cont};
   if (data.empty()) {
     return event_future<basct::cspan<T>>{std::move(data)};
@@ -48,7 +49,7 @@ event_future<basct::cspan<T>> make_active_device_viewable(memmg::managed_array<T
   if (attrs.device == active_device || attrs.kind == basdv::pointer_kind_t::managed) {
     return event_future<basct::cspan<T>>{std::move(data)};
   }
-  data_p.resize(data.size());
+  basct::span<T> data_p{do_allocate(data.size()), data.size()};
   basdv::stream stream;
   basdv::async_memcpy_to_device(data_p.data(), data.data(), sizeof(T) * data.size(), attrs, stream);
   basdv::event event;
@@ -56,5 +57,20 @@ event_future<basct::cspan<T>> make_active_device_viewable(memmg::managed_array<T
   computation_handle handle;
   handle.add_stream(std::move(stream));
   return event_future<basct::cspan<T>>{data_p, active_device, std::move(event), std::move(handle)};
+}
+} // namespace detail
+
+//--------------------------------------------------------------------------------------------------
+// make_active_device_viewable
+//--------------------------------------------------------------------------------------------------
+template <class T, class Cont>
+  requires std::convertible_to<Cont, basct::cspan<T>>
+event_future<basct::cspan<T>> make_active_device_viewable(memmg::managed_array<T>& data_p,
+                                                          const Cont& cont) noexcept {
+  auto do_allocate = [&](size_t n) noexcept {
+    data_p.resize(n);
+    return data_p.data();
+  };
+  return detail::make_active_device_viewable_impl<T>(do_allocate, cont);
 }
 } // namespace sxt::xendv
