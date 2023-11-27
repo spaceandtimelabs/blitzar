@@ -33,6 +33,9 @@ xena::future<> transform(basct::span<bast::value_type<Arg1>> res, F make_f,
       first, last, [&](const basit::index_range& rng) noexcept -> xena::future<> { 
       auto f_fut = make_f();
 
+      /* basdv::stream stream; */
+      /* memr::async_device_resource resource{stream}; */
+
       auto f = co_await std::move(f_fut);
       (void)f;
   });
