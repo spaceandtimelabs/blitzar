@@ -16,6 +16,19 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "element",
+    with_test = False,
+)
+
+sxt_cc_component(
+    name = "example_element",
+    test_deps = [
+        ":element",
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "subtract_p",
     test_deps = [
         "//sxt/base/test:unit_test",
