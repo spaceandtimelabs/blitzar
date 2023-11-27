@@ -13,5 +13,15 @@ concept transform_functor = std::copy_constructible<F> &&
     { f(x1, xrest...) } noexcept;
   };
 // clang-format on
-} // namespace sxt::algb
 
+//--------------------------------------------------------------------------------------------------
+// transform_functor_factory
+//--------------------------------------------------------------------------------------------------
+template <class F, class ArgFirst, class... ArgsRest>
+concept transform_functor_factory = 
+                        // clang-format off
+  requires(const F f) {
+    { f() } noexcept -> transform_functor<F, ArgFirst, ArgsRest...>;
+  };
+// clang-format on
+} // namespace sxt::algb
