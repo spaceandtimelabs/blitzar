@@ -36,6 +36,8 @@ public:
 
   event_future() noexcept = default;
 
+  event_future(event_future&&) noexcept = default;
+
   ~event_future() noexcept {
     if (event_) {
       (void)xena::future<T>{std::move(*this)};

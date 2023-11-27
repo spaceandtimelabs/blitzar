@@ -57,7 +57,7 @@ xena::future<> transform_impl(basct::span<T> res, basdv::stream&& stream, F f, F
 template <class F, class Arg1, class... ArgsRest>
   requires algb::transform_functor_factory<F, bast::value_type_t<Arg1>,
                                            bast::value_type_t<ArgsRest>...>
-xena::future<> transform(basct::span<bast::value_type<Arg1>> res, F make_f,
+xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res, F make_f,
                          basit::chunk_options chunk_options, const Arg1& x1,
                          const ArgsRest&... xrest) noexcept {
   auto n = res.size();
@@ -74,15 +74,26 @@ xena::future<> transform(basct::span<bast::value_type<Arg1>> res, F make_f,
         memr::async_device_resource resource{stream};
         memr::chained_resource alloc{&resource};
 
-        auto futs = std::make_tuple(
+        auto futs = std::tuple{
             xendv::make_active_device_viewable(&alloc, basct::subspan(x1, rng.a(), rng.size())),
             xendv::make_active_device_viewable(&alloc,
-                                               basct::subspan(xrest, rng.a(), rng.size()))...);
+                                               basct::subspan(xrest, rng.a(), rng.size()))...};
 
         auto f = co_await make_f(&alloc, stream);
         co_await detail::transform_impl(res.subspan(rng.a(), rng.size()), std::move(stream), f,
                                         std::move(futs),
                                         std::make_index_sequence<sizeof...(ArgsRest) + 1>{});
       });
+}
+
+template <class F, class Arg1, class... ArgsRest>
+  requires algb::transform_functor<F, bast::value_type_t<Arg1>, bast::value_type_t<ArgsRest>...>
+xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res, F f,
+                         basit::chunk_options chunk_options, const Arg1& x1,
+                         const ArgsRest&... xrest) noexcept {
+  auto make_f = [&](std::pmr::polymorphic_allocator<> /*alloc*/, basdv::stream& /*stream*/) {
+    return xena::make_ready_future<F>(F{f});
+  };
+  co_await transform(res, make_f, chunk_options, x1, xrest...);
 }
 } // namespace sxt::algi
