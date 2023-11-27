@@ -16,8 +16,9 @@ namespace sxt::algi {
 // transform
 //--------------------------------------------------------------------------------------------------
 template <class F, class Arg1, class... ArgsRest>
-  requires algb::transform_functor<F, bast::value_type_t<Arg1>, bast::value_type_t<ArgsRest>...>
-xena::future<> transform(basct::span<bast::value_type<Arg1>> res, F f,
+  requires algb::transform_functor_factory<F, bast::value_type_t<Arg1>,
+                                           bast::value_type_t<ArgsRest>...>
+xena::future<> transform(basct::span<bast::value_type<Arg1>> res, F make_f,
                          basit::chunk_options chunk_options, const Arg1& x1,
                          const ArgsRest&... xrest) noexcept {
   auto n = res.size();
@@ -28,8 +29,10 @@ xena::future<> transform(basct::span<bast::value_type<Arg1>> res, F f,
                                         .min_chunk_size(chunk_options.min_size)
                                         .max_chunk_size(chunk_options.max_size),
                                     chunk_options.split_factor);
-  xendv::concurrent_for_each(
-      first, last, [&](const basit::index_range& rng) noexcept -> xena::future<> { (void)rng; });
-  return {};
+  co_await xendv::concurrent_for_each(
+      first, last, [&](const basit::index_range& rng) noexcept -> xena::future<> { 
+      auto f = co_await make_f();
+      (void)f;
+  });
 }
 } // namespace sxt::algi
