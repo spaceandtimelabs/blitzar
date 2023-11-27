@@ -50,8 +50,8 @@ struct match_index_functor_future<xena::future<F>> {
 template <class F>
 concept index_functor_factory = 
                         // clang-format off
-  requires(const F f) {
-    requires detail::match_index_functor_future<decltype(f())>::value;
+  requires(const F f, size_t a, size_t b) {
+    requires detail::match_index_functor_future<decltype(f(a, b))>::value;
   };
 // clang-format on
 } // namespace sxt::algb
