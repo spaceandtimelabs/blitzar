@@ -32,7 +32,7 @@ sxt_cc_component(
         "//sxt/algorithm/base:index_functor",
         "//sxt/base/device:stream",
         "//sxt/base/num:divide_up",
-        "//sxt/execution/async:future",
+        "//sxt/execution/async:coroutine",
         "//sxt/execution/device:synchronization",
         "//sxt/execution/kernel:kernel_dims",
     ],
