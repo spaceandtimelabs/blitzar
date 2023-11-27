@@ -3,8 +3,10 @@
 #include <tuple>
 
 #include "sxt/algorithm/base/transform_functor.h"
+#include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/container/span_utility.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/chunk_options.h"
@@ -15,24 +17,37 @@
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/device_viewable.h"
 #include "sxt/execution/device/for_each.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/chained_resource.h"
 
 namespace sxt::algi {
 //--------------------------------------------------------------------------------------------------
+// apply_transform_functor 
+//--------------------------------------------------------------------------------------------------
+namespace detail {
+template <class Ptrs, class F, size_t... Indexes>
+void apply_transform_functor(const Ptrs& ptrs, const F& f, unsigned i,
+                             std::index_sequence<Indexes...>) noexcept {
+  f(std::get<Indexes>(ptrs)[i]...);
+}
+} // namespace detail
+
+//--------------------------------------------------------------------------------------------------
 // transform_impl
 //--------------------------------------------------------------------------------------------------
 namespace detail {
 template <class T, class F, class Futs, size_t... Indexes>
-xena::future<> transform_impl(basct::span<T> res, F f,
-                         basit::chunk_options chunk_options, 
-                         Futs&& futs,
-                         std::index_sequence<Indexes...>) noexcept {
-  (void)res;
-  (void)f;
-  (void)chunk_options;
-  (void)futs;
-  return {};
+xena::future<> transform_impl(basct::span<T> res, basdv::stream&& stream, F f, Futs&& futs,
+                              std::index_sequence<Indexes...>) noexcept {
+  auto spans = std::make_tuple(co_await std::move(std::get<Indexes>(futs))...);
+  auto ptrs = std::make_tuple(std::get<Indexes>(spans).data()...);
+  auto fp = [ptrs, f] __device__ __host__(unsigned /*n*/, unsigned i) noexcept {
+    apply_transform_functor(ptrs, f, i, std::make_index_sequence<sizeof...(Indexes)>{});
+  };
+  launch_for_each_kernel(stream, fp, static_cast<unsigned>(res.size()));
+  basdv::async_copy_device_to_host(res, std::get<0>(spans), stream);
+  co_await xendv::await_and_own_stream(std::move(stream));
 }
 } // namespace detail
 
@@ -65,7 +80,7 @@ xena::future<> transform(basct::span<bast::value_type<Arg1>> res, F make_f,
                                                basct::subspan(xrest, rng.a(), rng.size()))...);
 
         auto f = co_await make_f(&alloc, stream);
-        co_await detail::transform_impl(res.subspan(rng.a(), rng.size()), f, chunk_options,
+        co_await detail::transform_impl(res.subspan(rng.a(), rng.size()), std::move(stream), f,
                                         std::move(futs),
                                         std::make_index_sequence<sizeof...(ArgsRest) + 1>{});
       });
