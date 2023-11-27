@@ -20,6 +20,23 @@
 
 namespace sxt::algi {
 //--------------------------------------------------------------------------------------------------
+// transform_impl
+//--------------------------------------------------------------------------------------------------
+namespace detail {
+template <class T, class F, class Futs, size_t... Indexes>
+xena::future<> transform_impl(basct::span<T> res, F f,
+                         basit::chunk_options chunk_options, 
+                         Futs&& futs,
+                         std::index_sequence<Indexes...>) noexcept {
+  (void)res;
+  (void)f;
+  (void)chunk_options;
+  (void)futs;
+  return {};
+}
+} // namespace detail
+
+//--------------------------------------------------------------------------------------------------
 // transform
 //--------------------------------------------------------------------------------------------------
 template <class F, class Arg1, class... ArgsRest>
@@ -37,21 +54,20 @@ xena::future<> transform(basct::span<bast::value_type<Arg1>> res, F make_f,
                                         .max_chunk_size(chunk_options.max_size),
                                     chunk_options.split_factor);
   co_await xendv::concurrent_for_each(
-      first, last, [&](const basit::index_range& rng) noexcept -> xena::future<> { 
-      basdv::stream stream;
-      memr::async_device_resource resource{stream};
-      memr::chained_resource alloc{&resource};
+      first, last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+        basdv::stream stream;
+        memr::async_device_resource resource{stream};
+        memr::chained_resource alloc{&resource};
 
-      auto x1_slice_fut =
-          xendv::make_active_device_viewable(&alloc, basct::subspan(x1, rng.a(), rng.size()));
-      auto xrest_slices_fut = std::make_tuple(xendv::make_active_device_viewable(
-          &alloc, basct::subspan(xrest, rng.a(), rng.size()))...);
+        auto futs = std::make_tuple(
+            xendv::make_active_device_viewable(&alloc, basct::subspan(x1, rng.a(), rng.size())),
+            xendv::make_active_device_viewable(&alloc,
+                                               basct::subspan(xrest, rng.a(), rng.size()))...);
 
-      auto f = co_await make_f(&alloc, stream);
-      auto x1_slice = co_await std::move(x1_slice_fut);
-      (void)x1_slice;
-      (void)xrest_slices_fut;
-      (void)f;
-  });
+        auto f = co_await make_f(&alloc, stream);
+        co_await detail::transform_impl(res.subspan(rng.a(), rng.size()), f, chunk_options,
+                                        std::move(futs),
+                                        std::make_index_sequence<sizeof...(ArgsRest) + 1>{});
+      });
 }
 } // namespace sxt::algi
