@@ -1,7 +1,10 @@
 #pragma once
 
+#include <tuple>
+
 #include "sxt/algorithm/base/transform_functor.h"
 #include "sxt/base/container/span.h"
+#include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/chunk_options.h"
@@ -39,8 +42,15 @@ xena::future<> transform(basct::span<bast::value_type<Arg1>> res, F make_f,
       memr::async_device_resource resource{stream};
       memr::chained_resource alloc{&resource};
 
-      auto f_fut = make_f(alloc, stream);
-      auto f = co_await std::move(f_fut);
+      auto x1_slice_fut =
+          xendv::make_active_device_viewable(&alloc, basct::subspan(x1, rng.a(), rng.size()));
+      auto xrest_slices_fut = std::make_tuple(xendv::make_active_device_viewable(
+          &alloc, basct::subspan(xrest, rng.a(), rng.size()))...);
+
+      auto f = co_await make_f(&alloc, stream);
+      auto x1_slice = co_await std::move(x1_slice_fut);
+      (void)x1_slice;
+      (void)xrest_slices_fut;
       (void)f;
   });
 }

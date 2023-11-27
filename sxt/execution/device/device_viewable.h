@@ -26,6 +26,7 @@
 #include "sxt/base/device/pointer_attributes.h"
 #include "sxt/base/device/state.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/type/value_type.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/event_future.h"
 #include "sxt/execution/device/synchronization.h"
@@ -81,7 +82,7 @@ event_future<basct::cspan<T>> make_active_device_viewable(memmg::managed_array<T
  * Note: Be sure to use this with a compatible allocator.
  * See section 3 of https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0089r1.pdf
  */
-template <class T, class Cont>
+template <class Cont, class T = bast::value_type_t<Cont>>
   requires std::convertible_to<Cont, basct::cspan<T>>
 event_future<basct::cspan<T>> make_active_device_viewable(std::pmr::polymorphic_allocator<> alloc,
                                                           const Cont& cont) noexcept {

@@ -22,6 +22,7 @@ sxt_cc_component(
         "//sxt/base/device:pointer_attributes",
         "//sxt/base/device:state",
         "//sxt/base/device:stream",
+        "//sxt/base/type:value_type",
         "//sxt/execution/async:future",
         "//sxt/memory/management:managed_array",
     ],

@@ -47,6 +47,7 @@ sxt_cc_component(
     deps = [
       "//sxt/algorithm/base:transform_functor",
       "//sxt/base/container:span",
+      "//sxt/base/container:span_utility",
       "//sxt/base/device:stream",
       "//sxt/base/error:assert",
       "//sxt/base/iterator:chunk_options",
