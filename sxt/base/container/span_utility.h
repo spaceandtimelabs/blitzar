@@ -19,6 +19,7 @@
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
+#include <memory_resource>
 
 #include "sxt/base/container/span.h"
 
@@ -44,5 +45,21 @@ span<T> subspan(Cont&& cont, size_t offset, size_t size) noexcept
   }
 {
   return span<T>{cont}.subspan(offset, size);
+}
+
+//--------------------------------------------------------------------------------------------------
+// winked_span
+//--------------------------------------------------------------------------------------------------
+/**
+ * Convenience function for winked-out allocations.
+ *
+ * See section 3 of https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0089r1.pdf
+ */
+template <class T>
+span<T> winked_span(std::pmr::polymorphic_allocator<> alloc, size_t size) noexcept {
+  return {
+      static_cast<T*>(alloc.allocate_bytes(size, alignof(T))),
+      size,
+  };
 }
 } // namespace sxt::basct
