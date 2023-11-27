@@ -2,6 +2,7 @@
 
 #include "sxt/algorithm/base/transform_functor.h"
 #include "sxt/base/container/span.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/chunk_options.h"
 #include "sxt/base/iterator/index_range.h"
@@ -9,7 +10,10 @@
 #include "sxt/base/iterator/index_range_utility.h"
 #include "sxt/base/type/value_type.h"
 #include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/device_viewable.h"
 #include "sxt/execution/device/for_each.h"
+#include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/memory/resource/chained_resource.h"
 
 namespace sxt::algi {
 //--------------------------------------------------------------------------------------------------
@@ -31,11 +35,11 @@ xena::future<> transform(basct::span<bast::value_type<Arg1>> res, F make_f,
                                     chunk_options.split_factor);
   co_await xendv::concurrent_for_each(
       first, last, [&](const basit::index_range& rng) noexcept -> xena::future<> { 
-      auto f_fut = make_f();
+      basdv::stream stream;
+      memr::async_device_resource resource{stream};
+      memr::chained_resource alloc{&resource};
 
-      /* basdv::stream stream; */
-      /* memr::async_device_resource resource{stream}; */
-
+      auto f_fut = make_f(alloc, stream);
       auto f = co_await std::move(f_fut);
       (void)f;
   });

@@ -47,6 +47,7 @@ sxt_cc_component(
     deps = [
       "//sxt/algorithm/base:transform_functor",
       "//sxt/base/container:span",
+      "//sxt/base/device:stream",
       "//sxt/base/error:assert",
       "//sxt/base/iterator:chunk_options",
       "//sxt/base/iterator:index_range",
@@ -54,6 +55,9 @@ sxt_cc_component(
       "//sxt/base/iterator:index_range_utility",
       "//sxt/base/type:value_type",
       "//sxt/execution/async:coroutine",
+      "//sxt/execution/device:device_viewable",
       "//sxt/execution/device:for_each",
+      "//sxt/memory/resource:async_device_resource",
+      "//sxt/memory/resource:chained_resource",
     ],
 )

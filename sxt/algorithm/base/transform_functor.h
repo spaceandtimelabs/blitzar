@@ -2,8 +2,11 @@
 
 #include <concepts>
 #include <utility>
+#include <memory_resource>
 
 #include "sxt/execution/async/future.h"
+
+namespace sxt::basdv { class stream; }
 
 namespace sxt::algb {
 //--------------------------------------------------------------------------------------------------
@@ -35,8 +38,9 @@ struct match_transform_functor_future<xena::future<F>, ArgFirst, ArgsRest...> {
 template <class F, class ArgFirst, class... ArgsRest>
 concept transform_functor_factory = 
                         // clang-format off
-  requires(const F f) {
-    requires detail::match_transform_functor_future<decltype(f()), ArgFirst, ArgsRest...>::value;
+  requires(const F f, std::pmr::polymorphic_allocator<> alloc, basdv::stream stream) {
+    requires detail::match_transform_functor_future<
+        decltype(f(alloc, stream)), ArgFirst, ArgsRest...>::value;
   };
 // clang-format on
 } // namespace sxt::algb
