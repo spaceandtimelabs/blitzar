@@ -23,7 +23,8 @@ namespace sxt::basfld {
 // element
 //--------------------------------------------------------------------------------------------------
 template <class T>
-concept element = requires(T& elm) {
-  { elm.num_limbs_v } noexcept -> std::convertible_to<size_t>;
+concept element = requires() {
+  T::num_limbs_v > 0;
+  { T::modulus() } noexcept -> std::same_as<T>;
 };
 } // namespace sxt::basfld

@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include "sxt/base/macro/cuda_callable.h"
+
 namespace sxt::basfld {
 //--------------------------------------------------------------------------------------------------
 // element4
@@ -26,5 +28,27 @@ namespace sxt::basfld {
  */
 struct element4 {
   static constexpr size_t num_limbs_v = 4;
+
+  element4() noexcept = default;
+
+  CUDA_CALLABLE constexpr element4(uint64_t x1, uint64_t x2, uint64_t x3, uint64_t x4) noexcept
+      : data_{x1, x2, x3, x4} {}
+
+  CUDA_CALLABLE constexpr const uint64_t& operator[](int index) const noexcept {
+    return data_[index];
+  }
+
+  CUDA_CALLABLE constexpr uint64_t& operator[](int index) noexcept { return data_[index]; }
+
+  CUDA_CALLABLE constexpr const uint64_t* data() const noexcept { return data_; }
+
+  CUDA_CALLABLE constexpr uint64_t* data() noexcept { return data_; }
+
+  static constexpr element4 modulus() noexcept { return element4{0, 0, 0, 97}; }
+
+  bool operator==(const element4&) const noexcept = default;
+
+private:
+  uint64_t data_[num_limbs_v];
 };
 } // namespace sxt::basfld
