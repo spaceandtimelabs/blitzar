@@ -33,4 +33,17 @@ TEST_CASE("t") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 6);
   }
+
+  SECTION("we can split transform across multiple chunks") {
+    res = {3, 5};
+    auto f = [] __device__ __host__ (double& x) noexcept {
+      x *= 2;
+    };
+    chunk_options.max_size = 1;
+    auto fut = transform(res, f, chunk_options, res);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 6);
+    REQUIRE(res[1] == 10);
+  }
 }
