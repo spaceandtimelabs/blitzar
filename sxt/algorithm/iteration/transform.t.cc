@@ -12,8 +12,7 @@ TEST_CASE("t") {
   basit::chunk_options chunk_options;
 
   SECTION("we can transform a vector with a single element") {
-    res.resize(1);
-    res[0] = 123;
+    res = {123};
     auto f = [] __device__ __host__ (double& x) noexcept {
       x *= 2;
     };
@@ -21,5 +20,17 @@ TEST_CASE("t") {
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 246);
+  }
+
+  SECTION("we can transform two vectors") {
+    res = {2};
+    std::vector<double> y = {4};
+    auto f = [] __device__ __host__ (double& x, double& y) noexcept {
+      x = x + y;
+    };
+    auto fut = transform(res, f, chunk_options, res, y);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 6);
   }
 }
