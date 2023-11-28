@@ -13,13 +13,13 @@ TEST_CASE("t") {
 
   SECTION("we can transform a vector with a single element") {
     res.resize(1);
+    res[0] = 123;
     auto f = [] __device__ __host__ (double& x) noexcept {
       x *= 2;
     };
-  
     auto fut = transform(res, f, chunk_options, res);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
-    std::cout << res[0] << "\n";
+    REQUIRE(res[0] == 246);
   }
 }
