@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include "sxt/base/macro/cuda_callable.h"
+
 namespace sxt::basfld {
 //--------------------------------------------------------------------------------------------------
 // element1
