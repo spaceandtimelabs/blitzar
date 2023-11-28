@@ -43,6 +43,7 @@ sxt_cc_component(
     name = "transform",
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
     ],
     deps = [
       ":for_each",
@@ -52,13 +53,14 @@ sxt_cc_component(
       "//sxt/base/device:memory_utility",
       "//sxt/base/device:stream",
       "//sxt/base/error:assert",
+      "//sxt/base/macro:cuda_callable",
       "//sxt/base/iterator:chunk_options",
       "//sxt/base/iterator:index_range",
       "//sxt/base/iterator:index_range_iterator",
       "//sxt/base/iterator:index_range_utility",
       "//sxt/base/type:value_type",
       "//sxt/execution/async:coroutine",
-      "//sxt/execution/device:device_viewable",
+      "//sxt/execution/device:device_copy",
       "//sxt/execution/device:for_each",
       "//sxt/execution/device:synchronization",
       "//sxt/memory/resource:async_device_resource",

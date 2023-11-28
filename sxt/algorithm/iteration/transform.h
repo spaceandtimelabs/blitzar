@@ -13,8 +13,10 @@
 #include "sxt/base/iterator/index_range.h"
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/type/value_type.h"
 #include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/device_copy.h"
 #include "sxt/execution/device/device_viewable.h"
 #include "sxt/execution/device/for_each.h"
 #include "sxt/execution/device/synchronization.h"
@@ -27,7 +29,7 @@ namespace sxt::algi {
 //--------------------------------------------------------------------------------------------------
 namespace detail {
 template <class Ptrs, class F, size_t... Indexes>
-void apply_transform_functor(const Ptrs& ptrs, const F& f, unsigned i,
+CUDA_CALLABLE void apply_transform_functor(const Ptrs& ptrs, const F& f, unsigned i,
                              std::index_sequence<Indexes...>) noexcept {
   f(std::get<Indexes>(ptrs)[i]...);
 }
@@ -74,10 +76,9 @@ xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res, F make_f,
         memr::async_device_resource resource{stream};
         memr::chained_resource alloc{&resource};
 
-        auto futs = std::tuple{
-            xendv::make_active_device_viewable(&alloc, basct::subspan(x1, rng.a(), rng.size())),
-            xendv::make_active_device_viewable(&alloc,
-                                               basct::subspan(xrest, rng.a(), rng.size()))...};
+        auto futs = std::make_tuple(
+            xendv::winked_device_copy(&alloc, basct::subspan(x1, rng.a(), rng.size())),
+            xendv::winked_device_copy(&alloc, basct::subspan(xrest, rng.a(), rng.size()))...);
 
         auto f = co_await make_f(&alloc, stream);
         co_await detail::transform_impl(res.subspan(rng.a(), rng.size()), std::move(stream), f,

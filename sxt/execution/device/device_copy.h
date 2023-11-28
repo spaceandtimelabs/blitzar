@@ -26,6 +26,6 @@ event_future<basct::span<T>> winked_device_copy(std::pmr::polymorphic_allocator<
   computation_handle handle;
   handle.add_stream(std::move(stream));
   auto active_device = basdv::get_device();
-  return event_future<basct::cspan<T>>{res, active_device, std::move(event), std::move(handle)};
+  return event_future<basct::span<T>>{std::move(res), active_device, std::move(event), std::move(handle)};
 }
 } // namespace sxt::xendv

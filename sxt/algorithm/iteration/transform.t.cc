@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/base/test/unit_test.h"
 using namespace sxt;
 using namespace sxt::algi;
@@ -16,8 +17,9 @@ TEST_CASE("t") {
       x *= 2;
     };
   
-    /* transform(res, f, chunk_options, res); */
-    (void)f;
+    auto fut = transform(res, f, chunk_options, res);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    std::cout << res[0] << "\n";
   }
-  REQUIRE(1 == 1);
 }

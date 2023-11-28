@@ -59,7 +59,7 @@ span<T> subspan(Cont&& cont, size_t offset, size_t size) noexcept
 template <class T>
 span<T> winked_span(std::pmr::polymorphic_allocator<> alloc, size_t size) noexcept {
   return {
-      static_cast<T*>(alloc.allocate_bytes(size, alignof(T))),
+      static_cast<T*>(alloc.allocate_bytes(size * sizeof(T), alignof(T))),
       size,
   };
 }
