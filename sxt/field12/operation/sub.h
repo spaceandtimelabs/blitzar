@@ -25,8 +25,8 @@
  */
 #pragma once
 
+#include "sxt/base/field/add.h"
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/field12/operation/add.h"
 #include "sxt/field12/operation/neg.h"
 #include "sxt/field12/type/element.h"
 
@@ -41,6 +41,6 @@ CUDA_CALLABLE
 inline void sub(f12t::element& h, const f12t::element& f, const f12t::element& g) noexcept {
   f12t::element neg_g;
   f12o::neg(neg_g, g);
-  f12o::add(h, f, neg_g);
+  basfld::add(h, f, neg_g);
 }
 } // namespace sxt::f12o

@@ -14,24 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/operation/mul_by_3b.h"
+/*
+ * Adopted from zkcrypto/bls12_381
+ *
+ * Copyright (c) 2021
+ * Sean Bowe <ewillbefull@gmail.com>
+ * Jack Grigg <thestr4d@gmail.com>
+ *
+ * See third_party/license/zkcrypto.LICENSE
+ */
+#pragma once
 
-#include "sxt/base/field/add.h"
-#include "sxt/field12/type/element.h"
+#include <cstdint>
 
-namespace sxt::cg1o {
+#include "sxt/base/field/arithmetic_utility.h"
+#include "sxt/base/field/element.h"
+#include "sxt/base/field/subtract_p.h"
+#include "sxt/base/macro/cuda_callable.h"
+
+namespace sxt::basfld {
 //--------------------------------------------------------------------------------------------------
-// mul_by_3b
+// add
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void mul_by_3b(f12t::element& h, const f12t::element& p) noexcept {
-  f12t::element p2;
-  f12t::element p4;
-  f12t::element p8;
+template <basfld::element Element>
+CUDA_CALLABLE inline void add(Element& h, const Element& f, const Element& g) noexcept {
+  Element h_tmp;
+  uint64_t carry{0};
 
-  basfld::add(p2, p, p);
-  basfld::add(p4, p2, p2);
-  basfld::add(p8, p4, p4);
-  basfld::add(h, p8, p4);
+  for (size_t limb = 0; limb < h.num_limbs_v; ++limb) {
+    adc(h_tmp[limb], carry, f[limb], g[limb], carry);
+  }
+
+  subtract_p<Element::num_limbs_v>(h.data(), h_tmp.data(), Element::modulus().data());
 }
-} // namespace sxt::cg1o
+} // namespace sxt::basfld

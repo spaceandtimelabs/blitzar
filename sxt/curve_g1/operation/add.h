@@ -16,10 +16,10 @@
  */
 #pragma once
 
+#include "sxt/base/field/add.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/curve_g1/operation/mul_by_3b.h"
 #include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/operation/add.h"
 #include "sxt/field12/operation/mul.h"
 #include "sxt/field12/operation/sub.h"
 
@@ -41,25 +41,25 @@ CUDA_CALLABLE inline void add_inplace(cg1t::element_p2& p, const cg1t::element_p
   f12o::mul(t0, p.X, q.X);
   f12o::mul(t1, p.Y, q.Y);
   f12o::mul(t2, p.Z, q.Z);
-  f12o::add(t3, p.X, p.Y);
-  f12o::add(t4, q.X, q.Y);
+  basfld::add(t3, p.X, p.Y);
+  basfld::add(t4, q.X, q.Y);
   f12o::mul(t3, t3, t4);
-  f12o::add(t4, t0, t1);
+  basfld::add(t4, t0, t1);
   f12o::sub(t3, t3, t4);
-  f12o::add(t4, p.Y, p.Z);
-  f12o::add(p.X, q.Y, q.Z);
+  basfld::add(t4, p.Y, p.Z);
+  basfld::add(p.X, q.Y, q.Z);
   f12o::mul(t4, t4, p.X);
-  f12o::add(p.X, t1, t2);
+  basfld::add(p.X, t1, t2);
   f12o::sub(t4, t4, p.X);
-  f12o::add(p.X, px, p.Z);
-  f12o::add(p.Y, q.X, q.Z);
+  basfld::add(p.X, px, p.Z);
+  basfld::add(p.Y, q.X, q.Z);
   f12o::mul(p.X, p.X, p.Y);
-  f12o::add(p.Y, t0, t2);
+  basfld::add(p.Y, t0, t2);
   f12o::sub(p.Y, p.X, p.Y);
-  f12o::add(p.X, t0, t0);
-  f12o::add(t0, p.X, t0);
+  basfld::add(p.X, t0, t0);
+  basfld::add(t0, p.X, t0);
   mul_by_3b(t2, t2);
-  f12o::add(p.Z, t1, t2);
+  basfld::add(p.Z, t1, t2);
   f12o::sub(t1, t1, t2);
   mul_by_3b(p.Y, p.Y);
   f12o::mul(p.X, t4, p.Y);
@@ -67,10 +67,10 @@ CUDA_CALLABLE inline void add_inplace(cg1t::element_p2& p, const cg1t::element_p
   f12o::sub(p.X, t2, p.X);
   f12o::mul(p.Y, p.Y, t0);
   f12o::mul(t1, t1, p.Z);
-  f12o::add(p.Y, t1, p.Y);
+  basfld::add(p.Y, t1, p.Y);
   f12o::mul(t0, t0, t3);
   f12o::mul(p.Z, p.Z, t4);
-  f12o::add(p.Z, p.Z, t0);
+  basfld::add(p.Z, p.Z, t0);
 }
 
 //--------------------------------------------------------------------------------------------------

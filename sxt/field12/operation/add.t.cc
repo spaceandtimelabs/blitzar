@@ -16,12 +16,12 @@
  */
 #include "sxt/field12/operation/add.h"
 
+#include "sxt/base/field/add.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/field12/constant/zero.h"
 #include "sxt/field12/type/element.h"
 
 using namespace sxt;
-using namespace sxt::f12o;
 
 TEST_CASE("addition") {
   SECTION("of pre-computed value and zero returns pre-computed value") {
@@ -30,7 +30,7 @@ TEST_CASE("addition") {
                               0xfd64e34f83253657, 0x69f877012e12b25a, 0x9e91aa07f8a1e24};
 
     f12t::element ret;
-    add(ret, a, f12cn::zero_v);
+    basfld::add(ret, a, f12cn::zero_v);
 
     REQUIRE(a == ret);
   }
@@ -45,7 +45,7 @@ TEST_CASE("addition") {
                                      0x1ca538df7bfd4dec, 0x49fc4cbf538407d3, 0x27db87020eade91};
 
     f12t::element ret;
-    add(ret, a, b);
+    basfld::add(ret, a, b);
 
     REQUIRE(expected == ret);
   }
@@ -56,7 +56,7 @@ TEST_CASE("addition") {
     constexpr f12t::element b{0x1, 0x0, 0x0, 0x0, 0x0, 0x0};
 
     f12t::element ret;
-    add(ret, a, b);
+    basfld::add(ret, a, b);
 
     REQUIRE(f12cn::zero_v == ret);
   }

@@ -25,11 +25,11 @@
  */
 #include "sxt/curve_g1/operation/double.h"
 
+#include "sxt/base/field/add.h"
 #include "sxt/curve_g1/operation/cmov.h"
 #include "sxt/curve_g1/operation/mul_by_3b.h"
 #include "sxt/curve_g1/property/identity.h"
 #include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/operation/add.h"
 #include "sxt/field12/operation/mul.h"
 #include "sxt/field12/operation/square.h"
 #include "sxt/field12/operation/sub.h"
@@ -45,23 +45,23 @@ void double_element(cg1t::element_p2& h, const cg1t::element_p2& p) noexcept {
   f12t::element x3, y3, z3;
 
   f12o::square(t0, p.Y);
-  f12o::add(z3, t0, t0);
-  f12o::add(z3, z3, z3);
-  f12o::add(z3, z3, z3);
+  basfld::add(z3, t0, t0);
+  basfld::add(z3, z3, z3);
+  basfld::add(z3, z3, z3);
   f12o::mul(t1, p.Y, p.Z);
   f12o::square(t2, p.Z);
   mul_by_3b(t2, t2);
   f12o::mul(x3, t2, z3);
-  f12o::add(y3, t0, t2);
+  basfld::add(y3, t0, t2);
   f12o::mul(z3, t1, z3);
-  f12o::add(t1, t2, t2);
-  f12o::add(t2, t1, t2);
+  basfld::add(t1, t2, t2);
+  basfld::add(t2, t1, t2);
   f12o::sub(t0, t0, t2);
   f12o::mul(y3, t0, y3);
-  f12o::add(y3, x3, y3);
+  basfld::add(y3, x3, y3);
   f12o::mul(t1, p.X, p.Y);
   f12o::mul(x3, t0, t1);
-  f12o::add(x3, x3, x3);
+  basfld::add(x3, x3, x3);
 
   h.X = x3;
   h.Y = y3;

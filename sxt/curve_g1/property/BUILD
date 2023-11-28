@@ -6,10 +6,10 @@ load(
 sxt_cc_component(
     name = "curve",
     impl_deps = [
+        "//sxt/base/field:add",
         "//sxt/curve_g1/constant:b",
         "//sxt/curve_g1/type:element_affine",
         "//sxt/curve_g1/type:element_p2",
-        "//sxt/field12/operation:add",
         "//sxt/field12/operation:mul",
         "//sxt/field12/operation:square",
         "//sxt/field12/operation:sub",

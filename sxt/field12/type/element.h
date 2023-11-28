@@ -20,6 +20,7 @@
 #include <iosfwd>
 
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/field12/base/constants.h"
 
 namespace sxt::f12t {
 //--------------------------------------------------------------------------------------------------
@@ -47,6 +48,8 @@ public:
   CUDA_CALLABLE constexpr const uint64_t* data() const noexcept { return data_; }
 
   CUDA_CALLABLE constexpr uint64_t* data() noexcept { return data_; }
+
+  static constexpr element modulus() noexcept { return f12b::p_v.data(); }
 
 private:
   uint64_t data_[num_limbs_v];

@@ -14,24 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/operation/mul_by_3b.h"
-
 #include "sxt/base/field/add.h"
-#include "sxt/field12/type/element.h"
-
-namespace sxt::cg1o {
-//--------------------------------------------------------------------------------------------------
-// mul_by_3b
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void mul_by_3b(f12t::element& h, const f12t::element& p) noexcept {
-  f12t::element p2;
-  f12t::element p4;
-  f12t::element p8;
-
-  basfld::add(p2, p, p);
-  basfld::add(p4, p2, p2);
-  basfld::add(p8, p4, p4);
-  basfld::add(h, p8, p4);
-}
-} // namespace sxt::cg1o

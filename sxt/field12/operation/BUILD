@@ -6,14 +6,9 @@ load(
 sxt_cc_component(
     name = "add",
     test_deps = [
+        "//sxt/base/field:add",
         "//sxt/base/test:unit_test",
         "//sxt/field12/constant:zero",
-    ],
-    deps = [
-        "//sxt/base/field:arithmetic_utility",
-        "//sxt/base/field:subtract_p",
-        "//sxt/base/macro:cuda_callable",
-        "//sxt/field12/base:constants",
         "//sxt/field12/type:element",
     ],
 )
@@ -153,6 +148,7 @@ sxt_cc_component(
     deps = [
         ":add",
         ":neg",
+        "//sxt/base/field:add",
         "//sxt/base/macro:cuda_callable",
         "//sxt/field12/type:element",
     ],
