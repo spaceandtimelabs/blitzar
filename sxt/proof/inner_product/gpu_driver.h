@@ -39,6 +39,8 @@ public:
 
   xena::future<void> fold(workspace& ws, const s25t::element& x) const noexcept override;
 
+  xena::future<void> fold2(workspace& ws, const s25t::element& x) const noexcept;
+
   xena::future<void>
   compute_expected_commitment(rstt::compressed_element& commit, const proof_descriptor& descriptor,
                               basct::cspan<rstt::compressed_element> l_vector,

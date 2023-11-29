@@ -230,6 +230,49 @@ xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const
   co_await std::move(g_fut);
 }
 
+xena::future<void> gpu_driver::fold2(workspace& ws, const s25t::element& x) const noexcept {
+  (void)ws;
+  (void)x;
+  return {};
+#if 0
+  auto& work = static_cast<cpu_workspace&>(ws);
+  basct::cspan<c21t::element_p3> g_vector;
+  basct::cspan<s25t::element> a_vector;
+  basct::cspan<s25t::element> b_vector;
+  if (work.round_index == 0) {
+    g_vector = work.descriptor->g_vector;
+    a_vector = work.a_vector0;
+    b_vector = work.descriptor->b_vector;
+  } else {
+    g_vector = work.g_vector;
+    a_vector = work.a_vector;
+    b_vector = work.b_vector;
+  }
+  auto mid = g_vector.size() / 2;
+  SXT_DEBUG_ASSERT(mid > 0);
+
+  ++work.round_index;
+
+  s25t::element x_inv;
+  s25o::inv(x_inv, x);
+
+  // a_vector
+  fold_scalars(work.a_vector, a_vector, x, x_inv, mid);
+  if (mid == 1) {
+    // no need to compute the other folded values if we reduce to a single element
+    return xena::make_ready_future();
+  }
+
+  // b_vector
+  fold_scalars(work.b_vector, b_vector, x_inv, x, mid);
+
+  // g_vector
+  fold_generators(work.g_vector, g_vector, x_inv, x, mid);
+
+  return xena::make_ready_future();
+#endif
+}
+
 //--------------------------------------------------------------------------------------------------
 // compute_expected_commitment
 //--------------------------------------------------------------------------------------------------
