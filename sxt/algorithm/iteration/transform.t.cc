@@ -11,6 +11,14 @@ TEST_CASE("t") {
   std::vector<double> res;
   basit::chunk_options chunk_options;
 
+  SECTION("we handle the empty case") {
+    auto f = [] __device__ __host__ (double& x) noexcept {
+      x *= 2;
+    };
+    auto fut = transform(res, f, chunk_options, res);
+    REQUIRE(fut.ready());
+  }
+
   SECTION("we can transform a vector with a single element") {
     res = {123};
     auto f = [] __device__ __host__ (double& x) noexcept {
