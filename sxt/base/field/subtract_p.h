@@ -27,6 +27,7 @@
 
 #include "sxt/base/field/arithmetic_utility.h"
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/base/num/cmov.h"
 
 namespace sxt::basfld {
 //--------------------------------------------------------------------------------------------------
@@ -45,7 +46,8 @@ CUDA_CALLABLE inline void subtract_p(uint64_t* ret, const uint64_t* a, const uin
 
   // If underflow occurred on the final limb, borrow = 0xfff...fff, otherwise
   // borrow = 0x000...000. Thus, we use it as a mask!
-  uint64_t mask{borrow == 0x0 ? (borrow - 1) : 0x0};
+  uint64_t mask{0x0};
+  basn::cmov(mask, borrow - 1, borrow == 0x0);
 
   for (size_t limb = 0; limb < NumLimbs; ++limb) {
     ret[limb] = (a[limb] & borrow) | (ret[limb] & mask);

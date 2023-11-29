@@ -36,5 +36,6 @@ sxt_cc_component(
     deps = [
         ":arithmetic_utility",
         "//sxt/base/macro:cuda_callable",
+        "//sxt/base/num:cmov",
     ],
 )
