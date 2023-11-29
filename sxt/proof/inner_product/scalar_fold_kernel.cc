@@ -17,6 +17,7 @@
 #include "sxt/proof/inner_product/scalar_fold_kernel.h"
 
 #include "sxt/algorithm/iteration/for_each.h"
+#include "sxt/algorithm/iteration/transform.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/future.h"
@@ -90,5 +91,45 @@ xena::future<> fold_scalars(basct::span<s25t::element> scalars, const s25t::elem
   }
   auto fut2 = fold_scalars_case2(scalars, m_low, mid, m);
   return xena::await_all(std::move(fut1), std::move(fut2));
+}
+
+xena::future<> fold_scalars(basct::span<s25t::element> scalars_p,
+                            basct::cspan<s25t::element> scalars, const s25t::element& m_low,
+                            const s25t::element& m_high) noexcept {
+  auto mid = scalars_p.size();
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      scalars_p.size() == mid &&
+      mid < scalars.size() && scalars.size() <= 2u * mid
+      // clang-format on
+  );
+  auto f1 = [
+    m_low, 
+    m_high 
+  ] __device__ __host__(s25t::element& x, const s25t::element& y) noexcept 
+  {
+    s25o::mul(x, m_low, x);
+    s25o::muladd(x, m_high, y, x);
+  };
+  auto m = scalars.size() - mid;
+  basit::chunk_options chunk_options{
+      .min_size = 2u << 10u,
+      .max_size = 2u << 20u,
+  };
+
+  // case 1
+  auto fut1 = algi::transform(scalars_p.subspan(0, m), f1, chunk_options, scalars.subspan(0, m),
+                              scalars.subspan(mid));
+
+  // case 2
+  auto f2 = [
+    m_low 
+  ] __device__ __host__(s25t::element& x) noexcept 
+  {
+    s25o::mul(x, m_low, x);
+  };
+  co_await algi::transform(scalars_p.subspan(m), f2, chunk_options, scalars.subspan(m));
+
+  co_await std::move(fut1);
 }
 } // namespace sxt::prfip

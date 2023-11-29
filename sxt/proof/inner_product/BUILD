@@ -153,6 +153,7 @@ sxt_cc_component(
     name = "scalar_fold_kernel",
     impl_deps = [
         "//sxt/algorithm/iteration:for_each",
+        "//sxt/algorithm/iteration:transform",
         "//sxt/base/device:memory_utility",
         "//sxt/base/error:assert",
         "//sxt/scalar25/type:element",

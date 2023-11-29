@@ -66,6 +66,9 @@ xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res, F make_f,
   SXT_DEBUG_ASSERT(
       x1.size() == n && ((xrest.size() == n) && ...)
   );
+  if (n == 0) {
+    co_return;
+  }
   auto [first, last] = basit::split(basit::index_range{0, n}
                                         .min_chunk_size(chunk_options.min_size)
                                         .max_chunk_size(chunk_options.max_size),
