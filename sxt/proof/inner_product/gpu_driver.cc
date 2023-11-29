@@ -161,6 +161,38 @@ xena::future<void> gpu_driver::commit_to_fold(rstt::compressed_element& l_value,
   co_await std::move(r_fut);
 }
 
+xena::future<void> gpu_driver::commit_to_fold2(rstt::compressed_element& l_value,
+                                    rstt::compressed_element& r_value,
+                                    workspace& ws) const noexcept {
+  auto& work = static_cast<gpu_workspace&>(ws);
+  basct::cspan<c21t::element_p3> g_vector;
+  basct::cspan<s25t::element> a_vector;
+  basct::cspan<s25t::element> b_vector;
+  if (work.round_index == 0) {
+    g_vector = work.descriptor->g_vector;
+    a_vector = work.a_vector0X;
+    b_vector = work.descriptor->b_vector;
+  } else {
+    g_vector = work.g_vectorX;
+    a_vector = work.a_vectorX;
+    b_vector = work.b_vectorX;
+  }
+  auto mid = g_vector.size() / 2;
+  SXT_DEBUG_ASSERT(mid > 0);
+
+  auto a_low = a_vector.subspan(0, mid);
+  auto a_high = a_vector.subspan(mid);
+  auto b_low = b_vector.subspan(0, mid);
+  auto b_high = b_vector.subspan(mid);
+  auto g_low = g_vector.subspan(0, mid);
+  auto g_high = g_vector.subspan(mid);
+
+  auto l_fut = commit_to_fold_partial(l_value, g_high, *work.descriptor->q_value, a_low, b_high);
+  co_await commit_to_fold_partial(r_value, g_low, *work.descriptor->q_value, a_high, b_low);
+
+  co_await std::move(l_fut);
+}
+
 //--------------------------------------------------------------------------------------------------
 // fold
 //--------------------------------------------------------------------------------------------------

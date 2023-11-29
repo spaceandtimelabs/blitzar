@@ -33,6 +33,10 @@ public:
                                     rstt::compressed_element& r_value,
                                     workspace& ws) const noexcept override;
 
+  xena::future<void> commit_to_fold2(rstt::compressed_element& l_value,
+                                    rstt::compressed_element& r_value,
+                                    workspace& ws) const noexcept;
+
   xena::future<void> fold(workspace& ws, const s25t::element& x) const noexcept override;
 
   xena::future<void>
