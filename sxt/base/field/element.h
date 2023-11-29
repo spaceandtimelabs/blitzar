@@ -30,7 +30,7 @@ concept element = requires(T& eref, const T& ecref) {
   { eref.data() } noexcept -> std::same_as<uint64_t*>;
   { ecref.data() } noexcept -> std::same_as<const uint64_t*>;
   { T::modulus() } noexcept -> std::same_as<T>;
-  e[0];
+  { e[0] } noexcept -> std::convertible_to<uint64_t>;
   e.data();
 };
 } // namespace sxt::basfld
