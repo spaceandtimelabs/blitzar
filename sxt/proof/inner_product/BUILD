@@ -163,10 +163,18 @@ sxt_cc_component(
         "//sxt/execution/async:future_utility",
     ],
     is_cuda = True,
-    with_test = False,
     deps = [
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
+    ],
+    test_deps = [
+        "//sxt/base/container:span_utility",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+        "//sxt/scalar25/operation:overload",
     ],
 )
 

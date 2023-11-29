@@ -128,7 +128,7 @@ xena::future<> fold_scalars(basct::span<s25t::element> scalars_p,
   {
     s25o::mul(x, m_low, x);
   };
-  co_await algi::transform(scalars_p.subspan(m), f2, chunk_options, scalars.subspan(m));
+  co_await algi::transform(scalars_p.subspan(m), f2, chunk_options, scalars.subspan(m, mid - m));
 
   co_await std::move(fut1);
 }
