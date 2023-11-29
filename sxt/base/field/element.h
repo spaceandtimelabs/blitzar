@@ -23,10 +23,10 @@ namespace sxt::basfld {
 // element
 //--------------------------------------------------------------------------------------------------
 template <class T>
-concept element = requires(T& e) {
+concept element = requires(T e) {
   requires(T::num_limbs_v > 0);
   { T::modulus() } noexcept -> std::same_as<T>;
-  e[0];
+  { e[0] } noexcept -> std::convertible_to<uint64_t>;
   e.data();
 };
 } // namespace sxt::basfld
