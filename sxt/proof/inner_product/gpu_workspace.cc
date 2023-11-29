@@ -29,8 +29,8 @@ namespace sxt::prfip {
 // constructor
 //--------------------------------------------------------------------------------------------------
 gpu_workspace::gpu_workspace() noexcept
-    : a_vector{memr::get_device_resource()}, b_vector{memr::get_device_resource()},
-      g_vector{memr::get_device_resource()} {}
+    : alloc{memr::get_pinned_resource()}, a_vector{memr::get_device_resource()},
+      b_vector{memr::get_device_resource()}, g_vector{memr::get_device_resource()} {}
 
 //--------------------------------------------------------------------------------------------------
 // ap_value

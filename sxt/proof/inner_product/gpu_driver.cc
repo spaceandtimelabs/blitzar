@@ -101,6 +101,9 @@ setup_verification_generators(basct::span<c21t::element_p3> generators,
 xena::future<std::unique_ptr<workspace>>
 gpu_driver::make_workspace(const proof_descriptor& descriptor,
                            basct::cspan<s25t::element> a_vector) const noexcept {
+  auto n = a_vector.size();
+  auto np_half = descriptor.g_vector.size() / 2;
+
   auto res = std::make_unique<gpu_workspace>();
   basdv::stream stream;
 
@@ -118,6 +121,18 @@ gpu_driver::make_workspace(const proof_descriptor& descriptor,
   // g_vector
   res->g_vector.resize(descriptor.g_vector.size());
   basdv::async_copy_host_to_device(res->g_vector, descriptor.g_vector, stream);
+
+  auto scalars = basct::winked_span<s25t::element>(&res->alloc, 2u * np_half);
+
+  // a_vector
+  res->a_vector0X = a_vector;
+  res->a_vectorX = scalars.subspan(0, np_half);
+
+  // b_vector
+  res->b_vectorX = scalars.subspan(np_half);
+
+  // g_vector
+  res->g_vectorX = basct::winked_span<c21t::element_p3>(&res->alloc, np_half);
 
   return xendv::await_and_own_stream(std::move(stream), std::unique_ptr<workspace>{std::move(res)});
 }

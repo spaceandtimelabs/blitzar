@@ -28,6 +28,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "gpu_workspace",
     impl_deps = [
+        "//sxt/base/container:span",
         "//sxt/base/device:memory_utility",
         "//sxt/execution/async:future",
         "//sxt/execution/async:coroutine",
@@ -40,6 +41,7 @@ sxt_cc_component(
         ":workspace",
         "//sxt/curve21/type:element_p3",
         "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:chained_resource",
         "//sxt/scalar25/type:element",
     ],
 )
