@@ -263,7 +263,7 @@ xena::future<void> gpu_driver::fold2(workspace& ws, const s25t::element& x) cons
   basct::span<unsigned> decomposition{decomposition_data};
   decompose_generator_fold(decomposition, x_inv, x);
   work.g_vectorX = work.g_vectorX.subspan(0, mid);
-  auto g_fut = fold_generators(work.g_vectorX, decomposition);
+  auto g_fut = fold_generators(work.g_vectorX, g_vector, decomposition);
 
   // a_vector
   work.a_vectorX = work.a_vectorX.subspan(0, mid);

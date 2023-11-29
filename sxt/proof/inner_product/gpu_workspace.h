@@ -27,7 +27,8 @@
 namespace sxt::prfip {
 struct proof_descriptor;
 
-static constexpr bool use_new = false;
+/* static constexpr bool use_new = false; */
+static constexpr bool use_new = true;
 
 //--------------------------------------------------------------------------------------------------
 // gpu_workspace
