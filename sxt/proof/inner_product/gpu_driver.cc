@@ -143,6 +143,9 @@ gpu_driver::make_workspace(const proof_descriptor& descriptor,
 xena::future<void> gpu_driver::commit_to_fold(rstt::compressed_element& l_value,
                                               rstt::compressed_element& r_value,
                                               workspace& ws) const noexcept {
+  if (use_new) {
+    co_return co_await commit_to_fold2(l_value, r_value, ws);
+  }
   auto& work = static_cast<gpu_workspace&>(ws);
   auto mid = work.g_vector.size() / 2;
   SXT_DEBUG_ASSERT(mid > 0);
@@ -197,6 +200,9 @@ xena::future<void> gpu_driver::commit_to_fold2(rstt::compressed_element& l_value
 // fold
 //--------------------------------------------------------------------------------------------------
 xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const noexcept {
+  if (use_new) {
+    co_return co_await this->fold2(ws, x);
+  }
   auto& work = static_cast<gpu_workspace&>(ws);
   auto mid = work.g_vector.size() / 2u;
 
