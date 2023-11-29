@@ -25,6 +25,9 @@ namespace sxt::basfld {
 /**
  * Provides a minimal implementation of the field element concent that can be used for writing
  * tests.
+ *
+ * element4 uses the limb count and modulus (in little endian ordering) of the bn254
+ * curve.
  */
 struct element4 {
   static constexpr size_t num_limbs_v = 4;
@@ -44,7 +47,9 @@ struct element4 {
 
   CUDA_CALLABLE constexpr uint64_t* data() noexcept { return data_; }
 
-  static constexpr element4 modulus() noexcept { return element4{0, 0, 0, 97}; }
+  static constexpr element4 modulus() noexcept {
+    return element4{0x3c208c16d87cfd47, 0x97816a916871ca8d, 0xb85045b68181585d, 0x30644e72e131a029};
+  }
 
   bool operator==(const element4&) const noexcept = default;
 
