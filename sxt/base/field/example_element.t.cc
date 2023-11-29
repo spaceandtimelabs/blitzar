@@ -22,4 +22,4 @@
 using namespace sxt;
 using namespace sxt::basfld;
 
-TEST_CASE("element4 satisfies the field concept") { REQUIRE(basfld::element<element4>); }
+TEST_CASE("element1 satisfies the field concept") { REQUIRE(basfld::element<element1>); }
