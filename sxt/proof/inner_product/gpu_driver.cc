@@ -101,7 +101,7 @@ setup_verification_generators(basct::span<c21t::element_p3> generators,
 xena::future<std::unique_ptr<workspace>>
 gpu_driver::make_workspace(const proof_descriptor& descriptor,
                            basct::cspan<s25t::element> a_vector) const noexcept {
-  auto n = a_vector.size();
+  /* auto n = a_vector.size(); */
   auto np_half = descriptor.g_vector.size() / 2;
 
   auto res = std::make_unique<gpu_workspace>();
@@ -231,22 +231,18 @@ xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const
 }
 
 xena::future<void> gpu_driver::fold2(workspace& ws, const s25t::element& x) const noexcept {
-  (void)ws;
-  (void)x;
-  return {};
-#if 0
-  auto& work = static_cast<cpu_workspace&>(ws);
+  auto& work = static_cast<gpu_workspace&>(ws);
   basct::cspan<c21t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
   basct::cspan<s25t::element> b_vector;
   if (work.round_index == 0) {
     g_vector = work.descriptor->g_vector;
-    a_vector = work.a_vector0;
+    a_vector = work.a_vector0X;
     b_vector = work.descriptor->b_vector;
   } else {
-    g_vector = work.g_vector;
-    a_vector = work.a_vector;
-    b_vector = work.b_vector;
+    g_vector = work.g_vectorX;
+    a_vector = work.a_vectorX;
+    b_vector = work.b_vectorX;
   }
   auto mid = g_vector.size() / 2;
   SXT_DEBUG_ASSERT(mid > 0);
@@ -256,21 +252,28 @@ xena::future<void> gpu_driver::fold2(workspace& ws, const s25t::element& x) cons
   s25t::element x_inv;
   s25o::inv(x_inv, x);
 
+  // g_vector
+  unsigned decomposition_data[s25cn::max_bits_v];
+  basct::span<unsigned> decomposition{decomposition_data};
+  decompose_generator_fold(decomposition, x_inv, x);
+  work.g_vectorX = work.g_vectorX.subspan(0, mid);
+  auto g_fut = fold_generators(work.g_vectorX, decomposition);
+
   // a_vector
-  fold_scalars(work.a_vector, a_vector, x, x_inv, mid);
+  work.a_vectorX = work.a_vectorX.subspan(0, mid);
+  auto a_fut = fold_scalars(work.a_vectorX, a_vector, x, x_inv);
   if (mid == 1) {
     // no need to compute the other folded values if we reduce to a single element
-    return xena::make_ready_future();
+    co_await std::move(a_fut);
+    co_return;
   }
 
   // b_vector
-  fold_scalars(work.b_vector, b_vector, x_inv, x, mid);
+  work.b_vectorX = work.b_vectorX.subspan(0, mid);
+  co_await fold_scalars(work.b_vectorX, b_vector, x_inv, x);
 
-  // g_vector
-  fold_generators(work.g_vector, g_vector, x_inv, x, mid);
-
-  return xena::make_ready_future();
-#endif
+  co_await std::move(a_fut);
+  co_await std::move(g_fut);
 }
 
 //--------------------------------------------------------------------------------------------------
