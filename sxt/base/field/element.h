@@ -23,10 +23,14 @@ namespace sxt::basfld {
 // element
 //--------------------------------------------------------------------------------------------------
 template <class T>
-concept element = requires(T e) {
+concept element = requires(T& eref, const T& ecref) {
   requires(T::num_limbs_v > 0);
+  std::default_initializable<T>;
+  { eref[0] } noexcept -> std::same_as<uint64_t&>;
+  { ecref[0] } noexcept -> std::same_as<const uint64_t&>;
+  { eref.data() } noexcept -> std::same_as<uint64_t*>;
+  { ecref.data() } noexcept -> std::same_as<const uint64_t*>;
   { T::modulus() } noexcept -> std::same_as<T>;
-  { e[0] } noexcept -> std::convertible_to<uint64_t>;
-  e.data();
+  std::equality_comparable<T>;
 };
 } // namespace sxt::basfld
