@@ -39,16 +39,21 @@ CUDA_CALLABLE void apply_transform_functor(const Ptrs& ptrs, const F& f, unsigne
 // transform_impl
 //--------------------------------------------------------------------------------------------------
 namespace detail {
-template <class T, class F, class Futs, size_t... Indexes>
-xena::future<> transform_impl(basct::span<T> res, basdv::stream&& stream, F f, Futs&& futs,
-                              std::index_sequence<Indexes...>) noexcept {
-  auto spans = std::make_tuple(co_await std::move(std::get<Indexes>(futs))...);
-  auto ptrs = std::make_tuple(std::get<Indexes>(spans).data()...);
+template <class T, class F, class SpansDst, class SpansSrc, size_t... Indexes, class... Args>
+xena::future<> transform_impl(basct::span<T> res, basdv::stream&& stream, F f, const SpansDst& dsts,
+                              const SpansSrc& srcs, const basit::index_range& rng,
+                              std::index_sequence<Indexes...>, const Args&... xs) noexcept {
+
+  (basdv::async_copy_to_device(std::get<Indexes>(dsts),
+                               std::get<Indexes>(srcs).subspan(rng.a(), rng.size()), stream),
+   ...);
+
+  auto ptrs = std::make_tuple(std::get<Indexes>(dsts).data()...);
   auto fp = [ptrs, f] __device__ __host__(unsigned /*n*/, unsigned i) noexcept {
     apply_transform_functor(ptrs, f, i, std::make_index_sequence<sizeof...(Indexes)>{});
   };
   launch_for_each_kernel(stream, fp, static_cast<unsigned>(res.size()));
-  basdv::async_copy_device_to_host(res, std::get<0>(spans), stream);
+  basdv::async_copy_device_to_host(res, std::get<0>(dsts), stream);
   co_await xendv::await_and_own_stream(std::move(stream));
 }
 } // namespace detail
@@ -69,6 +74,8 @@ xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res, F make_f,
   if (n == 0) {
     co_return;
   }
+  std::tuple<basct::cspan<bast::value_type_t<Arg1>>, basct::cspan<bast::value_type_t<ArgsRest>>...>
+      srcs{x1, xrest...};
   auto [first, last] = basit::split(basit::index_range{0, n}
                                         .min_chunk_size(chunk_options.min_size)
                                         .max_chunk_size(chunk_options.max_size),
@@ -79,13 +86,13 @@ xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res, F make_f,
         memr::async_device_resource resource{stream};
         memr::chained_resource alloc{&resource};
 
-        auto futs = std::make_tuple(
-            xendv::winked_device_copy(&alloc, basct::subspan(x1, rng.a(), rng.size())),
-            xendv::winked_device_copy(&alloc, basct::subspan(xrest, rng.a(), rng.size()))...);
+        auto dsts =
+            std::make_tuple(basct::winked_span<bast::value_type_t<Arg1>>(&alloc, rng.size()),
+                            basct::winked_span<bast::value_type_t<ArgsRest>>(&alloc, rng.size())...);
 
         auto f = co_await make_f(&alloc, stream);
         co_await detail::transform_impl(res.subspan(rng.a(), rng.size()), std::move(stream), f,
-                                        std::move(futs),
+                                        dsts, srcs, rng,
                                         std::make_index_sequence<sizeof...(ArgsRest) + 1>{});
       });
 }

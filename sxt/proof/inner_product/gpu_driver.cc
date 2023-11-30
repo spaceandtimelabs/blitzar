@@ -238,6 +238,7 @@ xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const
 
 xena::future<void> gpu_driver::fold2(workspace& ws, const s25t::element& x) const noexcept {
   auto& work = static_cast<gpu_workspace&>(ws);
+  std::cout << "round = " << work.round_index << std::endl;
   basct::cspan<c21t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
   basct::cspan<s25t::element> b_vector;
@@ -280,6 +281,7 @@ xena::future<void> gpu_driver::fold2(workspace& ws, const s25t::element& x) cons
 
   co_await std::move(a_fut);
   co_await std::move(g_fut);
+  std::cerr << "fold done" << std::endl;
 }
 
 //--------------------------------------------------------------------------------------------------
