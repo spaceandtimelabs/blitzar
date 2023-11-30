@@ -40,10 +40,10 @@ struct gpu_workspace final : public workspace {
   size_t round_index;
   const proof_descriptor* descriptor;
 
-  basct::cspan<s25t::element> a_vector0X;
-  basct::span<c21t::element_p3> g_vectorX;
-  basct::span<s25t::element> a_vectorX;
-  basct::span<s25t::element> b_vectorX;
+  basct::cspan<s25t::element> a_vector0;
+  basct::span<c21t::element_p3> g_vector;
+  basct::span<s25t::element> a_vector;
+  basct::span<s25t::element> b_vector;
 
   // workspace
   xena::future<> ap_value(s25t::element& value) const noexcept override;

@@ -34,7 +34,7 @@ gpu_workspace::gpu_workspace() noexcept : alloc{memr::get_pinned_resource()} {}
 // ap_value
 //--------------------------------------------------------------------------------------------------
 xena::future<> gpu_workspace::ap_value(s25t::element& value) const noexcept {
-  value = this->a_vectorX[0];
+  value = this->a_vector[0];
   co_return;
 }
 } // namespace sxt::prfip

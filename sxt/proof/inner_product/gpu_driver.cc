@@ -112,14 +112,14 @@ gpu_driver::make_workspace(const proof_descriptor& descriptor,
   auto scalars = basct::winked_span<s25t::element>(&res->alloc, 2u * np_half);
 
   // a_vector
-  res->a_vector0X = a_vector;
-  res->a_vectorX = scalars.subspan(0, np_half);
+  res->a_vector0 = a_vector;
+  res->a_vector = scalars.subspan(0, np_half);
 
   // b_vector
-  res->b_vectorX = scalars.subspan(np_half);
+  res->b_vector = scalars.subspan(np_half);
 
   // g_vector
-  res->g_vectorX = basct::winked_span<c21t::element_p3>(&res->alloc, np_half);
+  res->g_vector = basct::winked_span<c21t::element_p3>(&res->alloc, np_half);
 
   return xendv::await_and_own_stream(std::move(stream), std::unique_ptr<workspace>{std::move(res)});
 }
@@ -136,12 +136,12 @@ xena::future<void> gpu_driver::commit_to_fold(rstt::compressed_element& l_value,
   basct::cspan<s25t::element> b_vector;
   if (work.round_index == 0) {
     g_vector = work.descriptor->g_vector;
-    a_vector = work.a_vector0X;
+    a_vector = work.a_vector0;
     b_vector = work.descriptor->b_vector;
   } else {
-    g_vector = work.g_vectorX;
-    a_vector = work.a_vectorX;
-    b_vector = work.b_vectorX;
+    g_vector = work.g_vector;
+    a_vector = work.a_vector;
+    b_vector = work.b_vector;
   }
   auto mid = g_vector.size() / 2;
   SXT_DEBUG_ASSERT(mid > 0);
@@ -169,12 +169,12 @@ xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const
   basct::cspan<s25t::element> b_vector;
   if (work.round_index == 0) {
     g_vector = work.descriptor->g_vector;
-    a_vector = work.a_vector0X;
+    a_vector = work.a_vector0;
     b_vector = work.descriptor->b_vector;
   } else {
-    g_vector = work.g_vectorX;
-    a_vector = work.a_vectorX;
-    b_vector = work.b_vectorX;
+    g_vector = work.g_vector;
+    a_vector = work.a_vector;
+    b_vector = work.b_vector;
   }
   auto mid = g_vector.size() / 2;
   SXT_DEBUG_ASSERT(mid > 0);
@@ -188,12 +188,12 @@ xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const
   unsigned decomposition_data[s25cn::max_bits_v];
   basct::span<unsigned> decomposition{decomposition_data};
   decompose_generator_fold(decomposition, x_inv, x);
-  work.g_vectorX = work.g_vectorX.subspan(0, mid);
-  auto g_fut = fold_generators(work.g_vectorX, g_vector, decomposition);
+  work.g_vector = work.g_vector.subspan(0, mid);
+  auto g_fut = fold_generators(work.g_vector, g_vector, decomposition);
 
   // a_vector
-  work.a_vectorX = work.a_vectorX.subspan(0, mid);
-  auto a_fut = fold_scalars(work.a_vectorX, a_vector, x, x_inv);
+  work.a_vector = work.a_vector.subspan(0, mid);
+  auto a_fut = fold_scalars(work.a_vector, a_vector, x, x_inv);
   if (mid == 1) {
     // no need to compute the other folded values if we reduce to a single element
     co_await std::move(a_fut);
@@ -201,8 +201,8 @@ xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const
   }
 
   // b_vector
-  work.b_vectorX = work.b_vectorX.subspan(0, mid);
-  co_await fold_scalars(work.b_vectorX, b_vector, x_inv, x);
+  work.b_vector = work.b_vector.subspan(0, mid);
+  co_await fold_scalars(work.b_vector, b_vector, x_inv, x);
 
   co_await std::move(a_fut);
   co_await std::move(g_fut);
