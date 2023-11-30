@@ -39,9 +39,6 @@ struct gpu_workspace final : public workspace {
   memr::chained_resource alloc;
   size_t round_index;
   const proof_descriptor* descriptor;
-  memmg::managed_array<s25t::element> a_vector;
-  memmg::managed_array<s25t::element> b_vector;
-  memmg::managed_array<c21t::element_p3> g_vector;
 
   basct::cspan<s25t::element> a_vector0X;
   basct::span<c21t::element_p3> g_vectorX;
