@@ -36,9 +36,7 @@ concept element = requires(T& eref, const T& ecref) {
 //--------------------------------------------------------------------------------------------------
 template <class T>
 concept element = requires {
-  requires T::num_limbs_v > 0 &&
-           std::equality_comparable<T> &&
-           modifiable<T>;
+  requires T::num_limbs_v > 0 && std::equality_comparable<T> && modifiable<T>;
   { T::modulus() } noexcept -> std::same_as<T>;
 };
 } // namespace sxt::basfld
