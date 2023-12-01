@@ -31,7 +31,7 @@
             name = "image-root";
             paths = [
               bazel
-              bashInteractive
+              pkgs.runtimeShell
               binutils
             ];
             pathsToLink = ["/bin"];
@@ -39,7 +39,7 @@
 
           config = {
             Cmd = [
-              "/bin/bash"
+              "${pkgs.runtimeShell}"
             ];
           };
         };
