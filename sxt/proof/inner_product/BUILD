@@ -126,21 +126,21 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
     ],
     is_cuda = True,
+    test_deps = [
+        ":generator_fold",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:overload",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/ristretto/operation:compression",
+        "//sxt/ristretto/type:literal",
+        "//sxt/scalar25/constant:max_bits",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:literal",
+    ],
     deps = [
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
-    ],
-    test_deps = [
-        ":generator_fold",
-        "//sxt/execution/async:future",
-        "//sxt/execution/schedule:scheduler",
-        "//sxt/scalar25/constant:max_bits",
-        "//sxt/base/test:unit_test",
-        "//sxt/curve21/operation:overload",
-        "//sxt/ristretto/operation:compression",
-        "//sxt/ristretto/type:literal",
-        "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:literal",
     ],
 )
 
@@ -165,18 +165,18 @@ sxt_cc_component(
         "//sxt/execution/async:future_utility",
     ],
     is_cuda = True,
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/execution/async:future_fwd",
-    ],
     test_deps = [
         "//sxt/base/container:span_utility",
         "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
         "//sxt/execution/schedule:scheduler",
+        "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
-        "//sxt/scalar25/operation:overload",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
     ],
 )
 

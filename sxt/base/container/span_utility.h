@@ -18,8 +18,8 @@
 
 #include <concepts>
 #include <cstddef>
-#include <type_traits>
 #include <memory_resource>
+#include <type_traits>
 
 #include "sxt/base/container/span.h"
 

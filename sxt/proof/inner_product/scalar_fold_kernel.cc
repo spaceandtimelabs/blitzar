@@ -40,11 +40,8 @@ xena::future<> fold_scalars(basct::span<s25t::element> scalars_p,
       mid < scalars.size() && scalars.size() <= 2u * mid
       // clang-format on
   );
-  auto f1 = [
-    m_low, 
-    m_high 
-  ] __device__ __host__(s25t::element& x, const s25t::element& y) noexcept 
-  {
+  auto f1 = [m_low, m_high] __device__ __host__(s25t::element & x,
+                                                const s25t::element& y) noexcept {
     s25o::mul(x, m_low, x);
     s25o::muladd(x, m_high, y, x);
   };
@@ -59,12 +56,7 @@ xena::future<> fold_scalars(basct::span<s25t::element> scalars_p,
                               scalars.subspan(mid));
 
   // case 2
-  auto f2 = [
-    m_low 
-  ] __device__ __host__(s25t::element& x) noexcept 
-  {
-    s25o::mul(x, m_low, x);
-  };
+  auto f2 = [m_low] __device__ __host__(s25t::element & x) noexcept { s25o::mul(x, m_low, x); };
   co_await algi::transform(scalars_p.subspan(m), f2, chunk_options, scalars.subspan(m, mid - m));
 
   co_await std::move(fut1);

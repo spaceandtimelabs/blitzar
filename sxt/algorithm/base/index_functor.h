@@ -48,8 +48,8 @@ struct match_index_functor_future<xena::future<F>> {
 } // namespace detail
 
 template <class F>
-concept index_functor_factory = 
-                        // clang-format off
+concept index_functor_factory =
+    // clang-format off
   requires(const F f, size_t a, size_t b) {
     requires detail::match_index_functor_future<decltype(f(a, b))>::value;
   };

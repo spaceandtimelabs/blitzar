@@ -88,7 +88,7 @@ event_future<basct::cspan<T>> make_active_device_viewable(std::pmr::polymorphic_
                                                           const Cont& cont) noexcept {
   auto do_allocate = [&](size_t n) noexcept {
     auto ptr = alloc.allocate_bytes(sizeof(T) * n, alignof(T));
-    return static_cast<T*>(ptr); 
+    return static_cast<T*>(ptr);
   };
   return detail::make_active_device_viewable_impl<T>(do_allocate, cont);
 }

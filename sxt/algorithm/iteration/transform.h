@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2023-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <tuple>
@@ -25,12 +41,12 @@
 
 namespace sxt::algi {
 //--------------------------------------------------------------------------------------------------
-// apply_transform_functor 
+// apply_transform_functor
 //--------------------------------------------------------------------------------------------------
 namespace detail {
 template <class Ptrs, class F, size_t... Indexes>
 CUDA_CALLABLE void apply_transform_functor(const Ptrs& ptrs, const F& f, unsigned i,
-                             std::index_sequence<Indexes...>) noexcept {
+                                           std::index_sequence<Indexes...>) noexcept {
   f(std::get<Indexes>(ptrs)[i]...);
 }
 } // namespace detail
@@ -68,9 +84,7 @@ xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res, F make_f,
                          basit::chunk_options chunk_options, const Arg1& x1,
                          const ArgsRest&... xrest) noexcept {
   auto n = res.size();
-  SXT_DEBUG_ASSERT(
-      x1.size() == n && ((xrest.size() == n) && ...)
-  );
+  SXT_DEBUG_ASSERT(x1.size() == n && ((xrest.size() == n) && ...));
   if (n == 0) {
     co_return;
   }
@@ -86,9 +100,9 @@ xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res, F make_f,
         memr::async_device_resource resource{stream};
         memr::chained_resource alloc{&resource};
 
-        auto dsts =
-            std::make_tuple(basct::winked_span<bast::value_type_t<Arg1>>(&alloc, rng.size()),
-                            basct::winked_span<bast::value_type_t<ArgsRest>>(&alloc, rng.size())...);
+        auto dsts = std::make_tuple(
+            basct::winked_span<bast::value_type_t<Arg1>>(&alloc, rng.size()),
+            basct::winked_span<bast::value_type_t<ArgsRest>>(&alloc, rng.size())...);
 
         auto f = co_await make_f(&alloc, stream);
         co_await detail::transform_impl(res.subspan(rng.a(), rng.size()), std::move(stream), f,

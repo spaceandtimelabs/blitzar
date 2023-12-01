@@ -25,7 +25,7 @@ struct element_p3;
 
 namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
-// fold_generators_impl 
+// fold_generators_impl
 //--------------------------------------------------------------------------------------------------
 xena::future<void> fold_generators_impl(basct::span<c21t::element_p3> g_vector_p,
                                         basct::cspan<c21t::element_p3> g_vector,

@@ -36,12 +36,9 @@ public:
 
   event_future() noexcept = default;
 
-  event_future(event_future&& other) noexcept 
-    : value_{std::move(other.value_)},
-      device_{std::exchange(other.device_, -1)},
-      event_{std::exchange(other.event_, {})},
-      handle_{std::move(other.handle_)}
-  {}
+  event_future(event_future&& other) noexcept
+      : value_{std::move(other.value_)}, device_{std::exchange(other.device_, -1)},
+        event_{std::exchange(other.event_, {})}, handle_{std::move(other.handle_)} {}
 
   ~event_future() noexcept {
     if (event_) {
