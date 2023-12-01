@@ -27,9 +27,6 @@ namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
 // fold_scalars
 //--------------------------------------------------------------------------------------------------
-xena::future<> fold_scalars(basct::span<s25t::element> scalars, const s25t::element& m_low,
-                            const s25t::element& m_high, unsigned mid) noexcept;
-
 xena::future<> fold_scalars(basct::span<s25t::element> scalars_p,
                             basct::cspan<s25t::element> scalars, const s25t::element& m_low,
                             const s25t::element& m_high) noexcept;
