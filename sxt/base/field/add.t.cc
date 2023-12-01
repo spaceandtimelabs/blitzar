@@ -23,11 +23,12 @@ using namespace sxt;
 using namespace sxt::basfld;
 
 TEST_CASE("Addition") {
-  constexpr basfld::element4 a{0, 0, 0, 1};
-  constexpr basfld::element4 exp{0, 0, 0, 2};
-  basfld::element4 ret;
+  constexpr basfld::element1 a{90};
+  constexpr basfld::element1 b{10};
+  constexpr basfld::element1 exp{3};
+  basfld::element1 ret;
 
-  add(ret, a, a);
+  add(ret, a, b);
 
   REQUIRE(ret == exp);
 }
