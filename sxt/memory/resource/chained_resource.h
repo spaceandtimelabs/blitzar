@@ -24,6 +24,11 @@ namespace sxt::memr {
 //--------------------------------------------------------------------------------------------------
 // chained_resource
 //--------------------------------------------------------------------------------------------------
+/**
+ * Provide a resource suitable for winked-out allocations with bost host and device memory.
+ *
+ * See section 3 of https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0089r1.pdf
+ */
 class chained_resource final : public std::pmr::memory_resource {
 public:
   chained_resource() noexcept;
