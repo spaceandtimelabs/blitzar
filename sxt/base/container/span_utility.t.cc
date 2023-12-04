@@ -14,24 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/base/type/value_type.h"
+#include "sxt/base/container/span_utility.h"
 
-#include <type_traits>
-#include <vector>
+#include <numeric>
 
 #include "sxt/base/test/unit_test.h"
 
 using namespace sxt;
-using namespace sxt::bast;
+using namespace sxt::basct;
 
-TEST_CASE("we can get the value type of containers") {
-  SECTION("we handle a simple container") {
-    REQUIRE(std::is_same_v<value_type_t<std::vector<int>>, int>);
+TEST_CASE("we can make winked allocations") {
+  std::pmr::monotonic_buffer_resource alloc;
+
+  {
+    auto sx = sxt::basct::winked_span<int>(&alloc, 3);
+    std::iota(sx.begin(), sx.end(), 0);
+    REQUIRE(sx.size() == 3);
+    REQUIRE(sx[0] == 0);
+    REQUIRE(sx[2] == 2);
   }
-
-  SECTION("we handle a const container") {
-    REQUIRE(std::is_same_v<value_type_t<const std::vector<int>>, int>);
-  }
-
-  SECTION("we handle an array") { REQUIRE(std::is_same_v<value_type_t<int[6]>, int>); }
 }

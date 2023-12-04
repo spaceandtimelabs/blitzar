@@ -14,43 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
- * Adopted from zkcrypto/bls12_381
- *
- * Copyright (c) 2021
- * Sean Bowe <ewillbefull@gmail.com>
- * Jack Grigg <thestr4d@gmail.com>
- *
- * See third_party/license/zkcrypto.LICENSE
- */
 #pragma once
 
-#include "sxt/base/field/arithmetic_utility.h"
-#include "sxt/base/macro/cuda_callable.h"
-#include "sxt/base/num/cmov.h"
+#include <concepts>
 
 namespace sxt::basfld {
 //--------------------------------------------------------------------------------------------------
-// subtract_p
+// element
 //--------------------------------------------------------------------------------------------------
-/*
- Compute ret = a - p, where p is the modulus.
- */
-template <size_t NumLimbs>
-CUDA_CALLABLE inline void subtract_p(uint64_t* ret, const uint64_t* a, const uint64_t* p) noexcept {
-  uint64_t borrow{0};
-
-  for (size_t limb = 0; limb < NumLimbs; ++limb) {
-    sbb(ret[limb], borrow, a[limb], p[limb]);
-  }
-
-  // If underflow occurred on the final limb, borrow = 0xfff...fff, otherwise
-  // borrow = 0x000...000. Thus, we use it as a mask!
-  uint64_t mask{0x0};
-  basn::cmov(mask, borrow - 1, borrow == 0x0);
-
-  for (size_t limb = 0; limb < NumLimbs; ++limb) {
-    ret[limb] = (a[limb] & borrow) | (ret[limb] & mask);
-  }
-}
+template <class T>
+concept element = requires(T& eref, const T& ecref) {
+  requires T::num_limbs_v > 0 && std::equality_comparable<T>;
+  { eref[0] } noexcept -> std::same_as<uint64_t&>;
+  { ecref[0] } noexcept -> std::same_as<const uint64_t&>;
+  { eref.data() } noexcept -> std::same_as<uint64_t*>;
+  { ecref.data() } noexcept -> std::same_as<const uint64_t*>;
+  { T::modulus() } noexcept -> std::same_as<T>;
+};
 } // namespace sxt::basfld

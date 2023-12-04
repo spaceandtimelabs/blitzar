@@ -14,24 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/base/type/value_type.h"
-
-#include <type_traits>
-#include <vector>
-
-#include "sxt/base/test/unit_test.h"
-
-using namespace sxt;
-using namespace sxt::bast;
-
-TEST_CASE("we can get the value type of containers") {
-  SECTION("we handle a simple container") {
-    REQUIRE(std::is_same_v<value_type_t<std::vector<int>>, int>);
-  }
-
-  SECTION("we handle a const container") {
-    REQUIRE(std::is_same_v<value_type_t<const std::vector<int>>, int>);
-  }
-
-  SECTION("we handle an array") { REQUIRE(std::is_same_v<value_type_t<int[6]>, int>); }
-}
+#include "sxt/base/field/example_element.h"

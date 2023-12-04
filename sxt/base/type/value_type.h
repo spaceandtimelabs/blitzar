@@ -16,16 +16,37 @@
  */
 #pragma once
 
+#include <type_traits>
+
 namespace sxt::bast {
 //--------------------------------------------------------------------------------------------------
 // value_type
 //--------------------------------------------------------------------------------------------------
+/**
+ * Mirror https://en.cppreference.com/w/cpp/experimental/ranges/iterator/value_type
+ */
 template <class T> struct value_type {};
+
+template <class T> struct value_type<T*> {
+  using type = std::remove_cv_t<T>;
+};
+
+template <class T>
+  requires std::is_array_v<T>
+struct value_type<T> : value_type<std::decay_t<T>> {};
+
+template <class T> struct value_type<const T> : value_type<std::decay_t<T>> {};
 
 template <class T>
   requires requires { typename T::value_type; }
 struct value_type<T> {
   using type = typename T::value_type;
+};
+
+template <class T>
+  requires requires { typename T::element_type; }
+struct value_type<T> {
+  using type = typename T::element_type;
 };
 
 //--------------------------------------------------------------------------------------------------
