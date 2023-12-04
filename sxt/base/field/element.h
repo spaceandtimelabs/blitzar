@@ -20,22 +20,15 @@
 
 namespace sxt::basfld {
 //--------------------------------------------------------------------------------------------------
-// modifiable
+// element
 //--------------------------------------------------------------------------------------------------
 template <class T>
-concept modifiable = requires(T& eref, const T& ecref) {
+concept element = requires(T& eref, const T& ecref) {
+  requires T::num_limbs_v > 0 && std::equality_comparable<T>;
   { eref[0] } noexcept -> std::same_as<uint64_t&>;
   { ecref[0] } noexcept -> std::same_as<const uint64_t&>;
   { eref.data() } noexcept -> std::same_as<uint64_t*>;
   { ecref.data() } noexcept -> std::same_as<const uint64_t*>;
-};
-
-//--------------------------------------------------------------------------------------------------
-// element
-//--------------------------------------------------------------------------------------------------
-template <class T>
-concept element = requires {
-  requires T::num_limbs_v > 0 && std::equality_comparable<T> && modifiable<T>;
   { T::modulus() } noexcept -> std::same_as<T>;
 };
 } // namespace sxt::basfld
