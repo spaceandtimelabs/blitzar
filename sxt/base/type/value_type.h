@@ -27,8 +27,7 @@ namespace sxt::bast {
  */
 template <class T> struct value_type {};
 
-template <class T>
-struct value_type<T*> {
+template <class T> struct value_type<T*> {
   using type = std::remove_cv_t<T>;
 };
 
@@ -36,8 +35,7 @@ template <class T>
   requires std::is_array_v<T>
 struct value_type<T> : value_type<std::decay_t<T>> {};
 
-template <class T>
-struct value_type<const T> : value_type<std::decay_t<T>> {};
+template <class T> struct value_type<const T> : value_type<std::decay_t<T>> {};
 
 template <class T>
   requires requires { typename T::value_type; }
