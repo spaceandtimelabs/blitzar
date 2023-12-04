@@ -29,9 +29,11 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "span_utility",
-    with_test = False,
     deps = [
         ":span",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
     ],
 )
 
