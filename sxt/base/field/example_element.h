@@ -14,43 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
- * Adopted from zkcrypto/bls12_381
- *
- * Copyright (c) 2021
- * Sean Bowe <ewillbefull@gmail.com>
- * Jack Grigg <thestr4d@gmail.com>
- *
- * See third_party/license/zkcrypto.LICENSE
- */
 #pragma once
-
-#include "sxt/base/field/arithmetic_utility.h"
-#include "sxt/base/macro/cuda_callable.h"
-#include "sxt/base/num/cmov.h"
 
 namespace sxt::basfld {
 //--------------------------------------------------------------------------------------------------
-// subtract_p
+// element1
 //--------------------------------------------------------------------------------------------------
-/*
- Compute ret = a - p, where p is the modulus.
+/**
+ * Provides a minimal implementation of the field element concent that can be used for writing
+ * tests.
+ *
+ * element1 is a one limb field element that uses modulus 97.
  */
-template <size_t NumLimbs>
-CUDA_CALLABLE inline void subtract_p(uint64_t* ret, const uint64_t* a, const uint64_t* p) noexcept {
-  uint64_t borrow{0};
+struct element1 {
+  static constexpr size_t num_limbs_v = 1;
 
-  for (size_t limb = 0; limb < NumLimbs; ++limb) {
-    sbb(ret[limb], borrow, a[limb], p[limb]);
-  }
+  element1() noexcept = default;
 
-  // If underflow occurred on the final limb, borrow = 0xfff...fff, otherwise
-  // borrow = 0x000...000. Thus, we use it as a mask!
-  uint64_t mask{0x0};
-  basn::cmov(mask, borrow - 1, borrow == 0x0);
+  constexpr element1(uint64_t x1) noexcept : data_{x1} {}
 
-  for (size_t limb = 0; limb < NumLimbs; ++limb) {
-    ret[limb] = (a[limb] & borrow) | (ret[limb] & mask);
-  }
-}
+  constexpr const uint64_t& operator[](int index) const noexcept { return data_[index]; }
+
+  constexpr uint64_t& operator[](int index) noexcept { return data_[index]; }
+
+  constexpr const uint64_t* data() const noexcept { return data_; }
+
+  constexpr uint64_t* data() noexcept { return data_; }
+
+  static constexpr element1 modulus() noexcept { return element1{97}; }
+
+  bool operator==(const element1&) const noexcept = default;
+
+private:
+  uint64_t data_[num_limbs_v];
+};
 } // namespace sxt::basfld
