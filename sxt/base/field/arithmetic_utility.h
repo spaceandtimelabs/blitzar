@@ -29,7 +29,7 @@
 #include "sxt/base/type/int.h"
 #include "sxt/base/type/narrow_cast.h"
 
-namespace sxt::basf {
+namespace sxt::basfld {
 //--------------------------------------------------------------------------------------------------
 // mac
 //--------------------------------------------------------------------------------------------------
@@ -71,4 +71,4 @@ CUDA_CALLABLE void inline sbb(uint64_t& ret, uint64_t& borrow, const uint64_t a,
   ret = bast::narrow_cast<uint64_t>(ret_tmp);
   borrow = bast::narrow_cast<uint64_t>(ret_tmp >> 64);
 }
-} // namespace sxt::basf
+} // namespace sxt::basfld

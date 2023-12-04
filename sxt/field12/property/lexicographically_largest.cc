@@ -46,12 +46,12 @@ bool lexicographically_largest(const f12t::element& e) noexcept {
 
   uint64_t dummy{0};
   uint64_t borrow{0};
-  basf::sbb(dummy, borrow, e_tmp[0], 0xdcff7fffffffd556);
-  basf::sbb(dummy, borrow, e_tmp[1], 0x0f55ffff58a9ffff);
-  basf::sbb(dummy, borrow, e_tmp[2], 0xb39869507b587b12);
-  basf::sbb(dummy, borrow, e_tmp[3], 0xb23ba5c279c2895f);
-  basf::sbb(dummy, borrow, e_tmp[4], 0x258dd3db21a5d66b);
-  basf::sbb(dummy, borrow, e_tmp[5], 0x0d0088f51cbff34d);
+  basfld::sbb(dummy, borrow, e_tmp[0], 0xdcff7fffffffd556);
+  basfld::sbb(dummy, borrow, e_tmp[1], 0x0f55ffff58a9ffff);
+  basfld::sbb(dummy, borrow, e_tmp[2], 0xb39869507b587b12);
+  basfld::sbb(dummy, borrow, e_tmp[3], 0xb23ba5c279c2895f);
+  basfld::sbb(dummy, borrow, e_tmp[4], 0x258dd3db21a5d66b);
+  basfld::sbb(dummy, borrow, e_tmp[5], 0x0d0088f51cbff34d);
 
   // If the element was smaller, the subtraction will underflow
   // producing a borrow value of 0xffff...ffff, otherwise it will
