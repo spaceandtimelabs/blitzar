@@ -25,7 +25,7 @@
 using namespace sxt;
 using namespace sxt::algi;
 
-TEST_CASE("t") {
+TEST_CASE("we can transform contigous regions of memory") {
   std::vector<double> res;
   basit::chunk_options chunk_options;
 
@@ -70,16 +70,14 @@ TEST_CASE("t") {
     struct functor {
       const int* xs;
 
-      __device__ __host__ void operator()(double& x) const noexcept {
-        x *= xs[0] * xs[1] * xs[2];
-      };
+      __device__ __host__ void operator()(double& x) const noexcept { x *= xs[0] * xs[1] * xs[2]; };
     };
 
     auto make_f = [&](std::pmr::polymorphic_allocator<> alloc,
-                      basdv::stream& stream) noexcept -> xena::future<functor> { 
+                      basdv::stream& stream) noexcept -> xena::future<functor> {
       auto xs_dev = co_await xendv::make_active_device_viewable(alloc, xs);
       co_return functor{
-        .xs = xs_dev.data(),
+          .xs = xs_dev.data(),
       };
     };
 
