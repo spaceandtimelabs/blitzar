@@ -28,6 +28,7 @@
 #include "sxt/base/iterator/index_range_utility.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/device_viewable.h"
 #include "sxt/execution/device/for_each.h"
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
@@ -131,57 +132,37 @@ xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector_p,
                               min_chunk_size, max_chunk_size);
 }
 
-xena::future<> async_fold_generators(basct::span<c21t::element_p3> g_vector_p,
-                                     basct::cspan<c21t::element_p3> g_vector,
-                                     basct::cspan<unsigned> decomposition) noexcept {
-  auto make_functor = [&](std::pmr::polymorphic_allocator<> alloc, basdv::stream& stream) noexcept {
-    (void)alloc;
-    (void)stream;
+xena::future<>
+async_fold_generators(basct::span<c21t::element_p3> g_vector_p,
+                      basct::cspan<c21t::element_p3> g_vector,
+                      basct::cspan<unsigned> decomposition) noexcept  {
+  auto np = g_vector_p.size();
+  SXT_DEBUG_ASSERT(
+      g_vector.size() == 2u * np
+  );
+  struct functor {
+    const unsigned* decomposition_data;
+    unsigned decomposition_size;
+
+    __device__ __host__ void operator()(c21t::element_p3& lhs,
+                                        const c21t::element_p3& rhs) const noexcept {
+      fold_generators(lhs, basct::cspan<unsigned>{decomposition_data, decomposition_size}, lhs,
+                      rhs);
+    }
   };
-  (void)make_functor;
-#if 0
-  auto n = g_vector_p.size();
-  auto partial_size = rng.size();
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-
-  // partial_g_vector
-  memmg::managed_array<c21t::element_p3> partial_g_vector{2u * partial_size, &resource};
-  basdv::async_copy_host_to_device(basct::subspan(partial_g_vector, 0, partial_size),
-                                   g_vector.subspan(rng.a(), partial_size), stream);
-  basdv::async_copy_host_to_device(basct::subspan(partial_g_vector, partial_size),
-                                   g_vector.subspan(rng.a() + n, partial_size), stream);
-
-  // decomposition_gpu
-  memmg::managed_array<unsigned> decomposition_gpu{decomposition.size(), &resource};
-  basdv::async_copy_host_to_device(decomposition_gpu, decomposition, stream);
-  auto decomposition_data = decomposition_gpu.data();
-  auto decomposition_size = static_cast<unsigned>(decomposition.size());
-
-  // launch kernel
-  auto data = partial_g_vector.data();
-  auto f = [
-               // clang-format off
-    data,
-    decomposition_data,
-    decomposition_size
-               // clang-format on
-  ] __device__
-           __host__(unsigned partial_size, unsigned i) noexcept {
-             fold_generators(data[i],
-                             basct::cspan<unsigned>{decomposition_data, decomposition_size},
-                             data[i], data[i + partial_size]);
-           };
-  algi::launch_for_each_kernel(stream, f, partial_size);
-
-  // copy result
-  basdv::async_copy_device_to_host(g_vector_p.subspan(rng.a(), partial_size),
-                                   basct::subspan(partial_g_vector, 0, partial_size), stream);
-  return xendv::await_and_own_stream(std::move(stream));
-#endif
-  (void)g_vector_p;
-  (void)g_vector;
-  (void)decomposition;
-  return {};
+  auto make_f = [&](std::pmr::polymorphic_allocator<> alloc,
+                    basdv::stream& /*stream*/) noexcept -> xena::future<functor> {
+    auto decomposition_device = co_await xendv::make_active_device_viewable(alloc, decomposition);
+    co_return functor{
+        .decomposition_data = decomposition_device.data(),
+        .decomposition_size = static_cast<unsigned>(decomposition_device.size()),
+    };
+  };
+  basit::chunk_options chunk_options{
+      .min_size = 1ull << 9u,
+      .max_size = 1ull << 18u,
+  };
+  co_await algi::transform(g_vector_p, make_f, chunk_options, g_vector.subspan(0, np),
+                           g_vector.subspan(np));
 }
 } // namespace sxt::prfip
