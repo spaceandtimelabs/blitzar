@@ -38,4 +38,8 @@ xena::future<void> fold_generators_impl(basct::span<c21t::element_p3> g_vector_p
 xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector_p,
                                    basct::cspan<c21t::element_p3> g_vector,
                                    basct::cspan<unsigned> decomposition) noexcept;
+
+xena::future<> async_fold_generators(basct::span<c21t::element_p3> g_vector_p,
+                                     basct::cspan<c21t::element_p3> g_vector,
+                                     basct::cspan<unsigned> decomposition) noexcept;
 } // namespace sxt::prfip
