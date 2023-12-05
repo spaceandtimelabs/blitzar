@@ -32,11 +32,11 @@ sxt_cc_component(
 sxt_cc_component(
     name = "device_copy",
     test_deps = [
-        "//sxt/memory/resource:chained_resource",
         "//sxt/base/device:active_device_guard",
         "//sxt/base/device:property",
         "//sxt/base/test:unit_test",
         "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:chained_resource",
         "//sxt/memory/resource:device_resource",
     ],
     deps = [
