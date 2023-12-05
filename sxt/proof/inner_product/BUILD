@@ -147,13 +147,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "fold_kernel",
-    test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-)
-
-sxt_cc_component(
     name = "scalar_fold_kernel",
     impl_deps = [
         "//sxt/algorithm/iteration:for_each",
