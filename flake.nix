@@ -35,6 +35,7 @@
             dockerTools.binSh
             dockerTools.caCertificates
             dockerTools.fakeNss
+            pkgs.nvidia-docker
           ];
           # pkgs.buildEnv {
           #   name = "image-root";
