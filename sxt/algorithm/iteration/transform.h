@@ -54,24 +54,6 @@ CUDA_CALLABLE void apply_transform_functor(const Ptrs& ptrs, const F& f, unsigne
 // transform_impl
 //--------------------------------------------------------------------------------------------------
 namespace detail {
-template <class T, class F, class SpansDst, class SpansSrc, size_t... Indexes, class... Args>
-xena::future<> transform_impl(basct::span<T> res, basdv::stream&& stream, F f, const SpansDst& dsts,
-                              const SpansSrc& srcs, const basit::index_range& rng,
-                              std::index_sequence<Indexes...>, const Args&... xs) noexcept {
-
-  (basdv::async_copy_to_device(std::get<Indexes>(dsts),
-                               std::get<Indexes>(srcs).subspan(rng.a(), rng.size()), stream),
-   ...);
-
-  auto ptrs = std::make_tuple(std::get<Indexes>(dsts).data()...);
-  auto fp = [ptrs, f] __device__ __host__(unsigned /*n*/, unsigned i) noexcept {
-    apply_transform_functor(ptrs, f, i, std::make_index_sequence<sizeof...(Indexes)>{});
-  };
-  launch_for_each_kernel(stream, fp, static_cast<unsigned>(res.size()));
-  basdv::async_copy_device_to_host(res, std::get<0>(dsts), stream);
-  co_await xendv::await_and_own_stream(std::move(stream));
-}
-
 template <class T, class F, class SpansSrc, size_t... Indexes, class... Args>
 xena::future<> transform_impl(basct::span<T> res, F make_f, const SpansSrc& srcs,
                               const basit::index_range& rng, std::index_sequence<Indexes...>,
@@ -117,23 +99,8 @@ xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res, F make_f,
                                     chunk_options.split_factor);
   co_await xendv::concurrent_for_each(
       first, last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
-#if 0
-        basdv::stream stream;
-        memr::async_device_resource resource{stream};
-        memr::chained_resource alloc{&resource};
-
-        auto dsts = std::make_tuple(
-            basct::winked_span<bast::value_type_t<Arg1>>(&alloc, rng.size()),
-            basct::winked_span<bast::value_type_t<ArgsRest>>(&alloc, rng.size())...);
-
-        auto f = co_await make_f(&alloc, stream);
-        co_await detail::transform_impl(res.subspan(rng.a(), rng.size()), std::move(stream), f,
-                                        dsts, srcs, rng,
-                                        std::make_index_sequence<sizeof...(ArgsRest) + 1>{});
-#else
         co_await detail::transform_impl(res.subspan(rng.a(), rng.size()), make_f, srcs, rng,
                                         std::make_index_sequence<sizeof...(ArgsRest) + 1>{});
-#endif
       });
 }
 
