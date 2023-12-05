@@ -97,8 +97,8 @@ xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res,
   std::tuple<basct::cspan<bast::value_type_t<Arg1>>, basct::cspan<bast::value_type_t<ArgsRest>>...>
       srcs{x1, xrest...};
   auto full_rng = basit::index_range{0, n}
-                 .min_chunk_size(chunk_options.min_size)
-                 .max_chunk_size(chunk_options.max_size);
+                      .min_chunk_size(chunk_options.min_size)
+                      .max_chunk_size(chunk_options.max_size);
   co_await xendv::concurrent_for_each(
       full_rng, [&](const basit::index_range& rng) noexcept -> xena::future<> {
         co_await detail::transform_impl(res.subspan(rng.a(), rng.size()), make_f, srcs, rng,
