@@ -17,6 +17,7 @@
 #include "sxt/proof/inner_product/generator_fold_kernel.h"
 
 #include "sxt/algorithm/iteration/for_each.h"
+#include "sxt/algorithm/iteration/transform.h"
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/property.h"
