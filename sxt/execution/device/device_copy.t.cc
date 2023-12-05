@@ -29,7 +29,6 @@ using namespace sxt;
 using namespace sxt::xendv;
 
 TEST_CASE("we can copy memory to the active device") {
-  memmg::managed_array<int> data_maybe{memr::get_device_resource()};
   memmg::managed_array<int> host_data = {1, 2, 3};
   memr::chained_resource alloc{memr::get_device_resource()};
 
