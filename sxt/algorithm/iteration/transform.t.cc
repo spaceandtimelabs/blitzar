@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/execution/device/device_viewable.h"
 #include "sxt/execution/schedule/scheduler.h"
 
 using namespace sxt;
@@ -62,5 +63,32 @@ TEST_CASE("t") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 6);
     REQUIRE(res[1] == 10);
+  }
+
+  SECTION("we can allocate memory for each device chunk") {
+    std::vector<int> xs = {3, 2, 1};
+    struct functor {
+      const int* xs;
+
+      __device__ __host__ void operator()(double& x) const noexcept {
+        x *= xs[0] * xs[1] * xs[2];
+      };
+    };
+
+    auto make_f = [&](std::pmr::polymorphic_allocator<> alloc,
+                      basdv::stream& stream) noexcept -> xena::future<functor> { 
+      auto xs_dev = co_await xendv::make_active_device_viewable(alloc, xs);
+      co_return functor{
+        .xs = xs_dev.data(),
+      };
+    };
+
+    res = {3, 4};
+    chunk_options.max_size = 1;
+    auto fut = transform(res, make_f, chunk_options, res);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 18);
+    REQUIRE(res[1] == 24);
   }
 }

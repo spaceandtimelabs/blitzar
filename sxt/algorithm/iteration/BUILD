@@ -43,6 +43,7 @@ sxt_cc_component(
     name = "transform",
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/execution/device:device_viewable",
         "//sxt/execution/schedule:scheduler",
     ],
     deps = [
