@@ -35,6 +35,9 @@ template <class Cont, class T = bast::value_type_t<Cont>>
   requires std::convertible_to<Cont, basct::cspan<T>>
 event_future<basct::span<T>> winked_device_copy(std::pmr::polymorphic_allocator<> alloc,
                                                 const Cont& src) noexcept {
+  if (src.empty()) {
+    return event_future<basct::span<T>>{basct::span<T>{}};
+  }
   auto res = basct::winked_span<T>(alloc, src.size());
   basdv::stream stream;
   basdv::async_copy_to_device(res, src, stream);
