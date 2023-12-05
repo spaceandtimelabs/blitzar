@@ -55,7 +55,7 @@ xena::future<> fold_generators(basct::span<c21t::element_p3> g_vector_p,
       .min_size = 1ull << 9u,
       .max_size = 1ull << 18u,
   };
-  co_await algi::transform(g_vector_p, make_f, chunk_options, g_vector.subspan(0, np),
+  co_await algi::transform(g_vector_p, chunk_options, make_f, g_vector.subspan(0, np),
                            g_vector.subspan(np));
 }
 } // namespace sxt::prfip

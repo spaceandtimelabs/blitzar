@@ -31,14 +31,14 @@ TEST_CASE("t") {
 
   SECTION("we handle the empty case") {
     auto f = [] __device__ __host__(double& x) noexcept { x *= 2; };
-    auto fut = transform(res, f, chunk_options, res);
+    auto fut = transform(res, chunk_options, f, res);
     REQUIRE(fut.ready());
   }
 
   SECTION("we can transform a vector with a single element") {
     res = {123};
     auto f = [] __device__ __host__(double& x) noexcept { x *= 2; };
-    auto fut = transform(res, f, chunk_options, res);
+    auto fut = transform(res, chunk_options, f, res);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 246);
@@ -48,7 +48,7 @@ TEST_CASE("t") {
     res = {2};
     std::vector<double> y = {4};
     auto f = [] __device__ __host__(double& x, double& y) noexcept { x = x + y; };
-    auto fut = transform(res, f, chunk_options, res, y);
+    auto fut = transform(res, chunk_options, f, res, y);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 6);
@@ -58,7 +58,7 @@ TEST_CASE("t") {
     res = {3, 5};
     auto f = [] __device__ __host__(double& x) noexcept { x *= 2; };
     chunk_options.max_size = 1;
-    auto fut = transform(res, f, chunk_options, res);
+    auto fut = transform(res, chunk_options, f, res);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 6);
@@ -85,7 +85,7 @@ TEST_CASE("t") {
 
     res = {3, 4};
     chunk_options.max_size = 1;
-    auto fut = transform(res, make_f, chunk_options, res);
+    auto fut = transform(res, chunk_options, make_f, res);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 18);

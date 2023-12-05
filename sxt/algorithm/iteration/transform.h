@@ -80,11 +80,14 @@ xena::future<> transform_impl(basct::span<T> res, F make_f, const SpansSrc& srcs
 //--------------------------------------------------------------------------------------------------
 // transform
 //--------------------------------------------------------------------------------------------------
+/**
+ * Use multiple GPUs to apply a transformation of contiguous regions of memory
+ */
 template <class F, class Arg1, class... ArgsRest>
   requires algb::transform_functor_factory<F, bast::value_type_t<Arg1>,
                                            bast::value_type_t<ArgsRest>...>
-xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res, F make_f,
-                         basit::chunk_options chunk_options, const Arg1& x1,
+xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res,
+                         basit::chunk_options chunk_options, F make_f, const Arg1& x1,
                          const ArgsRest&... xrest) noexcept {
   auto n = res.size();
   SXT_DEBUG_ASSERT(x1.size() == n && ((xrest.size() == n) && ...));
@@ -106,12 +109,12 @@ xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res, F make_f,
 
 template <class F, class Arg1, class... ArgsRest>
   requires algb::transform_functor<F, bast::value_type_t<Arg1>, bast::value_type_t<ArgsRest>...>
-xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res, F f,
-                         basit::chunk_options chunk_options, const Arg1& x1,
+xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res,
+                         basit::chunk_options chunk_options, F f, const Arg1& x1,
                          const ArgsRest&... xrest) noexcept {
   auto make_f = [&](std::pmr::polymorphic_allocator<> /*alloc*/, basdv::stream& /*stream*/) {
     return xena::make_ready_future<F>(F{f});
   };
-  co_await transform(res, make_f, chunk_options, x1, xrest...);
+  co_await transform(res, chunk_options, make_f, x1, xrest...);
 }
 } // namespace sxt::algi

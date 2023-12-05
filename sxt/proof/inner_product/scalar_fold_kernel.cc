@@ -52,12 +52,12 @@ xena::future<> fold_scalars(basct::span<s25t::element> scalars_p,
   };
 
   // case 1
-  auto fut1 = algi::transform(scalars_p.subspan(0, m), f1, chunk_options, scalars.subspan(0, m),
+  auto fut1 = algi::transform(scalars_p.subspan(0, m), chunk_options, f1, scalars.subspan(0, m),
                               scalars.subspan(mid));
 
   // case 2
   auto f2 = [m_low] __device__ __host__(s25t::element & x) noexcept { s25o::mul(x, m_low, x); };
-  co_await algi::transform(scalars_p.subspan(m), f2, chunk_options, scalars.subspan(m, mid - m));
+  co_await algi::transform(scalars_p.subspan(m), chunk_options, f2, scalars.subspan(m, mid - m));
 
   co_await std::move(fut1);
 }
