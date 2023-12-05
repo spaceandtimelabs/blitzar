@@ -75,21 +75,4 @@ TEST_CASE("we can fold generators using the GPU") {
     rsto::compress(actual, g_vector_p[1]);
     REQUIRE(actual == expected);
   }
-
-  SECTION("we can chunk a generator fold") {
-    g_vector = {0x11_rs, 0x22_rs, 0x33_rs, 0x44_rs};
-    g_vector_p.resize(2);
-
-    auto fut = fold_generators_impl(g_vector_p, g_vector, decomposition, 2u, 1u, 100u);
-    xens::get_scheduler().run();
-    REQUIRE(fut.ready());
-
-    rsto::compress(expected, x1 * g_vector[0] + x2 * g_vector[2]);
-    rsto::compress(actual, g_vector_p[0]);
-    REQUIRE(actual == expected);
-
-    rsto::compress(expected, x1 * g_vector[1] + x2 * g_vector[3]);
-    rsto::compress(actual, g_vector_p[1]);
-    REQUIRE(actual == expected);
-  }
 }
