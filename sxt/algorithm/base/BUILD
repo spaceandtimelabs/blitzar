@@ -6,6 +6,17 @@ load(
 sxt_cc_component(
     name = "index_functor",
     with_test = False,
+    deps = [
+        "//sxt/execution/async:future",
+    ],
+)
+
+sxt_cc_component(
+    name = "transform_functor",
+    with_test = False,
+    deps = [
+        "//sxt/execution/async:future",
+    ],
 )
 
 sxt_cc_component(

@@ -22,6 +22,7 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/chained_resource.h"
 #include "sxt/memory/resource/device_resource.h"
 
 using namespace sxt;
@@ -30,6 +31,7 @@ using namespace sxt::xendv;
 TEST_CASE("we can make a span of memory viewable to the active device") {
   memmg::managed_array<int> data_maybe{memr::get_device_resource()};
   memmg::managed_array<int> host_data = {1, 2, 3};
+  memr::chained_resource alloc{memr::get_device_resource()};
 
   SECTION("we handle the empty span") {
     auto viewable = make_active_device_viewable(data_maybe, basct::cspan<int>{});
@@ -43,6 +45,14 @@ TEST_CASE("we can make a span of memory viewable to the active device") {
     REQUIRE(viewable.value().data() == data_maybe.data());
     REQUIRE(basdv::is_active_device_pointer(data_maybe.data()));
     xens::get_scheduler().run();
+    REQUIRE(basdv::is_equal_for_testing<int>(viewable.value(), host_data));
+  }
+
+  SECTION("we use winked_allocations") {
+    auto viewable = make_active_device_viewable(&alloc, host_data);
+    REQUIRE(viewable.event());
+    xens::get_scheduler().run();
+    REQUIRE(basdv::is_active_device_pointer(viewable.value().data()));
     REQUIRE(basdv::is_equal_for_testing<int>(viewable.value(), host_data));
   }
 

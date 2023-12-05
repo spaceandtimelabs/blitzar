@@ -4,6 +4,14 @@ load(
 )
 
 sxt_cc_component(
+    name = "chunk_options",
+    with_test = False,
+    deps = [
+        "//sxt/base/device:property",
+    ],
+)
+
+sxt_cc_component(
     name = "counting_iterator",
     test_deps = [
         "//sxt/base/test:unit_test",
