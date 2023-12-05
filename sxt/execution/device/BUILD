@@ -10,6 +10,7 @@ sxt_cc_component(
         "//sxt/base/device:property",
         "//sxt/base/test:unit_test",
         "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:chained_resource",
         "//sxt/memory/resource:device_resource",
     ],
     deps = [
