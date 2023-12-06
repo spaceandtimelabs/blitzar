@@ -18,6 +18,25 @@
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
       devShells.${system}.default = shell;
+
+      # WIP: Set up a docker image
+      #
+      # To build the image, run
+      #   > nix build .#docker
+      #   > sudo docker load <result
+      # The image can be run with
+      #   > docker 
+      #   > sudo docker run -v /home/rnburn/proj/blitzar:/src -w /src --rm --runtime=nvidia --gpus all -it blitzar:<hash>
+      # TODO(rnburn):
+      #   * Invoking 
+      #        bazel build //sxt/...
+      #     in the container should work but the full build
+      #        bazel build //...
+      #     needs a bit of work to get the benchmarks to build
+      #   * When running
+      #        bazel test //sxt/...
+      #     the GPU tests will fail -- some steps are missing in the docker environment to get the
+      #     GPU drivers to appear
       packages.${system}.docker = 
         let
           clang = import ./nix/clang.nix { inherit pkgs; };
@@ -37,37 +56,8 @@
             dockerTools.fakeNss
             pkgs.nvidia-docker
           ];
-          # pkgs.buildEnv {
-          #   name = "image-root";
-          #   paths = [
-          #     bazel
-          #     binutils
-          #     coreutils
-          #     bashInteractive
-          #   ];
-          # };
 
           config = {
-            # extraCommands = 
-            #   # taken from https://github.com/nix-community/docker-nixpkgs/blob/master/images/devcontainer/default.nix
-            #   # # create the Nix DB
-            #   # export NIX_REMOTE=local?root=$PWD
-            #   # export USER=nobody
-            #   # ${nix}/bin/nix-store --load-db < ${closureInfo { rootPaths = [ profile ]; }}/registration
-
-            #   # # set the user profile
-            #   # ${profile}/bin/nix-env --profile nix/var/nix/profiles/default --set ${profile}
-
-            #   ''
-            #   # minimal
-            #   mkdir -p bin /usr/bin
-            #   ln -s /nix/var/nix/profiles/default/bin/sh bin/sh
-            #   ln -s /nix/var/nix/profiles/default/bin/sh bin/bash
-            #   ln -s /nix/var/nix/profiles/default/bin/env usr/bin/env
-
-            #   # make sure /tmp exists
-            #   mkdir -m 0777 tmp
-            # '';
             Cmd = [
               "/bin/sh"
             ];
