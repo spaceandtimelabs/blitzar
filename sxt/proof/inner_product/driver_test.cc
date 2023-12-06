@@ -56,9 +56,7 @@ static void exercise_fold_commit(const driver& drv) {
   SECTION("we correctly commit for the n = 2 case") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 2);
 
-    auto workspace_fut = drv.make_workspace(descriptor, a_vector);
-    xens::get_scheduler().run();
-    auto workspace = std::move(workspace_fut.value());
+    auto workspace = drv.make_workspace(descriptor, a_vector);
 
     auto fut = drv.commit_to_fold(l_value, r_value, *workspace);
     xens::get_scheduler().run();
@@ -78,9 +76,7 @@ static void exercise_fold_commit(const driver& drv) {
   SECTION("we correctly commit for the n = 3 case") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 3);
 
-    auto workspace_fut = drv.make_workspace(descriptor, a_vector);
-    xens::get_scheduler().run();
-    auto workspace = std::move(workspace_fut.value());
+    auto workspace = drv.make_workspace(descriptor, a_vector);
     auto fut = drv.commit_to_fold(l_value, r_value, *workspace);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
@@ -99,9 +95,7 @@ static void exercise_fold_commit(const driver& drv) {
 
   SECTION("we correctly commit for the n = 4 case") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 4);
-    auto workspace_fut = drv.make_workspace(descriptor, a_vector);
-    xens::get_scheduler().run();
-    auto workspace = std::move(workspace_fut.value());
+    auto workspace = drv.make_workspace(descriptor, a_vector);
     auto fut = drv.commit_to_fold(l_value, r_value, *workspace);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
@@ -148,9 +142,7 @@ static void exercise_fold(const driver& drv) {
   SECTION("we handle the n = 2 case") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 2);
 
-    auto workspace_fut = drv.make_workspace(descriptor, a_vector);
-    xens::get_scheduler().run();
-    auto workspace = std::move(workspace_fut.value());
+    auto workspace = drv.make_workspace(descriptor, a_vector);
 
     auto fut = drv.fold(*workspace, x1);
     xens::get_scheduler().run();
@@ -167,9 +159,7 @@ static void exercise_fold(const driver& drv) {
   SECTION("we handle the n = 3 case") {
     generate_random_product(descriptor, a_vector, rng, &alloc, 3);
 
-    auto workspace_fut = drv.make_workspace(descriptor, a_vector);
-    xens::get_scheduler().run();
-    auto workspace = std::move(workspace_fut.value());
+    auto workspace = drv.make_workspace(descriptor, a_vector);
 
     auto fut = drv.fold(*workspace, x1);
     xens::get_scheduler().run();

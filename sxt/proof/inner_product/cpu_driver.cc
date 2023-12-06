@@ -100,7 +100,7 @@ static void multiexponentiate(c21t::element_p3 c_commits[2], const c21t::element
 //--------------------------------------------------------------------------------------------------
 // make_workspace
 //--------------------------------------------------------------------------------------------------
-xena::future<std::unique_ptr<workspace>>
+std::unique_ptr<workspace>
 cpu_driver::make_workspace(const proof_descriptor& descriptor,
                            basct::cspan<s25t::element> a_vector) const noexcept {
   auto n = a_vector.size();
@@ -113,7 +113,7 @@ cpu_driver::make_workspace(const proof_descriptor& descriptor,
 
   init_workspace(*res);
 
-  return xena::make_ready_future(std::unique_ptr<workspace>{std::move(res)});
+  return res;
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -83,7 +83,7 @@ xena::future<void> prove_inner_product(basct::span<rstt::compressed_element> l_v
     co_return;
   }
 
-  auto workspace = co_await drv.make_workspace(descriptor, a_vector);
+  auto workspace = drv.make_workspace(descriptor, a_vector);
   size_t round_index = 0;
   while (np > 1) {
     auto& l_value = l_vector[round_index];
