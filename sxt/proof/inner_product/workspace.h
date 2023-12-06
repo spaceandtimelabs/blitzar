@@ -16,13 +16,22 @@
  */
 #pragma once
 
+#include <cstddef>
+#include <memory_resource>
+
+#include "sxt/base/container/span.h"
 #include "sxt/execution/async/future_fwd.h"
 
 namespace sxt::s25t {
 class element;
 }
+namespace sxt::c21t {
+struct element_p3;
+}
 
 namespace sxt::prfip {
+struct proof_descriptor;
+
 //--------------------------------------------------------------------------------------------------
 // workspace
 //--------------------------------------------------------------------------------------------------
@@ -41,4 +50,18 @@ public:
    */
   virtual xena::future<void> ap_value(s25t::element& value) const noexcept = 0;
 };
+
+struct workspace2 final : public workspace {
+  std::pmr::monotonic_buffer_resource alloc;
+  const proof_descriptor* descriptor;
+  basct::cspan<s25t::element> a_vector0;
+  size_t round_index;
+  basct::span<c21t::element_p3> g_vector;
+  basct::span<s25t::element> a_vector;
+  basct::span<s25t::element> b_vector;
+
+  xena::future<void> ap_value(s25t::element& value) const noexcept override;
+};
+
+void init_workspace(workspace2& work) noexcept;
 } // namespace sxt::prfip
