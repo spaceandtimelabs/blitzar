@@ -10,6 +10,7 @@ sxt_cc_component(
         "//sxt/base/device:property",
         "//sxt/base/test:unit_test",
         "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:chained_resource",
         "//sxt/memory/resource:device_resource",
     ],
     deps = [
@@ -22,6 +23,34 @@ sxt_cc_component(
         "//sxt/base/device:pointer_attributes",
         "//sxt/base/device:state",
         "//sxt/base/device:stream",
+        "//sxt/base/type:value_type",
+        "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
+    ],
+)
+
+sxt_cc_component(
+    name = "device_copy",
+    test_deps = [
+        "//sxt/base/device:active_device_guard",
+        "//sxt/base/device:property",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:chained_resource",
+        "//sxt/memory/resource:device_resource",
+    ],
+    deps = [
+        ":event_future",
+        ":synchronization",
+        "//sxt/base/container:span",
+        "//sxt/base/container:span_utility",
+        "//sxt/base/device:event",
+        "//sxt/base/device:event_utility",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:pointer_attributes",
+        "//sxt/base/device:state",
+        "//sxt/base/device:stream",
+        "//sxt/base/type:value_type",
         "//sxt/execution/async:future",
         "//sxt/memory/management:managed_array",
     ],

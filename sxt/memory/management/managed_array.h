@@ -115,6 +115,7 @@ template <class T> class managed_array {
 
 public:
   using allocator_type = basm::alloc_t;
+  using value_type = T;
 
   // constructor
   managed_array() noexcept = default;

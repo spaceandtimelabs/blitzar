@@ -23,34 +23,34 @@
  *
  * See third_party/license/zkcrypto.LICENSE
  */
-#include "sxt/field12/operation/neg.h"
+#pragma once
 
 #include "sxt/base/field/arithmetic_utility.h"
-#include "sxt/field12/base/constants.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/base/num/cmov.h"
 
-namespace sxt::f12o {
+namespace sxt::basfld {
 //--------------------------------------------------------------------------------------------------
-// neg
+// subtract_p
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void neg(f12t::element& h, const f12t::element& f) noexcept {
-  uint64_t d[6] = {};
+/*
+ Compute ret = a - p, where p is the modulus.
+ */
+template <size_t NumLimbs>
+CUDA_CALLABLE inline void subtract_p(uint64_t* ret, const uint64_t* a, const uint64_t* p) noexcept {
   uint64_t borrow{0};
 
-  basfld::sbb(d[0], borrow, f12b::p_v[0], f[0]);
-  basfld::sbb(d[1], borrow, f12b::p_v[1], f[1]);
-  basfld::sbb(d[2], borrow, f12b::p_v[2], f[2]);
-  basfld::sbb(d[3], borrow, f12b::p_v[3], f[3]);
-  basfld::sbb(d[4], borrow, f12b::p_v[4], f[4]);
-  basfld::sbb(d[5], borrow, f12b::p_v[5], f[5]);
+  for (size_t limb = 0; limb < NumLimbs; ++limb) {
+    sbb(ret[limb], borrow, a[limb], p[limb]);
+  }
 
-  // Let's use a mask if `self` was zero, which would mean
-  // the result of the subtraction is p.
-  uint64_t mask = uint64_t{((f[0] | f[1] | f[2] | f[3] | f[4] | f[5]) == 0)} - uint64_t{1};
+  // If underflow occurred on the final limb, borrow = 0xfff...fff, otherwise
+  // borrow = 0x000...000. Thus, we use it as a mask!
+  uint64_t mask{0x0};
+  basn::cmov(mask, borrow - 1, borrow == 0x0);
 
-  for (int i = 0; i < 6; ++i) {
-    h[i] = d[i] & mask;
+  for (size_t limb = 0; limb < NumLimbs; ++limb) {
+    ret[limb] = (a[limb] & borrow) | (ret[limb] & mask);
   }
 }
-} // namespace sxt::f12o
+} // namespace sxt::basfld
