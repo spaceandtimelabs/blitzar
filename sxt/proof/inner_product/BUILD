@@ -5,15 +5,15 @@ load(
 
 sxt_cc_component(
     name = "workspace",
+    impl_deps = [
+        ":proof_descriptor",
+        "//sxt/base/container:span_utility",
+        "//sxt/execution/async:future",
+    ],
     with_test = False,
     deps = [
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
-    ],
-    impl_deps = [
-      ":proof_descriptor",
-        "//sxt/base/container:span_utility",
-        "//sxt/execution/async:future",
     ],
 )
 

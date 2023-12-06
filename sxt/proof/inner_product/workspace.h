@@ -39,8 +39,9 @@ struct proof_descriptor;
  * Proving an inner product proceeds over multiple rounds. This workspace allows a backend for the
  * computational steps to persist data between prover rounds.
  */
-struct workspace  {
-  explicit workspace(std::pmr::memory_resource* upstream = std::pmr::get_default_resource()) noexcept;
+struct workspace {
+  explicit workspace(
+      std::pmr::memory_resource* upstream = std::pmr::get_default_resource()) noexcept;
 
   std::pmr::monotonic_buffer_resource alloc;
   const proof_descriptor* descriptor;
