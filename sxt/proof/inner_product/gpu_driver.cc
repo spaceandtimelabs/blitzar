@@ -34,10 +34,10 @@
 #include "sxt/proof/inner_product/cpu_driver.h"
 #include "sxt/proof/inner_product/generator_fold.h"
 #include "sxt/proof/inner_product/generator_fold_kernel.h"
-#include "sxt/proof/inner_product/gpu_workspace.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/inner_product/scalar_fold_kernel.h"
 #include "sxt/proof/inner_product/verification_computation_gpu.h"
+#include "sxt/proof/inner_product/workspace.h"
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/scalar25/constant/max_bits.h"
@@ -101,9 +101,14 @@ setup_verification_generators(basct::span<c21t::element_p3> generators,
 xena::future<std::unique_ptr<workspace>>
 gpu_driver::make_workspace(const proof_descriptor& descriptor,
                            basct::cspan<s25t::element> a_vector) const noexcept {
-  auto np_half = descriptor.g_vector.size() / 2;
+  /* auto np_half = descriptor.g_vector.size() / 2; */
 
-  auto res = std::make_unique<gpu_workspace>();
+  auto res = std::make_unique<workspace2>(memr::get_pinned_resource());
+  res->descriptor = &descriptor;
+  res->a_vector0 = a_vector;
+  init_workspace(*res);
+  return xena::make_ready_future(std::unique_ptr<workspace>{std::move(res)});
+#if 0
   basdv::stream stream;
 
   res->descriptor = &descriptor;
@@ -122,6 +127,7 @@ gpu_driver::make_workspace(const proof_descriptor& descriptor,
   res->g_vector = basct::winked_span<c21t::element_p3>(&res->alloc, np_half);
 
   return xendv::await_and_own_stream(std::move(stream), std::unique_ptr<workspace>{std::move(res)});
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -130,7 +136,7 @@ gpu_driver::make_workspace(const proof_descriptor& descriptor,
 xena::future<void> gpu_driver::commit_to_fold(rstt::compressed_element& l_value,
                                               rstt::compressed_element& r_value,
                                               workspace& ws) const noexcept {
-  auto& work = static_cast<gpu_workspace&>(ws);
+  auto& work = static_cast<workspace2&>(ws);
   basct::cspan<c21t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
   basct::cspan<s25t::element> b_vector;
@@ -163,7 +169,7 @@ xena::future<void> gpu_driver::commit_to_fold(rstt::compressed_element& l_value,
 // fold
 //--------------------------------------------------------------------------------------------------
 xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const noexcept {
-  auto& work = static_cast<gpu_workspace&>(ws);
+  auto& work = static_cast<workspace2&>(ws);
   basct::cspan<c21t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
   basct::cspan<s25t::element> b_vector;

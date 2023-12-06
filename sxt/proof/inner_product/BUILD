@@ -18,41 +18,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "cpu_workspace",
-    impl_deps = [
-        "//sxt/execution/async:future",
-    ],
-    with_test = False,
-    deps = [
-        ":workspace",
-        "//sxt/base/container:span",
-        "//sxt/execution/async:future_fwd",
-        "//sxt/scalar25/type:element",
-    ],
-)
-
-sxt_cc_component(
-    name = "gpu_workspace",
-    impl_deps = [
-        "//sxt/base/container:span",
-        "//sxt/base/device:memory_utility",
-        "//sxt/execution/async:future",
-        "//sxt/execution/async:coroutine",
-        "//sxt/execution/device:synchronization",
-        "//sxt/memory/resource:device_resource",
-        "//sxt/memory/resource:pinned_resource",
-    ],
-    with_test = False,
-    deps = [
-        ":workspace",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:chained_resource",
-        "//sxt/scalar25/type:element",
-    ],
-)
-
-sxt_cc_component(
     name = "driver",
     with_test = False,
     deps = [
@@ -370,6 +335,7 @@ sxt_cc_component(
         ":generator_fold",
         ":proof_descriptor",
         ":verification_computation",
+        ":workspace",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
         "//sxt/curve21/operation:neg",
@@ -391,7 +357,6 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        ":cpu_workspace",
         ":driver",
         "//sxt/base/container:span",
     ],
@@ -405,6 +370,7 @@ sxt_cc_component(
         ":proof_descriptor",
         ":scalar_fold_kernel",
         ":verification_computation_gpu",
+        ":workspace",
         "//sxt/base/container:span_utility",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
@@ -433,7 +399,6 @@ sxt_cc_component(
     ],
     deps = [
         ":driver",
-        ":gpu_workspace",
         "//sxt/base/container:span",
     ],
 )

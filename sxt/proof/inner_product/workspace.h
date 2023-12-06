@@ -52,6 +52,8 @@ public:
 };
 
 struct workspace2 final : public workspace {
+  explicit workspace2(std::pmr::memory_resource* upstream = std::pmr::get_default_resource()) noexcept;
+
   std::pmr::monotonic_buffer_resource alloc;
   const proof_descriptor* descriptor;
   basct::cspan<s25t::element> a_vector0;
