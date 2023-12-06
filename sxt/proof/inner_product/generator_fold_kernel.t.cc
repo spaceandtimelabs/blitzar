@@ -51,7 +51,7 @@ TEST_CASE("we can fold generators using the GPU") {
     g_vector = {0x112233_rs, 0x332211_rs};
     g_vector_p.resize(1);
 
-    auto fut = fold_generators(g_vector_p, g_vector, decomposition);
+    auto fut = async_fold_generators(g_vector_p, g_vector, decomposition);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     rsto::compress(expected, x1 * g_vector[0] + x2 * g_vector[1]);
@@ -63,7 +63,7 @@ TEST_CASE("we can fold generators using the GPU") {
     g_vector = {0x11_rs, 0x22_rs, 0x33_rs, 0x44_rs};
     g_vector_p.resize(2);
 
-    auto fut = fold_generators(g_vector_p, g_vector, decomposition);
+    auto fut = async_fold_generators(g_vector_p, g_vector, decomposition);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
 

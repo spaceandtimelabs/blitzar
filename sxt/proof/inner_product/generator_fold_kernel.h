@@ -25,9 +25,9 @@ struct element_p3;
 
 namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
-// fold_generators
+// async_fold_generators
 //--------------------------------------------------------------------------------------------------
-xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector_p,
-                                   basct::cspan<c21t::element_p3> g_vector,
-                                   basct::cspan<unsigned> decomposition) noexcept;
+xena::future<void> async_fold_generators(basct::span<c21t::element_p3> g_vector_p,
+                                         basct::cspan<c21t::element_p3> g_vector,
+                                         basct::cspan<unsigned> decomposition) noexcept;
 } // namespace sxt::prfip

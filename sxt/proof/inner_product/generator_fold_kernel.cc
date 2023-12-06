@@ -26,11 +26,11 @@
 
 namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
-// fold_generators
+// async_fold_generators
 //--------------------------------------------------------------------------------------------------
-xena::future<> fold_generators(basct::span<c21t::element_p3> g_vector_p,
-                               basct::cspan<c21t::element_p3> g_vector,
-                               basct::cspan<unsigned> decomposition) noexcept {
+xena::future<> async_fold_generators(basct::span<c21t::element_p3> g_vector_p,
+                                     basct::cspan<c21t::element_p3> g_vector,
+                                     basct::cspan<unsigned> decomposition) noexcept {
   auto np = g_vector_p.size();
   SXT_DEBUG_ASSERT(g_vector.size() == 2u * np);
   struct functor {
