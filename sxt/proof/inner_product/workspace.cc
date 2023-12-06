@@ -24,12 +24,12 @@ namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
-workspace2::workspace2(std::pmr::memory_resource* upstream) noexcept : alloc{upstream} {}
+workspace::workspace(std::pmr::memory_resource* upstream) noexcept : alloc{upstream} {}
 
 //--------------------------------------------------------------------------------------------------
 // init_workspace
 //--------------------------------------------------------------------------------------------------
-void init_workspace(workspace2& work) noexcept {
+void init_workspace(workspace& work) noexcept {
   auto np_half = work.descriptor->g_vector.size() / 2u;
 
   work.round_index = 0;
@@ -49,7 +49,7 @@ void init_workspace(workspace2& work) noexcept {
 //--------------------------------------------------------------------------------------------------
 // ap_value
 //--------------------------------------------------------------------------------------------------
-xena::future<> workspace2::ap_value(s25t::element& value) const noexcept {
+xena::future<> workspace::ap_value(s25t::element& value) const noexcept {
   value = this->a_vector[0];
   return xena::make_ready_future();
 }

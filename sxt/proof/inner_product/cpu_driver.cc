@@ -107,7 +107,7 @@ cpu_driver::make_workspace(const proof_descriptor& descriptor,
   auto np_half = descriptor.g_vector.size() / 2;
   SXT_DEBUG_ASSERT(n > 1);
 
-  auto res = std::make_unique<workspace2>();
+  auto res = std::make_unique<workspace>();
   res->descriptor = &descriptor;
   res->a_vector0 = a_vector;
 
@@ -122,7 +122,7 @@ cpu_driver::make_workspace(const proof_descriptor& descriptor,
 xena::future<void> cpu_driver::commit_to_fold(rstt::compressed_element& l_value,
                                               rstt::compressed_element& r_value,
                                               workspace& ws) const noexcept {
-  auto& work = static_cast<workspace2&>(ws);
+  auto& work = static_cast<workspace&>(ws);
   basct::cspan<c21t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
   basct::cspan<s25t::element> b_vector;
@@ -171,7 +171,7 @@ xena::future<void> cpu_driver::commit_to_fold(rstt::compressed_element& l_value,
 // fold
 //--------------------------------------------------------------------------------------------------
 xena::future<void> cpu_driver::fold(workspace& ws, const s25t::element& x) const noexcept {
-  auto& work = static_cast<workspace2&>(ws);
+  auto& work = static_cast<workspace&>(ws);
   basct::cspan<c21t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
   basct::cspan<s25t::element> b_vector;

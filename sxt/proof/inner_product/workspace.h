@@ -36,23 +36,11 @@ struct proof_descriptor;
 // workspace
 //--------------------------------------------------------------------------------------------------
 /**
- * Proving an inner product proceeds over multiple rounds. This abstraction allows a backend for the
+ * Proving an inner product proceeds over multiple rounds. This workspace allows a backend for the
  * computational steps to persist data between prover rounds.
  */
-class workspace {
-public:
-  virtual ~workspace() noexcept = default;
-
-  /**
-   * On the final round of an inner product proof for the product of vectors <a, b> where b is
-   * known, the prover will have repeatedly folded the vector a down to a single element a'. This
-   * function provides an accessor to the a' value.
-   */
-  virtual xena::future<void> ap_value(s25t::element& value) const noexcept = 0;
-};
-
-struct workspace2 final : public workspace {
-  explicit workspace2(std::pmr::memory_resource* upstream = std::pmr::get_default_resource()) noexcept;
+struct workspace  {
+  explicit workspace(std::pmr::memory_resource* upstream = std::pmr::get_default_resource()) noexcept;
 
   std::pmr::monotonic_buffer_resource alloc;
   const proof_descriptor* descriptor;
@@ -62,8 +50,8 @@ struct workspace2 final : public workspace {
   basct::span<s25t::element> a_vector;
   basct::span<s25t::element> b_vector;
 
-  xena::future<void> ap_value(s25t::element& value) const noexcept override;
+  xena::future<void> ap_value(s25t::element& value) const noexcept;
 };
 
-void init_workspace(workspace2& work) noexcept;
+void init_workspace(workspace& work) noexcept;
 } // namespace sxt::prfip
