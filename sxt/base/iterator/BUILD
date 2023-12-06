@@ -6,9 +6,6 @@ load(
 sxt_cc_component(
     name = "chunk_options",
     with_test = False,
-    deps = [
-        "//sxt/base/device:property",
-    ],
 )
 
 sxt_cc_component(

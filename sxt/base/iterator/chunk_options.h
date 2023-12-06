@@ -19,8 +19,6 @@
 #include <cstddef>
 #include <limits>
 
-#include "sxt/base/device/property.h"
-
 namespace sxt::basit {
 //--------------------------------------------------------------------------------------------------
 // chunk_options
