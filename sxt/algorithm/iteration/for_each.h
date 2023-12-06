@@ -21,7 +21,6 @@
 #include "sxt/algorithm/base/index_functor.h"
 #include "sxt/algorithm/iteration/kernel_fit.h"
 #include "sxt/base/device/stream.h"
-#include "sxt/base/iterator/chunk_options.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/synchronization.h"
