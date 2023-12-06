@@ -9,6 +9,14 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "transform_functor",
+    with_test = False,
+    deps = [
+        "//sxt/execution/async:future",
+    ],
+)
+
+sxt_cc_component(
     name = "mapper",
     with_test = False,
 )
