@@ -45,13 +45,4 @@ void init_workspace(workspace& work) noexcept {
   // g_vector
   work.g_vector = basct::winked_span<c21t::element_p3>(&work.alloc, np_half);
 }
-
-//--------------------------------------------------------------------------------------------------
-// ap_value
-//--------------------------------------------------------------------------------------------------
-xena::future<> workspace::ap_value(s25t::element& value) const noexcept {
-  value = this->a_vector[0];
-  return xena::make_ready_future();
-}
-
 } // namespace sxt::prfip

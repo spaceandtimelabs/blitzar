@@ -148,9 +148,7 @@ static void exercise_fold(const driver& drv) {
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
 
-    auto ap_fut = workspace->ap_value(ap_value);
-    xens::get_scheduler().run();
-    REQUIRE(ap_fut.ready());
+    ap_value = workspace->a_vector[0];
 
     auto expected_ap_value = x1 * a_vector[0] + x1_inv * a_vector[1];
     REQUIRE(ap_value == expected_ap_value);
@@ -193,9 +191,7 @@ static void exercise_fold(const driver& drv) {
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
 
-    auto ap_fut = workspace->ap_value(ap_value);
-    xens::get_scheduler().run();
-    REQUIRE(ap_fut.ready());
+    ap_value = workspace->a_vector[0];
     auto expected_ap_value = x2 * a1 + x2_inv * a2;
     REQUIRE(ap_value == expected_ap_value);
   }

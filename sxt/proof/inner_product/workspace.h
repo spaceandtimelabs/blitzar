@@ -50,8 +50,6 @@ struct workspace {
   basct::span<c21t::element_p3> g_vector;
   basct::span<s25t::element> a_vector;
   basct::span<s25t::element> b_vector;
-
-  xena::future<void> ap_value(s25t::element& value) const noexcept;
 };
 
 void init_workspace(workspace& work) noexcept;

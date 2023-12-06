@@ -99,7 +99,7 @@ xena::future<void> prove_inner_product(basct::span<rstt::compressed_element> l_v
     ++round_index;
   }
 
-  co_await workspace->ap_value(ap_value);
+  ap_value = workspace->a_vector[0];
 }
 
 //--------------------------------------------------------------------------------------------------
