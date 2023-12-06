@@ -38,7 +38,7 @@ TEST_CASE("we can fold scalars") {
 
   SECTION("we can fold two scalars") {
     scalars = {0x123_s25, 0x456_s25};
-    auto fut = fold_scalars(basct::subspan(scalars, 0, 1), scalars, m_low, m_high);
+    auto fut = async_fold_scalars(basct::subspan(scalars, 0, 1), scalars, m_low, m_high);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(scalars[0] == 0x123_s25 * m_low + 0x456_s25 * m_high);
@@ -46,7 +46,7 @@ TEST_CASE("we can fold scalars") {
 
   SECTION("we can fold three scalars") {
     scalars = {0x123_s25, 0x456_s25, 0x789_s25};
-    auto fut = fold_scalars(basct::subspan(scalars, 0, 2), scalars, m_low, m_high);
+    auto fut = async_fold_scalars(basct::subspan(scalars, 0, 2), scalars, m_low, m_high);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(scalars[0] == 0x123_s25 * m_low + 0x789_s25 * m_high);
