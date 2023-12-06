@@ -115,7 +115,6 @@ template <class T> class managed_array {
 
 public:
   using allocator_type = basm::alloc_t;
-  using value_type = T;
 
   // constructor
   managed_array() noexcept = default;
@@ -206,8 +205,8 @@ private:
 // operator==
 //--------------------------------------------------------------------------------------------------
 template <class T1, class T2>
-auto operator==(const managed_array<T1>& lhs,
-                const managed_array<T2>& rhs) noexcept -> decltype(*lhs.data() == *rhs.data()) {
+auto operator==(const managed_array<T1>& lhs, const managed_array<T2>& rhs) noexcept
+    -> decltype(*lhs.data() == *rhs.data()) {
   if (lhs.size() != rhs.size()) {
     return false;
   }
@@ -218,8 +217,8 @@ auto operator==(const managed_array<T1>& lhs,
 // operator!=
 //--------------------------------------------------------------------------------------------------
 template <class T1, class T2>
-auto operator!=(const managed_array<T1>& lhs,
-                const managed_array<T2>& rhs) noexcept -> decltype(*lhs.data() == *rhs.data()) {
+auto operator!=(const managed_array<T1>& lhs, const managed_array<T2>& rhs) noexcept
+    -> decltype(*lhs.data() == *rhs.data()) {
   return !(lhs == rhs);
 }
 } // namespace sxt::memmg
