@@ -25,6 +25,7 @@ jobs:
   test-cpp:
     name: C++ code
     runs-on: self-hosted
+    timeout-minutes: 600
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
