@@ -37,6 +37,9 @@ using s25t::operator""_s25;
 static void baseline_check(basct::cspan<s25t::element> x_vector, const s25t::element& ap_value,
                            basct::cspan<s25t::element> b_vector);
 
+static void baseline_check2(basct::cspan<s25t::element> x_vector, const s25t::element& ap_value,
+                           basct::cspan<s25t::element> b_vector);
+
 TEST_CASE("exponent computation with the GPU gives the same result as the CPU code") {
   std::pmr::monotonic_buffer_resource alloc;
   basn::fast_random_number_generator rng{1, 2};
@@ -52,6 +55,21 @@ TEST_CASE("exponent computation with the GPU gives the same result as the CPU co
   }
 }
 
+TEST_CASE("exponent computation with the GPU gives the same result as the CPU code2") {
+  std::pmr::monotonic_buffer_resource alloc;
+  basn::fast_random_number_generator rng{1, 2};
+
+  auto ap_value = 0x7682347_s25;
+
+  for (size_t n : {2, 3, 64, 123, 1000}) {
+    auto num_rounds = basn::ceil_log2(n);
+    memmg::managed_array<s25t::element> x_vector(num_rounds), b_vector(n);
+    s25rn::generate_random_elements(x_vector, rng);
+    s25rn::generate_random_elements(b_vector, rng);
+    baseline_check2(x_vector, ap_value, b_vector);
+  }
+}
+
 static void baseline_check(basct::cspan<s25t::element> x_vector, const s25t::element& ap_value,
                            basct::cspan<s25t::element> b_vector) {
   auto num_rounds = x_vector.size();
@@ -59,6 +77,23 @@ static void baseline_check(basct::cspan<s25t::element> x_vector, const s25t::ele
   auto num_exponents = 1 + np + 2 * num_rounds;
   memmg::managed_array<s25t::element> exponents{num_exponents, memr::get_managed_device_resource()};
   auto fut = async_compute_verification_exponents(exponents, x_vector, ap_value, b_vector);
+
+  memmg::managed_array<s25t::element> expected(num_exponents);
+  compute_verification_exponents(expected, x_vector, ap_value, b_vector);
+
+  xens::get_scheduler().run();
+  REQUIRE(fut.ready());
+
+  REQUIRE(exponents == expected);
+}
+
+static void baseline_check2(basct::cspan<s25t::element> x_vector, const s25t::element& ap_value,
+                           basct::cspan<s25t::element> b_vector) {
+  auto num_rounds = x_vector.size();
+  auto np = 1ull << num_rounds;
+  auto num_exponents = 1 + np + 2 * num_rounds;
+  memmg::managed_array<s25t::element> exponents(num_exponents);
+  auto fut = async_compute_verification_exponents2(exponents, x_vector, ap_value, b_vector);
 
   memmg::managed_array<s25t::element> expected(num_exponents);
   compute_verification_exponents(expected, x_vector, ap_value, b_vector);
