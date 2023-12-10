@@ -67,38 +67,8 @@ static xena::future<void> commit_to_fold_partial(rstt::compressed_element& commi
 //--------------------------------------------------------------------------------------------------
 // setup_verification_generators
 //--------------------------------------------------------------------------------------------------
-static xena::future<>
-setup_verification_generators(basct::span<c21t::element_p3> generators,
-                              const proof_descriptor& descriptor,
-                              basct::cspan<rstt::compressed_element> l_vector,
-                              basct::cspan<rstt::compressed_element> r_vector) noexcept {
-  auto np = descriptor.g_vector.size();
-  auto num_rounds = l_vector.size();
-  basdv::stream stream;
-
-  // q_value
-  basdv::async_copy_host_to_device(basct::subspan(generators, 0, 1),
-                                   basct::cspan<c21t::element_p3>{descriptor.q_value, 1}, stream);
-
-  // g_vector
-  basdv::async_copy_host_to_device(basct::subspan(generators, 1, np), descriptor.g_vector, stream);
-
-  // l_vector, r_vector
-  memmg::managed_array<c21t::element_p3> lr_vector{2 * num_rounds, memr::get_pinned_resource()};
-  auto iter = lr_vector.data();
-  for (auto& li : l_vector) {
-    rsto::decompress(*iter++, li);
-  }
-  for (auto& ri : r_vector) {
-    rsto::decompress(*iter++, ri);
-  }
-  basdv::async_copy_host_to_device(basct::subspan(generators, np + 1), lr_vector, stream);
-
-  co_await xendv::await_stream(stream);
-}
-
 static void
-setup_verification_generators2(basct::span<c21t::element_p3> generators,
+setup_verification_generators(basct::span<c21t::element_p3> generators,
                                const proof_descriptor& descriptor,
                                basct::cspan<rstt::compressed_element> l_vector,
                                basct::cspan<rstt::compressed_element> r_vector) noexcept {
@@ -214,46 +184,6 @@ xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const
 //--------------------------------------------------------------------------------------------------
 // compute_expected_commitment
 //--------------------------------------------------------------------------------------------------
-#if 0
-xena::future<void> gpu_driver::compute_expected_commitment(
-    rstt::compressed_element& commit, const proof_descriptor& descriptor,
-    basct::cspan<rstt::compressed_element> l_vector,
-    basct::cspan<rstt::compressed_element> r_vector, basct::cspan<s25t::element> x_vector,
-    const s25t::element& ap_value) const noexcept {
-  auto num_rounds = l_vector.size();
-  auto np = descriptor.g_vector.size();
-  // clang-format off
-  SXT_DEBUG_ASSERT(
-    np > 0 &&
-    l_vector.size() == num_rounds &&
-    r_vector.size() == num_rounds &&
-    x_vector.size() == num_rounds
-  );
-  // clang-format on
-  if (num_rounds < 6) {
-    cpu_driver drv;
-    co_return co_await drv.compute_expected_commitment(commit, descriptor, l_vector, r_vector,
-                                                       x_vector, ap_value);
-  }
-  auto num_exponents = 1 + np + 2 * num_rounds;
-
-  // exponents
-  memmg::managed_array<s25t::element> exponents{num_exponents, memr::get_device_resource()};
-  auto fut =
-      async_compute_verification_exponents(exponents, x_vector, ap_value, descriptor.b_vector);
-
-  // generators
-  memmg::managed_array<c21t::element_p3> generators{num_exponents, memr::get_device_resource()};
-  co_await setup_verification_generators(generators, descriptor, l_vector, r_vector);
-  (void)setup_verification_generators2;
-
-  // commitment
-  co_await std::move(fut);
-  auto commit_p = co_await mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(
-      generators, mtxb::to_exponent_sequence(exponents));
-  rsto::compress(commit, commit_p);
-}
-#else
 xena::future<void> gpu_driver::compute_expected_commitment(
     rstt::compressed_element& commit, const proof_descriptor& descriptor,
     basct::cspan<rstt::compressed_element> l_vector,
@@ -283,8 +213,7 @@ xena::future<void> gpu_driver::compute_expected_commitment(
 
   // generators
   memmg::managed_array<c21t::element_p3> generators(num_exponents, memr::get_pinned_resource());
-  setup_verification_generators2(generators, descriptor, l_vector, r_vector);
-  (void)setup_verification_generators;
+  setup_verification_generators(generators, descriptor, l_vector, r_vector);
 
   // commitment
   co_await std::move(fut);
@@ -292,5 +221,4 @@ xena::future<void> gpu_driver::compute_expected_commitment(
       generators, mtxb::to_exponent_sequence(exponents));
   rsto::compress(commit, commit_p);
 }
-#endif
 } // namespace sxt::prfip
