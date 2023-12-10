@@ -158,7 +158,7 @@ xena::future<> async_compute_verification_exponents2(
   auto np = 1ull << num_rounds;
   // clang-format off
   SXT_DEBUG_ASSERT(
-      basdv::is_active_device_pointer(exponents.data()) &&
+      basdv::is_host_pointer(exponents.data()) &&
       basdv::is_host_pointer(x_vector.data()) &&
       n > 1 &&
       (n == np || n > (1ull << (num_rounds-1))) &&
@@ -168,14 +168,14 @@ xena::future<> async_compute_verification_exponents2(
       b_vector.size() == n
   );
   // clang-format on
-  memmg::managed_array<s25t::element> lr_exponents{num_rounds * 2u, memr::get_pinned_resource()};
+  auto lr_exponents = exponents.subspan(1 + np);
   auto l_exponents = basct::subspan(lr_exponents, 0, num_rounds);
   auto r_exponents = basct::subspan(lr_exponents, num_rounds);
   s25t::element allinv;
   compute_lr_exponents_part1(l_exponents, r_exponents, allinv, x_vector);
 
   // compute g and product exponents
-  auto fut = compute_g_and_product_exponents2(
+  co_await compute_g_and_product_exponents2(
       exponents.subspan(0, 1 + np), allinv,
       std::vector<s25t::element>{l_exponents.begin(), l_exponents.end()}, ap_value, b_vector);
 
@@ -183,9 +183,5 @@ xena::future<> async_compute_verification_exponents2(
   for (auto& li : l_exponents) {
     s25o::neg(li, li);
   }
-  basdv::stream stream;
-  basdv::async_copy_host_to_device(exponents.subspan(1 + np), lr_exponents, stream);
-  co_await std::move(fut);
-  co_await xendv::await_stream(stream);
 }
 } // namespace sxt::prfip
