@@ -33,6 +33,6 @@ namespace sxt::prfip {
 // compute_g_exponents_partial
 //--------------------------------------------------------------------------------------------------
 xena::future<> async_compute_g_exponents_partial(basct::span<s25t::element> g_exponents,
-                                            basct::cspan<s25t::element> x_sq_vector,
-                                            size_t round_first) noexcept;
+                                                 basct::cspan<s25t::element> x_sq_vector,
+                                                 size_t round_first) noexcept;
 } // namespace sxt::prfip

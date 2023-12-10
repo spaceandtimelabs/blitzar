@@ -39,9 +39,9 @@ namespace sxt::prfip {
 // compute_g_exponents_gpu
 //--------------------------------------------------------------------------------------------------
 static xena::future<> compute_g_exponents_gpu(basct::span<s25t::element> g_exponents,
-                                               const s25t::element& allinv,
-                                               const s25t::element& ap_value,
-                                               basct::cspan<s25t::element> x_sq_vector) noexcept {
+                                              const s25t::element& allinv,
+                                              const s25t::element& ap_value,
+                                              basct::cspan<s25t::element> x_sq_vector) noexcept {
   auto num_rounds = x_sq_vector.size();
   auto num_host_rounds = std::min(5ul, x_sq_vector.size());
   auto num_device_rounds = num_rounds - num_host_rounds;
@@ -50,8 +50,8 @@ static xena::future<> compute_g_exponents_gpu(basct::span<s25t::element> g_expon
   if (num_host_rounds == num_rounds) {
     co_return;
   }
-  co_await async_compute_g_exponents_partial(g_exponents, x_sq_vector.subspan(0, num_device_rounds + 1),
-                                        num_host_rounds);
+  co_await async_compute_g_exponents_partial(
+      g_exponents, x_sq_vector.subspan(0, num_device_rounds + 1), num_host_rounds);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -59,9 +59,9 @@ static xena::future<> compute_g_exponents_gpu(basct::span<s25t::element> g_expon
 //--------------------------------------------------------------------------------------------------
 static xena::future<>
 compute_g_and_product_exponents(basct::span<s25t::element> exponents, const s25t::element& allinv,
-                                 std::vector<s25t::element> x_sq_vector,
-                                 const s25t::element& ap_value,
-                                 basct::cspan<s25t::element> b_vector) noexcept {
+                                std::vector<s25t::element> x_sq_vector,
+                                const s25t::element& ap_value,
+                                basct::cspan<s25t::element> b_vector) noexcept {
   auto num_rounds = x_sq_vector.size();
   auto np = 1ull << num_rounds;
   auto g_exponents = exponents.subspan(1, np);

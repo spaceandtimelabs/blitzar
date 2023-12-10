@@ -69,9 +69,9 @@ static xena::future<void> commit_to_fold_partial(rstt::compressed_element& commi
 //--------------------------------------------------------------------------------------------------
 static void
 setup_verification_generators(basct::span<c21t::element_p3> generators,
-                               const proof_descriptor& descriptor,
-                               basct::cspan<rstt::compressed_element> l_vector,
-                               basct::cspan<rstt::compressed_element> r_vector) noexcept {
+                              const proof_descriptor& descriptor,
+                              basct::cspan<rstt::compressed_element> l_vector,
+                              basct::cspan<rstt::compressed_element> r_vector) noexcept {
   auto np = descriptor.g_vector.size();
   auto num_rounds = l_vector.size();
 
