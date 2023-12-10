@@ -50,7 +50,7 @@ static xena::future<> compute_g_exponents_gpu(basct::span<s25t::element> g_expon
   if (num_host_rounds == num_rounds) {
     co_return;
   }
-  co_await compute_g_exponents_partial2(g_exponents, x_sq_vector.subspan(0, num_device_rounds + 1),
+  co_await async_compute_g_exponents_partial(g_exponents, x_sq_vector.subspan(0, num_device_rounds + 1),
                                         num_host_rounds);
 }
 
