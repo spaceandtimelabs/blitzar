@@ -17,7 +17,6 @@
 #include "sxt/proof/inner_product/workspace.h"
 
 #include "sxt/base/container/span_utility.h"
-#include "sxt/execution/async/future.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 
 namespace sxt::prfip {

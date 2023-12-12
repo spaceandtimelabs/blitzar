@@ -20,7 +20,6 @@
 #include <memory_resource>
 
 #include "sxt/base/container/span.h"
-#include "sxt/execution/async/future_fwd.h"
 
 namespace sxt::s25t {
 class element;

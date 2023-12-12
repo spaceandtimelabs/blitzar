@@ -51,6 +51,9 @@ xena::future<> async_fold_generators(basct::span<c21t::element_p3> g_vector_p,
         .decomposition_size = static_cast<unsigned>(decomposition_device.size()),
     };
   };
+  // Note: These haven't been informed by much benchmarking. I'm
+  // sure there are better values. This is just putting in some
+  // ballpark estimates to get started.
   basit::chunk_options chunk_options{
       .min_size = 1ull << 9u,
       .max_size = 1ull << 18u,

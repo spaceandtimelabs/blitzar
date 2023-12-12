@@ -46,6 +46,9 @@ xena::future<> async_fold_scalars(basct::span<s25t::element> scalars_p,
     s25o::muladd(x, m_high, y, x);
   };
   auto m = scalars.size() - mid;
+  // Note: These haven't been informed by much benchmarking. I'm
+  // sure there are better values. This is just putting in some
+  // ballpark estimates to get started.
   basit::chunk_options chunk_options{
       .min_size = 2u << 10u,
       .max_size = 2u << 20u,
