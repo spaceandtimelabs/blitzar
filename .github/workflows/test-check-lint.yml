@@ -22,7 +22,7 @@ jobs:
 
       - name: Run check
         run: >
-          nix develop --comand ./tools/code_format/check_format.py check
+          nix develop --command ./tools/code_format/check_format.py check
 
   test-cpp:
     name: C++ code
