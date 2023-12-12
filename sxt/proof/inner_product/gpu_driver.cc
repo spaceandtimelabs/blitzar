@@ -79,7 +79,8 @@ setup_verification_generators(basct::span<c21t::element_p3> generators,
   generators[0] = *descriptor.q_value;
 
   // g_vector
-  auto iter = std::copy(descriptor.g_vector.begin(), descriptor.g_vector.end(), generators.begin() + 1);
+  auto iter =
+      std::copy(descriptor.g_vector.begin(), descriptor.g_vector.end(), generators.begin() + 1);
 
   // l_vector, r_vector
   for (auto& li : l_vector) {
