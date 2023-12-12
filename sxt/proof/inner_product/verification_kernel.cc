@@ -48,6 +48,9 @@ xena::future<> async_compute_g_exponents_partial(basct::span<s25t::element> g_ex
   // clang-format on
   auto a = static_cast<unsigned>(1ull << (round_first - 1));
   auto multiplier_iter = x_sq_vector.data() + x_sq_vector.size();
+  // Note: These haven't been informed by much benchmarking. I'm
+  // sure there are better values. This is just putting in some
+  // ballpark estimates to get started.
   basit::chunk_options chunk_options{
       .min_size = 1u << 10u,
       .max_size = 1u << 20u,
