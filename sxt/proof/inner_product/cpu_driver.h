@@ -25,7 +25,7 @@ namespace sxt::prfip {
 class cpu_driver final : public driver {
 public:
   // driver
-  xena::future<std::unique_ptr<workspace>>
+  std::unique_ptr<workspace>
   make_workspace(const proof_descriptor& descriptor,
                  basct::cspan<s25t::element> a_vector) const noexcept override;
 

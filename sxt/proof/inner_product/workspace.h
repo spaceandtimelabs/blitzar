@@ -16,29 +16,40 @@
  */
 #pragma once
 
-#include "sxt/execution/async/future_fwd.h"
+#include <cstddef>
+#include <memory_resource>
+
+#include "sxt/base/container/span.h"
 
 namespace sxt::s25t {
 class element;
 }
+namespace sxt::c21t {
+struct element_p3;
+}
 
 namespace sxt::prfip {
+struct proof_descriptor;
+
 //--------------------------------------------------------------------------------------------------
 // workspace
 //--------------------------------------------------------------------------------------------------
 /**
- * Proving an inner product proceeds over multiple rounds. This abstraction allows a backend for the
+ * Proving an inner product proceeds over multiple rounds. This workspace allows a backend for the
  * computational steps to persist data between prover rounds.
  */
-class workspace {
-public:
-  virtual ~workspace() noexcept = default;
+struct workspace {
+  explicit
+  workspace(std::pmr::memory_resource* upstream = std::pmr::get_default_resource()) noexcept;
 
-  /**
-   * On the final round of an inner product proof for the product of vectors <a, b> where b is
-   * known, the prover will have repeatedly folded the vector a down to a single element a'. This
-   * function provides an accessor to the a' value.
-   */
-  virtual xena::future<void> ap_value(s25t::element& value) const noexcept = 0;
+  std::pmr::monotonic_buffer_resource alloc;
+  const proof_descriptor* descriptor;
+  basct::cspan<s25t::element> a_vector0;
+  size_t round_index;
+  basct::span<c21t::element_p3> g_vector;
+  basct::span<s25t::element> a_vector;
+  basct::span<s25t::element> b_vector;
 };
+
+void init_workspace(workspace& work) noexcept;
 } // namespace sxt::prfip

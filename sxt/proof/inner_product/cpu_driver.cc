@@ -29,11 +29,11 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/curve/multiexponentiation.h"
-#include "sxt/proof/inner_product/cpu_workspace.h"
 #include "sxt/proof/inner_product/fold.h"
 #include "sxt/proof/inner_product/generator_fold.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/inner_product/verification_computation.h"
+#include "sxt/proof/inner_product/workspace.h"
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/scalar25/constant/max_bits.h"
@@ -100,34 +100,20 @@ static void multiexponentiate(c21t::element_p3 c_commits[2], const c21t::element
 //--------------------------------------------------------------------------------------------------
 // make_workspace
 //--------------------------------------------------------------------------------------------------
-xena::future<std::unique_ptr<workspace>>
+std::unique_ptr<workspace>
 cpu_driver::make_workspace(const proof_descriptor& descriptor,
                            basct::cspan<s25t::element> a_vector) const noexcept {
   auto n = a_vector.size();
   auto np_half = descriptor.g_vector.size() / 2;
   SXT_DEBUG_ASSERT(n > 1);
 
-  auto res = std::make_unique<cpu_workspace>();
+  auto res = std::make_unique<workspace>();
   res->descriptor = &descriptor;
   res->a_vector0 = a_vector;
 
-  std::pmr::polymorphic_allocator<char> alloc{&res->alloc};
-  res->round_index = 0;
-  res->g_vector = {
-      reinterpret_cast<c21t::element_p3*>(alloc.allocate(np_half * sizeof(c21t::element_p3))),
-      np_half,
-  };
-  auto scalars =
-      reinterpret_cast<s25t::element*>(alloc.allocate(2 * np_half * sizeof(s25t::element)));
-  res->a_vector = {
-      scalars,
-      np_half,
-  };
-  res->b_vector = {
-      scalars + np_half,
-      np_half,
-  };
-  return xena::make_ready_future(std::unique_ptr<workspace>{std::move(res)});
+  init_workspace(*res);
+
+  return res;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -136,7 +122,7 @@ cpu_driver::make_workspace(const proof_descriptor& descriptor,
 xena::future<void> cpu_driver::commit_to_fold(rstt::compressed_element& l_value,
                                               rstt::compressed_element& r_value,
                                               workspace& ws) const noexcept {
-  auto& work = static_cast<cpu_workspace&>(ws);
+  auto& work = static_cast<workspace&>(ws);
   basct::cspan<c21t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
   basct::cspan<s25t::element> b_vector;
@@ -185,7 +171,7 @@ xena::future<void> cpu_driver::commit_to_fold(rstt::compressed_element& l_value,
 // fold
 //--------------------------------------------------------------------------------------------------
 xena::future<void> cpu_driver::fold(workspace& ws, const s25t::element& x) const noexcept {
-  auto& work = static_cast<cpu_workspace&>(ws);
+  auto& work = static_cast<workspace&>(ws);
   basct::cspan<c21t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
   basct::cspan<s25t::element> b_vector;

@@ -16,49 +16,49 @@
  */
 #include "sxt/proof/inner_product/generator_fold_kernel.h"
 
-#include "sxt/algorithm/iteration/for_each.h"
-#include "sxt/base/device/memory_utility.h"
+#include "sxt/algorithm/iteration/transform.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/curve21/type/element_p3.h"
-#include "sxt/memory/management/managed_array.h"
-#include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/device_viewable.h"
 #include "sxt/proof/inner_product/generator_fold.h"
 
 namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
-// fold_generators
+// async_fold_generators
 //--------------------------------------------------------------------------------------------------
-xena::future<void> fold_generators(basct::span<c21t::element_p3> g_vector,
-                                   basct::cspan<unsigned> decomposition) noexcept {
-  SXT_DEBUG_ASSERT(
-      // clang-format off
-      basdv::is_active_device_pointer(g_vector.data()) &&
-      basdv::is_host_pointer(decomposition.data()) &&
-      g_vector.size() % 2 == 0 && 
-      g_vector.size() > 1
-      // clang-format on
-  );
-  auto n = static_cast<unsigned>(g_vector.size() / 2);
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<unsigned> decomposition_gpu{decomposition.size(), &resource};
-  basdv::async_copy_host_to_device(decomposition_gpu, decomposition, stream);
-  auto data = g_vector.data();
-  auto decomposition_data = decomposition_gpu.data();
-  auto decomposition_size = static_cast<unsigned>(decomposition.size());
-  auto f = [
-               // clang-format off
-    data,
-    decomposition_data,
-    decomposition_size
-               // clang-format on
-  ] __device__
-           __host__(unsigned n, unsigned i) noexcept {
-             fold_generators(data[i],
-                             basct::cspan<unsigned>{decomposition_data, decomposition_size},
-                             data[i], data[i + n]);
-           };
-  return algi::for_each(std::move(stream), f, n);
+xena::future<> async_fold_generators(basct::span<c21t::element_p3> g_vector_p,
+                                     basct::cspan<c21t::element_p3> g_vector,
+                                     basct::cspan<unsigned> decomposition) noexcept {
+  auto np = g_vector_p.size();
+  SXT_DEBUG_ASSERT(g_vector.size() == 2u * np);
+  struct functor {
+    const unsigned* decomposition_data;
+    unsigned decomposition_size;
+
+    __device__ __host__ void operator()(c21t::element_p3& lhs,
+                                        const c21t::element_p3& rhs) const noexcept {
+      fold_generators(lhs, basct::cspan<unsigned>{decomposition_data, decomposition_size}, lhs,
+                      rhs);
+    }
+  };
+  auto make_f = [&](std::pmr::polymorphic_allocator<> alloc,
+                    basdv::stream& /*stream*/) noexcept -> xena::future<functor> {
+    auto decomposition_device = co_await xendv::make_active_device_viewable(alloc, decomposition);
+    co_return functor{
+        .decomposition_data = decomposition_device.data(),
+        .decomposition_size = static_cast<unsigned>(decomposition_device.size()),
+    };
+  };
+  // Note: These haven't been informed by much benchmarking. I'm
+  // sure there are better values. This is just putting in some
+  // ballpark estimates to get started.
+  basit::chunk_options chunk_options{
+      .min_size = 1ull << 9u,
+      .max_size = 1ull << 18u,
+  };
+  co_await algi::transform(g_vector_p, chunk_options, make_f, g_vector.subspan(0, np),
+                           g_vector.subspan(np));
 }
 } // namespace sxt::prfip

@@ -5,42 +5,13 @@ load(
 
 sxt_cc_component(
     name = "workspace",
-    with_test = False,
-    deps = [
-        "//sxt/execution/async:future_fwd",
-    ],
-)
-
-sxt_cc_component(
-    name = "cpu_workspace",
     impl_deps = [
-        "//sxt/execution/async:future",
+        ":proof_descriptor",
+        "//sxt/base/container:span_utility",
     ],
     with_test = False,
     deps = [
-        ":workspace",
         "//sxt/base/container:span",
-        "//sxt/execution/async:future_fwd",
-        "//sxt/scalar25/type:element",
-    ],
-)
-
-sxt_cc_component(
-    name = "gpu_workspace",
-    impl_deps = [
-        "//sxt/base/device:memory_utility",
-        "//sxt/execution/async:future",
-        "//sxt/execution/async:coroutine",
-        "//sxt/execution/device:synchronization",
-        "//sxt/memory/resource:device_resource",
-        "//sxt/memory/resource:pinned_resource",
-    ],
-    with_test = False,
-    deps = [
-        ":workspace",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/memory/management:managed_array",
-        "//sxt/scalar25/type:element",
     ],
 )
 
@@ -108,15 +79,36 @@ sxt_cc_component(
     impl_deps = [
         ":generator_fold",
         "//sxt/algorithm/iteration:for_each",
+        "//sxt/algorithm/iteration:transform",
+        "//sxt/base/container:span_utility",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/device:property",
         "//sxt/base/error:assert",
         "//sxt/base/device:stream",
+        "//sxt/base/iterator:index_range",
+        "//sxt/base/iterator:index_range_iterator",
+        "//sxt/base/iterator:index_range_utility",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:device_viewable",
+        "//sxt/execution/device:for_each",
+        "//sxt/execution/device:synchronization",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/curve21/type:element_p3",
     ],
     is_cuda = True,
-    with_test = False,
+    test_deps = [
+        ":generator_fold",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:overload",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/ristretto/operation:compression",
+        "//sxt/ristretto/type:literal",
+        "//sxt/scalar25/constant:max_bits",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:literal",
+    ],
     deps = [
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
@@ -127,6 +119,7 @@ sxt_cc_component(
     name = "scalar_fold_kernel",
     impl_deps = [
         "//sxt/algorithm/iteration:for_each",
+        "//sxt/algorithm/iteration:transform",
         "//sxt/base/device:memory_utility",
         "//sxt/base/error:assert",
         "//sxt/scalar25/type:element",
@@ -136,7 +129,15 @@ sxt_cc_component(
         "//sxt/execution/async:future_utility",
     ],
     is_cuda = True,
-    with_test = False,
+    test_deps = [
+        "//sxt/base/container:span_utility",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
     deps = [
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
@@ -333,6 +334,7 @@ sxt_cc_component(
         ":generator_fold",
         ":proof_descriptor",
         ":verification_computation",
+        ":workspace",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
         "//sxt/curve21/operation:neg",
@@ -354,7 +356,6 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        ":cpu_workspace",
         ":driver",
         "//sxt/base/container:span",
     ],
@@ -368,6 +369,7 @@ sxt_cc_component(
         ":proof_descriptor",
         ":scalar_fold_kernel",
         ":verification_computation_gpu",
+        ":workspace",
         "//sxt/base/container:span_utility",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
@@ -396,7 +398,6 @@ sxt_cc_component(
     ],
     deps = [
         ":driver",
-        ":gpu_workspace",
         "//sxt/base/container:span",
     ],
 )

@@ -32,7 +32,7 @@ class compressed_element;
 }
 
 namespace sxt::prfip {
-class workspace;
+struct workspace;
 struct proof_descriptor;
 
 //--------------------------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ public:
    * Create a workspace that persists through the proving of an inner product and can be used to
    * store context that's referenced by multiple rounds of the proving.
    */
-  virtual xena::future<std::unique_ptr<workspace>>
+  virtual std::unique_ptr<workspace>
   make_workspace(const proof_descriptor& descriptor,
                  basct::cspan<s25t::element> a_vector) const noexcept = 0;
 

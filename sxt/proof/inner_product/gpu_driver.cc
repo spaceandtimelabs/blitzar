@@ -36,10 +36,10 @@
 #include "sxt/proof/inner_product/cpu_driver.h"
 #include "sxt/proof/inner_product/generator_fold.h"
 #include "sxt/proof/inner_product/generator_fold_kernel.h"
-#include "sxt/proof/inner_product/gpu_workspace.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/inner_product/scalar_fold_kernel.h"
 #include "sxt/proof/inner_product/verification_computation_gpu.h"
+#include "sxt/proof/inner_product/workspace.h"
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/scalar25/constant/max_bits.h"
@@ -96,28 +96,14 @@ setup_verification_generators(basct::span<c21t::element_p3> generators,
 //--------------------------------------------------------------------------------------------------
 // make_workspace
 //--------------------------------------------------------------------------------------------------
-xena::future<std::unique_ptr<workspace>>
+std::unique_ptr<workspace>
 gpu_driver::make_workspace(const proof_descriptor& descriptor,
                            basct::cspan<s25t::element> a_vector) const noexcept {
-  auto res = std::make_unique<gpu_workspace>();
-  basdv::stream stream;
-
+  auto res = std::make_unique<workspace>(memr::get_pinned_resource());
   res->descriptor = &descriptor;
-  res->round_index = 0;
-
-  // a_vector
-  res->a_vector.resize(a_vector.size());
-  basdv::async_copy_host_to_device(res->a_vector, a_vector, stream);
-
-  // b_vector
-  res->b_vector.resize(descriptor.b_vector.size());
-  basdv::async_copy_host_to_device(res->b_vector, descriptor.b_vector, stream);
-
-  // g_vector
-  res->g_vector.resize(descriptor.g_vector.size());
-  basdv::async_copy_host_to_device(res->g_vector, descriptor.g_vector, stream);
-
-  return xendv::await_and_own_stream(std::move(stream), std::unique_ptr<workspace>{std::move(res)});
+  res->a_vector0 = a_vector;
+  init_workspace(*res);
+  return res;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -126,39 +112,70 @@ gpu_driver::make_workspace(const proof_descriptor& descriptor,
 xena::future<void> gpu_driver::commit_to_fold(rstt::compressed_element& l_value,
                                               rstt::compressed_element& r_value,
                                               workspace& ws) const noexcept {
-  auto& work = static_cast<gpu_workspace&>(ws);
-  auto mid = work.g_vector.size() / 2;
+  auto& work = static_cast<workspace&>(ws);
+  basct::cspan<c21t::element_p3> g_vector;
+  basct::cspan<s25t::element> a_vector;
+  basct::cspan<s25t::element> b_vector;
+  if (work.round_index == 0) {
+    g_vector = work.descriptor->g_vector;
+    a_vector = work.a_vector0;
+    b_vector = work.descriptor->b_vector;
+  } else {
+    g_vector = work.g_vector;
+    a_vector = work.a_vector;
+    b_vector = work.b_vector;
+  }
+  auto mid = g_vector.size() / 2;
   SXT_DEBUG_ASSERT(mid > 0);
 
-  auto a_low = basct::subspan(work.a_vector, 0, mid);
-  auto a_high = basct::subspan(work.a_vector, mid);
-  auto b_low = basct::subspan(work.b_vector, 0, mid);
-  auto b_high = basct::subspan(work.b_vector, mid);
-  auto g_low = basct::subspan(work.g_vector, 0, mid);
-  auto g_high = basct::subspan(work.g_vector, mid);
+  auto a_low = a_vector.subspan(0, mid);
+  auto a_high = a_vector.subspan(mid);
+  auto b_low = b_vector.subspan(0, mid);
+  auto b_high = b_vector.subspan(mid);
+  auto g_low = g_vector.subspan(0, mid);
+  auto g_high = g_vector.subspan(mid);
 
   auto l_fut = commit_to_fold_partial(l_value, g_high, *work.descriptor->q_value, a_low, b_high);
-  auto r_fut = commit_to_fold_partial(r_value, g_low, *work.descriptor->q_value, a_high, b_low);
+  co_await commit_to_fold_partial(r_value, g_low, *work.descriptor->q_value, a_high, b_low);
 
   co_await std::move(l_fut);
-  co_await std::move(r_fut);
 }
 
 //--------------------------------------------------------------------------------------------------
 // fold
 //--------------------------------------------------------------------------------------------------
 xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const noexcept {
-  auto& work = static_cast<gpu_workspace&>(ws);
-  auto mid = work.g_vector.size() / 2u;
+  auto& work = static_cast<workspace&>(ws);
+  basct::cspan<c21t::element_p3> g_vector;
+  basct::cspan<s25t::element> a_vector;
+  basct::cspan<s25t::element> b_vector;
+  if (work.round_index == 0) {
+    g_vector = work.descriptor->g_vector;
+    a_vector = work.a_vector0;
+    b_vector = work.descriptor->b_vector;
+  } else {
+    g_vector = work.g_vector;
+    a_vector = work.a_vector;
+    b_vector = work.b_vector;
+  }
+  auto mid = g_vector.size() / 2;
+  SXT_DEBUG_ASSERT(mid > 0);
 
   ++work.round_index;
 
   s25t::element x_inv;
   s25o::inv(x_inv, x);
 
+  // g_vector
+  unsigned decomposition_data[s25cn::max_bits_v];
+  basct::span<unsigned> decomposition{decomposition_data};
+  decompose_generator_fold(decomposition, x_inv, x);
+  work.g_vector = work.g_vector.subspan(0, mid);
+  auto g_fut = async_fold_generators(work.g_vector, g_vector, decomposition);
+
   // a_vector
-  auto a_fut = fold_scalars(work.a_vector, x, x_inv, mid);
-  work.a_vector.shrink(mid);
+  work.a_vector = work.a_vector.subspan(0, mid);
+  auto a_fut = async_fold_scalars(work.a_vector, a_vector, x, x_inv);
   if (mid == 1) {
     // no need to compute the other folded values if we reduce to a single element
     co_await std::move(a_fut);
@@ -166,18 +183,10 @@ xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const
   }
 
   // b_vector
-  auto b_fut = fold_scalars(work.b_vector, x_inv, x, mid);
-  work.b_vector.shrink(mid);
-
-  // g_vector
-  unsigned decomposition_data[s25cn::max_bits_v];
-  basct::span<unsigned> decomposition{decomposition_data};
-  decompose_generator_fold(decomposition, x_inv, x);
-  auto g_fut = fold_generators(work.g_vector, decomposition);
-  work.g_vector.shrink(mid);
+  work.b_vector = work.b_vector.subspan(0, mid);
+  co_await async_fold_scalars(work.b_vector, b_vector, x_inv, x);
 
   co_await std::move(a_fut);
-  co_await std::move(b_fut);
   co_await std::move(g_fut);
 }
 

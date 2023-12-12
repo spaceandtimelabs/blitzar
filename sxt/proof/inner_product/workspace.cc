@@ -15,3 +15,33 @@
  * limitations under the License.
  */
 #include "sxt/proof/inner_product/workspace.h"
+
+#include "sxt/base/container/span_utility.h"
+#include "sxt/proof/inner_product/proof_descriptor.h"
+
+namespace sxt::prfip {
+//--------------------------------------------------------------------------------------------------
+// constructor
+//--------------------------------------------------------------------------------------------------
+workspace::workspace(std::pmr::memory_resource* upstream) noexcept : alloc{upstream} {}
+
+//--------------------------------------------------------------------------------------------------
+// init_workspace
+//--------------------------------------------------------------------------------------------------
+void init_workspace(workspace& work) noexcept {
+  auto np_half = work.descriptor->g_vector.size() / 2u;
+
+  work.round_index = 0;
+
+  auto scalars = basct::winked_span<s25t::element>(&work.alloc, 2u * np_half);
+
+  // a_vector
+  work.a_vector = scalars.subspan(0, np_half);
+
+  // b_vector
+  work.b_vector = scalars.subspan(np_half);
+
+  // g_vector
+  work.g_vector = basct::winked_span<c21t::element_p3>(&work.alloc, np_half);
+}
+} // namespace sxt::prfip
