@@ -32,8 +32,7 @@ jobs:
 
       - name: Run cpp tests
         run: >
-          nix develop --command
-            bazel test //...
+          nix develop --command bazel test //...
 
   test-cpp-compute-sanitizer:
     name: C++ code with compute sanitizer
