@@ -90,7 +90,7 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
                                 stream>>>(bucket_sums_dev.data(), partial_bucket_sums.data(),
                                           num_blocks);
   partial_bucket_sums.reset();
-  basdv::async_copy_to_device(bucket_sums, bucket_sums_dev, stream);
+  basdv::async_copy_device_to_device(bucket_sums, bucket_sums_dev, stream);
   co_await xendv::await_stream(stream);
 }
 
@@ -136,13 +136,14 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
   memmg::managed_array<T> partial_bucket_sums_data{&resource};
   basct::span<T> partial_bucket_sums;
   if (num_chunks > 1) {
-    partial_bucket_sums_data.resize(num_bucket_groups * bucket_group_size * num_chunks);
+    partial_bucket_sums_data.resize(num_bucket_groups * bucket_group_size * num_outputs *
+                                    num_chunks);
     partial_bucket_sums = partial_bucket_sums_data;
   } else {
     partial_bucket_sums = bucket_sums;
   }
 
-  size_t step = bucket_group_size * num_bucket_groups * num_outputs;
+  size_t step = num_bucket_groups * bucket_group_size * num_outputs;
   size_t i = 0;
   co_await xendv::concurrent_for_each(first, last, [&](const basit::index_range& rng) noexcept {
     return accumulate_buckets_impl(partial_bucket_sums.subspan(step * i++, step), generators,
