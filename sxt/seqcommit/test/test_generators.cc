@@ -30,7 +30,7 @@ void test_pedersen_get_generators(
 
   SECTION("we can verify that computed generators are correct when offset is zero") {
     c21t::element_p3 expected_g_0, expected_g_1;
-    uint64_t num_generators = 2;
+    constexpr uint64_t num_generators = 2;
     uint64_t offset_generators = 0;
 
     sqcgn::compute_base_element(expected_g_0, 0 + offset_generators);
@@ -47,7 +47,7 @@ void test_pedersen_get_generators(
 
   SECTION("we can verify that computed generators are correct when offset is non zero") {
     c21t::element_p3 expected_g_0, expected_g_1;
-    uint64_t num_generators = 2;
+    constexpr uint64_t num_generators = 2;
     uint64_t offset_generators = 15;
 
     sqcgn::compute_base_element(expected_g_0, 0 + offset_generators);
