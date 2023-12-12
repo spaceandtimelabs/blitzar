@@ -30,11 +30,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Enter nix environment
-        run: nix develop
-
       - name: Run cpp tests
-        run: bazel test //...
+        run: >
+          nix develop
+          bazel test //...
 
   test-cpp-compute-sanitizer:
     name: C++ code with compute sanitizer
