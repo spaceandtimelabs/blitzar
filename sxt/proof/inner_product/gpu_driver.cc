@@ -79,18 +79,15 @@ setup_verification_generators(basct::span<c21t::element_p3> generators,
   generators[0] = *descriptor.q_value;
 
   // g_vector
-  std::copy(descriptor.g_vector.begin(), descriptor.g_vector.end(), generators.begin() + 1);
+  auto iter = std::copy(descriptor.g_vector.begin(), descriptor.g_vector.end(), generators.begin() + 1);
 
   // l_vector, r_vector
-  memmg::managed_array<c21t::element_p3> lr_vector(2 * num_rounds);
-  auto iter = lr_vector.data();
   for (auto& li : l_vector) {
     rsto::decompress(*iter++, li);
   }
   for (auto& ri : r_vector) {
     rsto::decompress(*iter++, ri);
   }
-  std::copy(lr_vector.begin(), lr_vector.end(), generators.begin() + np + 1);
 }
 
 //--------------------------------------------------------------------------------------------------
