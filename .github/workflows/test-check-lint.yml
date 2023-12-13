@@ -44,13 +44,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-        # TODO(rnburn): Two test cases fail
-        #    - //cbindings:inner_product_proof.t
-        #    - //sxt/multiexp/multiproduct_gpu:kernel.t
-        # The first times out and the second gives errors in the CI
-        # environment but not the nix environment with more up-to-date versions
-        # of LLVM and the cuda toolkit. I'm disabling the tests for now but will
-        # revist after the CI environment is updated.
+        # TODO(rnburn): //cbindings:inner_product_proof.t fails because it
+        # takes too long ... I'm disabling for now
       - name: Run cpp tests
         run: >
           nix develop --command \
