@@ -72,9 +72,10 @@ compute_g_and_product_exponents(basct::span<s25t::element> exponents, const s25t
 //--------------------------------------------------------------------------------------------------
 // async_compute_verification_exponents
 //--------------------------------------------------------------------------------------------------
-xena::future<> async_compute_verification_exponents2(
-    basct::span<s25t::element> exponents, basct::cspan<s25t::element> x_vector,
-    const s25t::element& ap_value, basct::cspan<s25t::element> b_vector) noexcept {
+xena::future<> async_compute_verification_exponents(basct::span<s25t::element> exponents,
+                                                    basct::cspan<s25t::element> x_vector,
+                                                    const s25t::element& ap_value,
+                                                    basct::cspan<s25t::element> b_vector) noexcept {
   auto num_exponents = exponents.size();
   auto num_rounds = x_vector.size();
   auto n = b_vector.size();

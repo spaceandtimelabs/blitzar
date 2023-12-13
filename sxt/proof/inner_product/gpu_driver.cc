@@ -211,7 +211,7 @@ xena::future<void> gpu_driver::compute_expected_commitment(
   // exponents
   memmg::managed_array<s25t::element> exponents(num_exponents, memr::get_pinned_resource());
   auto fut =
-      async_compute_verification_exponents2(exponents, x_vector, ap_value, descriptor.b_vector);
+      async_compute_verification_exponents(exponents, x_vector, ap_value, descriptor.b_vector);
 
   // generators
   memmg::managed_array<c21t::element_p3> generators(num_exponents, memr::get_pinned_resource());
