@@ -19,6 +19,7 @@
 #include <limits>
 
 #include "sxt/algorithm/iteration/for_each.h"
+#include "sxt/algorithm/iteration/transform.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/future.h"
@@ -30,16 +31,15 @@ namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
 // compute_g_exponents_partial
 //--------------------------------------------------------------------------------------------------
-xena::future<> compute_g_exponents_partial(basct::span<s25t::element> g_exponents,
-                                           const basdv::stream& stream,
-                                           basct::cspan<s25t::element> x_sq_vector,
-                                           size_t round_first) noexcept {
+xena::future<> async_compute_g_exponents_partial(basct::span<s25t::element> g_exponents,
+                                                 basct::cspan<s25t::element> x_sq_vector,
+                                                 size_t round_first) noexcept {
   auto num_rounds = round_first - 1 + x_sq_vector.size();
   auto np = 1ull << num_rounds;
   // clang-format off
   SXT_DEBUG_ASSERT(
       np <= std::numeric_limits<unsigned>::max() &&
-      basdv::is_active_device_pointer(g_exponents.data()) &&
+      basdv::is_host_pointer(g_exponents.data()) &&
       basdv::is_host_pointer(x_sq_vector.data()) &&
       g_exponents.size() == np &&
       !x_sq_vector.empty() &&
@@ -48,15 +48,21 @@ xena::future<> compute_g_exponents_partial(basct::span<s25t::element> g_exponent
   // clang-format on
   auto a = static_cast<unsigned>(1ull << (round_first - 1));
   auto multiplier_iter = x_sq_vector.data() + x_sq_vector.size();
-  auto data = g_exponents.data();
+  // Note: These haven't been informed by much benchmarking. I'm
+  // sure there are better values. This is just putting in some
+  // ballpark estimates to get started.
+  basit::chunk_options chunk_options{
+      .min_size = 1u << 10u,
+      .max_size = 1u << 20u,
+  };
   while (a != np) {
     auto& multiplier = *--multiplier_iter;
-    auto f = [multiplier, data] __device__ __host__(unsigned a, unsigned i) noexcept {
-      s25o::mul(data[i + a], multiplier, data[i]);
+    auto f = [multiplier] __device__ __host__(s25t::element & val) noexcept {
+      s25o::mul(val, multiplier, val);
     };
-    algi::launch_for_each_kernel(stream, f, a);
+    co_await algi::transform(g_exponents.subspan(a, a), chunk_options, f,
+                             g_exponents.subspan(0, a));
     a *= 2u;
   }
-  return xendv::await_stream(stream);
 }
 } // namespace sxt::prfip

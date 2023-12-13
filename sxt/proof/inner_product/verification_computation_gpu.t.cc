@@ -57,7 +57,7 @@ static void baseline_check(basct::cspan<s25t::element> x_vector, const s25t::ele
   auto num_rounds = x_vector.size();
   auto np = 1ull << num_rounds;
   auto num_exponents = 1 + np + 2 * num_rounds;
-  memmg::managed_array<s25t::element> exponents{num_exponents, memr::get_managed_device_resource()};
+  memmg::managed_array<s25t::element> exponents(num_exponents);
   auto fut = async_compute_verification_exponents(exponents, x_vector, ap_value, b_vector);
 
   memmg::managed_array<s25t::element> expected(num_exponents);
