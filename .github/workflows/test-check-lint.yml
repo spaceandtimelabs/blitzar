@@ -49,7 +49,7 @@ jobs:
       - name: Run cpp tests
         run: >
           nix develop --command \
-            bazel test --run_under /src_tmp/tools/cuda/compute_sanitizer_wrapper.sh //... -- -//cbindings:inner_product_proof.t 
+            bazel test --run_under $PWD/tools/cuda/compute_sanitizer_wrapper.sh //... -- -//cbindings:inner_product_proof.t 
           
   test-cpp-opt:
     name: C++ code with optimizations
@@ -73,7 +73,7 @@ jobs:
       
       - name: Run cpp-asan tests
         run: >
-          nix develop --command bazel test --config=asan opt //...
+          nix develop --command bazel test --config=asan //...
 
   test-rust:
     name: Rust Sys Crate
