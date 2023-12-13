@@ -90,7 +90,7 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
                                 stream>>>(bucket_sums_dev.data(), partial_bucket_sums.data(),
                                           num_blocks);
   partial_bucket_sums.reset();
-  basdv::async_copy_device_to_device(bucket_sums, bucket_sums_dev, stream);
+  basdv::async_copy_device_to_host(bucket_sums, bucket_sums_dev, stream);
   co_await xendv::await_stream(stream);
 }
 
@@ -131,9 +131,7 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
                                     split_factor);
   auto num_chunks = std::distance(first, last);
 
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<T> partial_bucket_sums_data{&resource};
+  memmg::managed_array<T> partial_bucket_sums_data{memr::get_pinned_resource()};
   basct::span<T> partial_bucket_sums;
   if (num_chunks > 1) {
     partial_bucket_sums_data.resize(num_bucket_groups * bucket_group_size * num_outputs *
@@ -152,8 +150,12 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
   if (num_chunks <= 1) {
     co_return;
   }
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> partial_bucket_sums_dev{partial_bucket_sums.size(), &resource};
+  basdv::async_copy_host_to_device(partial_bucket_sums_dev, partial_bucket_sums, stream);
   combine_partial_bucket_sums<<<dim3(bucket_group_size, num_outputs, 1), num_bucket_groups, 0,
-                                stream>>>(bucket_sums.data(), partial_bucket_sums.data(),
+                                stream>>>(bucket_sums.data(), partial_bucket_sums_dev.data(),
                                           num_chunks);
   co_await xendv::await_stream(stream);
 }
