@@ -11,6 +11,7 @@ mkShell {
     pkgs.python3
     pkgs.cargo
     pkgs.rust-bindgen
+    pkgs.rustfmt
     bazel
     clang
     cuda
