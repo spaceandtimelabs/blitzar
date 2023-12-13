@@ -78,7 +78,6 @@ sxt_cc_component(
     name = "generator_fold_kernel",
     impl_deps = [
         ":generator_fold",
-        "//sxt/algorithm/iteration:for_each",
         "//sxt/algorithm/iteration:transform",
         "//sxt/base/container:span_utility",
         "//sxt/base/device:memory_utility",
@@ -90,7 +89,6 @@ sxt_cc_component(
         "//sxt/base/iterator:index_range_utility",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:device_viewable",
-        "//sxt/execution/device:for_each",
         "//sxt/execution/device:synchronization",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
@@ -118,7 +116,6 @@ sxt_cc_component(
 sxt_cc_component(
     name = "scalar_fold_kernel",
     impl_deps = [
-        "//sxt/algorithm/iteration:for_each",
         "//sxt/algorithm/iteration:transform",
         "//sxt/base/device:memory_utility",
         "//sxt/base/error:assert",
@@ -301,7 +298,7 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/execution/async:future",
         "//sxt/execution/device:synchronization",
-        "//sxt/algorithm/iteration:for_each",
+        "//sxt/algorithm/iteration:transform",
         "//sxt/base/device:memory_utility",
         "//sxt/base/error:assert",
         "//sxt/scalar25/operation:mul",

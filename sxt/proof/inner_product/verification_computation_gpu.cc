@@ -38,24 +38,20 @@ namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
 // compute_g_exponents_gpu
 //--------------------------------------------------------------------------------------------------
-static xena::future<> compute_g_exponents_gpu(basct::span<s25t::element> g_exponents_dev,
+static xena::future<> compute_g_exponents_gpu(basct::span<s25t::element> g_exponents,
                                               const s25t::element& allinv,
                                               const s25t::element& ap_value,
                                               basct::cspan<s25t::element> x_sq_vector) noexcept {
   auto num_rounds = x_sq_vector.size();
   auto num_host_rounds = std::min(5ul, x_sq_vector.size());
   auto num_device_rounds = num_rounds - num_host_rounds;
-  memmg::managed_array<s25t::element> g_exponents_host{1ull << num_host_rounds,
-                                                       memr::get_pinned_resource()};
-  compute_g_exponents(g_exponents_host, allinv, ap_value, x_sq_vector.subspan(num_device_rounds));
-  basdv::stream stream;
-  basdv::async_copy_host_to_device(g_exponents_dev.subspan(0, g_exponents_host.size()),
-                                   g_exponents_host, stream);
+  compute_g_exponents(g_exponents.subspan(0, 1ull << num_host_rounds), allinv, ap_value,
+                      x_sq_vector.subspan(num_device_rounds));
   if (num_host_rounds == num_rounds) {
-    co_return co_await xendv::await_stream(stream);
+    co_return;
   }
-  co_await compute_g_exponents_partial(
-      g_exponents_dev, stream, x_sq_vector.subspan(0, num_device_rounds + 1), num_host_rounds);
+  co_await async_compute_g_exponents_partial(
+      g_exponents, x_sq_vector.subspan(0, num_device_rounds + 1), num_host_rounds);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -70,11 +66,7 @@ compute_g_and_product_exponents(basct::span<s25t::element> exponents, const s25t
   auto np = 1ull << num_rounds;
   auto g_exponents = exponents.subspan(1, np);
   co_await compute_g_exponents_gpu(g_exponents, allinv, ap_value, x_sq_vector);
-  auto product = co_await s25o::async_inner_product(g_exponents, b_vector);
-  basdv::stream stream;
-  basdv::async_copy_host_to_device(exponents.subspan(0, 1),
-                                   basct::cspan<s25t::element>{&product, 1}, stream);
-  co_await xendv::await_stream(stream);
+  exponents[0] = co_await s25o::async_inner_product(g_exponents, b_vector);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -90,7 +82,7 @@ xena::future<> async_compute_verification_exponents(basct::span<s25t::element> e
   auto np = 1ull << num_rounds;
   // clang-format off
   SXT_DEBUG_ASSERT(
-      basdv::is_active_device_pointer(exponents.data()) &&
+      basdv::is_host_pointer(exponents.data()) &&
       basdv::is_host_pointer(x_vector.data()) &&
       n > 1 &&
       (n == np || n > (1ull << (num_rounds-1))) &&
@@ -100,14 +92,14 @@ xena::future<> async_compute_verification_exponents(basct::span<s25t::element> e
       b_vector.size() == n
   );
   // clang-format on
-  memmg::managed_array<s25t::element> lr_exponents{num_rounds * 2u, memr::get_pinned_resource()};
+  auto lr_exponents = exponents.subspan(1 + np);
   auto l_exponents = basct::subspan(lr_exponents, 0, num_rounds);
   auto r_exponents = basct::subspan(lr_exponents, num_rounds);
   s25t::element allinv;
   compute_lr_exponents_part1(l_exponents, r_exponents, allinv, x_vector);
 
   // compute g and product exponents
-  auto fut = compute_g_and_product_exponents(
+  co_await compute_g_and_product_exponents(
       exponents.subspan(0, 1 + np), allinv,
       std::vector<s25t::element>{l_exponents.begin(), l_exponents.end()}, ap_value, b_vector);
 
@@ -115,9 +107,5 @@ xena::future<> async_compute_verification_exponents(basct::span<s25t::element> e
   for (auto& li : l_exponents) {
     s25o::neg(li, li);
   }
-  basdv::stream stream;
-  basdv::async_copy_host_to_device(exponents.subspan(1 + np), lr_exponents, stream);
-  co_await std::move(fut);
-  co_await xendv::await_stream(stream);
 }
 } // namespace sxt::prfip
