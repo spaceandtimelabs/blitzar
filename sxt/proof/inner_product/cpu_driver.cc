@@ -104,7 +104,6 @@ std::unique_ptr<workspace>
 cpu_driver::make_workspace(const proof_descriptor& descriptor,
                            basct::cspan<s25t::element> a_vector) const noexcept {
   auto n = a_vector.size();
-  auto np_half = descriptor.g_vector.size() / 2;
   SXT_DEBUG_ASSERT(n > 1);
 
   auto res = std::make_unique<workspace>();
