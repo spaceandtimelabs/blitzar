@@ -15,7 +15,7 @@ mkShell {
   ];
   LD_LIBRARY_PATH = lib.makeLibraryPath [
     "/usr/lib/wsl"
-    cudaDrivers
+    linuxPackages.nvidia_x11
   ];
   shellHook = ''
   '';

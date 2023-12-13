@@ -3,27 +3,15 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgsDrv.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
-  outputs = { self, nixpkgs, nixpkgsDrv }:
+  outputs = { self, nixpkgs, }:
     let
       system = "x86_64-linux";
-      pkgsDrv = import nixpkgsDrv {
-        inherit system; 
-        config.allowUnfree = true;
-        config.cudaSupport = true;
-      };
-      driverOverlay = final: prev: {
-        cudaDrivers = pkgsDrv.linuxPackages.nvidia_x11;
-      };
       pkgs = import nixpkgs { 
         inherit system; 
         config.allowUnfree = true;
         config.cudaSupport = true;
-        overlays = [
-          driverOverlay
-        ];
       };
       shell = import ./nix/shell.nix { inherit pkgs; };
     in
