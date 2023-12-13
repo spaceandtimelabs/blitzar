@@ -9,6 +9,8 @@ mkShell {
   buildInputs = [
     pkgs.bazel-buildtools
     pkgs.python3
+    pkgs.cargo
+    pkgs.rust-bindgen
     bazel
     clang
     cuda
