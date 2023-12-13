@@ -90,7 +90,7 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
                                 stream>>>(bucket_sums_dev.data(), partial_bucket_sums.data(),
                                           num_blocks);
   partial_bucket_sums.reset();
-  basdv::async_copy_device_to_device(bucket_sums, bucket_sums_dev, stream);
+  basdv::async_copy_to_device(bucket_sums, bucket_sums_dev, stream);
   co_await xendv::await_stream(stream);
 }
 
