@@ -297,7 +297,7 @@ The main branch is regularly built and tested, being the only source of truth. [
 This repository follows some C++ formatting rules. To check if your modified code is compliant, run the following commands:
 
 ```bash
-./ci/docker/run_docker_gpu.sh
+nix develop
 
 ./tools/code_format/check_format.py check
 

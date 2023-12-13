@@ -15,12 +15,14 @@ jobs:
   format-code:
     name: Check code
     runs-on: self-hosted
+    timeout-minutes: 600
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Run check
-        run: docker run --rm -v "$PWD":/src -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 /bin/bash -c "PYTHONDONTWRITEBYTECODE=1 ./tools/code_format/check_format.py check"
+        run: >
+          nix develop --command ./tools/code_format/check_format.py check
 
   test-cpp:
     name: C++ code
