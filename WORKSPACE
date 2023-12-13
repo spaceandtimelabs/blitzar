@@ -14,7 +14,7 @@ http_archive(
 
 git_repository(
     name = "com_github_catchorg_catch2",
-    commit = "766541d",
+    commit = "53d0d91",
     remote = "https://github.com/catchorg/Catch2",
 )
 

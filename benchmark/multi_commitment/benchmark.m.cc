@@ -59,13 +59,8 @@ struct params {
     status = 0;
 
     if (argc < 7) {
-      std::cerr << "Usage: benchmark "
-                << "<cpu|gpu> "
-                << "<n> "
-                << "<num_samples> "
-                << "<num_commitments> "
-                << "<element_nbytes> "
-                << "<verbose>\n";
+      std::cerr << "Usage: benchmark " << "<cpu|gpu> " << "<n> " << "<num_samples> "
+                << "<num_commitments> " << "<element_nbytes> " << "<verbose>\n";
       status = -1;
     }
 
