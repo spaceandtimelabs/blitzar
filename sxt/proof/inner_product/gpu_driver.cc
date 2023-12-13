@@ -65,34 +65,25 @@ static xena::future<void> commit_to_fold_partial(rstt::compressed_element& commi
 //--------------------------------------------------------------------------------------------------
 // setup_verification_generators
 //--------------------------------------------------------------------------------------------------
-static xena::future<>
+static void
 setup_verification_generators(basct::span<c21t::element_p3> generators,
                               const proof_descriptor& descriptor,
                               basct::cspan<rstt::compressed_element> l_vector,
                               basct::cspan<rstt::compressed_element> r_vector) noexcept {
-  auto np = descriptor.g_vector.size();
-  auto num_rounds = l_vector.size();
-  basdv::stream stream;
-
   // q_value
-  basdv::async_copy_host_to_device(basct::subspan(generators, 0, 1),
-                                   basct::cspan<c21t::element_p3>{descriptor.q_value, 1}, stream);
+  generators[0] = *descriptor.q_value;
 
   // g_vector
-  basdv::async_copy_host_to_device(basct::subspan(generators, 1, np), descriptor.g_vector, stream);
+  auto iter =
+      std::copy(descriptor.g_vector.begin(), descriptor.g_vector.end(), generators.begin() + 1);
 
   // l_vector, r_vector
-  memmg::managed_array<c21t::element_p3> lr_vector{2 * num_rounds, memr::get_pinned_resource()};
-  auto iter = lr_vector.data();
   for (auto& li : l_vector) {
     rsto::decompress(*iter++, li);
   }
   for (auto& ri : r_vector) {
     rsto::decompress(*iter++, ri);
   }
-  basdv::async_copy_host_to_device(basct::subspan(generators, np + 1), lr_vector, stream);
-
-  co_await xendv::await_stream(stream);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -218,13 +209,13 @@ xena::future<void> gpu_driver::compute_expected_commitment(
   auto num_exponents = 1 + np + 2 * num_rounds;
 
   // exponents
-  memmg::managed_array<s25t::element> exponents{num_exponents, memr::get_device_resource()};
+  memmg::managed_array<s25t::element> exponents(num_exponents, memr::get_pinned_resource());
   auto fut =
       async_compute_verification_exponents(exponents, x_vector, ap_value, descriptor.b_vector);
 
   // generators
-  memmg::managed_array<c21t::element_p3> generators{num_exponents, memr::get_device_resource()};
-  co_await setup_verification_generators(generators, descriptor, l_vector, r_vector);
+  memmg::managed_array<c21t::element_p3> generators(num_exponents, memr::get_pinned_resource());
+  setup_verification_generators(generators, descriptor, l_vector, r_vector);
 
   // commitment
   co_await std::move(fut);
