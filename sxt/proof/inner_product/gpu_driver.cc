@@ -16,8 +16,6 @@
  */
 #include "sxt/proof/inner_product/gpu_driver.h"
 
-#include <algorithm>
-
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
