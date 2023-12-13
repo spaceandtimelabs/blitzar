@@ -32,13 +32,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Run check
+      - name: Run cpp tests
         run: >
           nix develop --command bazel test //...
 
   test-cpp-compute-sanitizer:
     name: C++ code with compute sanitizer
     runs-on: self-hosted
+    timeout-minutes: 600
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -52,35 +53,32 @@ jobs:
         # revist after the CI environment is updated.
       - name: Run cpp tests
         run: >
-          docker run 
-          --rm -e TEST_TMPDIR=/root/.cache_bazel 
-          -v $HOME/.cache_bazel_test:/root/.cache_bazel 
-          -v "$PWD":/src:ro -w /src --gpus all 
-          --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 
-          /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test --run_under /src_tmp/tools/cuda/compute_sanitizer_wrapper.sh //... -- -//cbindings:inner_product_proof.t -//sxt/multiexp/multiproduct_gpu:kernel.t"
+          nix develop --command \
+            bazel test --run_under /src_tmp/tools/cuda/compute_sanitizer_wrapper.sh //... -- -//cbindings:inner_product_proof.t 
           
   test-cpp-opt:
     name: C++ code with optimizations
     runs-on: self-hosted
+    timeout-minutes: 600
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-          # Note: Certain tests crashes nvlink
-          #       See https://developer.nvidia.com/bugs/4288496
-          #       As a simple workaround, I'm disabling for now
       - name: Run cpp tests with optimization flags on
-        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel_opt -v $HOME/.cache_bazel_test_opt:/root/.cache_bazel_opt -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test -c opt //..."
+        run: >
+          nix develop --command bazel test -c opt //...
 
   test-cpp-asan:
     name: C++ code with address sanitizer
     runs-on: self-hosted
+    timeout-minutes: 600
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
       
       - name: Run cpp-asan tests
-        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test_asan:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; bazel test --config=asan //..."
+        run: >
+          nix develop --command bazel test --config=asan opt //...
 
   test-rust:
     name: Rust Sys Crate
