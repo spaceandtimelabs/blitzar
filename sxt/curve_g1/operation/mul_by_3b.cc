@@ -16,8 +16,8 @@
  */
 #include "sxt/curve_g1/operation/mul_by_3b.h"
 
-#include "sxt/base/field/add.h"
 #include "sxt/field12/type/element.h"
+#include "sxt/field_mtg/operation/add.h"
 
 namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
@@ -29,9 +29,9 @@ void mul_by_3b(f12t::element& h, const f12t::element& p) noexcept {
   f12t::element p4;
   f12t::element p8;
 
-  basfld::add(p2, p, p);
-  basfld::add(p4, p2, p2);
-  basfld::add(p8, p4, p4);
-  basfld::add(h, p8, p4);
+  fmtgo::add(p2, p, p);
+  fmtgo::add(p4, p2, p2);
+  fmtgo::add(p8, p4, p4);
+  fmtgo::add(h, p8, p4);
 }
 } // namespace sxt::cg1o

@@ -32,7 +32,7 @@
 #include "sxt/base/field/subtract_p.h"
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::basfld {
+namespace sxt::fmtgo {
 //--------------------------------------------------------------------------------------------------
 // add
 //--------------------------------------------------------------------------------------------------
@@ -42,9 +42,9 @@ CUDA_CALLABLE inline void add(Element& h, const Element& f, const Element& g) no
   uint64_t carry{0};
 
   for (size_t limb = 0; limb < h.num_limbs_v; ++limb) {
-    adc(h_tmp[limb], carry, f[limb], g[limb], carry);
+    basfld::adc(h_tmp[limb], carry, f[limb], g[limb], carry);
   }
 
-  subtract_p<Element::num_limbs_v>(h.data(), h_tmp.data(), Element::modulus().data());
+  basfld::subtract_p<Element::num_limbs_v>(h.data(), h_tmp.data(), Element::modulus().data());
 }
-} // namespace sxt::basfld
+} // namespace sxt::fmtgo

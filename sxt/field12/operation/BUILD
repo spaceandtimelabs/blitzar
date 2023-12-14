@@ -137,8 +137,8 @@ sxt_cc_component(
     ],
     deps = [
         ":neg",
-        "//sxt/base/field:add",
         "//sxt/base/macro:cuda_callable",
         "//sxt/field12/type:element",
+        "//sxt/field_mtg/operation:add",
     ],
 )

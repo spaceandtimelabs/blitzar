@@ -25,7 +25,6 @@
  */
 #include "sxt/curve_g1/operation/double.h"
 
-#include "sxt/base/field/add.h"
 #include "sxt/curve_g1/operation/cmov.h"
 #include "sxt/curve_g1/operation/mul_by_3b.h"
 #include "sxt/curve_g1/property/identity.h"
@@ -34,6 +33,7 @@
 #include "sxt/field12/operation/square.h"
 #include "sxt/field12/operation/sub.h"
 #include "sxt/field12/type/element.h"
+#include "sxt/field_mtg/operation/add.h"
 
 namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
@@ -45,23 +45,23 @@ void double_element(cg1t::element_p2& h, const cg1t::element_p2& p) noexcept {
   f12t::element x3, y3, z3;
 
   f12o::square(t0, p.Y);
-  basfld::add(z3, t0, t0);
-  basfld::add(z3, z3, z3);
-  basfld::add(z3, z3, z3);
+  fmtgo::add(z3, t0, t0);
+  fmtgo::add(z3, z3, z3);
+  fmtgo::add(z3, z3, z3);
   f12o::mul(t1, p.Y, p.Z);
   f12o::square(t2, p.Z);
   mul_by_3b(t2, t2);
   f12o::mul(x3, t2, z3);
-  basfld::add(y3, t0, t2);
+  fmtgo::add(y3, t0, t2);
   f12o::mul(z3, t1, z3);
-  basfld::add(t1, t2, t2);
-  basfld::add(t2, t1, t2);
+  fmtgo::add(t1, t2, t2);
+  fmtgo::add(t2, t1, t2);
   f12o::sub(t0, t0, t2);
   f12o::mul(y3, t0, y3);
-  basfld::add(y3, x3, y3);
+  fmtgo::add(y3, x3, y3);
   f12o::mul(t1, p.X, p.Y);
   f12o::mul(x3, t0, t1);
-  basfld::add(x3, x3, x3);
+  fmtgo::add(x3, x3, x3);
 
   h.X = x3;
   h.Y = y3;

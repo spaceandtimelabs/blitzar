@@ -22,11 +22,11 @@ sxt_cc_component(
     ],
     deps = [
         ":mul_by_3b",
-        "//sxt/base/field:add",
         "//sxt/base/macro:cuda_callable",
         "//sxt/curve_g1/type:element_p2",
         "//sxt/field12/operation:mul",
         "//sxt/field12/operation:sub",
+        "//sxt/field_mtg/operation:add",
     ],
 )
 
@@ -83,9 +83,9 @@ sxt_cc_component(
     impl_deps = [
         ":cmov",
         ":mul_by_3b",
-        "//sxt/base/field:add",
         "//sxt/curve_g1/property:identity",
         "//sxt/curve_g1/type:element_p2",
+        "//sxt/field_mtg/operation:add",
         "//sxt/field12/operation:mul",
         "//sxt/field12/operation:square",
         "//sxt/field12/operation:sub",
@@ -108,7 +108,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "mul_by_3b",
     impl_deps = [
-        "//sxt/base/field:add",
+        "//sxt/field_mtg/operation:add",
         "//sxt/field12/type:element",
     ],
     is_cuda = True,

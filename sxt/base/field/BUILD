@@ -4,20 +4,6 @@ load(
 )
 
 sxt_cc_component(
-    name = "add",
-    test_deps = [
-        ":example_element",
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        ":arithmetic_utility",
-        ":element",
-        ":subtract_p",
-        "//sxt/base/macro:cuda_callable",
-    ],
-)
-
-sxt_cc_component(
     name = "arithmetic_utility",
     test_deps = [
         "//sxt/base/test:unit_test",

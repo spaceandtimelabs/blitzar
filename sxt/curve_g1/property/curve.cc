@@ -25,7 +25,6 @@
  */
 #include "sxt/curve_g1/property/curve.h"
 
-#include "sxt/base/field/add.h"
 #include "sxt/curve_g1/constant/b.h"
 #include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
@@ -34,6 +33,7 @@
 #include "sxt/field12/operation/sub.h"
 #include "sxt/field12/property/zero.h"
 #include "sxt/field12/type/element.h"
+#include "sxt/field_mtg/operation/add.h"
 
 namespace sxt::cg1p {
 //--------------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ bool is_on_curve(const cg1t::element_p2& p) noexcept {
   f12o::mul(b_z3, f12t::element{cg1cn::b_v}, z3);
 
   f12t::element x3_b_z3;
-  basfld::add(x3_b_z3, x3, b_z3);
+  fmtgo::add(x3_b_z3, x3, b_z3);
 
   return (y2_z == x3_b_z3) || f12p::is_zero(p.Z);
 }
