@@ -4,16 +4,6 @@ load(
 )
 
 sxt_cc_component(
-    name = "add",
-    test_deps = [
-        "//sxt/base/field:add",
-        "//sxt/base/test:unit_test",
-        "//sxt/field12/constant:zero",
-        "//sxt/field12/type:element",
-    ],
-)
-
-sxt_cc_component(
     name = "cmov",
     impl_deps = [
         "//sxt/field12/type:element",
@@ -146,7 +136,6 @@ sxt_cc_component(
         "//sxt/field12/constant:zero",
     ],
     deps = [
-        ":add",
         ":neg",
         "//sxt/base/field:add",
         "//sxt/base/macro:cuda_callable",
