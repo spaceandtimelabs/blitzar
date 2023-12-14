@@ -13,6 +13,8 @@ mkShell {
     rust-bindgen
     rustfmt
     patchelf
+    nodejs
+    # custom
     bazel
     clang
     cuda
