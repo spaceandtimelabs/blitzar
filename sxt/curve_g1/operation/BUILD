@@ -85,11 +85,11 @@ sxt_cc_component(
         ":mul_by_3b",
         "//sxt/curve_g1/property:identity",
         "//sxt/curve_g1/type:element_p2",
-        "//sxt/field_mtg/operation:add",
         "//sxt/field12/operation:mul",
         "//sxt/field12/operation:square",
         "//sxt/field12/operation:sub",
         "//sxt/field12/type:element",
+        "//sxt/field_mtg/operation:add",
     ],
     is_cuda = True,
     test_deps = [
@@ -108,8 +108,8 @@ sxt_cc_component(
 sxt_cc_component(
     name = "mul_by_3b",
     impl_deps = [
-        "//sxt/field_mtg/operation:add",
         "//sxt/field12/type:element",
+        "//sxt/field_mtg/operation:add",
     ],
     is_cuda = True,
     test_deps = [

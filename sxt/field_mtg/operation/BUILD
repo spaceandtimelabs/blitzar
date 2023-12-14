@@ -8,8 +8,6 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/field:example_element",
         "//sxt/base/test:unit_test",
-        "//sxt/field12/constant:zero",
-        "//sxt/field12/type:element",
     ],
     deps = [
         "//sxt/base/field:arithmetic_utility",
