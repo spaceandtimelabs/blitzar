@@ -7,11 +7,12 @@ in
 with pkgs;
 mkShell {
   buildInputs = [
-    pkgs.bazel-buildtools
-    pkgs.python3
-    pkgs.cargo
-    pkgs.rust-bindgen
-    pkgs.rustfmt
+    bazel-buildtools
+    python3
+    cargo
+    rust-bindgen
+    rustfmt
+    patchelf
     bazel
     clang
     cuda

@@ -22,9 +22,13 @@ bindgen --allowlist-file ${INCLUDE_PATH}/${INCLUDE_FILE}.h ${INCLUDE_PATH}/${INC
 
 # Build the Shared Library
 bazel build -c opt --config=portable_glibc //cbindings:libblitzar.so
+chmod +w $SRC_SO_LIB_PATH
+patchelf --remove-rpath $SRC_SO_LIB_PATH
+chmod -w $SRC_SO_LIB_PATH
 
 # Copy the Shared Library to the `DST_SO_LIB_PATH
 if ! cmp -s $SRC_SO_LIB_PATH $DST_SO_LIB_PATH; then
+    rm -f $DST_SO_LIB_PATH
     cp $SRC_SO_LIB_PATH $DST_SO_LIB_PATH
 fi
 
