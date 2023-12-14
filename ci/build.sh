@@ -1,10 +1,6 @@
 #!/bin/bash
 set -eou pipefail
 
-export PATH=$PATH:/root/.cargo/bin/
-
-rustup default stable
-
 DST_SO_LIB_PATH=$1
 NEW_VERSION=$2
 
