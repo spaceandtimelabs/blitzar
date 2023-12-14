@@ -36,7 +36,7 @@ public:
                                   uint64_t x6) noexcept
       : data_{x1, x2, x3, x4, x5, x6} {}
 
-  CUDA_CALLABLE constexpr element(const uint64_t x[6]) noexcept
+  CUDA_CALLABLE explicit constexpr element(const uint64_t x[6]) noexcept
       : data_{x[0], x[1], x[2], x[3], x[4], x[5]} {}
 
   CUDA_CALLABLE constexpr const uint64_t& operator[](int index) const noexcept {
@@ -49,7 +49,7 @@ public:
 
   CUDA_CALLABLE constexpr uint64_t* data() noexcept { return data_; }
 
-  static constexpr element modulus() noexcept { return f12b::p_v.data(); }
+  static constexpr element modulus() noexcept { return element{f12b::p_v.data()}; }
 
 private:
   uint64_t data_[num_limbs_v];
