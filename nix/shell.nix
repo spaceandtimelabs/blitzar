@@ -9,7 +9,7 @@ mkShell {
   buildInputs = [
     bazel-buildtools
     python3
-    (rust-bin.selectLatestNightlyWith (toolchain: toolchain.default))
+    rust-bin.nightly."2023-12-01".default
     # cargo
     # rust-bindgen
     # rustfmt
