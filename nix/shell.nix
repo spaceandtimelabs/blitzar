@@ -9,6 +9,7 @@ mkShell {
   buildInputs = [
     bazel-buildtools
     python3
+    llvmPackages.libclang.lib
     rust-bin.nightly."2023-12-01".default
     # cargo
     # rust-bindgen
@@ -25,6 +26,6 @@ mkShell {
     cudaDrivers
   ];
   shellHook = ''
-    export LIBCLANG_PATH=${llvmPackages.libclang}/lib
+    export LIBCLANG_PATH=${llvmPackages.libclang.lib}/lib
   '';
 }
