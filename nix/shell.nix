@@ -9,9 +9,10 @@ mkShell {
   buildInputs = [
     bazel-buildtools
     python3
-    cargo
-    rust-bindgen
-    rustfmt
+    (rust-bin.selectLatestNightlyWith (toolchain: toolchain.default))
+    # cargo
+    # rust-bindgen
+    # rustfmt
     patchelf
     nodejs
     # custom
