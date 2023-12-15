@@ -9,7 +9,7 @@ mkShell {
   buildInputs = [
     bazel-buildtools
     python3
-    stdenv.cc.libc
+    gcc13.libc
     rust-bin.nightly."2023-12-01".default
     # cargo
     # rust-bindgen
