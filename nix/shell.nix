@@ -23,9 +23,8 @@ mkShell {
   LD_LIBRARY_PATH = lib.makeLibraryPath [
     "/usr/lib/wsl"
     cudaDrivers
-    gcc13.libc
   ];
   shellHook = ''
-    export LIBCLANG_PATH=${clang}/lib
+    export LIBCLANG_PATH=${llvmPackages.libclang}/lib
   '';
 }
