@@ -9,7 +9,6 @@ mkShell {
   buildInputs = [
     bazel-buildtools
     python3
-    gcc13.libc
     rust-bin.nightly."2023-12-01".default
     # cargo
     # rust-bindgen
@@ -24,6 +23,7 @@ mkShell {
   LD_LIBRARY_PATH = lib.makeLibraryPath [
     "/usr/lib/wsl"
     cudaDrivers
+    gcc13.libc
   ];
   shellHook = ''
     export LIBCLANG_PATH=${clang}/lib
