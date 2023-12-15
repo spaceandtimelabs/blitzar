@@ -24,6 +24,7 @@ mkShell {
   ];
   LD_LIBRARY_PATH = lib.makeLibraryPath [
     "/usr/lib/wsl"
+    gcc13.libc
     cudaDrivers
   ];
   shellHook = ''
