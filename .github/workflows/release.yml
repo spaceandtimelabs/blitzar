@@ -11,16 +11,15 @@ jobs:
 
   release:
     name: Build Publish Library - Linux-x86_64
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    timeout-minutes: 600
     needs: [test-check-lint]
     environment: deploy #!! DO NOT CHANGE THIS LINE !! #
     container:
       image: spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GH_TOKEN }}
 
       - run: git config --global --add safe.directory $(realpath .)
 
@@ -29,10 +28,10 @@ jobs:
         with:
           node-version: "18.x"
 
-      - name: Semantic relase
+      - name: Semantic release
         run: |
-          npm install semantic-release
-          npx semantic-release
+          nix develop --command npm install semantic-release
+          nix develop --command npx semantic-release
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}

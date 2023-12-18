@@ -21,7 +21,6 @@ SRC_SO_LIB_PATH="bazel-bin/cbindings/libblitzar.so"
 bindgen --allowlist-file ${INCLUDE_PATH}/${INCLUDE_FILE}.h ${INCLUDE_PATH}/${INCLUDE_FILE}.h -o ${RUST_PATH}/${LIB_PATH}/src/bindings.rs
 
 # Build the Shared Library
-# bazel build -c opt --config=portable_glibc //cbindings:libblitzar.so
 bazel build -c opt //cbindings:libblitzar.so
 chmod +w $SRC_SO_LIB_PATH
 patchelf --remove-rpath $SRC_SO_LIB_PATH

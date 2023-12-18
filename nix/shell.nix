@@ -26,6 +26,5 @@ mkShell {
     cudaDrivers
   ];
   shellHook = ''
-    export LIBCLANG_PATH=${llvmPackages.libclang.lib}/lib
   '';
 }
