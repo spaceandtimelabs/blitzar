@@ -91,6 +91,5 @@ jobs:
 
       - name: Run rust tests
         run: |
-          nix-store --gc
-          nix develop --command cargo test -Z unstable-options --manifest-path rust/blitzar-sys/Cargo.toml
-          nix develop --command cargo test -Z unstable-options --manifest-path rust/tests/Cargo.toml
+          nix develop --command cargo test --manifest-path rust/blitzar-sys/Cargo.toml
+          nix develop --command cargo test --manifest-path rust/tests/Cargo.toml
