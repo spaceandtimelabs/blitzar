@@ -20,7 +20,8 @@ git_repository(
 
 git_repository(
     name = "rules_cuda",
-    commit = "7a29239",
+    # commit = "7a29239",
+    commit = "80b1de8",
     remote = "https://github.com/bazel-contrib/rules_cuda",
 )
 

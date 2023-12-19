@@ -4,8 +4,8 @@ let
   path = pkgs.lib.strings.concatStringsSep ":" [
     "${clang}/bin"
     "${pkgs.git}/bin"
-    "${pkgs.gcc13}/bin"
-    "${pkgs.gcc13.libc.bin}/bin"
+    "${pkgs.portableGcc}/bin"
+    "${pkgs.portableGcc.libc.bin}/bin"
     "${pkgs.binutils}/bin"
     "${pkgs.coreutils}/bin"
     "${pkgs.findutils}/bin"
