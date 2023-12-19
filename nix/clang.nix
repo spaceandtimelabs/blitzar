@@ -6,10 +6,11 @@ let
 in
 stdenvNoCC.mkDerivation {
   name = "clang";
-  src = pkgs.fetchgit {
-    url = "https://github.com/llvm/llvm-project";
+  src = pkgs.fetchFromGitHub {
+    owner = "llvm";
+    repo = "llvm-project";
     rev = "3effc19";
-    hash = "sha256-kipkrgqzSgdsHwYz5P2NpUo6miulE/Nd9zRgeKAHeHM=";
+    hash = "sha256-tbS0tgxMFPu42M4gYKr3DiovCuMIsTmH8S9864QA4Hw=";
   };
   nativeBuildInputs = [
     cmake
