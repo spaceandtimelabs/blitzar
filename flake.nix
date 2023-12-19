@@ -3,11 +3,12 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgsGcc.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgsDrv.url = "github:nixos/nixpkgs/nixos-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
-  outputs = { self, nixpkgs, nixpkgsDrv, rust-overlay, }:
+  outputs = { self, nixpkgs, nixpkgsDrv, nixpkgsGcc, rust-overlay, }:
     let
       system = "x86_64-linux";
       pkgsDrv = import nixpkgsDrv {
@@ -15,11 +16,18 @@
         config.allowUnfree = true;
         config.cudaSupport = true;
       };
+      pkgsGcc = import nixpkgsGcc {
+        inherit system; 
+      };
       driverOverlay = final: prev: {
         cudaDrivers = pkgsDrv.linuxPackages.nvidia_x11;
       };
+      gccOverlay = final: prev: {
+        portableGcc = pkgsGcc.gcc;
+      };
       overlays = [
         driverOverlay
+        gccOverlay
         (import rust-overlay)
       ];
       pkgs = import nixpkgs { 
