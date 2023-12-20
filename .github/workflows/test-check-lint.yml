@@ -34,7 +34,7 @@ jobs:
   
       - name: Run cpp tests
         run: >
-          nix develop --command bazel test //...
+          nix develop --command TEST_TMPDIR=$HOME/.bazel_test bazel test //...
   
   test-cpp-compute-sanitizer:
     name: C++ code with compute sanitizer
@@ -53,7 +53,7 @@ jobs:
         # revist after the CI environment is updated.
       - name: Run cpp tests
         run: >
-          nix develop --command \
+          nix develop --command TEST_TMPDIR=$HOME/.bazel_test \
             bazel test --jobs=1 --run_under $PWD/tools/cuda/compute_sanitizer_wrapper.sh //... -- \
                -//cbindings:inner_product_proof.t -//sxt/multiexp/multiproduct_gpu:kernel.t
          
@@ -67,7 +67,7 @@ jobs:
   
       - name: Run cpp tests with optimization flags on
         run: >
-          nix develop --command bazel test --jobs=1 -c opt //...
+          nix develop --command TEST_TMPDIR=$HOME/.bazel_test_opt bazel test --jobs=1 -c opt //...
   
   test-cpp-asan:
     name: C++ code with address sanitizer
@@ -79,7 +79,7 @@ jobs:
      
       - name: Run cpp-asan tests
         run: >
-          nix develop --command bazel test --config=asan //...
+          nix develop --command TEST_TMPDIR=$HOME/.bazel_test_asan bazel test --config=asan //...
 
   test-rust:
     name: Rust Sys Crate
@@ -91,5 +91,5 @@ jobs:
 
       - name: Run rust tests
         run: |
-          nix develop --command cargo test --manifest-path rust/blitzar-sys/Cargo.toml
-          nix develop --command cargo test --manifest-path rust/tests/Cargo.toml
+          nix develop --command TEST_TMPDIR=$HOME/.bazel_test_rust cargo test --manifest-path rust/blitzar-sys/Cargo.toml
+          nix develop --command TEST_TMPDIR=$HOME/.bazel_test_rust cargo test --manifest-path rust/tests/Cargo.toml
