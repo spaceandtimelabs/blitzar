@@ -31,13 +31,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
-      - name: Set up bazel cache
-        run: mkdir -p $HOME/.bazel_test
   
       - name: Run cpp tests
         run: >
-          nix develop --command TEST_TMPDIR=$HOME/.bazel_test bazel test //...
+          TEST_TMPDIR=$HOME/.bazel_test nix develop --command bazel test //...
   
   test-cpp-compute-sanitizer:
     name: C++ code with compute sanitizer
@@ -47,9 +44,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up bazel cache
-        run: mkdir -p $HOME/.bazel_test
-  
         # TODO(rnburn): Two test cases fail
         #    - //cbindings:inner_product_proof.t
         #    - //sxt/multiexp/multiproduct_gpu:kernel.t
@@ -59,7 +53,7 @@ jobs:
         # revist after the CI environment is updated.
       - name: Run cpp tests
         run: >
-          nix develop --command TEST_TMPDIR=$HOME/.bazel_test \
+          TEST_TMPDIR=$HOME/.bazel_test nix develop --command \
             bazel test --jobs=1 --run_under $PWD/tools/cuda/compute_sanitizer_wrapper.sh //... -- \
                -//cbindings:inner_product_proof.t -//sxt/multiexp/multiproduct_gpu:kernel.t
          
@@ -70,13 +64,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
-      - name: Set up bazel cache
-        run: mkdir -p $HOME/.bazel_test_opt
   
       - name: Run cpp tests with optimization flags on
         run: >
-          nix develop --command TEST_TMPDIR=$HOME/.bazel_test_opt bazel test --jobs=1 -c opt //...
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command bazel test --jobs=1 -c opt //...
   
   test-cpp-asan:
     name: C++ code with address sanitizer
@@ -86,12 +77,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up bazel cache
-        run: mkdir -p $HOME/.bazel_test_asan
-     
       - name: Run cpp-asan tests
         run: >
-          nix develop --command TEST_TMPDIR=$HOME/.bazel_test_asan bazel test --config=asan //...
+          TEST_TMPDIR=$HOME/.bazel_test_asan nix develop --command bazel test --config=asan //...
 
   test-rust:
     name: Rust Sys Crate
@@ -101,10 +89,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up bazel cache
-        run: mkdir -p $HOME/.bazel_test_release
-
       - name: Run rust tests
         run: |
-          nix develop --command TEST_TMPDIR=$HOME/.bazel_test_release cargo test --manifest-path rust/blitzar-sys/Cargo.toml
-          nix develop --command TEST_TMPDIR=$HOME/.bazel_test_release cargo test --manifest-path rust/tests/Cargo.toml
+          TEST_TMPDIR=$HOME/.bazel_test_release nix develop --command cargo test --manifest-path rust/blitzar-sys/Cargo.toml
+          TEST_TMPDIR=$HOME/.bazel_test_release nix develop --command cargo test --manifest-path rust/tests/Cargo.toml
