@@ -24,12 +24,12 @@
     let
       system = "x86_64-linux";
       pkgsDrv = import nixpkgsDrv {
-        inherit system; 
+        inherit system;
         config.allowUnfree = true;
         config.cudaSupport = true;
       };
       pkgsGcc = import nixpkgsGcc {
-        inherit system; 
+        inherit system;
       };
       driverOverlay = final: prev: {
         cudaDrivers = pkgsDrv.linuxPackages.nvidia_x11;
@@ -42,8 +42,8 @@
         gccOverlay
         (import rust-overlay)
       ];
-      pkgs = import nixpkgs { 
-        inherit system overlays; 
+      pkgs = import nixpkgs {
+        inherit system overlays;
         config.allowUnfree = true;
         config.cudaSupport = true;
       };
