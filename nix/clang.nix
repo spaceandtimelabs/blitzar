@@ -1,12 +1,14 @@
 { pkgs }:
 with pkgs;
 let
-  gccForLibs = gcc13.cc;
+  gcc = portableGcc;
+  gccForLibs = gcc.cc;
 in
 stdenvNoCC.mkDerivation {
   name = "clang";
-  src = pkgs.fetchgit {
-    url = "https://github.com/llvm/llvm-project";
+  src = pkgs.fetchFromGitHub {
+    owner = "llvm";
+    repo = "llvm-project";
     rev = "fdbff88";
     hash = "sha256-kipkrgqzSgdsHwYz5P2NpUo6miulE/Nd9zRgeKAHeHM=";
   };
@@ -18,10 +20,10 @@ stdenvNoCC.mkDerivation {
     git
   ];
   buildInputs = [
-    gcc13
+    gcc
   ];
-  NIX_LDFLAGS = "-L${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -L${gcc13.libc}/lib";
-  CFLAGS = "-B${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -B${gcc13.libc}/lib";
+  NIX_LDFLAGS = "-L${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -L${gcc.libc}/lib";
+  CFLAGS = "-B${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -B${gcc.libc}/lib";
   patches = [
     ./clang_driver.patch
 
@@ -31,14 +33,14 @@ stdenvNoCC.mkDerivation {
   ];
   postPatch = ''
     substituteInPlace clang/lib/Driver/ToolChains/Gnu.cpp \
-      --replace 'GLIBC_PATH_ABC123' '${gcc13.libc}/lib'
+      --replace 'GLIBC_PATH_ABC123' '${gcc.libc}/lib'
   '';
   configurePhase = pkgs.lib.strings.concatStringsSep " " [
     "mkdir build; cd build;"
     "cmake"
     "-G \"Unix Makefiles\""
     "-DGCC_INSTALL_PREFIX=${gccForLibs}"
-    "-DC_INCLUDE_DIRS=${gcc13.libc.dev}/include"
+    "-DC_INCLUDE_DIRS=${gcc.libc.dev}/include"
     "-DLLVM_TARGETS_TO_BUILD=\"host;NVPTX\""
     "-DLLVM_BUILTIN_TARGETS=\"x86_64-unknown-linux-gnu\""
     "-DLLVM_RUNTIME_TARGETS=\"x86_64-unknown-linux-gnu\""

@@ -4,8 +4,8 @@ let
   path = pkgs.lib.strings.concatStringsSep ":" [
     "${clang}/bin"
     "${pkgs.git}/bin"
-    "${pkgs.gcc13}/bin"
-    "${pkgs.gcc13.libc.bin}/bin"
+    "${pkgs.portableGcc}/bin"
+    "${pkgs.portableGcc.libc.bin}/bin"
     "${pkgs.binutils}/bin"
     "${pkgs.coreutils}/bin"
     "${pkgs.findutils}/bin"
@@ -33,7 +33,7 @@ pkgs.writeShellScriptBin "bazel" ''
      --action_env CXX=${clang}/bin/clang++ \
      --action_env PATH="${path}" \
      --action_env CUDA_PATH="${cuda}" \
-     --action_env=BAZEL_LINKLIBS='-l%:libc++.a' \
+     --action_env=BAZEL_LINKLIBS='-l%:libc++.a -static-libgcc' \
      --action_env=BAZEL_LINKOPTS='-L${clang}/lib' \
      ''${@:2}
   else
