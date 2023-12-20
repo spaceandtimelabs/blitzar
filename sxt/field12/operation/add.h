@@ -28,9 +28,9 @@
 #include <cstdint>
 
 #include "sxt/base/field/arithmetic_utility.h"
-#include "sxt/base/field/subtract_p.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/field12/base/constants.h"
+#include "sxt/field12/base/subtract_p.h"
 #include "sxt/field12/type/element.h"
 
 namespace sxt::f12o {
@@ -49,6 +49,6 @@ CUDA_CALLABLE inline void add(f12t::element& h, const f12t::element& f,
   basfld::adc(h_tmp[4], carry, f[4], g[4], carry);
   basfld::adc(h_tmp[5], carry, f[5], g[5], carry);
 
-  basfld::subtract_p<6>(h.data(), h_tmp, f12b::p_v.data());
+  f12b::subtract_p(h.data(), h_tmp);
 }
 } // namespace sxt::f12o
