@@ -31,6 +31,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Set up bazel cache
+        run: mkdir -p $HOME/.bazel_test
   
       - name: Run cpp tests
         run: >
@@ -43,6 +46,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Set up bazel cache
+        run: mkdir -p $HOME/.bazel_test
   
         # TODO(rnburn): Two test cases fail
         #    - //cbindings:inner_product_proof.t
@@ -64,6 +70,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Set up bazel cache
+        run: mkdir -p $HOME/.bazel_test_opt
   
       - name: Run cpp tests with optimization flags on
         run: >
@@ -76,6 +85,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Set up bazel cache
+        run: mkdir -p $HOME/.bazel_test_asan
      
       - name: Run cpp-asan tests
         run: >
@@ -88,6 +100,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Set up bazel cache
+        run: mkdir -p $HOME/.bazel_test_release
 
       - name: Run rust tests
         run: |

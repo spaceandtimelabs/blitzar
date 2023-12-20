@@ -21,6 +21,9 @@ jobs:
 
       - run: git config --global --add safe.directory $(realpath .)
 
+      - name: Set up bazel cache
+        run: mkdir -p $HOME/.bazel_test_release
+
       - name: Semantic release
         run: |
           nix develop --command npm install semantic-release
