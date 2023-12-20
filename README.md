@@ -171,7 +171,7 @@ See the [example](./example) folder for some examples.
 
 Prerequisites:
 * `x86_64` Linux instance.
-* Nix with flake support (check out [The Determinate Nix Installer](https://github.com/DeterminateSystems/nix-installer)
+* Nix with flake support (check out [The Determinate Nix Installer](https://github.com/DeterminateSystems/nix-installer))
 * Nvidia GPU capable of running CUDA 12.2 code.
 
 From your terminal, run the following command in the root of the source directory to set
