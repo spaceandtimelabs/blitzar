@@ -21,13 +21,10 @@ jobs:
 
       - run: git config --global --add safe.directory $(realpath .)
 
-      - name: Set up bazel cache
-        run: mkdir -p $HOME/.bazel_test_release
-
       - name: Semantic release
         run: |
           nix develop --command npm install semantic-release
-          TEST_TMPDIR=$HOME/.bazel_test_release nix develop --command npx semantic-release
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command npx semantic-release
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}

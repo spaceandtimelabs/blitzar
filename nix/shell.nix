@@ -10,12 +10,10 @@ mkShell {
     bazel-buildtools
     python3
     rust-bin.nightly."2023-12-01".default
-    # cargo
     rust-bindgen
-    # rustfmt
     patchelf
     nodejs
-    # custom
+    # custom packages
     bazel
     clang
     cuda

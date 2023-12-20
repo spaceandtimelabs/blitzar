@@ -91,5 +91,5 @@ jobs:
 
       - name: Run rust tests
         run: |
-          TEST_TMPDIR=$HOME/.bazel_test_release nix develop --command cargo test --manifest-path rust/blitzar-sys/Cargo.toml
-          TEST_TMPDIR=$HOME/.bazel_test_release nix develop --command cargo test --manifest-path rust/tests/Cargo.toml
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command cargo test --manifest-path rust/blitzar-sys/Cargo.toml
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command cargo test --manifest-path rust/tests/Cargo.toml
