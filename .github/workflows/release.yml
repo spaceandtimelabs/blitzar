@@ -15,18 +15,11 @@ jobs:
     timeout-minutes: 600
     needs: [test-check-lint]
     environment: deploy #!! DO NOT CHANGE THIS LINE !! #
-    container:
-      image: spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
       - run: git config --global --add safe.directory $(realpath .)
-
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
 
       - name: Semantic release
         run: |

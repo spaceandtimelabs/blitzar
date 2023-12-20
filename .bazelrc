@@ -5,6 +5,8 @@ build --copt -std=c++20
 build --linkopt=-lm
 
 build:portable_glibc --define SXT_PORTABLE_GLIBC=1
+build:portable_glibc --action_env=BAZEL_LINKLIBS='-l%:libstdc++.a'
+build:portable_glibc --action_env=BAZEL_LINKOPTS='-static-libstdc++ -static-libgcc'
 
 build --flag_alias=enable_cuda=@rules_cuda//cuda:enable
 build --flag_alias=cuda_archs=@rules_cuda//cuda:archs
