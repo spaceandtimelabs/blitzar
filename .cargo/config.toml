@@ -1,0 +1,2 @@
+[build]
+rustdocflags = ["--cfg", "docsrs", "-Z", "unstable-options", "--enable-per-target-ignores"]

@@ -7,8 +7,13 @@ in
 with pkgs;
 mkShell {
   buildInputs = [
-    pkgs.bazel-buildtools
-    pkgs.python3
+    bazel-buildtools
+    python3
+    rust-bin.nightly."2023-12-01".default
+    rust-bindgen
+    patchelf
+    nodejs
+    # custom packages
     bazel
     clang
     cuda

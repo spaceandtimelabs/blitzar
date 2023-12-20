@@ -19,11 +19,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
+  
       - name: Run check
         run: >
           nix develop --command ./tools/code_format/check_format.py check
-
+  
   test-cpp:
     name: C++ code
     runs-on: self-hosted
@@ -31,11 +31,11 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
+  
       - name: Run cpp tests
         run: >
-          nix develop --command bazel test //...
-
+          TEST_TMPDIR=$HOME/.bazel_test nix develop --command bazel test //...
+  
   test-cpp-compute-sanitizer:
     name: C++ code with compute sanitizer
     runs-on: self-hosted
@@ -53,10 +53,10 @@ jobs:
         # revist after the CI environment is updated.
       - name: Run cpp tests
         run: >
-          nix develop --command \
+          TEST_TMPDIR=$HOME/.bazel_test nix develop --command \
             bazel test --jobs=1 --run_under $PWD/tools/cuda/compute_sanitizer_wrapper.sh //... -- \
                -//cbindings:inner_product_proof.t -//sxt/multiexp/multiproduct_gpu:kernel.t
-          
+         
   test-cpp-opt:
     name: C++ code with optimizations
     runs-on: self-hosted
@@ -64,11 +64,11 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
+  
       - name: Run cpp tests with optimization flags on
         run: >
-          nix develop --command bazel test --jobs=1 -c opt //...
-
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command bazel test --jobs=1 -c opt //...
+  
   test-cpp-asan:
     name: C++ code with address sanitizer
     runs-on: self-hosted
@@ -76,17 +76,20 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      
+
       - name: Run cpp-asan tests
         run: >
-          nix develop --command bazel test --config=asan //...
+          TEST_TMPDIR=$HOME/.bazel_test_asan nix develop --command bazel test --config=asan //...
 
   test-rust:
     name: Rust Sys Crate
     runs-on: self-hosted
+    timeout-minutes: 600
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Run rust tests
-        run: docker run --rm -e TEST_TMPDIR=/root/.cache_bazel -v $HOME/.cache_bazel_test_rust:/root/.cache_bazel -v "$PWD":/src:ro -w /src --gpus all --privileged spaceandtimelabs/blitzar:12.2.0-cuda-1.71.1-rust-1 /bin/bash -c "cp -av /src/ /src_tmp/; cd /src_tmp; source /root/.cargo/env; /root/.cargo/bin/cargo test --manifest-path rust/blitzar-sys/Cargo.toml; /root/.cargo/bin/cargo test --manifest-path rust/tests/Cargo.toml"
+        run: |
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command cargo test --manifest-path rust/blitzar-sys/Cargo.toml
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command cargo test --manifest-path rust/tests/Cargo.toml
