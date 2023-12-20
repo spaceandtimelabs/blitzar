@@ -167,41 +167,19 @@ See the [example](./example) folder for some examples.
 ### Prerequisites to build from source
 
 <details open>
-<summary>GPU backend prerequisites:</summary>
+<summary>Build environment</summary>
 
+Prerequisites:
 * `x86_64` Linux instance.
-* Docker installed (check [install guidelines](https://docs.docker.com/engine/install/ubuntu/)).
-* Nvidia GPU capable of run CUDA 12.2 code.
-* Recommended Nvidia Toolkit Driver Version: >= 530.30.02 (check the [compatibility list here](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html)).
-* [Nvidia container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) (necessary only if you intend to run tests and benchmarks on the GPU).
+* Nix with flake support (check out [The Determinate Nix Installer](https://github.com/DeterminateSystems/nix-installer)
+* Nvidia GPU capable of running CUDA 12.2 code.
 
-From your terminal, run the following command to start the GPU docker container:
+From your terminal, run the following command in the root of the source directory to set
+up a build environment. 
 ```bash
-./ci/docker/run_docker_gpu.sh
+nix develop
 ```
-</details>
-
-<details>
-<summary>CPU backend prerequisites:</summary>
-
-You'll need the following requirements to run the environment:
-
-* `x86_64` Linux instance.
-* Docker installed (check [install guidelines](https://docs.docker.com/engine/install/ubuntu/)).
-
-From your terminal, run the following command to start the CPU docker container:
-```bash
-./ci/docker/run_docker_cpu.sh
-```
-
-</details>
-
-<details>
-
-<summary> General List of prerequisites: </summary>
-
-Check the [prerequisites list](./ci/docker/Dockerfile) for the complete list of prerequisites.
-
+Note: if this is the first time, it may take a while as we build a clang compiler from source.
 </details>
 
 ## Usage
@@ -210,7 +188,7 @@ Check the [prerequisites list](./ci/docker/Dockerfile) for the complete list of 
 <summary>Building and Testing the C++/CUDA code:</summary>
 
 ```bash
-./ci/docker/run_docker_gpu.sh
+nix develop
 
 # build all the code assets
 bazel build //...
@@ -230,7 +208,7 @@ Note: some tests will fail in case you don't have a GPU available.
 <summary>Building and Testing the Rust Sys-Crate code:</summary>
 
 ```bash
-./ci/docker/run_docker_gpu.sh
+nix develop
 
 # run the sys-crate tests
 cargo test --manifest-path rust/blitzar-sys/Cargo.toml
@@ -253,7 +231,7 @@ You can find release ready versions of this library under the [release page](htt
 See the C++ example here: [example/cbindings1/main.cc](./example/cbindings1/main.cc). To run this example, execute:
 
 ```bash
-./ci/docker/run_docker_gpu.sh
+nix develop
 
 bazel run //example/cbindings1:cbind1
 ```
@@ -261,7 +239,7 @@ bazel run //example/cbindings1:cbind1
 Alternatively, compile this example code with g++:
 
 ```bash
-./ci/docker/run_docker_gpu.sh
+nix develop
 
 # Build the shared library
 bazel build -c opt --config=portable_glibc //cbindings:libblitzar.so
@@ -281,7 +259,7 @@ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:bazel-bin/cbindings/ ./main
 See the Rust example here: [rust/tests/src/main.rs](./rust/tests/src/main.rs). To run this example, execute:
 
 ```bash
-./ci/docker/run_docker_gpu.sh
+nix develop
 
 cargo test --manifest-path rust/tests/Cargo.toml
 ```
@@ -310,7 +288,7 @@ nix develop
 <summary>Generalized Pedersen Commitment (MSM):</summary>
 
 ```bash
-./ci/docker/run_docker_gpu.sh
+nix develop
 
 # Usage: benchmark <cpu|gpu> <n> <num_samples> <num_commitments> <element_nbytes> <verbose>
 # - n: the size of the multiexponentiation vector (or the sequence length).
@@ -327,7 +305,7 @@ bazel run -c opt //benchmark/multi_commitment:benchmark -- gpu 1000 5 1 32 1
 <summary>Inner Product Argument:</summary>
 
 ```bash
-./ci/docker/run_docker_gpu.sh
+nix develop
 
 # Usage: benchmark <cpu|gpu> <n> <num_samples>
 # - n: the size of the inner product vector (or the sequence length).
