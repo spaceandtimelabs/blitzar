@@ -14,14 +14,13 @@ http_archive(
 
 git_repository(
     name = "com_github_catchorg_catch2",
-    commit = "53d0d91",
+    commit = "766541d",
     remote = "https://github.com/catchorg/Catch2",
 )
 
 git_repository(
     name = "rules_cuda",
-    # commit = "7a29239",
-    commit = "80b1de8",
+    commit = "7a29239",
     remote = "https://github.com/bazel-contrib/rules_cuda",
 )
 
