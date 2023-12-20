@@ -27,15 +27,3 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
 )
-
-sxt_cc_component(
-    name = "subtract_p",
-    test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        ":arithmetic_utility",
-        "//sxt/base/macro:cuda_callable",
-        "//sxt/base/num:cmov",
-    ],
-)

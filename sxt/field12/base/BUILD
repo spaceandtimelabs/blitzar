@@ -47,8 +47,8 @@ sxt_cc_component(
     name = "reduce",
     impl_deps = [
         ":constants",
+        ":subtract_p",
         "//sxt/base/field:arithmetic_utility",
-        "//sxt/base/field:subtract_p",
         "//sxt/base/type:narrow_cast",
     ],
     is_cuda = True,
@@ -58,5 +58,18 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
+    name = "subtract_p",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":constants",
+        "//sxt/base/field:arithmetic_utility",
+        "//sxt/base/macro:cuda_callable",
+        "//sxt/base/num:cmov",
     ],
 )
