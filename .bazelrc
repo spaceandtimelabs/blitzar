@@ -39,6 +39,8 @@ build:asan --copt -g
 build:asan --copt -fno-omit-frame-pointer
 build:asan --copt -fsanitize=address
 build:asan --linkopt -fsanitize=address
+
+# work around for https://github.com/google/sanitizers/issues/856
 build:asan --linkopt -no-pie
 
 # For asan to work with cuda, we need to add this option
