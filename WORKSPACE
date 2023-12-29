@@ -41,9 +41,6 @@ filegroup(
 
 configure_make(
   name = "libbacktrace",
-  configure_options = [
-    "--enable-shared=no",
-  ],
   lib_source = ":all_srcs",
 )
   """,
@@ -62,6 +59,8 @@ git_repository(
 git_repository(
     name = "com_github_nelhage_rules_boost",
     commit = "ff4fefd",
+    # Patch build to add libbacktrace dependency.
+    # See https://github.com/nelhage/rules_boost/issues/534
     patches = [
         "//bazel:stacktrace.patch",
     ],
