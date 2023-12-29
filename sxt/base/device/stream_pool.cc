@@ -18,8 +18,6 @@
 
 #include <cuda_runtime.h>
 
-#include <string>
-
 #include "sxt/base/device/active_device_guard.h"
 #include "sxt/base/device/stream_handle.h"
 #include "sxt/base/error/assert.h"
@@ -34,7 +32,7 @@ static stream_handle* make_stream_handle(int device) noexcept {
   auto res = new stream_handle{};
   auto rcode = cudaStreamCreate(&res->stream);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaStreamCreate failed: " + std::string(cudaGetErrorString(rcode)));
+    baser::panic("cudaStreamCreate failed: {}", cudaGetErrorString(rcode));
   }
   res->device = device;
   res->next = nullptr;
@@ -64,7 +62,7 @@ stream_pool::~stream_pool() noexcept {
       auto next = handle->next;
       auto rcode = cudaStreamDestroy(handle->stream);
       if (rcode != cudaSuccess) {
-        baser::panic("cudaStreamDestroy failed: " + std::string(cudaGetErrorString(rcode)));
+        baser::panic("cudaStreamDestroy failed: {}", cudaGetErrorString(rcode));
       }
       delete handle;
       handle = next;
