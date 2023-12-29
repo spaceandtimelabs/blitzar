@@ -19,9 +19,16 @@
 #include <cstdlib>
 #include <print>
 
-#include "sxt/base/error/stacktrace.h"
-
 namespace sxt::baser {
+//--------------------------------------------------------------------------------------------------
+// panic_with_message
+//--------------------------------------------------------------------------------------------------
+[[noreturn]] void panic_with_message(std::string_view file, int line, std::string_view msg,
+                                     const std::string& trace) noexcept {
+  std::print(stderr, "{}:{} panic: {}\n{}\n", file, line, msg, trace);
+  std::abort();
+}
+
 //--------------------------------------------------------------------------------------------------
 // panic
 //--------------------------------------------------------------------------------------------------

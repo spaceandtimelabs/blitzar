@@ -14,7 +14,7 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "panic",
-    impl_deps = [
+    deps = [
         ":stacktrace",
     ],
     with_test = False,
