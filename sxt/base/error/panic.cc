@@ -16,8 +16,8 @@
  */
 #include "sxt/base/error/panic.h"
 
-#include <print>
 #include <cstdlib>
+#include <print>
 
 #include "sxt/base/error/stacktrace.h"
 

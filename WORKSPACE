@@ -12,23 +12,21 @@ http_archive(
     ],
 )
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
 # rules_foreign_cc
 git_repository(
     name = "rules_foreign_cc",
     commit = "a87e754",
     remote = "https://github.com/bazelbuild/rules_foreign_cc",
 )
+
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
+
 rules_foreign_cc_dependencies()
 
 # libbacktrace
 git_repository(
-  name = "com_github_ianlancetaylor_libbacktrace",
-  commit = "14818b7",
-  remote = "https://github.com/ianlancetaylor/libbacktrace",
-  build_file_content = """
+    name = "com_github_ianlancetaylor_libbacktrace",
+    build_file_content = """
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make")
 
 package(default_visibility = ["//visibility:public"])
@@ -48,7 +46,9 @@ configure_make(
   ],
   lib_source = ":all_srcs",
 )
-  """
+  """,
+    commit = "14818b7",
+    remote = "https://github.com/ianlancetaylor/libbacktrace",
 )
 
 # catch2
@@ -62,12 +62,14 @@ git_repository(
 git_repository(
     name = "com_github_nelhage_rules_boost",
     commit = "ff4fefd",
-    remote = "https://github.com/nelhage/rules_boost",
     patches = [
-      "//bazel:stacktrace.patch",
+        "//bazel:stacktrace.patch",
     ],
+    remote = "https://github.com/nelhage/rules_boost",
 )
+
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
+
 boost_deps()
 
 # rules_cuda
@@ -76,6 +78,9 @@ git_repository(
     commit = "7a29239",
     remote = "https://github.com/bazel-contrib/rules_cuda",
 )
+
 load("@rules_cuda//cuda:repositories.bzl", "register_detected_cuda_toolchains", "rules_cuda_dependencies")
+
 rules_cuda_dependencies()
+
 register_detected_cuda_toolchains()
