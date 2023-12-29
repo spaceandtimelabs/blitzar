@@ -42,14 +42,13 @@ struct panic_message {
 //--------------------------------------------------------------------------------------------------
 // panic_format
 //--------------------------------------------------------------------------------------------------
-template <class... Args>
-struct panic_format {
+template <class... Args> struct panic_format {
   template <class T>
     requires std::constructible_from<std::format_string<Args...>, T>
   consteval panic_format(const T& s,
                          std::source_location loc = std::source_location::current()) noexcept
       : fmt{s}, loc{loc} {}
-  
+
   std::format_string<Args...> fmt;
   std::source_location loc;
 };
@@ -71,8 +70,8 @@ struct panic_format {
 }
 
 template <class... Args>
-[[noreturn]] void panic(panic_format<std::type_identity_t<Args>...> fmt, Args&&... args) noexcept 
-  requires (sizeof...(Args) > 0)
+[[noreturn]] void panic(panic_format<std::type_identity_t<Args>...> fmt, Args&&... args) noexcept
+  requires(sizeof...(Args) > 0)
 {
   panic_with_message(fmt.loc.file_name(), fmt.loc.line(),
                      std::format(fmt.fmt, std::forward<Args>(args)...));
