@@ -23,7 +23,6 @@ build:clang --action_env CC=/usr/bin/clang-18
 build:clang --action_env CXX=/usr/bin/clang++-18
 build --@rules_cuda//cuda:copts=-std=c++2b
 build --@rules_cuda//cuda:host_copts=-std=c++2b
-build --@rules_cuda//cuda:host_copts=-fno-omit-frame-pointer
 build --config=clang
 
 
