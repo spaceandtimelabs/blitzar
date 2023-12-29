@@ -1,0 +1,27 @@
+diff --git a/boost.BUILD b/boost.BUILD
+index 8eabdd0..0f2f344 100644
+--- boost.BUILD
++++ boost.BUILD
+@@ -1907,12 +1907,13 @@ boost_library(
+         "//conditions:default": [],
+     }),
+     exclude_src = ["libs/stacktrace/src/*.cpp"],
++    linkstatic = 1,
+     linkopts = select({
+         ":linux_ppc": [
+             "-lbacktrace -ldl",
+         ],
+         ":linux_x86_64": [
+-            "-lbacktrace -ldl",
++            "-ldl",
+         ],
+         ":linux_aarch64": [
+             "-lbacktrace -ldl",
+@@ -1928,6 +1929,7 @@ boost_library(
+         ":predef",
+         ":static_assert",
+         ":type_traits",
++        "@com_github_ianlancetaylor_libbacktrace//:libbacktrace",
+     ],
+ )
+ 
