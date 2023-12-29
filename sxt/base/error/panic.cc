@@ -16,15 +16,17 @@
  */
 #include "sxt/base/error/panic.h"
 
+#include <print>
 #include <cstdlib>
-#include <iostream>
+
+#include "sxt/base/error/stacktrace.h"
 
 namespace sxt::baser {
 //--------------------------------------------------------------------------------------------------
 // panic
 //--------------------------------------------------------------------------------------------------
 [[noreturn]] void panic(std::string_view message, int line, const char* file) noexcept {
-  std::cerr << file << ":" << line << " panic: " << message << "\n";
+  std::print(stderr, "{}:{} panic: {}\n{}\n", file, line, message, stacktrace());
   std::abort();
 }
 } // namespace sxt::baser
