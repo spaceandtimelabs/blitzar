@@ -28,12 +28,4 @@ namespace sxt::baser {
   std::print(stderr, "{}:{} panic: {}\n{}\n", file, line, msg, trace);
   std::abort();
 }
-
-//--------------------------------------------------------------------------------------------------
-// panic
-//--------------------------------------------------------------------------------------------------
-[[noreturn]] void panic(std::string_view message, int line, const char* file) noexcept {
-  std::print(stderr, "{}:{} panic: {}\n{}\n", file, line, message, stacktrace());
-  std::abort();
-}
 } // namespace sxt::baser
