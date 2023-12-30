@@ -18,8 +18,6 @@
 
 #include <cuda_runtime.h>
 
-#include <string>
-
 #include "sxt/base/error/panic.h"
 
 namespace sxt::basdv {
@@ -29,7 +27,7 @@ namespace sxt::basdv {
 void record_event(bast::raw_cuda_event_t event, bast::raw_stream_t stream) noexcept {
   auto rcode = cudaEventRecord(event, stream);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaEventRecord failed: " + std::string(cudaGetErrorString(rcode)));
+    baser::panic("cudaEventRecord failed: {}", cudaGetErrorString(rcode));
   }
 }
 
@@ -39,7 +37,7 @@ void record_event(bast::raw_cuda_event_t event, bast::raw_stream_t stream) noexc
 void async_wait_on_event(bast::raw_stream_t stream, bast::raw_cuda_event_t event) noexcept {
   auto rcode = cudaStreamWaitEvent(stream, event);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaStreamWaitEvent failed: " + std::string(cudaGetErrorString(rcode)));
+    baser::panic("cudaStreamWaitEvent failed: {}", cudaGetErrorString(rcode));
   }
 }
 } // namespace sxt::basdv

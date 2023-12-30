@@ -18,8 +18,6 @@
 
 #include <cuda_runtime.h>
 
-#include <string>
-
 #include "sxt/base/error/panic.h"
 
 namespace sxt::memr {
@@ -36,7 +34,7 @@ void* async_device_resource::do_allocate(size_t bytes, size_t alignment) noexcep
   void* res;
   auto rcode = cudaMallocAsync(&res, bytes, stream_);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaMallocAsync failed: " + std::string{cudaGetErrorString(rcode)});
+    baser::panic("cudaMallocAsync failed: {}", cudaGetErrorString(rcode));
   }
   return res;
 }
@@ -47,7 +45,7 @@ void* async_device_resource::do_allocate(size_t bytes, size_t alignment) noexcep
 void async_device_resource::do_deallocate(void* ptr, size_t bytes, size_t alignment) noexcept {
   auto rcode = cudaFreeAsync(ptr, stream_);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaFreeAsync failed: " + std::string{cudaGetErrorString(rcode)});
+    baser::panic("cudaFreeAsync failed: {}", cudaGetErrorString(rcode));
   }
 }
 
