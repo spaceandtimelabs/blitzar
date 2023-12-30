@@ -67,6 +67,7 @@ static __global__ void count_kernel(unsigned* counters, const uint8_t* data, uns
 //--------------------------------------------------------------------------------------------------
 template <size_t NumBytes>
 static __global__ void signed_count_kernel(unsigned* counters, const uint8_t* data, unsigned n) {
+  using T = bast::sized_int_t<NumBytes * 8u>;
   unsigned element_num_bytes = blockDim.x;
   unsigned element_num_bits = element_num_bytes * 8u;
   unsigned num_blocks = gridDim.x;
@@ -86,7 +87,14 @@ static __global__ void signed_count_kernel(unsigned* counters, const uint8_t* da
   unsigned count = 0;
   for (unsigned i = first; i < last; ++i) {
     // Note: we can assume the data pointer is properly aligned
-    auto element = abs(*reinterpret_cast<const bast::sized_int_t<NumBytes * 8u>*>(data));
+    auto element = *reinterpret_cast<const T*>(data);
+    if constexpr (NumBytes < 16) {
+      element = abs(element);
+    } else {
+      if (element < 0) {
+        element = -element;
+      } 
+    }
     auto byte = reinterpret_cast<uint8_t*>(&element)[byte_index];
     count += static_cast<unsigned>((byte & mask) != 0);
     data += element_num_bytes;
@@ -238,8 +246,10 @@ xena::future<> count_exponent_bits(memmg::managed_array<unsigned>& block_counts,
     count_kernel<<<dim3(num_blocks, 1, 1), dim3(element_num_bytes, 8, 1), 0, stream>>>(
         block_counts_dev.data(), exponents.data, static_cast<unsigned>(n));
   } else {
-    SXT_DEBUG_ASSERT(basn::is_power2(element_num_bytes));
-    basn::constexpr_switch<4>(
+    SXT_RELEASE_ASSERT(basn::is_power2(element_num_bytes));
+    SXT_RELEASE_ASSERT(element_num_bytes <= 16,
+                       "signed commitments for numbers larger than 128-bits aren't supported");
+    basn::constexpr_switch<5>(
         basn::ceil_log2(element_num_bytes),
         [&]<unsigned NumBytesLg2>(std::integral_constant<unsigned, NumBytesLg2>) noexcept {
           static constexpr auto NumBytes = 1ull << NumBytesLg2;

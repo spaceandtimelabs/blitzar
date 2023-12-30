@@ -20,6 +20,7 @@
 #include <cstdint>
 
 using uint128_t = __uint128_t;
+using int128_t = __int128_t;
 
 namespace sxt::bast {
 //--------------------------------------------------------------------------------------------------
@@ -42,6 +43,10 @@ template <> struct sized_int_t_impl<32> {
 
 template <> struct sized_int_t_impl<64> {
   using type = int64_t;
+};
+
+template <> struct sized_int_t_impl<128> {
+  using type = int128_t;
 };
 } // namespace detail
 
