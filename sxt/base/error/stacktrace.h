@@ -14,19 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/base/error/panic.h"
+#pragma once
 
-#include <cstdlib>
-#include <print>
-
-#include "sxt/base/error/stacktrace.h"
+#include <string>
 
 namespace sxt::baser {
 //--------------------------------------------------------------------------------------------------
-// panic
+// stacktrace
 //--------------------------------------------------------------------------------------------------
-[[noreturn]] void panic(std::string_view message, int line, const char* file) noexcept {
-  std::print(stderr, "{}:{} panic: {}\n{}\n", file, line, message, stacktrace());
-  std::abort();
-}
+/**
+ * Wrapper around an implementation of stacktrace.
+ *
+ * In the future, we might replace this with https://en.cppreference.com/w/cpp/header/stacktrace
+ * once it's available in standard libraries
+ */
+std::string stacktrace() noexcept;
 } // namespace sxt::baser
