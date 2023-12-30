@@ -18,6 +18,7 @@ sxt_cc_component(
     name = "curve21_arithmetic",
     impl_deps = [
         "//sxt/base/container:stack_array",
+        "//sxt/base/num:abs",
         "//sxt/base/num:constexpr_switch",
         "//sxt/base/num:ceil_log2",
         "//sxt/base/type:int",

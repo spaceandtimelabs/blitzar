@@ -45,6 +45,7 @@ sxt_cc_component(
     name = "exponent_aggregates_computation",
     impl_deps = [
         ":exponent_aggregates",
+        "//sxt/base/num:abs",
         "//sxt/base/num:constexpr_switch",
         "//sxt/base/num:ceil_log2",
         "//sxt/base/num:power2_equality",
@@ -72,6 +73,7 @@ sxt_cc_component(
         "//sxt/base/container:blob_array",
         "//sxt/base/container:span_utility",
         "//sxt/base/container:stack_array",
+        "//sxt/base/num:abs",
         "//sxt/base/num:divide_up",
         "//sxt/multiexp/base:digit_utility",
         "//sxt/multiexp/base:exponent_sequence",
@@ -129,6 +131,7 @@ sxt_cc_component(
     name = "multiproduct_decomposition_kernel",
     impl_deps = [
         "//sxt/base/error:assert",
+        "//sxt/base/num:abs",
         "//sxt/base/num:divide_up",
         "//sxt/base/num:constexpr_switch",
         "//sxt/base/num:ceil_log2",

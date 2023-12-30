@@ -22,6 +22,7 @@
 
 #include "sxt/base/container/stack_array.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/num/abs.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/constexpr_switch.h"
 #include "sxt/base/type/int.h"
@@ -44,13 +45,13 @@ static void read_exponent(c21t::element_p3& e, basct::span<uint8_t>& exponent,
   if (!static_cast<bool>(sequence.is_signed)) {
     return;
   }
-  basn::constexpr_switch<4>(
+  basn::constexpr_switch<5>(
       basn::ceil_log2(element_nbytes),
       [&]<unsigned NumBytesLg2>(std::integral_constant<unsigned, NumBytesLg2>) noexcept {
         static constexpr auto NumBytes = 1ull << NumBytesLg2;
         bast::sized_int_t<NumBytes * 8> x{};
         std::copy_n(exponent.begin(), element_nbytes, reinterpret_cast<uint8_t*>(&x));
-        auto abs_x = std::abs(x);
+        auto abs_x = basn::abs(x);
         if (x == abs_x) {
           return;
         }

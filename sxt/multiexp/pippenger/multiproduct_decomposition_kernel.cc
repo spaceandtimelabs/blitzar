@@ -21,6 +21,7 @@
 
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/num/abs.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/constexpr_switch.h"
 #include "sxt/base/num/divide_up.h"
@@ -87,14 +88,7 @@ static __global__ void signed_count_kernel(unsigned* counters, const uint8_t* da
   unsigned count = 0;
   for (unsigned i = first; i < last; ++i) {
     // Note: we can assume the data pointer is properly aligned
-    auto element = *reinterpret_cast<const T*>(data);
-    if constexpr (NumBytes < 16) {
-      element = abs(element);
-    } else {
-      if (element < 0) {
-        element = -element;
-      } 
-    }
+    auto element = basn::abs(*reinterpret_cast<const T*>(data));
     auto byte = reinterpret_cast<uint8_t*>(&element)[byte_index];
     count += static_cast<unsigned>((byte & mask) != 0);
     data += element_num_bytes;
@@ -142,6 +136,7 @@ static __global__ void decomposition_kernel(unsigned* out, const unsigned* offse
 template <size_t NumBytes>
 static __global__ void signed_decomposition_kernel(unsigned* out, const unsigned* offsets,
                                                    const uint8_t* data, unsigned n) {
+  using T = bast::sized_int_t<NumBytes * 8u>;
   unsigned element_num_bytes = blockDim.x;
   unsigned element_num_bits = element_num_bytes * 8u;
   unsigned num_blocks = gridDim.x;
@@ -162,8 +157,8 @@ static __global__ void signed_decomposition_kernel(unsigned* out, const unsigned
   unsigned count = 0;
   for (unsigned i = first; i < last; ++i) {
     // Note: we can assume the data pointer is properly aligned
-    auto element = *reinterpret_cast<const bast::sized_int_t<NumBytes * 8u>*>(data);
-    auto abs_element = abs(element);
+    auto element = *reinterpret_cast<const T*>(data);
+    auto abs_element = basn::abs(element);
     auto sign_bit = (1u << 31) * static_cast<unsigned>(element != abs_element);
 
     auto byte = reinterpret_cast<uint8_t*>(&abs_element)[byte_index];
@@ -206,7 +201,9 @@ xena::future<> decompose_exponent_bits(basct::span<unsigned> indexes, const basd
         indexes.data(), offsets_dev.data(), exponents.data, static_cast<unsigned>(n));
   } else {
     SXT_DEBUG_ASSERT(basn::is_power2(element_num_bytes));
-    basn::constexpr_switch<4>(
+    SXT_RELEASE_ASSERT(element_num_bytes <= 16,
+                       "signed commitments for numbers larger than 128-bits aren't supported");
+    basn::constexpr_switch<5>(
         basn::ceil_log2(element_num_bytes),
         [&]<unsigned NumBytesLg2>(std::integral_constant<unsigned, NumBytesLg2>) noexcept {
           static constexpr auto NumBytes = 1ull << NumBytesLg2;

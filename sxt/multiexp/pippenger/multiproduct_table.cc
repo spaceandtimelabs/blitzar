@@ -25,6 +25,7 @@
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/container/stack_array.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/num/abs.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/constexpr_switch.h"
 #include "sxt/base/num/divide_up.h"
@@ -110,7 +111,7 @@ static uint64_t* init_signed_multiproduct_output_rows(basct::span<basct::span<ui
                             sequence.element_nbytes};
     bast::sized_int_t<NumBytes * 8> x;
     std::copy(e.begin(), e.end(), reinterpret_cast<uint8_t*>(&x));
-    auto abs_x = std::abs(x);
+    auto abs_x = basn::abs(x);
     e = {reinterpret_cast<uint8_t*>(&abs_x), NumBytes};
     auto offset = static_cast<size_t>(abs_x != x) * radix_log2;
     auto digit_last = mtxb::get_last_digit(e, radix_log2);
@@ -186,7 +187,7 @@ static size_t fill_from_signed_sequence(
                             sequence.element_nbytes};
     bast::sized_int_t<NumBytes * 8> x;
     std::copy(e.begin(), e.end(), reinterpret_cast<uint8_t*>(&x));
-    auto abs_x = std::abs(x);
+    auto abs_x = basn::abs(x);
     e = {reinterpret_cast<uint8_t*>(&abs_x), NumBytes};
     auto digit_last = mtxb::get_last_digit(e, radix_log2);
     size_t input_offset = 0;
@@ -237,7 +238,9 @@ size_t make_multiproduct_table(mtxi::index_table& table,
     auto element_num_bytes = sequence.element_nbytes;
     if (sequence.is_signed) {
       SXT_DEBUG_ASSERT(basn::is_power2(element_num_bytes));
-      basn::constexpr_switch<4>(
+      SXT_RELEASE_ASSERT(element_num_bytes <= 16,
+                         "signed commitments for numbers larger than 128-bits aren't supported");
+      basn::constexpr_switch<5>(
           basn::ceil_log2(element_num_bytes),
           [&]<unsigned NumBytesLg2>(std::integral_constant<unsigned, NumBytesLg2>) noexcept {
             static constexpr auto NumBytes = 1ull << NumBytesLg2;
