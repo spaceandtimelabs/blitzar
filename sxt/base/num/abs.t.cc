@@ -30,7 +30,9 @@ TEST_CASE("we can compute the absolute value of numbers") {
   }
 
   SECTION("we can compute the absolute value of numbers larger than 8 bytes") {
-    int128_t x = -1;
-    REQUIRE(abs(x) == 1);
+    REQUIRE(abs(int128_t{-1}) == 1);
+    REQUIRE(abs(int128_t{1}) == 1);
+    REQUIRE(abs(int128_t{-2}) == 2);
+    REQUIRE(abs(int128_t{2}) == 2);
   }
 }

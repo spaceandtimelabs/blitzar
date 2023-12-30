@@ -32,13 +32,7 @@ template <std::signed_integral T> CUDA_CALLABLE T abs(T x) noexcept {
   if constexpr (sizeof(T) <= 8) {
     return std::abs(x);
   }
-
-  // Note: There's probably a better way to do this that avoids branching, but
-  // this is an ok place to start from.
-  if (x < 0) {
-    return -x;
-  } else {
-    return x;
-  }
+  auto mul = static_cast<int>(x > 0) * 2 - 1;
+  return mul * x;
 }
 } // namespace sxt::basn
