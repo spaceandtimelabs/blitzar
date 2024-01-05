@@ -16,18 +16,64 @@
  */
 #pragma once
 
+#include <concepts>
+#include <format>
+#include <source_location>
 #include <string_view>
+#include <type_traits>
+#include <utility>
+
+#include "sxt/base/error/stacktrace.h"
 
 namespace sxt::baser {
+//--------------------------------------------------------------------------------------------------
+// panic_message
+//--------------------------------------------------------------------------------------------------
+struct panic_message {
+  template <class T>
+    requires std::constructible_from<std::string_view, T>
+  panic_message(const T& s, std::source_location loc = std::source_location::current()) noexcept
+      : s{s}, loc{loc} {}
+
+  std::string_view s;
+  std::source_location loc;
+};
+
+//--------------------------------------------------------------------------------------------------
+// panic_format
+//--------------------------------------------------------------------------------------------------
+template <class... Args> struct panic_format {
+  template <class T>
+    requires std::constructible_from<std::format_string<Args...>, T>
+  consteval panic_format(const T& s,
+                         std::source_location loc = std::source_location::current()) noexcept
+      : fmt{s}, loc{loc} {}
+
+  std::format_string<Args...> fmt;
+  std::source_location loc;
+};
+
+//--------------------------------------------------------------------------------------------------
+// panic_with_message
+//--------------------------------------------------------------------------------------------------
+[[noreturn]] void panic_with_message(std::string_view file, int line, std::string_view msg,
+                                     const std::string& trace = stacktrace()) noexcept;
+
 //--------------------------------------------------------------------------------------------------
 // panic
 //--------------------------------------------------------------------------------------------------
 /**
- * Note: This technique for getting the file and line is technically not standard compliant, but
- * it works with most compilers (gcc, clang) and the standard-friendly approach requires c++20
- * and support is flaky:
- * https://en.cppreference.com/w/cpp/utility/source_location
+ * Adopted from https://buildingblock.ai/panic
  */
-[[noreturn]] void panic(std::string_view message, int line = __builtin_LINE(),
-                        const char* file = __builtin_FILE()) noexcept;
+[[noreturn]] inline void panic(panic_message msg) noexcept {
+  panic_with_message(msg.loc.file_name(), msg.loc.line(), msg.s);
+}
+
+template <class... Args>
+[[noreturn]] void panic(panic_format<std::type_identity_t<Args>...> fmt, Args&&... args) noexcept
+  requires(sizeof...(Args) > 0)
+{
+  panic_with_message(fmt.loc.file_name(), fmt.loc.line(),
+                     std::format(fmt.fmt, std::forward<Args>(args)...));
+}
 } // namespace sxt::baser

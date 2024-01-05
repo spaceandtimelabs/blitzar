@@ -29,7 +29,7 @@ namespace sxt::basdv {
 void set_device(int device) noexcept {
   auto rcode = cudaSetDevice(device);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaSetDevice failed: " + std::string(cudaGetErrorString(rcode)));
+    baser::panic("cudaSetDevice failed: {}", cudaGetErrorString(rcode));
   }
 }
 
@@ -40,7 +40,7 @@ int get_device() noexcept {
   int device;
   auto rcode = cudaGetDevice(&device);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaGetDevice failed: " + std::string(cudaGetErrorString(rcode)));
+    baser::panic("cudaGetDevice failed: {}", cudaGetErrorString(rcode));
   }
   return device;
 }

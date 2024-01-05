@@ -30,7 +30,7 @@ namespace sxt::basdv {
 void synchronize_stream(bast::raw_stream_t stream) noexcept {
   auto rcode = cudaStreamSynchronize(stream);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaStreamSynchronize failed: " + std::string(cudaGetErrorString(rcode)));
+    baser::panic("cudaStreamSynchronize failed: {}", cudaGetErrorString(rcode));
   }
 }
 
@@ -40,7 +40,7 @@ void synchronize_stream(bast::raw_stream_t stream) noexcept {
 void synchronize_device() noexcept {
   auto rcode = cudaDeviceSynchronize();
   if (rcode != cudaSuccess) {
-    baser::panic("cudaDeviceSynchronize failed: " + std::string(cudaGetErrorString(rcode)));
+    baser::panic("cudaDeviceSynchronize failed: {}", cudaGetErrorString(rcode));
   }
 }
 } // namespace sxt::basdv

@@ -30,7 +30,7 @@ void* pinned_resource::do_allocate(size_t bytes, size_t /*alignment*/) noexcept 
   void* res;
   auto rcode = cudaMallocHost(&res, bytes);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaMallocHost failed: " + std::string{cudaGetErrorString(rcode)});
+    baser::panic("cudaMallocHost failed: {}", cudaGetErrorString(rcode));
   }
   return res;
 }
@@ -41,7 +41,7 @@ void* pinned_resource::do_allocate(size_t bytes, size_t /*alignment*/) noexcept 
 void pinned_resource::do_deallocate(void* ptr, size_t /*bytes*/, size_t /*alignment*/) noexcept {
   auto rcode = cudaFreeHost(ptr);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaFreeHost failed: " + std::string{cudaGetErrorString(rcode)});
+    baser::panic("cudaFreeHost failed: {}", cudaGetErrorString(rcode));
   }
 }
 

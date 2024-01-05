@@ -18,7 +18,6 @@
 
 #include <cuda_runtime.h>
 
-#include <string>
 #include <utility>
 
 #include "sxt/base/error/panic.h"
@@ -30,7 +29,7 @@ namespace sxt::basdv {
 event::event() noexcept {
   auto rcode = cudaEventCreateWithFlags(&event_, cudaEventDisableTiming);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaEventCreate failed: " + std::string(cudaGetErrorString(rcode)));
+    baser::panic("cudaEventCreate failed: {}", cudaGetErrorString(rcode));
   }
 }
 
@@ -54,7 +53,7 @@ void event::clear() noexcept {
   }
   auto rcode = cudaEventDestroy(event_);
   if (rcode != cudaSuccess) {
-    baser::panic("cudaEventDestroy failed: " + std::string(cudaGetErrorString(rcode)));
+    baser::panic("cudaEventDestroy failed: {}", cudaGetErrorString(rcode));
   }
   event_ = nullptr;
 }
@@ -70,7 +69,7 @@ bool event::query_is_ready() noexcept {
   if (rcode == cudaErrorNotReady) {
     return false;
   }
-  baser::panic("cudaEventQuery failed: " + std::string(cudaGetErrorString(rcode)));
+  baser::panic("cudaEventQuery failed: {}", cudaGetErrorString(rcode));
 }
 
 //--------------------------------------------------------------------------------------------------
