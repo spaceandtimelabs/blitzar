@@ -416,7 +416,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     };
     size_t index = 0;
     for (int i = 0; i < 10; ++i) {
-      auto num_bytes = 1ull << (i % 4);
+      auto num_bytes = 1ull << (i % 5);
       descriptor.min_exponent_num_bytes = num_bytes;
       descriptor.max_exponent_num_bytes = num_bytes;
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);

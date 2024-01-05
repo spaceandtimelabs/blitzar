@@ -22,6 +22,7 @@
 
 #include "sxt/base/bit/count.h"
 #include "sxt/base/bit/span_op.h"
+#include "sxt/base/num/abs.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/constexpr_switch.h"
 #include "sxt/base/num/power2_equality.h"
@@ -62,7 +63,7 @@ static void aggregate_signed_terms(exponent_aggregates& aggregates, size_t outpu
   for (size_t term_index = 0; term_index < sequence.n; ++term_index) {
     bast::sized_int_t<NumBytes * 8> x;
     std::memcpy(reinterpret_cast<uint8_t*>(&x), sequence.data + term_index * NumBytes, NumBytes);
-    auto abs_x = std::abs(x);
+    auto abs_x = basn::abs(x);
     basct::cspan<uint8_t> term{reinterpret_cast<uint8_t*>(&abs_x), NumBytes};
     if (x == abs_x) {
       aggegate_term(aggregates, term, output_index, term_index);
@@ -96,7 +97,9 @@ void compute_exponent_aggregates(exponent_aggregates& aggregates,
     auto element_num_bytes = sequence.element_nbytes;
     if (sequence.is_signed) {
       SXT_DEBUG_ASSERT(basn::is_power2(element_num_bytes));
-      basn::constexpr_switch<4>(
+      SXT_RELEASE_ASSERT(element_num_bytes <= 16,
+                         "signed commitments for numbers larger than 128-bits aren't supported");
+      basn::constexpr_switch<5>(
           basn::ceil_log2(element_num_bytes),
           [&]<unsigned NumBytesLg2>(std::integral_constant<unsigned, NumBytesLg2>) noexcept {
             static constexpr auto NumBytes = 1ull << NumBytesLg2;
