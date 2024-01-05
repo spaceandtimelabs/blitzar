@@ -22,7 +22,9 @@
 #pragma once
 
 #include <cstdlib>
-#include <iostream>
+#include <print>
+
+#include "sxt/base/error/stacktrace.h"
 
 //--------------------------------------------------------------------------------------------------
 // Helper Macros
@@ -49,8 +51,8 @@
 #define _ASSERT_IMPL(CONDITION, CONDITION_STR, MESSAGE)                                            \
   do {                                                                                             \
     if (!(CONDITION)) {                                                                            \
-      std::cerr << __builtin_FILE() << ":" << __builtin_LINE() << " failed assert: [ "             \
-                << CONDITION_STR << " ]. " << MESSAGE << "\n";                                     \
+      std::print(stderr, "{}:{} failed assert: [{}]. {}\n{}\n", __builtin_FILE(),                  \
+                 __builtin_LINE(), CONDITION_STR, MESSAGE, sxt::baser::stacktrace());              \
       std::abort();                                                                                \
     }                                                                                              \
   } while (false);

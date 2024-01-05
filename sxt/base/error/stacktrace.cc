@@ -14,19 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/base/error/panic.h"
-
-#include <cstdlib>
-#include <print>
-
 #include "sxt/base/error/stacktrace.h"
+
+#define BOOST_STACKTRACE_USE_BACKTRACE
+#include "boost/stacktrace.hpp"
 
 namespace sxt::baser {
 //--------------------------------------------------------------------------------------------------
-// panic
+// constructor
 //--------------------------------------------------------------------------------------------------
-[[noreturn]] void panic(std::string_view message, int line, const char* file) noexcept {
-  std::print(stderr, "{}:{} panic: {}\n{}\n", file, line, message, stacktrace());
-  std::abort();
+std::string stacktrace() noexcept {
+  return boost::stacktrace::to_string(boost::stacktrace::stacktrace());
 }
 } // namespace sxt::baser

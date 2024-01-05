@@ -12,12 +12,66 @@ http_archive(
     ],
 )
 
+# rules_foreign_cc
+git_repository(
+    name = "rules_foreign_cc",
+    commit = "a87e754",
+    remote = "https://github.com/bazelbuild/rules_foreign_cc",
+)
+
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
+
+rules_foreign_cc_dependencies()
+
+# libbacktrace
+git_repository(
+    name = "com_github_ianlancetaylor_libbacktrace",
+    build_file_content = """
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+  name = "all_srcs",
+  srcs = glob(
+      include = ["**"],
+      exclude = ["*.bazel"],
+  ),
+)
+
+configure_make(
+  name = "libbacktrace",
+  lib_source = ":all_srcs",
+)
+  """,
+    commit = "14818b7",
+    remote = "https://github.com/ianlancetaylor/libbacktrace",
+)
+
+# catch2
 git_repository(
     name = "com_github_catchorg_catch2",
     commit = "53d0d91",
     remote = "https://github.com/catchorg/Catch2",
 )
 
+# boost
+git_repository(
+    name = "com_github_nelhage_rules_boost",
+    commit = "ff4fefd",
+    # Patch build to add libbacktrace dependency.
+    # See https://github.com/nelhage/rules_boost/issues/534
+    patches = [
+        "//bazel:stacktrace.patch",
+    ],
+    remote = "https://github.com/nelhage/rules_boost",
+)
+
+load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
+
+boost_deps()
+
+# rules_cuda
 git_repository(
     name = "rules_cuda",
     commit = "7a29239",

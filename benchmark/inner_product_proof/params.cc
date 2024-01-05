@@ -17,6 +17,7 @@
 #include "params.h"
 
 #include <cstdlib>
+#include <iostream>
 #include <sstream>
 #include <string_view>
 
