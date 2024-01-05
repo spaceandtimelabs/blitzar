@@ -20,7 +20,7 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::f12b {
+namespace sxt::fbnqb {
 //--------------------------------------------------------------------------------------------------
 // from_bytes
 //--------------------------------------------------------------------------------------------------
@@ -31,26 +31,26 @@ namespace sxt::f12b {
  is_below_modulus flag will be set to true and s == to_bytes(h).
  */
 CUDA_CALLABLE
-void from_bytes(bool& is_below_modulus, uint64_t h[6], const uint8_t s[48]) noexcept;
+void from_bytes(bool& is_below_modulus, uint64_t h[4], const uint8_t s[32]) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // from_bytes_le
 //--------------------------------------------------------------------------------------------------
 /*
- The internal representation of field12 elements are in little-endian order.
+ The internal representation of field_bnq elements are in little-endian order.
  */
 CUDA_CALLABLE
-void from_bytes_le(bool& is_below_modulus, uint64_t h[6], const uint8_t s[48]) noexcept;
+void from_bytes_le(bool& is_below_modulus, uint64_t h[4], const uint8_t s[32]) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // to_bytes
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void to_bytes(uint8_t s[48], const uint64_t h[6]) noexcept;
+void to_bytes(uint8_t s[32], const uint64_t h[4]) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // to_bytes_le
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void to_bytes_le(uint8_t s[48], const uint64_t h[6]) noexcept;
-} // namespace sxt::f12b
+void to_bytes_le(uint8_t s[32], const uint64_t h[4]) noexcept;
+} // namespace sxt::fbnqb

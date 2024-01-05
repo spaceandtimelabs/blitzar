@@ -14,38 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
- * Adopted from zkcrypto/bls12_381
- *
- * Copyright (c) 2021
- * Sean Bowe <ewillbefull@gmail.com>
- * Jack Grigg <thestr4d@gmail.com>
- *
- * See third_party/license/zkcrypto.LICENSE
- */
 #pragma once
 
 #include "sxt/base/field/arithmetic_utility.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/cmov.h"
-#include "sxt/field12/base/constants.h"
+#include "sxt/field_bnq/base/constants.h"
 
-namespace sxt::f12b {
+namespace sxt::fbnqb {
 //--------------------------------------------------------------------------------------------------
 // subtract_p
 //--------------------------------------------------------------------------------------------------
 /*
- Compute ret = a - p, where p is the modulus.
+ Compute ret = a - p_v, where p_v is the modulus.
  */
-CUDA_CALLABLE inline void subtract_p(uint64_t ret[6], const uint64_t a[6]) noexcept {
+CUDA_CALLABLE inline void subtract_p(uint64_t ret[4], const uint64_t a[4]) noexcept {
   uint64_t borrow{0};
 
   basfld::sbb(ret[0], borrow, a[0], p_v[0]);
   basfld::sbb(ret[1], borrow, a[1], p_v[1]);
   basfld::sbb(ret[2], borrow, a[2], p_v[2]);
   basfld::sbb(ret[3], borrow, a[3], p_v[3]);
-  basfld::sbb(ret[4], borrow, a[4], p_v[4]);
-  basfld::sbb(ret[5], borrow, a[5], p_v[5]);
 
   // If underflow occurred on the final limb, borrow = 0xfff...fff, otherwise
   // borrow = 0x000...000. Thus, we use it as a mask!
@@ -56,7 +45,5 @@ CUDA_CALLABLE inline void subtract_p(uint64_t ret[6], const uint64_t a[6]) noexc
   ret[1] = (a[1] & borrow) | (ret[1] & mask);
   ret[2] = (a[2] & borrow) | (ret[2] & mask);
   ret[3] = (a[3] & borrow) | (ret[3] & mask);
-  ret[4] = (a[4] & borrow) | (ret[4] & mask);
-  ret[5] = (a[5] & borrow) | (ret[5] & mask);
 }
-} // namespace sxt::f12b
+} // namespace sxt::fbnqb

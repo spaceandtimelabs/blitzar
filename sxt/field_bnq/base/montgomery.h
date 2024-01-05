@@ -20,12 +20,12 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::f12b {
+namespace sxt::fbnqb {
 //--------------------------------------------------------------------------------------------------
 // to_montgomery_form
 //-------------------------------------------------------------------------------------------------
 /*
  h = s * r2
  */
-CUDA_CALLABLE void to_montgomery_form(uint64_t h[6], const uint64_t s[6]) noexcept;
-} // namespace sxt::f12b
+CUDA_CALLABLE void to_montgomery_form(uint64_t h[4], const uint64_t s[4]) noexcept;
+} // namespace sxt::fbnqb

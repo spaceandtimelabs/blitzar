@@ -14,39 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
- * Adopted from zkcrypto/bls12_381
- *
- * Copyright (c) 2021
- * Sean Bowe <ewillbefull@gmail.com>
- * Jack Grigg <thestr4d@gmail.com>
- *
- * See third_party/license/zkcrypto.LICENSE
- */
-#include "sxt/field12/base/reduce.h"
+#include "sxt/field_bnq/base/reduce.h"
 
 #include "sxt/base/field/arithmetic_utility.h"
 #include "sxt/base/type/narrow_cast.h"
-#include "sxt/field12/base/constants.h"
-#include "sxt/field12/base/subtract_p.h"
+#include "sxt/field_bnq/base/constants.h"
+#include "sxt/field_bnq/base/subtract_p.h"
 
-namespace sxt::f12b {
+namespace sxt::fbnqb {
 //--------------------------------------------------------------------------------------------------
 // reduce
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE void reduce(uint64_t h[6], const uint64_t t[12]) noexcept {
+CUDA_CALLABLE void reduce(uint64_t h[4], const uint64_t t[8]) noexcept {
   uint64_t tmp = 0;
   uint64_t carry = 0;
-  uint64_t ret[12];
+  uint64_t ret[8];
 
   uint64_t k = t[0] * inv_v;
   basfld::mac(tmp, carry, t[0], k, p_v[0]);
   basfld::mac(ret[1], carry, t[1], k, p_v[1]);
   basfld::mac(ret[2], carry, t[2], k, p_v[2]);
   basfld::mac(ret[3], carry, t[3], k, p_v[3]);
-  basfld::mac(ret[4], carry, t[4], k, p_v[4]);
-  basfld::mac(ret[5], carry, t[5], k, p_v[5]);
-  basfld::adc(ret[6], ret[7], t[6], 0, carry);
+  basfld::adc(ret[4], ret[5], t[4], 0, carry);
 
   carry = 0;
   k = ret[1] * inv_v;
@@ -54,9 +43,7 @@ CUDA_CALLABLE void reduce(uint64_t h[6], const uint64_t t[12]) noexcept {
   basfld::mac(ret[2], carry, ret[2], k, p_v[1]);
   basfld::mac(ret[3], carry, ret[3], k, p_v[2]);
   basfld::mac(ret[4], carry, ret[4], k, p_v[3]);
-  basfld::mac(ret[5], carry, ret[5], k, p_v[4]);
-  basfld::mac(ret[6], carry, ret[6], k, p_v[5]);
-  basfld::adc(ret[7], ret[8], t[7], ret[7], carry);
+  basfld::adc(ret[5], ret[6], t[5], ret[5], carry);
 
   carry = 0;
   k = ret[2] * inv_v;
@@ -64,9 +51,7 @@ CUDA_CALLABLE void reduce(uint64_t h[6], const uint64_t t[12]) noexcept {
   basfld::mac(ret[3], carry, ret[3], k, p_v[1]);
   basfld::mac(ret[4], carry, ret[4], k, p_v[2]);
   basfld::mac(ret[5], carry, ret[5], k, p_v[3]);
-  basfld::mac(ret[6], carry, ret[6], k, p_v[4]);
-  basfld::mac(ret[7], carry, ret[7], k, p_v[5]);
-  basfld::adc(ret[8], ret[9], t[8], ret[8], carry);
+  basfld::adc(ret[6], ret[7], t[6], ret[6], carry);
 
   carry = 0;
   k = ret[3] * inv_v;
@@ -74,54 +59,30 @@ CUDA_CALLABLE void reduce(uint64_t h[6], const uint64_t t[12]) noexcept {
   basfld::mac(ret[4], carry, ret[4], k, p_v[1]);
   basfld::mac(ret[5], carry, ret[5], k, p_v[2]);
   basfld::mac(ret[6], carry, ret[6], k, p_v[3]);
-  basfld::mac(ret[7], carry, ret[7], k, p_v[4]);
-  basfld::mac(ret[8], carry, ret[8], k, p_v[5]);
-  basfld::adc(ret[9], ret[10], t[9], ret[9], carry);
-
-  carry = 0;
-  k = ret[4] * inv_v;
-  basfld::mac(tmp, carry, ret[4], k, p_v[0]);
-  basfld::mac(ret[5], carry, ret[5], k, p_v[1]);
-  basfld::mac(ret[6], carry, ret[6], k, p_v[2]);
-  basfld::mac(ret[7], carry, ret[7], k, p_v[3]);
-  basfld::mac(ret[8], carry, ret[8], k, p_v[4]);
-  basfld::mac(ret[9], carry, ret[9], k, p_v[5]);
-  basfld::adc(ret[10], ret[11], t[10], ret[10], carry);
-
-  carry = 0;
-  k = ret[5] * inv_v;
-  basfld::mac(tmp, carry, ret[5], k, p_v[0]);
-  basfld::mac(ret[6], carry, ret[6], k, p_v[1]);
-  basfld::mac(ret[7], carry, ret[7], k, p_v[2]);
-  basfld::mac(ret[8], carry, ret[8], k, p_v[3]);
-  basfld::mac(ret[9], carry, ret[9], k, p_v[4]);
-  basfld::mac(ret[10], carry, ret[10], k, p_v[5]);
-  basfld::adc(ret[11], tmp, t[11], ret[11], carry);
+  basfld::adc(ret[7], tmp, t[7], ret[7], carry);
 
   // Attempt to subtract the modulus,
   // to ensure the value is smaller than the modulus.
-  uint64_t a[6] = {ret[6], ret[7], ret[8], ret[9], ret[10], ret[11]};
+  uint64_t a[4] = {ret[4], ret[5], ret[6], ret[7]};
   subtract_p(h, a);
 }
 
 //--------------------------------------------------------------------------------------------------
 // is_below_modulus
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE bool is_below_modulus(const uint64_t h[6]) noexcept {
+CUDA_CALLABLE bool is_below_modulus(const uint64_t h[4]) noexcept {
   uint64_t borrow = 0;
-  uint64_t ret[6] = {};
+  uint64_t ret[4] = {};
 
   // Try to subtract the modulus
   basfld::sbb(ret[0], borrow, h[0], p_v[0]);
   basfld::sbb(ret[1], borrow, h[1], p_v[1]);
   basfld::sbb(ret[2], borrow, h[2], p_v[2]);
   basfld::sbb(ret[3], borrow, h[3], p_v[3]);
-  basfld::sbb(ret[4], borrow, h[4], p_v[4]);
-  basfld::sbb(ret[5], borrow, h[5], p_v[5]);
 
   // If the element is smaller than MODULUS then the
   // subtraction will underflow, producing a borrow value
   // of 0xffff...ffff. Otherwise, it'll be zero.
   return bast::narrow_cast<uint8_t>(borrow) & 1;
 }
-} // namespace sxt::f12b
+} // namespace sxt::fbnqb

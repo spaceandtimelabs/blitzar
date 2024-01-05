@@ -14,63 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field12/base/subtract_p.h"
+#include "sxt/field_bnq/base/subtract_p.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/base/constants.h"
+#include "sxt/field_bnq/base/constants.h"
 
-using namespace sxt::f12b;
+using namespace sxt::fbnqb;
 
 TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
-  SECTION("with minimum value") {
-    constexpr std::array<uint64_t, 6> a = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
-    std::array<uint64_t, 6> ret;
+  SECTION("of zero") {
+    constexpr std::array<uint64_t, 4> a = {0, 0, 0, 0};
+    std::array<uint64_t, 4> ret;
 
     subtract_p(ret.data(), a.data());
 
     REQUIRE(ret == a);
   }
 
-  SECTION("with a value below the modulus") {
-    constexpr std::array<uint64_t, 6> a = {0xb9feffffffffaaaa, 0x1eabfffeb153ffff,
-                                           0x6730d2a0f6b0f624, 0x64774b84f38512bf,
-                                           0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
-    std::array<uint64_t, 6> ret;
+  SECTION("of one below the modulus p_v") {
+    constexpr std::array<uint64_t, 4> a = {0x3c208c16d87cfd46, 0x97816a916871ca8d,
+                                           0xb85045b68181585d, 0x30644e72e131a029};
+    std::array<uint64_t, 4> ret;
 
     subtract_p(ret.data(), a.data());
 
     REQUIRE(ret == a);
   }
 
-  SECTION("with a value equal to the modulus") {
-    constexpr std::array<uint64_t, 6> expect = {0, 0, 0, 0, 0, 0};
-    std::array<uint64_t, 6> ret;
+  SECTION("of the modulus p_v") {
+    constexpr std::array<uint64_t, 4> expect = {0, 0, 0, 0};
+    std::array<uint64_t, 4> ret;
 
     subtract_p(ret.data(), p_v.data());
 
     REQUIRE(expect == ret);
   }
 
-  SECTION("with a value above the modulus") {
-    constexpr std::array<uint64_t, 6> a = {0xb9feffffffffaaae, 0x1eabfffeb153ffff,
-                                           0x6730d2a0f6b0f624, 0x64774b84f38512bf,
-                                           0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
-    constexpr std::array<uint64_t, 6> expect = {0x3, 0x0, 0x0, 0x0, 0x0, 0x0};
-    std::array<uint64_t, 6> ret;
-
-    subtract_p(ret.data(), a.data());
-
-    REQUIRE(expect == ret);
-  }
-
-  SECTION("with maximum value") {
-    constexpr std::array<uint64_t, 6> a = {0xffffffffffffffff, 0xffffffffffffffff,
-                                           0xffffffffffffffff, 0xffffffffffffffff,
-                                           0xffffffffffffffff, 0xffffffffffffffff};
-    constexpr std::array<uint64_t, 6> expect = {0x4601000000005554, 0xe15400014eac0000,
-                                                0x98cf2d5f094f09db, 0x9b88b47b0c7aed40,
-                                                0xb4e45849bcb45328, 0xe5feee15c6801965};
-    std::array<uint64_t, 6> ret;
+  SECTION("of one above the modulus p_v") {
+    constexpr std::array<uint64_t, 4> a = {0x3c208c16d87cfd48, 0x97816a916871ca8d,
+                                           0xb85045b68181585d, 0x30644e72e131a029};
+    constexpr std::array<uint64_t, 4> expect = {1, 0, 0, 0};
+    std::array<uint64_t, 4> ret;
 
     subtract_p(ret.data(), a.data());
 

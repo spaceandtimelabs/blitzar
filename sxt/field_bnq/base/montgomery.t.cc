@@ -14,27 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field12/base/montgomery.h"
+#include "sxt/field_bnq/base/montgomery.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/base/constants.h"
+#include "sxt/field_bnq/base/constants.h"
+#include "sxt/field_bnq/base/reduce.h"
 
-using namespace sxt::f12b;
+using namespace sxt::fbnqb;
 
 TEST_CASE("conversion to Montgomery form") {
   SECTION("with zero returns zero") {
-    constexpr std::array<uint64_t, 6> a = {0, 0, 0, 0, 0, 0};
-    constexpr std::array<uint64_t, 6> expected = {0, 0, 0, 0, 0, 0};
-    std::array<uint64_t, 6> ret;
+    constexpr std::array<uint64_t, 4> a = {0, 0, 0, 0};
+    std::array<uint64_t, 4> ret;
 
     to_montgomery_form(ret.data(), a.data());
 
-    REQUIRE(expected == ret);
+    REQUIRE(ret == a);
   }
 
   SECTION("with one returns one in Montgomery form") {
-    constexpr std::array<uint64_t, 6> a = {1, 0, 0, 0, 0, 0};
-    std::array<uint64_t, 6> ret;
+    constexpr std::array<uint64_t, 4> a = {1, 0, 0, 0};
+    std::array<uint64_t, 4> ret;
 
     to_montgomery_form(ret.data(), a.data());
 
@@ -42,25 +42,11 @@ TEST_CASE("conversion to Montgomery form") {
   }
 
   SECTION("with the modulus returns zero") {
-    constexpr std::array<uint64_t, 6> expect = {0, 0, 0, 0, 0, 0};
-    std::array<uint64_t, 6> ret;
+    constexpr std::array<uint64_t, 4> expect = {0, 0, 0, 0};
+    std::array<uint64_t, 4> ret;
 
     to_montgomery_form(ret.data(), p_v.data());
 
     REQUIRE(expect == ret);
-  }
-
-  SECTION("with maximum value returns pre-computed value") {
-    constexpr std::array<uint64_t, 6> a = {0xffffffffffffffff, 0xffffffffffffffff,
-                                           0xffffffffffffffff, 0xffffffffffffffff,
-                                           0xffffffffffffffff, 0xffffffffffffffff};
-    constexpr std::array<uint64_t, 6> expected = {0x38d51f341c30c1f4, 0x3d2ee698f71904ef,
-                                                  0x95cd81b5ef7f543e, 0x54947bdb16d03f3a,
-                                                  0x898dcba4560e5597, 0x15a3430bd1c9e5b1};
-    std::array<uint64_t, 6> ret;
-
-    to_montgomery_form(ret.data(), a.data());
-
-    REQUIRE(expected == ret);
   }
 }

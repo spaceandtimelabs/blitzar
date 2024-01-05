@@ -14,56 +14,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
- * Adopted from zkcrypto/bls12_381
- *
- * Copyright (c) 2021
- * Sean Bowe <ewillbefull@gmail.com>
- * Jack Grigg <thestr4d@gmail.com>
- *
- * See third_party/license/zkcrypto.LICENSE
- */
 #pragma once
 
 #include <array>
 #include <cstdint>
 
-namespace sxt::f12b {
+namespace sxt::fbnqb {
 //--------------------------------------------------------------------------------------------------
 // p_v
 //--------------------------------------------------------------------------------------------------
 /*
- p_v =
- 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787
-     =
- 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab
+ p_v = 21888242871839275222246405745257275088696311157297823662689037894645226208583
+     = 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47
  */
-static constexpr std::array<uint64_t, 6> p_v{0xb9feffffffffaaab, 0x1eabfffeb153ffff,
-                                             0x6730d2a0f6b0f624, 0x64774b84f38512bf,
-                                             0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
+static constexpr std::array<uint64_t, 4> p_v{0x3c208c16d87cfd47, 0x97816a916871ca8d,
+                                             0xb85045b68181585d, 0x30644e72e131a029};
+
 //--------------------------------------------------------------------------------------------------
 // r_v
 //--------------------------------------------------------------------------------------------------
 /*
- r_v = 2^384 mod p
+ r_v = 2^256 mod p_v
+     = 6350874878119819312338956282401532409788428879151445726012394534686998597021
+     = 0xe0a77c19a07df2f666ea36f7879462c0a78eb28f5c70b3dd35d438dc58f0d9d
  */
-static constexpr std::array<uint64_t, 6> r_v = {0x760900000002fffd, 0xebf4000bc40c0002,
-                                                0x5f48985753c758ba, 0x77ce585370525745,
-                                                0x5c071a97a256ec6d, 0x15f65ec3fa80e493};
+static constexpr std::array<uint64_t, 4> r_v = {0xd35d438dc58f0d9d, 0x0a78eb28f5c70b3d,
+                                                0x666ea36f7879462c, 0xe0a77c19a07df2f};
+
 //--------------------------------------------------------------------------------------------------
 // r2_v
 //--------------------------------------------------------------------------------------------------
 /*
- r2_v = 2^(384*2) mod p
+ r2_v = 2^(256*2) mod p_v
+      = 3096616502983703923843567936837374451735540968419076528771170197431451843209
+      = 0x6d89f71cab8351f47ab1eff0a417ff6b5e71911d44501fbf32cfc5b538afa89
  */
-static constexpr std::array<uint64_t, 6> r2_v = {0xf4df1f341c341746, 0xa76e6a609d104f1,
-                                                 0x8de5476c4c95b6d5, 0x67eb88a9939d83c0,
-                                                 0x9a793e85b519952d, 0x11988fe592cae3aa};
+static constexpr std::array<uint64_t, 4> r2_v = {0xf32cfc5b538afa89, 0xb5e71911d44501fb,
+                                                 0x47ab1eff0a417ff6, 0x6d89f71cab8351f};
+
 //--------------------------------------------------------------------------------------------------
 // inv_v
 //--------------------------------------------------------------------------------------------------
 /*
- inv_v = -(p^{-1} mod 2^64) mod 2^64
+ inv_v = -(p_v^{-1} mod 2^64) mod 2^64
+       = 9786893198990664585
+       = 0x87d20782e4866389
  */
-static constexpr uint64_t inv_v = 0x89f3fffcfffcfffd;
-} // namespace sxt::f12b
+static constexpr uint64_t inv_v = 0x87d20782e4866389;
+} // namespace sxt::fbnqb

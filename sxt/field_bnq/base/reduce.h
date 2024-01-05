@@ -14,22 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
- * Adopted from zkcrypto/bls12_381
- *
- * Copyright (c) 2021
- * Sean Bowe <ewillbefull@gmail.com>
- * Jack Grigg <thestr4d@gmail.com>
- *
- * See third_party/license/zkcrypto.LICENSE
- */
 #pragma once
 
 #include <cstdint>
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::f12b {
+namespace sxt::fbnqb {
 //--------------------------------------------------------------------------------------------------
 // reduce
 //--------------------------------------------------------------------------------------------------
@@ -38,10 +29,10 @@ namespace sxt::f12b {
  Handbook of Applied Cryptography
  <http://cacr.uwaterloo.ca/hac/about/chap14.pdf>.
  */
-CUDA_CALLABLE void reduce(uint64_t h[6], const uint64_t t[12]) noexcept;
+CUDA_CALLABLE void reduce(uint64_t h[4], const uint64_t t[8]) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // is_below_modulus
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE bool is_below_modulus(const uint64_t h[6]) noexcept;
-} // namespace sxt::f12b
+CUDA_CALLABLE bool is_below_modulus(const uint64_t h[4]) noexcept;
+} // namespace sxt::fbnqb
