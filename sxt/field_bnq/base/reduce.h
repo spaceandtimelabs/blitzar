@@ -24,10 +24,10 @@ namespace sxt::fbnqb {
 //--------------------------------------------------------------------------------------------------
 // reduce
 //--------------------------------------------------------------------------------------------------
-/*
- The Montgomery reduction here is based on Algorithm 14.32 in
- Handbook of Applied Cryptography
- <http://cacr.uwaterloo.ca/hac/about/chap14.pdf>.
+/**
+ * The Montgomery reduction here is based on Algorithm 14.32 in
+ * Handbook of Applied Cryptography
+ * <http://cacr.uwaterloo.ca/hac/about/chap14.pdf>.
  */
 CUDA_CALLABLE void reduce(uint64_t h[4], const uint64_t t[8]) noexcept;
 

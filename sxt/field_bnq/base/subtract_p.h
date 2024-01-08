@@ -25,8 +25,8 @@ namespace sxt::fbnqb {
 //--------------------------------------------------------------------------------------------------
 // subtract_p
 //--------------------------------------------------------------------------------------------------
-/*
- Compute ret = a - p_v, where p_v is the modulus.
+/**
+ * Compute ret = a - p_v, where p_v is the modulus.
  */
 CUDA_CALLABLE inline void subtract_p(uint64_t ret[4], const uint64_t a[4]) noexcept {
   uint64_t borrow{0};

@@ -24,8 +24,8 @@ namespace sxt::fbnqb {
 //--------------------------------------------------------------------------------------------------
 // to_montgomery_form
 //-------------------------------------------------------------------------------------------------
-/*
- h = s * r2
+/**
+ * h = s * r2
  */
 CUDA_CALLABLE void to_montgomery_form(uint64_t h[4], const uint64_t s[4]) noexcept;
 } // namespace sxt::fbnqb

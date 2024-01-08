@@ -24,11 +24,11 @@ namespace sxt::fbnqb {
 //--------------------------------------------------------------------------------------------------
 // from_bytes
 //--------------------------------------------------------------------------------------------------
-/*
- h = s mod p
- If s represents a above the modulus, the from_bytes function will set the is_below_modulus flag
- to false and return a wrapped the value, h. In this case s != to_bytes(h). Otherwise the
- is_below_modulus flag will be set to true and s == to_bytes(h).
+/**
+ * h = s mod p
+ * If s represents a above the modulus, the from_bytes function will set the is_below_modulus flag
+ * to false and return a wrapped the value, h. In this case s != to_bytes(h). Otherwise the
+ * is_below_modulus flag will be set to true and s == to_bytes(h).
  */
 CUDA_CALLABLE
 void from_bytes(bool& is_below_modulus, uint64_t h[4], const uint8_t s[32]) noexcept;
@@ -36,8 +36,8 @@ void from_bytes(bool& is_below_modulus, uint64_t h[4], const uint8_t s[32]) noex
 //--------------------------------------------------------------------------------------------------
 // from_bytes_le
 //--------------------------------------------------------------------------------------------------
-/*
- The internal representation of field_bnq elements are in little-endian order.
+/**
+ * The internal representation of field_bnq elements are in little-endian order.
  */
 CUDA_CALLABLE
 void from_bytes_le(bool& is_below_modulus, uint64_t h[4], const uint8_t s[32]) noexcept;
