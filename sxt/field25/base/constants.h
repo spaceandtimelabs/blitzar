@@ -16,41 +16,49 @@
  */
 #pragma once
 
+#include <array>
 #include <cstdint>
 
-#include "sxt/base/macro/cuda_callable.h"
-
-namespace sxt::fbnqb {
+namespace sxt::f25b {
 //--------------------------------------------------------------------------------------------------
-// from_bytes
+// p_v
 //--------------------------------------------------------------------------------------------------
 /**
- * h = s mod p
- * If s represents a above the modulus, the from_bytes function will set the is_below_modulus flag
- * to false and return a wrapped the value, h. In this case s != to_bytes(h). Otherwise the
- * is_below_modulus flag will be set to true and s == to_bytes(h).
+ * p_v = 21888242871839275222246405745257275088696311157297823662689037894645226208583
+ *     = 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47
  */
-CUDA_CALLABLE
-void from_bytes(bool& is_below_modulus, uint64_t h[4], const uint8_t s[32]) noexcept;
+static constexpr std::array<uint64_t, 4> p_v{0x3c208c16d87cfd47, 0x97816a916871ca8d,
+                                             0xb85045b68181585d, 0x30644e72e131a029};
 
 //--------------------------------------------------------------------------------------------------
-// from_bytes_le
+// r_v
 //--------------------------------------------------------------------------------------------------
 /**
- * The internal representation of field_bnq elements are in little-endian order.
+ * r_v = 2^256 mod p_v
+ *     = 6350874878119819312338956282401532409788428879151445726012394534686998597021
+ *     = 0xe0a77c19a07df2f666ea36f7879462c0a78eb28f5c70b3dd35d438dc58f0d9d
  */
-CUDA_CALLABLE
-void from_bytes_le(bool& is_below_modulus, uint64_t h[4], const uint8_t s[32]) noexcept;
+static constexpr std::array<uint64_t, 4> r_v = {0xd35d438dc58f0d9d, 0x0a78eb28f5c70b3d,
+                                                0x666ea36f7879462c, 0xe0a77c19a07df2f};
 
 //--------------------------------------------------------------------------------------------------
-// to_bytes
+// r2_v
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void to_bytes(uint8_t s[32], const uint64_t h[4]) noexcept;
+/**
+ * r2_v = 2^(256*2) mod p_v
+ *      = 3096616502983703923843567936837374451735540968419076528771170197431451843209
+ *      = 0x6d89f71cab8351f47ab1eff0a417ff6b5e71911d44501fbf32cfc5b538afa89
+ */
+static constexpr std::array<uint64_t, 4> r2_v = {0xf32cfc5b538afa89, 0xb5e71911d44501fb,
+                                                 0x47ab1eff0a417ff6, 0x6d89f71cab8351f};
 
 //--------------------------------------------------------------------------------------------------
-// to_bytes_le
+// inv_v
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void to_bytes_le(uint8_t s[32], const uint64_t h[4]) noexcept;
-} // namespace sxt::fbnqb
+/**
+ * inv_v = -(p_v^{-1} mod 2^64) mod 2^64
+ *       = 9786893198990664585
+ *       = 0x87d20782e4866389
+ */
+static constexpr uint64_t inv_v = 0x87d20782e4866389;
+} // namespace sxt::f25b

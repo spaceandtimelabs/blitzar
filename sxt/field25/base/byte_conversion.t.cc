@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field_bnq/base/byte_conversion.h"
+#include "sxt/field25/base/byte_conversion.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field_bnq/base/constants.h"
+#include "sxt/field25/base/constants.h"
 
-using namespace sxt::fbnqb;
+using namespace sxt::f25b;
 
 TEST_CASE("complete byte conversion in big endian") {
   SECTION("with a value equal to the modulus minus one returns original value") {

@@ -19,9 +19,9 @@
 #include "sxt/base/field/arithmetic_utility.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/cmov.h"
-#include "sxt/field_bnq/base/constants.h"
+#include "sxt/field25/base/constants.h"
 
-namespace sxt::fbnqb {
+namespace sxt::f25b {
 //--------------------------------------------------------------------------------------------------
 // subtract_p
 //--------------------------------------------------------------------------------------------------
@@ -46,4 +46,4 @@ CUDA_CALLABLE inline void subtract_p(uint64_t ret[4], const uint64_t a[4]) noexc
   ret[2] = (a[2] & borrow) | (ret[2] & mask);
   ret[3] = (a[3] & borrow) | (ret[3] & mask);
 }
-} // namespace sxt::fbnqb
+} // namespace sxt::f25b

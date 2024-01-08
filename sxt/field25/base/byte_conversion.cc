@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field_bnq/base/byte_conversion.h"
+#include "sxt/field25/base/byte_conversion.h"
 
 #include "sxt/base/bit/load.h"
 #include "sxt/base/bit/store.h"
-#include "sxt/field_bnq/base/montgomery.h"
-#include "sxt/field_bnq/base/reduce.h"
+#include "sxt/field25/base/montgomery.h"
+#include "sxt/field25/base/reduce.h"
 
-namespace sxt::fbnqb {
+namespace sxt::f25b {
 //--------------------------------------------------------------------------------------------------
 // from_bytes
 //--------------------------------------------------------------------------------------------------
@@ -89,4 +89,4 @@ void to_bytes_le(uint8_t s[32], const uint64_t h[4]) noexcept {
   basbt::store64_le(s + 16, h_tmp[2]);
   basbt::store64_le(s + 24, h_tmp[3]);
 }
-} // namespace sxt::fbnqb
+} // namespace sxt::f25b

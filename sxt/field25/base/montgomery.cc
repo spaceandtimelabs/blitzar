@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field_bnq/base/montgomery.h"
+#include "sxt/field25/base/montgomery.h"
 
 #include "sxt/base/field/arithmetic_utility.h"
-#include "sxt/field_bnq/base/constants.h"
-#include "sxt/field_bnq/base/reduce.h"
+#include "sxt/field25/base/constants.h"
+#include "sxt/field25/base/reduce.h"
 
-namespace sxt::fbnqb {
+namespace sxt::f25b {
 //--------------------------------------------------------------------------------------------------
 // to_montgomery_form
 //--------------------------------------------------------------------------------------------------
@@ -57,4 +57,4 @@ CUDA_CALLABLE void to_montgomery_form(uint64_t h[4], const uint64_t s[4]) noexce
 
   reduce(h, t);
 }
-} // namespace sxt::fbnqb
+} // namespace sxt::f25b

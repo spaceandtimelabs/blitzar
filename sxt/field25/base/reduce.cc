@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field_bnq/base/reduce.h"
+#include "sxt/field25/base/reduce.h"
 
 #include "sxt/base/field/arithmetic_utility.h"
 #include "sxt/base/type/narrow_cast.h"
-#include "sxt/field_bnq/base/constants.h"
-#include "sxt/field_bnq/base/subtract_p.h"
+#include "sxt/field25/base/constants.h"
+#include "sxt/field25/base/subtract_p.h"
 
-namespace sxt::fbnqb {
+namespace sxt::f25b {
 //--------------------------------------------------------------------------------------------------
 // reduce
 //--------------------------------------------------------------------------------------------------
@@ -85,4 +85,4 @@ CUDA_CALLABLE bool is_below_modulus(const uint64_t h[4]) noexcept {
   // of 0xffff...ffff. Otherwise, it'll be zero.
   return bast::narrow_cast<uint8_t>(borrow) & 1;
 }
-} // namespace sxt::fbnqb
+} // namespace sxt::f25b

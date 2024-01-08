@@ -20,19 +20,12 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::fbnqb {
+namespace sxt::f25b {
 //--------------------------------------------------------------------------------------------------
-// reduce
-//--------------------------------------------------------------------------------------------------
+// to_montgomery_form
+//-------------------------------------------------------------------------------------------------
 /**
- * The Montgomery reduction here is based on Algorithm 14.32 in
- * Handbook of Applied Cryptography
- * <http://cacr.uwaterloo.ca/hac/about/chap14.pdf>.
+ * h = s * r2
  */
-CUDA_CALLABLE void reduce(uint64_t h[4], const uint64_t t[8]) noexcept;
-
-//--------------------------------------------------------------------------------------------------
-// is_below_modulus
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE bool is_below_modulus(const uint64_t h[4]) noexcept;
-} // namespace sxt::fbnqb
+CUDA_CALLABLE void to_montgomery_form(uint64_t h[4], const uint64_t s[4]) noexcept;
+} // namespace sxt::f25b

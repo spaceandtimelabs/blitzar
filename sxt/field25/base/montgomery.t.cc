@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field_bnq/base/montgomery.h"
+#include "sxt/field25/base/montgomery.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field_bnq/base/constants.h"
-#include "sxt/field_bnq/base/reduce.h"
+#include "sxt/field25/base/constants.h"
+#include "sxt/field25/base/reduce.h"
 
-using namespace sxt::fbnqb;
+using namespace sxt::f25b;
 
 TEST_CASE("conversion to Montgomery form") {
   SECTION("with zero returns zero") {

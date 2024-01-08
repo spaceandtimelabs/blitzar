@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field_bnq/base/subtract_p.h"
+#include "sxt/field25/base/subtract_p.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field_bnq/base/constants.h"
+#include "sxt/field25/base/constants.h"
 
-using namespace sxt::fbnqb;
+using namespace sxt::f25b;
 
 TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
   SECTION("of zero") {
