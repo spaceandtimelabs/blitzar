@@ -6,13 +6,13 @@ load(
 sxt_cc_component(
     name = "element",
     impl_deps = [
-        "//sxt/field12/base:byte_conversion",
-        "//sxt/field12/base:reduce",
+        "//sxt/field25/base:byte_conversion",
+        "//sxt/field25/base:reduce",
     ],
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/field12/base:constants",
+        "//sxt/field25/base:constants",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
@@ -27,6 +27,6 @@ sxt_cc_component(
     deps = [
         ":element",
         "//sxt/base/type:literal",
-        "//sxt/field12/base:byte_conversion",
+        "//sxt/field25/base:byte_conversion",
     ],
 )

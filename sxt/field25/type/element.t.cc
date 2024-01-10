@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/type/element.h"
 
 #include <sstream>
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/base/constants.h"
+#include "sxt/field25/base/constants.h"
 
 using namespace sxt;
-using namespace sxt::f12t;
+using namespace sxt::f25t;
 
 TEST_CASE("element conversion") {
   std::ostringstream oss;

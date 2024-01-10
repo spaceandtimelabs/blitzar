@@ -21,7 +21,7 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::f12t {
+namespace sxt::f25t {
 //--------------------------------------------------------------------------------------------------
 // element
 //--------------------------------------------------------------------------------------------------
@@ -66,4 +66,4 @@ CUDA_CALLABLE bool operator==(const element& lhs, const element& rhs) noexcept;
 // operator!=
 //--------------------------------------------------------------------------------------------------
 inline bool operator!=(const element& lhs, const element& rhs) noexcept { return !(lhs == rhs); }
-} // namespace sxt::f12t
+} // namespace sxt::f25t

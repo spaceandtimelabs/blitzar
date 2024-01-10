@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/type/element.h"
 
 #include <array>
 #include <iomanip>
 
-#include "sxt/field12/base/byte_conversion.h"
-#include "sxt/field12/base/reduce.h"
+#include "sxt/field25/base/byte_conversion.h"
+#include "sxt/field25/base/reduce.h"
 
-namespace sxt::f12t {
+namespace sxt::f25t {
 //--------------------------------------------------------------------------------------------------
 // print_impl
 //--------------------------------------------------------------------------------------------------
@@ -67,4 +67,4 @@ CUDA_CALLABLE bool operator==(const element& lhs, const element& rhs) noexcept {
   }
   return true;
 }
-} // namespace sxt::f12t
+} // namespace sxt::f25t

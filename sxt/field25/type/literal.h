@@ -19,10 +19,10 @@
 #include <array>
 
 #include "sxt/base/type/literal.h"
-#include "sxt/field12/base/byte_conversion.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/base/byte_conversion.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::f12t {
+namespace sxt::f25t {
 //--------------------------------------------------------------------------------------------------
 // _f12
 //--------------------------------------------------------------------------------------------------
@@ -34,4 +34,4 @@ template <char... Chars> element operator"" _f12() noexcept {
   f12b::from_bytes_le(is_below, res.data(), reinterpret_cast<const uint8_t*>(bytes.data()));
   return res;
 }
-} // namespace sxt::f12t
+} // namespace sxt::f25t

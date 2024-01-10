@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field12/type/literal.h"
+#include "sxt/field25/type/literal.h"
 
 #include <sstream>
 
 #include "sxt/base/test/unit_test.h"
 
-using namespace sxt::f12t;
+using namespace sxt::f25t;
 
 TEST_CASE("literal element printing") {
   std::ostringstream oss;
