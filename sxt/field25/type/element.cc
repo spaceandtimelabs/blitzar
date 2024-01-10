@@ -26,13 +26,13 @@ namespace sxt::f25t {
 //--------------------------------------------------------------------------------------------------
 // print_impl
 //--------------------------------------------------------------------------------------------------
-static std::ostream& print_impl(std::ostream& out, const std::array<uint8_t, 48>& bytes,
+static std::ostream& print_impl(std::ostream& out, const std::array<uint8_t, 32>& bytes,
                                 int start) noexcept {
   out << std::hex << static_cast<int>(bytes[start]);
   for (int i = start; i-- > 0;) {
     out << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(bytes[i]);
   }
-  out << "_f12";
+  out << "_f25";
   return out;
 }
 
@@ -40,18 +40,18 @@ static std::ostream& print_impl(std::ostream& out, const std::array<uint8_t, 48>
 // operator<<
 //--------------------------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& out, const element& e) noexcept {
-  std::array<uint8_t, 48> bytes = {};
-  f12b::to_bytes_le(bytes.data(), e.data());
+  std::array<uint8_t, 32> bytes = {};
+  f25b::to_bytes_le(bytes.data(), e.data());
   auto flags = out.flags();
   out << "0x";
-  for (int i = 48; i-- > 0;) {
+  for (int i = 32; i-- > 0;) {
     if (bytes[i] != 0) {
       print_impl(out, bytes, i);
       out.flags(flags);
       return out;
     }
   }
-  out << "0_f12";
+  out << "0_f25";
   out.flags(flags);
   return out;
 }

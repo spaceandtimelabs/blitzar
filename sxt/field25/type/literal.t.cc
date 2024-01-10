@@ -25,34 +25,38 @@ using namespace sxt::f25t;
 TEST_CASE("literal element printing") {
   std::ostringstream oss;
 
-  SECTION("of zero prints 0x0_f12") {
-    oss << 0x0_f12;
-    REQUIRE(oss.str() == "0x0_f12");
+  SECTION("of zero prints 0x0_f25") {
+    oss << 0x0_f25;
+    REQUIRE(oss.str() == "0x0_f25");
   }
 
-  SECTION("of one prints 0x1_f12") {
-    oss << 0x1_f12;
-    REQUIRE(oss.str() == "0x1_f12");
+  SECTION("of one prints 0x1_f25") {
+    oss << 0x1_f25;
+    REQUIRE(oss.str() == "0x1_f25");
   }
 
-  SECTION("of 10 prints 0xa_f12") {
-    oss << 0xa_f12;
-    REQUIRE(oss.str() == "0xa_f12");
+  SECTION("of 10 prints 0xa_f25") {
+    oss << 0xa_f25;
+    REQUIRE(oss.str() == "0xa_f25");
   }
 
-  SECTION("of 16 prints 0x10_f12") {
-    oss << 0x10_f12;
-    REQUIRE(oss.str() == "0x10_f12");
+  SECTION("of 16 prints 0x10_f25") {
+    oss << 0x10_f25;
+    REQUIRE(oss.str() == "0x10_f25");
   }
 
-  SECTION("of the modulus prints 0x0_f12") {
-    oss << 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab_f12;
-    REQUIRE(oss.str() == "0x0_f12");
+  SECTION("of the modulus prints 0x0_f25") {
+    oss << 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47_f25;
+    REQUIRE(oss.str() == "0x0_f25");
   }
 
   SECTION("of the modulus minus one prints a pre-computed value") {
-    oss << 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaaa_f12;
-    REQUIRE(oss.str() == "0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfff"
-                         "eb153ffffb9feffffffffaaaa_f12");
+    oss << 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd46_f25;
+    REQUIRE(oss.str() == "0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd46_f25");
+  }
+
+  SECTION("of the modulus plus one prints as one") {
+    oss << 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd48_f25;
+    REQUIRE(oss.str() == "0x1_f25");
   }
 }

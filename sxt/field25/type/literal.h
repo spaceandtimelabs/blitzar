@@ -24,14 +24,14 @@
 
 namespace sxt::f25t {
 //--------------------------------------------------------------------------------------------------
-// _f12
+// _f25
 //--------------------------------------------------------------------------------------------------
-template <char... Chars> element operator"" _f12() noexcept {
-  std::array<uint64_t, 6> bytes = {};
-  bast::parse_literal<6, Chars...>(bytes);
+template <char... Chars> element operator"" _f25() noexcept {
+  std::array<uint64_t, 4> bytes = {};
+  bast::parse_literal<4, Chars...>(bytes);
   element res;
   bool is_below;
-  f12b::from_bytes_le(is_below, res.data(), reinterpret_cast<const uint8_t*>(bytes.data()));
+  f25b::from_bytes_le(is_below, res.data(), reinterpret_cast<const uint8_t*>(bytes.data()));
   return res;
 }
 } // namespace sxt::f25t
