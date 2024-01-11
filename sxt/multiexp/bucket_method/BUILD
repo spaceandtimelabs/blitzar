@@ -108,8 +108,11 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     impl_deps = [
-        "//sxt/execution/async:future",
+      ":count",
+        "//sxt/execution/async:coroutine",
         "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/base/device:stream",
         "//sxt/base/error:assert",
         "//sxt/base/num:divide_up",
     ],

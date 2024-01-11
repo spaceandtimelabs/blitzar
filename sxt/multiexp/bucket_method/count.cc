@@ -23,9 +23,11 @@ static __global__ void count_bucket_entries_kernel(unsigned* count_array, uint8_
 // count_bucket_entries
 //--------------------------------------------------------------------------------------------------
 xena::future<> count_bucket_entries(memmg::managed_array<unsigned>& count_array,
-                                    basct::cspan<uint8_t> scalars, unsigned element_num_bytes,
-                                    unsigned bit_width, unsigned num_partitions) noexcept {
+                                    const basdv::stream& stream, basct::cspan<uint8_t> scalars,
+                                    unsigned element_num_bytes, unsigned bit_width,
+                                    unsigned num_partitions) noexcept {
   (void)count_bucket_entries_kernel;
+  (void)stream;
   auto num_bucket_groups = basn::divide_up(element_num_bytes * 8u, bit_width);
   auto num_outputs = scalars.size();
   auto num_buckets_per_group = 1u << bit_width;
