@@ -38,7 +38,7 @@ static __global__ void count_bucket_entries_kernel(unsigned* count_array,
         output_scalars + i * element_num_bytes,
         element_num_bytes,
     };
-    uint16_t digit = 0;
+    unsigned digit = 0;
     mtxb::extract_digit({reinterpret_cast<uint8_t*>(&digit), byte_width}, scalar, bit_width,
                         bucket_group_index);
     auto count_index = min(digit, 1) - 1;
@@ -55,8 +55,7 @@ void count_bucket_entries(memmg::managed_array<unsigned>& count_array, const bas
   SXT_DEBUG_ASSERT(
       // clang-format off
       basdv::is_active_device_pointer(scalars.data()) &&
-      num_partitions <= n &&
-      bit_width <= 16
+      num_partitions <= n
       // clang-format on
   );
   auto num_bucket_groups = basn::divide_up(element_num_bytes * 8u, bit_width);
