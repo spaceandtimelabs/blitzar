@@ -19,8 +19,8 @@ xena::future<void> compute_multiproduct_table(memmg::managed_array<bucket_descri
   const unsigned num_partitions = 64;
   memr::async_device_resource resource{stream};
   memmg::managed_array<unsigned> bucket_count_array{&resource};
-  co_await count_bucket_entries(bucket_count_array, stream, scalars, element_num_bytes, bit_width,
-                                num_partitions);
+  /* count_bucket_entries(bucket_count_array, stream, scalars, element_num_bytes, bit_width, */
+  /*                      num_partitions); */
   /* xena::future<> count_bucket_entries(memmg::managed_array<unsigned>& count_array, */
   /*                                     const basdv::stream& stream, basct::cspan<uint8_t> scalars,
    */

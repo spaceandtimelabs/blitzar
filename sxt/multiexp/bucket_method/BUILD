@@ -90,13 +90,16 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     impl_deps = [
-        "//sxt/execution/async:future",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:chained_resource",
+        "//sxt/memory/resource:pinned_resource",
         "//sxt/memory/management:managed_array",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
         "//sxt/base/error:assert",
         "//sxt/base/num:divide_up",
     ],
     deps = [
-        "//sxt/execution/async:future_fwd",
         "//sxt/base/container:span",
         "//sxt/memory/management:managed_array_fwd",
     ],
