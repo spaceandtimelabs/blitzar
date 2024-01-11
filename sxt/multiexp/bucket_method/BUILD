@@ -94,6 +94,7 @@ sxt_cc_component(
         "//sxt/memory/resource:chained_resource",
         "//sxt/memory/resource:pinned_resource",
         "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/base:digit_utility",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",
