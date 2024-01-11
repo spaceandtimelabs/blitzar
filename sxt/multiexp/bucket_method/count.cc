@@ -20,6 +20,18 @@ static __global__ void count_bucket_entries_kernel(unsigned* count_array,
   unsigned output_index = threadIdx.x;
   unsigned bucket_group_index = threadIdx.y;
   unsigned partition_index = blockIdx.x;
+  unsigned num_partitions = gridDim.x;
+  unsigned num_buckets_per_group = 1u << bit_width;
+  unsigned num_bucket_groups = blockDim.y;
+  auto output_scalars = scalars[output_index];
+  auto bucket_counts = count_array;
+  bucket_counts += output_index * num_buckets_per_group * num_buckets_per_group * num_partitions;
+  bucket_counts += bucket_group_index * num_buckets_per_group * num_partitions;
+  bucket_counts += partition_index * num_buckets_per_group;
+  for (unsigned count_index = 0; count_index < num_buckets_per_group; ++count_index) {
+    bucket_counts[count_index] = 0;
+  }
+  (void)output_scalars;
   (void)output_index;
   (void)bucket_group_index;
   (void)partition_index;
