@@ -6,6 +6,16 @@
 #include "sxt/memory/management/managed_array.h"
 
 namespace sxt::mtxbk {
+//--------------------------------------------------------------------------------------------------
+// count_bucket_entries_kernel
+//--------------------------------------------------------------------------------------------------
+static __global__ void count_bucket_entries_kernel(unsigned* count_array, uint8_t** scalars,
+                                                   unsigned element_num_bytes, unsigned bit_width) {
+  (void)count_array;
+  (void)scalars;
+  (void)element_num_bytes;
+  (void)bit_width;
+}
 
 //--------------------------------------------------------------------------------------------------
 // count_bucket_entries
@@ -13,6 +23,7 @@ namespace sxt::mtxbk {
 xena::future<> count_bucket_entries(memmg::managed_array<unsigned>& count_array,
                                     basct::cspan<uint8_t> scalars, unsigned element_num_bytes,
                                     unsigned bit_width, unsigned num_partitions) noexcept {
+  (void)count_bucket_entries_kernel;
   auto num_bucket_groups = basn::divide_up(element_num_bytes * 8u, bit_width);
   auto num_outputs = scalars.size();
   auto num_buckets_per_group = 1u << bit_width;
