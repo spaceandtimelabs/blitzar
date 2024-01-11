@@ -98,6 +98,24 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "multiproduct_table",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    impl_deps = [
+        "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
+        "//sxt/base/error:assert",
+        "//sxt/base/num:divide_up",
+    ],
+    deps = [
+        "//sxt/execution/async:future_fwd",
+        "//sxt/base/container:span",
+        "//sxt/memory/management:managed_array_fwd",
+    ],
+)
+
+sxt_cc_component(
     name = "multiexponentiation",
     test_deps = [
         "//sxt/base/curve:example_element",
