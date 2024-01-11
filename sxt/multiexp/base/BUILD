@@ -27,6 +27,7 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/container:span",
+        "//sxt/base/macro:cuda_callable",
     ],
 )
 
