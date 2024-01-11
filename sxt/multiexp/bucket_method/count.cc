@@ -41,7 +41,7 @@ static __global__ void count_bucket_entries_kernel(unsigned* count_array,
     unsigned digit = 0;
     mtxb::extract_digit({reinterpret_cast<uint8_t*>(&digit), byte_width}, scalar, bit_width,
                         bucket_group_index);
-    auto count_index = min(digit, 1) - 1;
+    auto count_index = max(digit, 1) - 1;
     bucket_counts[count_index] += digit != 0;
   }
 }
