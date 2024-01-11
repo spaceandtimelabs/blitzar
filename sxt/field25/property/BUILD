@@ -13,6 +13,7 @@ sxt_cc_component(
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/field25/base:montgomery",
         "//sxt/field25/constant:one",
         "//sxt/field25/constant:zero",
         "//sxt/field25/type:element",

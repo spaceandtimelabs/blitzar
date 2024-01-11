@@ -30,5 +30,5 @@ namespace sxt::f25p {
  * Returns whether or not this element is strictly lexicographically larger than its negation.
  */
 CUDA_CALLABLE
-bool lexicographically_largest(const f12t::element& e) noexcept;
+bool lexicographically_largest(const f25t::element& e) noexcept;
 } // namespace sxt::f25p

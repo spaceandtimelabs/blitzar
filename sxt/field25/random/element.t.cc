@@ -29,7 +29,7 @@ TEST_CASE("random element generation") {
   basn::fast_random_number_generator rng{1, 2};
 
   SECTION("will return different values if called multiple times") {
-    f12t::element e1, e2;
+    f25t::element e1, e2;
     generate_random_element(e1, rng);
     generate_random_element(e2, rng);
     REQUIRE(e1 != e2);

@@ -23,11 +23,11 @@ using namespace sxt;
 using namespace sxt::f25p;
 
 TEST_CASE("is zero can identify a zero element") {
-  constexpr f12t::element e_zero{0, 0, 0, 0, 0, 0};
+  constexpr f25t::element e_zero{0, 0, 0, 0};
   REQUIRE(is_zero(e_zero));
 }
 
 TEST_CASE("is zero can identify a non-zero element") {
-  constexpr f12t::element e_one{1, 0, 0, 0, 0, 0};
+  constexpr f25t::element e_one{1, 0, 0, 0};
   REQUIRE(!is_zero(e_one));
 }

@@ -26,9 +26,9 @@ namespace sxt::f25p {
 // is_zero
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-inline bool is_zero(const f12t::element& e) noexcept {
-  unsigned char bytes[48];
-  f12b::to_bytes(bytes, e.data());
+inline bool is_zero(const f25t::element& e) noexcept {
+  unsigned char bytes[32];
+  f25b::to_bytes(bytes, e.data());
   return basbt::is_zero(bytes, sizeof(bytes));
 }
 } // namespace sxt::f25p

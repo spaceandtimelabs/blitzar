@@ -27,25 +27,25 @@ namespace sxt::f25rn {
 //--------------------------------------------------------------------------------------------------
 CUDA_DISABLE_HOSTDEV_WARNING
 template <class Rng>
-static CUDA_CALLABLE void generate_random_element_impl(f12t::element& e, Rng& generator) noexcept {
-  uint64_t data[6];
-  for (int i = 0; i < 6; ++i) {
+static CUDA_CALLABLE void generate_random_element_impl(f25t::element& e, Rng& generator) noexcept {
+  uint64_t data[4];
+  for (int i = 0; i < 4; ++i) {
     data[i] = generator();
   }
 
   bool is_below_modulus{false};
-  f12b::from_bytes(is_below_modulus, e.data(), reinterpret_cast<const uint8_t*>(data));
+  f25b::from_bytes(is_below_modulus, e.data(), reinterpret_cast<const uint8_t*>(data));
 }
 
 //--------------------------------------------------------------------------------------------------
 // generate_random_element
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void generate_random_element(f12t::element& e, basn::fast_random_number_generator& rng) noexcept {
+void generate_random_element(f25t::element& e, basn::fast_random_number_generator& rng) noexcept {
   generate_random_element_impl(e, rng);
 }
 
-void generate_random_element(f12t::element& e, std::mt19937& rng) noexcept {
+void generate_random_element(f25t::element& e, std::mt19937& rng) noexcept {
   generate_random_element_impl(e, rng);
 }
 } // namespace sxt::f25rn

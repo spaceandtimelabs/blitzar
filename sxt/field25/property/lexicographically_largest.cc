@@ -34,24 +34,22 @@ namespace sxt::f25p {
 // lexicographically_largest
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-bool lexicographically_largest(const f12t::element& e) noexcept {
+bool lexicographically_largest(const f25t::element& e) noexcept {
   // Checking to see if the element is larger than (p - 1) / 2.
   // If we subtract by ((p - 1) / 2) + 1 and there is no underflow,
   // then the element must be larger than (p - 1) / 2.
 
-  // First, because self is in Montgomery form we need to reduce it.
-  f12t::element e_tmp;
-  uint64_t tmp[12]{e[0], e[1], e[2], e[3], e[4], e[5], 0, 0, 0, 0, 0, 0};
-  f12b::reduce(e_tmp.data(), tmp);
+  // First, because e is in Montgomery form we need to reduce it.
+  f25t::element e_tmp;
+  uint64_t tmp[8]{e[0], e[1], e[2], e[3], 0, 0, 0, 0};
+  f25b::reduce(e_tmp.data(), tmp);
 
   uint64_t dummy{0};
   uint64_t borrow{0};
-  basfld::sbb(dummy, borrow, e_tmp[0], 0xdcff7fffffffd556);
-  basfld::sbb(dummy, borrow, e_tmp[1], 0x0f55ffff58a9ffff);
-  basfld::sbb(dummy, borrow, e_tmp[2], 0xb39869507b587b12);
-  basfld::sbb(dummy, borrow, e_tmp[3], 0xb23ba5c279c2895f);
-  basfld::sbb(dummy, borrow, e_tmp[4], 0x258dd3db21a5d66b);
-  basfld::sbb(dummy, borrow, e_tmp[5], 0x0d0088f51cbff34d);
+  basfld::sbb(dummy, borrow, e_tmp[0], 0x9e10460b6c3e7ea4);
+  basfld::sbb(dummy, borrow, e_tmp[1], 0xcbc0b548b438e546);
+  basfld::sbb(dummy, borrow, e_tmp[2], 0xdc2822db40c0ac2e);
+  basfld::sbb(dummy, borrow, e_tmp[3], 0x183227397098d014);
 
   // If the element was smaller, the subtraction will underflow
   // producing a borrow value of 0xffff...ffff, otherwise it will
