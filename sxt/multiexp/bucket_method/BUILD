@@ -51,6 +51,11 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "bucket_descriptor",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "combination_kernel",
     test_deps = [
         "//sxt/base/curve:example_element",

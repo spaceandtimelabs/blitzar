@@ -2,8 +2,11 @@
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
-// compute_multiproduct_table
+// bucket_descriptor
 //--------------------------------------------------------------------------------------------------
-  /* xena::future<void> compute_multiproduct_table( */
-
+struct bucket_descriptor {
+  unsigned bucket_index;
+  unsigned entry_first;
+  unsigned entry_last;
+};
 } // namespace sxt::mtxbk
