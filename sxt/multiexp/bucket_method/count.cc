@@ -25,7 +25,7 @@ static __global__ void count_bucket_entries_kernel(unsigned* count_array,
   unsigned num_buckets_per_group = (1u << bit_width) - 1;
   unsigned num_bucket_groups = blockDim.y;
   auto bucket_counts = count_array;
-  bucket_counts += output_index * num_buckets_per_group * num_buckets_per_group * num_partitions;
+  bucket_counts += output_index * num_bucket_groups * num_buckets_per_group * num_partitions;
   bucket_counts += bucket_group_index * num_buckets_per_group * num_partitions;
   bucket_counts += partition_index * num_buckets_per_group;
   for (unsigned count_index = 0; count_index < num_buckets_per_group; ++count_index) {
@@ -41,21 +41,9 @@ static __global__ void count_bucket_entries_kernel(unsigned* count_array,
     uint16_t digit = 0;
     mtxb::extract_digit({reinterpret_cast<uint8_t*>(&digit), byte_width}, scalar, bit_width,
                         bucket_group_index);
-    (void)digit;
-    /* CUDA_CALLABLE void extract_digit(basct::span<uint8_t> digit, basct::cspan<uint8_t> e, */
-    /*                                  size_t radix_log2, size_t digit_index) noexcept; */
-    (void)scalar;
-    (void)i;
+    auto count_index = min(digit, 1) - 1;
+    bucket_counts[count_index] += digit != 0;
   }
-  (void)output_scalars;
-  (void)output_index;
-  (void)bucket_group_index;
-  (void)partition_index;
-  (void)count_array;
-  (void)scalars;
-  (void)element_num_bytes;
-  (void)bit_width;
-  (void)n;
 }
 
 //--------------------------------------------------------------------------------------------------
