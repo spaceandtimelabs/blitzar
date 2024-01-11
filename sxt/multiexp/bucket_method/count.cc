@@ -10,11 +10,13 @@ namespace sxt::mtxbk {
 // count_bucket_entries_kernel
 //--------------------------------------------------------------------------------------------------
 static __global__ void count_bucket_entries_kernel(unsigned* count_array, uint8_t** scalars,
-                                                   unsigned element_num_bytes, unsigned bit_width) {
+                                                   unsigned element_num_bytes, unsigned bit_width,
+                                                   unsigned n) {
   (void)count_array;
   (void)scalars;
   (void)element_num_bytes;
   (void)bit_width;
+  (void)n;
 }
 
 //--------------------------------------------------------------------------------------------------
