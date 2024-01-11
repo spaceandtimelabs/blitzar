@@ -87,6 +87,10 @@ sxt_cc_component(
 sxt_cc_component(
     name = "count",
     test_deps = [
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
     ],
     impl_deps = [
