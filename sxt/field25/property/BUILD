@@ -7,15 +7,15 @@ sxt_cc_component(
     name = "lexicographically_largest",
     impl_deps = [
         "//sxt/base/field:arithmetic_utility",
-        "//sxt/field12/base:reduce",
-        "//sxt/field12/type:element",
+        "//sxt/field25/base:reduce",
+        "//sxt/field25/type:element",
     ],
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/field12/constant:one",
-        "//sxt/field12/constant:zero",
-        "//sxt/field12/type:element",
+        "//sxt/field25/constant:one",
+        "//sxt/field25/constant:zero",
+        "//sxt/field25/type:element",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
@@ -30,7 +30,7 @@ sxt_cc_component(
     deps = [
         "//sxt/base/bit:zero_equality",
         "//sxt/base/macro:cuda_callable",
-        "//sxt/field12/base:byte_conversion",
-        "//sxt/field12/type:element",
+        "//sxt/field25/base:byte_conversion",
+        "//sxt/field25/type:element",
     ],
 )

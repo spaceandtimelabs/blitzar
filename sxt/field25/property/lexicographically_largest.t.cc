@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -23,15 +23,15 @@
  *
  * See third_party/license/zkcrypto.LICENSE
  */
-#include "sxt/field12/property/lexicographically_largest.h"
+#include "sxt/field25/property/lexicographically_largest.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/constant/one.h"
-#include "sxt/field12/constant/zero.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/constant/one.h"
+#include "sxt/field25/constant/zero.h"
+#include "sxt/field25/type/element.h"
 
 using namespace sxt;
-using namespace sxt::f12p;
+using namespace sxt::f25p;
 
 TEST_CASE("lexicographically largest correctly identifies") {
   SECTION("zero is not largest") { REQUIRE(!lexicographically_largest(f12cn::zero_v)); }

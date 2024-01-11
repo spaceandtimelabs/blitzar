@@ -23,19 +23,19 @@
 namespace sxt::basn {
 class fast_random_number_generator;
 }
-namespace sxt::f12t {
+namespace sxt::f25t {
 class element;
 }
 
-namespace sxt::f12rn {
+namespace sxt::f25rn {
 //--------------------------------------------------------------------------------------------------
 // generate_random_element
 //--------------------------------------------------------------------------------------------------
-/*
- Not guaranteed to be uniform. Only random elements generated below the modulus will be accepted.
+/**
+ * Not guaranteed to be uniform. Only random elements generated below the modulus will be accepted.
  */
 CUDA_CALLABLE
 void generate_random_element(f12t::element& e, basn::fast_random_number_generator& rng) noexcept;
 
 void generate_random_element(f12t::element& e, std::mt19937& rng) noexcept;
-} // namespace sxt::f12rn
+} // namespace sxt::f25rn

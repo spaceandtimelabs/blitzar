@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field12/random/element.h"
+#include "sxt/field25/random/element.h"
 
 #include <cstdint>
 
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/type/element.h"
 
 using namespace sxt;
-using namespace sxt::f12rn;
+using namespace sxt::f25rn;
 
 TEST_CASE("random element generation") {
   basn::fast_random_number_generator rng{1, 2};

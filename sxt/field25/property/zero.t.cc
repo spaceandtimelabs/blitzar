@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field12/property/zero.h"
+#include "sxt/field25/property/zero.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/type/element.h"
 
 using namespace sxt;
-using namespace sxt::f12p;
+using namespace sxt::f25p;
 
 TEST_CASE("is zero can identify a zero element") {
   constexpr f12t::element e_zero{0, 0, 0, 0, 0, 0};

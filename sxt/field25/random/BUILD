@@ -8,13 +8,13 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/base/macro:cuda_warning",
         "//sxt/base/num:fast_random_number_generator",
-        "//sxt/field12/base:byte_conversion",
-        "//sxt/field12/type:element",
+        "//sxt/field25/base:byte_conversion",
+        "//sxt/field25/type:element",
     ],
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/field12/type:element",
+        "//sxt/field25/type:element",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",

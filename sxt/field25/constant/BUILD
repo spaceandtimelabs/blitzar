@@ -7,8 +7,8 @@ sxt_cc_component(
     name = "one",
     with_test = False,
     deps = [
-        "//sxt/field12/base:constants",
-        "//sxt/field12/type:element",
+        "//sxt/field25/base:constants",
+        "//sxt/field25/type:element",
     ],
 )
 
@@ -16,6 +16,6 @@ sxt_cc_component(
     name = "zero",
     with_test = False,
     deps = [
-        "//sxt/field12/type:element",
+        "//sxt/field25/type:element",
     ],
 )

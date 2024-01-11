@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field12/random/element.h"
+#include "sxt/field25/random/element.h"
 
 #include "sxt/base/macro/cuda_warning.h"
 #include "sxt/base/num/fast_random_number_generator.h"
-#include "sxt/field12/base/byte_conversion.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/base/byte_conversion.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::f12rn {
+namespace sxt::f25rn {
 //--------------------------------------------------------------------------------------------------
 // generate_random_element_impl
 //--------------------------------------------------------------------------------------------------
@@ -48,4 +48,4 @@ void generate_random_element(f12t::element& e, basn::fast_random_number_generato
 void generate_random_element(f12t::element& e, std::mt19937& rng) noexcept {
   generate_random_element_impl(e, rng);
 }
-} // namespace sxt::f12rn
+} // namespace sxt::f25rn

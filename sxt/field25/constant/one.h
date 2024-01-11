@@ -16,13 +16,13 @@
  */
 #pragma once
 
-#include "sxt/field12/base/constants.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/base/constants.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::f12cn {
+namespace sxt::f25cn {
 //--------------------------------------------------------------------------------------------------
 // one_v
 //--------------------------------------------------------------------------------------------------
 static constexpr f12t::element one_v{f12b::r_v[0], f12b::r_v[1], f12b::r_v[2],
                                      f12b::r_v[3], f12b::r_v[4], f12b::r_v[5]};
-} // namespace sxt::f12cn
+} // namespace sxt::f25cn

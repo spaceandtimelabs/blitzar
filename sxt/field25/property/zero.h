@@ -18,10 +18,10 @@
 
 #include "sxt/base/bit/zero_equality.h"
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/field12/base/byte_conversion.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/base/byte_conversion.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::f12p {
+namespace sxt::f25p {
 //--------------------------------------------------------------------------------------------------
 // is_zero
 //--------------------------------------------------------------------------------------------------
@@ -31,4 +31,4 @@ inline bool is_zero(const f12t::element& e) noexcept {
   f12b::to_bytes(bytes, e.data());
   return basbt::is_zero(bytes, sizeof(bytes));
 }
-} // namespace sxt::f12p
+} // namespace sxt::f25p

@@ -16,11 +16,11 @@
  */
 #pragma once
 
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::f12cn {
+namespace sxt::f25cn {
 //--------------------------------------------------------------------------------------------------
 // zero_v
 //--------------------------------------------------------------------------------------------------
 static constexpr f12t::element zero_v{0, 0, 0, 0, 0, 0};
-} // namespace sxt::f12cn
+} // namespace sxt::f25cn

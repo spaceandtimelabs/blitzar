@@ -18,17 +18,17 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::f12t {
+namespace sxt::f25t {
 class element;
 }
 
-namespace sxt::f12p {
+namespace sxt::f25p {
 //--------------------------------------------------------------------------------------------------
 // lexicographically_largest
 //--------------------------------------------------------------------------------------------------
-/*
- Returns whether or not this element is strictly lexicographically larger than its negation.
+/**
+ * Returns whether or not this element is strictly lexicographically larger than its negation.
  */
 CUDA_CALLABLE
 bool lexicographically_largest(const f12t::element& e) noexcept;
-} // namespace sxt::f12p
+} // namespace sxt::f25p
