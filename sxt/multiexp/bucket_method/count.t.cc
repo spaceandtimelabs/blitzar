@@ -1,5 +1,6 @@
 #include "sxt/multiexp/bucket_method/count.h"
 
+#include <algorithm>
 #include <iostream>
 
 #include "sxt/base/device/stream.h"
@@ -22,6 +23,7 @@ TEST_CASE("we can count the number of entries in buckets") {
     sxt::mtxbk::count_bucket_entries(count_array, stream, scalars, 1, 1, 8, 1);
     basdv::synchronize_stream(stream);
     memmg::managed_array<unsigned> expected(255);
+    std::fill(expected.begin(), expected.end(), 0);
     expected[0] = 1;
     REQUIRE(count_array == expected);
   }
