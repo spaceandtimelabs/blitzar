@@ -16,6 +16,10 @@ sxt_cc_component(
       "//sxt/memory/resource:async_device_resource",
     ],
     test_deps = [
-        "//sxt/base/test:unit_test",
+      "//sxt/memory/management:managed_array",
+      "//sxt/memory/resource:managed_device_resource",
+      "//sxt/base/device:stream",
+      "//sxt/base/device:synchronization",
+      "//sxt/base/test:unit_test",
     ],
 )
