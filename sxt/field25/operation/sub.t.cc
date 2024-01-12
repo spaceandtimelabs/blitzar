@@ -16,47 +16,50 @@
  */
 #include "sxt/field25/operation/sub.h"
 
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/field25/constant/zero.h"
+#include "sxt/field25/random/element.h"
 #include "sxt/field25/type/element.h"
 
 using namespace sxt;
 using namespace sxt::f25o;
 
 TEST_CASE("subtraction") {
-  SECTION("of pre-computed value and zero returns pre-computed value") {
-    // Random values between 1 and p_v generated using the SAGE library.
-    constexpr f12t::element a{0xd841a79826bf52bd, 0xf03e2c871b72b39f, 0x3e0849ec3694f61f,
-                              0x9f2941b0ba71fbae, 0xdc01791735636ad0, 0x16049d32722cd303};
+  SECTION("of a random field element and zero returns the random field element") {
+    f25t::element a;
+    basn::fast_random_number_generator rng{1, 2};
+    f25rn::generate_random_element(a, rng);
 
-    f12t::element ret;
-    sub(ret, a, f12cn::zero_v);
+    f25t::element ret;
+
+    sub(ret, a, f25cn::zero_v);
 
     REQUIRE(a == ret);
   }
 
   SECTION("of pre-computed values returns expected value") {
-    // Random values between 1 and p_v generated using the SAGE library.
-    constexpr f12t::element a{0x3a67dc4bfd86d199, 0x131d9f2a59475351, 0xa4277d44c833b67a,
-                              0x21ea1c79f6aedd93, 0x3fadab0c84079145, 0x179af60bd96d6d51};
-    constexpr f12t::element b{0xff30f3d15bd9e635, 0x9565c755ac959535, 0x836b6466e8730b6a,
-                              0x9e9f141d4b78bb12, 0x265d74738f87c381, 0x0a3adb6a76b8e291};
-    constexpr f12t::element expected{0x3b36e87aa1aceb64, 0x7db7d7d4acb1be1b, 0x20bc18dddfc0ab0f,
-                                     0x834b085cab362281, 0x19503698f47fcdc3, 0xd601aa162b48ac0};
+    // Random bn254 base field element generated using the SAGE library.
+    constexpr f25t::element a{0x5277392d1dd1c9b6, 0xd4128bfefd8e4cf5, 0xa7d5b7f3662a0ee9,
+                              0x0994b748e9d2dbe7};
+    constexpr f25t::element b{0x9412b919732aa7c6, 0x714691531e314d76, 0xcf45bbcd6cf10aa2,
+                              0x1295b5038773df78};
+    constexpr f25t::element expected{0xfa850c2a83241f37, 0xfa4d653d47ceca0b, 0x90e041dc7aba5ca4,
+                                     0x276350b843909c98};
+    f25t::element ret;
 
-    f12t::element ret;
     sub(ret, a, b);
 
     REQUIRE(expected == ret);
   }
 
   SECTION("of zero and one returns the modulus minus one") {
-    constexpr f12t::element b{0x1, 0x0, 0x0, 0x0, 0x0, 0x0};
-    constexpr f12t::element expected{0xb9feffffffffaaaa, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,
-                                     0x64774b84f38512bf, 0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
+    constexpr f25t::element b{1, 0, 0, 0};
+    constexpr f25t::element expected{0x3c208c16d87cfd46, 0x97816a916871ca8d, 0xb85045b68181585d,
+                                     0x30644e72e131a029};
+    f25t::element ret;
 
-    f12t::element ret;
-    sub(ret, f12cn::zero_v, b);
+    sub(ret, f25cn::zero_v, b);
 
     REQUIRE(expected == ret);
   }

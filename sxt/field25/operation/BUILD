@@ -6,8 +6,10 @@ load(
 sxt_cc_component(
     name = "add",
     test_deps = [
+        "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
         "//sxt/field25/constant:zero",
+        "//sxt/field25/random:element",
     ],
     deps = [
         "//sxt/base/field:arithmetic_utility",
@@ -27,8 +29,12 @@ sxt_cc_component(
     ],
     is_cuda = True,
     test_deps = [
+        "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
+        "//sxt/field25/base:constants",
+        "//sxt/field25/base:montgomery",
         "//sxt/field25/constant:zero",
+        "//sxt/field25/random:element",
         "//sxt/field25/type:element",
     ],
     deps = [
@@ -47,6 +53,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/field25/base:constants",
+        "//sxt/field25/constant:zero",
         "//sxt/field25/type:element",
     ],
     deps = [
@@ -57,8 +64,10 @@ sxt_cc_component(
 sxt_cc_component(
     name = "sub",
     test_deps = [
+        "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
         "//sxt/field25/constant:zero",
+        "//sxt/field25/random:element",
     ],
     deps = [
         ":add",

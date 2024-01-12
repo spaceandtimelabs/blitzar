@@ -14,19 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Adopted from zkcrypto/bls12_381
- *
- * Copyright (c) 2021
- * Sean Bowe <ewillbefull@gmail.com>
- * Jack Grigg <thestr4d@gmail.com>
- *
- * See third_party/license/zkcrypto.LICENSE
- */
 #include "sxt/field25/operation/neg.h"
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/field25/base/constants.h"
+#include "sxt/field25/constant/zero.h"
 #include "sxt/field25/type/element.h"
 
 using namespace sxt;
@@ -34,23 +26,20 @@ using namespace sxt::f25o;
 
 TEST_CASE("negation") {
   SECTION("of zero and the modulus are equal") {
-    constexpr f12t::element zero{0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
-    constexpr f12t::element modulus{f12b::p_v.data()};
-    f12t::element ret_zero;
-    f12t::element ret_modulus;
+    f25t::element ret_zero;
+    f25t::element ret_modulus;
 
-    neg(ret_zero, zero);
-    neg(ret_modulus, modulus);
+    neg(ret_zero, f25cn::zero_v);
+    neg(ret_modulus, f25b::p_v.data());
 
     REQUIRE(ret_zero == ret_modulus);
   }
 
   SECTION("of the modulus minus one is one") {
-    constexpr f12t::element modulus_minus_one{0xb9feffffffffaaaa, 0x1eabfffeb153ffff,
-                                              0x6730d2a0f6b0f624, 0x64774b84f38512bf,
-                                              0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
-    constexpr f12t::element one{0x1, 0x0, 0x0, 0x0, 0x0, 0x0};
-    f12t::element ret;
+    constexpr f25t::element modulus_minus_one{0x3c208c16d87cfd46, 0x97816a916871ca8d,
+                                              0xb85045b68181585d, 0x30644e72e131a029};
+    constexpr f25t::element one{1, 0, 0, 0};
+    f25t::element ret;
 
     neg(ret, modulus_minus_one);
 
@@ -58,11 +47,12 @@ TEST_CASE("negation") {
   }
 
   SECTION("of a pre-computed value is expected") {
-    constexpr f12t::element a{0x5360bb5978678032, 0x7dd275ae799e128e, 0x5c5b5071ce4f4dcf,
-                              0xcdb21f93078dbb3e, 0xc32365c5e73f474a, 0x115a2a5489babe5b};
-    constexpr f12t::element expected{0x669e44a687982a79, 0xa0d98a5037b5ed71, 0x0ad5822f2861a854,
-                                     0x96c52bf1ebf75781, 0x87f841f05c0c658c, 0x08a6e795afc5283e};
-    f12t::element ret;
+    // Random bn254 base field element generated using the SAGE library.
+    constexpr f25t::element a{0x1149c21473b043fd, 0x5610b2a5c08c7ecf, 0xc9e31f2d914c45b5,
+                              0x066031eb7a3ca7fd};
+    constexpr f25t::element expected{0x2ad6ca0264ccb94a, 0x4170b7eba7e54bbe, 0xee6d2688f03512a8,
+                                     0x2a041c8766f4f82b};
+    f25t::element ret;
 
     neg(ret, a);
 

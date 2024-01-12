@@ -16,48 +16,66 @@
  */
 #include "sxt/field25/operation/add.h"
 
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/field25/constant/zero.h"
+#include "sxt/field25/random/element.h"
 #include "sxt/field25/type/element.h"
 
 using namespace sxt;
 using namespace sxt::f25o;
 
 TEST_CASE("addition") {
-  SECTION("of pre-computed value and zero returns pre-computed value") {
-    // Random values between 1 and p_v generated using the SAGE library.
-    constexpr f12t::element a{0xa18bb998ebd63ed4, 0xf9376579bd7313fb, 0x7c8e20c46f387e01,
-                              0xfd64e34f83253657, 0x69f877012e12b25a, 0x9e91aa07f8a1e24};
+  SECTION("of a random field element and zero returns the random field element") {
+    f25t::element a;
+    basn::fast_random_number_generator rng{1, 2};
+    f25rn::generate_random_element(a, rng);
 
-    f12t::element ret;
-    add(ret, a, f12cn::zero_v);
+    f25t::element ret;
+
+    add(ret, a, f25cn::zero_v);
 
     REQUIRE(a == ret);
   }
 
   SECTION("of pre-computed values returns expected value") {
-    // Random values between 1 and p_v generated using the SAGE library.
-    constexpr f12t::element a{0xd13cd59bb4634e05, 0x0f2509b85592e56f, 0x651937e06008a619,
-                              0x64d5bd872b39c8a7, 0x841f0f8892fa4f10, 0x78048ec7ecc6399};
-    constexpr f12t::element b{0x16c9e69b4dea3f04, 0xf0a6ec99d0b1f9be, 0x22bb437b9b63365f,
-                              0x1c46c6dd44489804, 0x10f8e4ed03d5659a, 0x14fe816ddb9e6192};
-    constexpr f12t::element expected{0x2e07bc37024de25e, 0xe11ff65374f0df2e, 0x20a3a8bb04bae654,
-                                     0x1ca538df7bfd4dec, 0x49fc4cbf538407d3, 0x27db87020eade91};
+    // Random bn254 base field elements generated using the SAGE library.
+    constexpr f25t::element a{0x1149c21473b043fd, 0x5610b2a5c08c7ecf, 0xc9e31f2d914c45b5,
+                              0x066031eb7a3ca7fd};
+    constexpr f25t::element b{0x13f757e660d431b8, 0x8a86bc6a237b60d5, 0x6f91e11522e9b96d,
+                              0x10ce4233724f624b};
+    constexpr f25t::element expected{0x254119fad48475b5, 0xe0976f0fe407dfa4, 0x39750042b435ff22,
+                                     0x172e741eec8c0a49};
+    f25t::element ret;
 
-    f12t::element ret;
+    add(ret, a, b);
+
+    REQUIRE(expected == ret);
+  }
+
+  SECTION("of a pre-computed value the modulus minus one returns expected value") {
+    // Random bn254 base field element generated using the SAGE library.
+    constexpr f25t::element a{0x1149c21473b043fd, 0x5610b2a5c08c7ecf, 0xc9e31f2d914c45b5,
+                              0x066031eb7a3ca7fd};
+    constexpr f25t::element b{0x3c208c16d87cfd46, 0x97816a916871ca8d, 0xb85045b68181585d,
+                              0x30644e72e131a029};
+    constexpr f25t::element expected{0x1149c21473b043fc, 0x5610b2a5c08c7ecf, 0xc9e31f2d914c45b5,
+                                     0x066031eb7a3ca7fd};
+    f25t::element ret;
+
     add(ret, a, b);
 
     REQUIRE(expected == ret);
   }
 
   SECTION("of the modulus minus one and one returns zero") {
-    constexpr f12t::element a{0xb9feffffffffaaaa, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,
-                              0x64774b84f38512bf, 0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a};
-    constexpr f12t::element b{0x1, 0x0, 0x0, 0x0, 0x0, 0x0};
+    constexpr f25t::element a{0x3c208c16d87cfd46, 0x97816a916871ca8d, 0xb85045b68181585d,
+                              0x30644e72e131a029};
+    constexpr f25t::element b{1, 0, 0, 0};
+    f25t::element ret;
 
-    f12t::element ret;
     add(ret, a, b);
 
-    REQUIRE(f12cn::zero_v == ret);
+    REQUIRE(f25cn::zero_v == ret);
   }
 }

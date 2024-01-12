@@ -27,5 +27,5 @@ namespace sxt::f25o {
 // mul
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void mul(f12t::element& h, const f12t::element& f, const f12t::element& g) noexcept;
+void mul(f25t::element& h, const f25t::element& f, const f25t::element& g) noexcept;
 } // namespace sxt::f25o

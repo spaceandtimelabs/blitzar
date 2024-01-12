@@ -14,43 +14,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Adopted from zkcrypto/bls12_381
- *
- * Copyright (c) 2021
- * Sean Bowe <ewillbefull@gmail.com>
- * Jack Grigg <thestr4d@gmail.com>
- *
- * See third_party/license/zkcrypto.LICENSE
- */
 #include "sxt/field25/operation/mul.h"
 
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/field25/base/constants.h"
+#include "sxt/field25/base/montgomery.h"
 #include "sxt/field25/constant/zero.h"
+#include "sxt/field25/random/element.h"
 #include "sxt/field25/type/element.h"
 
 using namespace sxt;
 using namespace sxt::f25o;
 
 TEST_CASE("multiplication") {
-  SECTION("of a pre-computed value and zero returns zero") {
-    constexpr f12t::element a{0x14fd599a70a077d8, 0xf10f187e64b9426d, 0x8ee7d30c9b4bab84,
-                              0x1bcd1f840d3ed0f0, 0xcd14c6f310abdc3d, 0x69d558ed64d6a25f};
-    f12t::element ret;
+  SECTION("of a random field element and zero returns zero") {
+    f25t::element a;
+    basn::fast_random_number_generator rng{1, 2};
+    f25rn::generate_random_element(a, rng);
+    f25t::element ret;
 
-    mul(ret, a, f12cn::zero_v);
+    mul(ret, a, f25cn::zero_v);
 
-    REQUIRE(ret == f12cn::zero_v);
+    REQUIRE(ret == f25cn::zero_v);
+  }
+
+  SECTION("of one with itself returns one") {
+    constexpr f25t::element one{f25b::r_v.data()};
+    f25t::element ret;
+
+    mul(ret, one, one);
+
+    REQUIRE(one == ret);
   }
 
   SECTION("of pre-computed values returns expected value") {
-    constexpr f12t::element a{0x0397a38320170cd4, 0x734c1b2c9e761d30, 0x5ed255ad9a48beb5,
-                              0x095a3c6b22a7fcfc, 0x2294ce75d4e26a27, 0x13338bd870011ebb};
-    constexpr f12t::element b{0xb9c3c7c5b1196af7, 0x2580e2086ce335c1, 0xf49aed3d8a57ef42,
-                              0x41f281e49846e878, 0xe0762346c38452ce, 0x0652e89326e57dc0};
-    constexpr f12t::element expected{0xf96ef3d711ab5355, 0xe8d459ea00f148dd, 0x53f7354a5f00fa78,
-                                     0x9e34a4f3125c5f83, 0x3fbe0c47ca74c19e, 0x01b06a8bbd4adfe4};
-    f12t::element ret;
+    // Random bn254 base field element generated using the SAGE library.
+    constexpr f25t::element a{0x5d19786fd5f59520, 0xa80980aec93386cf, 0x6f49109c5fb69712,
+                              0x19803c04269ae364};
+    constexpr f25t::element b{0x0746f2e0932048bf, 0xc05bea62ab71831e, 0x1342f6ebbc9497e9,
+                              0x12b50c2429b1a851};
+    constexpr f25t::element expected{0x241cac338ef8e513, 0x98220ca91953d8c1, 0x0bf0a5fd342762a0,
+                                     0x0e616e612ed86a67};
+    f25t::element ret;
 
     mul(ret, a, b);
 

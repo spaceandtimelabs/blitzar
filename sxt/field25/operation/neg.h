@@ -27,5 +27,5 @@ namespace sxt::f25o {
 // neg
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void neg(f12t::element& h, const f12t::element& f) noexcept;
+void neg(f25t::element& h, const f25t::element& f) noexcept;
 } // namespace sxt::f25o

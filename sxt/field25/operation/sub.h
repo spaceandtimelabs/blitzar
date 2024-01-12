@@ -38,9 +38,9 @@ namespace sxt::f25o {
  * h = f - g
  */
 CUDA_CALLABLE
-inline void sub(f12t::element& h, const f12t::element& f, const f12t::element& g) noexcept {
-  f12t::element neg_g;
-  f12o::neg(neg_g, g);
-  f12o::add(h, f, neg_g);
+inline void sub(f25t::element& h, const f25t::element& f, const f25t::element& g) noexcept {
+  f25t::element neg_g;
+  f25o::neg(neg_g, g);
+  f25o::add(h, f, neg_g);
 }
 } // namespace sxt::f25o
