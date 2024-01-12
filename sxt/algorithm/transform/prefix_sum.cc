@@ -14,8 +14,8 @@ namespace sxt::algtr {
 //--------------------------------------------------------------------------------------------------
 // exclusive_prefix_sum 
 //--------------------------------------------------------------------------------------------------
-void exclusive_prefix_sum(basct::span<unsigned> out, basct::span<unsigned> in,
-                           const basdv::stream& stream) noexcept {
+void exclusive_prefix_sum(basct::span<unsigned> out, basct::cspan<unsigned> in,
+                          const basdv::stream& stream) noexcept {
   auto n = static_cast<int>(out.size());
   if (n == 0) {
     return;
