@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -23,13 +23,13 @@
  *
  * See third_party/license/zkcrypto.LICENSE
  */
-#include "sxt/field12/operation/neg.h"
+#include "sxt/field25/operation/neg.h"
 
 #include "sxt/base/field/arithmetic_utility.h"
-#include "sxt/field12/base/constants.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/base/constants.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::f12o {
+namespace sxt::f25o {
 //--------------------------------------------------------------------------------------------------
 // neg
 //--------------------------------------------------------------------------------------------------
@@ -53,4 +53,4 @@ void neg(f12t::element& h, const f12t::element& f) noexcept {
     h[i] = d[i] & mask;
   }
 }
-} // namespace sxt::f12o
+} // namespace sxt::f25o

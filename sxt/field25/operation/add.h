@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -29,11 +29,11 @@
 
 #include "sxt/base/field/arithmetic_utility.h"
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/field12/base/constants.h"
-#include "sxt/field12/base/subtract_p.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/base/constants.h"
+#include "sxt/field25/base/subtract_p.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::f12o {
+namespace sxt::f25o {
 //--------------------------------------------------------------------------------------------------
 // add
 //--------------------------------------------------------------------------------------------------
@@ -51,4 +51,4 @@ CUDA_CALLABLE inline void add(f12t::element& h, const f12t::element& f,
 
   f12b::subtract_p(h.data(), h_tmp);
 }
-} // namespace sxt::f12o
+} // namespace sxt::f25o

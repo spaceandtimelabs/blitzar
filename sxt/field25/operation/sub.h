@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -26,21 +26,21 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/field12/operation/add.h"
-#include "sxt/field12/operation/neg.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/operation/add.h"
+#include "sxt/field25/operation/neg.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::f12o {
+namespace sxt::f25o {
 //--------------------------------------------------------------------------------------------------
 // sub
 //--------------------------------------------------------------------------------------------------
-/*
- h = f - g
-*/
+/**
+ * h = f - g
+ */
 CUDA_CALLABLE
 inline void sub(f12t::element& h, const f12t::element& f, const f12t::element& g) noexcept {
   f12t::element neg_g;
   f12o::neg(neg_g, g);
   f12o::add(h, f, neg_g);
 }
-} // namespace sxt::f12o
+} // namespace sxt::f25o

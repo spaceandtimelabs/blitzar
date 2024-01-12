@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field12/operation/add.h"
+#include "sxt/field25/operation/add.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/constant/zero.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/constant/zero.h"
+#include "sxt/field25/type/element.h"
 
 using namespace sxt;
-using namespace sxt::f12o;
+using namespace sxt::f25o;
 
 TEST_CASE("addition") {
   SECTION("of pre-computed value and zero returns pre-computed value") {

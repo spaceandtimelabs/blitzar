@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -23,14 +23,14 @@
  *
  * See third_party/license/zkcrypto.LICENSE
  */
-#include "sxt/field12/operation/mul.h"
+#include "sxt/field25/operation/mul.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/constant/zero.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/constant/zero.h"
+#include "sxt/field25/type/element.h"
 
 using namespace sxt;
-using namespace sxt::f12o;
+using namespace sxt::f25o;
 
 TEST_CASE("multiplication") {
   SECTION("of a pre-computed value and zero returns zero") {

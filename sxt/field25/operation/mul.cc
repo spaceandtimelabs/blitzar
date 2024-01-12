@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -23,13 +23,13 @@
  *
  * See third_party/license/zkcrypto.LICENSE
  */
-#include "sxt/field12/operation/mul.h"
+#include "sxt/field25/operation/mul.h"
 
 #include "sxt/base/field/arithmetic_utility.h"
-#include "sxt/field12/base/reduce.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/base/reduce.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::f12o {
+namespace sxt::f25o {
 //--------------------------------------------------------------------------------------------------
 // mul
 //--------------------------------------------------------------------------------------------------
@@ -93,4 +93,4 @@ void mul(f12t::element& h, const f12t::element& f, const f12t::element& g) noexc
 
   f12b::reduce(h.data(), t);
 }
-} // namespace sxt::f12o
+} // namespace sxt::f25o

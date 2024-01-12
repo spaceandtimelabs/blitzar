@@ -18,14 +18,14 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::f12t {
+namespace sxt::f25t {
 class element;
 }
 
-namespace sxt::f12o {
+namespace sxt::f25o {
 //--------------------------------------------------------------------------------------------------
 // neg
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 void neg(f12t::element& h, const f12t::element& f) noexcept;
-} // namespace sxt::f12o
+} // namespace sxt::f25o
