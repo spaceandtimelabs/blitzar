@@ -48,6 +48,8 @@ sxt_cc_component(
     name = "scalar_array",
     deps = [
       "//sxt/base/container:span",
+      "//sxt/base/error:assert",
+      "//sxt/base/device:stream",
     ],
     impl_deps = [
       "//sxt/base/device:memory_utility",
