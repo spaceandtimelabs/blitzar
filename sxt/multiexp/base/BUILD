@@ -43,3 +43,13 @@ sxt_cc_component(
         ":exponent_sequence",
     ],
 )
+
+sxt_cc_component(
+    name = "scalar_array",
+    deps = [
+      "//sxt/base/container:span",
+    ],
+    impl_deps = [
+      "//sxt/base/device:memory_utility",
+    ],
+)
