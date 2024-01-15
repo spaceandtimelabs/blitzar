@@ -133,4 +133,15 @@ TEST_CASE("we can count the number of entries in buckets 2") {
     expected[2 * 2 + 1] = 1;
     REQUIRE(count_array == expected);
   }
+
+  SECTION("we handle multiple outputs") {
+    scalars = {1u, 3u};
+    sxt::mtxbk::count_bucket_entries(count_array, stream, scalars,  1, 1, 2, 8, 1);
+    basdv::synchronize_stream(stream);
+    memmg::managed_array<unsigned> expected(255 * 2);
+    std::fill(expected.begin(), expected.end(), 0);
+    expected[0] = 1;
+    expected[255 + 2] = 1;
+    REQUIRE(count_array == expected);
+  }
 }
