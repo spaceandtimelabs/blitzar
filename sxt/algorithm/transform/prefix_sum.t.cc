@@ -35,4 +35,13 @@ TEST_CASE("we can compute exclusive prefix sums") {
     memmg::managed_array<unsigned> expected = {0, 123};
     REQUIRE(out == expected);
   }
+
+  SECTION("we can also compute a total aggregation") {
+    in = {123, 456};
+    out.resize(3);
+    sxt::algtr::exclusive_prefix_sum(out, in, stream);
+    basdv::synchronize_stream(stream);
+    memmg::managed_array<unsigned> expected = {0, 123, 123 + 456};
+    REQUIRE(out == expected);
+  }
 }

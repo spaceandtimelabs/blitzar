@@ -23,7 +23,10 @@ void exclusive_prefix_sum(basct::span<unsigned> out, basct::cspan<unsigned> in,
   SXT_DEBUG_ASSERT(
       // clang-format off
       out.size() == static_cast<size_t>(n) &&
-      in.size() == static_cast<size_t>(n) &&
+      (in.size() == static_cast<size_t>(n) || in.size() == static_cast<size_t>(n-1)) &&
+              // Note: we allow for `out` to be one larger than `in` as the last element of
+              // `in` isn't referenced. This can be useful if we want to also compute the sum
+              // of all elements
       basdv::is_active_device_pointer(out.data()) &&
       basdv::is_active_device_pointer(in.data())
       // clang-format on
