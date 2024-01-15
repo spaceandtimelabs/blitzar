@@ -92,12 +92,9 @@ TEST_CASE("we can count the number of entries in buckets 2") {
     REQUIRE(count_array == expected);
   }
 
-#if 0
   SECTION("we handle the case of a single entry of 1") {
-    memmg::managed_array<uint8_t> scalars1{memr::get_managed_device_resource()};
-    scalars1 = {1u};
-    scalars = {scalars1.data()};
-    sxt::mtxbk::count_bucket_entries(count_array, stream, scalars, 1, 1, 8, 1);
+    scalars = {1u};
+    sxt::mtxbk::count_bucket_entries(count_array, stream, scalars, 1, 1, 1, 8, 1);
     basdv::synchronize_stream(stream);
     memmg::managed_array<unsigned> expected(255);
     std::fill(expected.begin(), expected.end(), 0);
@@ -106,10 +103,8 @@ TEST_CASE("we can count the number of entries in buckets 2") {
   }
 
   SECTION("we handle the case of a single entry of 2") {
-    memmg::managed_array<uint8_t> scalars1{memr::get_managed_device_resource()};
-    scalars1 = {2u};
-    scalars = {scalars1.data()};
-    sxt::mtxbk::count_bucket_entries(count_array, stream, scalars, 1, 1, 8, 1);
+    scalars = {2u};
+    sxt::mtxbk::count_bucket_entries(count_array, stream, scalars, 1, 1, 1, 8, 1);
     basdv::synchronize_stream(stream);
     memmg::managed_array<unsigned> expected(255);
     std::fill(expected.begin(), expected.end(), 0);
@@ -118,10 +113,8 @@ TEST_CASE("we can count the number of entries in buckets 2") {
   }
 
   SECTION("we handle multiple entries") {
-    memmg::managed_array<uint8_t> scalars1{memr::get_managed_device_resource()};
-    scalars1 = {2u, 2u, 1u};
-    scalars = {scalars1.data()};
-    sxt::mtxbk::count_bucket_entries(count_array, stream, scalars, 3, 1, 8, 1);
+    scalars = {2u, 2u, 1u};
+    sxt::mtxbk::count_bucket_entries(count_array, stream, scalars, 1, 3, 1, 8, 1);
     basdv::synchronize_stream(stream);
     memmg::managed_array<unsigned> expected(255);
     std::fill(expected.begin(), expected.end(), 0);
@@ -131,10 +124,8 @@ TEST_CASE("we can count the number of entries in buckets 2") {
   }
 
   SECTION("we handle multiple partitions") {
-    memmg::managed_array<uint8_t> scalars1{memr::get_managed_device_resource()};
-    scalars1 = {1u, 3u};
-    scalars = {scalars1.data()};
-    sxt::mtxbk::count_bucket_entries(count_array, stream, scalars, 2, 1, 8, 2);
+    scalars = {1u, 3u};
+    sxt::mtxbk::count_bucket_entries(count_array, stream, scalars,  1, 2, 1, 8, 2);
     basdv::synchronize_stream(stream);
     memmg::managed_array<unsigned> expected(255 * 2);
     std::fill(expected.begin(), expected.end(), 0);
@@ -142,5 +133,4 @@ TEST_CASE("we can count the number of entries in buckets 2") {
     expected[2 * 2 + 1] = 1;
     REQUIRE(count_array == expected);
   }
-#endif
 }
