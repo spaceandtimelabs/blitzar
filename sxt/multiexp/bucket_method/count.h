@@ -12,10 +12,6 @@ namespace sxt::mtxbk {
 // count_bucket_entries
 //--------------------------------------------------------------------------------------------------
 void count_bucket_entries(memmg::managed_array<unsigned>& count_array, const basdv::stream& stream,
-                          basct::cspan<uint8_t*> scalars, unsigned n, unsigned element_num_bytes,
-                          unsigned bit_width, unsigned num_partitions) noexcept;
-
-void count_bucket_entries(memmg::managed_array<unsigned>& count_array, const basdv::stream& stream,
                           basct::cspan<uint8_t> scalars, unsigned element_num_bytes, unsigned n,
                           unsigned num_outputs, unsigned bit_width,
                           unsigned num_partitions) noexcept;
