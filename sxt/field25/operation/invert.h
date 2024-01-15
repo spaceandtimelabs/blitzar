@@ -26,5 +26,5 @@ namespace sxt::f25o {
 //--------------------------------------------------------------------------------------------------
 // invert
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE bool invert(f12t::element& h, const f12t::element& f) noexcept;
+CUDA_CALLABLE bool invert(f25t::element& h, const f25t::element& f) noexcept;
 } // namespace sxt::f25o

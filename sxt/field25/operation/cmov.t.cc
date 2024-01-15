@@ -14,23 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field12/operation/cmov.h"
+#include "sxt/field25/operation/cmov.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/constant/one.h"
-#include "sxt/field12/constant/zero.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/constant/one.h"
+#include "sxt/field25/constant/zero.h"
+#include "sxt/field25/type/element.h"
 
 using namespace sxt;
 using namespace sxt::f25o;
 
 TEST_CASE("cmov correctly moves field elements") {
-  f12t::element h{f12cn::zero_v};
-  f12t::element g{f12cn::zero_v};
+  f25t::element h{f25cn::zero_v};
+  f25t::element g{f25cn::zero_v};
 
-  cmov(h, f12cn::one_v, 1);
-  cmov(g, f12cn::one_v, 0);
+  cmov(h, f25cn::one_v, 1);
+  cmov(g, f25cn::one_v, 0);
 
-  REQUIRE(h == f12cn::one_v);
-  REQUIRE(g == f12cn::zero_v);
+  REQUIRE(h == f25cn::one_v);
+  REQUIRE(g == f25cn::zero_v);
 }

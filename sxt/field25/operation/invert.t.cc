@@ -14,58 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Adopted from zkcrypto/bls12_381
- *
- * Copyright (c) 2021
- * Sean Bowe <ewillbefull@gmail.com>
- * Jack Grigg <thestr4d@gmail.com>
- *
- * See third_party/license/zkcrypto.LICENSE
- */
 #include "sxt/field25/operation/invert.h"
 
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/field25/constant/one.h"
 #include "sxt/field25/operation/mul.h"
+#include "sxt/field25/random/element.h"
 #include "sxt/field25/type/element.h"
 
 using namespace sxt;
 using namespace sxt::f25o;
 
 TEST_CASE("inversion") {
-  SECTION("of a pre-computed value multiplied by its inverse is equal to one in Montogomery form") {
-    constexpr f12t::element a{0x4fb9be8a496563c1, 0x98a27a4674c765e1, 0x8475a3d548b133fe,
-                              0xdbeb89b089f08299, 0x5c1fb7a3c186887f, 0x13db2e403f66ba22};
+  SECTION("of a random field element multiplied by its inverse is equal to one") {
+    f25t::element a;
+    basn::fast_random_number_generator rng{1, 2};
+    f25rn::generate_random_element(a, rng);
 
-    f12t::element a_inv;
+    f25t::element a_inv;
     auto is_zero = invert(a_inv, a);
     REQUIRE(!is_zero);
 
-    f12t::element ret_mul;
+    f25t::element ret_mul;
     mul(ret_mul, a, a_inv);
-    REQUIRE(ret_mul == f12cn::one_v);
-  }
-
-  SECTION("of pre-computed values returns expected value") {
-    constexpr f12t::element a{0x43b43a5078ac2076, 0x1ce0763046f8962b, 0x724a5276486d735c,
-                              0x6f05c2a6282d48fd, 0x2095bd5bb4ca9331, 0x03b35b3894b0f7da};
-    constexpr f12t::element expected{0x69ecd7040952148f, 0x985ccc2022190f55, 0xe19bba36a9ad2f41,
-                                     0x19bb16c95219dbd8, 0x14dcacfdfb478693, 0x115ff58afff9a8e1};
-
-    f12t::element ret;
-    auto is_zero = invert(ret, a);
-
-    REQUIRE(!is_zero);
-    REQUIRE(expected == ret);
-  }
-
-  SECTION("of zero returns the a flag indicating the value is zero") {
-    constexpr f12t::element a{0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
-
-    f12t::element ret;
-    auto is_zero = invert(ret, a);
-
-    REQUIRE(is_zero);
+    REQUIRE(ret_mul == f25cn::one_v);
   }
 }

@@ -16,23 +16,26 @@
  */
 #include "sxt/field25/operation/square.h"
 
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/field25/operation/mul.h"
+#include "sxt/field25/random/element.h"
 #include "sxt/field25/type/element.h"
 
 using namespace sxt;
 using namespace sxt::f25o;
 
 TEST_CASE("squaring") {
-  SECTION("of a pre-computed value is equal to the multiplication of the same value with itself") {
-    // Random value between 1 and p_v generated using the SAGE library.
-    constexpr f12t::element a{0x5e14fa3f799a1246, 0xd2684f55323a5290, 0x7f05158a2afce436,
-                              0xe52da61b5953ed17, 0x8ed26f9683921f45, 0x03b2ad9ebab772aa};
+  SECTION(
+      "of a random field element is equal to the multiplication of the same value with itself") {
+    f25t::element a;
+    basn::fast_random_number_generator rng{1, 2};
+    f25rn::generate_random_element(a, rng);
 
-    f12t::element ret_square;
+    f25t::element ret_square;
     square(ret_square, a);
 
-    f12t::element ret_mul;
+    f25t::element ret_mul;
     mul(ret_mul, a, a);
 
     REQUIRE(ret_square == ret_mul);

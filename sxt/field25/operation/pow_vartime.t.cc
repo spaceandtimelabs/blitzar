@@ -26,13 +26,13 @@ using namespace sxt::f25o;
 
 TEST_CASE("pow_varitime") {
   SECTION("of pre-computed values returns expected value") {
-    constexpr f12t::element a{0xaa270000000cfff3, 0x53cc0032fc34000a, 0x478fe97a6b0a807f,
-                              0xb1d37ebee6ba24d7, 0x8ec9733bbf78ab2f, 0x09d645513d83de7e};
-    constexpr f12t::element b{0xee7fbfffffffeaab, 0x07aaffffac54ffff, 0xd9cc34a83dac3d89,
-                              0xd91dd2e13ce144af, 0x92c6e9ed90d2eb35, 0x0680447a8e5ff9a6};
-    constexpr f12t::element expected{0x87ebfffffff9555c, 0x656fffe5da8ffffa, 0xfd0749345d33ad2,
-                                     0xd951e663066576f4, 0xde291a3d41e980d3, 0x815664c7dfe040d};
-    f12t::element ret;
+    constexpr f25t::element a{0xb92e567e0e2f6f1e, 0xc1d6653f0e1b09b, 0x6e52b0b322cdbd45,
+                              0x18c27d738c4b7477};
+    constexpr f25t::element b{0x3c208c16d87cfd45, 0x97816a916871ca8d, 0xb85045b68181585d,
+                              0x30644e72e131a029};
+    constexpr f25t::element expected{0xb513f9d751f64c03, 0x3f7b2093dcebd1f, 0x42276bfa13f711b8,
+                                     0x10b1e99cf9afc988};
+    f25t::element ret;
 
     pow_vartime(ret, a, b);
 

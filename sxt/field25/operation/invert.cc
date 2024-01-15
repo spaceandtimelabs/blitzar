@@ -36,13 +36,15 @@ namespace sxt::f25o {
 /**
  * Computes the multiplicative inverse of this field element,
  * returning FALSE in the case that this element is zero.
+ * A finite field of order p is a cyclic group of order p-1.
+ * Therefore, for any f in Fp: f^{-1} == f^{p-2}.
  */
-CUDA_CALLABLE bool invert(f12t::element& h, const f12t::element& f) noexcept {
-  constexpr f12t::element g(0xb9feffffffffaaa9, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,
-                            0x64774b84f38512bf, 0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a);
+CUDA_CALLABLE bool invert(f25t::element& h, const f25t::element& f) noexcept {
+  constexpr f25t::element p_v_minus_2{0x3c208c16d87cfd45, 0x97816a916871ca8d, 0xb85045b68181585d,
+                                      0x30644e72e131a029};
 
-  f12o::pow_vartime(h, f, g);
+  f25o::pow_vartime(h, f, p_v_minus_2);
 
-  return f12p::is_zero(h);
+  return f25p::is_zero(h);
 }
 } // namespace sxt::f25o

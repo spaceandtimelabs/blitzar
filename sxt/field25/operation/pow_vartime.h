@@ -27,5 +27,5 @@ namespace sxt::f25o {
 // pow_vartime
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void pow_vartime(f12t::element& h, const f12t::element& f, const f12t::element& g) noexcept;
+void pow_vartime(f25t::element& h, const f25t::element& f, const f25t::element& g) noexcept;
 } // namespace sxt::f25o

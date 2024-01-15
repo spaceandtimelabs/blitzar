@@ -32,5 +32,5 @@ namespace sxt::f25o {
  *
  Preconditions: b in {0,1}.
  */
-CUDA_CALLABLE void cmov(f12t::element& f, const f12t::element& g, unsigned int b) noexcept;
+CUDA_CALLABLE void cmov(f25t::element& f, const f25t::element& g, unsigned int b) noexcept;
 } // namespace sxt::f25o

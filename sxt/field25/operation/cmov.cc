@@ -22,7 +22,7 @@ namespace sxt::f25o {
 //--------------------------------------------------------------------------------------------------
 // cmov
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE void cmov(f12t::element& f, const f12t::element& g, unsigned int b) noexcept {
+CUDA_CALLABLE void cmov(f25t::element& f, const f25t::element& g, unsigned int b) noexcept {
   const uint64_t mask = static_cast<uint64_t>(-static_cast<uint64_t>(b));
   for (size_t i = 0; i < g.num_limbs_v; ++i) {
     f[i] = f[i] ^ (mask & (f[i] ^ g[i]));

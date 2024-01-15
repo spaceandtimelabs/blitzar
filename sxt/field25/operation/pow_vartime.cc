@@ -38,11 +38,11 @@ namespace sxt::f25o {
  * Although this is labeled "vartime", it is only variable time with respect to the exponent.
  */
 CUDA_CALLABLE
-void pow_vartime(f12t::element& h, const f12t::element& f, const f12t::element& g) noexcept {
-  f12t::element res = f12cn::one_v;
+void pow_vartime(f25t::element& h, const f25t::element& f, const f25t::element& g) noexcept {
+  f25t::element res = f25cn::one_v;
 
-  for (int i = 5; i >= 0; --i) {
-    f12t::element res_tmp;
+  for (int i = 3; i >= 0; --i) {
+    f25t::element res_tmp;
     for (int j = 63; j >= 0; --j) {
       square(res_tmp, res);
       res = res_tmp;

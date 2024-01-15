@@ -27,5 +27,5 @@ namespace sxt::f25o {
 // square
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void square(f12t::element& h, const f12t::element& f) noexcept;
+void square(f25t::element& h, const f25t::element& f) noexcept;
 } // namespace sxt::f25o
