@@ -54,4 +54,10 @@ sxt_cc_component(
     impl_deps = [
       "//sxt/base/device:memory_utility",
     ],
+    test_deps = [
+      "//sxt/base/device:stream",
+      "//sxt/base/device:synchronization",
+      "//sxt/memory/management:managed_array",
+      "//sxt/memory/resource:managed_device_resource",
+    ],
 )
