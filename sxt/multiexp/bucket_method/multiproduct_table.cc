@@ -1,10 +1,13 @@
 #include "sxt/multiexp/bucket_method/multiproduct_table.h"
 
 #include "sxt/algorithm/transform/prefix_sum.h"
+#include "sxt/base/container/span_utility.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/base/scalar_array.h"
 #include "sxt/multiexp/bucket_method/count.h"
 
@@ -39,6 +42,10 @@ xena::future<> compute_multiproduct_table_part1(memmg::managed_array<unsigned>& 
   memmg::managed_array<unsigned> bucket_count_sums{bucket_count_array.size()+1, &resource};
   algtr::exclusive_prefix_sum(bucket_count_sums, bucket_count_array, stream);
 
+  // indexes
+  memmg::managed_array<unsigned> index_count{1, memr::get_pinned_resource()};
+  basdv::async_copy_device_to_host(
+      index_count, basct::subspan(bucket_count_sums, bucket_count_array.size()), stream);
   (void)bucket_counts;
   (void)indexes;
   (void)stream;

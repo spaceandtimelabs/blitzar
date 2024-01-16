@@ -122,6 +122,8 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/multiexp/base:scalar_array",
+        "//sxt/base/container:span_utility",
+        "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",
         "//sxt/base/num:divide_up",
