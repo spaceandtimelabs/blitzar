@@ -117,6 +117,7 @@ sxt_cc_component(
         "//sxt/execution/schedule:scheduler",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
+        "//sxt/base/device:synchronization",
         "//sxt/base/device:stream",
         "//sxt/base/test:unit_test",
     ],

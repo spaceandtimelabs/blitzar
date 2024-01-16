@@ -40,7 +40,6 @@ static __global__ void fill_index_kernel(unsigned* __restrict__ indexes,
   offsets += bucket_group_index * num_buckets_per_group * num_partitions;
   offsets += partition_index;
 
-  indexes += *offsets;
   scalars += output_index * element_num_bytes * n;
   auto byte_width = basn::divide_up(bit_width, 8u);
   for (unsigned i = partition_index; i < n; i += num_partitions) {
@@ -74,7 +73,6 @@ xena::future<> fill_multiproduct_indexes(memmg::managed_array<unsigned>& bucket_
   }
   auto num_outputs = scalars.size();
   auto num_bucket_groups = basn::divide_up(element_num_bytes * 8u, bit_width);
-  auto num_buckets_per_group = (1u << bit_width) - 1u;
   auto num_partitions = std::min(n, max_num_partitions_v);
   memr::async_device_resource resource{stream};
 
@@ -111,7 +109,6 @@ xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor
                                           basct::cspan<const uint8_t*> scalars,
                                           unsigned element_num_bytes, unsigned n,
                                           unsigned bit_width) noexcept {
-  auto num_outputs = scalars.size();
   memr::async_device_resource resource{stream};
 
   // part 1
