@@ -4,6 +4,7 @@
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/synchronization.h"
@@ -68,6 +69,9 @@ xena::future<> fill_multiproduct_indexes(memmg::managed_array<unsigned>& bucket_
                                          basct::cspan<const uint8_t*> scalars,
                                          unsigned element_num_bytes, unsigned n,
                                          unsigned bit_width) noexcept {
+  if (n == 0) {
+    co_return;
+  }
   auto num_outputs = scalars.size();
   auto num_bucket_groups = basn::divide_up(element_num_bytes * 8u, bit_width);
   auto num_buckets_per_group = (1u << bit_width) - 1u;
