@@ -1,5 +1,6 @@
 #include "sxt/multiexp/bucket_method/multiproduct_table.h"
 
+#include "sxt/algorithm/transform/prefix_sum.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/memory/management/managed_array.h"
@@ -33,6 +34,11 @@ xena::future<> compute_multiproduct_table_part1(memmg::managed_array<unsigned>& 
   memmg::managed_array<unsigned> bucket_count_array{&resource};
   count_bucket_entries(bucket_count_array, stream, scalar_array, element_num_bytes, n, num_outputs,
                        bit_width, max_num_partitions_v);
+
+  // bucket_count_sums
+  memmg::managed_array<unsigned> bucket_count_sums{bucket_count_array.size()+1, &resource};
+  algtr::exclusive_prefix_sum(bucket_count_sums, bucket_count_array, stream);
+
   (void)bucket_counts;
   (void)indexes;
   (void)stream;
@@ -47,27 +53,20 @@ xena::future<> compute_multiproduct_table_part1(memmg::managed_array<unsigned>& 
 // compute_multiproduct_table
 //--------------------------------------------------------------------------------------------------
 xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor>& table,
-                                              memmg::managed_array<unsigned>& indexes,
-                                              const basdv::stream& stream,
-                                              basct::cspan<const uint8_t*> scalars,
-                                              unsigned element_num_bytes, unsigned n,
-                                              unsigned bit_width) noexcept {
+                                          memmg::managed_array<unsigned>& indexes,
+                                          const basdv::stream& stream,
+                                          basct::cspan<const uint8_t*> scalars,
+                                          unsigned element_num_bytes, unsigned n,
+                                          unsigned bit_width) noexcept {
   auto num_outputs = scalars.size();
   memr::async_device_resource resource{stream};
 
-  // scalar_array
-  memmg::managed_array<uint8_t> scalar_array{num_outputs * element_num_bytes * n, &resource};
-  mtxb::make_device_scalar_array(scalar_array, stream, scalars, element_num_bytes, n);
+  // part 1
+  memmg::managed_array<unsigned> bucket_counts{&resource};
+  auto part1_fut = compute_multiproduct_table_part1(bucket_counts, indexes, stream, scalars,
+                                                    element_num_bytes, n, bit_width);
 
-  // bucket_count_array
-  memmg::managed_array<unsigned> bucket_count_array{&resource};
-  count_bucket_entries(bucket_count_array, stream, scalar_array, element_num_bytes, n, num_outputs,
-                       bit_width, max_num_partitions_v);
-
-  (void)table;
-  (void)indexes;
-  (void)scalars;
-  (void)element_num_bytes;
-  (void)bit_width;
+  // part 2
+  co_await std::move(part1_fut);
 }
 } // namespace sxt::mtxbk
