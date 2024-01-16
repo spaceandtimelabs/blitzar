@@ -113,6 +113,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "multiproduct_table",
     test_deps = [
+      ":bucket_descriptor",
         "//sxt/execution/async:future",
         "//sxt/execution/schedule:scheduler",
         "//sxt/memory/management:managed_array",

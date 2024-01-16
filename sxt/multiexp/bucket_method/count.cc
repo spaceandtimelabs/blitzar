@@ -22,7 +22,7 @@ static __global__ void count_bucket_entries_kernel(unsigned* __restrict__ count_
   unsigned bucket_group_index = threadIdx.y;
   unsigned partition_index = blockIdx.x;
   unsigned num_partitions = gridDim.x;
-  unsigned num_buckets_per_group = (1u << bit_width) - 1;
+  unsigned num_buckets_per_group = (1u << bit_width) - 1u;
   unsigned num_bucket_groups = blockDim.y;
   auto bucket_counts = count_array;
   bucket_counts += output_index * num_bucket_groups * num_buckets_per_group * num_partitions;
