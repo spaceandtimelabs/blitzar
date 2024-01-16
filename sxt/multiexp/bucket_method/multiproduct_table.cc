@@ -163,7 +163,7 @@ fill_multiproduct_indexes(memmg::managed_array<bucket_descriptor>& bucket_descri
 }
 
 xena::future<>
-fill_multiproduct_indexes(memmg::managed_array<unsigned> bucket_counts,
+fill_multiproduct_indexes(memmg::managed_array<unsigned>& bucket_counts,
                           memmg::managed_array<bucket_descriptor>& bucket_descriptors,
                           memmg::managed_array<unsigned>& indexes, const basdv::stream& stream,
                           basct::cspan<const uint8_t*> scalars, unsigned element_num_bytes,
@@ -237,5 +237,6 @@ xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor
   cub::DeviceRadixSort::SortPairs(temp_storage.data(), temp_storage_num_bytes, bucket_counts.data(),
                                   bucket_counts_p.data(), bucket_descriptors.data(), table.data(),
                                   num_buckets, 0, sizeof(unsigned) * 8u, stream);
+  co_await xendv::await_stream(stream);
 }
 } // namespace sxt::mtxbk

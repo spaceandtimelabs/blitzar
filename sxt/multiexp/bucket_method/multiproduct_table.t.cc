@@ -1,6 +1,7 @@
 #include "sxt/multiexp/bucket_method/multiproduct_table.h"
 
 #include <vector>
+#include <iostream>
 
 #include "sxt/base/device/stream.h"
 #include "sxt/base/device/synchronization.h"
@@ -122,13 +123,35 @@ TEST_CASE(
 }
 
 TEST_CASE("we can compute the multiproduct table used for the bucket method") {
-  /* memmg::managed_array<bucket_descriptor> table{memr::get_managed_device_resource()}; */
-  /* memmg::managed_array<unsigned> indexes{memr::get_managed_device_resource()}; */
-  /* basdv::stream stream; */
-/* xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor>& table, */
-/*                                           memmg::managed_array<unsigned>& indexes, */
-/*                                           const basdv::stream& stream, */
-/*                                           basct::cspan<const uint8_t*> scalars, */
-/*                                           unsigned element_num_bytes, unsigned n, */
-/*                                           unsigned bit_width) noexcept; */
+  memmg::managed_array<bucket_descriptor> table{memr::get_managed_device_resource()};
+  memmg::managed_array<unsigned> indexes{memr::get_managed_device_resource()};
+
+  SECTION("we can compute the multiproduct table for the bucket method") {
+    std::vector<uint8_t> scalars1 = {2u, 1u, 2u};
+    std::vector<const uint8_t*> scalars = {scalars1.data()};
+    auto fut = sxt::mtxbk::compute_multiproduct_table(table, indexes, scalars, 1, 3, 8);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    memmg::managed_array<unsigned> expected_indexes = {1, 0, 2};
+    REQUIRE(indexes == expected_indexes);
+    memmg::managed_array<bucket_descriptor> expected_table(255u);
+    expected_table[253] = {
+          .num_entries = 1,
+          .bucket_index = 0,
+          .entry_first = 0,
+    };
+    expected_table[254] = {
+          .num_entries = 2,
+          .bucket_index = 1,
+          .entry_first = 1,
+    };
+    for (unsigned i = 2; i < 255u; ++i) {
+      expected_table[i - 2] = {
+          .num_entries = 0,
+          .bucket_index = i,
+          .entry_first = 3,
+      };
+    }
+    REQUIRE(table == expected_table);
+  }
 }
