@@ -10,9 +10,19 @@ namespace sxt::mtxbk {
 struct bucket_descriptor;
 
 //--------------------------------------------------------------------------------------------------
+// compute_multiproduct_table_part1 
+//--------------------------------------------------------------------------------------------------
+xena::future<> compute_multiproduct_table_part1(memmg::managed_array<unsigned>& bucket_counts,
+                                                memmg::managed_array<unsigned>& indexes,
+                                                const basdv::stream& stream,
+                                                basct::cspan<const uint8_t*> scalars,
+                                                unsigned element_num_bytes, unsigned n,
+                                                unsigned bit_width) noexcept;
+
+//--------------------------------------------------------------------------------------------------
 // compute_multiproduct_table
 //--------------------------------------------------------------------------------------------------
-xena::future<void> compute_multiproduct_table(memmg::managed_array<bucket_descriptor>& table,
+xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor>& table,
                                               memmg::managed_array<unsigned>& indexes,
                                               const basdv::stream& stream,
                                               basct::cspan<const uint8_t*> scalars,
