@@ -220,20 +220,22 @@ xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor
   memr::async_device_resource resource{stream};
 
   // fill indexes
+  memmg::managed_array<unsigned> bucket_counts{&resource};
   memmg::managed_array<bucket_descriptor> bucket_descriptors{&resource};
-  co_await fill_multiproduct_indexes(bucket_descriptors, indexes, stream, scalars,
+  co_await fill_multiproduct_indexes(bucket_counts, bucket_descriptors, indexes, stream, scalars,
                                      element_num_bytes, n, bit_width);
+  auto num_buckets = bucket_descriptors.size();
 
   // sort bucket descriptors
-  (void)bucket_descriptors;
-  /* auto num_buckets = bucket_descriptors.size(); */
-  /* table.resize(num_buckets); */
-  /* size_t temp_storage_num_bytes = 0; */
-  /* cub::DeviceRadixSort::SortKeys(nullptr, temp_storage_num_bytes, bucket_descriptors.data(), */
-  /*                                table.data(), num_buckets, 0, sizeof(unsigned) * 8u, stream); */
-  /* memmg::managed_array<std::byte> temp_storage{temp_storage_num_bytes, &resource}; */
-  /* cub::DeviceRadixSort::SortKeys(temp_storage.data(), temp_storage_num_bytes, */
-  /*                                bucket_descriptors.data(), table.data(), num_buckets, 0, */
-  /*                                sizeof(unsigned) * 8u, stream); */
+  memmg::managed_array<unsigned> bucket_counts_p{num_buckets, &resource};
+  table.resize(num_buckets);
+  size_t temp_storage_num_bytes = 0;
+  cub::DeviceRadixSort::SortPairs(nullptr, temp_storage_num_bytes, bucket_counts.data(),
+                                  bucket_counts_p.data(), bucket_descriptors.data(), table.data(),
+                                  num_buckets, 0, sizeof(unsigned) * 8u, stream);
+  memmg::managed_array<std::byte> temp_storage{temp_storage_num_bytes, &resource};
+  cub::DeviceRadixSort::SortPairs(temp_storage.data(), temp_storage_num_bytes, bucket_counts.data(),
+                                  bucket_counts_p.data(), bucket_descriptors.data(), table.data(),
+                                  num_buckets, 0, sizeof(unsigned) * 8u, stream);
 }
 } // namespace sxt::mtxbk
