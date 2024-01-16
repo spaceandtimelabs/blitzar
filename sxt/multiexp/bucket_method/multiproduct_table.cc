@@ -4,7 +4,9 @@
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
@@ -21,8 +23,8 @@ const unsigned max_num_partitions_v = 64;
 // index_kernel
 //--------------------------------------------------------------------------------------------------
 static __global__ void index_kernel(unsigned* indexes, const unsigned* count_sums,
-                                    const uint8_t* scalars, unsigned element_num_bytes,
-                                    unsigned bit_width, unsigned n) {
+                                    const uint8_t* scalars, unsigned element_num_bytes, unsigned n,
+                                    unsigned bit_width) {
   (void)indexes;
   (void)count_sums;
   (void)scalars;
@@ -69,6 +71,9 @@ xena::future<> compute_multiproduct_table_part1(memmg::managed_array<unsigned>& 
                                                 unsigned element_num_bytes, unsigned n,
                                                 unsigned bit_width) noexcept {
   auto num_outputs = scalars.size();
+  auto num_bucket_groups = basn::divide_up(element_num_bytes * 8u, bit_width);
+  auto num_buckets_per_group = (1u << bit_width) - 1u;
+  auto num_partitions = std::min(n, max_num_partitions_v);
   memr::async_device_resource resource{stream};
 
   // scalar_array
@@ -78,7 +83,7 @@ xena::future<> compute_multiproduct_table_part1(memmg::managed_array<unsigned>& 
   // bucket_count_array
   memmg::managed_array<unsigned> bucket_count_array{&resource};
   count_bucket_entries(bucket_count_array, stream, scalar_array, element_num_bytes, n, num_outputs,
-                       bit_width, max_num_partitions_v);
+                       bit_width, num_partitions);
 
   // bucket_count_sums
   memmg::managed_array<unsigned> bucket_count_sums{bucket_count_array.size()+1, &resource};
@@ -88,17 +93,11 @@ xena::future<> compute_multiproduct_table_part1(memmg::managed_array<unsigned>& 
   memmg::managed_array<unsigned> index_count{1, memr::get_pinned_resource()};
   basdv::async_copy_device_to_host(
       index_count, basct::subspan(bucket_count_sums, bucket_count_array.size()), stream);
-  (void)index_kernel;
-  /* index_kernel<<<num_partitions, dim3(num_outputs, num_bucket_groups, 1), 0, stream>>>( */
-  /*     count_array.data(), scalars.data(), element_num_bytes, bit_width, n); */
-  (void)bucket_counts;
-  (void)indexes;
-  (void)stream;
-  (void)scalars;
-  (void)element_num_bytes;
-  (void)n;
-  (void)bit_width;
-  return {};
+  co_await xendv::await_stream(stream);
+  indexes.resize(index_count[0]);
+  index_kernel<<<num_partitions, dim3(num_outputs, num_bucket_groups, 1), 0, stream>>>(
+      indexes.data(), bucket_count_sums.data(), scalar_array.data(), element_num_bytes, n,
+      bit_width);
 }
 
 //--------------------------------------------------------------------------------------------------

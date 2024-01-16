@@ -119,6 +119,7 @@ sxt_cc_component(
       ":count",
         "//sxt/algorithm/transform:prefix_sum",
         "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:synchronization",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/multiexp/base:scalar_array",
