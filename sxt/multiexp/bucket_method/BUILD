@@ -137,6 +137,7 @@ sxt_cc_component(
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",
         "//sxt/base/num:divide_up",
+        "@local_cuda//:cub",
     ],
     deps = [
         "//sxt/execution/async:future_fwd",

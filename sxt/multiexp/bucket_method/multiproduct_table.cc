@@ -1,5 +1,10 @@
 #include "sxt/multiexp/bucket_method/multiproduct_table.h"
 
+#include <exception> // https://github.com/NVIDIA/cccl/issues/1278
+#include <limits>
+
+#include "cub/cub.cuh"
+
 #include "sxt/algorithm/transform/prefix_sum.h"
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
@@ -16,6 +21,16 @@
 #include "sxt/multiexp/bucket_method/bucket_descriptor.h"
 #include "sxt/multiexp/bucket_method/count.h"
 
+namespace cub {
+template <>
+struct Traits<sxt::mtxbk::bucket_descriptor> {
+  using UnsignedBits = unsigned;
+  static constexpr unsigned LOWEST_KEY = 0;
+  static constexpr unsigned MAX_KEY = std::numeric_limits<unsigned>::max();
+};
+} // namespace cub
+
+/* typedef typename Traits<KeyT>::UnsignedBits UnsignedBits; */
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 // max_num_partitions_v
@@ -138,18 +153,21 @@ xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor
                                           unsigned bit_width) noexcept {
   memr::async_device_resource resource{stream};
 
-  // part 1
+  // fill indexes
   memmg::managed_array<bucket_descriptor> bucket_descriptors{&resource};
-  auto part1_fut = fill_multiproduct_indexes(bucket_descriptors, indexes, stream, scalars,
-                                             element_num_bytes, n, bit_width);
+  co_await fill_multiproduct_indexes(bucket_descriptors, indexes, stream, scalars,
+                                     element_num_bytes, n, bit_width);
 
-  (void)fill_bucket_descriptors_kernel;
-  // part 2
-  co_await std::move(part1_fut);
-/* struct bucket_descriptor { */
-/*   unsigned num_entries; */
-/*   unsigned bucket_index; */
-/*   unsigned entry_first; */
-/* }; */
+  // sort bucket descriptors
+  (void)bucket_descriptors;
+  /* auto num_buckets = bucket_descriptors.size(); */
+  /* table.resize(num_buckets); */
+  /* size_t temp_storage_num_bytes = 0; */
+  /* cub::DeviceRadixSort::SortKeys(nullptr, temp_storage_num_bytes, bucket_descriptors.data(), */
+  /*                                table.data(), num_buckets, 0, sizeof(unsigned) * 8u, stream); */
+  /* memmg::managed_array<std::byte> temp_storage{temp_storage_num_bytes, &resource}; */
+  /* cub::DeviceRadixSort::SortKeys(temp_storage.data(), temp_storage_num_bytes, */
+  /*                                bucket_descriptors.data(), table.data(), num_buckets, 0, */
+  /*                                sizeof(unsigned) * 8u, stream); */
 }
 } // namespace sxt::mtxbk
