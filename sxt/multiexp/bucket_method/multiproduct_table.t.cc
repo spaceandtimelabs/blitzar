@@ -128,29 +128,55 @@ TEST_CASE(
     REQUIRE(bucket_descriptors == expected_descriptors);
   }
 
-#if 0
   SECTION("we handle an n == 2 case with the same scalar") {
     std::vector<uint8_t> scalars1 = {1u, 1u};
     std::vector<const uint8_t*> scalars = {scalars1.data()};
-    auto fut = fill_multiproduct_indexes(bucket_counts, indexes, stream, scalars, 1, 2, 8);
+    auto fut = fill_multiproduct_indexes(bucket_descriptors, indexes, stream, scalars, 1, 2, 8);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_stream(stream);
-    memmg::managed_array<unsigned> expected = {0, 1};
-    REQUIRE(indexes == expected);
+    memmg::managed_array<unsigned> expected_indexes = {0, 1};
+    REQUIRE(indexes == expected_indexes);
+    memmg::managed_array<bucket_descriptor> expected_descriptors(255u);
+    expected_descriptors[0] = {
+          .num_entries = 2,
+          .bucket_index = 0,
+          .entry_first = 0,
+    };
+    for (unsigned i = 1; i < 255u; ++i) {
+      expected_descriptors[i] = {
+          .num_entries = 0,
+          .bucket_index = i,
+          .entry_first = 2,
+      };
+    }
+    REQUIRE(bucket_descriptors == expected_descriptors);
   }
 
   SECTION("we handle an n == 2 case with zero scalars") {
     std::vector<uint8_t> scalars1 = {0u, 1u};
     std::vector<const uint8_t*> scalars = {scalars1.data()};
-    auto fut = fill_multiproduct_indexes(bucket_counts, indexes, stream, scalars, 1, 2, 8);
+    auto fut = fill_multiproduct_indexes(bucket_descriptors, indexes, stream, scalars, 1, 2, 8);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_stream(stream);
-    memmg::managed_array<unsigned> expected = {1};
-    REQUIRE(indexes == expected);
+    memmg::managed_array<unsigned> expected_indexes = {1};
+    REQUIRE(indexes == expected_indexes);
+    memmg::managed_array<bucket_descriptor> expected_descriptors(255u);
+    expected_descriptors[0] = {
+          .num_entries = 1,
+          .bucket_index = 0,
+          .entry_first = 0,
+    };
+    for (unsigned i = 1; i < 255u; ++i) {
+      expected_descriptors[i] = {
+          .num_entries = 0,
+          .bucket_index = i,
+          .entry_first = 1,
+      };
+    }
+    REQUIRE(bucket_descriptors == expected_descriptors);
   }
-#endif
 }
 
 TEST_CASE("we can compute the multiproduct table used for the bucket method") {
