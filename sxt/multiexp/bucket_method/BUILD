@@ -122,6 +122,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     impl_deps = [
+      ":bucket_descriptor",
       ":count",
       "//sxt/multiexp/base:digit_utility",
         "//sxt/algorithm/transform:prefix_sum",

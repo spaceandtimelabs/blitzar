@@ -13,11 +13,17 @@ struct bucket_descriptor;
 // fill_multiproduct_indexes 
 //--------------------------------------------------------------------------------------------------
 xena::future<> fill_multiproduct_indexes(memmg::managed_array<unsigned>& bucket_counts,
-                                                memmg::managed_array<unsigned>& indexes,
-                                                const basdv::stream& stream,
-                                                basct::cspan<const uint8_t*> scalars,
-                                                unsigned element_num_bytes, unsigned n,
-                                                unsigned bit_width) noexcept;
+                                         memmg::managed_array<unsigned>& indexes,
+                                         const basdv::stream& stream,
+                                         basct::cspan<const uint8_t*> scalars,
+                                         unsigned element_num_bytes, unsigned n,
+                                         unsigned bit_width) noexcept;
+
+xena::future<>
+fill_multiproduct_indexes(memmg::managed_array<bucket_descriptor>& bucket_descriptors,
+                          memmg::managed_array<unsigned>& indexes, const basdv::stream& stream,
+                          basct::cspan<const uint8_t*> scalars, unsigned element_num_bytes,
+                          unsigned n, unsigned bit_width) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // compute_multiproduct_table
