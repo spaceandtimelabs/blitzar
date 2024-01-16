@@ -96,6 +96,26 @@ static __global__ void fill_bucket_descriptors_kernel(bucket_descriptor* __restr
   };
 }
 
+static __global__ void fill_bucket_descriptors_kernel(unsigned* __restrict__ counts,
+                                                      bucket_descriptor* __restrict__ descriptors,
+                                                      const unsigned* __restrict__ offsets,
+                                                      unsigned num_partitions,
+                                                      unsigned num_buckets) noexcept {
+  auto bucket_index = threadIdx.x + blockIdx.x * blockDim.x;
+  if (bucket_index >= num_buckets) {
+    return;
+  }
+  offsets += bucket_index * num_partitions;
+  auto first = *offsets;
+  auto num_entries = *(offsets + num_partitions) - first;
+  counts[bucket_index] = num_entries;
+  descriptors[bucket_index] = {
+      .num_entries = num_entries,
+      .bucket_index = bucket_index,
+      .entry_first = first,
+  };
+}
+
 //--------------------------------------------------------------------------------------------------
 // fill_multiproduct_indexes 
 //--------------------------------------------------------------------------------------------------
@@ -130,6 +150,52 @@ fill_multiproduct_indexes(memmg::managed_array<bucket_descriptor>& bucket_descri
   bucket_descriptors.resize(num_buckets);
   fill_bucket_descriptors_kernel<<<basn::divide_up(num_buckets, 256u), 256u, 0, stream>>>(
       bucket_descriptors.data(), bucket_count_sums.data(), num_partitions, num_buckets);
+
+  // indexes
+  memmg::managed_array<unsigned> index_count{1, memr::get_pinned_resource()};
+  basdv::async_copy_device_to_host(
+      index_count, basct::subspan(bucket_count_sums, bucket_count_sums.size() - 1), stream);
+  co_await xendv::await_stream(stream);
+  indexes.resize(index_count[0]);
+  fill_index_kernel<<<num_partitions, dim3(num_outputs, num_bucket_groups, 1), 0, stream>>>(
+      indexes.data(), bucket_count_sums.data(), scalar_array.data(), element_num_bytes, n,
+      bit_width);
+}
+
+xena::future<>
+fill_multiproduct_indexes(memmg::managed_array<unsigned> bucket_counts,
+                          memmg::managed_array<bucket_descriptor>& bucket_descriptors,
+                          memmg::managed_array<unsigned>& indexes, const basdv::stream& stream,
+                          basct::cspan<const uint8_t*> scalars, unsigned element_num_bytes,
+                          unsigned n, unsigned bit_width) noexcept {
+  if (n == 0) {
+    co_return;
+  }
+  auto num_outputs = static_cast<unsigned>(scalars.size());
+  auto num_bucket_groups = basn::divide_up(element_num_bytes * 8u, bit_width);
+  auto num_buckets_per_group = (1u << bit_width) - 1u;
+  auto num_buckets = num_outputs * num_bucket_groups * num_buckets_per_group;
+  auto num_partitions = std::min(n, max_num_partitions_v);
+  memr::async_device_resource resource{stream};
+
+  // scalar_array
+  memmg::managed_array<uint8_t> scalar_array{num_outputs * element_num_bytes * n, &resource};
+  mtxb::make_device_scalar_array(scalar_array, stream, scalars, element_num_bytes, n);
+
+  // bucket_count_sums
+  memmg::managed_array<unsigned> bucket_count_array{&resource};
+  count_bucket_entries(bucket_count_array, stream, scalar_array, element_num_bytes, n, num_outputs,
+                       bit_width, num_partitions);
+  memmg::managed_array<unsigned> bucket_count_sums{bucket_count_array.size() + 1, &resource};
+  algtr::exclusive_prefix_sum(bucket_count_sums, bucket_count_array, stream);
+  bucket_count_array.reset();
+
+  // bucket_descriptors
+  bucket_counts.resize(num_buckets);
+  bucket_descriptors.resize(num_buckets);
+  fill_bucket_descriptors_kernel<<<basn::divide_up(num_buckets, 256u), 256u, 0, stream>>>(
+      bucket_counts.data(), bucket_descriptors.data(), bucket_count_sums.data(), num_partitions,
+      num_buckets);
 
   // indexes
   memmg::managed_array<unsigned> index_count{1, memr::get_pinned_resource()};
