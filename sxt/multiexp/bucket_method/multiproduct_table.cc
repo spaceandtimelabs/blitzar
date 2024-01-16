@@ -18,6 +18,48 @@ namespace sxt::mtxbk {
 const unsigned max_num_partitions_v = 64;
 
 //--------------------------------------------------------------------------------------------------
+// index_kernel
+//--------------------------------------------------------------------------------------------------
+static __global__ void index_kernel(unsigned* indexes, const unsigned* count_sums,
+                                    const uint8_t* scalars, unsigned element_num_bytes,
+                                    unsigned bit_width, unsigned n) {
+  (void)indexes;
+  (void)count_sums;
+  (void)scalars;
+  (void)element_num_bytes;
+  (void)bit_width;
+  (void)n;
+#if 0
+  unsigned output_index = threadIdx.x;
+  unsigned bucket_group_index = threadIdx.y;
+  unsigned partition_index = blockIdx.x;
+  unsigned num_partitions = gridDim.x;
+  unsigned num_buckets_per_group = (1u << bit_width) - 1;
+  unsigned num_bucket_groups = blockDim.y;
+  auto bucket_counts = count_array;
+  bucket_counts += output_index * num_bucket_groups * num_buckets_per_group * num_partitions;
+  bucket_counts += bucket_group_index * num_buckets_per_group * num_partitions;
+  bucket_counts += partition_index;
+  for (unsigned count_index = 0; count_index < num_buckets_per_group; ++count_index) {
+    *(bucket_counts + count_index * num_partitions) = 0;
+  }
+  scalars += output_index * element_num_bytes * n;
+  auto byte_width = basn::divide_up(bit_width, 8u);
+  for (unsigned i = partition_index; i < n; i += num_partitions) {
+    basct::cspan<uint8_t> scalar{
+        scalars + i * element_num_bytes,
+        element_num_bytes,
+    };
+    unsigned digit = 0;
+    mtxb::extract_digit({reinterpret_cast<uint8_t*>(&digit), byte_width}, scalar, bit_width,
+                        bucket_group_index);
+    auto count_index = max(digit, 1) - 1;
+    *(bucket_counts + count_index * num_partitions) += digit != 0;
+  }
+#endif
+}
+
+//--------------------------------------------------------------------------------------------------
 // compute_multiproduct_table_part1 
 //--------------------------------------------------------------------------------------------------
 xena::future<> compute_multiproduct_table_part1(memmg::managed_array<unsigned>& bucket_counts,
@@ -46,6 +88,9 @@ xena::future<> compute_multiproduct_table_part1(memmg::managed_array<unsigned>& 
   memmg::managed_array<unsigned> index_count{1, memr::get_pinned_resource()};
   basdv::async_copy_device_to_host(
       index_count, basct::subspan(bucket_count_sums, bucket_count_array.size()), stream);
+  (void)index_kernel;
+  /* index_kernel<<<num_partitions, dim3(num_outputs, num_bucket_groups, 1), 0, stream>>>( */
+  /*     count_array.data(), scalars.data(), element_num_bytes, bit_width, n); */
   (void)bucket_counts;
   (void)indexes;
   (void)stream;
