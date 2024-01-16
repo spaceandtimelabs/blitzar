@@ -20,9 +20,9 @@ namespace sxt::mtxbk {
 const unsigned max_num_partitions_v = 64;
 
 //--------------------------------------------------------------------------------------------------
-// index_kernel
+// fill_index_kernel
 //--------------------------------------------------------------------------------------------------
-static __global__ void index_kernel(unsigned* indexes, const unsigned* count_sums,
+static __global__ void fill_index_kernel(unsigned* indexes, const unsigned* count_sums,
                                     const uint8_t* scalars, unsigned element_num_bytes, unsigned n,
                                     unsigned bit_width) {
   (void)indexes;
@@ -62,14 +62,14 @@ static __global__ void index_kernel(unsigned* indexes, const unsigned* count_sum
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_multiproduct_table_part1 
+// fill_multiproduct_indexes 
 //--------------------------------------------------------------------------------------------------
-xena::future<> compute_multiproduct_table_part1(memmg::managed_array<unsigned>& bucket_counts,
-                                                memmg::managed_array<unsigned>& indexes,
-                                                const basdv::stream& stream,
-                                                basct::cspan<const uint8_t*> scalars,
-                                                unsigned element_num_bytes, unsigned n,
-                                                unsigned bit_width) noexcept {
+xena::future<> fill_multiproduct_indexes(memmg::managed_array<unsigned>& bucket_counts,
+                                         memmg::managed_array<unsigned>& indexes,
+                                         const basdv::stream& stream,
+                                         basct::cspan<const uint8_t*> scalars,
+                                         unsigned element_num_bytes, unsigned n,
+                                         unsigned bit_width) noexcept {
   auto num_outputs = scalars.size();
   auto num_bucket_groups = basn::divide_up(element_num_bytes * 8u, bit_width);
   auto num_buckets_per_group = (1u << bit_width) - 1u;
@@ -95,7 +95,7 @@ xena::future<> compute_multiproduct_table_part1(memmg::managed_array<unsigned>& 
       index_count, basct::subspan(bucket_count_sums, bucket_count_array.size()), stream);
   co_await xendv::await_stream(stream);
   indexes.resize(index_count[0]);
-  index_kernel<<<num_partitions, dim3(num_outputs, num_bucket_groups, 1), 0, stream>>>(
+  fill_index_kernel<<<num_partitions, dim3(num_outputs, num_bucket_groups, 1), 0, stream>>>(
       indexes.data(), bucket_count_sums.data(), scalar_array.data(), element_num_bytes, n,
       bit_width);
 }
@@ -114,7 +114,7 @@ xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor
 
   // part 1
   memmg::managed_array<unsigned> bucket_counts{&resource};
-  auto part1_fut = compute_multiproduct_table_part1(bucket_counts, indexes, stream, scalars,
+  auto part1_fut = fill_multiproduct_indexes(bucket_counts, indexes, stream, scalars,
                                                     element_num_bytes, n, bit_width);
 
   // part 2
