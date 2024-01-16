@@ -122,4 +122,13 @@ TEST_CASE(
 }
 
 TEST_CASE("we can compute the multiproduct table used for the bucket method") {
+  /* memmg::managed_array<bucket_descriptor> table{memr::get_managed_device_resource()}; */
+  /* memmg::managed_array<unsigned> indexes{memr::get_managed_device_resource()}; */
+  /* basdv::stream stream; */
+/* xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor>& table, */
+/*                                           memmg::managed_array<unsigned>& indexes, */
+/*                                           const basdv::stream& stream, */
+/*                                           basct::cspan<const uint8_t*> scalars, */
+/*                                           unsigned element_num_bytes, unsigned n, */
+/*                                           unsigned bit_width) noexcept; */
 }

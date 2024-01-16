@@ -29,9 +29,8 @@ fill_multiproduct_indexes(memmg::managed_array<unsigned> bucket_counts,
 // compute_multiproduct_table
 //--------------------------------------------------------------------------------------------------
 xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor>& table,
-                                              memmg::managed_array<unsigned>& indexes,
-                                              const basdv::stream& stream,
-                                              basct::cspan<const uint8_t*> scalars,
-                                              unsigned element_num_bytes, unsigned n,
-                                              unsigned bit_width) noexcept;
+                                          memmg::managed_array<unsigned>& indexes,
+                                          basct::cspan<const uint8_t*> scalars,
+                                          unsigned element_num_bytes, unsigned n,
+                                          unsigned bit_width) noexcept;
 } // namespace sxt::mtxbk

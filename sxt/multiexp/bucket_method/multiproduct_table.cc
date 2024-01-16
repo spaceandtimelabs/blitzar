@@ -213,10 +213,10 @@ fill_multiproduct_indexes(memmg::managed_array<unsigned> bucket_counts,
 //--------------------------------------------------------------------------------------------------
 xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor>& table,
                                           memmg::managed_array<unsigned>& indexes,
-                                          const basdv::stream& stream,
                                           basct::cspan<const uint8_t*> scalars,
                                           unsigned element_num_bytes, unsigned n,
                                           unsigned bit_width) noexcept {
+  basdv::stream stream;
   memr::async_device_resource resource{stream};
 
   // fill indexes
