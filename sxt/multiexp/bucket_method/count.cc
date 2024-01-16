@@ -15,8 +15,8 @@ namespace sxt::mtxbk {
 // count_bucket_entries_kernel
 //--------------------------------------------------------------------------------------------------
 static __global__ void count_bucket_entries_kernel(unsigned* count_array, const uint8_t* scalars,
-                                                   unsigned element_num_bytes, unsigned bit_width,
-                                                   unsigned n) {
+                                                   unsigned element_num_bytes, unsigned n,
+                                                   unsigned bit_width) {
   unsigned output_index = threadIdx.x;
   unsigned bucket_group_index = threadIdx.y;
   unsigned partition_index = blockIdx.x;
@@ -66,7 +66,7 @@ void count_bucket_entries(memmg::managed_array<unsigned>& count_array, const bas
   SXT_DEBUG_ASSERT(basdv::is_active_device_pointer(count_array.data()));
   memr::async_device_resource resource{stream};
   count_bucket_entries_kernel<<<num_partitions, dim3(num_outputs, num_bucket_groups, 1), 0,
-                                stream>>>(count_array.data(), scalars.data(), element_num_bytes,
-                                          bit_width, n);
+                                stream>>>(count_array.data(), scalars.data(), element_num_bytes, n,
+                                          bit_width);
 }
 } // namespace sxt::mtxbk
