@@ -14,7 +14,8 @@ namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 // count_bucket_entries_kernel
 //--------------------------------------------------------------------------------------------------
-static __global__ void count_bucket_entries_kernel(unsigned* count_array, const uint8_t* scalars,
+static __global__ void count_bucket_entries_kernel(unsigned* __restrict__ count_array,
+                                                   const uint8_t* __restrict__ scalars,
                                                    unsigned element_num_bytes, unsigned n,
                                                    unsigned bit_width) {
   unsigned output_index = threadIdx.x;

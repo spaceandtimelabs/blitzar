@@ -117,6 +117,7 @@ sxt_cc_component(
     ],
     impl_deps = [
       ":count",
+      "//sxt/multiexp/base:digit_utility",
         "//sxt/algorithm/transform:prefix_sum",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:synchronization",
