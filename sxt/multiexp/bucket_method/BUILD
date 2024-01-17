@@ -182,3 +182,22 @@ sxt_cc_component(
         "//sxt/multiexp/base:exponent_sequence",
     ],
 )
+
+sxt_cc_component(
+    name = "sum",
+    test_deps = [
+      "//sxt/base/error:assert",
+        "//sxt/base/test:unit_test",
+    ],
+    impl_deps = [
+    ],
+    deps = [
+      ":bucket_descriptor",
+      ":multiproduct_table",
+        "//sxt/base/container:span",
+        "//sxt/base/device:stream",
+        "//sxt/execution/async:coroutine",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+    ],
+)
