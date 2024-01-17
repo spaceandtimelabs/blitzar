@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zcash/librustzcash
  *
  * Copyright (c) 2017
@@ -22,17 +22,17 @@
  *
  * See third_party/license/zcash.LICENSE
  */
-#include "sxt/curve_g1/type/conversion_utility.h"
+#include "sxt/curve_bng1/type/conversion_utility.h"
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/operation/mul.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/curve_bng1/type/element_affine.h"
+#include "sxt/curve_bng1/type/element_p2.h"
+#include "sxt/field25/operation/mul.h"
+#include "sxt/field25/type/element.h"
 
 using namespace sxt;
-using namespace sxt::cg1t;
+using namespace sxt::cn1t;
 
 constexpr f12t::element generator_x{0x5cb38790fd530c16, 0x7817fc679976fff5, 0x154f95c7143ba1c1,
                                     0xf0ae6acdf3d0e747, 0xedce6ecc21dbf440, 0x120177419e0bfb75};

@@ -16,7 +16,7 @@
  */
 #pragma once
 
-namespace sxt::cg1o {
+namespace sxt::cn1o {
 //--------------------------------------------------------------------------------------------------
 // operation_adl_stub
 //--------------------------------------------------------------------------------------------------
@@ -25,4 +25,4 @@ namespace sxt::cg1o {
  * will participate in ADL.
  */
 struct operation_adl_stub {};
-}; // namespace sxt::cg1o
+}; // namespace sxt::cn1o

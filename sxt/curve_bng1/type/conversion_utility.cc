@@ -14,4 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/type/conversion_utility.h"
+#include "sxt/curve_bng1/type/conversion_utility.h"

@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/type/compressed_element.h"
+#include "sxt/curve_bng1/type/compressed_element.h"
 
 #include <cstring>
 #include <iostream>
 
-namespace sxt::cg1t {
+namespace sxt::cn1t {
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
@@ -43,4 +43,4 @@ std::ostream& operator<<(std::ostream& out, const compressed_element& c) noexcep
   out << "}";
   return out;
 }
-} // namespace sxt::cg1t
+} // namespace sxt::cn1t

@@ -16,18 +16,18 @@
  */
 #pragma once
 
-#include "sxt/curve_g1/type/operation_adl_stub.h"
-#include "sxt/field12/constant/one.h"
-#include "sxt/field12/constant/zero.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/curve_bng1/type/operation_adl_stub.h"
+#include "sxt/field25/constant/one.h"
+#include "sxt/field25/constant/zero.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::cg1t {
+namespace sxt::cn1t {
 //--------------------------------------------------------------------------------------------------
 // element_p2
 //--------------------------------------------------------------------------------------------------
-/*
- Projective coordinates (X,Y,Z). Represents the Affine coordinate point (X/Z,Y/Z).
- Homogeneous form Y^2 * Z = X^3 + (4 * Z^3).
+/**
+ * Projective coordinates (X,Y,Z). Represents the Affine coordinate point (X/Z,Y/Z).
+ * Homogeneous form Y^2 * Z = X^3 + (4 * Z^3).
  */
 struct element_p2 : cg1o::operation_adl_stub {
   element_p2() noexcept = default;
@@ -59,4 +59,4 @@ bool is_marked(const element_p2& e) noexcept;
 // operator==
 //--------------------------------------------------------------------------------------------------
 bool operator==(const element_p2& lhs, const element_p2& rhs) noexcept;
-} // namespace sxt::cg1t
+} // namespace sxt::cn1t

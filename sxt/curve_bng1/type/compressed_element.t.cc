@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/type/compressed_element.h"
+#include "sxt/curve_bng1/type/compressed_element.h"
 
 #include "sxt/base/test/unit_test.h"
 
-using namespace sxt::cg1t;
+using namespace sxt::cn1t;
 
 TEST_CASE("compressed_element is comparable") {
   compressed_element c1{};

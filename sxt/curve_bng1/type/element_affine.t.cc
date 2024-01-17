@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -23,14 +23,14 @@
  *
  * See third_party/license/zkcrypto.LICENSE
  */
-#include "sxt/curve_g1/type/element_affine.h"
+#include "sxt/curve_bng1/type/element_affine.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/constant/one.h"
-#include "sxt/field12/constant/zero.h"
+#include "sxt/field25/constant/one.h"
+#include "sxt/field25/constant/zero.h"
 
 using namespace sxt;
-using namespace sxt::cg1t;
+using namespace sxt::cn1t;
 
 TEST_CASE("affine element equality") {
   SECTION("can distinguish the generator from the identity") {

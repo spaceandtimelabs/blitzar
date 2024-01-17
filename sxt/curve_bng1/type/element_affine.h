@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -25,19 +25,19 @@
  */
 #pragma once
 
-#include "sxt/field12/constant/one.h"
-#include "sxt/field12/constant/zero.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/constant/one.h"
+#include "sxt/field25/constant/zero.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::cg1t {
+namespace sxt::cn1t {
 //--------------------------------------------------------------------------------------------------
 // element_affine
 //--------------------------------------------------------------------------------------------------
 /**
- This is an element of G1 represented in the affine coordinate space.
- It is ideal to keep elements in this representation to reduce memory usage and
- improve performance through the use of mixed curve model arithmetic.
- Values of `G1Affine` are guaranteed to be in the q-order subgroup.
+ * This is an element of G1 represented in the affine coordinate space.
+ * It is ideal to keep elements in this representation to reduce memory usage and
+ * improve performance through the use of mixed curve model arithmetic.
+ * Values of `G1Affine` are guaranteed to be in the q-order subgroup.
  */
 struct element_affine {
   f12t::element X;
@@ -50,4 +50,4 @@ struct element_affine {
 
   bool operator==(const element_affine& rhs) const noexcept = default;
 };
-} // namespace sxt::cg1t
+} // namespace sxt::cn1t

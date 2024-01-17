@@ -25,10 +25,10 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/base/macro:cuda_callable",
         "//sxt/base/num:cmov",
-        "//sxt/field12/operation:cmov",
-        "//sxt/field12/operation:invert",
-        "//sxt/field12/operation:mul",
-        "//sxt/field12/type:element",
+        "//sxt/field25/operation:cmov",
+        "//sxt/field25/operation:invert",
+        "//sxt/field25/operation:mul",
+        "//sxt/field25/type:element",
     ],
 )
 
@@ -38,27 +38,27 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        "//sxt/field12/constant:one",
-        "//sxt/field12/constant:zero",
-        "//sxt/field12/type:element",
+        "//sxt/field25/constant:one",
+        "//sxt/field25/constant:zero",
+        "//sxt/field25/type:element",
     ],
 )
 
 sxt_cc_component(
     name = "element_p2",
     impl_deps = [
-        "//sxt/field12/operation:mul",
-        "//sxt/field12/property:zero",
+        "//sxt/field25/operation:mul",
+        "//sxt/field25/property:zero",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/field12/operation:mul",
+        "//sxt/field25/operation:mul",
     ],
     deps = [
         ":operation_adl_stub",
-        "//sxt/field12/constant:one",
-        "//sxt/field12/constant:zero",
-        "//sxt/field12/type:element",
+        "//sxt/field25/constant:one",
+        "//sxt/field25/constant:zero",
+        "//sxt/field25/type:element",
     ],
 )
 

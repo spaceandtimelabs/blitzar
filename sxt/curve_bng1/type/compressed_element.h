@@ -20,7 +20,7 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::cg1t {
+namespace sxt::cn1t {
 //--------------------------------------------------------------------------------------------------
 // compressed_element
 //--------------------------------------------------------------------------------------------------
@@ -46,4 +46,4 @@ private:
 // opeator<<
 //--------------------------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& out, const compressed_element& c) noexcept;
-} // namespace sxt::cg1t
+} // namespace sxt::cn1t

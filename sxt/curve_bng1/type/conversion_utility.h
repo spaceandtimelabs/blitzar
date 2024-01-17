@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zcash/librustzcash
  *
  * Copyright (c) 2017
@@ -27,19 +27,19 @@
 #include "sxt/base/container/span.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/cmov.h"
-#include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/operation/cmov.h"
-#include "sxt/field12/operation/invert.h"
-#include "sxt/field12/operation/mul.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/curve_bng1/type/element_affine.h"
+#include "sxt/curve_bng1/type/element_p2.h"
+#include "sxt/field25/operation/cmov.h"
+#include "sxt/field25/operation/invert.h"
+#include "sxt/field25/operation/mul.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::cg1t {
+namespace sxt::cn1t {
 //--------------------------------------------------------------------------------------------------
 // to_element_affine
 //--------------------------------------------------------------------------------------------------
-/*
- Converts projective to affine element.
+/**
+ * Converts projective to affine element.
  */
 CUDA_CALLABLE
 inline void to_element_affine(element_affine& a, const element_p2& p) noexcept {
@@ -78,8 +78,8 @@ inline void to_element_p2(element_p2& p, const element_affine& a) noexcept {
 //--------------------------------------------------------------------------------------------------
 // batch_to_element_p2
 //--------------------------------------------------------------------------------------------------
-/*
- Batch converts affine to projective element.
+/**
+ * Batch converts affine to projective element.
  */
 CUDA_CALLABLE
 inline void batch_to_element_p2(basct::span<cg1t::element_p2> p,
@@ -89,4 +89,4 @@ inline void batch_to_element_p2(basct::span<cg1t::element_p2> p,
     to_element_p2(p[i], a[i]);
   }
 }
-} // namespace sxt::cg1t
+} // namespace sxt::cn1t

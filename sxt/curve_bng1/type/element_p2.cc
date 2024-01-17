@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -23,13 +23,13 @@
  *
  * See third_party/license/zkcrypto.LICENSE
  */
-#include "sxt/curve_g1/type/element_p2.h"
+#include "sxt/curve_bng1/type/element_p2.h"
 
-#include "sxt/field12/operation/mul.h"
-#include "sxt/field12/property/zero.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/operation/mul.h"
+#include "sxt/field25/property/zero.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::cg1t {
+namespace sxt::cn1t {
 //--------------------------------------------------------------------------------------------------
 // unset_marker_v
 //--------------------------------------------------------------------------------------------------
@@ -48,10 +48,10 @@ bool is_marked(const element_p2& e) noexcept { return e.Z[5] != unset_marker_v; 
 //--------------------------------------------------------------------------------------------------
 // operator==
 //--------------------------------------------------------------------------------------------------
-/*
- Returns true if either both points are at infinity or neither point is at infinity,
- and the coordinates are the same.
-*/
+/**
+ * Returns true if either both points are at infinity or neither point is at infinity,
+ * and the coordinates are the same.
+ */
 bool operator==(const element_p2& lhs, const element_p2& rhs) noexcept {
   f12t::element x1;
   f12t::element x2;
@@ -70,4 +70,4 @@ bool operator==(const element_p2& lhs, const element_p2& rhs) noexcept {
   return (lhs_is_zero && rhs_is_zero) ||
          ((!lhs_is_zero) && (!rhs_is_zero) && (x1 == x2) && (y1 == y2));
 }
-} // namespace sxt::cg1t
+} // namespace sxt::cn1t
