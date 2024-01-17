@@ -40,12 +40,12 @@ namespace sxt::cn1t {
  * Values of `G1Affine` are guaranteed to be in the q-order subgroup.
  */
 struct element_affine {
-  f12t::element X;
-  f12t::element Y;
+  f25t::element X;
+  f25t::element Y;
   uint8_t infinity;
 
   static constexpr element_affine identity() noexcept {
-    return element_affine{f12cn::zero_v, f12cn::one_v, true};
+    return element_affine{f25cn::zero_v, f25cn::one_v, true};
   }
 
   bool operator==(const element_affine& rhs) const noexcept = default;

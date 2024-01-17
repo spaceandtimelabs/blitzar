@@ -34,13 +34,12 @@ using namespace sxt::cn1t;
 
 TEST_CASE("affine element equality") {
   SECTION("can distinguish the generator from the identity") {
-    constexpr element_affine a{{0x5cb38790fd530c16, 0x7817fc679976fff5, 0x154f95c7143ba1c1,
-                                0xf0ae6acdf3d0e747, 0xedce6ecc21dbf440, 0x120177419e0bfb75},
-                               {0xbaac93d50ce72271, 0x8c22631a7918fd8e, 0xdd595f13570725ce,
-                                0x51ac582950405194, 0x0e1c8c3fad0059c0, 0x0bbc3efc5008a26a},
-                               false};
+    constexpr element_affine a{
+        f25cn::one_v,
+        {0xa6ba871b8b1e1b3a, 0x14f1d651eb8e167b, 0xccdd46def0f28c58, 0x1c14ef83340fbe5e},
+        false};
 
-    constexpr element_affine b{f12cn::zero_v, f12cn::one_v, true};
+    constexpr element_affine b{f25cn::zero_v, f25cn::one_v, true};
 
     REQUIRE(a == a);
     REQUIRE(b == b);

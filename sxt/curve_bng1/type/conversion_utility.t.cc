@@ -25,22 +25,23 @@
 #include "sxt/curve_bng1/type/conversion_utility.h"
 
 #include "sxt/base/container/span.h"
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_bng1/type/element_affine.h"
 #include "sxt/curve_bng1/type/element_p2.h"
+#include "sxt/field25/constant/one.h"
 #include "sxt/field25/operation/mul.h"
+#include "sxt/field25/random/element.h"
 #include "sxt/field25/type/element.h"
 
 using namespace sxt;
 using namespace sxt::cn1t;
 
-constexpr f12t::element generator_x{0x5cb38790fd530c16, 0x7817fc679976fff5, 0x154f95c7143ba1c1,
-                                    0xf0ae6acdf3d0e747, 0xedce6ecc21dbf440, 0x120177419e0bfb75};
+constexpr f25t::element generator_x{f25cn::one_v};
+constexpr f25t::element generator_y{0xa6ba871b8b1e1b3a, 0x14f1d651eb8e167b, 0xccdd46def0f28c58,
+                                    0x1c14ef83340fbe5e};
 
-constexpr f12t::element generator_y{0xbaac93d50ce72271, 0x8c22631a7918fd8e, 0xdd595f13570725ce,
-                                    0x51ac582950405194, 0x0e1c8c3fad0059c0, 0x0bbc3efc5008a26a};
-
-constexpr element_p2 generator_projective{generator_x, generator_y, f12cn::one_v};
+constexpr element_p2 generator_projective{generator_x, generator_y, f25cn::one_v};
 constexpr element_p2 identity_projective{element_p2::identity()};
 
 constexpr element_affine generator_affine{generator_x, generator_y, false};
@@ -64,13 +65,14 @@ TEST_CASE("conversion from projective to affine elements") {
   }
 
   SECTION("does not change a projected generator coordinate") {
-    constexpr f12t::element z{0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
-                              0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e};
+    f25t::element z;
+    basn::fast_random_number_generator rng{1, 2};
+    f25rn::generate_random_element(z, rng);
 
-    f12t::element gpx_z;
-    f12t::element gpy_z;
-    f12o::mul(gpx_z, generator_projective.X, z);
-    f12o::mul(gpy_z, generator_projective.Y, z);
+    f25t::element gpx_z;
+    f25t::element gpy_z;
+    f25o::mul(gpx_z, generator_projective.X, z);
+    f25o::mul(gpy_z, generator_projective.Y, z);
     element_p2 projective_pt{gpx_z, gpy_z, z};
 
     element_affine affine_pt;

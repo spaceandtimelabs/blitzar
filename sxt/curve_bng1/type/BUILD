@@ -17,7 +17,10 @@ sxt_cc_component(
     name = "conversion_utility",
     test_deps = [
         "//sxt/base/container:span",
+        "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
+        "//sxt/field25/constant:one",
+        "//sxt/field25/random:element",
     ],
     deps = [
         ":element_affine",
@@ -51,8 +54,10 @@ sxt_cc_component(
         "//sxt/field25/property:zero",
     ],
     test_deps = [
+        "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
         "//sxt/field25/operation:mul",
+        "//sxt/field25/random:element",
     ],
     deps = [
         ":operation_adl_stub",

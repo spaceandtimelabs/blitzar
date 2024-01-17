@@ -39,7 +39,7 @@ public:
   auto operator<=>(const compressed_element&) const noexcept = default;
 
 private:
-  uint8_t data_[48] = {};
+  uint8_t data_[32] = {};
 };
 
 //--------------------------------------------------------------------------------------------------

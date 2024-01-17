@@ -29,19 +29,19 @@ namespace sxt::cn1t {
  * Projective coordinates (X,Y,Z). Represents the Affine coordinate point (X/Z,Y/Z).
  * Homogeneous form Y^2 * Z = X^3 + (4 * Z^3).
  */
-struct element_p2 : cg1o::operation_adl_stub {
+struct element_p2 : cn1o::operation_adl_stub {
   element_p2() noexcept = default;
 
-  constexpr element_p2(const f12t::element& X, const f12t::element& Y,
-                       const f12t::element& Z) noexcept
+  constexpr element_p2(const f25t::element& X, const f25t::element& Y,
+                       const f25t::element& Z) noexcept
       : X{X}, Y{Y}, Z{Z} {}
 
-  f12t::element X;
-  f12t::element Y;
-  f12t::element Z;
+  f25t::element X;
+  f25t::element Y;
+  f25t::element Z;
 
   static constexpr element_p2 identity() noexcept {
-    return element_p2{f12cn::zero_v, f12cn::one_v, f12cn::zero_v};
+    return element_p2{f25cn::zero_v, f25cn::one_v, f25cn::zero_v};
   }
 };
 

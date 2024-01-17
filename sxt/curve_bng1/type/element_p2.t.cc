@@ -25,10 +25,12 @@
  */
 #include "sxt/curve_bng1/type/element_p2.h"
 
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/field25/constant/one.h"
 #include "sxt/field25/constant/zero.h"
 #include "sxt/field25/operation/mul.h"
+#include "sxt/field25/random/element.h"
 #include "sxt/field25/type/element.h"
 
 using namespace sxt;
@@ -36,26 +38,27 @@ using namespace sxt::cn1t;
 
 TEST_CASE("projective element equality") {
   SECTION("can distinguish the generator from the identity") {
-    constexpr element_p2 a{{0x5cb38790fd530c16, 0x7817fc679976fff5, 0x154f95c7143ba1c1,
-                            0xf0ae6acdf3d0e747, 0xedce6ecc21dbf440, 0x120177419e0bfb75},
-                           {0xbaac93d50ce72271, 0x8c22631a7918fd8e, 0xdd595f13570725ce,
-                            0x51ac582950405194, 0x0e1c8c3fad0059c0, 0x0bbc3efc5008a26a},
-                           f12cn::one_v};
-    constexpr element_p2 b{f12cn::zero_v, f12cn::one_v, f12cn::zero_v};
+    constexpr element_p2 a{
+        f25cn::one_v,
+        {0xa6ba871b8b1e1b3a, 0x14f1d651eb8e167b, 0xccdd46def0f28c58, 0x1c14ef83340fbe5e},
+        f25cn::one_v};
+    constexpr element_p2 b{element_p2::identity()};
 
     REQUIRE(a == a);
     REQUIRE(b == b);
     REQUIRE(a != b);
     REQUIRE(b != a);
 
-    constexpr f12t::element z{0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
-                              0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e};
+    // Project the generator with a random field element.
+    f25t::element z;
+    basn::fast_random_number_generator rng{1, 2};
+    f25rn::generate_random_element(z, rng);
 
-    f12t::element ax_z;
-    f12o::mul(ax_z, a.X, z);
+    f25t::element ax_z;
+    f25o::mul(ax_z, a.X, z);
 
-    f12t::element ay_z;
-    f12o::mul(ay_z, a.Y, z);
+    f25t::element ay_z;
+    f25o::mul(ay_z, a.Y, z);
 
     element_p2 c{ax_z, ay_z, z};
 

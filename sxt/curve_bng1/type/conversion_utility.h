@@ -43,36 +43,36 @@ namespace sxt::cn1t {
  */
 CUDA_CALLABLE
 inline void to_element_affine(element_affine& a, const element_p2& p) noexcept {
-  f12t::element z_inv;
-  const bool is_zero{f12o::invert(z_inv, p.Z)};
-  f12o::cmov(z_inv, f12cn::zero_v, is_zero);
+  f25t::element z_inv;
+  const bool is_zero{f25o::invert(z_inv, p.Z)};
+  f25o::cmov(z_inv, f25cn::zero_v, is_zero);
 
-  f12t::element x;
-  f12t::element y;
-  f12o::mul(x, p.X, z_inv);
-  f12o::mul(y, p.Y, z_inv);
+  f25t::element x;
+  f25t::element y;
+  f25o::mul(x, p.X, z_inv);
+  f25o::mul(y, p.Y, z_inv);
 
   a.X = x;
   a.Y = y;
   a.infinity = false;
 
-  f12o::cmov(a.X, element_affine::identity().X, is_zero);
-  f12o::cmov(a.Y, element_affine::identity().Y, is_zero);
+  f25o::cmov(a.X, element_affine::identity().X, is_zero);
+  f25o::cmov(a.Y, element_affine::identity().Y, is_zero);
   basn::cmov(a.infinity, element_affine::identity().infinity, is_zero);
 }
 
 //--------------------------------------------------------------------------------------------------
 // to_element_p2
 //--------------------------------------------------------------------------------------------------
-/*
- Converts affine to projective element.
+/**
+ * Converts affine to projective element.
  */
 CUDA_CALLABLE
 inline void to_element_p2(element_p2& p, const element_affine& a) noexcept {
   p.X = a.X;
   p.Y = a.Y;
-  p.Z = f12cn::one_v;
-  f12o::cmov(p.Z, f12cn::zero_v, a.infinity);
+  p.Z = f25cn::one_v;
+  f25o::cmov(p.Z, f25cn::zero_v, a.infinity);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -82,8 +82,8 @@ inline void to_element_p2(element_p2& p, const element_affine& a) noexcept {
  * Batch converts affine to projective element.
  */
 CUDA_CALLABLE
-inline void batch_to_element_p2(basct::span<cg1t::element_p2> p,
-                                basct::cspan<cg1t::element_affine> a) noexcept {
+inline void batch_to_element_p2(basct::span<cn1t::element_p2> p,
+                                basct::cspan<cn1t::element_affine> a) noexcept {
   SXT_DEBUG_ASSERT(a.size() == p.size());
   for (size_t i = 0; i < a.size(); ++i) {
     to_element_p2(p[i], a[i]);

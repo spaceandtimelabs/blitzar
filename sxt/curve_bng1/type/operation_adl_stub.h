@@ -21,7 +21,7 @@ namespace sxt::cn1o {
 // operation_adl_stub
 //--------------------------------------------------------------------------------------------------
 /**
- * A stub class that can be inherited so that functions in the cg1o namespace
+ * A stub class that can be inherited so that functions in the cn1o namespace
  * will participate in ADL.
  */
 struct operation_adl_stub {};

@@ -38,12 +38,12 @@ static constexpr uint64_t unset_marker_v = static_cast<uint64_t>(-1);
 //--------------------------------------------------------------------------------------------------
 // mark
 //--------------------------------------------------------------------------------------------------
-void mark(element_p2& e) noexcept { e.Z[5] = unset_marker_v; }
+void mark(element_p2& e) noexcept { e.Z[3] = unset_marker_v; }
 
 //--------------------------------------------------------------------------------------------------
 // is_marked
 //--------------------------------------------------------------------------------------------------
-bool is_marked(const element_p2& e) noexcept { return e.Z[5] != unset_marker_v; }
+bool is_marked(const element_p2& e) noexcept { return e.Z[3] != unset_marker_v; }
 
 //--------------------------------------------------------------------------------------------------
 // operator==
@@ -53,19 +53,19 @@ bool is_marked(const element_p2& e) noexcept { return e.Z[5] != unset_marker_v; 
  * and the coordinates are the same.
  */
 bool operator==(const element_p2& lhs, const element_p2& rhs) noexcept {
-  f12t::element x1;
-  f12t::element x2;
-  f12t::element y1;
-  f12t::element y2;
+  f25t::element x1;
+  f25t::element x2;
+  f25t::element y1;
+  f25t::element y2;
 
-  f12o::mul(x1, lhs.X, rhs.Z);
-  f12o::mul(x2, rhs.X, lhs.Z);
+  f25o::mul(x1, lhs.X, rhs.Z);
+  f25o::mul(x2, rhs.X, lhs.Z);
 
-  f12o::mul(y1, lhs.Y, rhs.Z);
-  f12o::mul(y2, rhs.Y, lhs.Z);
+  f25o::mul(y1, lhs.Y, rhs.Z);
+  f25o::mul(y2, rhs.Y, lhs.Z);
 
-  const auto lhs_is_zero = f12p::is_zero(lhs.Z);
-  const auto rhs_is_zero = f12p::is_zero(rhs.Z);
+  const auto lhs_is_zero = f25p::is_zero(lhs.Z);
+  const auto rhs_is_zero = f25p::is_zero(rhs.Z);
 
   return (lhs_is_zero && rhs_is_zero) ||
          ((!lhs_is_zero) && (!rhs_is_zero) && (x1 == x2) && (y1 == y2));

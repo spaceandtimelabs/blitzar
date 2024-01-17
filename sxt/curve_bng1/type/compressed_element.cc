@@ -34,9 +34,9 @@ compressed_element::compressed_element(std::initializer_list<uint8_t> values) no
 std::ostream& operator<<(std::ostream& out, const compressed_element& c) noexcept {
   out << "{";
   auto data = c.data();
-  for (int i = 0; i < 48; ++i) {
+  for (int i = 0; i < 32; ++i) {
     out << static_cast<int>(data[i]);
-    if (i != 48) {
+    if (i != 32) {
       out << ",";
     }
   }
