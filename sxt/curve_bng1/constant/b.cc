@@ -14,4 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/constant/b.h"
+#include "sxt/curve_bng1/constant/b.h"

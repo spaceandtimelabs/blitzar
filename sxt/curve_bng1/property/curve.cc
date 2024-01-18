@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -23,24 +23,24 @@
  *
  * See third_party/license/zkcrypto.LICENSE
  */
-#include "sxt/curve_g1/property/curve.h"
+#include "sxt/curve_bng1/property/curve.h"
 
-#include "sxt/curve_g1/constant/b.h"
-#include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/operation/add.h"
-#include "sxt/field12/operation/mul.h"
-#include "sxt/field12/operation/square.h"
-#include "sxt/field12/operation/sub.h"
-#include "sxt/field12/property/zero.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/curve_bng1/constant/b.h"
+#include "sxt/curve_bng1/type/element_affine.h"
+#include "sxt/curve_bng1/type/element_p2.h"
+#include "sxt/field25/operation/add.h"
+#include "sxt/field25/operation/mul.h"
+#include "sxt/field25/operation/square.h"
+#include "sxt/field25/operation/sub.h"
+#include "sxt/field25/property/zero.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::cg1p {
+namespace sxt::cn1p {
 //--------------------------------------------------------------------------------------------------
 // is_on_curve
 //--------------------------------------------------------------------------------------------------
-/*
- Returns true if the element is on the curve: y^2 - x^3 = b_v
+/**
+ * Returns true if the element is on the curve: y^2 - x^3 = b_v
  */
 bool is_on_curve(const cg1t::element_affine& p) noexcept {
   f12t::element y2;
@@ -60,8 +60,8 @@ bool is_on_curve(const cg1t::element_affine& p) noexcept {
 //--------------------------------------------------------------------------------------------------
 // is_on_curve
 //--------------------------------------------------------------------------------------------------
-/*
- Returns true if the element is on the curve: (y^2 * z) = x^3 + (b_v * z^3)
+/**
+ * Returns true if the element is on the curve: (y^2 * z) = x^3 + (b_v * z^3)
  */
 bool is_on_curve(const cg1t::element_p2& p) noexcept {
   f12t::element y2;
@@ -86,4 +86,4 @@ bool is_on_curve(const cg1t::element_p2& p) noexcept {
 
   return (y2_z == x3_b_z3) || f12p::is_zero(p.Z);
 }
-} // namespace sxt::cg1p
+} // namespace sxt::cn1p

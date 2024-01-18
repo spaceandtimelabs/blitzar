@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/property/identity.h"
+#include "sxt/curve_bng1/property/identity.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve_g1/constant/generator.h"
-#include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
+#include "sxt/curve_bng1/constant/generator.h"
+#include "sxt/curve_bng1/type/element_affine.h"
+#include "sxt/curve_bng1/type/element_p2.h"
 
 using namespace sxt;
-using namespace sxt::cg1p;
+using namespace sxt::cn1p;
 
 TEST_CASE("the identity can be identified") {
   SECTION("as an affine element") {

@@ -16,16 +16,16 @@
  */
 #pragma once
 
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::cg1cn {
+namespace sxt::cn1cn {
 //--------------------------------------------------------------------------------------------------
 // b_v
 //--------------------------------------------------------------------------------------------------
-/*
- b_v is 4 in Montgomery form.
- Used in the bls12-381 curve equation: y^2 = x^3 + 4
+/**
+ * b_v is 4 in Montgomery form.
+ * Used in the bls12-381 curve equation: y^2 = x^3 + 4
  */
 static constexpr f12t::element b_v{0xaa270000000cfff3, 0x53cc0032fc34000a, 0x478fe97a6b0a807f,
                                    0xb1d37ebee6ba24d7, 0x8ec9733bbf78ab2f, 0x09d645513d83de7e};
-} // namespace sxt::cg1cn
+} // namespace sxt::cn1cn

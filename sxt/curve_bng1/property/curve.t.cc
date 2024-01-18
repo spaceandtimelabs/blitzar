@@ -14,19 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/property/curve.h"
+#include "sxt/curve_bng1/property/curve.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve_g1/constant/b.h"
-#include "sxt/curve_g1/constant/generator.h"
-#include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/constant/one.h"
-#include "sxt/field12/operation/mul.h"
-#include "sxt/field12/operation/neg.h"
+#include "sxt/curve_bng1/constant/b.h"
+#include "sxt/curve_bng1/constant/generator.h"
+#include "sxt/curve_bng1/type/element_affine.h"
+#include "sxt/curve_bng1/type/element_p2.h"
+#include "sxt/field25/constant/one.h"
+#include "sxt/field25/operation/mul.h"
+#include "sxt/field25/operation/neg.h"
 
 using namespace sxt;
-using namespace sxt::cg1p;
+using namespace sxt::cn1p;
 
 TEST_CASE("an affine element") {
   SECTION("equal to the generator is on the curve") {

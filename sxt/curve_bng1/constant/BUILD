@@ -7,10 +7,10 @@ sxt_cc_component(
     name = "b",
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/field12/base:montgomery",
+        "//sxt/field25/base:montgomery",
     ],
     deps = [
-        "//sxt/field12/type:element",
+        "//sxt/field25/type:element",
     ],
 )
 
@@ -18,9 +18,9 @@ sxt_cc_component(
     name = "generator",
     with_test = False,
     deps = [
-        "//sxt/curve_g1/type:element_affine",
-        "//sxt/curve_g1/type:element_p2",
-        "//sxt/field12/constant:one",
-        "//sxt/field12/type:element",
+        "//sxt/curve_bng1/type:element_affine",
+        "//sxt/curve_bng1/type:element_p2",
+        "//sxt/field25/constant:one",
+        "//sxt/field25/type:element",
     ],
 )

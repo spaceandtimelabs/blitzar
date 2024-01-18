@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/constant/b.h"
+#include "sxt/curve_bng1/constant/b.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/base/montgomery.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/base/montgomery.h"
+#include "sxt/field25/type/element.h"
 
 using namespace sxt;
-using namespace sxt::cg1cn;
+using namespace sxt::cn1cn;
 
 TEST_CASE("b_v") {
   SECTION("is 4 in Montgomery form") {

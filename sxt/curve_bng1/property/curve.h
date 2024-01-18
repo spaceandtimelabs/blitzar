@@ -16,12 +16,12 @@
  */
 #pragma once
 
-namespace sxt::cg1t {
+namespace sxt::cn1t {
 struct element_affine;
 struct element_p2;
-} // namespace sxt::cg1t
+} // namespace sxt::cn1t
 
-namespace sxt::cg1p {
+namespace sxt::cn1p {
 //--------------------------------------------------------------------------------------------------
 // is_on_curve
 //--------------------------------------------------------------------------------------------------
@@ -31,4 +31,4 @@ bool is_on_curve(const cg1t::element_affine& p) noexcept;
 // is_on_curve
 //--------------------------------------------------------------------------------------------------
 bool is_on_curve(const cg1t::element_p2& p) noexcept;
-} // namespace sxt::cg1p
+} // namespace sxt::cn1p

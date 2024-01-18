@@ -17,11 +17,11 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/property/zero.h"
+#include "sxt/curve_bng1/type/element_affine.h"
+#include "sxt/curve_bng1/type/element_p2.h"
+#include "sxt/field25/property/zero.h"
 
-namespace sxt::cg1p {
+namespace sxt::cn1p {
 //--------------------------------------------------------------------------------------------------
 // is_identity
 //--------------------------------------------------------------------------------------------------
@@ -33,4 +33,4 @@ inline bool is_identity(const cg1t::element_affine& p) noexcept { return p.infin
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 inline bool is_identity(const cg1t::element_p2& p) noexcept { return f12p::is_zero(p.Z); }
-} // namespace sxt::cg1p
+} // namespace sxt::cn1p
