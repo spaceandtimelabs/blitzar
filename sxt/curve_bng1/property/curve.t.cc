@@ -30,51 +30,53 @@ using namespace sxt::cn1p;
 
 TEST_CASE("an affine element") {
   SECTION("equal to the generator is on the curve") {
-    REQUIRE(is_on_curve(cg1cn::generator_affine_v));
+    REQUIRE(is_on_curve(cn1cn::generator_affine_v));
   }
 
   SECTION("equal to the identity is on the curve") {
-    REQUIRE(is_on_curve(cg1t::element_affine::identity()));
+    REQUIRE(is_on_curve(cn1t::element_affine::identity()));
   }
 
   SECTION("equal to (1,1) is not on the curve") {
-    constexpr cg1t::element_affine one_one{f12cn::one_v, f12cn::one_v, false};
+    constexpr cn1t::element_affine one_one{f25cn::one_v, f25cn::one_v, false};
 
     REQUIRE(!is_on_curve(one_one));
   }
 }
 
 TEST_CASE("a projective element") {
-  SECTION("equal to the generator is on the curve") { REQUIRE(is_on_curve(cg1cn::generator_p2_v)); }
+  SECTION("equal to the generator is on the curve") { REQUIRE(is_on_curve(cn1cn::generator_p2_v)); }
 
   SECTION("equal to the generator projected by z is on the curve") {
-    // z is arbitrarily chosen to be 4 in Montgomery form for this section of the test.
-    constexpr f12t::element z{cg1cn::b_v};
-    f12t::element x_projected;
-    f12t::element y_projected;
-    f12o::mul(x_projected, cg1cn::generator_p2_v.X, z);
-    f12o::mul(y_projected, cg1cn::generator_p2_v.Y, z);
-    cg1t::element_p2 generator_projected{x_projected, y_projected, z};
+    // z is arbitrarily chosen to be 3 in Montgomery form for this section of the test.
+    constexpr f25t::element z{cn1cn::b_v};
+    f25t::element x_projected;
+    f25t::element y_projected;
+    f25o::mul(x_projected, cn1cn::generator_p2_v.X, z);
+    f25o::mul(y_projected, cn1cn::generator_p2_v.Y, z);
+    cn1t::element_p2 generator_projected{x_projected, y_projected, z};
 
     REQUIRE(is_on_curve(generator_projected));
 
-    f12t::element neg_y;
-    f12o::neg(neg_y, generator_projected.Y);
+    f25t::element neg_y;
+    f25o::neg(neg_y, generator_projected.Y);
     generator_projected.Y = neg_y;
 
     REQUIRE(is_on_curve(generator_projected));
 
-    generator_projected.X = z;
+    f25t::element neg_x;
+    f25o::neg(neg_x, generator_projected.X);
+    generator_projected.X = neg_x;
 
     REQUIRE(!is_on_curve(generator_projected));
   }
 
   SECTION("equal to the identity is on the curve") {
-    REQUIRE(is_on_curve(cg1t::element_p2::identity()));
+    REQUIRE(is_on_curve(cn1t::element_p2::identity()));
   }
 
   SECTION("equal to (1,1,1) is not on the curve") {
-    constexpr cg1t::element_p2 one_one{f12cn::one_v, f12cn::one_v, f12cn::one_v};
+    constexpr cn1t::element_p2 one_one{f25cn::one_v, f25cn::one_v, f25cn::one_v};
 
     REQUIRE(!is_on_curve(one_one));
   }

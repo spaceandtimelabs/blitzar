@@ -42,19 +42,19 @@ namespace sxt::cn1p {
 /**
  * Returns true if the element is on the curve: y^2 - x^3 = b_v
  */
-bool is_on_curve(const cg1t::element_affine& p) noexcept {
-  f12t::element y2;
-  f12o::square(y2, p.Y);
+bool is_on_curve(const cn1t::element_affine& p) noexcept {
+  f25t::element y2;
+  f25o::square(y2, p.Y);
 
-  f12t::element x2;
-  f12t::element x3;
-  f12o::square(x2, p.X);
-  f12o::mul(x3, x2, p.X);
+  f25t::element x2;
+  f25t::element x3;
+  f25o::square(x2, p.X);
+  f25o::mul(x3, x2, p.X);
 
-  f12t::element y2_x3;
-  f12o::sub(y2_x3, y2, x3);
+  f25t::element y2_x3;
+  f25o::sub(y2_x3, y2, x3);
 
-  return (y2_x3 == cg1cn::b_v) || p.infinity;
+  return (y2_x3 == cn1cn::b_v) || p.infinity;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -63,27 +63,27 @@ bool is_on_curve(const cg1t::element_affine& p) noexcept {
 /**
  * Returns true if the element is on the curve: (y^2 * z) = x^3 + (b_v * z^3)
  */
-bool is_on_curve(const cg1t::element_p2& p) noexcept {
-  f12t::element y2;
-  f12t::element y2_z;
-  f12o::square(y2, p.Y);
-  f12o::mul(y2_z, y2, p.Z);
+bool is_on_curve(const cn1t::element_p2& p) noexcept {
+  f25t::element y2;
+  f25t::element y2_z;
+  f25o::square(y2, p.Y);
+  f25o::mul(y2_z, y2, p.Z);
 
-  f12t::element x2;
-  f12t::element x3;
-  f12o::square(x2, p.X);
-  f12o::mul(x3, x2, p.X);
+  f25t::element x2;
+  f25t::element x3;
+  f25o::square(x2, p.X);
+  f25o::mul(x3, x2, p.X);
 
-  f12t::element z2;
-  f12t::element z3;
-  f12t::element b_z3;
-  f12o::square(z2, p.Z);
-  f12o::mul(z3, z2, p.Z);
-  f12o::mul(b_z3, f12t::element{cg1cn::b_v}, z3);
+  f25t::element z2;
+  f25t::element z3;
+  f25t::element b_z3;
+  f25o::square(z2, p.Z);
+  f25o::mul(z3, z2, p.Z);
+  f25o::mul(b_z3, f25t::element{cn1cn::b_v}, z3);
 
-  f12t::element x3_b_z3;
-  f12o::add(x3_b_z3, x3, b_z3);
+  f25t::element x3_b_z3;
+  f25o::add(x3_b_z3, x3, b_z3);
 
-  return (y2_z == x3_b_z3) || f12p::is_zero(p.Z);
+  return (y2_z == x3_b_z3) || f25p::is_zero(p.Z);
 }
 } // namespace sxt::cn1p

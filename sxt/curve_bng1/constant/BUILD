@@ -16,7 +16,10 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "generator",
-    with_test = False,
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/field25/base:montgomery",
+    ],
     deps = [
         "//sxt/curve_bng1/type:element_affine",
         "//sxt/curve_bng1/type:element_p2",

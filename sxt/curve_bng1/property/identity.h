@@ -26,11 +26,11 @@ namespace sxt::cn1p {
 // is_identity
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-inline bool is_identity(const cg1t::element_affine& p) noexcept { return p.infinity; }
+inline bool is_identity(const cn1t::element_affine& p) noexcept { return p.infinity; }
 
 //--------------------------------------------------------------------------------------------------
 // is_identity
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-inline bool is_identity(const cg1t::element_p2& p) noexcept { return f12p::is_zero(p.Z); }
+inline bool is_identity(const cn1t::element_p2& p) noexcept { return f25p::is_zero(p.Z); }
 } // namespace sxt::cn1p

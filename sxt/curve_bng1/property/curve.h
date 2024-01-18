@@ -25,10 +25,10 @@ namespace sxt::cn1p {
 //--------------------------------------------------------------------------------------------------
 // is_on_curve
 //--------------------------------------------------------------------------------------------------
-bool is_on_curve(const cg1t::element_affine& p) noexcept;
+bool is_on_curve(const cn1t::element_affine& p) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // is_on_curve
 //--------------------------------------------------------------------------------------------------
-bool is_on_curve(const cg1t::element_p2& p) noexcept;
+bool is_on_curve(const cn1t::element_p2& p) noexcept;
 } // namespace sxt::cn1p

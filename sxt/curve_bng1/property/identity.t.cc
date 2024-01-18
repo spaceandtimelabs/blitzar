@@ -26,12 +26,12 @@ using namespace sxt::cn1p;
 
 TEST_CASE("the identity can be identified") {
   SECTION("as an affine element") {
-    REQUIRE(is_identity(cg1t::element_affine::identity()));
-    REQUIRE(!is_identity(cg1cn::generator_affine_v));
+    REQUIRE(is_identity(cn1t::element_affine::identity()));
+    REQUIRE(!is_identity(cn1cn::generator_affine_v));
   }
 
   SECTION("as a projective element") {
-    REQUIRE(is_identity(cg1t::element_p2::identity()));
-    REQUIRE(!is_identity(cg1cn::generator_p2_v));
+    REQUIRE(is_identity(cn1t::element_p2::identity()));
+    REQUIRE(!is_identity(cn1cn::generator_p2_v));
   }
 }

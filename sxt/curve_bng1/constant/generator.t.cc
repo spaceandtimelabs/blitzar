@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_bng1/constant/b.h"
+#include "sxt/curve_bng1/constant/generator.h"
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/field25/base/montgomery.h"
@@ -23,13 +23,13 @@
 using namespace sxt;
 using namespace sxt::cn1cn;
 
-TEST_CASE("b_v") {
-  SECTION("is 3 in Montgomery form") {
-    constexpr std::array<uint64_t, 4> a{3, 0, 0, 0};
+TEST_CASE("generator_y_v") {
+  SECTION("is 2 in Montgomery form") {
+    constexpr std::array<uint64_t, 4> a{2, 0, 0, 0};
     f25t::element ret;
 
     f25b::to_montgomery_form(ret.data(), a.data());
 
-    REQUIRE(b_v == ret);
+    REQUIRE(generator_y_v == ret);
   }
 }
