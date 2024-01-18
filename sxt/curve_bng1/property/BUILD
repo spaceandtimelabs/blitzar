@@ -21,7 +21,7 @@ sxt_cc_component(
         "//sxt/curve_bng1/constant:b",
         "//sxt/curve_bng1/constant:generator",
         "//sxt/curve_bng1/type:element_affine",
-        "//sxt/curve_g1/type:element_p2",
+        "//sxt/curve_bng1/type:element_p2",
         "//sxt/field25/constant:one",
         "//sxt/field25/operation:mul",
         "//sxt/field25/operation:neg",
