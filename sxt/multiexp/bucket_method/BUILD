@@ -211,8 +211,10 @@ sxt_cc_component(
 sxt_cc_component(
     name = "reduction",
     test_deps = [
+      "//sxt/algorithm/iteration:for_each",
       "//sxt/base/curve:example_element",
       "//sxt/base/error:assert",
+      "//sxt/base/num:divide_up",
         "//sxt/base/test:unit_test",
         "//sxt/execution/schedule:scheduler",
         "//sxt/memory/resource:managed_device_resource",
@@ -221,6 +223,7 @@ sxt_cc_component(
     ],
     deps = [
       "//sxt/base/device:stream",
+      "//sxt/base/macro:cuda_callable",
       "//sxt/algorithm/iteration:for_each",
         "//sxt/base/container:span",
         "//sxt/execution/async:coroutine",

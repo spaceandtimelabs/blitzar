@@ -1,10 +1,42 @@
 #pragma once
 
+#include <algorithm>
+#include <cassert>
+
+#include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/base/num/divide_up.h"
 
 namespace sxt::mtxbk {
+//--------------------------------------------------------------------------------------------------
+// reduce_bucket_grouip 
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+CUDA_CALLABLE void reduce_bucket_group(T* __restrict__ reductions,
+                                       const T* __restrict__ bucket_sums, unsigned bit_width,
+                                       unsigned num_buckets_per_output, unsigned reduction_width,
+                                       unsigned reduction_index) noexcept {
+  auto num_reductions_per_output = basn::divide_up(num_buckets_per_output, reduction_width);
+  auto output_index = reduction_index / num_reductions_per_output;
+  auto bucket_first = reduction_index % num_reductions_per_output;
+  auto bucket_last = std::min(bucket_first + reduction_width, num_buckets_per_output);
+  bucket_first += output_index * num_buckets_per_output;
+  bucket_last += output_index * num_buckets_per_output;
+  assert(bucket_last - bucket_first > 1 && "there must be at least two buckets to reduce");
+  T res = bucket_sums[--bucket_last];
+  while (bucket_first != bucket_last) {
+    for (unsigned i = 0; i < bit_width; ++i) {
+      double_element(res, res);
+    }
+    auto e = bucket_sums[--bucket_last];
+    add_inplace(res, e);
+  }
+  reductions[reduction_index] = res;
+}
+
 //--------------------------------------------------------------------------------------------------
 // compute_partial_reduction 
 //--------------------------------------------------------------------------------------------------
@@ -13,12 +45,22 @@ void compute_partial_reduction(basct::span<T> reductions, const basdv::stream& s
                                basct::cspan<T> bucket_sums, unsigned bit_width,
                                unsigned num_buckets, unsigned num_outputs,
                                unsigned reduction_width) noexcept {
-  (void)reductions;
-  (void)stream;
-  (void)bucket_sums;
-  (void)bit_width;
-  (void)num_buckets;
-  (void)num_outputs;
-  (void)reduction_width;
+  auto num_buckets_per_output = num_buckets / num_outputs;
+  auto num_reductions_per_output = basn::divide_up(num_buckets_per_output, reduction_width);
+  auto num_reductions = num_reductions_per_output * num_outputs;
+  auto f = [
+               // clang-format off
+    reductions = reductions.data(),
+    bucket_sums = bucket_sums,
+    bit_width = bit_width,
+    num_buckets_per_output = num_buckets_per_output,
+    reduction_width = reduction_width
+               // clang-format on
+  ] __device__
+           __host__(unsigned /*num_reductions*/, unsigned reduction_index) noexcept {
+             reduce_bucket_group(reductions, bucket_sums, bit_width, num_buckets_per_output,
+                                 reduction_width, reduction_index);
+           };
+  algi::launch_for_each_kernel(stream, f, num_reductions);
 }
 } // namespace sxt::mtxbk
