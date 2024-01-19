@@ -5,7 +5,7 @@
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
-#include "sxt/base/device/stream.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/device_viewable.h"
@@ -23,8 +23,14 @@ template <bascrv::element T>
 xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generators,
                                    basct::cspan<const uint8_t*> scalars, unsigned element_num_bytes,
                                    unsigned bit_width) noexcept {
+  SXT_DEBUG_ASSERT(
+      basdv::is_active_device_pointer(sums.data())
+  );
   auto num_buckets = sums.size();
   auto n = generators.size();
+  if (n == 0) {
+    co_return;
+  }
   memmg::managed_array<bucket_descriptor> table{memr::get_device_resource()};
   memmg::managed_array<unsigned> indexes{memr::get_device_resource()};
   auto fut = compute_multiproduct_table(table, indexes, scalars, element_num_bytes, n, bit_width);
@@ -42,21 +48,23 @@ xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generato
     table = table.data(),
     indexes = indexes.data()
                // clang-format on
-  ] __device__(unsigned /*num_buckets*/, unsigned bucket_index) noexcept {
-    T* __restrict__ sums = sums_p;
-    const T* __restrict__ generators = generators_p;
-    auto descriptor = table[bucket_index];
-    if (descriptor.num_entries == 0) {
-      return;
-    }
-    auto first = descriptor.entry_first;
-    auto sum = generators[indexes[first]];
-    for (unsigned i = 1; i < descriptor.num_entries; ++i) {
-      auto e = generators[indexes[first + i]];
-      add_inplace(sum, e);
-    }
-    sums[descriptor.bucket_index] = sum;
-  };
+  ] __device__
+           __host__(unsigned /*num_buckets*/, unsigned bucket_index) noexcept {
+             T* __restrict__ sums = sums_p;
+             const T* __restrict__ generators = generators_p;
+             auto descriptor = table[bucket_index];
+             if (descriptor.num_entries == 0) {
+               sums[descriptor.bucket_index] = T::identity();
+               return;
+             }
+             auto first = descriptor.entry_first;
+             auto sum = generators[indexes[first]];
+             for (unsigned i = 1; i < descriptor.num_entries; ++i) {
+               auto e = generators[indexes[first + i]];
+               add_inplace(sum, e);
+             }
+             sums[descriptor.bucket_index] = sum;
+           };
   co_await algi::for_each(f, num_buckets);
 }
 } // namespace sxt::mtxbk

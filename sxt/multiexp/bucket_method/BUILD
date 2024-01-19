@@ -186,8 +186,11 @@ sxt_cc_component(
 sxt_cc_component(
     name = "sum",
     test_deps = [
+      "//sxt/base/curve:example_element",
       "//sxt/base/error:assert",
         "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
     ],
     impl_deps = [
     ],
@@ -196,7 +199,7 @@ sxt_cc_component(
       ":multiproduct_table",
       "//sxt/algorithm/iteration:for_each",
         "//sxt/base/container:span",
-        "//sxt/base/device:stream",
+        "//sxt/base/device:memory_utility",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:device_viewable",
         "//sxt/memory/management:managed_array",
