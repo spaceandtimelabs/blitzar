@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zcash/librustzcash
  *
  * Copyright (c) 2017
@@ -38,8 +38,8 @@ namespace sxt::cg1t {
 //--------------------------------------------------------------------------------------------------
 // to_element_affine
 //--------------------------------------------------------------------------------------------------
-/*
- Converts projective to affine element.
+/**
+ * Converts projective to affine element.
  */
 CUDA_CALLABLE
 inline void to_element_affine(element_affine& a, const element_p2& p) noexcept {
@@ -64,8 +64,8 @@ inline void to_element_affine(element_affine& a, const element_p2& p) noexcept {
 //--------------------------------------------------------------------------------------------------
 // to_element_p2
 //--------------------------------------------------------------------------------------------------
-/*
- Converts affine to projective element.
+/**
+ * Converts affine to projective element.
  */
 CUDA_CALLABLE
 inline void to_element_p2(element_p2& p, const element_affine& a) noexcept {
@@ -78,8 +78,8 @@ inline void to_element_p2(element_p2& p, const element_affine& a) noexcept {
 //--------------------------------------------------------------------------------------------------
 // batch_to_element_p2
 //--------------------------------------------------------------------------------------------------
-/*
- Batch converts affine to projective element.
+/**
+ * Batch converts affine to projective element.
  */
 CUDA_CALLABLE
 inline void batch_to_element_p2(basct::span<cg1t::element_p2> p,

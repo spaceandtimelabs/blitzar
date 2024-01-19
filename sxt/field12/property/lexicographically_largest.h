@@ -26,8 +26,8 @@ namespace sxt::f12p {
 //--------------------------------------------------------------------------------------------------
 // lexicographically_largest
 //--------------------------------------------------------------------------------------------------
-/*
- Returns whether or not this element is strictly lexicographically larger than its negation.
+/**
+ * Returns whether or not this element is strictly lexicographically larger than its negation.
  */
 CUDA_CALLABLE
 bool lexicographically_largest(const f12t::element& e) noexcept;

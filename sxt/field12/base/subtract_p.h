@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -34,8 +34,8 @@ namespace sxt::f12b {
 //--------------------------------------------------------------------------------------------------
 // subtract_p
 //--------------------------------------------------------------------------------------------------
-/*
- Compute ret = a - p, where p is the modulus.
+/**
+ * Compute ret = a - p_v, where p_v is the modulus.
  */
 CUDA_CALLABLE inline void subtract_p(uint64_t ret[6], const uint64_t a[6]) noexcept {
   uint64_t borrow{0};

@@ -25,9 +25,9 @@ namespace sxt::cg1t {
 //--------------------------------------------------------------------------------------------------
 // element_p2
 //--------------------------------------------------------------------------------------------------
-/*
- Projective coordinates (X,Y,Z). Represents the Affine coordinate point (X/Z,Y/Z).
- Homogeneous form Y^2 * Z = X^3 + (4 * Z^3).
+/**
+ * Projective coordinates (X,Y,Z). Represents the Affine coordinate point (X/Z,Y/Z).
+ * Homogeneous form Y^2 * Z = X^3 + (4 * Z^3).
  */
 struct element_p2 : cg1o::operation_adl_stub {
   element_p2() noexcept = default;

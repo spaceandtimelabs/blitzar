@@ -26,11 +26,11 @@ namespace sxt::f12o {
 //--------------------------------------------------------------------------------------------------
 // cmov
 //--------------------------------------------------------------------------------------------------
-/*
- Replace (f,g) with (g,g) if b == 1.
- Replace (f,g) with (f,g) if b == 0.
+/**
+ * Replace (f,g) with (g,g) if b == 1.
+ * Replace (f,g) with (f,g) if b == 0.
  *
- Preconditions: b in {0,1}.
+ * Preconditions: b in {0,1}.
  */
 CUDA_CALLABLE void cmov(f12t::element& f, const f12t::element& g, unsigned int b) noexcept;
 } // namespace sxt::f12o

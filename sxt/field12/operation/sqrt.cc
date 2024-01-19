@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -34,10 +34,10 @@ namespace sxt::f12o {
 // sqrt
 //--------------------------------------------------------------------------------------------------
 /*
- We use Shank's method, as p = 3 (mod 4). This means we only need to exponentiate by (p+1)/4.
- This only works for elements that are actually quadratic residue so we check that we got the
- correct result at the end and return a boolean value indicating if the result was correct.
-*/
+ * We use Shank's method, as p_v = 3 (mod 4). This means we only need to exponentiate by (p_v+1)/4.
+ * This only works for elements that are actually quadratic residue so we check that we got the
+ * correct result at the end and return a boolean value indicating if the result was correct.
+ */
 CUDA_CALLABLE bool sqrt(f12t::element& h, const f12t::element& f) noexcept {
   constexpr f12t::element g(0xee7fbfffffffeaab, 0x07aaffffac54ffff, 0xd9cc34a83dac3d89,
                             0xd91dd2e13ce144af, 0x92c6e9ed90d2eb35, 0x0680447a8e5ff9a6);

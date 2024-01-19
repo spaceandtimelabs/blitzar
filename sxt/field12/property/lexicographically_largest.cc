@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -35,9 +35,9 @@ namespace sxt::f12p {
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 bool lexicographically_largest(const f12t::element& e) noexcept {
-  // Checking to see if the element is larger than (p - 1) / 2.
-  // If we subtract by ((p - 1) / 2) + 1 and there is no underflow,
-  // then the element must be larger than (p - 1) / 2.
+  // Checking to see if the element is larger than (p_v - 1) / 2.
+  // If we subtract by ((p_v - 1) / 2) + 1 and there is no underflow,
+  // then the element must be larger than (p_v - 1) / 2.
 
   // First, because self is in Montgomery form we need to reduce it.
   f12t::element e_tmp;

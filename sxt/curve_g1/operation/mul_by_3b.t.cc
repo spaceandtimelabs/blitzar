@@ -26,7 +26,7 @@ using namespace sxt::cg1o;
 using namespace sxt::f12t;
 
 TEST_CASE("multiply by 3b") {
-  SECTION("returns twelve if one in Montogomery form is the input") {
+  SECTION("returns twelve if one in Montgomery form is the input") {
     f12t::element ret;
 
     mul_by_3b(ret, f12cn::one_v);
