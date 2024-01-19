@@ -77,6 +77,23 @@ void compute_partial_reduction_device(basct::span<T> reductions, const basdv::st
 }
 
 //--------------------------------------------------------------------------------------------------
+// compute_partial_reduction_host
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+void compute_partial_reduction_host(basct::span<T> reductions, basct::cspan<T> bucket_sums,
+                                    unsigned bit_width, unsigned num_outputs,
+                                    unsigned reduction_width) noexcept {
+  auto num_buckets = bucket_sums.size();
+  auto num_buckets_per_output = num_buckets / num_outputs;
+  auto num_reductions_per_output = basn::divide_up(num_buckets_per_output, reduction_width);
+  auto num_reductions = num_reductions_per_output * num_outputs;
+  for (unsigned reduction_index = 0; reduction_index < num_reductions; ++reduction_index) {
+    reduce_bucket_group(reductions.data(), bucket_sums.data(), bit_width, num_buckets_per_output,
+                        reduction_width, reduction_index);
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
 // plan_reduction 
 //--------------------------------------------------------------------------------------------------
 unsigned plan_reduction(unsigned num_buckets, unsigned num_outputs) noexcept;
@@ -99,9 +116,12 @@ xena::future<> compute_reduction(basct::span<T> reductions, basct::cspan<T> buck
                                      reduction_width);
     co_return co_await xendv::await_stream(std::move(stream));
   }
-  (void)reductions;
-  (void)bucket_sums;
-  (void)bit_width;
-  (void)reduction_width;
+  auto num_reductions_p = basn::divide_up(num_buckets_per_output, reduction_width) * num_outputs;
+  memmg::managed_array<T> partial_reductions{num_reductions_p};
+  compute_partial_reduction_device(partial_reductions, stream, bucket_sums, bit_width, num_outputs,
+                                   reduction_width);
+  co_await xendv::await_stream(std::move(stream));
+  compute_partial_reduction_host(reductions, partial_reductions, bit_width, num_outputs,
+                                 num_reductions_p / num_outputs);
 }
 } // namespace sxt::mtxbk
