@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/operation/mul_by_3b.h"
+#include "sxt/curve_bng1/operation/mul_by_3b.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field12/constant/one.h"
-#include "sxt/field12/type/element.h"
-#include "sxt/field12/type/literal.h"
+#include "sxt/field25/constant/one.h"
+#include "sxt/field25/type/element.h"
+#include "sxt/field25/type/literal.h"
 
 using namespace sxt;
-using namespace sxt::cg1o;
-using namespace sxt::f12t;
+using namespace sxt::cn1o;
+using namespace sxt::f25t;
 
 TEST_CASE("multiply by 3b") {
   SECTION("returns twelve if one in Montogomery form is the input") {

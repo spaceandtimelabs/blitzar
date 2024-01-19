@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/operation/cmov.h"
+#include "sxt/curve_bng1/operation/cmov.h"
 
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/operation/cmov.h"
+#include "sxt/curve_bng1/type/element_p2.h"
+#include "sxt/field25/operation/cmov.h"
 
-namespace sxt::cg1o {
+namespace sxt::cn1o {
 //--------------------------------------------------------------------------------------------------
 // cmov
 //--------------------------------------------------------------------------------------------------
@@ -29,4 +29,4 @@ void cmov(cg1t::element_p2& f, const cg1t::element_p2& g, unsigned int b) noexce
   f12o::cmov(f.Y, g.Y, b);
   f12o::cmov(f.Z, g.Z, b);
 }
-} // namespace sxt::cg1o
+} // namespace sxt::cn1o

@@ -18,18 +18,18 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::f12t {
+namespace sxt::f25t {
 class element;
 }
 
-namespace sxt::cg1o {
+namespace sxt::cn1o {
 //--------------------------------------------------------------------------------------------------
 // mul_by_3b
 //--------------------------------------------------------------------------------------------------
-/*
- For the bls12-381 curve, since b = 4, 3b = 12.
- See Algorithm 9 for details, https://eprint.iacr.org/2015/1060.pdf
+/**
+ * For the bls12-381 curve, since b = 4, 3b = 12.
+ * See Algorithm 9 for details, https://eprint.iacr.org/2015/1060.pdf
  */
 CUDA_CALLABLE
 void mul_by_3b(f12t::element& h, const f12t::element& p) noexcept;
-} // namespace sxt::cg1o
+} // namespace sxt::cn1o

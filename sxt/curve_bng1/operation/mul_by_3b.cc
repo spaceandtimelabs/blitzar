@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/operation/mul_by_3b.h"
+#include "sxt/curve_bng1/operation/mul_by_3b.h"
 
-#include "sxt/field12/operation/add.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/field25/operation/add.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::cg1o {
+namespace sxt::cn1o {
 //--------------------------------------------------------------------------------------------------
 // mul_by_3b
 //--------------------------------------------------------------------------------------------------
@@ -34,4 +34,4 @@ void mul_by_3b(f12t::element& h, const f12t::element& p) noexcept {
   f12o::add(p8, p4, p4);
   f12o::add(h, p8, p4);
 }
-} // namespace sxt::cg1o
+} // namespace sxt::cn1o
