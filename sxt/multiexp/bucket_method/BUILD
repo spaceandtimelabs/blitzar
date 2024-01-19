@@ -213,6 +213,7 @@ sxt_cc_component(
     test_deps = [
       "//sxt/algorithm/iteration:for_each",
       "//sxt/base/curve:example_element",
+      "//sxt/base/device:memory_utility",
       "//sxt/base/error:assert",
       "//sxt/base/num:divide_up",
         "//sxt/base/test:unit_test",
@@ -222,6 +223,8 @@ sxt_cc_component(
     impl_deps = [
     ],
     deps = [
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
       "//sxt/base/device:stream",
       "//sxt/base/macro:cuda_callable",
       "//sxt/algorithm/iteration:for_each",

@@ -6,13 +6,16 @@
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/divide_up.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/async_device_resource.h"
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
-// reduce_bucket_grouip 
+// reduce_bucket_group 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 CUDA_CALLABLE void reduce_bucket_group(T* __restrict__ reductions,
@@ -48,9 +51,15 @@ void compute_partial_reduction(basct::span<T> reductions, const basdv::stream& s
   auto num_buckets_per_output = num_buckets / num_outputs;
   auto num_reductions_per_output = basn::divide_up(num_buckets_per_output, reduction_width);
   auto num_reductions = num_reductions_per_output * num_outputs;
+  if (reduction_width == 1) {
+    basdv::async_copy_device_to_host(reductions, bucket_sums, stream);
+    return;
+  }
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> reductions_dev{num_reductions, &resource};
   auto f = [
                // clang-format off
-    reductions = reductions.data(),
+    reductions = reductions_dev.data(),
     bucket_sums = bucket_sums,
     bit_width = bit_width,
     num_buckets_per_output = num_buckets_per_output,
@@ -62,5 +71,6 @@ void compute_partial_reduction(basct::span<T> reductions, const basdv::stream& s
                                  reduction_width, reduction_index);
            };
   algi::launch_for_each_kernel(stream, f, num_reductions);
+  basdv::async_copy_device_to_host(reductions, reductions_dev, stream);
 }
 } // namespace sxt::mtxbk
