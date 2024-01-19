@@ -207,3 +207,22 @@ sxt_cc_component(
         "//sxt/memory/resource:device_resource",
     ],
 )
+
+sxt_cc_component(
+    name = "reduction",
+    test_deps = [
+      "//sxt/base/curve:example_element",
+      "//sxt/base/error:assert",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    impl_deps = [
+    ],
+    deps = [
+      "//sxt/base/device:stream",
+      "//sxt/algorithm/iteration:for_each",
+        "//sxt/base/container:span",
+        "//sxt/execution/async:coroutine",
+    ],
+)
