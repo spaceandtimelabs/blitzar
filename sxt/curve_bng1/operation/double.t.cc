@@ -28,45 +28,42 @@ using namespace sxt::cn1o;
 
 TEST_CASE("doubling a projective element") {
   SECTION("preserves the identity") {
-    cg1t::element_p2 identity_double;
+    cn1t::element_p2 identity_double;
 
-    double_element(identity_double, cg1t::element_p2::identity());
+    double_element(identity_double, cn1t::element_p2::identity());
 
-    REQUIRE(cg1p::is_identity(identity_double));
-    REQUIRE(cg1p::is_on_curve(identity_double));
+    REQUIRE(cn1p::is_identity(identity_double));
+    REQUIRE(cn1p::is_on_curve(identity_double));
   }
 
   SECTION("preserves the generator") {
-    cg1t::element_p2 generator_double;
+    cn1t::element_p2 generator_double;
 
-    double_element(generator_double, cg1cn::generator_p2_v);
+    double_element(generator_double, cn1cn::generator_p2_v);
 
-    REQUIRE(!cg1p::is_identity(generator_double));
-    REQUIRE(cg1p::is_on_curve(generator_double));
+    REQUIRE(!cn1p::is_identity(generator_double));
+    REQUIRE(cn1p::is_on_curve(generator_double));
   }
 
   SECTION("produces double the generator") {
-    constexpr cg1t::element_p2 expected{
-        {0xea99aa7b7fd2610f, 0x2d8f4ecb16a2c805, 0x6f5685b7bc2cce0c, 0xa00450614064a604,
-         0x212102802cecd57b, 0x28576e1a7289e84},
-        {0x111405902b1882bf, 0xa8cd3dd3a683ef06, 0x13639d9f8c73cebe, 0x3ac292fd4559e0f7,
-         0x628c04a2e7fb8e20, 0x15c2f5f94df1f750},
-        {0xfc9ac7edde06dbee, 0xfdc16d121f0f95e2, 0xa06d9a77977a906d, 0xef28f3348e385c64,
-         0x8e0d17d2ffa3c835, 0x1700fc91a24772ec}};
-    cg1t::element_p2 generator_double;
+    constexpr cn1t::element_p2 expected{
+        {0xe10460b6c3e7ea38, 0xbc0b548b438e5469, 0xc2822db40c0ac2ec, 0x13227397098d014d},
+        {0x3c208c16d87cfd47, 0x97816a916871ca8d, 0xb85045b68181585d, 0x04644e72e131a029},
+        {0xd35d438dc58f0d9d, 0x0a78eb28f5c70b3d, 0x666ea36f7879462c, 0xe0a77c19a07df2f}};
+    cn1t::element_p2 generator_double;
 
-    double_element(generator_double, cg1cn::generator_p2_v);
+    double_element(generator_double, cn1cn::generator_p2_v);
 
     REQUIRE(expected == generator_double);
   }
 
   SECTION("produces the identity when Z is the zero element") {
-    constexpr cg1t::element_p2 p{cg1cn::generator_p2_v.X, cg1cn::generator_p2_v.Y, f12cn::zero_v};
-    cg1t::element_p2 expect_identity;
+    constexpr cn1t::element_p2 p{cn1cn::generator_p2_v.X, cn1cn::generator_p2_v.Y, f25cn::zero_v};
+    cn1t::element_p2 expect_identity;
 
     double_element(expect_identity, p);
 
-    REQUIRE(cg1p::is_on_curve(p));
-    REQUIRE(expect_identity == cg1t::element_p2::identity());
+    REQUIRE(cn1p::is_on_curve(p));
+    REQUIRE(expect_identity == cn1t::element_p2::identity());
   }
 }

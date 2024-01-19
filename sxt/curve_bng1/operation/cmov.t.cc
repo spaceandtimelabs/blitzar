@@ -25,12 +25,12 @@ using namespace sxt;
 using namespace sxt::cn1o;
 
 TEST_CASE("cmov returns the expected projective coordinates") {
-  cg1t::element_p2 expect_generator{cg1cn::generator_p2_v};
-  cg1t::element_p2 expect_identity{cg1t::element_p2::identity()};
+  cn1t::element_p2 expect_generator{cn1cn::generator_p2_v};
+  cn1t::element_p2 expect_identity{cn1t::element_p2::identity()};
 
-  cg1o::cmov(expect_generator, cg1t::element_p2::identity(), 0);
-  cg1o::cmov(expect_identity, cg1t::element_p2::identity(), 1);
+  cn1o::cmov(expect_generator, cn1t::element_p2::identity(), 0);
+  cn1o::cmov(expect_identity, cn1t::element_p2::identity(), 1);
 
-  REQUIRE(expect_generator == cg1cn::generator_p2_v);
-  REQUIRE(expect_identity == cg1t::element_p2::identity());
+  REQUIRE(expect_generator == cn1cn::generator_p2_v);
+  REQUIRE(expect_identity == cn1t::element_p2::identity());
 }

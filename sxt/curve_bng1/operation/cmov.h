@@ -33,5 +33,5 @@ namespace sxt::cn1o {
  * Preconditions: b in {0,1}.
  */
 CUDA_CALLABLE
-void cmov(cg1t::element_p2& f, const cg1t::element_p2& g, unsigned int b) noexcept;
+void cmov(cn1t::element_p2& f, const cn1t::element_p2& g, unsigned int b) noexcept;
 } // namespace sxt::cn1o

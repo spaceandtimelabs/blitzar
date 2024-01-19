@@ -27,9 +27,9 @@ namespace sxt::cn1o {
 // mul_by_3b
 //--------------------------------------------------------------------------------------------------
 /**
- * For the bls12-381 curve, since b = 4, 3b = 12.
+ * For the bn254 curve, since b = 3, 3b = 9.
  * See Algorithm 9 for details, https://eprint.iacr.org/2015/1060.pdf
  */
 CUDA_CALLABLE
-void mul_by_3b(f12t::element& h, const f12t::element& p) noexcept;
+void mul_by_3b(f25t::element& h, const f25t::element& p) noexcept;
 } // namespace sxt::cn1o

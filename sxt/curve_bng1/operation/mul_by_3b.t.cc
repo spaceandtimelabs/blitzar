@@ -26,11 +26,11 @@ using namespace sxt::cn1o;
 using namespace sxt::f25t;
 
 TEST_CASE("multiply by 3b") {
-  SECTION("returns twelve if one in Montogomery form is the input") {
-    f12t::element ret;
+  SECTION("returns nine if one in Montgomery form is the input") {
+    f25t::element ret;
 
-    mul_by_3b(ret, f12cn::one_v);
+    mul_by_3b(ret, f25cn::one_v);
 
-    REQUIRE(0xc_f12 == ret);
+    REQUIRE(0x9_f25 == ret);
   }
 }

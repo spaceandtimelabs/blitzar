@@ -24,9 +24,9 @@ namespace sxt::cn1o {
 // cmov
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void cmov(cg1t::element_p2& f, const cg1t::element_p2& g, unsigned int b) noexcept {
-  f12o::cmov(f.X, g.X, b);
-  f12o::cmov(f.Y, g.Y, b);
-  f12o::cmov(f.Z, g.Z, b);
+void cmov(cn1t::element_p2& f, const cn1t::element_p2& g, unsigned int b) noexcept {
+  f25o::cmov(f.X, g.X, b);
+  f25o::cmov(f.Y, g.Y, b);
+  f25o::cmov(f.Z, g.Z, b);
 }
 } // namespace sxt::cn1o

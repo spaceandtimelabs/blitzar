@@ -40,33 +40,33 @@ namespace sxt::cn1o {
 // double_element
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void double_element(cg1t::element_p2& h, const cg1t::element_p2& p) noexcept {
-  f12t::element t0, t1, t2;
-  f12t::element x3, y3, z3;
+void double_element(cn1t::element_p2& h, const cn1t::element_p2& p) noexcept {
+  f25t::element t0, t1, t2;
+  f25t::element x3, y3, z3;
 
-  f12o::square(t0, p.Y);
-  f12o::add(z3, t0, t0);
-  f12o::add(z3, z3, z3);
-  f12o::add(z3, z3, z3);
-  f12o::mul(t1, p.Y, p.Z);
-  f12o::square(t2, p.Z);
+  f25o::square(t0, p.Y);
+  f25o::add(z3, t0, t0);
+  f25o::add(z3, z3, z3);
+  f25o::add(z3, z3, z3);
+  f25o::mul(t1, p.Y, p.Z);
+  f25o::square(t2, p.Z);
   mul_by_3b(t2, t2);
-  f12o::mul(x3, t2, z3);
-  f12o::add(y3, t0, t2);
-  f12o::mul(z3, t1, z3);
-  f12o::add(t1, t2, t2);
-  f12o::add(t2, t1, t2);
-  f12o::sub(t0, t0, t2);
-  f12o::mul(y3, t0, y3);
-  f12o::add(y3, x3, y3);
-  f12o::mul(t1, p.X, p.Y);
-  f12o::mul(x3, t0, t1);
-  f12o::add(x3, x3, x3);
+  f25o::mul(x3, t2, z3);
+  f25o::add(y3, t0, t2);
+  f25o::mul(z3, t1, z3);
+  f25o::add(t1, t2, t2);
+  f25o::add(t2, t1, t2);
+  f25o::sub(t0, t0, t2);
+  f25o::mul(y3, t0, y3);
+  f25o::add(y3, x3, y3);
+  f25o::mul(t1, p.X, p.Y);
+  f25o::mul(x3, t0, t1);
+  f25o::add(x3, x3, x3);
 
   h.X = x3;
   h.Y = y3;
   h.Z = z3;
 
-  cmov(h, cg1t::element_p2::identity(), cg1p::is_identity(p));
+  cmov(h, cn1t::element_p2::identity(), cn1p::is_identity(p));
 }
 } // namespace sxt::cn1o

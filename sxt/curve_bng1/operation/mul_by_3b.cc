@@ -24,14 +24,14 @@ namespace sxt::cn1o {
 // mul_by_3b
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void mul_by_3b(f12t::element& h, const f12t::element& p) noexcept {
-  f12t::element p2;
-  f12t::element p4;
-  f12t::element p8;
+void mul_by_3b(f25t::element& h, const f25t::element& p) noexcept {
+  f25t::element p2;
+  f25t::element p4;
+  f25t::element p8;
 
-  f12o::add(p2, p, p);
-  f12o::add(p4, p2, p2);
-  f12o::add(p8, p4, p4);
-  f12o::add(h, p8, p4);
+  f25o::add(p2, p, p);
+  f25o::add(p4, p2, p2);
+  f25o::add(p8, p4, p4);
+  f25o::add(h, p8, p);
 }
 } // namespace sxt::cn1o

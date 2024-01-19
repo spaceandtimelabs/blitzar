@@ -31,5 +31,5 @@ namespace sxt::cn1o {
  * Algorithm 9, https://eprint.iacr.org/2015/1060.pdf
  */
 CUDA_CALLABLE
-void double_element(cg1t::element_p2& h, const cg1t::element_p2& p) noexcept;
+void double_element(cn1t::element_p2& h, const cn1t::element_p2& p) noexcept;
 } // namespace sxt::cn1o
