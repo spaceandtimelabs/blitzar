@@ -217,6 +217,7 @@ sxt_cc_component(
       "//sxt/base/error:assert",
       "//sxt/base/num:divide_up",
         "//sxt/base/test:unit_test",
+        "//sxt/execution/device:synchronization",
         "//sxt/execution/schedule:scheduler",
         "//sxt/memory/resource:managed_device_resource",
     ],

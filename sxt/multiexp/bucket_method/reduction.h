@@ -10,6 +10,8 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/divide_up.h"
+#include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 
@@ -41,13 +43,13 @@ CUDA_CALLABLE void reduce_bucket_group(T* __restrict__ reductions,
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_partial_reduction 
+// compute_partial_reduction_device
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-void compute_partial_reduction(basct::span<T> reductions, const basdv::stream& stream,
-                               basct::cspan<T> bucket_sums, unsigned bit_width,
-                               unsigned num_buckets, unsigned num_outputs,
-                               unsigned reduction_width) noexcept {
+void compute_partial_reduction_device(basct::span<T> reductions, const basdv::stream& stream,
+                                      basct::cspan<T> bucket_sums, unsigned bit_width,
+                                      unsigned num_outputs, unsigned reduction_width) noexcept {
+  auto num_buckets = bucket_sums.size();
   auto num_buckets_per_output = num_buckets / num_outputs;
   auto num_reductions_per_output = basn::divide_up(num_buckets_per_output, reduction_width);
   auto num_reductions = num_reductions_per_output * num_outputs;
@@ -72,5 +74,34 @@ void compute_partial_reduction(basct::span<T> reductions, const basdv::stream& s
            };
   algi::launch_for_each_kernel(stream, f, num_reductions);
   basdv::async_copy_device_to_host(reductions, reductions_dev, stream);
+}
+
+//--------------------------------------------------------------------------------------------------
+// plan_reduction 
+//--------------------------------------------------------------------------------------------------
+unsigned plan_reduction(unsigned num_buckets, unsigned num_outputs) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// compute_reduction
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+xena::future<> compute_reduction(basct::span<T> reductions, basct::cspan<T> bucket_sums,
+                                 unsigned bit_width, unsigned reduction_width = 0) noexcept {
+  auto num_buckets = bucket_sums.size();
+  auto num_outputs = reductions.size();
+  auto num_buckets_per_output = num_buckets / num_outputs;
+  if (reduction_width == 0) {
+    reduction_width = plan_reduction(num_buckets, num_outputs);
+  }
+  basdv::stream stream;
+  if (reduction_width == num_buckets_per_output) {
+    compute_partial_reduction_device(reductions, stream, bucket_sums, bit_width, num_outputs,
+                                     reduction_width);
+    co_return co_await xendv::await_stream(std::move(stream));
+  }
+  (void)reductions;
+  (void)bucket_sums;
+  (void)bit_width;
+  (void)reduction_width;
 }
 } // namespace sxt::mtxbk
