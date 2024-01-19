@@ -36,7 +36,7 @@ struct element_p3;
 
 namespace sxt::cg1t {
 class compressed_element;
-struct element_p3;
+struct element_p2;
 } // namespace sxt::cg1t
 
 namespace sxt::s25t {
