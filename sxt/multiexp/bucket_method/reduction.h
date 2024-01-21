@@ -74,12 +74,13 @@ CUDA_CALLABLE void complete_bucket_group_reduction_kernel(T* __restrict__ reduct
 }
 
 //--------------------------------------------------------------------------------------------------
-// complete_bucket_reduction 
+// complete_bucket_reduction_kernel
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-CUDA_CALLABLE void complete_bucket_reduction(T* __restrict__ reductions, const T* group_reductions,
-                                             unsigned bit_width, unsigned num_groups_per_output,
-                                             unsigned output_index) noexcept {
+CUDA_CALLABLE void complete_bucket_reduction_kernel(T* __restrict__ reductions,
+                                                    const T* group_reductions, unsigned bit_width,
+                                                    unsigned num_groups_per_output,
+                                                    unsigned output_index) noexcept {
   auto group_first = num_groups_per_output * output_index;
   auto group_last = group_first + num_groups_per_output;
   auto res = group_reductions[--group_last];
@@ -122,8 +123,8 @@ void partial_reduce(basct::span<T> reductions, const basdv::stream& stream,
 // complete_bucket_group_reduction 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-void complete_bucket_group_reduction(basct::span<T> reductions, basct::cspan<T> partial_reductions,
-                                     const basdv::stream& stream,
+void complete_bucket_group_reduction(basct::span<T> reductions, const basdv::stream& stream,
+                                     basct::cspan<T> partial_reductions,
                                      unsigned reduction_width_log2) noexcept {
   auto num_groups = reductions.size();
   auto num_partials_per_group = partial_reductions.size() / num_groups / 2u;
@@ -135,11 +136,35 @@ void complete_bucket_group_reduction(basct::span<T> reductions, basct::cspan<T> 
     reduction_width_log2 = reduction_width_log2,
     num_partials_per_group = num_partials_per_group
           // clang-format on
-  ] __device__ __host__(unsigned /*num_groups*/, unsigned group_index) {
+  ] __device__
+      __host__(unsigned /*num_groups*/, unsigned group_index) noexcept {
         complete_bucket_group_reduction_kernel(reductions, partial_reductions, reduction_width_log2,
                                                num_partials_per_group, group_index);
       };
   algi::launch_for_each_kernel(stream, f, num_groups);
+}
+
+//--------------------------------------------------------------------------------------------------
+// complete_bucket_reduction 
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+void complete_bucket_reduction(basct::span<T> reductions, const basdv::stream& stream,
+                               basct::cspan<T> group_reductions, unsigned bit_width) noexcept {
+  auto num_outputs = reductions.size();
+  auto num_groups_per_output = group_reductions.size() / num_outputs;
+  auto f = [
+               // clang-format off
+    reductions = reductions.data(),
+    group_reductions = group_reductions.data(),
+    bit_width = bit_width,
+    num_groups_per_output = num_groups_per_output
+               // clang-format on
+  ] __device__
+           __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
+             complete_bucket_reduction_kernel(reductions, group_reductions, bit_width,
+                                              num_groups_per_output, output_index);
+           };
+  algi::launch_for_each_kernel(stream, f, num_outputs);
 }
 
 //--------------------------------------------------------------------------------------------------
