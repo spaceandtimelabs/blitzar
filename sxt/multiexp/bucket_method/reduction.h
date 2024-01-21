@@ -123,23 +123,6 @@ void complete_bucket_group_reduction(basct::span<T> reductions, basct::cspan<T> 
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_partial_reduction_host
-//--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
-void compute_partial_reduction_host(basct::span<T> reductions, basct::cspan<T> bucket_sums,
-                                    unsigned bit_width, unsigned num_outputs,
-                                    unsigned reduction_width) noexcept {
-  auto num_buckets = bucket_sums.size();
-  auto num_buckets_per_output = num_buckets / num_outputs;
-  auto num_reductions_per_output = basn::divide_up(num_buckets_per_output, reduction_width);
-  auto num_reductions = num_reductions_per_output * num_outputs;
-  for (unsigned reduction_index = 0; reduction_index < num_reductions; ++reduction_index) {
-    reduce_bucket_group(reductions.data(), bucket_sums.data(), bit_width, num_buckets_per_output,
-                        reduction_width, reduction_index);
-  }
-}
-
-//--------------------------------------------------------------------------------------------------
 // plan_reduction 
 //--------------------------------------------------------------------------------------------------
 unsigned plan_reduction(unsigned num_buckets, unsigned num_outputs) noexcept;
