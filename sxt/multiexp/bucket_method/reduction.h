@@ -10,7 +10,6 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/divide_up.h"
-#include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
@@ -145,11 +144,11 @@ void complete_bucket_group_reductions(basct::span<T> reductions, const basdv::st
 }
 
 //--------------------------------------------------------------------------------------------------
-// complete_bucket_reduction 
+// complete_bucket_reductions
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-void complete_bucket_reduction(basct::span<T> reductions, const basdv::stream& stream,
-                               basct::cspan<T> group_reductions, unsigned bit_width) noexcept {
+void complete_bucket_reductions(basct::span<T> reductions, const basdv::stream& stream,
+                                basct::cspan<T> group_reductions, unsigned bit_width) noexcept {
   auto num_outputs = reductions.size();
   auto num_groups_per_output = group_reductions.size() / num_outputs;
   auto f = [
@@ -176,8 +175,9 @@ unsigned plan_reduction(unsigned num_buckets, unsigned num_outputs) noexcept;
 // reduce_buckets
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-xena::future<> reduce_buckets(basct::span<T> reductions, basct::cspan<T> bucket_sums,
-                              unsigned bit_width, unsigned reduction_width_log2 = 0) noexcept {
+void reduce_buckets(basct::span<T> reductions, const basdv::stream& stream,
+                    basct::cspan<T> bucket_sums, unsigned bit_width,
+                    unsigned reduction_width_log2 = 0) noexcept {
   auto num_buckets = bucket_sums.size();
   auto num_outputs = reductions.size();
   auto num_buckets_per_group = (1u << bit_width) - 1u;
@@ -189,7 +189,6 @@ xena::future<> reduce_buckets(basct::span<T> reductions, basct::cspan<T> bucket_
   auto reduction_width = (1u << reduction_width_log2);
   auto num_partials_per_output = basn::divide_up(num_buckets_per_output, reduction_width);
   auto num_partials = num_partials_per_output * num_outputs;
-  basdv::stream stream;
   memr::async_device_resource resource{stream};
 
   // partially reduce bucket groups
@@ -202,32 +201,12 @@ xena::future<> reduce_buckets(basct::span<T> reductions, basct::cspan<T> bucket_
   complete_bucket_group_reductions(group_reductions, stream, partial_group_reductions,
                                    reduction_width_log2);
   partial_group_reductions.reset();
-  /* template <bascrv::element T> */
-  /* void complete_bucket_group_reductions(basct::span<T> reductions, const basdv::stream& stream,
-   */
-  /*                                       basct::cspan<T> partial_reductions, */
-  /*                                       unsigned reduction_width_log2) noexcept { */
-  (void)resource;
-  (void)reductions;
 
-  /* template <bascrv::element T> */
-  /* void partial_reduce_bucket_groups(basct::span<T> reductions, const basdv::stream& stream, */
-  /*                                   basct::cspan<T> bucket_sums, unsigned bit_width, */
-  /*                                   unsigned reduction_width) noexcept { */
+  // complete bucket_reductions
+  memmg::managed_array<T> reductions_p{num_outputs, &resource};
+  complete_bucket_group_reductions(reductions_p, stream, group_reductions, bit_width);
+  group_reductions.reset();
 
-#if 0
-  if (reduction_width == num_buckets_per_output) {
-    compute_partial_reduction_device(reductions, stream, bucket_sums, bit_width, num_outputs,
-                                     reduction_width);
-    co_return co_await xendv::await_stream(std::move(stream));
-  }
-  auto num_reductions_p = basn::divide_up(num_buckets_per_output, reduction_width) * num_outputs;
-  memmg::managed_array<T> partial_reductions{num_reductions_p};
-  compute_partial_reduction_device(partial_reductions, stream, bucket_sums, bit_width, num_outputs,
-                                   reduction_width);
-  co_await xendv::await_stream(std::move(stream));
-  compute_partial_reduction_host(reductions, partial_reductions, bit_width, num_outputs,
-                                 num_reductions_p / num_outputs);
-#endif
+  basdv::async_copy_device_to_host(reductions, reductions_p, stream);
 }
 } // namespace sxt::mtxbk

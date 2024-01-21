@@ -230,6 +230,5 @@ sxt_cc_component(
       "//sxt/base/macro:cuda_callable",
       "//sxt/algorithm/iteration:for_each",
         "//sxt/base/container:span",
-        "//sxt/execution/async:coroutine",
     ],
 )
