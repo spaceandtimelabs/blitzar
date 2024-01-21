@@ -214,11 +214,9 @@ sxt_cc_component(
       "//sxt/algorithm/iteration:for_each",
       "//sxt/base/curve:example_element",
       "//sxt/base/device:memory_utility",
+      "//sxt/base/device:synchronization",
       "//sxt/base/error:assert",
-      "//sxt/base/num:divide_up",
         "//sxt/base/test:unit_test",
-        "//sxt/execution/device:synchronization",
-        "//sxt/execution/schedule:scheduler",
         "//sxt/memory/resource:managed_device_resource",
     ],
     impl_deps = [

@@ -178,8 +178,8 @@ template <bascrv::element T>
 void reduce_buckets(basct::span<T> reductions, const basdv::stream& stream,
                     basct::cspan<T> bucket_sums, unsigned bit_width,
                     unsigned reduction_width_log2 = 0) noexcept {
-  auto num_buckets = bucket_sums.size();
-  auto num_outputs = reductions.size();
+  auto num_buckets = static_cast<unsigned>(bucket_sums.size());
+  auto num_outputs = static_cast<unsigned>(reductions.size());
   auto num_buckets_per_group = (1u << bit_width) - 1u;
   auto num_buckets_per_output = num_buckets / num_outputs;
   auto num_bucket_groups = num_buckets / num_buckets_per_group;
@@ -192,19 +192,19 @@ void reduce_buckets(basct::span<T> reductions, const basdv::stream& stream,
   memr::async_device_resource resource{stream};
 
   // partially reduce bucket groups
-  memmg::managed_array<T> partial_group_reductions{num_partials, &resource};
-  partially_reduce_bucket_groups(partial_group_reductions, stream, bucket_sums, bit_width,
+  memmg::managed_array<T> partial_group_reductions{2u * num_partials, &resource};
+  partially_reduce_bucket_groups<T>(partial_group_reductions, stream, bucket_sums, bit_width,
                                  reduction_width);
 
   // complete bucket group reductions
   memmg::managed_array<T> group_reductions{num_bucket_groups, &resource};
-  complete_bucket_group_reductions(group_reductions, stream, partial_group_reductions,
+  complete_bucket_group_reductions<T>(group_reductions, stream, partial_group_reductions,
                                    reduction_width_log2);
   partial_group_reductions.reset();
 
   // complete bucket_reductions
   memmg::managed_array<T> reductions_p{num_outputs, &resource};
-  complete_bucket_group_reductions(reductions_p, stream, group_reductions, bit_width);
+  complete_bucket_reductions<T>(reductions_p, stream, group_reductions, bit_width);
   group_reductions.reset();
 
   basdv::async_copy_device_to_host(reductions, reductions_p, stream);

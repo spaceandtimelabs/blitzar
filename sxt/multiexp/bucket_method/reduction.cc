@@ -7,6 +7,6 @@ namespace sxt::mtxbk {
 unsigned plan_reduction(unsigned num_buckets, unsigned num_outputs) noexcept {
   (void)num_buckets;
   (void)num_outputs;
-  return 0;
+  return 1;
 }
 } // namespace sxt::mtxbk

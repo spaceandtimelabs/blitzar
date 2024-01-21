@@ -1,5 +1,26 @@
 #include "sxt/multiexp/bucket_method/reduction.h"
 
-#include "sxt/base/test/unit_test.h"
+#include <iostream>
 
-TEST_CASE("t") {}
+#include "sxt/base/curve/example_element.h"
+#include "sxt/base/device/synchronization.h"
+#include "sxt/base/test/unit_test.h"
+#include "sxt/memory/resource/managed_device_resource.h"
+using namespace sxt;
+using namespace sxt::mtxbk;
+
+using E = bascrv::element97;
+
+TEST_CASE("we can reduce bucket sums") {
+  basdv::stream stream;
+
+  memmg::managed_array<E> bucket_sums{memr::get_managed_device_resource()};
+  memmg::managed_array<E> reductions(1);
+
+  SECTION("we can reduce 3 bucket sums") {
+    bucket_sums = {3, 5, 2};
+    reduce_buckets<E>(reductions, stream, bucket_sums, 2, 1);
+    basdv::synchronize_stream(stream);
+    std::cout << reductions[0] << "\n";
+  }
+}
