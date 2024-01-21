@@ -42,6 +42,26 @@ CUDA_CALLABLE void reduce_bucket_group(T* __restrict__ reductions,
   reductions[reduction_index] = res;
 }
 
+template <bascrv::element T>
+CUDA_CALLABLE void reduce_bucket_group(T* __restrict__ reductions,
+                                       const T* __restrict__ bucket_sums, unsigned bit_width,
+                                       unsigned reduction_width,
+                                       unsigned reduction_index) noexcept {
+  auto num_buckets_per_group = (1u << bit_width) - 1u;
+  auto num_reductions_per_group = basn::divide_up(num_buckets_per_group, reduction_width);
+  auto group_index = reduction_index / num_reductions_per_group;
+  auto reduction_group_index = reduction_index % num_reductions_per_group;
+  auto bucket_first_group = group_index * num_buckets_per_group;
+  auto bucket_first = bucket_first_group + reduction_group_index * reduction_width;
+  auto bucket_last =
+      std::min(bucket_first + reduction_width, bucket_first_group + num_buckets_per_group);
+  auto res = bucket_sums[--bucket_last];
+  while (bucket_last != bucket_first) {
+    add_inplace(res, res, bucket_sums[--bucket_last]);
+  }
+  reductions[reduction_index] = res;
+}
+
 //--------------------------------------------------------------------------------------------------
 // compute_partial_reduction_device
 //--------------------------------------------------------------------------------------------------
@@ -74,6 +94,17 @@ void compute_partial_reduction_device(basct::span<T> reductions, const basdv::st
            };
   algi::launch_for_each_kernel(stream, f, num_reductions);
   basdv::async_copy_device_to_host(reductions, reductions_dev, stream);
+}
+
+template <bascrv::element T>
+void compute_partial_reduction_device(basct::span<T> reductions, const basdv::stream& stream,
+                                      basct::cspan<T> bucket_sums, unsigned bit_width,
+                                      unsigned reduction_width) noexcept {
+  auto num_buckets_per_group = (1u << bit_width) - 1u;
+  auto num_reductions_per_group = basn::divide_up(num_buckets_per_group, reduction_width);
+  auto num_bucket_groups = bucket_sums.size() / num_buckets_per_group;
+  auto num_reductions = num_bucket_groups * num_buckets_per_group;
+  (void)num_reductions;
 }
 
 //--------------------------------------------------------------------------------------------------
