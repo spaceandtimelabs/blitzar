@@ -17,13 +17,13 @@
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
-// reduce_bucket_group 
+// partially_reduce_bucket_group_kernel
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-CUDA_CALLABLE void reduce_bucket_group(T* __restrict__ reductions,
-                                       const T* __restrict__ bucket_sums, unsigned bit_width,
-                                       unsigned reduction_width,
-                                       unsigned reduction_index) noexcept {
+CUDA_CALLABLE void
+partially_reduce_bucket_group_kernel(T* __restrict__ reductions, const T* __restrict__ bucket_sums,
+                                     unsigned bit_width, unsigned reduction_width,
+                                     unsigned reduction_index) noexcept {
   auto num_buckets_per_group = (1u << bit_width) - 1u;
   auto num_reductions_per_group = basn::divide_up(num_buckets_per_group, reduction_width);
   auto group_index = reduction_index / num_reductions_per_group;
@@ -95,37 +95,37 @@ CUDA_CALLABLE void complete_bucket_reduction_kernel(T* __restrict__ reductions,
 }
 
 //--------------------------------------------------------------------------------------------------
-// partial_reduce
+// partially_reduce_bucket_groups
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-void partial_reduce(basct::span<T> reductions, const basdv::stream& stream,
-                    basct::cspan<T> bucket_sums, unsigned bit_width,
-                    unsigned reduction_width) noexcept {
+void partially_reduce_bucket_groups(basct::span<T> reductions, const basdv::stream& stream,
+                                  basct::cspan<T> bucket_sums, unsigned bit_width,
+                                  unsigned reduction_width) noexcept {
   auto num_buckets_per_group = (1u << bit_width) - 1u;
   auto num_bucket_groups = bucket_sums.size() / num_buckets_per_group;
   auto num_reductions = num_bucket_groups * num_buckets_per_group;
-  auto f =
-      [
-          // clang-format off
+  auto f = [
+               // clang-format off
     reductions = reductions.data(),
     bucket_sums = bucket_sums.data(),
     bit_width = bit_width,
     reduction_width = reduction_width
-          // clang-format on
+               // clang-format on
   ] __device__
-      __host__(unsigned /*num_reductions*/, unsigned reduction_index) noexcept {
-        reduce_bucket_group(reductions, bucket_sums, bit_width, reduction_width, reduction_index);
-      };
+           __host__(unsigned /*num_reductions*/, unsigned reduction_index) noexcept {
+             partially_reduce_bucket_group_kernel(reductions, bucket_sums, bit_width,
+                                                  reduction_width, reduction_index);
+           };
   algi::launch_for_each_kernel(stream, f, num_reductions);
 }
 
 //--------------------------------------------------------------------------------------------------
-// complete_bucket_group_reduction 
+// complete_bucket_group_reductions 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-void complete_bucket_group_reduction(basct::span<T> reductions, const basdv::stream& stream,
-                                     basct::cspan<T> partial_reductions,
-                                     unsigned reduction_width_log2) noexcept {
+void complete_bucket_group_reductions(basct::span<T> reductions, const basdv::stream& stream,
+                                      basct::cspan<T> partial_reductions,
+                                      unsigned reduction_width_log2) noexcept {
   auto num_groups = reductions.size();
   auto num_partials_per_group = partial_reductions.size() / num_groups / 2u;
   auto f =
@@ -173,23 +173,49 @@ void complete_bucket_reduction(basct::span<T> reductions, const basdv::stream& s
 unsigned plan_reduction(unsigned num_buckets, unsigned num_outputs) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// compute_reduction
+// reduce_buckets
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-xena::future<> compute_reduction(basct::span<T> reductions, basct::cspan<T> bucket_sums,
-                                 unsigned bit_width, unsigned reduction_width = 0) noexcept {
-  (void)reductions;
-  (void)bucket_sums;
-  (void)bit_width;
-  (void)reduction_width;
-#if 0
+xena::future<> reduce_buckets(basct::span<T> reductions, basct::cspan<T> bucket_sums,
+                              unsigned bit_width, unsigned reduction_width_log2 = 0) noexcept {
   auto num_buckets = bucket_sums.size();
   auto num_outputs = reductions.size();
+  auto num_buckets_per_group = (1u << bit_width) - 1u;
   auto num_buckets_per_output = num_buckets / num_outputs;
-  if (reduction_width == 0) {
-    reduction_width = plan_reduction(num_buckets, num_outputs);
+  auto num_bucket_groups = num_buckets / num_buckets_per_group;
+  if (reduction_width_log2 == 0) {
+    reduction_width_log2 = plan_reduction(num_buckets, num_outputs);
   }
+  auto reduction_width = (1u << reduction_width_log2);
+  auto num_partials_per_output = basn::divide_up(num_buckets_per_output, reduction_width);
+  auto num_partials = num_partials_per_output * num_outputs;
   basdv::stream stream;
+  memr::async_device_resource resource{stream};
+
+  // partially reduce bucket groups
+  memmg::managed_array<T> partial_group_reductions{num_partials, &resource};
+  partially_reduce_bucket_groups(partial_group_reductions, stream, bucket_sums, bit_width,
+                                 reduction_width);
+
+  // complete bucket group reductions
+  memmg::managed_array<T> group_reductions{num_bucket_groups, &resource};
+  complete_bucket_group_reductions(group_reductions, stream, partial_group_reductions,
+                                   reduction_width_log2);
+  partial_group_reductions.reset();
+  /* template <bascrv::element T> */
+  /* void complete_bucket_group_reductions(basct::span<T> reductions, const basdv::stream& stream,
+   */
+  /*                                       basct::cspan<T> partial_reductions, */
+  /*                                       unsigned reduction_width_log2) noexcept { */
+  (void)resource;
+  (void)reductions;
+
+  /* template <bascrv::element T> */
+  /* void partial_reduce_bucket_groups(basct::span<T> reductions, const basdv::stream& stream, */
+  /*                                   basct::cspan<T> bucket_sums, unsigned bit_width, */
+  /*                                   unsigned reduction_width) noexcept { */
+
+#if 0
   if (reduction_width == num_buckets_per_output) {
     compute_partial_reduction_device(reductions, stream, bucket_sums, bit_width, num_outputs,
                                      reduction_width);
