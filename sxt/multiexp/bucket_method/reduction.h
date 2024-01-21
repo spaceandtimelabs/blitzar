@@ -74,6 +74,26 @@ CUDA_CALLABLE void complete_bucket_group_reduction_kernel(T* __restrict__ reduct
 }
 
 //--------------------------------------------------------------------------------------------------
+// complete_bucket_reduction 
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+CUDA_CALLABLE void complete_bucket_reduction(T* __restrict__ reductions, const T* group_reductions,
+                                             unsigned bit_width, unsigned num_groups_per_output,
+                                             unsigned output_index) noexcept {
+  auto group_first = num_groups_per_output * output_index;
+  auto group_last = group_first + num_groups_per_output;
+  auto res = group_reductions[--group_last];
+  while (group_last != group_first) {
+    for (unsigned i=0; i<bit_width; ++i) {
+      double_element(res, res);
+    }
+    auto e = group_reductions[--group_last];
+    add_inplace(res, e);
+  }
+  reductions[output_index] = res;
+}
+
+//--------------------------------------------------------------------------------------------------
 // partial_reduce
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
