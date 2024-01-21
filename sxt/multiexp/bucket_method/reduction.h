@@ -35,8 +35,8 @@ CUDA_CALLABLE void reduce_bucket_group(T* __restrict__ reductions,
   auto sum = bucket_sums[--bucket_last];
   auto partial = sum;
   while (bucket_last != bucket_first) {
-    auto g = bucket_sums[--bucket_last];
-    add_inplace(sum, g);
+    auto e = bucket_sums[--bucket_last];
+    add_inplace(sum, e);
     add(partial, partial, sum);
   }
   reductions[2u * reduction_index] = sum;
@@ -44,14 +44,43 @@ CUDA_CALLABLE void reduce_bucket_group(T* __restrict__ reductions,
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_partial_reduction_device
+// complete_bucket_group_reduction_kernel 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-void compute_partial_reduction_device(basct::span<T> reductions, const basdv::stream& stream,
-                                      basct::cspan<T> bucket_sums, unsigned bit_width,
-                                      unsigned reduction_width) noexcept {
+CUDA_CALLABLE void complete_bucket_group_reduction_kernel(T* __restrict__ reductions,
+                                                          const T* __restrict__ partial_reductions,
+                                                          unsigned reduction_width_log2,
+                                                          unsigned num_partials_per_group,
+                                                          unsigned group_index) noexcept {
+  auto partial_first = num_partials_per_group * group_index;
+  auto partial_last = partial_first + num_partials_per_group;
+  --partial_last;
+  T sum_part1 = partial_reductions[2u * partial_last];
+  T t = sum_part1; 
+  T sum_part2 = partial_reductions[2u * partial_last + 1u];
+  while (partial_last != partial_first) {
+    --partial_last;
+    auto e = partial_reductions[2u * partial_last];
+    add_inplace(t, e);
+    add(sum_part1, sum_part1, t);
+    e = partial_reductions[2u * partial_last + 1u];
+    add_inplace(sum_part2, e);
+  }
+  for (unsigned i=0; i<reduction_width_log2; ++i) {
+    double_element(sum_part1, sum_part1);
+  }
+  add_inplace(sum_part1, sum_part2);
+  reductions[group_index] = sum_part1;
+}
+
+//--------------------------------------------------------------------------------------------------
+// partial_reduce
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+void partial_reduce(basct::span<T> reductions, const basdv::stream& stream,
+                    basct::cspan<T> bucket_sums, unsigned bit_width,
+                    unsigned reduction_width) noexcept {
   auto num_buckets_per_group = (1u << bit_width) - 1u;
-  auto num_reductions_per_group = basn::divide_up(num_buckets_per_group, reduction_width);
   auto num_bucket_groups = bucket_sums.size() / num_buckets_per_group;
   auto num_reductions = num_bucket_groups * num_buckets_per_group;
   auto f =
@@ -67,6 +96,30 @@ void compute_partial_reduction_device(basct::span<T> reductions, const basdv::st
         reduce_bucket_group(reductions, bucket_sums, bit_width, reduction_width, reduction_index);
       };
   algi::launch_for_each_kernel(stream, f, num_reductions);
+}
+
+//--------------------------------------------------------------------------------------------------
+// complete_bucket_group_reduction 
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+void complete_bucket_group_reduction(basct::span<T> reductions, basct::cspan<T> partial_reductions,
+                                     const basdv::stream& stream,
+                                     unsigned reduction_width_log2) noexcept {
+  auto num_groups = reductions.size();
+  auto num_partials_per_group = partial_reductions.size() / num_groups / 2u;
+  auto f =
+      [
+          // clang-format off
+    reductions = reductions.data(),
+    partial_reductions = partial_reductions.data(),
+    reduction_width_log2 = reduction_width_log2,
+    num_partials_per_group = num_partials_per_group
+          // clang-format on
+  ] __device__ __host__(unsigned /*num_groups*/, unsigned group_index) {
+        complete_bucket_group_reduction_kernel(reductions, partial_reductions, reduction_width_log2,
+                                               num_partials_per_group, group_index);
+      };
+  algi::launch_for_each_kernel(stream, f, num_groups);
 }
 
 //--------------------------------------------------------------------------------------------------
