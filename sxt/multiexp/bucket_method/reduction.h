@@ -57,7 +57,7 @@ CUDA_CALLABLE void complete_bucket_group_reduction_kernel(T* __restrict__ reduct
   T sum_part1 = partial_reductions[2u * partial_last];
   T t = sum_part1; 
   T sum_part2 = partial_reductions[2u * partial_last + 1u];
-  while (partial_last != partial_first) {
+  while (partial_last != partial_first + 1) {
     --partial_last;
     auto e = partial_reductions[2u * partial_last];
     add_inplace(t, e);
@@ -65,6 +65,9 @@ CUDA_CALLABLE void complete_bucket_group_reduction_kernel(T* __restrict__ reduct
     e = partial_reductions[2u * partial_last + 1u];
     add_inplace(sum_part2, e);
   }
+  --partial_last;
+  auto e = partial_reductions[2u * partial_last + 1u];
+  add_inplace(sum_part2, e);
   for (unsigned i=0; i<reduction_width_log2; ++i) {
     double_element(sum_part1, sum_part1);
   }
@@ -100,9 +103,7 @@ template <bascrv::element T>
 void partially_reduce_bucket_groups(basct::span<T> reductions, const basdv::stream& stream,
                                   basct::cspan<T> bucket_sums, unsigned bit_width,
                                   unsigned reduction_width) noexcept {
-  auto num_buckets_per_group = (1u << bit_width) - 1u;
-  auto num_bucket_groups = bucket_sums.size() / num_buckets_per_group;
-  auto num_reductions = num_bucket_groups * num_buckets_per_group;
+  auto num_reductions = static_cast<unsigned>(reductions.size()) / 2u;
   auto f = [
                // clang-format off
     reductions = reductions.data(),
