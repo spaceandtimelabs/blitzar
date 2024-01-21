@@ -104,7 +104,19 @@ void compute_partial_reduction_device(basct::span<T> reductions, const basdv::st
   auto num_reductions_per_group = basn::divide_up(num_buckets_per_group, reduction_width);
   auto num_bucket_groups = bucket_sums.size() / num_buckets_per_group;
   auto num_reductions = num_bucket_groups * num_buckets_per_group;
-  (void)num_reductions;
+  auto f =
+      [
+          // clang-format off
+    reductions = reductions.data(),
+    bucket_sums = bucket_sums.data(),
+    bit_width = bit_width,
+    reduction_width = reduction_width
+          // clang-format on
+  ] __device__
+      __host__(unsigned /*num_reductions*/, unsigned reduction_index) noexcept {
+        reduce_bucket_group(reductions, bucket_sums, bit_width, reduction_width, reduction_index);
+      };
+  algi::launch_for_each_kernel(stream, f, num_reductions);
 }
 
 //--------------------------------------------------------------------------------------------------
