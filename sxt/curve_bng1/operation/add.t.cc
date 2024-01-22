@@ -16,6 +16,7 @@
  */
 #include "sxt/curve_bng1/operation/add.h"
 
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_bng1/constant/generator.h"
 #include "sxt/curve_bng1/operation/double.h"
@@ -24,6 +25,7 @@
 #include "sxt/curve_bng1/type/element_affine.h"
 #include "sxt/curve_bng1/type/element_p2.h"
 #include "sxt/field25/operation/mul.h"
+#include "sxt/field25/random/element.h"
 #include "sxt/field25/type/element.h"
 
 using namespace sxt;
@@ -31,112 +33,116 @@ using namespace sxt::cn1o;
 
 TEST_CASE("addition with projective elements") {
   SECTION("keeps the identity on the curve") {
-    cg1t::element_p2 ret;
-    add(ret, cg1t::element_p2::identity(), cg1t::element_p2::identity());
+    cn1t::element_p2 ret;
+    add(ret, cn1t::element_p2::identity(), cn1t::element_p2::identity());
 
-    REQUIRE(cg1p::is_identity(ret));
-    REQUIRE(cg1p::is_on_curve(ret));
+    REQUIRE(cn1p::is_identity(ret));
+    REQUIRE(cn1p::is_on_curve(ret));
   }
 
   SECTION("is commutative") {
-    constexpr f12t::element z{0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
-                              0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e};
-    f12t::element x;
-    f12t::element y;
-    f12o::mul(x, cg1cn::generator_p2_v.X, z);
-    f12o::mul(y, cg1cn::generator_p2_v.Y, z);
-    const cg1t::element_p2 projected_generator{x, y, z};
-    cg1t::element_p2 ret;
+    f25t::element z;
+    basn::fast_random_number_generator rng{1, 2};
+    f25rn::generate_random_element(z, rng);
 
-    add(ret, cg1t::element_p2::identity(), projected_generator);
+    f25t::element x;
+    f25t::element y;
+    f25o::mul(x, cn1cn::generator_p2_v.X, z);
+    f25o::mul(y, cn1cn::generator_p2_v.Y, z);
+    const cn1t::element_p2 projected_generator{x, y, z};
+    cn1t::element_p2 ret;
 
-    REQUIRE(!cg1p::is_identity(ret));
-    REQUIRE(cg1p::is_on_curve(ret));
-    REQUIRE(cg1cn::generator_p2_v == ret);
+    add(ret, cn1t::element_p2::identity(), projected_generator);
+
+    REQUIRE(!cn1p::is_identity(ret));
+    REQUIRE(cn1p::is_on_curve(ret));
+    REQUIRE(cn1cn::generator_p2_v == ret);
 
     // Switch summands
-    add(ret, projected_generator, cg1t::element_p2::identity());
+    add(ret, projected_generator, cn1t::element_p2::identity());
 
-    REQUIRE(!cg1p::is_identity(ret));
-    REQUIRE(cg1p::is_on_curve(ret));
-    REQUIRE(cg1cn::generator_p2_v == ret);
+    REQUIRE(!cn1p::is_identity(ret));
+    REQUIRE(cn1p::is_on_curve(ret));
+    REQUIRE(cn1cn::generator_p2_v == ret);
   }
 
   SECTION("can reproduce doubling results") {
-    cg1t::element_p2 a;
-    cg1t::element_p2 b;
-    cg1t::element_p2 c;
+    cn1t::element_p2 a;
+    cn1t::element_p2 b;
+    cn1t::element_p2 c;
 
-    double_element(a, cg1cn::generator_p2_v); // a = 2g
+    double_element(a, cn1cn::generator_p2_v); // a = 2g
     double_element(a, a);                     // a = 4g
-    double_element(b, cg1cn::generator_p2_v); // b = 2g
+    double_element(b, cn1cn::generator_p2_v); // b = 2g
     add(c, a, b);                             // c = 6g
 
-    cg1t::element_p2 d{cg1cn::generator_p2_v};
+    cn1t::element_p2 d{cn1cn::generator_p2_v};
     for (size_t i = 1; i < 6; ++i) {
-      add(d, d, cg1cn::generator_p2_v);
+      add(d, d, cn1cn::generator_p2_v);
     }
 
-    REQUIRE(!cg1p::is_identity(c));
-    REQUIRE(cg1p::is_on_curve(c));
-    REQUIRE(!cg1p::is_identity(d));
-    REQUIRE(cg1p::is_on_curve(d));
+    REQUIRE(!cn1p::is_identity(c));
+    REQUIRE(cn1p::is_on_curve(c));
+    REQUIRE(!cn1p::is_identity(d));
+    REQUIRE(cn1p::is_on_curve(d));
     REQUIRE(c == d);
   }
 
   SECTION("can be done inplace") {
-    cg1t::element_p2 lhs{cg1t::element_p2::identity()};
-    cg1t::element_p2 rhs{cg1cn::generator_p2_v};
+    cn1t::element_p2 lhs{cn1t::element_p2::identity()};
+    cn1t::element_p2 rhs{cn1cn::generator_p2_v};
 
     add_inplace(lhs, rhs);
 
-    REQUIRE(lhs == cg1cn::generator_p2_v);
+    REQUIRE(lhs == cn1cn::generator_p2_v);
   }
 }
 
 TEST_CASE("addition with mixed elements") {
   SECTION("keeps the identity on the curve") {
-    cg1t::element_p2 ret;
-    add(ret, cg1t::element_p2::identity(), cg1t::element_affine::identity());
+    cn1t::element_p2 ret;
+    add(ret, cn1t::element_p2::identity(), cn1t::element_affine::identity());
 
-    REQUIRE(cg1p::is_identity(ret));
-    REQUIRE(cg1p::is_on_curve(ret));
+    REQUIRE(cn1p::is_identity(ret));
+    REQUIRE(cn1p::is_on_curve(ret));
   }
 
   SECTION("keeps the generator on the curve") {
-    constexpr f12t::element z{0xba7afa1f9a6fe250, 0xfa0f5b595eafe731, 0x3bdc477694c306e7,
-                              0x2149be4b3949fa24, 0x64aa6e0649b2078c, 0x12b108ac33643c3e};
-    f12t::element x;
-    f12t::element y;
-    f12o::mul(x, cg1cn::generator_p2_v.X, z);
-    f12o::mul(y, cg1cn::generator_p2_v.Y, z);
-    const cg1t::element_p2 projected_generator{x, y, z};
-    cg1t::element_p2 ret;
+    f25t::element z;
+    basn::fast_random_number_generator rng{1, 2};
+    f25rn::generate_random_element(z, rng);
 
-    add(ret, projected_generator, cg1t::element_affine::identity());
+    f25t::element x;
+    f25t::element y;
+    f25o::mul(x, cn1cn::generator_p2_v.X, z);
+    f25o::mul(y, cn1cn::generator_p2_v.Y, z);
+    const cn1t::element_p2 projected_generator{x, y, z};
+    cn1t::element_p2 ret;
 
-    REQUIRE(!cg1p::is_identity(ret));
-    REQUIRE(cg1p::is_on_curve(ret));
-    REQUIRE(cg1cn::generator_p2_v == ret);
+    add(ret, projected_generator, cn1t::element_affine::identity());
+
+    REQUIRE(!cn1p::is_identity(ret));
+    REQUIRE(cn1p::is_on_curve(ret));
+    REQUIRE(cn1cn::generator_p2_v == ret);
   }
 
   SECTION("can reproduce doubling results") {
-    cg1t::element_p2 a;
-    cg1t::element_p2 b;
-    cg1t::element_p2 c;
+    cn1t::element_p2 a;
+    cn1t::element_p2 b;
+    cn1t::element_p2 c;
 
-    double_element(a, cg1cn::generator_p2_v); // a = 2g
+    double_element(a, cn1cn::generator_p2_v); // a = 2g
     double_element(a, a);                     // a = 4g
-    double_element(b, cg1cn::generator_p2_v); // b = 2g
+    double_element(b, cn1cn::generator_p2_v); // b = 2g
     add(c, a, b);                             // c = 6g
 
-    cg1t::element_p2 d{cg1cn::generator_p2_v};
+    cn1t::element_p2 d{cn1cn::generator_p2_v};
     for (size_t i = 1; i < 6; ++i) {
-      add(d, d, cg1cn::generator_affine_v);
+      add(d, d, cn1cn::generator_affine_v);
     }
 
-    REQUIRE(!cg1p::is_identity(d));
-    REQUIRE(cg1p::is_on_curve(d));
+    REQUIRE(!cn1p::is_identity(d));
+    REQUIRE(cn1p::is_on_curve(d));
     REQUIRE(c == d);
   }
 }

@@ -26,26 +26,26 @@ using namespace sxt::cn1o;
 
 TEST_CASE("negation on projective elements") {
   SECTION("produces the identity when summing the generator with its negation") {
-    cg1t::element_p2 gen_neg;
-    neg(gen_neg, cg1cn::generator_p2_v);
+    cn1t::element_p2 gen_neg;
+    neg(gen_neg, cn1cn::generator_p2_v);
 
-    cg1t::element_p2 expect_identity;
-    add(expect_identity, cg1cn::generator_p2_v, gen_neg);
+    cn1t::element_p2 expect_identity;
+    add(expect_identity, cn1cn::generator_p2_v, gen_neg);
 
-    REQUIRE(expect_identity == cg1t::element_p2::identity());
+    REQUIRE(expect_identity == cn1t::element_p2::identity());
   }
 
   SECTION("can be done inplace") {
-    cg1t::element_p2 ng;
-    neg(ng, cg1cn::generator_p2_v);
-    cg1t::element_p2 g{cg1cn::generator_p2_v};
+    cn1t::element_p2 ng;
+    neg(ng, cn1cn::generator_p2_v);
+    cn1t::element_p2 g{cn1cn::generator_p2_v};
     cneg(g, 1);
 
     REQUIRE(g == ng);
 
-    g = cg1cn::generator_p2_v;
+    g = cn1cn::generator_p2_v;
     cneg(g, 0);
 
-    REQUIRE(g == cg1cn::generator_p2_v);
+    REQUIRE(g == cn1cn::generator_p2_v);
   }
 }

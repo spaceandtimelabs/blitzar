@@ -27,7 +27,7 @@ namespace sxt::cn1o {
 // neg
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void neg(cg1t::element_p2& r, const cg1t::element_p2& p) noexcept;
+void neg(cn1t::element_p2& r, const cn1t::element_p2& p) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // cneg
@@ -36,5 +36,5 @@ void neg(cg1t::element_p2& r, const cg1t::element_p2& p) noexcept;
  * r = -r if b = 1 else r
  */
 CUDA_CALLABLE
-void cneg(cg1t::element_p2& r, unsigned int b) noexcept;
+void cneg(cn1t::element_p2& r, unsigned int b) noexcept;
 } // namespace sxt::cn1o

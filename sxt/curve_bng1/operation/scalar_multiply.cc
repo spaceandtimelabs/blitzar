@@ -64,18 +64,18 @@ static bool get_first_one_bit(int& first_one_byte, int& first_one_bit,
 // scalar_multiply_impl
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-static void scalar_multiply_impl(cg1t::element_p2& h, const cg1t::element_p2& p,
+static void scalar_multiply_impl(cn1t::element_p2& h, const cn1t::element_p2& p,
                                  const uint8_t q[32], const int first_one_byte,
                                  const int first_one_bit) noexcept {
-  cg1t::element_p2 acc{cg1t::element_p2::identity()};
+  cn1t::element_p2 acc{cn1t::element_p2::identity()};
   int starting_bit{first_one_bit};
 
   for (int byte_index = first_one_byte; byte_index >= 0; --byte_index) {
     auto byte = q[byte_index];
     for (int bit_index = starting_bit; bit_index >= 0; --bit_index) {
-      cg1o::double_element(acc, acc);
+      double_element(acc, acc);
       if ((byte >> bit_index) & 1) {
-        cg1o::add(acc, acc, p);
+        add(acc, acc, p);
       }
     }
     starting_bit = 7; // reset starting bit for the remainder of bytes
@@ -88,7 +88,7 @@ static void scalar_multiply_impl(cg1t::element_p2& h, const cg1t::element_p2& p,
 // scalar_multiply255
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void scalar_multiply255(cg1t::element_p2& h, const cg1t::element_p2& p,
+void scalar_multiply255(cn1t::element_p2& h, const cn1t::element_p2& p,
                         const uint8_t q[32]) noexcept {
   int first_one_byte{0};
   int first_one_bit{0};
@@ -96,7 +96,7 @@ void scalar_multiply255(cg1t::element_p2& h, const cg1t::element_p2& p,
   if (get_first_one_bit(first_one_byte, first_one_bit, q)) {
     scalar_multiply_impl(h, p, q, first_one_byte, first_one_bit);
   } else {
-    h = cg1t::element_p2::identity();
+    h = cn1t::element_p2::identity();
   }
 }
 } // namespace sxt::cn1o

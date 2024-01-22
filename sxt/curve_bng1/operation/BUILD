@@ -13,11 +13,13 @@ sxt_cc_component(
     is_cuda = True,
     test_deps = [
         ":double",
+        "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
         "//sxt/curve_bng1/constant:generator",
         "//sxt/curve_bng1/property:curve",
         "//sxt/curve_bng1/property:identity",
         "//sxt/curve_bng1/type:element_affine",
+        "//sxt/field25/random:element",
         "//sxt/field25/type:element",
     ],
     deps = [
@@ -123,6 +125,8 @@ sxt_cc_component(
     ],
     is_cuda = True,
     test_deps = [
+        ":add",
+        ":double",
         "//sxt/base/test:unit_test",
         "//sxt/curve_bng1/constant:generator",
         "//sxt/curve_bng1/type:element_p2",

@@ -35,6 +35,6 @@ namespace sxt::cn1o {
  * been reduced.
  */
 CUDA_CALLABLE
-void scalar_multiply255(cg1t::element_p2& h, const cg1t::element_p2& p,
+void scalar_multiply255(cn1t::element_p2& h, const cn1t::element_p2& p,
                         const uint8_t q[32]) noexcept;
 } // namespace sxt::cn1o
