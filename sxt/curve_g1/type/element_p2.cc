@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -48,10 +48,10 @@ bool is_marked(const element_p2& e) noexcept { return e.Z[5] != unset_marker_v; 
 //--------------------------------------------------------------------------------------------------
 // operator==
 //--------------------------------------------------------------------------------------------------
-/*
- Returns true if either both points are at infinity or neither point is at infinity,
- and the coordinates are the same.
-*/
+/**
+ * Returns true if either both points are at infinity or neither point is at infinity,
+ * and the coordinates are the same.
+ */
 bool operator==(const element_p2& lhs, const element_p2& rhs) noexcept {
   f12t::element x1;
   f12t::element x2;

@@ -14,6 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Adopted from zkcrypto/bls12_381
+ *
+ * Copyright (c) 2021
+ * Sean Bowe <ewillbefull@gmail.com>
+ * Jack Grigg <thestr4d@gmail.com>
+ *
+ * See third_party/license/zkcrypto.LICENSE
+ */
 #pragma once
 
 #include "sxt/base/container/span.h"
@@ -27,6 +36,12 @@ namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
 // compress
 //--------------------------------------------------------------------------------------------------
+/*
+ * Serializes a point on the BLS12-381 curve to compressed form using the zkcrypto/bls12_381
+ * projects serialization guidance.
+ * https://github.com/zkcrypto/bls12_381/blob/4df45188913e9d66ef36ae12825865347eed4e1b/src/notes/serialization.rs
+ */
+
 void compress(cg1t::compressed_element& e_c, const cg1t::element_p2& e_p) noexcept;
 
 //--------------------------------------------------------------------------------------------------

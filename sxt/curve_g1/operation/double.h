@@ -26,9 +26,9 @@ namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
 // double_element
 //--------------------------------------------------------------------------------------------------
-/*
- Computes the doubling of element.
- Algorithm 9, https://eprint.iacr.org/2015/1060.pdf
+/**
+ * Computes the doubling of element.
+ * Algorithm 9, https://eprint.iacr.org/2015/1060.pdf
  */
 CUDA_CALLABLE
 void double_element(cg1t::element_p2& h, const cg1t::element_p2& p) noexcept;

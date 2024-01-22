@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -34,9 +34,9 @@ namespace sxt::f12o {
 //--------------------------------------------------------------------------------------------------
 // sub
 //--------------------------------------------------------------------------------------------------
-/*
- h = f - g
-*/
+/**
+ * h = f - g
+ */
 CUDA_CALLABLE
 inline void sub(f12t::element& h, const f12t::element& f, const f12t::element& g) noexcept {
   f12t::element neg_g;

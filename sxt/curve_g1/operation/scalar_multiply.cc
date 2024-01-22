@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -73,9 +73,9 @@ static void scalar_multiply_impl(cg1t::element_p2& h, const cg1t::element_p2& p,
   for (int byte_index = first_one_byte; byte_index >= 0; --byte_index) {
     auto byte = q[byte_index];
     for (int bit_index = starting_bit; bit_index >= 0; --bit_index) {
-      cg1o::double_element(acc, acc);
+      double_element(acc, acc);
       if ((byte >> bit_index) & 1) {
-        cg1o::add(acc, acc, p);
+        add(acc, acc, p);
       }
     }
     starting_bit = 7; // reset starting bit for the remainder of bytes

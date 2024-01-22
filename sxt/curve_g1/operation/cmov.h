@@ -26,11 +26,11 @@ namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
 // cmov
 //--------------------------------------------------------------------------------------------------
-/*
- Replace (f,g) with (g,g) if b == 1;
- replace (f,g) with (f,g) if b == 0.
+/**
+ * Replace (f,g) with (g,g) if b == 1;
+ * replace (f,g) with (f,g) if b == 0.
  *
- Preconditions: b in {0,1}.
+ * Preconditions: b in {0,1}.
  */
 CUDA_CALLABLE
 void cmov(cg1t::element_p2& f, const cg1t::element_p2& g, unsigned int b) noexcept;

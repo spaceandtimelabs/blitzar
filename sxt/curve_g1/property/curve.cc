@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -39,8 +39,8 @@ namespace sxt::cg1p {
 //--------------------------------------------------------------------------------------------------
 // is_on_curve
 //--------------------------------------------------------------------------------------------------
-/*
- Returns true if the element is on the curve: y^2 - x^3 = b_v
+/**
+ * Returns true if the element is on the curve: y^2 - x^3 = b_v
  */
 bool is_on_curve(const cg1t::element_affine& p) noexcept {
   f12t::element y2;
@@ -60,8 +60,8 @@ bool is_on_curve(const cg1t::element_affine& p) noexcept {
 //--------------------------------------------------------------------------------------------------
 // is_on_curve
 //--------------------------------------------------------------------------------------------------
-/*
- Returns true if the element is on the curve: (y^2 * z) = x^3 + (b_v * z^3)
+/**
+ * Returns true if the element is on the curve: (y^2 * z) = x^3 + (b_v * z^3)
  */
 bool is_on_curve(const cg1t::element_p2& p) noexcept {
   f12t::element y2;
