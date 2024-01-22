@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -23,14 +23,14 @@
  *
  * See third_party/license/zkcrypto.LICENSE
  */
-#include "sxt/curve_g1/operation/neg.h"
+#include "sxt/curve_bng1/operation/neg.h"
 
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/operation/cmov.h"
-#include "sxt/field12/operation/neg.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/curve_bng1/type/element_p2.h"
+#include "sxt/field25/operation/cmov.h"
+#include "sxt/field25/operation/neg.h"
+#include "sxt/field25/type/element.h"
 
-namespace sxt::cg1o {
+namespace sxt::cn1o {
 //--------------------------------------------------------------------------------------------------
 // neg
 //--------------------------------------------------------------------------------------------------
@@ -50,4 +50,4 @@ void cneg(cg1t::element_p2& r, unsigned int b) noexcept {
   f12o::neg(t, r.Y);
   f12o::cmov(r.Y, t, b);
 }
-} // namespace sxt::cg1o
+} // namespace sxt::cn1o

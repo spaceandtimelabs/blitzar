@@ -14,20 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/curve_g1/operation/add.h"
+#include "sxt/curve_bng1/operation/add.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve_g1/constant/generator.h"
-#include "sxt/curve_g1/operation/double.h"
-#include "sxt/curve_g1/property/curve.h"
-#include "sxt/curve_g1/property/identity.h"
-#include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/operation/mul.h"
-#include "sxt/field12/type/element.h"
+#include "sxt/curve_bng1/constant/generator.h"
+#include "sxt/curve_bng1/operation/double.h"
+#include "sxt/curve_bng1/property/curve.h"
+#include "sxt/curve_bng1/property/identity.h"
+#include "sxt/curve_bng1/type/element_affine.h"
+#include "sxt/curve_bng1/type/element_p2.h"
+#include "sxt/field25/operation/mul.h"
+#include "sxt/field25/type/element.h"
 
 using namespace sxt;
-using namespace sxt::cg1o;
+using namespace sxt::cn1o;
 
 TEST_CASE("addition with projective elements") {
   SECTION("keeps the identity on the curve") {

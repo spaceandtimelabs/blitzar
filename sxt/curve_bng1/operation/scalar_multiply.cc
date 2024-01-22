@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -23,13 +23,13 @@
  *
  * See third_party/license/zkcrypto.LICENSE
  */
-#include "sxt/curve_g1/operation/scalar_multiply.h"
+#include "sxt/curve_bng1/operation/scalar_multiply.h"
 
-#include "sxt/curve_g1/operation/add.h"
-#include "sxt/curve_g1/operation/double.h"
-#include "sxt/curve_g1/type/element_p2.h"
+#include "sxt/curve_bng1/operation/add.h"
+#include "sxt/curve_bng1/operation/double.h"
+#include "sxt/curve_bng1/type/element_p2.h"
 
-namespace sxt::cg1o {
+namespace sxt::cn1o {
 //--------------------------------------------------------------------------------------------------
 // is_first_bit
 //--------------------------------------------------------------------------------------------------
@@ -99,4 +99,4 @@ void scalar_multiply255(cg1t::element_p2& h, const cg1t::element_p2& p,
     h = cg1t::element_p2::identity();
   }
 }
-} // namespace sxt::cg1o
+} // namespace sxt::cn1o

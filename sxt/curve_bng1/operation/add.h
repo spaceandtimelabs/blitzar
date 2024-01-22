@@ -17,22 +17,22 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/curve_g1/operation/mul_by_3b.h"
-#include "sxt/curve_g1/type/element_p2.h"
-#include "sxt/field12/operation/add.h"
-#include "sxt/field12/operation/mul.h"
-#include "sxt/field12/operation/sub.h"
+#include "sxt/curve_bng1/operation/mul_by_3b.h"
+#include "sxt/curve_bng1/type/element_p2.h"
+#include "sxt/field25/operation/add.h"
+#include "sxt/field25/operation/mul.h"
+#include "sxt/field25/operation/sub.h"
 
-namespace sxt::cg1t {
+namespace sxt::cn1t {
 struct element_affine;
-} // namespace sxt::cg1t
+}
 
-namespace sxt::cg1o {
+namespace sxt::cn1o {
 //--------------------------------------------------------------------------------------------------
 // add_inplace
 //--------------------------------------------------------------------------------------------------
-/*
- p = p + q
+/**
+ * p = p + q
  */
 CUDA_CALLABLE inline void add_inplace(cg1t::element_p2& p, const cg1t::element_p2& q) noexcept {
   f12t::element t0, t1, t2, t3, t4;
@@ -76,8 +76,8 @@ CUDA_CALLABLE inline void add_inplace(cg1t::element_p2& p, const cg1t::element_p
 //--------------------------------------------------------------------------------------------------
 // add
 //--------------------------------------------------------------------------------------------------
-/*
- Algorithm 7, https://eprint.iacr.org/2015/1060.pdf
+/**
+ * Algorithm 7, https://eprint.iacr.org/2015/1060.pdf
  */
 CUDA_CALLABLE
 void inline add(cg1t::element_p2& h, const cg1t::element_p2& p,
@@ -89,9 +89,9 @@ void inline add(cg1t::element_p2& h, const cg1t::element_p2& p,
 //--------------------------------------------------------------------------------------------------
 // add
 //--------------------------------------------------------------------------------------------------
-/*
- Algorithm 8, https://eprint.iacr.org/2015/1060.pdf
+/**
+ * Algorithm 8, https://eprint.iacr.org/2015/1060.pdf
  */
 CUDA_CALLABLE
 void add(cg1t::element_p2& h, const cg1t::element_p2& p, const cg1t::element_affine& q) noexcept;
-} // namespace sxt::cg1o
+} // namespace sxt::cn1o

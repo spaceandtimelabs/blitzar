@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -23,13 +23,13 @@
  *
  * See third_party/license/zkcrypto.LICENSE
  */
-#include "sxt/curve_g1/operation/add.h"
+#include "sxt/curve_bng1/operation/add.h"
 
-#include "sxt/curve_g1/operation/cmov.h"
-#include "sxt/curve_g1/property/identity.h"
-#include "sxt/curve_g1/type/element_affine.h"
+#include "sxt/curve_bng1/operation/cmov.h"
+#include "sxt/curve_bng1/property/identity.h"
+#include "sxt/curve_bng1/type/element_affine.h"
 
-namespace sxt::cg1o {
+namespace sxt::cn1o {
 //--------------------------------------------------------------------------------------------------
 // add
 //--------------------------------------------------------------------------------------------------
@@ -71,4 +71,4 @@ void add(cg1t::element_p2& h, const cg1t::element_p2& p, const cg1t::element_aff
 
   cmov(h, p, cg1p::is_identity(q));
 }
-} // namespace sxt::cg1o
+} // namespace sxt::cn1o
