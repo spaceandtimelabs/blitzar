@@ -186,6 +186,7 @@ void reduce_buckets(basct::span<T> reductions, const basdv::stream& stream,
   auto num_bucket_groups = num_buckets / num_buckets_per_group;
   SXT_DEBUG_ASSERT(
       // clang-format off
+      basdv::is_host_pointer(reductions.data()) &&
       num_outputs > 0 &&
       num_buckets > 1 &&
       num_buckets % num_outputs == 0 && 

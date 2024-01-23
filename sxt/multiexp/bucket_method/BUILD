@@ -184,6 +184,24 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "multiexponentiation2",
+    test_deps = [
+        "//sxt/base/curve:example_element",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
+        "//sxt/curve21/operation:neg",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/type:literal",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+    ],
+)
+
+sxt_cc_component(
     name = "sum",
     test_deps = [
       "//sxt/base/curve:example_element",
