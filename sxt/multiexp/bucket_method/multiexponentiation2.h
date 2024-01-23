@@ -9,13 +9,30 @@
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
+// multiexponentiate_options 
+//--------------------------------------------------------------------------------------------------
+struct multiexponentiate_options {
+  unsigned min_chunk_size = 1'000u;
+  unsigned max_chunk_size = 256'000u;
+  unsigned bit_width = 8;
+};
+
+//--------------------------------------------------------------------------------------------------
+// plan_multiexponentiation 
+//--------------------------------------------------------------------------------------------------
+void plan_multiexponentiation(multiexponentiate_options& options, unsigned num_outputs,
+                              unsigned element_num_bytes, unsigned n) noexcept;
+
+//--------------------------------------------------------------------------------------------------
 // multiexponentiate2 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element Element>
-xena::future<> multiexponentiate2(basct::span<Element> res, basct::cspan<Element> generators,
-                                  basct::cspan<const Element*> scalars, unsigned element_num_bytes,
-                                  unsigned n) noexcept {
+xena::future<>
+multiexponentiate2(basct::span<Element> res, const multiexponentiate_options& options,
+                   basct::cspan<Element> generators, basct::cspan<const Element*> scalars,
+                   unsigned element_num_bytes, unsigned n) noexcept {
   (void)res;
+  (void)options;
   (void)scalars;
   (void)element_num_bytes;
   (void)n;
@@ -52,7 +69,9 @@ try_multiexponentiate2(basct::cspan<Element> generators,
     scalars[output_index] = seq.data;
   }
   memmg::managed_array<Element> res{num_outputs, memr::get_pinned_resource()};
-  co_await multiexponentiate2(res, generators, scalars, element_num_bytes, n);
+  multiexponentiate_options options;
+  plan_multiexponentiation(options, num_outputs, element_num_bytes, n);
+  co_await multiexponentiate2(res, options, generators, scalars, element_num_bytes, n);
   co_return res;
 }
 } // namespace sxt::mtxbk
