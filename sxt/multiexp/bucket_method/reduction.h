@@ -171,7 +171,7 @@ void complete_bucket_reductions(basct::span<T> reductions, const basdv::stream& 
 //--------------------------------------------------------------------------------------------------
 // plan_reduction 
 //--------------------------------------------------------------------------------------------------
-unsigned plan_reduction(unsigned num_buckets, unsigned num_outputs) noexcept;
+unsigned plan_reduction(unsigned bit_width, unsigned num_buckets, unsigned num_outputs) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // reduce_buckets
@@ -194,7 +194,7 @@ void reduce_buckets(basct::span<T> reductions, const basdv::stream& stream,
       // clang-format on
   );
   if (reduction_width_log2 == 0) {
-    reduction_width_log2 = plan_reduction(num_buckets, num_outputs);
+    reduction_width_log2 = plan_reduction(bit_width, num_buckets, num_outputs);
   }
   auto reduction_width = (1u << reduction_width_log2);
   auto num_partials_per_group = basn::divide_up(num_buckets_per_group, reduction_width);
