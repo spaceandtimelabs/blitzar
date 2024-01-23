@@ -198,6 +198,19 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/curve:element",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/iterator:index_range",
+        "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/num:divide_up",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
+        # "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:pinned_resource",
+        "//sxt/multiexp/base:exponent_sequence",
     ],
 )
 
