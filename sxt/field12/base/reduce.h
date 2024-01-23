@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -33,10 +33,10 @@ namespace sxt::f12b {
 //--------------------------------------------------------------------------------------------------
 // reduce
 //--------------------------------------------------------------------------------------------------
-/*
- The Montgomery reduction here is based on Algorithm 14.32 in
- Handbook of Applied Cryptography
- <http://cacr.uwaterloo.ca/hac/about/chap14.pdf>.
+/**
+ * The Montgomery reduction here is based on Algorithm 14.32 in
+ * Handbook of Applied Cryptography
+ * <http://cacr.uwaterloo.ca/hac/about/chap14.pdf>.
  */
 CUDA_CALLABLE void reduce(uint64_t h[6], const uint64_t t[12]) noexcept;
 

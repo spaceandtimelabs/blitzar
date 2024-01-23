@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -33,10 +33,10 @@ namespace sxt::f12o {
 //--------------------------------------------------------------------------------------------------
 // invert
 //--------------------------------------------------------------------------------------------------
-/*
- Computes the multiplicative inverse of this field element,
- returning FALSE in the case that this element is zero.
-*/
+/**
+ * Computes the multiplicative inverse of this field element,
+ * returning FALSE in the case that this element is zero.
+ */
 CUDA_CALLABLE bool invert(f12t::element& h, const f12t::element& f) noexcept {
   constexpr f12t::element g(0xb9feffffffffaaa9, 0x1eabfffeb153ffff, 0x6730d2a0f6b0f624,
                             0x64774b84f38512bf, 0x4b1ba7b6434bacd7, 0x1a0111ea397fe69a);

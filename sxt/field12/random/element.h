@@ -31,8 +31,8 @@ namespace sxt::f12rn {
 //--------------------------------------------------------------------------------------------------
 // generate_random_element
 //--------------------------------------------------------------------------------------------------
-/*
- Not guaranteed to be uniform. Only random elements generated below the modulus will be accepted.
+/**
+ * Not guaranteed to be uniform. Only random elements generated below the modulus will be accepted.
  */
 CUDA_CALLABLE
 void generate_random_element(f12t::element& e, basn::fast_random_number_generator& rng) noexcept;

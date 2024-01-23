@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+/**
  * Adopted from zkcrypto/bls12_381
  *
  * Copyright (c) 2021
@@ -34,9 +34,9 @@ namespace sxt::f12o {
 //--------------------------------------------------------------------------------------------------
 // pow_vartime
 //--------------------------------------------------------------------------------------------------
-/*
- Although this is labeled "vartime", it is only variable time with respect to the exponent.
-*/
+/**
+ * Although this is labeled "vartime", it is only variable time with respect to the exponent.
+ */
 CUDA_CALLABLE
 void pow_vartime(f12t::element& h, const f12t::element& f, const f12t::element& g) noexcept {
   f12t::element res = f12cn::one_v;

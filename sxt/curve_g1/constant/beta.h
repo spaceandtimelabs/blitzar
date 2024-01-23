@@ -22,8 +22,8 @@ namespace sxt::cg1cn {
 //--------------------------------------------------------------------------------------------------
 // beta_v
 //--------------------------------------------------------------------------------------------------
-/*
- A nontrivial third root of unity in Fp
+/**
+ * A nontrivial third root of unity in Fp
  */
 static constexpr f12t::element beta_v{0x30f1361b798a64e8, 0xf3b8ddab7ece5a2a, 0x16a8ca3ac61577f7,
                                       0xc26a2ff874fd029b, 0x3636b76660701c6e, 0x051ba4ab241b6160};

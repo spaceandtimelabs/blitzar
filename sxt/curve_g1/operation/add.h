@@ -14,6 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Adopted from zkcrypto/bls12_381
+ *
+ * Copyright (c) 2021
+ * Sean Bowe <ewillbefull@gmail.com>
+ * Jack Grigg <thestr4d@gmail.com>
+ *
+ * See third_party/license/zkcrypto.LICENSE
+ */
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
@@ -31,8 +40,8 @@ namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
 // add_inplace
 //--------------------------------------------------------------------------------------------------
-/*
- p = p + q
+/**
+ * p = p + q
  */
 CUDA_CALLABLE inline void add_inplace(cg1t::element_p2& p, const cg1t::element_p2& q) noexcept {
   f12t::element t0, t1, t2, t3, t4;
@@ -76,8 +85,8 @@ CUDA_CALLABLE inline void add_inplace(cg1t::element_p2& p, const cg1t::element_p
 //--------------------------------------------------------------------------------------------------
 // add
 //--------------------------------------------------------------------------------------------------
-/*
- Algorithm 7, https://eprint.iacr.org/2015/1060.pdf
+/**
+ * Algorithm 7, https://eprint.iacr.org/2015/1060.pdf
  */
 CUDA_CALLABLE
 void inline add(cg1t::element_p2& h, const cg1t::element_p2& p,
@@ -89,8 +98,8 @@ void inline add(cg1t::element_p2& h, const cg1t::element_p2& p,
 //--------------------------------------------------------------------------------------------------
 // add
 //--------------------------------------------------------------------------------------------------
-/*
- Algorithm 8, https://eprint.iacr.org/2015/1060.pdf
+/**
+ * Algorithm 8, https://eprint.iacr.org/2015/1060.pdf
  */
 CUDA_CALLABLE
 void add(cg1t::element_p2& h, const cg1t::element_p2& p, const cg1t::element_affine& q) noexcept;

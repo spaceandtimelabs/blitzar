@@ -28,12 +28,12 @@ namespace sxt::cg1o {
 //--------------------------------------------------------------------------------------------------
 // scalar_multiply255
 //--------------------------------------------------------------------------------------------------
-/*
- This is a simple double-and-add implementation of point multiplication, moving from most
- significant to least significant bit of the scalar. We skip the leading bit because it's
- always unset for Fq elements. Assumes the scalar q is little endian and the exponent has already
- been reduced.
-*/
+/**
+ * This is a simple double-and-add implementation of point multiplication, moving from most
+ * significant to least significant bit of the scalar. We skip the leading bit because it's
+ * always unset for Fq elements. Assumes the scalar q is little endian and the exponent has already
+ * been reduced.
+ */
 CUDA_CALLABLE
 void scalar_multiply255(cg1t::element_p2& h, const cg1t::element_p2& p,
                         const uint8_t q[32]) noexcept;

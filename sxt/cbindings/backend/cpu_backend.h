@@ -22,35 +22,6 @@
 #include "sxt/base/container/span.h"
 #include "sxt/cbindings/backend/computational_backend.h"
 
-namespace sxt::mtxb {
-struct exponent_sequence;
-}
-
-namespace sxt::rstt {
-class compressed_element;
-}
-
-namespace sxt::c21t {
-struct element_p3;
-}
-
-namespace sxt::cg1t {
-class compressed_element;
-struct element_p3;
-} // namespace sxt::cg1t
-
-namespace sxt::s25t {
-class element;
-}
-
-namespace sxt::prft {
-class transcript;
-}
-
-namespace sxt::prfip {
-struct proof_descriptor;
-}
-
 namespace sxt::cbnbck {
 
 //--------------------------------------------------------------------------------------------------
