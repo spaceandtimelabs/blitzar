@@ -24,4 +24,12 @@ TEST_CASE("we can reduce bucket sums") {
     E expected = 3u * 1 + 5u * 2u + 2u * 3u;
     REQUIRE(reductions[0] == expected);
   }
+
+  SECTION("we can reduce two groups of 3 bucket sums") {
+    bucket_sums = {3, 5, 2, 7, 1, 9};
+    reduce_buckets<E>(reductions, stream, bucket_sums, 2, 1);
+    basdv::synchronize_stream(stream);
+    /* E expected = 3u * 1 + 5u * 2u + 2u * 3u; */
+    /* REQUIRE(reductions[0] == expected); */
+  }
 }

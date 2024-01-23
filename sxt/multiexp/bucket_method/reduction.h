@@ -8,6 +8,7 @@
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/device/synchronization.h"
@@ -182,14 +183,22 @@ void reduce_buckets(basct::span<T> reductions, const basdv::stream& stream,
   auto num_buckets = static_cast<unsigned>(bucket_sums.size());
   auto num_outputs = static_cast<unsigned>(reductions.size());
   auto num_buckets_per_group = (1u << bit_width) - 1u;
-  auto num_buckets_per_output = num_buckets / num_outputs;
   auto num_bucket_groups = num_buckets / num_buckets_per_group;
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      num_outputs > 0 &&
+      num_buckets > 1 &&
+      num_buckets % num_outputs == 0 && 
+      num_buckets % num_bucket_groups == 0 && 
+      num_buckets % num_buckets_per_group == 0
+      // clang-format on
+  );
   if (reduction_width_log2 == 0) {
     reduction_width_log2 = plan_reduction(num_buckets, num_outputs);
   }
   auto reduction_width = (1u << reduction_width_log2);
-  auto num_partials_per_output = basn::divide_up(num_buckets_per_output, reduction_width);
-  auto num_partials = num_partials_per_output * num_outputs;
+  auto num_partials_per_group = basn::divide_up(num_buckets_per_group, reduction_width);
+  auto num_partials = num_partials_per_group * num_bucket_groups;
   memr::async_device_resource resource{stream};
 
   // partially reduce bucket groups
