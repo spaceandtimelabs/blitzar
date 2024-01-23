@@ -184,9 +184,9 @@ void sxt_bls12_381_g1_compute_pedersen_commitments_with_generators(
 }
 
 //--------------------------------------------------------------------------------------------------
-// sxt_bn254_g1_compute_pedersen_commitments_with_generators
+// sxt_bn254_g1_uncompressed_compute_pedersen_commitments_with_generators
 //--------------------------------------------------------------------------------------------------
-void sxt_bn254_g1_compute_pedersen_commitments_with_generators(
+void sxt_bn254_g1_uncompressed_compute_pedersen_commitments_with_generators(
     struct sxt_bn254_g1* commitments, uint32_t num_sequences,
     const struct sxt_sequence_descriptor* descriptors, const struct sxt_bn254_g1* generators) {
   cbn::process_compute_pedersen_commitments(
