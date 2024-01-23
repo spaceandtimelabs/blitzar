@@ -33,6 +33,11 @@ namespace sxt::c21t {
 struct element_p3;
 }
 
+namespace sxt::cn1t {
+struct element_affine;
+struct element_p2;
+} // namespace sxt::cn1t
+
 namespace sxt::cg1t {
 class compressed_element;
 struct element_p2;
@@ -66,6 +71,10 @@ public:
   virtual void compute_commitments(basct::span<cg1t::compressed_element> commitments,
                                    basct::cspan<mtxb::exponent_sequence> value_sequences,
                                    basct::cspan<cg1t::element_p2> generators) const noexcept = 0;
+
+  virtual void compute_commitments(basct::span<cn1t::element_affine> commitments,
+                                   basct::cspan<mtxb::exponent_sequence> value_sequences,
+                                   basct::cspan<cn1t::element_p2> generators) const noexcept = 0;
 
   virtual basct::cspan<c21t::element_p3>
   get_precomputed_generators(std::vector<c21t::element_p3>& temp_generators, uint64_t n,

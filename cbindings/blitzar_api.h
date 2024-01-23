@@ -65,6 +65,13 @@ struct sxt_bls12_381_g1 {
   uint64_t Y[6];
 };
 
+struct sxt_bn254_g1 {
+  // encodes an affine element of the bn254 G1 group
+  uint64_t X[4];
+  uint64_t Y[4];
+  uint8_t infinity;
+};
+
 /** describes a sequence of values **/
 struct sxt_sequence_descriptor {
   // the number of bytes used to represent an element in the sequence
@@ -222,6 +229,46 @@ void sxt_curve25519_compute_pedersen_commitments_with_generators(
 void sxt_bls12_381_g1_compute_pedersen_commitments_with_generators(
     struct sxt_bls12_381_g1_compressed* commitments, uint32_t num_sequences,
     const struct sxt_sequence_descriptor* descriptors, const struct sxt_bls12_381_g1* generators);
+
+/**
+ * Compute the Pedersen commitments for sequences of values
+ *
+ * Denote an element of a sequence by a_ij where i represents the sequence index
+ * and j represents the element index. Let * represent the operator for the
+ * bn254 G1 group. Then res\[i] encodes the bn254 G1 group value
+ *
+ * ```text
+ *     Prod_{j=1 to n_i} g_j ^ a_ij
+ * ```
+ *
+ * where n_i represents the number of elements in sequence i and g_j is a group
+ * element determined by the `generators\[j]` user value given as input
+ *
+ * # Arguments:
+ *
+ * - commitments   (out): an array of length num_sequences where the computed commitments
+ *                     of each sequence must be written into
+ *
+ * - num_sequences (in): specifies the number of sequences
+ * - descriptors   (in): an array of length num_sequences that specifies each sequence
+ * - generators    (in): an array of length `max_num_rows` = `the maximum between all n_i`
+ *
+ * # Abnormal program termination in case of:
+ *
+ * - backend not initialized or incorrectly initialized
+ * - descriptors == nullptr
+ * - commitments == nullptr
+ * - descriptor\[i].element_nbytes == 0
+ * - descriptor\[i].element_nbytes > 32
+ * - descriptor\[i].n > 0 && descriptor\[i].data == nullptr
+ *
+ * # Considerations:
+ *
+ * - num_sequences equal to 0 will skip the computation
+ */
+void sxt_bn254_g1_uncompressed_compute_pedersen_commitments_with_generators(
+    struct sxt_bn254_g1* commitments, uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors, const struct sxt_bn254_g1* generators);
 
 /**
  * Gets the pre-specified random generated elements used for the Pedersen commitments in the

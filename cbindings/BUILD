@@ -103,6 +103,9 @@ sxt_cc_component(
     impl_deps = [
         ":backend",
         "//sxt/base/error:assert",
+        "//sxt/curve_bng1/type:conversion_utility",
+        "//sxt/curve_bng1/type:element_affine",
+        "//sxt/curve_bng1/type:element_p2",
         "//sxt/curve_g1/type:compressed_element",
         "//sxt/curve_g1/type:conversion_utility",
         "//sxt/curve_g1/type:element_affine",
