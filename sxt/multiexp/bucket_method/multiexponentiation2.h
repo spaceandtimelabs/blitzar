@@ -54,11 +54,11 @@ CUDA_CALLABLE void bucket_sum_combination_kernel(T* __restrict__ sums,
 }
 
 //--------------------------------------------------------------------------------------------------
-// multiexponentiate2 
+// multiexponentiate 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element Element>
 xena::future<>
-multiexponentiate2(basct::span<Element> res, const multiexponentiate_options& options,
+multiexponentiate(basct::span<Element> res, const multiexponentiate_options& options,
                    basct::cspan<Element> generators, basct::cspan<const uint8_t*> scalars,
                    unsigned element_num_bytes) noexcept {
   auto num_outputs = res.size();
@@ -110,7 +110,7 @@ multiexponentiate2(basct::span<Element> res, const multiexponentiate_options& op
   bucket_sums_chunks_dev.reset();
 
   // reduce bucket sums
-  reduce_buckets(res, stream, bucket_sums, options.bit_width);
+  reduce_buckets<Element>(res, stream, bucket_sums, options.bit_width);
   co_await xendv::await_stream(std::move(stream));
 }
 
@@ -148,7 +148,7 @@ try_multiexponentiate2(basct::cspan<Element> generators,
   memmg::managed_array<Element> res{num_outputs, memr::get_pinned_resource()};
   multiexponentiate_options options;
   plan_multiexponentiation(options, num_outputs, element_num_bytes, n);
-  co_await multiexponentiate2(res, options, generators, scalars, element_num_bytes);
+  co_await multiexponentiate(res, options, generators, scalars, element_num_bytes);
   co_return res;
 }
 } // namespace sxt::mtxbk
