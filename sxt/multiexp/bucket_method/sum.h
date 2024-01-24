@@ -49,55 +49,6 @@ xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generato
                                    basct::cspan<const uint8_t*> scalars, unsigned element_num_bytes,
                                    unsigned bit_width) noexcept {
   SXT_DEBUG_ASSERT(
-      basdv::is_active_device_pointer(sums.data())
-  );
-  auto num_buckets = sums.size();
-  auto n = generators.size();
-  if (n == 0) {
-    co_return;
-  }
-  memmg::managed_array<bucket_descriptor> table{memr::get_device_resource()};
-  memmg::managed_array<unsigned> indexes{memr::get_device_resource()};
-  auto fut = compute_multiproduct_table(table, indexes, scalars, element_num_bytes, n, bit_width);
-
-  memmg::managed_array<T> generators_data{memr::get_device_resource()};
-  auto generators_dev = co_await xendv::make_active_device_viewable(generators_data, generators);
-  co_await std::move(fut);
-
-  SXT_DEBUG_ASSERT(table.size() == num_buckets);
-
-  auto f = [
-               // clang-format off
-    sums_p = sums.data(), 
-    generators_p = generators_dev.data(), 
-    table = table.data(),
-    indexes = indexes.data()
-               // clang-format on
-  ] __device__
-           __host__(unsigned /*num_buckets*/, unsigned bucket_index) noexcept {
-             T* __restrict__ sums = sums_p;
-             const T* __restrict__ generators = generators_p;
-             auto descriptor = table[bucket_index];
-             if (descriptor.num_entries == 0) {
-               sums[descriptor.bucket_index] = T::identity();
-               return;
-             }
-             auto first = descriptor.entry_first;
-             auto sum = generators[indexes[first]];
-             for (unsigned i = 1; i < descriptor.num_entries; ++i) {
-               auto e = generators[indexes[first + i]];
-               add_inplace(sum, e);
-             }
-             sums[descriptor.bucket_index] = sum;
-           };
-  co_await algi::for_each(f, num_buckets);
-}
-
-template <bascrv::element T>
-xena::future<> compute_bucket_sums2(basct::span<T> sums, basct::cspan<T> generators,
-                                    basct::cspan<const uint8_t*> scalars,
-                                    unsigned element_num_bytes, unsigned bit_width) noexcept {
-  SXT_DEBUG_ASSERT(
       basdv::is_host_pointer(sums.data())
   );
   auto num_buckets = sums.size();
@@ -119,18 +70,18 @@ xena::future<> compute_bucket_sums2(basct::span<T> sums, basct::cspan<T> generat
   // compute bucket sums
   basdv::stream stream;
   memr::async_device_resource resource{stream};
-  memmg::managed_array<T> sums_dev{num_buckets, resource};
+  memmg::managed_array<T> sums_dev{num_buckets, &resource};
   auto f = [
     // clang-format off
     sums = sums_dev.data(),
-    generators = generators.data(),
+    generators = generators_dev.data(),
     table = table.data(),
     indexes = indexes.data()
     // clang-format on
   ] __device__ __host__ (unsigned /*num_buckets*/, unsigned sum_index) noexcept {
     bucket_sum_kernel(sums, generators, table, indexes, sum_index);
   };
-  algi::launch_for_each_kernel(f, stream, num_buckets);
+  algi::launch_for_each_kernel(stream, f, num_buckets);
 
   // copy sums to host
   basdv::async_copy_device_to_host(sums, sums_dev, stream);

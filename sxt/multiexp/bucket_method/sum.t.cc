@@ -12,7 +12,7 @@ using namespace sxt::mtxbk;
 
 TEST_CASE("we can compute bucket sums") {
   using E = bascrv::element97;
-  memmg::managed_array<E> sums{255u, memr::get_managed_device_resource()};
+  memmg::managed_array<E> sums(255u);
   const auto element_num_bytes = 1u;
   const auto bit_width = 8u;
 
@@ -58,9 +58,4 @@ TEST_CASE("we can compute bucket sums") {
     expected[0] = 32u + 5u;
     REQUIRE(sums == expected);
   }
-  (void)sums;
 }
-/* template <bascrv::element T> */
-/* xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generators, */
-/*                                    basct::cspan<const uint8_t*> scalars, unsigned element_num_bytes, */
-/*                                    unsigned bit_width) noexcept { */
