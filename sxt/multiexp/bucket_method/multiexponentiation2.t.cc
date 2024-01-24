@@ -26,4 +26,24 @@ TEST_CASE("we can compute multiexponentiations") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 33u);
   }
+
+  SECTION("we handle the case of a single scalar of 2") {
+    memmg::managed_array<uint8_t> scalars1 = {2u};
+    scalars = {scalars1.data()};
+    generators = {33u};
+    auto fut = multiexponentiate<E>(res, options, generators, scalars, element_num_bytes);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 66u);
+  }
+
+  SECTION("we handle two elements") {
+    memmg::managed_array<uint8_t> scalars1 = {2u, 7u};
+    scalars = {scalars1.data()};
+    generators = {33u, 53u};
+    auto fut = multiexponentiate<E>(res, options, generators, scalars, element_num_bytes);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 33u * 2u + 53u * 7u);
+  }
 }
