@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iterator>
+#include <chrono>
+#include <print>
 
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
@@ -61,10 +63,12 @@ xena::future<>
 multiexponentiate(basct::span<Element> res, const multiexponentiate_options& options,
                    basct::cspan<Element> generators, basct::cspan<const uint8_t*> scalars,
                    unsigned element_num_bytes) noexcept {
+  std::print("********\n");
   auto num_outputs = res.size();
   auto n = generators.size();
 
   // sum buckets
+  auto t1 = std::chrono::steady_clock::now();
   auto rng = basit::index_range{0, n}
                  .min_chunk_size(options.min_chunk_size)
                  .max_chunk_size(options.max_chunk_size);
@@ -76,6 +80,7 @@ multiexponentiate(basct::span<Element> res, const multiexponentiate_options& opt
   memmg::managed_array<Element> bucket_sums_chunks{num_buckets * num_chunks,
                                                    memr::get_pinned_resource()};
   size_t chunk_index = 0;
+  auto t2 = std::chrono::steady_clock::now();
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& chunk) noexcept -> xena::future<> {
         auto sums_slice =
@@ -90,6 +95,7 @@ multiexponentiate(basct::span<Element> res, const multiexponentiate_options& opt
                                      options.bit_width);
       });
 
+  auto t3 = std::chrono::steady_clock::now();
   // combine chunks
   basdv::stream stream;
   memr::async_device_resource resource{stream};
@@ -113,6 +119,13 @@ multiexponentiate(basct::span<Element> res, const multiexponentiate_options& opt
   // reduce bucket sums
   reduce_buckets<Element>(res, stream, bucket_sums, options.bit_width);
   co_await xendv::await_stream(std::move(stream));
+  auto t4 = std::chrono::steady_clock::now();
+  auto mp = std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t1).count() / 1000.0;
+  auto rest = std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count() / 1000.0;
+  auto total = std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t1).count() / 1000.0;
+  std::print("total = {}\n", total);
+  std::print("mp = {}\n", mp);
+  std::print("rest = {}\n", rest);
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstddef>
+#include <chrono>
+#include <print>
 
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
@@ -58,6 +60,7 @@ xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generato
   }
 
   // set up the multiproduct table
+  auto t1 = std::chrono::steady_clock::now();
   memmg::managed_array<bucket_descriptor> table{memr::get_device_resource()};
   memmg::managed_array<unsigned> indexes{memr::get_device_resource()};
   auto fut = compute_multiproduct_table(table, indexes, scalars, element_num_bytes, n, bit_width);
@@ -67,6 +70,7 @@ xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generato
   co_await std::move(fut);
   SXT_DEBUG_ASSERT(table.size() == num_buckets);
 
+  auto t2 = std::chrono::steady_clock::now();
   // compute bucket sums
   basdv::stream stream;
   memr::async_device_resource resource{stream};
@@ -86,5 +90,10 @@ xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generato
   // copy sums to host
   basdv::async_copy_device_to_host(sums, sums_dev, stream);
   co_await xendv::await_stream(std::move(stream));
+  auto t3 = std::chrono::steady_clock::now();
+  auto prep = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() / 1000.0;
+  auto bksum = std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count() / 1000.0;
+  std::print("  mp_prep={}\n", prep);
+  std::print("  mp_bucket_sums={}\n", bksum);
 }
 } // namespace sxt::mtxbk

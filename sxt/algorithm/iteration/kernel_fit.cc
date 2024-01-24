@@ -74,7 +74,8 @@ xenk::kernel_dims fit_iteration_kernel(unsigned int n) noexcept {
   }
 
   // Fix block size and use a formula to derive the other numbers
-  unsigned max_blocks = 256;
+  /* unsigned max_blocks = 256; */
+  unsigned max_blocks = 65'535;
   auto block_size = xenk::block_size_t::v128;
   auto num_iters = basn::divide_up(n, static_cast<unsigned>(block_size) * max_blocks) *
                    static_cast<unsigned>(block_size);
