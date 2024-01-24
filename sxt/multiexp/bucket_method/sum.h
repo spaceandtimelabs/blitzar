@@ -7,6 +7,7 @@
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/macro/cuda_callable.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/device_viewable.h"
 #include "sxt/memory/management/managed_array.h"
@@ -17,7 +18,29 @@
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
-// compute_bucket_sums 
+// bucket_sum_kernel 
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+CUDA_CALLABLE void bucket_sum_kernel(T* __restrict__ sums, const T* __restrict__ generators,
+                                     const bucket_descriptor* __restrict__ table,
+                                     const unsigned* __restrict__ indexes,
+                                     unsigned bucket_index) noexcept {
+  auto descriptor = table[bucket_index];
+  if (descriptor.num_entries == 0) {
+    sums[descriptor.bucket_index] = T::identity();
+    return;
+  }
+  auto first = descriptor.entry_first;
+  auto sum = generators[indexes[first]];
+  for (unsigned i = 1; i < descriptor.num_entries; ++i) {
+    auto e = generators[indexes[first + i]];
+    add_inplace(sum, e);
+  }
+  sums[descriptor.bucket_index] = sum;
+}
+
+//--------------------------------------------------------------------------------------------------
+// compute_bucket_sums
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generators,
