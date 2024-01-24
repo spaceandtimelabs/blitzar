@@ -199,6 +199,7 @@ sxt_cc_component(
     ],
     deps = [
       ":sum",
+      ":reduction",
         "//sxt/base/container:span",
         "//sxt/base/container:span_utility",
         "//sxt/base/curve:element",
@@ -211,8 +212,9 @@ sxt_cc_component(
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
         "//sxt/execution/device:for_each",
+        "//sxt/execution/device:synchronization",
         "//sxt/memory/management:managed_array",
-        # "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:pinned_resource",
         "//sxt/multiexp/base:exponent_sequence",
     ],
