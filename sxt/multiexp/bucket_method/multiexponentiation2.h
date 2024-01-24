@@ -127,29 +127,30 @@ xena::future<memmg::managed_array<Element>>
 try_multiexponentiate2(basct::cspan<Element> generators,
                       basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   auto num_outputs = exponents.size();
+  memmg::managed_array<Element> res{memr::get_pinned_resource()};
   if (num_outputs == 0) {
-    co_return {};
+    co_return res;
   }
   auto n = exponents[0].n;
-  if (n == 0) {
-    co_return {};
+  if (n == 0 || exponents[0].is_signed) {
+    co_return res;
   }
-  SXT_RELEASE_ASSERT(generators >= n);
+  SXT_RELEASE_ASSERT(generators.size() >= n);
   generators = generators.subspan(0, n);
   memmg::managed_array<const uint8_t*> scalars(num_outputs);
   scalars[0] = exponents[0].data;
   auto element_num_bytes = exponents[0].element_nbytes;
   for (size_t output_index=1; output_index<num_outputs; ++output_index) {
     auto& seq = exponents[output_index];
-    if (seq.n != n || seq.element_nbytes != element_num_bytes) {
-      co_return {};
+    if (seq.n != n || seq.element_nbytes != element_num_bytes || seq.is_signed) {
+      co_return res;
     }
     scalars[output_index] = seq.data;
   }
-  memmg::managed_array<Element> res{num_outputs, memr::get_pinned_resource()};
+  res.resize(num_outputs);
   multiexponentiate_options options;
   plan_multiexponentiation(options, num_outputs, element_num_bytes, n);
-  co_await multiexponentiate(res, options, generators, scalars, element_num_bytes);
+  co_await multiexponentiate<Element>(res, options, generators, scalars, element_num_bytes);
   co_return res;
 }
 } // namespace sxt::mtxbk

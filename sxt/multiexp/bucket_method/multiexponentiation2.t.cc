@@ -73,4 +73,25 @@ TEST_CASE("we can compute multiexponentiations") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 33u * 2u + 53u * 7u);
   }
+
+  SECTION("we handle scalars of multiple bytes") {
+    element_num_bytes = 2u;
+    memmg::managed_array<uint8_t> scalars1 = {0u, 1u};
+    scalars = {scalars1.data()};
+    generators = {33u};
+    auto fut = multiexponentiate<E>(res, options, generators, scalars, element_num_bytes);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == (1u << 8u) * 33u);
+  }
+
+  SECTION("we handle a scalar of negative 1") {
+    memmg::managed_array<uint8_t> scalars1 = {96u};
+    scalars = {scalars1.data()};
+    generators = {33u};
+    auto fut = multiexponentiate<E>(res, options, generators, scalars, element_num_bytes);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == (97u - 33u));
+  }
 }
