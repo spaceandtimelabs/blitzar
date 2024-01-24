@@ -235,6 +235,7 @@ sxt_cc_component(
       "//sxt/algorithm/iteration:for_each",
         "//sxt/base/container:span",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:device_viewable",
         "//sxt/memory/management:managed_array",
