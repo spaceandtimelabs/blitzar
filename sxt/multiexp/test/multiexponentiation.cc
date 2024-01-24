@@ -208,7 +208,6 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     REQUIRE(res == expected);
   }
 
-  return;
   SECTION("we handle multiple sequences with multiple exponents") {
     std::vector<uint8_t> exponents1 = {1, 10, 3};
     std::vector<uint16_t> exponents2 = {2, 6, 4};
