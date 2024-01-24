@@ -85,6 +85,7 @@ multiexponentiate(basct::span<Element> res, const multiexponentiate_options& opt
           scalars_slice[output_index] = scalars[output_index] + element_num_bytes * chunk.a();
         }
         auto generators_slice = generators.subspan(chunk.a(), chunk.size());
+        ++chunk_index;
         co_await compute_bucket_sums(sums_slice, generators_slice, scalars_slice, element_num_bytes,
                                      options.bit_width);
       });
