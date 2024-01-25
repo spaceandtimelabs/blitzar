@@ -1,12 +1,14 @@
 #include "sxt/multiexp/bucket_method/multiproduct_table.h"
 
+#include <algorithm>
+#include <chrono>
 #include <exception> // https://github.com/NVIDIA/cccl/issues/1278
 #include <limits>
-#include <chrono>
 #include <print>
 
 #include "cub/cub.cuh"
 
+#include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/algorithm/transform/prefix_sum.h"
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
@@ -91,15 +93,61 @@ static __global__ void fill_bucket_descriptors_kernel(unsigned* __restrict__ cou
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_splits 
+// compute_bucket_split_points 
 //--------------------------------------------------------------------------------------------------
-static xena::future<> compute_splits(basct::span<unsigned> splits,
-                                     basct::span<unsigned> bucket_counts,
-                                     const basdv::stream& stream) noexcept {
-  (void)splits;
-  (void)bucket_counts;
-  (void)stream;
-  return {};
+xena::future<> compute_bucket_split_points(basct::span<unsigned> splits,
+                                           basct::span<unsigned> bucket_counts,
+                                           const basdv::stream& stream) noexcept {
+  auto num_buckets = bucket_counts.size();
+  auto num_splits = splits.size();
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      basdv::is_host_pointer(splits.data()) &&
+      basdv::is_active_device_pointer(bucket_counts.data()) &&
+      num_splits < num_buckets
+      // clang-format on
+  );
+
+  // count the number of additions in each bucket
+  algi::launch_for_each_kernel(
+      stream,
+      [counts = bucket_counts.data()] __device__ __host__(unsigned /*num_buckets*/,
+                                                          unsigned bucket_index) noexcept {
+        auto& count = counts[bucket_index];
+        count = std::max(1u, count) - 1u;
+      },
+      num_buckets);
+  auto operation_counts = bucket_counts; // rename
+
+  // compute the inclusive prefix sum of the additions
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<unsigned> operation_sums_dev{num_buckets, &resource};
+  algtr::inclusive_prefix_sum(operation_sums_dev, operation_counts, stream);
+
+  // copy the sums to the host
+  memmg::managed_array<unsigned> operation_sums{num_buckets, memr::get_pinned_resource()};
+  basdv::async_copy_device_to_host(operation_sums, operation_sums_dev, stream);
+  co_await xendv::await_stream(stream);
+
+  // find the split points
+  auto total_operations = operation_sums[num_buckets - 1u];
+  auto operations_per_split = total_operations / (num_splits + 1u);
+  if (operations_per_split == 0) {
+    // hanle the special case of no operations
+    auto t = num_buckets / (num_splits + 1u);
+    for (auto& split : splits) {
+      split = t;
+      t += num_buckets / (num_splits + 1u);
+    }
+    co_return;
+  }
+  auto iter = operation_sums.begin();
+  auto target = operations_per_split;
+  for (auto& split : splits) {
+    iter = std::upper_bound(iter, operation_sums.end(), target);
+    split = static_cast<unsigned>(std::distance(operation_sums.begin(), iter));
+    target += operations_per_split;
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -244,7 +292,7 @@ xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor
   cub::DeviceRadixSort::SortPairs(temp_storage.data(), temp_storage_num_bytes, bucket_counts.data(),
                                   bucket_counts_p.data(), bucket_descriptors.data(), table.data(),
                                   num_buckets, 0, sizeof(unsigned) * 8u, stream);
-  compute_splits(splits, bucket_counts_p, stream);
+  compute_bucket_split_points(splits, bucket_counts_p, stream);
   co_await xendv::await_stream(stream);
   auto t3 = std::chrono::steady_clock::now();
   auto idx = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1) / 1000.0;

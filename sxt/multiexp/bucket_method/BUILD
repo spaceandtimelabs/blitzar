@@ -126,6 +126,7 @@ sxt_cc_component(
       ":bucket_descriptor",
       ":count",
       "//sxt/multiexp/base:digit_utility",
+        "//sxt/algorithm/iteration:for_each",
         "//sxt/algorithm/transform:prefix_sum",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:synchronization",

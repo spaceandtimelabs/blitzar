@@ -10,6 +10,13 @@ namespace sxt::mtxbk {
 struct bucket_descriptor;
 
 //--------------------------------------------------------------------------------------------------
+// compute_bucket_split_points 
+//--------------------------------------------------------------------------------------------------
+xena::future<> compute_bucket_split_points(basct::span<unsigned> splits,
+                                           basct::span<unsigned> bucket_counts,
+                                           const basdv::stream& stream) noexcept;
+
+//--------------------------------------------------------------------------------------------------
 // fill_multiproduct_indexes 
 //--------------------------------------------------------------------------------------------------
 xena::future<>
