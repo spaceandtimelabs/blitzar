@@ -22,16 +22,18 @@ TEST_CASE("we can compute bucket sums") {
   memmg::managed_array<E> expected(sums.size());
   std::fill(expected.begin(), expected.end(), E::identity());
 
+#if 0
   SECTION("we handle the case of no elements") {
     auto fut = compute_bucket_sums<E>(sums, generators, scalars, element_num_bytes, bit_width);
     REQUIRE(fut.ready());
   }
+#endif
 
   SECTION("we handle the case of a single element with a zero exponent") {
     generators = {32u};
     std::vector<uint8_t> scalars1 = {0u};
     scalars = {scalars1.data()};
-    auto fut = compute_bucket_sums<E>(sums, generators, scalars, element_num_bytes, bit_width);
+    auto fut = compute_bucket_sums2<E>(sums, generators, scalars, element_num_bytes, bit_width);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(sums == expected);

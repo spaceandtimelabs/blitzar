@@ -91,8 +91,13 @@ multiexponentiate(basct::span<Element> res, const multiexponentiate_options& opt
         }
         auto generators_slice = generators.subspan(chunk.a(), chunk.size());
         ++chunk_index;
-        co_await compute_bucket_sums(sums_slice, generators_slice, scalars_slice, element_num_bytes,
-                                     options.bit_width);
+        if (false) {
+          co_await compute_bucket_sums(sums_slice, generators_slice, scalars_slice,
+                                       element_num_bytes, options.bit_width);
+        } else {
+          co_await compute_bucket_sums2(sums_slice, generators_slice, scalars_slice,
+                                        element_num_bytes, options.bit_width);
+        }
       });
 
   auto t3 = std::chrono::steady_clock::now();

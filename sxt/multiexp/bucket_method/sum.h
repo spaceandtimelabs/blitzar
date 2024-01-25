@@ -17,6 +17,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
+#include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/bucket_method/bucket_descriptor.h"
 #include "sxt/multiexp/bucket_method/multiproduct_table.h"
 
@@ -42,6 +43,45 @@ CUDA_CALLABLE void bucket_sum_kernel(T* __restrict__ sums, const T* __restrict__
   }
   sums[descriptor.bucket_index] = sum;
 }
+
+template <bascrv::element T>
+__global__ void bucket_sum_kernel2(T* __restrict__ sums, const T* __restrict__ generators,
+                                   const bucket_descriptor* __restrict__ table,
+                                   const unsigned* __restrict__ indexes,
+                                   const unsigned* __restrict__ splits,
+                                   unsigned num_buckets) noexcept {
+  auto thread_index = threadIdx.x;
+  auto num_threads = blockDim.x;
+  auto block_index = blockIdx.x;
+  auto num_blocks = gridDim.x;
+  bool is_first = block_index == 0;
+  bool is_last = block_index == num_blocks - 1u;
+  auto sum_first = splits[max(1u, block_index) - 1u] * static_cast<unsigned>(!is_first);
+  auto sum_last = splits[min(num_blocks - 2u, block_index)] * static_cast<unsigned>(!is_last) +
+                  num_buckets * static_cast<unsigned>(is_last);
+  assert(sum_first <= sum_last);
+  sum_first += thread_index;
+  for (unsigned sum_index = sum_first; sum_index < sum_last; sum_index += num_threads) {
+    auto descriptor = table[sum_index];
+    if (descriptor.num_entries == 0) {
+      sums[descriptor.bucket_index] = T::identity();
+      continue;
+    }
+    auto first = descriptor.entry_first;
+    auto sum = generators[indexes[first]];
+    for (unsigned i = 1; i < descriptor.num_entries; ++i) {
+      auto e = generators[indexes[first + i]];
+      add_inplace(sum, e);
+    }
+    sums[descriptor.bucket_index] = sum;
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+// fit_bucket_sum_kernel 
+//--------------------------------------------------------------------------------------------------
+void fit_bucket_sum_kernel(unsigned& num_blocks, unsigned& num_threads,
+                           unsigned num_buckets) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // compute_bucket_sums
@@ -86,6 +126,62 @@ xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generato
     bucket_sum_kernel(sums, generators, table, indexes, sum_index);
   };
   algi::launch_for_each_kernel(stream, f, num_buckets);
+
+  // copy sums to host
+  basdv::async_copy_device_to_host(sums, sums_dev, stream);
+  co_await xendv::await_stream(std::move(stream));
+  auto t3 = std::chrono::steady_clock::now();
+  auto prep = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() / 1000.0;
+  auto bksum = std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count() / 1000.0;
+  std::print("  mp_prep={}\n", prep);
+  std::print("  mp_bucket_sums={}\n", bksum);
+}
+
+template <bascrv::element T>
+xena::future<> compute_bucket_sums2(basct::span<T> sums, basct::cspan<T> generators,
+                                    basct::cspan<const uint8_t*> scalars,
+                                    unsigned element_num_bytes, unsigned bit_width) noexcept {
+  SXT_DEBUG_ASSERT(
+      basdv::is_host_pointer(sums.data())
+  );
+  auto num_buckets = sums.size();
+  auto n = generators.size();
+  if (n == 0) {
+    co_return;
+  }
+
+  // fit the dimensions of the kernel
+  unsigned num_blocks;
+  unsigned num_threads;
+  fit_bucket_sum_kernel(num_blocks, num_threads, num_buckets);
+
+  // set up the multiproduct table
+  memmg::managed_array<unsigned> splits{num_blocks - 1u, memr::get_pinned_resource()};
+  auto t1 = std::chrono::steady_clock::now();
+  memmg::managed_array<bucket_descriptor> table{memr::get_device_resource()};
+  memmg::managed_array<unsigned> indexes{memr::get_device_resource()};
+  auto fut =
+      compute_multiproduct_table(table, indexes, splits, scalars, element_num_bytes, n, bit_width);
+
+  memmg::managed_array<T> generators_data{memr::get_device_resource()};
+  auto generators_dev = co_await xendv::make_active_device_viewable(generators_data, generators);
+  co_await std::move(fut);
+  for (auto split : splits) {
+    std::print("split = {}\n", split);
+  }
+  SXT_DEBUG_ASSERT(table.size() == num_buckets);
+
+  auto t2 = std::chrono::steady_clock::now();
+
+  // compute bucket sums
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<unsigned> splits_dev{splits.size(), &resource};
+  basdv::async_copy_host_to_device(splits_dev, splits, stream);
+  memmg::managed_array<T> sums_dev{num_buckets, &resource};
+  bucket_sum_kernel2<<<num_blocks, num_threads, 0, stream>>>(sums_dev.data(), generators_dev.data(),
+                                                             table.data(), indexes.data(),
+                                                             splits_dev.data(), num_buckets);
 
   // copy sums to host
   basdv::async_copy_device_to_host(sums, sums_dev, stream);

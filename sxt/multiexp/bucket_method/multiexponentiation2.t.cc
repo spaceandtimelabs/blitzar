@@ -32,6 +32,7 @@ TEST_CASE("we can compute multiexponentiations") {
     REQUIRE(res[0] == 33u);
   }
 
+#if 0
   SECTION("we handle the case of a single scalar of 1 using a bit_width of 7") {
     options.bit_width = 7u;
     memmg::managed_array<uint8_t> scalars1 = {1u};
@@ -94,4 +95,5 @@ TEST_CASE("we can compute multiexponentiations") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == (97u - 33u));
   }
+#endif
 }

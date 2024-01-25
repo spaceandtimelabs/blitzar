@@ -131,13 +131,15 @@ xena::future<> split_bucket_sums(basct::span<unsigned> splits,
 
   // find the split points
   auto total_operations = operation_sums[num_buckets - 1u];
+  std::print("total_operations = {}\n", total_operations);
   auto operations_per_split = total_operations / (num_splits + 1u);
   if (operations_per_split == 0) {
-    // hanle the special case of no operations
-    auto t = num_buckets / (num_splits + 1u);
+    // handle the special case of no operations
+    auto delta = std::max(1u, static_cast<unsigned>(num_buckets / (num_splits + 1u)));
+    auto t = delta;
     for (auto& split : splits) {
       split = t;
-      t += num_buckets / (num_splits + 1u);
+      t += delta;
     }
     co_return;
   }
@@ -146,6 +148,8 @@ xena::future<> split_bucket_sums(basct::span<unsigned> splits,
   for (auto& split : splits) {
     iter = std::upper_bound(iter, operation_sums.end(), target);
     split = static_cast<unsigned>(std::distance(operation_sums.begin(), iter));
+    /* split = basn::divide_up(split, 32u) * 32u; */
+    /* iter = operation_sums.begin() + split; */
     target += operations_per_split;
   }
 }
@@ -292,8 +296,9 @@ xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor
   cub::DeviceRadixSort::SortPairs(temp_storage.data(), temp_storage_num_bytes, bucket_counts.data(),
                                   bucket_counts_p.data(), bucket_descriptors.data(), table.data(),
                                   num_buckets, 0, sizeof(unsigned) * 8u, stream);
-  split_bucket_sums(splits, bucket_counts_p, stream);
+  auto fut = split_bucket_sums(splits, bucket_counts_p, stream);
   co_await xendv::await_stream(stream);
+  co_await std::move(fut);
   auto t3 = std::chrono::steady_clock::now();
   auto idx = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1) / 1000.0;
   auto srt = std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2) / 1000.0;
