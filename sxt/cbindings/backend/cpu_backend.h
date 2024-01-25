@@ -23,7 +23,6 @@
 #include "sxt/cbindings/backend/computational_backend.h"
 
 namespace sxt::cbnbck {
-
 //--------------------------------------------------------------------------------------------------
 // cpu_backend
 //--------------------------------------------------------------------------------------------------
@@ -36,6 +35,10 @@ public:
   void compute_commitments(basct::span<cg1t::compressed_element> commitments,
                            basct::cspan<mtxb::exponent_sequence> value_sequences,
                            basct::cspan<cg1t::element_p2> generators) const noexcept override;
+
+  void compute_commitments(basct::span<cn1t::element_affine> commitments,
+                           basct::cspan<mtxb::exponent_sequence> value_sequences,
+                           basct::cspan<cn1t::element_p2> generators) const noexcept override;
 
   basct::cspan<c21t::element_p3>
   get_precomputed_generators(std::vector<c21t::element_p3>& temp_generators, uint64_t n,

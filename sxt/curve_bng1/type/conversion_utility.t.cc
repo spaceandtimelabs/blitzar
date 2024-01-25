@@ -101,6 +101,34 @@ TEST_CASE("conversion from affine to projective elements") {
   }
 }
 
+TEST_CASE("batch conversion from projective to affine elements") {
+  SECTION("does not change the generator") {
+    std::vector<element_affine> res_vec{element_affine{}, element_affine{}};
+    basct::span<element_affine> results{res_vec};
+    const std::vector<element_p2> gen_vec{generator_projective, generator_projective};
+    basct::cspan<element_p2> generators{gen_vec};
+
+    batch_to_element_affine(results, generators);
+
+    REQUIRE(results.size() == 2);
+    REQUIRE(results[0] == generator_affine);
+    REQUIRE(results[1] == generator_affine);
+  }
+
+  SECTION("does not change the identity") {
+    std::vector<element_affine> res_vec{element_affine{}, element_affine{}};
+    basct::span<element_affine> results{res_vec};
+    const std::vector<element_p2> gen_vec{identity_projective, identity_projective};
+    basct::cspan<element_p2> generators{gen_vec};
+
+    batch_to_element_affine(results, generators);
+
+    REQUIRE(results.size() == 2);
+    REQUIRE(results[0] == identity_affine);
+    REQUIRE(results[1] == identity_affine);
+  }
+}
+
 TEST_CASE("batch conversion from affine to projective elements") {
   SECTION("does not change the generator") {
     std::vector<element_p2> res_vec{element_p2{}, element_p2{}};
