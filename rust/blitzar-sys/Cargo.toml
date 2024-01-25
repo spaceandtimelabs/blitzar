@@ -16,6 +16,7 @@ exclude = [
     "*.so*"
 ]
 include = ["/src", "build.rs", "Cargo.toml"]
+documentation = "https://docs.rs/blitzar-sys"
 
 [dependencies]
 
