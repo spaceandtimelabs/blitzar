@@ -14,6 +14,42 @@
 using namespace sxt;
 using namespace sxt::mtxbk;
 
+TEST_CASE("we can split bucket sums into approximately equal groups by operation count") {
+  memmg::managed_array<unsigned> counts{memr::get_managed_device_resource()};
+  memmg::managed_array<unsigned> splits;
+  basdv::stream stream;
+
+  SECTION("we handle the case of a single split point and two bucket sums") {
+    counts = {10, 15};
+    splits.resize(1);
+    auto fut = sxt::mtxbk::split_bucket_sums(splits, counts, stream);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    memmg::managed_array<unsigned> expected = {1};
+    REQUIRE(splits == expected);
+  }
+
+  SECTION("we handle a single split point and three sums where the last sum is much larger") {
+    counts = {10, 15, 100};
+    splits.resize(1);
+    auto fut = sxt::mtxbk::split_bucket_sums(splits, counts, stream);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    memmg::managed_array<unsigned> expected = {2};
+    REQUIRE(splits == expected);
+  }
+
+  SECTION("we handle two split points") {
+    counts = {10, 15, 30, 9};
+    splits.resize(2);
+    auto fut = sxt::mtxbk::split_bucket_sums(splits, counts, stream);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    memmg::managed_array<unsigned> expected = {1, 2};
+    REQUIRE(splits == expected);
+  }
+}
+
 TEST_CASE(
     "we can compute the generator indexes used for the multiproduct part of the bucket method") {
   memmg::managed_array<unsigned> bucket_counts{memr::get_managed_device_resource()};

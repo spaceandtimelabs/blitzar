@@ -93,9 +93,9 @@ static __global__ void fill_bucket_descriptors_kernel(unsigned* __restrict__ cou
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_bucket_split_points 
+// split_bucket_sums 
 //--------------------------------------------------------------------------------------------------
-xena::future<> compute_bucket_split_points(basct::span<unsigned> splits,
+xena::future<> split_bucket_sums(basct::span<unsigned> splits,
                                            basct::span<unsigned> bucket_counts,
                                            const basdv::stream& stream) noexcept {
   auto num_buckets = bucket_counts.size();
@@ -292,7 +292,7 @@ xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor
   cub::DeviceRadixSort::SortPairs(temp_storage.data(), temp_storage_num_bytes, bucket_counts.data(),
                                   bucket_counts_p.data(), bucket_descriptors.data(), table.data(),
                                   num_buckets, 0, sizeof(unsigned) * 8u, stream);
-  compute_bucket_split_points(splits, bucket_counts_p, stream);
+  split_bucket_sums(splits, bucket_counts_p, stream);
   co_await xendv::await_stream(stream);
   auto t3 = std::chrono::steady_clock::now();
   auto idx = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1) / 1000.0;
