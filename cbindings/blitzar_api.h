@@ -110,7 +110,7 @@ int sxt_init(const struct sxt_config* config);
  *
  * Denote an element of a sequence by a_ij where i represents the sequence index
  * and j represents the element index. Let * represent the operator for the
- * ristretto255 group. Then res\[i] encodes the ristretto255 group value
+ * ristretto255 group. Then res\[i\] encodes the ristretto255 group value
  *
  * ```text
  *     Prod_{j=1 to n_i} g_{offset_generators + j} ^ a_ij
@@ -137,9 +137,9 @@ int sxt_init(const struct sxt_config* config);
  * - backend not initialized or incorrectly initialized
  * - descriptors == nullptr
  * - commitments == nullptr
- * - descriptor\[i].element_nbytes == 0
- * - descriptor\[i].element_nbytes > 32
- * - descriptor\[i].n > 0 && descriptor\[i].data == nullptr
+ * - descriptor\[i\].element_nbytes == 0
+ * - descriptor\[i\].element_nbytes > 32
+ * - descriptor\[i\].n > 0 && descriptor\[i\].data == nullptr
  *
  * # Considerations:
  *
@@ -155,14 +155,14 @@ void sxt_curve25519_compute_pedersen_commitments(struct sxt_ristretto255_compres
  *
  * Denote an element of a sequence by a_ij where i represents the sequence index
  * and j represents the element index. Let * represent the operator for the
- * ristretto255 group. Then res\[i] encodes the ristretto255 group value
+ * ristretto255 group. Then res\[i\] encodes the ristretto255 group value
  *
  * ```text
  *     Prod_{j=1 to n_i} g_j ^ a_ij
  * ```
  *
  * where n_i represents the number of elements in sequence i and g_j is a group
- * element determined by the `generators\[j]` user value given as input
+ * element determined by the `generators[j]` user value given as input
  *
  * # Arguments:
  *
@@ -178,9 +178,9 @@ void sxt_curve25519_compute_pedersen_commitments(struct sxt_ristretto255_compres
  * - backend not initialized or incorrectly initialized
  * - descriptors == nullptr
  * - commitments == nullptr
- * - descriptor\[i].element_nbytes == 0
- * - descriptor\[i].element_nbytes > 32
- * - descriptor\[i].n > 0 && descriptor\[i].data == nullptr
+ * - descriptor\[i\].element_nbytes == 0
+ * - descriptor\[i\].element_nbytes > 32
+ * - descriptor\[i\].n > 0 && descriptor\[i\].data == nullptr
  *
  * # Considerations:
  *
@@ -195,14 +195,14 @@ void sxt_curve25519_compute_pedersen_commitments_with_generators(
  *
  * Denote an element of a sequence by a_ij where i represents the sequence index
  * and j represents the element index. Let * represent the operator for the
- * bls12-381 G1 group. Then res\[i] encodes the bls12-381 G1 group value
+ * bls12-381 G1 group. Then res\[i\] encodes the bls12-381 G1 group value
  *
  * ```text
  *     Prod_{j=1 to n_i} g_j ^ a_ij
  * ```
  *
  * where n_i represents the number of elements in sequence i and g_j is a group
- * element determined by the `generators\[j]` user value given as input
+ * element determined by the `generators[j]` user value given as input
  *
  * # Arguments:
  *
@@ -218,9 +218,9 @@ void sxt_curve25519_compute_pedersen_commitments_with_generators(
  * - backend not initialized or incorrectly initialized
  * - descriptors == nullptr
  * - commitments == nullptr
- * - descriptor\[i].element_nbytes == 0
- * - descriptor\[i].element_nbytes > 32
- * - descriptor\[i].n > 0 && descriptor\[i].data == nullptr
+ * - descriptor\[i\].element_nbytes == 0
+ * - descriptor\[i\].element_nbytes > 32
+ * - descriptor\[i\].n > 0 && descriptor\[i\].data == nullptr
  *
  * # Considerations:
  *
@@ -235,14 +235,14 @@ void sxt_bls12_381_g1_compute_pedersen_commitments_with_generators(
  *
  * Denote an element of a sequence by a_ij where i represents the sequence index
  * and j represents the element index. Let * represent the operator for the
- * bn254 G1 group. Then res\[i] encodes the bn254 G1 group value
+ * bn254 G1 group. Then res\[i\] encodes the bn254 G1 group value
  *
  * ```text
  *     Prod_{j=1 to n_i} g_j ^ a_ij
  * ```
  *
  * where n_i represents the number of elements in sequence i and g_j is a group
- * element determined by the `generators\[j]` user value given as input
+ * element determined by the `generators[j]` user value given as input
  *
  * # Arguments:
  *
@@ -258,9 +258,9 @@ void sxt_bls12_381_g1_compute_pedersen_commitments_with_generators(
  * - backend not initialized or incorrectly initialized
  * - descriptors == nullptr
  * - commitments == nullptr
- * - descriptor\[i].element_nbytes == 0
- * - descriptor\[i].element_nbytes > 32
- * - descriptor\[i].n > 0 && descriptor\[i].data == nullptr
+ * - descriptor\[i\].element_nbytes == 0
+ * - descriptor\[i\].element_nbytes > 32
+ * - descriptor\[i\].n > 0 && descriptor\[i\].data == nullptr
  *
  * # Considerations:
  *
@@ -275,13 +275,13 @@ void sxt_bn254_g1_uncompressed_compute_pedersen_commitments_with_generators(
  * `sxt_curve25519_compute_pedersen_commitments` function
  *
  * sxt_ristretto255_get_generators(generators, num_generators, offset_generators) →
- *     generators\[0] = generate_random_ristretto(0 + offset_generators)
- *     generators\[1] = generate_random_ristretto(1 + offset_generators)
- *     generators\[2] = generate_random_ristretto(2 + offset_generators)
+ *     generators\[0\] = generate_random_ristretto(0 + offset_generators)
+ *     generators\[1\] = generate_random_ristretto(1 + offset_generators)
+ *     generators\[2\] = generate_random_ristretto(2 + offset_generators)
  *       .
  *       .
  *       .
- *     generators\[num_generators - 1] = generate_random_ristretto(num_generators - 1 +
+ *     generators\[num_generators - 1\] = generate_random_ristretto(num_generators - 1 +
  * offset_generators)
  *
  * # Arguments:
@@ -311,10 +311,10 @@ int sxt_ristretto255_get_generators(struct sxt_ristretto255* generators, uint64_
  * Gets the n-th ristretto point defined as:
  *
  * If n == 0:
- *    one_commit[0] = ristretto_identity;
+ *    one_commit\[0\] = ristretto_identity;
  *
  * Else:
- *    one_commit[0] = g[0] + g[1] + ... + g[n - 1];
+ *    one_commit\[0\] = g\[0\] + g\[1\] + ... + g\[n - 1\];
  *
  * where
  *
@@ -353,7 +353,7 @@ int sxt_curve25519_get_one_commit(struct sxt_ristretto255* one_commit, uint64_t 
  *
  * # Algorithm description
  *
- * Initially, we compute G and Q = G[np], where np = 1ull << ceil(log2(n))
+ * Initially, we compute G and Q = G\[np\], where np = 1ull << ceil(log2(n))
  * and G is zero-indexed.
  *
  * The protocol consists of k = ceil(lg_2(n)) rounds, indexed by j = k - 1 , ... , 0.
@@ -376,9 +376,9 @@ int sxt_curve25519_get_one_commit(struct sxt_ristretto255* one_commit, uint64_t 
  * then `a` or `b` is padded with zeros until it has a power of 2.
  * G always has a power of 2 given how it is constructed.
  *
- * Then the prover sends l_vector[j] and r_vector[j] to the verifier,
+ * Then the prover sends l_vector\[j\] and r_vector\[j\] to the verifier,
  * and the verifier responds with a
- * challenge value u[j] <- Z_p (finite field of order p),
+ * challenge value u\[j\] <- Z_p (finite field of order p),
  * which is non-interactively simulated by
  * the input strobe-based transcript:
  *
@@ -389,7 +389,7 @@ int sxt_curve25519_get_one_commit(struct sxt_ristretto255* one_commit, uint64_t 
  * u[j] = transcript.challenge_value("x");
  * ```
  *
- * Then the prover uses u[j] to compute
+ * Then the prover uses u\[j\] to compute
  *
  * ```text
  * a = a_lo * u[j] + (u[j]^-1) * a_hi;
@@ -406,7 +406,7 @@ int sxt_curve25519_get_one_commit(struct sxt_ristretto255* one_commit, uint64_t 
  *
  * and use these vectors (all of length 2^j) for the next round.
  *
- * After the last (j = 0) round, the prover sends ap_value = a[0] to the verifier.
+ * After the last (j = 0) round, the prover sends ap_value = a\[0\] to the verifier.
  *
  * # Arguments:
  *
@@ -448,7 +448,7 @@ void sxt_curve25519_prove_inner_product(struct sxt_ristretto255_compressed* l_ve
  * - n (in): non-zero length for the input arrays
  * - generators_offset (in): offset used to fetch the bases
  * - b_vector (in): array with length n, the same one used by `sxt_curve25519_prove_inner_product`
- * - product (in): a single scalar, represented by <a, b>,
+ * - product (in): a single scalar, represented by `<a, b>`,
  *                 the inner product of the two vectors `a` and `b` used by
  * `sxt_curve25519_prove_inner_product`
  * - a_commit (in): a single ristretto point, represented by <a, G> (the inner product of the two
