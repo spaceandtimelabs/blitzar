@@ -13,9 +13,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         panic!("Unsupported architecture. Only x86_64 is supported.");
     }
 
-    const LIB_NAME: &'static str = "blitzar-linux-x86_64";
-    const SHARED_LIB: &'static str = "libblitzar-linux-x86_64.so";
-    const PKG_VERSION: &'static str = env!("CARGO_PKG_VERSION");
+    const LIB_NAME: &str = "blitzar-linux-x86_64";
+    const SHARED_LIB: &str = "libblitzar-linux-x86_64.so";
+    const PKG_VERSION: &str = env!("CARGO_PKG_VERSION");
 
     let out_dir = PathBuf::from(env::var("OUT_DIR")?);
     let lib_path = out_dir.join(SHARED_LIB);
@@ -29,8 +29,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .arg("0.0.0")
             .status()
             .expect("Failed to run the build script")
-            .success()
-        );
+            .success());
     } else {
         // Download the shared library from GitHub releases and place it in the `OUT_DIR`.
         let mut lib_file = File::create(&lib_path)?;
