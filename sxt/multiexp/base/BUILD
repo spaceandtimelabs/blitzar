@@ -19,13 +19,13 @@ sxt_cc_component(
     name = "digit_utility",
     impl_deps = [
         "//sxt/base/bit:count",
-        "//sxt/base/num:divide_up",
         "//sxt/base/error:assert",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
     deps = [
+        "//sxt/base/num:divide_up",
         "//sxt/base/container:span",
         "//sxt/base/macro:cuda_callable",
     ],

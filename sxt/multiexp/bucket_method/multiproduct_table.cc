@@ -2,6 +2,8 @@
 
 #include <exception> // https://github.com/NVIDIA/cccl/issues/1278
 #include <limits>
+#include <chrono>
+#include <print>
 
 #include "cub/cub.cuh"
 
@@ -25,7 +27,7 @@ namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 // max_num_partitions_v
 //--------------------------------------------------------------------------------------------------
-const unsigned max_num_partitions_v = 64;
+const unsigned max_num_partitions_v = 64u;
 
 //--------------------------------------------------------------------------------------------------
 // fill_index_kernel
@@ -89,6 +91,18 @@ static __global__ void fill_bucket_descriptors_kernel(unsigned* __restrict__ cou
 }
 
 //--------------------------------------------------------------------------------------------------
+// compute_splits 
+//--------------------------------------------------------------------------------------------------
+static xena::future<> compute_splits(basct::span<unsigned> splits,
+                                     basct::span<unsigned> bucket_counts,
+                                     const basdv::stream& stream) noexcept {
+  (void)splits;
+  (void)bucket_counts;
+  (void)stream;
+  return {};
+}
+
+//--------------------------------------------------------------------------------------------------
 // fill_multiproduct_indexes 
 //--------------------------------------------------------------------------------------------------
 xena::future<>
@@ -107,17 +121,31 @@ fill_multiproduct_indexes(memmg::managed_array<unsigned>& bucket_counts,
   auto num_partitions = std::min(n, max_num_partitions_v);
   memr::async_device_resource resource{stream};
 
+  auto t1 = std::chrono::steady_clock::now();
+
   // scalar_array
   memmg::managed_array<uint8_t> scalar_array{num_outputs * element_num_bytes * n, &resource};
   mtxb::make_device_scalar_array(scalar_array, stream, scalars, element_num_bytes, n);
+  co_await xendv::await_stream(stream); // TODO: remove
+  auto t2 = std::chrono::steady_clock::now();
 
   // bucket_count_sums
   memmg::managed_array<unsigned> bucket_count_array{&resource};
   count_bucket_entries(bucket_count_array, stream, scalar_array, element_num_bytes, n, num_outputs,
                        bit_width, num_partitions);
+  co_await xendv::await_stream(stream); // TODO: remove
+  auto t3 = std::chrono::steady_clock::now();
   memmg::managed_array<unsigned> bucket_count_sums{bucket_count_array.size() + 1, &resource};
   algtr::exclusive_prefix_sum(bucket_count_sums, bucket_count_array, stream);
   bucket_count_array.reset();
+  co_await xendv::await_stream(stream); // TODO: remove
+  auto t4 = std::chrono::steady_clock::now();
+  auto mkarr = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1) / 1000.0;
+  auto cnt = std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2) / 1000.0;
+  auto pfx = std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3) / 1000.0;
+  std::print("    prep_mkar = {}\n", mkarr);
+  std::print("    prep_cnt = {}\n", cnt);
+  std::print("    prep_pfx = {}\n", pfx);
 
   // bucket_descriptors
   bucket_counts.resize(num_buckets);
@@ -127,6 +155,7 @@ fill_multiproduct_indexes(memmg::managed_array<unsigned>& bucket_counts,
       num_buckets);
 
   // indexes
+  auto t5 = std::chrono::steady_clock::now();
   memmg::managed_array<unsigned> index_count{1, memr::get_pinned_resource()};
   basdv::async_copy_device_to_host(
       index_count, basct::subspan(bucket_count_sums, bucket_count_sums.size() - 1), stream);
@@ -135,6 +164,10 @@ fill_multiproduct_indexes(memmg::managed_array<unsigned>& bucket_counts,
   fill_index_kernel<<<num_partitions, dim3(num_outputs, num_bucket_groups, 1), 0, stream>>>(
       indexes.data(), bucket_count_sums.data(), scalar_array.data(), element_num_bytes, n,
       bit_width);
+  co_await xendv::await_stream(stream); // TODO: remove
+  auto t6 = std::chrono::steady_clock::now();
+  auto fillk = std::chrono::duration_cast<std::chrono::milliseconds>(t6 - t5) / 1000.0;
+  std::print("    prep_fillk = {}\n", fillk);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -152,11 +185,13 @@ xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor
   memr::async_device_resource resource{stream};
 
   // fill indexes
+  auto t1 = std::chrono::steady_clock::now();
   memmg::managed_array<unsigned> bucket_counts{&resource};
   memmg::managed_array<bucket_descriptor> bucket_descriptors{&resource};
   co_await fill_multiproduct_indexes(bucket_counts, bucket_descriptors, indexes, stream, scalars,
                                      element_num_bytes, n, bit_width);
   auto num_buckets = bucket_descriptors.size();
+  auto t2 = std::chrono::steady_clock::now();
 
   // sort bucket descriptors
   memmg::managed_array<unsigned> bucket_counts_p{num_buckets, &resource};
@@ -170,5 +205,51 @@ xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor
                                   bucket_counts_p.data(), bucket_descriptors.data(), table.data(),
                                   num_buckets, 0, sizeof(unsigned) * 8u, stream);
   co_await xendv::await_stream(stream);
+  auto t3 = std::chrono::steady_clock::now();
+  auto idx = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1) / 1000.0;
+  auto srt = std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2) / 1000.0;
+  std::print("    prep_idx = {}\n", idx);
+  std::print("    prep_srt = {}\n", srt);
+}
+
+xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor>& table,
+                                          memmg::managed_array<unsigned>& indexes,
+                                          basct::span<unsigned> splits,
+                                          basct::cspan<const uint8_t*> scalars,
+                                          unsigned element_num_bytes, unsigned n,
+                                          unsigned bit_width) noexcept {
+  if (n == 0) {
+    co_return;
+  }
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+
+  // fill indexes
+  auto t1 = std::chrono::steady_clock::now();
+  memmg::managed_array<unsigned> bucket_counts{&resource};
+  memmg::managed_array<bucket_descriptor> bucket_descriptors{&resource};
+  co_await fill_multiproduct_indexes(bucket_counts, bucket_descriptors, indexes, stream, scalars,
+                                     element_num_bytes, n, bit_width);
+  auto num_buckets = bucket_descriptors.size();
+  auto t2 = std::chrono::steady_clock::now();
+
+  // sort bucket descriptors
+  memmg::managed_array<unsigned> bucket_counts_p{num_buckets, &resource};
+  table.resize(num_buckets);
+  size_t temp_storage_num_bytes = 0;
+  cub::DeviceRadixSort::SortPairs(nullptr, temp_storage_num_bytes, bucket_counts.data(),
+                                  bucket_counts_p.data(), bucket_descriptors.data(), table.data(),
+                                  num_buckets, 0, sizeof(unsigned) * 8u, stream);
+  memmg::managed_array<std::byte> temp_storage{temp_storage_num_bytes, &resource};
+  cub::DeviceRadixSort::SortPairs(temp_storage.data(), temp_storage_num_bytes, bucket_counts.data(),
+                                  bucket_counts_p.data(), bucket_descriptors.data(), table.data(),
+                                  num_buckets, 0, sizeof(unsigned) * 8u, stream);
+  compute_splits(splits, bucket_counts_p, stream);
+  co_await xendv::await_stream(stream);
+  auto t3 = std::chrono::steady_clock::now();
+  auto idx = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1) / 1000.0;
+  auto srt = std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2) / 1000.0;
+  std::print("    prep_idx = {}\n", idx);
+  std::print("    prep_srt = {}\n", srt);
 }
 } // namespace sxt::mtxbk

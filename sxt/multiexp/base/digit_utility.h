@@ -17,16 +17,40 @@
 #pragma once
 
 #include <cstdint>
+#include <cassert>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/base/num/divide_up.h"
 
 namespace sxt::mtxb {
 //--------------------------------------------------------------------------------------------------
 // extract_digit
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE void extract_digit(basct::span<uint8_t> digit, basct::cspan<uint8_t> e,
-                                 size_t radix_log2, size_t digit_index) noexcept;
+inline CUDA_CALLABLE void extract_digit(basct::span<uint8_t> digit, basct::cspan<uint8_t> e,
+                                        size_t radix_log2, size_t digit_index) noexcept {
+  assert(digit.size() == basn::divide_up(radix_log2, 8ul));
+  auto digit_num_bytes = digit.size();
+  auto bit_first = radix_log2 * digit_index;
+  assert(e.size() * 8 > bit_first);
+  auto byte_first = bit_first / 8;
+  auto offset = bit_first - 8 * byte_first;
+  digit[0] = e[byte_first] >> offset;
+  auto byte_last = std::min(digit_num_bytes, e.size() - byte_first);
+  for (size_t byte_index = 1; byte_index < byte_last; ++byte_index) {
+    auto byte = e[byte_first + byte_index];
+    digit[byte_index - 1] |= byte << (8 - offset);
+    digit[byte_index] = byte >> offset;
+  }
+  for (size_t byte_index = byte_last; byte_index < digit_num_bytes; ++byte_index) {
+    digit[byte_index] = 0;
+  }
+  if (offset + radix_log2 > 8 && byte_first + digit_num_bytes < e.size()) {
+    digit[digit_num_bytes - 1] |= e[byte_first + digit_num_bytes] << (8 - offset);
+  }
+  constexpr uint8_t ones = 0xff;
+  digit[digit_num_bytes - 1] &= ones >> (digit_num_bytes * 8 - radix_log2);
+}
 
 //--------------------------------------------------------------------------------------------------
 // is_digit_zero

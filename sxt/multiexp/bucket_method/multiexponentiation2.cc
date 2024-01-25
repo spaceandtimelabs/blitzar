@@ -12,8 +12,9 @@ void plan_multiexponentiation(multiexponentiate_options& options, unsigned num_o
   (void)n;
   options = multiexponentiate_options{
   .min_chunk_size = 1'000u,
-  /* .max_chunk_size = 1'024'000u, */
-  .max_chunk_size = 256'000u,
+  .max_chunk_size = 1'024'000u,
+  /* .max_chunk_size = 256'000u, */
+  /* .max_chunk_size = 512'000u, */
   .bit_width = 8u,
   .split_factor = 1u,
   };

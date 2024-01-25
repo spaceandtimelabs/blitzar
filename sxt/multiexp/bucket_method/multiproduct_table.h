@@ -27,4 +27,11 @@ xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor
                                           basct::cspan<const uint8_t*> scalars,
                                           unsigned element_num_bytes, unsigned n,
                                           unsigned bit_width) noexcept;
+
+xena::future<> compute_multiproduct_table(memmg::managed_array<bucket_descriptor>& table,
+                                          memmg::managed_array<unsigned>& indexes,
+                                          basct::span<unsigned> splits,
+                                          basct::cspan<const uint8_t*> scalars,
+                                          unsigned element_num_bytes, unsigned n,
+                                          unsigned bit_width) noexcept;
 } // namespace sxt::mtxbk

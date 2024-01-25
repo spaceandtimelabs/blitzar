@@ -45,3 +45,32 @@ TEST_CASE("we can compute exclusive prefix sums") {
     REQUIRE(out == expected);
   }
 }
+
+TEST_CASE("we can compute inclusive prefix sums") {
+  basdv::stream stream;
+
+  memmg::managed_array<unsigned> in{memr::get_managed_device_resource()};
+  memmg::managed_array<unsigned> out{memr::get_managed_device_resource()};
+
+  SECTION("we handle the empty case") {
+    sxt::algtr::exclusive_prefix_sum(out, in, stream);
+  }
+
+  SECTION("we handle the case of a single element") {
+    in = {123};
+    out.resize(1);
+    sxt::algtr::inclusive_prefix_sum(out, in, stream);
+    basdv::synchronize_stream(stream);
+    memmg::managed_array<unsigned> expected = {123};
+    REQUIRE(out == expected);
+  }
+
+  SECTION("we handle two elements") {
+    in = {123, 456};
+    out.resize(2);
+    sxt::algtr::inclusive_prefix_sum(out, in, stream);
+    basdv::synchronize_stream(stream);
+    memmg::managed_array<unsigned> expected = {123, 123 + 456};
+    REQUIRE(out == expected);
+  }
+}
