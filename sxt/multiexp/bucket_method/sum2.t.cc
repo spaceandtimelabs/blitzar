@@ -45,7 +45,6 @@ TEST_CASE("we can compute bucket sums") {
     REQUIRE(sums == expected);
   }
 
-#if 0
   SECTION("we handle a sum with a single element and a scalar of two") {
     sums.resize(12);
     generators = {33u};
@@ -54,8 +53,7 @@ TEST_CASE("we can compute bucket sums") {
     compute_bucket_sums<E>(sums, stream, generators, scalars, element_num_bytes, bit_width);
     basdv::synchronize_stream(stream);
     std::vector<E> expected(sums.size(), 0u);
-    expected[0] = 33u;
+    expected[1] = 33u;
     REQUIRE(sums == expected);
   }
-#endif
 }

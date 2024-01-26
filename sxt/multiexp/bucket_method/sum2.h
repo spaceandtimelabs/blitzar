@@ -42,7 +42,7 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   scalars += output_index * n * element_num_bytes;
 
   // initialize the bucket partial sums
-  T* __restrict__ sums = sum_array + num_buckets_per_group + bucket_group_index;
+  T* __restrict__ sums = sum_array + num_buckets_per_group * bucket_group_index;
   for (unsigned sum_index = 0; sum_index < num_buckets_per_group; ++sum_index) {
     sums[sum_index] = T::identity();
   }
