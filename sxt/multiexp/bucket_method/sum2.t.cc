@@ -9,7 +9,7 @@ using namespace sxt::mtxbk;
 using E = bascrv::element97;
 
 TEST_CASE("we can compute bucket sums") {
-  memmg::managed_array<E> sums;
+  std::vector<E> sums;
 
   basdv::stream stream;
   std::vector<E> generators;
@@ -20,13 +20,16 @@ TEST_CASE("we can compute bucket sums") {
 
   SECTION("we handle the empty case") {
     compute_bucket_sums<E>(sums, stream, generators, scalars, element_num_bytes, bit_width);
-/* template <bascrv::element T> */
-/* void compute_bucket_sums(basct::span<T> sums, const basdv::stream& stream, */
-/*                          basct::cspan<T> generators, basct::cspan<const uint8_t*> scalars, */
-/*                          unsigned element_num_bytes, unsigned bit_width) noexcept { */
-/* template <bascrv::element T> */
-/* xena::future<> compute_bucket_sums2(basct::span<T> sums, basct::cspan<T> generators, */
-/*                                     basct::cspan<const uint8_t*> scalars, */
-/*                                     unsigned element_num_bytes, unsigned bit_width) noexcept { */
+  }
+
+  SECTION("we handle a sum with a single element") {
+    sums.resize(12);
+    generators = {33u};
+    std::vector<uint8_t> scalars1 = {0u};
+    scalars = {scalars1.data()};
+    compute_bucket_sums<E>(sums, stream, generators, scalars, element_num_bytes, bit_width);
+    basdv::synchronize_stream(stream);
+    std::vector<E> expected(sums.size(), 0u);
+    REQUIRE(sums == expected);
   }
 }

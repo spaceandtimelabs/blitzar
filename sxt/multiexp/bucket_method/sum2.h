@@ -128,7 +128,7 @@ void compute_bucket_sums(basct::span<T> sums, const basdv::stream& stream,
   mtxb::make_device_scalar_array(scalar_array, stream, scalars, element_num_bytes, n);
 
   // set up generators
-  memmg::managed_array<T> generators_dev{&resource};
+  memmg::managed_array<T> generators_dev{n, &resource};
   basdv::async_copy_host_to_device(generators_dev, generators, stream);
 
   // launch kernel
