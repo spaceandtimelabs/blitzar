@@ -283,6 +283,8 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
+      "//sxt/algorithm/iteration:for_each",
+        "//sxt/multiexp/base:scalar_array",
         "//sxt/base/container:span",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",

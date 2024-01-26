@@ -1,10 +1,12 @@
 #pragma once
 
+#include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/device_viewable.h"
@@ -14,6 +16,7 @@
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/base/digit_utility.h"
+#include "sxt/multiexp/base/scalar_array.h"
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
@@ -35,7 +38,7 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   extern __shared__ T sum_array[];
 
   partial_sums += output_index * num_partial_buckets_per_output +
-                  tile_index * num_buckets_per_output + bucket_group_index * num_buckets_per_group;
+                  bucket_group_index * num_buckets_per_group * num_tiles;
   scalars += output_index * n * element_num_bytes;
 
   // initialize the bucket partial sums
@@ -74,30 +77,73 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
 
   // copy partial sums to global memory
   for (unsigned sum_index = 0; sum_index < num_buckets_per_group; ++sum_index) {
-    partial_sums[sum_index] = sums[sum_index];
+    partial_sums[sum_index * num_tiles + tile_index] = sums[sum_index];
   }
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_bucket_sums2
+// bucket_sum_combination_kernel
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generators,
-                                   basct::cspan<const uint8_t*> scalars, unsigned element_num_bytes,
-                                   unsigned bit_width) noexcept {
+CUDA_CALLABLE void bucket_sum_combination_kernel(T* __restrict__ sums, T* __restrict__ partial_sums,
+                                                 unsigned num_tiles,
+                                                 unsigned bucket_index) noexcept {
+  partial_sums += bucket_index * num_tiles;
+  T res = partial_sums[0];
+  for (unsigned tile_index = 1; tile_index < num_tiles; ++tile_index) {
+    auto e = partial_sums[tile_index];
+    add_inplace(res, e);
+  }
+  sums[bucket_index] = res;
+}
+
+//--------------------------------------------------------------------------------------------------
+// compute_bucket_sums
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+void compute_bucket_sums(basct::span<T> sums, const basdv::stream& stream,
+                         basct::cspan<T> generators, basct::cspan<const uint8_t*> scalars,
+                         unsigned element_num_bytes, unsigned bit_width) noexcept {
   auto num_outputs = scalars.size();
   auto num_buckets_per_group = (1u << bit_width) - 1u;
   auto num_bucket_groups = basn::divide_up(element_num_bytes * 8u, bit_width);
   auto num_buckets_per_output = num_buckets_per_group * num_bucket_groups;
+  auto num_buckets = num_buckets_per_output * num_outputs;
+  auto n = generators.size();
 
-  auto shared_memory_num_bytes = num_buckets_per_output;
-  auto num_tiles = 64u; // set better
+  auto num_tiles = std::min(64u, n); // TODO: set better
 
-  (void)sums;
-  (void)generators;
-  (void)scalars;
-  (void)element_num_bytes;
-  (void)bit_width;
-  return {};
+  memr::async_device_resource resource{stream};
+
+  // scalar_array
+  memmg::managed_array<uint8_t> scalar_array{num_outputs * element_num_bytes * n, &resource};
+  mtxb::make_device_scalar_array(scalar_array, stream, scalars, element_num_bytes, n);
+
+  // set up generators
+  memmg::managed_array<T> generators_dev{&resource};
+  basdv::async_copy_host_to_device(generators_dev, generators, stream);
+
+  // launch kernel
+  auto shared_memory_num_bytes = num_buckets_per_output * sizeof(T);
+  memmg::managed_array<T> partial_sums{num_buckets * num_tiles, &resource};
+  bucket_sum_kernel<<<dim3(num_outputs, num_tiles, 1), num_bucket_groups, shared_memory_num_bytes,
+                      stream>>>(partial_sums.data(), generators_dev.data(), scalar_array.data(),
+                                element_num_bytes, bit_width, n);
+  generators_dev.reset();
+  scalar_array.reset();
+
+  // combine bucket sums
+  memmg::managed_array<T> sums_dev{sums.size(), &resource};
+  auto combine = [
+                     // clang-format off
+    sums = sums_dev.data(),
+    partial_sums = partial_sums.data(),
+    num_tiles = num_tiles
+                     // clang-format on
+  ] __device__ __host__(unsigned /*num_buckets*/, unsigned bucket_index) noexcept {
+    bucket_sum_combination_kernel(sums, partial_sums, num_tiles, bucket_index);
+  };
+  algi::launch_for_each_kernel(stream, num_buckets, combine);
+  basdv::async_copy_device_to_host(sums, sums_dev, stream);
 }
 } // namespace sxt::mtxbk
