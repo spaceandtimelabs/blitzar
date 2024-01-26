@@ -56,4 +56,29 @@ TEST_CASE("we can compute bucket sums") {
     expected[1] = 33u;
     REQUIRE(sums == expected);
   }
+
+  SECTION("we handle two elements that map to different buckets") {
+    sums.resize(12);
+    generators = {33u, 77u};
+    std::vector<uint8_t> scalars1 = {1u, 2u};
+    scalars = {scalars1.data()};
+    compute_bucket_sums<E>(sums, stream, generators, scalars, element_num_bytes, bit_width);
+    basdv::synchronize_stream(stream);
+    std::vector<E> expected(sums.size(), 0u);
+    expected[0] = 33u;
+    expected[1] = 77u;
+    REQUIRE(sums == expected);
+  }
+
+  SECTION("we handle two elements that map to the same bucket") {
+    sums.resize(12);
+    generators = {33u, 77u};
+    std::vector<uint8_t> scalars1 = {2u, 2u};
+    scalars = {scalars1.data()};
+    compute_bucket_sums<E>(sums, stream, generators, scalars, element_num_bytes, bit_width);
+    basdv::synchronize_stream(stream);
+    std::vector<E> expected(sums.size(), 0u);
+    expected[1] = 33u + 77u;
+    REQUIRE(sums == expected);
+  }
 }
