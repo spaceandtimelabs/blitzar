@@ -42,7 +42,7 @@ struct sxt_bls12_381_g1_compressed {
 };
 
 /** encodes an element of the finite field for `curve25519`
- * 
+ *
  * modulo `(2^252 + 27742317777372353535851937790883648493)`
  */
 struct sxt_curve25519_scalar {
@@ -96,7 +96,7 @@ struct sxt_sequence_descriptor {
 
 /**
  * Initializes the library.
- * 
+ *
  * This should only be called once.
  *
  * # Arguments:
