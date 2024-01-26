@@ -71,7 +71,7 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
     uint8_t digit = 0;
     mtxb::extract_digit({&digit, 1u}, scalar, bit_width, bucket_group_index);
     if (digit != 0) {
-      add(sums[digit], sums[digit], e);
+      add(sums[digit - 1u], sums[digit - 1u], e);
     }
   }
 

@@ -22,7 +22,7 @@ TEST_CASE("we can compute bucket sums") {
     compute_bucket_sums<E>(sums, stream, generators, scalars, element_num_bytes, bit_width);
   }
 
-  SECTION("we handle a sum with a single element") {
+  SECTION("we handle a sum with a single element and a scalar of zero") {
     sums.resize(12);
     generators = {33u};
     std::vector<uint8_t> scalars1 = {0u};
@@ -30,6 +30,18 @@ TEST_CASE("we can compute bucket sums") {
     compute_bucket_sums<E>(sums, stream, generators, scalars, element_num_bytes, bit_width);
     basdv::synchronize_stream(stream);
     std::vector<E> expected(sums.size(), 0u);
+    REQUIRE(sums == expected);
+  }
+
+  SECTION("we handle a sum with a single element and a scalar of one") {
+    sums.resize(12);
+    generators = {33u};
+    std::vector<uint8_t> scalars1 = {1u};
+    scalars = {scalars1.data()};
+    compute_bucket_sums<E>(sums, stream, generators, scalars, element_num_bytes, bit_width);
+    basdv::synchronize_stream(stream);
+    std::vector<E> expected(sums.size(), 0u);
+    expected[0] = 33u;
     REQUIRE(sums == expected);
   }
 }
