@@ -272,3 +272,27 @@ sxt_cc_component(
         "//sxt/base/container:span",
     ],
 )
+
+sxt_cc_component(
+    name = "sum2",
+    test_deps = [
+      "//sxt/base/curve:example_element",
+      "//sxt/base/error:assert",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/num:divide_up",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:device_viewable",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:pinned_resource",
+        "//sxt/multiexp/base:digit_utility",
+    ],
+)
