@@ -28,9 +28,14 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   auto num_tiles = gridDim.y;
   auto num_generators_per_tile = basn::divide_up(n, num_tiles);
   auto num_buckets_per_group = (1u << bit_width) - 1u;
+  auto num_bucket_groups = blockDim.x;
+  auto num_buckets_per_output = num_buckets_per_group * num_bucket_groups;
+  auto num_partial_buckets_per_output = num_buckets_per_output * num_tiles;
   auto bucket_group_index = threadIdx.x;
   extern __shared__ T sum_array[];
 
+  partial_sums += output_index * num_partial_buckets_per_output +
+                  tile_index * num_buckets_per_output + bucket_group_index * num_buckets_per_group;
   scalars += output_index * n * element_num_bytes;
 
   // initialize the bucket partial sums
@@ -46,7 +51,8 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   __shared__ T e;
   __shared__ uint8_t scalar_data[32];
   basct::span<uint8_t> scalar{scalar_data, element_num_bytes};
-  for (unsigned generator_index=generator_first; generator_index<generator_last; ++generator_index) {
+  for (unsigned generator_index = generator_first; generator_index < generator_last;
+       ++generator_index) {
     // load the generator into shared memory
     if (bucket_group_index == 0) {
       e = generators[generator_index];
@@ -67,10 +73,9 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   }
 
   // copy partial sums to global memory
-  (void)partial_sums;
-  (void)generators;
-  (void)scalars;
-  (void)n;
+  for (unsigned sum_index = 0; sum_index < num_buckets_per_group; ++sum_index) {
+    partial_sums[sum_index] = sums[sum_index];
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
