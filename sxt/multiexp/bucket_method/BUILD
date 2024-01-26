@@ -277,9 +277,9 @@ sxt_cc_component(
     name = "sum2",
     test_deps = [
       "//sxt/base/curve:example_element",
+      "//sxt/base/device:synchronization",
       "//sxt/base/error:assert",
         "//sxt/base/test:unit_test",
-        "//sxt/execution/schedule:scheduler",
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [

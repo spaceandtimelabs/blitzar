@@ -109,7 +109,15 @@ void compute_bucket_sums(basct::span<T> sums, const basdv::stream& stream,
   auto num_bucket_groups = basn::divide_up(element_num_bytes * 8u, bit_width);
   auto num_buckets_per_output = num_buckets_per_group * num_bucket_groups;
   auto num_buckets = num_buckets_per_output * num_outputs;
-  auto n = generators.size();
+  auto n = static_cast<unsigned>(generators.size());
+  if (n == 0) {
+    return;
+  }
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      sums.size() == num_buckets
+      // clang-format on
+  );
 
   auto num_tiles = std::min(64u, n); // TODO: set better
 
@@ -143,7 +151,7 @@ void compute_bucket_sums(basct::span<T> sums, const basdv::stream& stream,
   ] __device__ __host__(unsigned /*num_buckets*/, unsigned bucket_index) noexcept {
     bucket_sum_combination_kernel(sums, partial_sums, num_tiles, bucket_index);
   };
-  algi::launch_for_each_kernel(stream, num_buckets, combine);
+  algi::launch_for_each_kernel(stream, combine, num_buckets);
   basdv::async_copy_device_to_host(sums, sums_dev, stream);
 }
 } // namespace sxt::mtxbk
