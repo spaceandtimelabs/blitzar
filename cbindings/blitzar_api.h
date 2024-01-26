@@ -316,7 +316,7 @@ int sxt_ristretto255_get_generators(struct sxt_ristretto255* generators, uint64_
  *
  * The `n`-th Ristretto point is defined as:
  *
- * ```rust
+ * ```text
  * if n == 0:
  *    one_commit[0] = ristretto_identity;
  * else:
@@ -325,7 +325,7 @@ int sxt_ristretto255_get_generators(struct sxt_ristretto255* generators, uint64_
  *
  * where
  *
- * ```rust
+ * ```text
  * struct sxt_ristretto255 ristretto_identity = {
  *    {0, 0, 0, 0, 0},
  *    {1, 0, 0, 0, 0},
