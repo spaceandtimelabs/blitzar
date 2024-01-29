@@ -49,10 +49,14 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
 
   // sum buckets
   using Sort = cub::BlockRadixSort<uint8_t, 32, items_per_thread>;
+  using Scan = cub::BlockScan<uint8_t, 32>;
   using Discontinuity = cub::BlockDiscontinuity<uint8_t, 32>;
+  using Reduce = cub::BlockReduce<unsigned, 32>;
   __shared__ union {
     Sort::TempStorage sort;
     Discontinuity::TempStorage discontinuity;
+    Scan::TempStorage scan;
+    Reduce::TempStorage reduce;
   } temp_storage;
 
   unsigned index = generator_first + thread_index;
@@ -61,29 +65,35 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   uint8_t should_accumulate[items_per_thread];
   digits[0] = scalars_t[index];
   gs[0] = generators[index];
-  while (index < generator_last) {
+  while (true) {
     // sort digit-g pairs
     Sort(temp_storage.sort).Sort(digits, gs);
 
     // compute the difference between adjacent digit-g pairs
     Discontinuity(temp_storage.discontinuity).FlagHeads(should_accumulate, digits, cub::Inequality());
-    should_accumulate[0] *= (digits[0] != 0u);
 
     // accumulate digits with no collisions
-    if (should_accumulate[0]) {
+    if (should_accumulate[0] && digits[0] != 0u) {
       add_inplace(sums[digits[0]-1u], gs[0]);
     }
+    should_accumulate[0] *= (digits[0] == 0u);
 
     // use a prefix sum on consumed generator indexes to update the index
+    uint8_t offsets[items_per_thread];
+    Scan(temp_storage.scan).InclusiveSum(offsets, should_accumulate);
+    auto max_index = 123u; // TODO: get the max index Reduce(temp_storage.reduce).Max(index);
 
     // if the generator was consumed, load a new element
+    if (!should_accumulate[0]) {
+      continue;
+    }
+    index = max_index + offsets[0];
+    if (index >= generator_last) {
+      return;
+    }
+    digits[0] = scalars_t[index];
+    gs[0] = generators[index];
   }
-  (void)sums;
-  (void)num_threads;
-  (void)partial_sums;
-  (void)generators;
-  (void)element_num_bytes;
-  (void)n;
 }
 
 //--------------------------------------------------------------------------------------------------
