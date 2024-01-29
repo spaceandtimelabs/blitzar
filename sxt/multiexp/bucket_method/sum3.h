@@ -47,7 +47,7 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   auto generator_last = min(generator_first + num_generators_per_tile, n);
 
   // adjust the pointers
-  scalars_t += n * bucket_group_index;
+  scalars_t += n * bucket_group_index + output_index * num_bucket_groups * n;
   partial_sums += output_index * num_partial_buckets_per_output +
                   bucket_group_index * num_buckets_per_group * num_tiles;
 
