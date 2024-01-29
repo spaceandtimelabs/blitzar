@@ -50,9 +50,11 @@ sxt_cc_component(
       "//sxt/base/container:span",
       "//sxt/base/error:assert",
       "//sxt/base/device:stream",
+      "//sxt/execution/async:future_fwd",
     ],
     impl_deps = [
       "//sxt/base/device:memory_utility",
+      "//sxt/execution/async:coroutine",
     ],
     test_deps = [
       "//sxt/base/device:stream",
