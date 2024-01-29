@@ -310,6 +310,7 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
+      "@local_cuda//:cub",
       "//sxt/algorithm/iteration:for_each",
         "//sxt/multiexp/base:scalar_array",
         "//sxt/base/container:span",

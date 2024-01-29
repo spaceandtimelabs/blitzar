@@ -1,5 +1,8 @@
 #pragma once
 
+#include <exception> // https://github.com/NVIDIA/cccl/issues/1278
+#include "cub/cub.cuh"
+
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/memory_utility.h"
@@ -21,8 +24,10 @@ namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, size_t BitWidth>
 __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restrict__ generators,
-                                  const uint8_t* __restrict__ scalars, unsigned element_num_bytes,
+                                  const uint8_t* __restrict__ scalars_t, unsigned element_num_bytes,
                                   unsigned n) noexcept {
+  constexpr size_t items_per_thread = 1;
+
   auto thread_index = threadIdx.x;
   auto num_threads = blockDim.x;
   constexpr size_t num_buckets_per_output = (1u << BitWidth) - 1u;
@@ -34,6 +39,8 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   auto generator_first = num_generators_per_tile * tile_index;
   auto generator_last = min(generator_first + num_generators_per_tile, n);
 
+  scalars_t += n * digit_index;
+
   // set up a sum table initialized to the identity
   __shared__ T sums[num_buckets_per_output];
   for (unsigned i=thread_index; i<num_buckets_per_output; i+=num_threads) {
@@ -41,11 +48,19 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   }
 
   // sum buckets
+  using Sort = cub::BlockRadixSort<uint8_t, 32, items_per_thread>;
+  __shared__ union {
+    Sort::TempStorage sort;
+  } temp_storage;
+
   unsigned index = generator_first + thread_index;
-  uint8_t digit = scalars[index];
-  T g = generators[index];
+  uint8_t digits[items_per_thread];
+  T gs[items_per_thread];
+  digits[0] = scalars_t[index];
+  gs[0] = generators[index];
   while (index < generator_last) {
     // sort digit-g pairs
+    Sort(temp_storage.sort).Sort(digits, gs);
 
     // compute the difference between adjacent digit-g pairs
 
@@ -61,7 +76,6 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   (void)num_threads;
   (void)partial_sums;
   (void)generators;
-  (void)scalars;
   (void)element_num_bytes;
   (void)n;
 }
