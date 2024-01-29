@@ -25,6 +25,8 @@ namespace sxt::basl {
 //--------------------------------------------------------------------------------------------------
 // info
 //--------------------------------------------------------------------------------------------------
+inline void info(std::string_view s) noexcept { info_impl(s); }
+
 template <class... Args> void info(std::format_string<Args...> fmt, Args&&... args) noexcept {
   info_impl(std::format(fmt, std::forward<Args>(args)...));
 }
