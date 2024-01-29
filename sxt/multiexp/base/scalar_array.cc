@@ -2,12 +2,68 @@
 
 #include <vector>
 
+#include <exception> // https://github.com/NVIDIA/cccl/issues/1278
+#include "cub/cub.cuh"
+
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/synchronization.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/async_device_resource.h"
 
 namespace sxt::mtxb {
+//--------------------------------------------------------------------------------------------------
+// scalar32
+//--------------------------------------------------------------------------------------------------
+namespace {
+struct scalar32 {
+  uint8_t data[32];
+};
+} // namespace
+
+//--------------------------------------------------------------------------------------------------
+// transpose_kernel 
+//--------------------------------------------------------------------------------------------------
+static __global__ void transpose_kernel(uint8_t* __restrict__ dst, const scalar32* __restrict__ src,
+                                        unsigned n) noexcept {
+  static constexpr unsigned element_num_bytes = 32u;
+
+  auto byte_index = threadIdx.x;
+  auto tile_index = blockIdx.x;
+  auto num_tiles = gridDim.x;
+  auto n_per_tile =
+      basn::divide_up(basn::divide_up(n, element_num_bytes), num_tiles) * element_num_bytes;
+
+  auto last = min(n_per_tile * tile_index + n_per_tile, n);
+
+  // adjust pointers
+  src += tile_index * n_per_tile;
+  dst += byte_index * n + tile_index * n_per_tile;
+
+  // set up algorithm
+  using BlockExchange = cub::BlockExchange<uint8_t, element_num_bytes, element_num_bytes>;
+  __shared__ BlockExchange::TempStorage temp_storage;
+
+  // transpose 
+  scalar32 s;
+  for (unsigned i = byte_index; i < n_per_tile; i += element_num_bytes) {
+    if (i < last) {
+      s = src[i];
+    }
+    BlockExchange(temp_storage).StripedToBlocked(s.data);
+    for (unsigned j=0; j<32u; ++j) {
+      auto out_index = i + j;
+      if (out_index < last) {
+        dst[out_index] = s.data[j];
+      }
+    }
+    __syncthreads();
+  }
+}
+
 //--------------------------------------------------------------------------------------------------
 // make_transposed_device_scalar_array_impl
 //--------------------------------------------------------------------------------------------------
@@ -15,11 +71,16 @@ static xena::future<> make_transposed_device_scalar_array_impl(basct::span<uint8
                                                                basct::cspan<uint8_t> scalars,
                                                                unsigned element_num_bytes,
                                                                unsigned n) noexcept {
-  (void)array_slice;
-  (void)scalars;
-  (void)element_num_bytes;
-  (void)n;
-  return {};
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<uint8_t> scalars_dev{scalars.size(), &resource};
+  basdv::async_copy_host_to_device(scalars_dev, scalars, stream);
+  auto num_tiles = std::min(basn::divide_up(n, 32u), 64u);
+
+  transpose_kernel<<<num_tiles, 32, 0, stream>>>(
+      array_slice.data(), reinterpret_cast<const scalar32*>(scalars.data()), n);
+
+  return xendv::await_and_own_stream(std::move(stream));
 }
 
 //--------------------------------------------------------------------------------------------------

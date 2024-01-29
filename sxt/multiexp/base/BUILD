@@ -53,8 +53,13 @@ sxt_cc_component(
       "//sxt/execution/async:future_fwd",
     ],
     impl_deps = [
+      "@local_cuda//:cub",
       "//sxt/base/device:memory_utility",
+      "//sxt/base/num:divide_up",
       "//sxt/execution/async:coroutine",
+      "//sxt/execution/device:synchronization",
+      "//sxt/memory/resource:async_device_resource",
+      "//sxt/memory/management:managed_array",
     ],
     test_deps = [
       "//sxt/base/device:stream",

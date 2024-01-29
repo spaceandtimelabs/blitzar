@@ -82,7 +82,7 @@ multiexponentiate(basct::span<Element> res, const multiexponentiate_options& opt
                                                    memr::get_pinned_resource()};
   size_t chunk_index = 0;
   auto t2 = std::chrono::steady_clock::now();
-#if 0
+#if 1
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& chunk) noexcept -> xena::future<> {
         auto sums_slice =
