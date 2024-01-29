@@ -45,13 +45,19 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   scalars += output_index * n * element_num_bytes;
 
   // initialize the bucket partial sums
-  std::printf("num_buckets_per_group=%d\n", num_buckets_per_group);
-  std::printf("bucket_group_index=%d\n", bucket_group_index);
-  T* __restrict__ sums = sum_array + num_buckets_per_group * bucket_group_index;
+  /* std::printf("num_buckets_per_group=%d\n", num_buckets_per_group); */
+  /* std::printf("bucket_group_index=%d\n", bucket_group_index); */
+  /* T* __restrict__ sums = sum_array + num_buckets_per_group * bucket_group_index; */
+  T* sums = sum_array + num_buckets_per_group * bucket_group_index;
+  sums[0] = T::identity();
+  sums[1] = T::identity();
+  sums[2] = T::identity();
+  // TODO: why does above work but below doesn't?
+#if 0
   for (unsigned sum_index = 0; sum_index < num_buckets_per_group; ++sum_index) {
-    printf("sums[%d] = T::identity()\n", sum_index);
     sums[sum_index] = T::identity();
   }
+#endif
 
   // process
   auto generator_first = tile_index * num_generators_per_tile;

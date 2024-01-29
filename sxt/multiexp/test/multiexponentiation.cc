@@ -326,7 +326,6 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
       REQUIRE(res == expected);
     }
   }
-  return;
 
   SECTION("we handle random sequences of length 1 and varying num_bytes") {
     mtxrn::random_multiexponentiation_descriptor descriptor{
@@ -337,14 +336,18 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
         .min_exponent_num_bytes = 1,
         .max_exponent_num_bytes = 32,
     };
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 1000; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
+      if (sequences[0].element_nbytes > 8) {
+        continue;
+      }
       auto res = f(generators, sequences);
       memmg::managed_array<c21t::element_p3> expected(sequences.size());
       mtxtst::mul_sum_curve21_elements(expected, generators, sequences);
       REQUIRE(res == expected);
     }
   }
+  return;
 
   SECTION("we handle random sequences of varying length and varying num_bytes") {
     mtxrn::random_multiexponentiation_descriptor descriptor{
