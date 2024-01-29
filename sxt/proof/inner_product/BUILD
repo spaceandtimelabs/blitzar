@@ -172,6 +172,7 @@ sxt_cc_component(
         "//sxt/curve21/type:element_p3",
         "//sxt/execution/async:future",
         "//sxt/execution/async:coroutine",
+        "//sxt/base/log:log",
         "//sxt/base/num:ceil_log2",
         "//sxt/ristretto/operation:compression",
         "//sxt/ristretto/type:compressed_element",
