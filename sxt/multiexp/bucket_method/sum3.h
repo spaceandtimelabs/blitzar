@@ -51,7 +51,7 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   using Sort = cub::BlockRadixSort<uint8_t, 32, items_per_thread>;
   using Scan = cub::BlockScan<uint8_t, 32>;
   using Discontinuity = cub::BlockDiscontinuity<uint8_t, 32>;
-  using Reduce = cub::BlockReduce<unsigned, 32>;
+  using Reduce = cub::BlockReduce<uint8_t, 32>;
   __shared__ union {
     Sort::TempStorage sort;
     Discontinuity::TempStorage discontinuity;
@@ -65,6 +65,7 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   uint8_t should_accumulate[items_per_thread];
   digits[0] = scalars_t[index];
   gs[0] = generators[index];
+  unsigned index_p = generator_first + num_threads;
   while (true) {
     // sort digit-g pairs
     Sort(temp_storage.sort).Sort(digits, gs);
@@ -80,16 +81,19 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
 
     // use a prefix sum on consumed generator indexes to update the index
     uint8_t offsets[items_per_thread];
-    Scan(temp_storage.scan).InclusiveSum(offsets, should_accumulate);
-    auto max_index = 123u; // TODO: get the max index Reduce(temp_storage.reduce).Max(index);
+    Scan(temp_storage.scan).InclusiveSum(should_accumulate, offsets);
+    auto num_consumed = Reduce(temp_storage.reduce).Sum(should_accumulate);
+                   // Note: probably a more efficient way to do this using the
+                   // prefix sums
+    index = index_p + offsets[0];
+    index_p += num_consumed;
+    if (index >= generator_last) {
+      return;
+    }
 
     // if the generator was consumed, load a new element
     if (!should_accumulate[0]) {
       continue;
-    }
-    index = max_index + offsets[0];
-    if (index >= generator_last) {
-      return;
     }
     digits[0] = scalars_t[index];
     gs[0] = generators[index];
