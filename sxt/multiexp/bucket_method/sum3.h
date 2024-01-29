@@ -26,18 +26,24 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   auto thread_index = threadIdx.x;
   auto num_threads = blockDim.x;
   constexpr size_t num_buckets_per_output = (1u << BitWidth) - 1u;
-  __shared__ T sums[num_buckets_per_output];
-  unsigned generator_last = 123u; // TODO: compute based on tile
+  auto digit_index = blockIdx.x;
+  auto tile_index = blockIdx.y;
+  auto num_tiles = gridDim.y;
 
-  // initialize sums to identity
+  auto num_generators_per_tile = basn::divide_up(n, num_tiles);
+  auto generator_first = num_generators_per_tile * tile_index;
+  auto generator_last = min(generator_first + num_generators_per_tile, n);
+
+  // set up a sum table initialized to the identity
+  __shared__ T sums[num_buckets_per_output];
   for (unsigned i=thread_index; i<num_buckets_per_output; i+=num_threads) {
     sums[i] = T::identity();
   }
 
   // sum buckets
-  unsigned index = 123u; // TODO: load
-  uint8_t digit = 123u; // TODO: load
-  T g = T::identity(); // TODO: load
+  unsigned index = generator_first + thread_index;
+  uint8_t digit = scalars[index];
+  T g = generators[index];
   while (index < generator_last) {
     // sort digit-g pairs
 
