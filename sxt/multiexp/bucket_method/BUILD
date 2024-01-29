@@ -299,3 +299,29 @@ sxt_cc_component(
         "//sxt/multiexp/base:digit_utility",
     ],
 )
+
+sxt_cc_component(
+    name = "sum3",
+    test_deps = [
+      "//sxt/base/curve:example_element",
+      "//sxt/base/device:synchronization",
+      "//sxt/base/error:assert",
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+      "//sxt/algorithm/iteration:for_each",
+        "//sxt/multiexp/base:scalar_array",
+        "//sxt/base/container:span",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/num:divide_up",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:device_viewable",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:pinned_resource",
+        "//sxt/multiexp/base:digit_utility",
+    ],
+)
