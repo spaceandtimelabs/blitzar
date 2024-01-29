@@ -4,44 +4,44 @@ load(
 )
 
 cc_library(
-  name = "setup",
-  copts = [
-    "-stdlib=libc++",
-    "-std=c++20",
-  ],
-  hdrs = [
-    "setup.h",
-  ],
-  srcs = [
-    "setup.cc",
-  ],
-  deps = [
-    "@com_github_gabime_spdlog//:libspdlog",
-  ],
+    name = "setup",
+    srcs = [
+        "setup.cc",
+    ],
+    hdrs = [
+        "setup.h",
+    ],
+    copts = [
+        "-stdlib=libc++",
+        "-std=c++20",
+    ],
+    deps = [
+        "@com_github_gabime_spdlog//:libspdlog",
+    ],
 )
 
 cc_library(
-  name = "log_impl",
-  copts = [
-    "-stdlib=libc++",
-    "-std=c++20",
-  ],
-  hdrs = [
-    "log_impl.h",
-  ],
-  srcs = [
-    "log_impl.cc",
-  ],
-  deps = [
-    ":setup",
-    "@com_github_gabime_spdlog//:libspdlog",
-  ],
+    name = "log_impl",
+    srcs = [
+        "log_impl.cc",
+    ],
+    hdrs = [
+        "log_impl.h",
+    ],
+    copts = [
+        "-stdlib=libc++",
+        "-std=c++20",
+    ],
+    deps = [
+        ":setup",
+        "@com_github_gabime_spdlog//:libspdlog",
+    ],
 )
 
 sxt_cc_component(
-  name = "log",
-  with_test = False,
-  impl_deps = [
-    ":log_impl",
-  ],
+    name = "log",
+    impl_deps = [
+        ":log_impl",
+    ],
+    with_test = False,
 )
