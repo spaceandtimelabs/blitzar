@@ -23,9 +23,34 @@ template <bascrv::element T, size_t BitWidth>
 __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restrict__ generators,
                                   const uint8_t* __restrict__ scalars, unsigned element_num_bytes,
                                   unsigned n) noexcept {
+  auto thread_index = threadIdx.x;
   auto num_threads = blockDim.x;
   constexpr size_t num_buckets_per_output = (1u << BitWidth) - 1u;
-  T sums[num_buckets_per_output];
+  __shared__ T sums[num_buckets_per_output];
+  unsigned generator_last = 123u; // TODO: compute based on tile
+
+  // initialize sums to identity
+  for (unsigned i=thread_index; i<num_buckets_per_output; i+=num_threads) {
+    sums[i] = T::identity();
+  }
+
+  // sum buckets
+  unsigned index = 123u; // TODO: load
+  uint8_t digit = 123u; // TODO: load
+  T g = T::identity(); // TODO: load
+  while (index < generator_last) {
+    // sort digit-g pairs
+
+    // compute the difference between adjacent digit-g pairs
+
+    // is this digit free of collisions
+    // if so
+    //      add_inplace(sums[digit-1u], g)
+
+    // use a prefix sum on consumed generator indexes to update the index
+
+    // if the generator was consumed, load a new element
+  }
   (void)sums;
   (void)num_threads;
   (void)partial_sums;
