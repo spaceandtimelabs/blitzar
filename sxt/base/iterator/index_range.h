@@ -36,8 +36,6 @@ public:
 
   size_t size() const noexcept { return b_ - a_; }
 
-  bool empty() const noexcept { return this->size() == 0; }
-
   bool operator==(const index_range&) const noexcept = default;
 
   size_t min_chunk_size() const noexcept { return min_chunk_size_; }
