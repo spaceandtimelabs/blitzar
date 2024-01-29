@@ -49,13 +49,16 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
 
   // sum buckets
   using Sort = cub::BlockRadixSort<uint8_t, 32, items_per_thread>;
+  using Discontinuity = cub::BlockDiscontinuity<uint8_t, 32>;
   __shared__ union {
     Sort::TempStorage sort;
+    Discontinuity::TempStorage discontinuity;
   } temp_storage;
 
   unsigned index = generator_first + thread_index;
   uint8_t digits[items_per_thread];
   T gs[items_per_thread];
+  uint8_t should_accumulate[items_per_thread];
   digits[0] = scalars_t[index];
   gs[0] = generators[index];
   while (index < generator_last) {
@@ -63,10 +66,13 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
     Sort(temp_storage.sort).Sort(digits, gs);
 
     // compute the difference between adjacent digit-g pairs
+    Discontinuity(temp_storage.discontinuity).FlagHeads(should_accumulate, digits, cub::Inequality());
+    should_accumulate[0] *= (digits[0] != 0u);
 
-    // is this digit free of collisions
-    // if so
-    //      add_inplace(sums[digit-1u], g)
+    // accumulate digits with no collisions
+    if (should_accumulate[0]) {
+      add_inplace(sums[digits[0]-1u], gs[0]);
+    }
 
     // use a prefix sum on consumed generator indexes to update the index
 
