@@ -19,15 +19,19 @@ namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 // bucket_sum_kernel 
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
+template <bascrv::element T, size_t BitWidth>
 __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restrict__ generators,
                                   const uint8_t* __restrict__ scalars, unsigned element_num_bytes,
-                                  unsigned bit_width, unsigned n) noexcept {
+                                  unsigned n) noexcept {
+  auto num_threads = blockDim.x;
+  constexpr size_t num_buckets_per_output = (1u << BitWidth) - 1u;
+  T sums[num_buckets_per_output];
+  (void)sums;
+  (void)num_threads;
   (void)partial_sums;
   (void)generators;
   (void)scalars;
   (void)element_num_bytes;
-  (void)bit_width;
   (void)n;
 }
 
