@@ -15,6 +15,7 @@ TEST_CASE("we can compute multiexponentiations") {
     .min_chunk_size = 1u,
     .max_chunk_size = 100u,
     .bit_width = 8u,
+    /* .bit_width = 2u, */
     .split_factor = 1u,
   };
   memmg::managed_array<const uint8_t*> scalars;
@@ -32,7 +33,6 @@ TEST_CASE("we can compute multiexponentiations") {
     REQUIRE(res[0] == 33u);
   }
 
-#if 0
   SECTION("we handle the case of a single scalar of 1 using a bit_width of 7") {
     options.bit_width = 7u;
     memmg::managed_array<uint8_t> scalars1 = {1u};
@@ -95,5 +95,4 @@ TEST_CASE("we can compute multiexponentiations") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == (97u - 33u));
   }
-#endif
 }

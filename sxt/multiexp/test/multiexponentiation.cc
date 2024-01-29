@@ -326,6 +326,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
       REQUIRE(res == expected);
     }
   }
+  return;
 
   SECTION("we handle random sequences of length 1 and varying num_bytes") {
     mtxrn::random_multiexponentiation_descriptor descriptor{

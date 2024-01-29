@@ -200,6 +200,7 @@ sxt_cc_component(
     ],
     deps = [
       ":sum",
+      ":sum2",
       ":reduction",
         "//sxt/base/container:span",
         "//sxt/base/container:span_utility",

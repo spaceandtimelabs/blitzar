@@ -1,5 +1,7 @@
 #pragma once
 
+#include <print>
+
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
@@ -35,15 +37,19 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   auto num_buckets_per_output = num_buckets_per_group * num_bucket_groups;
   auto num_partial_buckets_per_output = num_buckets_per_output * num_tiles;
   auto bucket_group_index = threadIdx.x;
-  extern __shared__ T sum_array[];
+  extern __shared__ std::byte sum_array_data[];
+  auto sum_array = reinterpret_cast<T*>(sum_array_data);
 
   partial_sums += output_index * num_partial_buckets_per_output +
                   bucket_group_index * num_buckets_per_group * num_tiles;
   scalars += output_index * n * element_num_bytes;
 
   // initialize the bucket partial sums
+  std::printf("num_buckets_per_group=%d\n", num_buckets_per_group);
+  std::printf("bucket_group_index=%d\n", bucket_group_index);
   T* __restrict__ sums = sum_array + num_buckets_per_group * bucket_group_index;
   for (unsigned sum_index = 0; sum_index < num_buckets_per_group; ++sum_index) {
+    printf("sums[%d] = T::identity()\n", sum_index);
     sums[sum_index] = T::identity();
   }
 
@@ -108,6 +114,8 @@ void compute_bucket_sums(basct::span<T> sums, const basdv::stream& stream,
   auto num_buckets_per_group = (1u << bit_width) - 1u;
   auto num_bucket_groups = basn::divide_up(element_num_bytes * 8u, bit_width);
   auto num_buckets_per_output = num_buckets_per_group * num_bucket_groups;
+  std::print("num_buckets_per_output={} num_bucket_groups={}\n", num_buckets_per_output,
+             num_bucket_groups);
   auto num_buckets = num_buckets_per_output * num_outputs;
   auto n = static_cast<unsigned>(generators.size());
   if (n == 0) {
@@ -120,6 +128,9 @@ void compute_bucket_sums(basct::span<T> sums, const basdv::stream& stream,
   );
 
   auto num_tiles = std::min(64u, n); // TODO: set better
+  std::print("num_tiles = {}\n", num_tiles);                                     
+  std::print("num_bucket_groups = {}\n", num_bucket_groups);
+  std::print("element_num_bytes = {}\n", element_num_bytes);
 
   memr::async_device_resource resource{stream};
 
@@ -132,7 +143,9 @@ void compute_bucket_sums(basct::span<T> sums, const basdv::stream& stream,
   basdv::async_copy_host_to_device(generators_dev, generators, stream);
 
   // launch kernel
+  std::print("num_buckets_per_output={}\n", num_buckets_per_output);
   auto shared_memory_num_bytes = num_buckets_per_output * sizeof(T);
+  std::print("shared_memory_num_bytes = {}\n", shared_memory_num_bytes);
   memmg::managed_array<T> partial_sums{num_buckets * num_tiles, &resource};
   bucket_sum_kernel<<<dim3(num_outputs, num_tiles, 1), num_bucket_groups, shared_memory_num_bytes,
                       stream>>>(partial_sums.data(), generators_dev.data(), scalar_array.data(),

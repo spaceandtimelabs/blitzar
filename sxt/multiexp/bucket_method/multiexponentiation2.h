@@ -21,6 +21,7 @@
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/bucket_method/reduction.h"
 #include "sxt/multiexp/bucket_method/sum.h"
+#include "sxt/multiexp/bucket_method/sum2.h"
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
@@ -81,6 +82,7 @@ multiexponentiate(basct::span<Element> res, const multiexponentiate_options& opt
                                                    memr::get_pinned_resource()};
   size_t chunk_index = 0;
   auto t2 = std::chrono::steady_clock::now();
+#if 0
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& chunk) noexcept -> xena::future<> {
         auto sums_slice =
@@ -99,6 +101,23 @@ multiexponentiate(basct::span<Element> res, const multiexponentiate_options& opt
                                         element_num_bytes, options.bit_width);
         }
       });
+#else
+  co_await xendv::concurrent_for_each(
+      chunk_first, chunk_last, [&](const basit::index_range& chunk) noexcept -> xena::future<> {
+      basdv::stream stream;
+        auto sums_slice =
+            basct::subspan(bucket_sums_chunks, num_buckets * chunk_index, num_buckets);
+        memmg::managed_array<const uint8_t*> scalars_slice(num_outputs);
+        for (unsigned output_index = 0; output_index < num_outputs; ++output_index) {
+          scalars_slice[output_index] = scalars[output_index] + element_num_bytes * chunk.a();
+        }
+        auto generators_slice = generators.subspan(chunk.a(), chunk.size());
+        ++chunk_index;
+        compute_bucket_sums(sums_slice, stream, generators_slice, scalars_slice,
+            element_num_bytes, options.bit_width);
+        co_await xendv::await_stream(stream);
+      });
+#endif
 
   auto t3 = std::chrono::steady_clock::now();
   // combine chunks
