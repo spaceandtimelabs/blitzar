@@ -49,17 +49,19 @@ static __global__ void transpose_kernel(uint8_t* __restrict__ dst, const scalar3
 
   // transpose 
   scalar32 s;
+  unsigned out_first = 0;
   for (unsigned i = byte_index; i < n_per_tile; i += element_num_bytes) {
     if (i < last) {
       s = src[i];
     }
     BlockExchange(temp_storage).StripedToBlocked(s.data);
     for (unsigned j=0; j<32u; ++j) {
-      auto out_index = i + j;
+      auto out_index = out_first + j;
       if (out_index < last) {
         dst[out_index] = s.data[j];
       }
     }
+    out_first += element_num_bytes;
     __syncthreads();
   }
 }
@@ -71,6 +73,7 @@ static xena::future<> make_transposed_device_scalar_array_impl(basct::span<uint8
                                                                basct::cspan<uint8_t> scalars,
                                                                unsigned element_num_bytes,
                                                                unsigned n) noexcept {
+  SXT_RELEASE_ASSERT(element_num_bytes == 32, "we only support 32 byte scalars for now");
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<uint8_t> scalars_dev{scalars.size(), &resource};
@@ -78,7 +81,7 @@ static xena::future<> make_transposed_device_scalar_array_impl(basct::span<uint8
   auto num_tiles = std::min(basn::divide_up(n, 32u), 64u);
 
   transpose_kernel<<<num_tiles, 32, 0, stream>>>(
-      array_slice.data(), reinterpret_cast<const scalar32*>(scalars.data()), n);
+      array_slice.data(), reinterpret_cast<const scalar32*>(scalars_dev.data()), n);
 
   return xendv::await_and_own_stream(std::move(stream));
 }

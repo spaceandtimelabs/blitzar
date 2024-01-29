@@ -20,5 +20,5 @@ void make_device_scalar_array(basct::span<uint8_t> array, const basdv::stream& s
 //--------------------------------------------------------------------------------------------------
 xena::future<> make_transposed_device_scalar_array(basct::span<uint8_t> array,
                                                    basct::cspan<const uint8_t*> scalars,
-                                                   size_t element_num_bytes, size_t n) noexcept;
+                                                   unsigned element_num_bytes, unsigned n) noexcept;
 } // namespace sxt::mtxb
