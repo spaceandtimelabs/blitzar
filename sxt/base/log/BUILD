@@ -15,7 +15,7 @@ cc_library(
         "-stdlib=libc++",
         "-std=c++20",
     ],
-    deps = [
+    implementation_deps = [
         "@com_github_gabime_spdlog//:libspdlog",
     ],
 )
@@ -32,7 +32,7 @@ cc_library(
         "-stdlib=libc++",
         "-std=c++20",
     ],
-    deps = [
+    implementation_deps = [
         ":setup",
         "@com_github_gabime_spdlog//:libspdlog",
     ],
