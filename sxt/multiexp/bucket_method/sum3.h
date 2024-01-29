@@ -30,7 +30,7 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
 
   auto thread_index = threadIdx.x;
   auto num_threads = blockDim.x;
-  constexpr size_t num_buckets_per_output = (1u << BitWidth) - 1u;
+  constexpr size_t num_buckets_per_group = (1u << BitWidth) - 1u;
   auto digit_index = blockIdx.x;
   auto tile_index = blockIdx.y;
   auto num_tiles = gridDim.y;
@@ -39,15 +39,18 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   auto generator_first = num_generators_per_tile * tile_index;
   auto generator_last = min(generator_first + num_generators_per_tile, n);
 
+  // adjust the pointers
   scalars_t += n * digit_index;
+  /* partial_sums += output_index * num_partial_buckets_per_output + */
+  /*                 bucket_group_index * num_buckets_per_group * num_tiles; */
 
   // set up a sum table initialized to the identity
-  __shared__ T sums[num_buckets_per_output];
-  for (unsigned i=thread_index; i<num_buckets_per_output; i+=num_threads) {
+  __shared__ T sums[num_buckets_per_group];
+  for (unsigned i=thread_index; i<num_buckets_per_group; i+=num_threads) {
     sums[i] = T::identity();
   }
 
-  // sum buckets
+  // set up temp storage for algorithms
   using Sort = cub::BlockRadixSort<uint8_t, 32, items_per_thread>;
   using Scan = cub::BlockScan<uint8_t, 32>;
   using Discontinuity = cub::BlockDiscontinuity<uint8_t, 32>;
@@ -59,6 +62,7 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
     Reduce::TempStorage reduce;
   } temp_storage;
 
+  // sum buckets
   unsigned index = generator_first + thread_index;
   uint8_t digits[items_per_thread];
   T gs[items_per_thread];
@@ -71,7 +75,8 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
     Sort(temp_storage.sort).Sort(digits, gs);
 
     // compute the difference between adjacent digit-g pairs
-    Discontinuity(temp_storage.discontinuity).FlagHeads(should_accumulate, digits, cub::Inequality());
+    Discontinuity(temp_storage.discontinuity)
+        .FlagHeads(should_accumulate, digits, cub::Inequality());
 
     // accumulate digits with no collisions
     if (should_accumulate[0] && digits[0] != 0u) {
@@ -92,11 +97,15 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
     }
 
     // if the generator was consumed, load a new element
-    if (!should_accumulate[0]) {
-      continue;
+    if (should_accumulate[0]) {
+      digits[0] = scalars_t[index];
+      gs[0] = generators[index];
     }
-    digits[0] = scalars_t[index];
-    gs[0] = generators[index];
+  }
+
+  // copy partial sums to global memory
+  for (unsigned sum_index = 0; sum_index < num_buckets_per_group; ++sum_index) {
+    partial_sums[sum_index * num_tiles + tile_index] = sums[sum_index];
   }
 }
 
