@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "sxt/base/error/assert.h"
+#include "sxt/base/log/log.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/scalar_multiply.h"
@@ -75,6 +76,7 @@ xena::future<void> prove_inner_product(basct::span<rstt::compressed_element> l_v
     a_vector.size() == n
   );
   // clang-format on
+  basl::info("creating an inner product proof for n={} with {} rounds", n, num_rounds);
 
   init_transcript(transcript, n);
 
@@ -88,11 +90,13 @@ xena::future<void> prove_inner_product(basct::span<rstt::compressed_element> l_v
   while (np > 1) {
     auto& l_value = l_vector[round_index];
     auto& r_value = r_vector[round_index];
+    basl::info("committing to inner product proof fold round={}", round_index);
     co_await drv.commit_to_fold(l_value, r_value, *workspace);
 
     s25t::element x;
     compute_round_challenge(x, transcript, l_value, r_value);
 
+    basl::info("folding inner product proof round={}", round_index);
     co_await drv.fold(*workspace, x);
 
     np /= 2;
@@ -122,6 +126,7 @@ xena::future<bool> verify_inner_product(prft::transcript& transcript, const driv
     descriptor.g_vector.size() == np
   );
   // clang-format on
+  basl::info("verifying an inner product proof for n={} with {} rounds", n, num_rounds);
 
   if (l_vector.size() != num_rounds || r_vector.size() != num_rounds) {
     co_return false;
