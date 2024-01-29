@@ -31,18 +31,25 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   auto thread_index = threadIdx.x;
   auto num_threads = blockDim.x;
   constexpr size_t num_buckets_per_group = (1u << BitWidth) - 1u;
-  auto digit_index = blockIdx.x;
+
+  auto bucket_group_index = blockIdx.x;
   auto tile_index = blockIdx.y;
+  auto output_index = blockIdx.z;
+
+  auto num_bucket_groups = gridDim.x;
   auto num_tiles = gridDim.y;
 
   auto num_generators_per_tile = basn::divide_up(n, num_tiles);
+  auto num_buckets_per_output = num_buckets_per_group * num_bucket_groups;
+  auto num_partial_buckets_per_output = num_buckets_per_output * num_tiles;
+
   auto generator_first = num_generators_per_tile * tile_index;
   auto generator_last = min(generator_first + num_generators_per_tile, n);
 
   // adjust the pointers
-  scalars_t += n * digit_index;
-  /* partial_sums += output_index * num_partial_buckets_per_output + */
-  /*                 bucket_group_index * num_buckets_per_group * num_tiles; */
+  scalars_t += n * bucket_group_index;
+  partial_sums += output_index * num_partial_buckets_per_output +
+                  bucket_group_index * num_buckets_per_group * num_tiles;
 
   // set up a sum table initialized to the identity
   __shared__ T sums[num_buckets_per_group];
