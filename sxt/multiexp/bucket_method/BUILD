@@ -307,6 +307,7 @@ sxt_cc_component(
       "//sxt/base/device:synchronization",
       "//sxt/base/error:assert",
         "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [

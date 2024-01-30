@@ -27,8 +27,7 @@ namespace sxt::mtxbk {
 template <bascrv::element T, size_t BitWidth>
 __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restrict__ generators,
                                   const uint8_t* __restrict__ scalars_t, unsigned n) noexcept {
-  constexpr size_t element_num_bytes = 32;
-  constexpr size_t items_per_thread = 1;
+  constexpr unsigned items_per_thread = 1;
 
   auto thread_index = threadIdx.x;
   auto num_threads = blockDim.x;
@@ -60,7 +59,7 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   }
 
   // set up temp storage for algorithms
-  using Sort = cub::BlockRadixSort<uint8_t, 32, items_per_thread>;
+  using Sort = cub::BlockRadixSort<uint8_t, 32, items_per_thread, T>;
   using Scan = cub::BlockScan<uint8_t, 32>;
   using Discontinuity = cub::BlockDiscontinuity<uint8_t, 32>;
   using Reduce = cub::BlockReduce<uint8_t, 32>;
