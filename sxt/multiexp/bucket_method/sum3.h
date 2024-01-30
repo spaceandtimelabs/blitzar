@@ -45,7 +45,8 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   auto num_partial_buckets_per_output = num_buckets_per_output * num_tiles;
 
   auto generator_first = num_generators_per_tile * tile_index;
-  auto generator_last = min(generator_first + num_generators_per_tile, n);
+  auto consumption_target = min(num_generators_per_tile, n - generator_first);
+  auto generator_last = generator_first + consumption_target;
 
   // adjust the pointers
   scalars_t += n * bucket_group_index + output_index * num_bucket_groups * n;
@@ -81,13 +82,20 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   } else {
     digits[0] = 0u;
   }
-  while (generator_first < generator_last) {
+  generator_first += 32;
+
+  unsigned num_generators_consumed = 0;
+  __shared__ uint8_t consumption_counter;
+  while (num_generators_consumed < consumption_target) {
     // sort digit-g pairs
     Sort(temp_storage.sort).Sort(digits, gs);
+    __syncthreads();
+
 
     // compute the difference between adjacent digit-g pairs
     Discontinuity(temp_storage.discontinuity)
         .FlagHeads(should_accumulate, digits, cub::Inequality());
+    __syncthreads();
 
     // accumulate digits with no collisions
     if (should_accumulate[0] && digits[0] != 0u) {
@@ -98,11 +106,13 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
     // use a prefix sum on consumed generator indexes to update the index
     uint8_t offsets[items_per_thread];
     Scan(temp_storage.scan).InclusiveSum(should_accumulate, offsets);
-    auto num_consumed = Reduce(temp_storage.reduce).Sum(should_accumulate);
-                   // Note: probably a more efficient way to do this using the
-                   // prefix sums
+    if (thread_index == 31) {
+      consumption_counter = offsets[0];
+    }
+    __syncthreads();
     index = generator_first + offsets[0];
-    generator_first += num_consumed;
+    generator_first += consumption_counter;
+    num_generators_consumed += consumption_counter;
 
     // if the generator was consumed, load a new element
     if (should_accumulate[0]) {
