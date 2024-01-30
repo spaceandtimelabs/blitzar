@@ -2,7 +2,6 @@
 name = "blitzar-sys"
 version = "0.0.0" # DO NOT CHANGE
 edition = "2021"
-rust-version = "1.71.1"
 license = "Apache-2.0"
 description = "Rust bindings for the Blitzar library"
 repository = "https://github.com/spaceandtimelabs/blitzar"
