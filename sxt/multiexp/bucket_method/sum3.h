@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include <exception> // https://github.com/NVIDIA/cccl/issues/1278
 #include "cub/cub.cuh"
 
@@ -60,7 +61,7 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   }
 
   // set up temp storage for algorithms
-  using Sort = cub::BlockRadixSort<uint8_t, 32, items_per_thread, T>;
+  using Sort = cub::BlockRadixSort<uint8_t, 32, items_per_thread, std::pair<unsigned, T>>;
   using Scan = cub::BlockScan<uint8_t, 32>;
   using Discontinuity = cub::BlockDiscontinuity<uint8_t, 32>;
   using Reduce = cub::BlockReduce<uint8_t, 32>;
@@ -69,56 +70,56 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
     Discontinuity::TempStorage discontinuity;
     Scan::TempStorage scan;
     Reduce::TempStorage reduce;
+    uint8_t consumption_counter;
   } temp_storage;
 
   // sum buckets
-  unsigned index = generator_first + thread_index;
   uint8_t digits[items_per_thread];
-  T gs[items_per_thread];
+  std::pair<unsigned, T> gis[items_per_thread];
   uint8_t should_accumulate[items_per_thread];
-  if (index < generator_last) {
-    digits[0] = scalars_t[index];
-    gs[0] = generators[index];
+  gis[0].first = generator_first + thread_index;
+  if (gis[0].first < generator_last) {
+    digits[0] = scalars_t[gis[0].first];
+    gis[0].second = generators[gis[0].first];
   } else {
     digits[0] = 0u;
   }
   generator_first += 32;
 
   unsigned num_generators_consumed = 0;
-  __shared__ uint8_t consumption_counter;
   while (num_generators_consumed < consumption_target) {
     // sort digit-g pairs
-    Sort(temp_storage.sort).Sort(digits, gs);
+    Sort(temp_storage.sort).Sort(digits, gis);
     __syncthreads();
-
 
     // compute the difference between adjacent digit-g pairs
     Discontinuity(temp_storage.discontinuity)
         .FlagHeads(should_accumulate, digits, cub::Inequality());
     __syncthreads();
+    should_accumulate[0] = should_accumulate[0] && digits[0] != 0u;
 
     // accumulate digits with no collisions
-    if (should_accumulate[0] && digits[0] != 0u) {
-      add_inplace(sums[digits[0]-1u], gs[0]);
+    if (should_accumulate[0]) {
+      add_inplace(sums[digits[0]-1u], gis[0].second);
     }
-    should_accumulate[0] = should_accumulate[0] || (digits[0] == 0u && index < generator_last);
+    should_accumulate[0] = should_accumulate[0] || (digits[0] == 0u && gis[0].first < generator_last);
 
     // use a prefix sum on consumed generator indexes to update the index
     uint8_t offsets[items_per_thread];
     Scan(temp_storage.scan).InclusiveSum(should_accumulate, offsets);
-    if (thread_index == 31) {
-      consumption_counter = offsets[0];
+    if (thread_index == num_threads - 1) {
+      temp_storage.consumption_counter = offsets[0];
     }
     __syncthreads();
-    index = generator_first + offsets[0];
-    generator_first += consumption_counter;
-    num_generators_consumed += consumption_counter;
+    gis[0].first = generator_first + offsets[0] - 1u;
+    generator_first += temp_storage.consumption_counter;
+    num_generators_consumed += temp_storage.consumption_counter;
 
     // if the generator was consumed, load a new element
     if (should_accumulate[0]) {
-      if (index < generator_last) {
-        digits[0] = scalars_t[index];
-        gs[0] = generators[index];
+      if (gis[0].first < generator_last) {
+        digits[0] = scalars_t[gis[0].first];
+        gis[0].second = generators[gis[0].first];
       } else {
         digits[0] = 0;
       }
@@ -153,7 +154,7 @@ CUDA_CALLABLE void bucket_sum_combination_kernel(T* __restrict__ sums, T* __rest
 template <bascrv::element T>
 xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generators,
                                    basct::cspan<const uint8_t*> scalars, unsigned element_num_bytes,
-                                   unsigned bit_width) noexcept {
+                                   unsigned bit_width, unsigned max_num_tiles = 4u) noexcept {
   SXT_RELEASE_ASSERT(element_num_bytes == 32 && bit_width == 8,
                      "only support these values for now");
   auto n = static_cast<unsigned>(generators.size());
@@ -175,7 +176,7 @@ xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generato
   basdv::async_copy_host_to_device(generators_dev, generators, stream);
 
   // launch bucket accumulation kernel
-  auto num_tiles = std::min(n, 4u);
+  auto num_tiles = std::min(n, max_num_tiles);
   auto num_partial_sums = num_buckets * num_tiles;
   memmg::managed_array<T> partial_sums{num_partial_sums, &resource};
   co_await std::move(fut);

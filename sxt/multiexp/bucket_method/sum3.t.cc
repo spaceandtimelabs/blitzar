@@ -63,7 +63,7 @@ TEST_CASE("we accumulate buckets") {
     scalars1[0] = 1u;
     scalars1[32] = 1u;
     scalars = {scalars1.data()};
-    auto fut = compute_bucket_sums<E>(sums, generators, scalars, element_num_bytes, bit_width);
+    auto fut = compute_bucket_sums<E>(sums, generators, scalars, element_num_bytes, bit_width, 1u);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     expected[0] = 77u;
