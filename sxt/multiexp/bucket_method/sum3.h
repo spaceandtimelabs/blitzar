@@ -76,10 +76,13 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
   uint8_t digits[items_per_thread];
   T gs[items_per_thread];
   uint8_t should_accumulate[items_per_thread];
-  digits[0] = scalars_t[index];
-  gs[0] = generators[index];
-  unsigned index_p = generator_first + num_threads;
-  while (true) {
+  if (index < generator_last) {
+    digits[0] = scalars_t[index];
+    gs[0] = generators[index];
+  } else {
+    digits[0] = 0u;
+  }
+  while (generator_first < generator_last) {
     // sort digit-g pairs
     Sort(temp_storage.sort).Sort(digits, gs);
 
@@ -91,7 +94,7 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
     if (should_accumulate[0] && digits[0] != 0u) {
       add_inplace(sums[digits[0]-1u], gs[0]);
     }
-    should_accumulate[0] = max(should_accumulate[0], digits[0] == 0u);
+    should_accumulate[0] = should_accumulate[0] || (digits[0] == 0u && index < generator_last);
 
     // use a prefix sum on consumed generator indexes to update the index
     uint8_t offsets[items_per_thread];
@@ -99,16 +102,17 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
     auto num_consumed = Reduce(temp_storage.reduce).Sum(should_accumulate);
                    // Note: probably a more efficient way to do this using the
                    // prefix sums
-    index = index_p + offsets[0];
-    index_p += num_consumed;
-    if (index >= generator_last) {
-      return;
-    }
+    index = generator_first + offsets[0];
+    generator_first += num_consumed;
 
     // if the generator was consumed, load a new element
     if (should_accumulate[0]) {
-      digits[0] = scalars_t[index];
-      gs[0] = generators[index];
+      if (index < generator_last) {
+        digits[0] = scalars_t[index];
+        gs[0] = generators[index];
+      } else {
+        digits[0] = 0;
+      }
     }
   }
 
@@ -162,7 +166,7 @@ xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generato
   basdv::async_copy_host_to_device(generators_dev, generators, stream);
 
   // launch bucket accumulation kernel
-  auto num_tiles = std::min(basn::divide_up(n, 32u), 4u);
+  auto num_tiles = std::min(n, 4u);
   auto num_partial_sums = num_buckets * num_tiles;
   memmg::managed_array<T> partial_sums{num_partial_sums, &resource};
   co_await std::move(fut);
