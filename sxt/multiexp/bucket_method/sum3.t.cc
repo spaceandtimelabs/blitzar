@@ -57,7 +57,7 @@ TEST_CASE("we accumulate buckets") {
     REQUIRE(sums == expected);
   }
 
-  SECTION("we can accumulate multiple elements in the same bucket") {
+  SECTION("we can accumulate two elements into the same bucket") {
     generators = {33u, 44u};
     std::vector<uint8_t> scalars1(64);
     scalars1[0] = 1u;
@@ -67,6 +67,20 @@ TEST_CASE("we accumulate buckets") {
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     expected[0] = 77u;
+    REQUIRE(sums == expected);
+  }
+
+  SECTION("we can accumulate three elements into the same bucket") {
+    generators = {33u, 44u, 55u};
+    std::vector<uint8_t> scalars1(32u * 3u);
+    scalars1[0] = 1u;
+    scalars1[32] = 1u;
+    scalars1[64] = 1u;
+    scalars = {scalars1.data()};
+    auto fut = compute_bucket_sums<E>(sums, generators, scalars, element_num_bytes, bit_width, 1u);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    expected[0] = 33u + 44u + 55u;
     REQUIRE(sums == expected);
   }
 
