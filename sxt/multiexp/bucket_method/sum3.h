@@ -29,12 +29,16 @@ template <bascrv::element T, size_t BitWidth>
 __global__ void bucket_sum_kernel3(T* __restrict__ partial_sums, const T* __restrict__ generators,
                                    const uint8_t* __restrict__ scalars_t, unsigned n) noexcept {
   constexpr unsigned items_per_thread = 1;
+  constexpr unsigned num_bucket_groups_per_byte = 8u / BitWidth;
+  static_assert(8u % BitWidth == 0, "8 must be a multiple of BitWidth");
 
   auto thread_index = threadIdx.x;
   auto num_threads = blockDim.x;
   constexpr unsigned num_buckets_per_group = (1u << BitWidth) - 1u;
+  constexpr unsigned element_num_bytes = 32u;
 
   auto bucket_group_index = blockIdx.x;
+  auto byte_index = bucket_group_index / num_bucket_groups_per_byte;
   auto tile_index = blockIdx.y;
   auto output_index = blockIdx.z;
 
@@ -50,7 +54,7 @@ __global__ void bucket_sum_kernel3(T* __restrict__ partial_sums, const T* __rest
   auto generator_last = generator_first + consumption_target;
 
   // adjust the pointers
-  scalars_t += n * bucket_group_index + output_index * num_bucket_groups * n;
+  scalars_t += n * byte_index + output_index * element_num_bytes * n;
   partial_sums += output_index * num_partial_buckets_per_output +
                   bucket_group_index * num_buckets_per_group * num_tiles;
 
