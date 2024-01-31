@@ -36,38 +36,30 @@ TEST_CASE("we can compute multiexponentiations") {
     REQUIRE(res[0] == 33u);
   }
 
-#if 0
-  SECTION("we handle the case of a single scalar of 1 using a bit_width of 7") {
-    options.bit_width = 7u;
-    memmg::managed_array<uint8_t> scalars1 = {1u};
-    scalars = {scalars1.data()};
-    generators = {33u};
-    auto fut = multiexponentiate<E>(res, options, generators, scalars, element_num_bytes);
-    xens::get_scheduler().run();
-    REQUIRE(fut.ready());
-    REQUIRE(res[0] == 33u);
-  }
-
   SECTION("we handle the case of a single scalar of 2") {
-    memmg::managed_array<uint8_t> scalars1 = {2u};
+    std::vector<uint8_t> scalars1(32);
+    scalars1[0] = 2u;
     scalars = {scalars1.data()};
     generators = {33u};
-    auto fut = multiexponentiate<E>(res, options, generators, scalars, element_num_bytes);
+    auto fut = multiexponentiate3<E>(res, options, generators, scalars, element_num_bytes);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 66u);
   }
 
   SECTION("we handle two elements") {
-    memmg::managed_array<uint8_t> scalars1 = {2u, 7u};
+    std::vector<uint8_t> scalars1(64);
+    scalars1[0] = 2u;
+    scalars1[32] = 7u;
     scalars = {scalars1.data()};
     generators = {33u, 53u};
-    auto fut = multiexponentiate<E>(res, options, generators, scalars, element_num_bytes);
+    auto fut = multiexponentiate3<E>(res, options, generators, scalars, element_num_bytes);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 33u * 2u + 53u * 7u);
   }
 
+#if 0
   SECTION("we handle two scalars using two chunks") {
     options.split_factor = 2u;
     memmg::managed_array<uint8_t> scalars1 = {2u, 7u};
