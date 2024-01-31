@@ -127,7 +127,8 @@ __global__ void bucket_sum_kernel3(T* __restrict__ partial_sums, const T* __rest
   }
 
   // copy partial sums to global memory
-  for (unsigned sum_index = 0; sum_index < num_buckets_per_group; ++sum_index) {
+  for (unsigned sum_index = thread_index; sum_index < num_buckets_per_group;
+       sum_index += num_threads) {
     partial_sums[sum_index * num_tiles + tile_index] = sums[sum_index];
   }
 }
