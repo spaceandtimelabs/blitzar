@@ -36,7 +36,7 @@ namespace sxt::mtxbk {
 struct multiexponentiate_options3 {
   unsigned min_chunk_size = 1'000u;
   unsigned max_chunk_size = 256'000u;
-  unsigned bit_width = 8u;
+  unsigned bit_width = 4u;
   unsigned split_factor = 1u;
 };
 

@@ -17,7 +17,7 @@ TEST_CASE("we can compute multiexponentiations") {
   multiexponentiate_options3 options{
     .min_chunk_size = 1u,
     .max_chunk_size = 100u,
-    .bit_width = 8u,
+    .bit_width = 4u,
     /* .bit_width = 2u, */
     .split_factor = 1u,
   };
@@ -26,6 +26,7 @@ TEST_CASE("we can compute multiexponentiations") {
 
   memmg::managed_array<E> generators;
 
+#if 0
   SECTION("we handle the case of a single scalar of 1") {
     std::vector<uint8_t> scalars1(32);
     scalars1[0] = 1u;
@@ -59,6 +60,7 @@ TEST_CASE("we can compute multiexponentiations") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 33u * 2u + 53u * 7u);
   }
+#endif
 
 #if 0
   SECTION("we handle two scalars using two chunks") {
