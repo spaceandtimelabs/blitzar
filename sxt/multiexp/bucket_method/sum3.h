@@ -64,12 +64,10 @@ __global__ void bucket_sum_kernel3(T* __restrict__ partial_sums, const T* __rest
   using Sort = cub::BlockRadixSort<uint8_t, 32, items_per_thread, std::pair<unsigned, T>>;
   using Scan = cub::BlockScan<uint8_t, 32>;
   using Discontinuity = cub::BlockDiscontinuity<uint8_t, 32>;
-  using Reduce = cub::BlockReduce<uint8_t, 32>;
   __shared__ union {
     Sort::TempStorage sort;
     Discontinuity::TempStorage discontinuity;
     Scan::TempStorage scan;
-    Reduce::TempStorage reduce;
     uint8_t consumption_counter;
   } temp_storage;
 
@@ -182,10 +180,7 @@ xena::future<> compute_bucket_sums3(basct::span<T> sums, basct::cspan<T> generat
   auto num_partial_sums = num_buckets * num_tiles;
   memmg::managed_array<T> partial_sums{num_partial_sums, &resource};
   co_await std::move(fut);
-  {
-    std::vector<uint8_t> scalars_t_host(scalars_t.size());
-    basdv::memcpy_device_to_host(scalars_t_host.data(), scalars_t.data(), scalars_t.size());
-  }
+  std::print(stderr, "required shared memory: {}\n", num_buckets_per_group * sizeof(T));
   bucket_sum_kernel3<T, 8u><<<dim3(num_bucket_groups, num_tiles, num_outputs), 32, 0, stream>>>(
       partial_sums.data(), generators_dev.data(), scalars_t.data(), n);
   scalars_t.reset();

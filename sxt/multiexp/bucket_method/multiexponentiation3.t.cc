@@ -10,6 +10,7 @@ using namespace sxt;
 using namespace sxt::mtxbk;
 
 using E = bascrv::element97;
+using c21t::operator""_c21;
 
 TEST_CASE("we can compute multiexponentiations") {
   memmg::managed_array<E> res(1);
@@ -93,3 +94,32 @@ TEST_CASE("we can compute multiexponentiations") {
   }
 #endif
 }
+
+#if 0
+TEST_CASE("we can compute multiexponentiations with curve21 elements") {
+  std::vector<c21t::element_p3> res(1);
+  std::vector<c21t::element_p3> generators;
+  std::vector<const uint8_t*> scalars;
+  multiexponentiate_options3 options{
+    .min_chunk_size = 1u,
+    .max_chunk_size = 100u,
+    .bit_width = 8u,
+    /* .bit_width = 2u, */
+    .split_factor = 1u,
+  };
+  unsigned element_num_bytes = 32;
+
+  SECTION("we can compute a multiexponentiation with a single element of 1") {
+    std::vector<uint8_t> scalars1(32);
+    scalars1[0] = 1u;
+    scalars = {scalars1.data()};
+
+    generators = {0x123_c21};
+    auto fut =
+        multiexponentiate3<c21t::element_p3>(res, options, generators, scalars, element_num_bytes);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 0x123_c21);
+  }
+}
+#endif
