@@ -130,9 +130,6 @@ __global__ void bucket_sum_kernel3(T* __restrict__ partial_sums, const T* __rest
   for (unsigned sum_index = thread_index; sum_index < num_buckets_per_group;
        sum_index += num_threads) {
     partial_sums[sum_index * num_tiles + tile_index] = sums[sum_index];
-    if (sums[sum_index].value != 0) {
-      printf("%d sums[%d] = %d\n", bucket_group_index, sum_index, sums[sum_index].value);
-    }
   }
 }
 

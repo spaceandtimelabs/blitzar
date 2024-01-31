@@ -71,7 +71,6 @@ multiexponentiate3(basct::span<Element> res, const multiexponentiate_options3& o
   auto num_bucket_groups = basn::divide_up(element_num_bytes * 8u, options.bit_width);
   auto num_buckets = num_buckets_per_group * num_bucket_groups * num_outputs;
   auto num_chunks = std::distance(chunk_first, chunk_last);
-  std::cout << "num_chunks = " << num_chunks << std::endl;
   memmg::managed_array<Element> bucket_sums_chunks{num_buckets * num_chunks,
                                                    memr::get_pinned_resource()};
   size_t chunk_index = 0;
