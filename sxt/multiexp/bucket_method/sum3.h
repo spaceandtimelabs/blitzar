@@ -23,6 +23,22 @@
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
+// transform_to_digit 
+//--------------------------------------------------------------------------------------------------
+template <size_t BitWidth>
+CUDA_CALLABLE uint8_t transform_to_digit(uint8_t byte, unsigned bucket_group_index) noexcept {
+   static_assert(BitWidth == 8u || BitWidth == 4u);
+   if constexpr (BitWidth == 8) {
+     return byte;
+   }
+   if (bucket_group_index % 2 == 0) {
+     return byte & 0xf; 
+   } else {
+     return byte >> 4u;
+   }
+}
+
+//--------------------------------------------------------------------------------------------------
 // bucket_sum_kernel 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, size_t BitWidth>
@@ -81,7 +97,7 @@ __global__ void bucket_sum_kernel3(T* __restrict__ partial_sums, const T* __rest
   uint8_t should_accumulate[items_per_thread];
   gis[0].first = generator_first + thread_index;
   if (gis[0].first < generator_last) {
-    digits[0] = scalars_t[gis[0].first];
+    digits[0] = transform_to_digit<BitWidth>(scalars_t[gis[0].first], bucket_group_index);
     gis[0].second = generators[gis[0].first];
   } else {
     digits[0] = 0u;
@@ -120,7 +136,7 @@ __global__ void bucket_sum_kernel3(T* __restrict__ partial_sums, const T* __rest
     // if the generator was consumed, load a new element
     if (should_accumulate[0]) {
       if (gis[0].first < generator_last) {
-        digits[0] = scalars_t[gis[0].first];
+        digits[0] = transform_to_digit<BitWidth>(scalars_t[gis[0].first], bucket_group_index);
         gis[0].second = generators[gis[0].first];
       } else {
         digits[0] = 0;
