@@ -89,9 +89,6 @@ multiexponentiate3(basct::span<Element> res, const multiexponentiate_options3& o
         co_await compute_bucket_sums3(sums_slice, generators_slice, scalars_slice,
                                       element_num_bytes, options.bit_width);
       });
-  for (int i = 0; i < num_buckets * num_chunks; ++i) {
-    std::cout << "bucket_sum " << i << ": " << bucket_sums_chunks[i] << "\n";
-  }
 
   auto t3 = std::chrono::steady_clock::now();
   // combine chunks

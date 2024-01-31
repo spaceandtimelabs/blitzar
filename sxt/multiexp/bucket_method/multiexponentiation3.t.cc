@@ -1,5 +1,7 @@
 #include "sxt/multiexp/bucket_method/multiexponentiation3.h"
 
+#include <vector>
+
 #include "sxt/base/curve/example_element.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/schedule/scheduler.h"
@@ -24,14 +26,14 @@ TEST_CASE("we can compute multiexponentiations") {
   memmg::managed_array<E> generators;
 
   SECTION("we handle the case of a single scalar of 1") {
-    memmg::managed_array<uint8_t> scalars1(32);
+    std::vector<uint8_t> scalars1(32);
     scalars1[0] = 1u;
     scalars = {scalars1.data()};
     generators = {33u};
     auto fut = multiexponentiate3<E>(res, options, generators, scalars, element_num_bytes);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
-    /* REQUIRE(res[0] == 33u); */
+    REQUIRE(res[0] == 33u);
   }
 
 #if 0

@@ -55,9 +55,11 @@ static __global__ void transpose_kernel(uint8_t* __restrict__ dst, const scalar3
       s = src[i];
     }
     BlockExchange(temp_storage).StripedToBlocked(s.data);
+    __syncthreads();
     for (unsigned j=0; j<32u; ++j) {
       auto out_index = out_first + j;
       if (out_index < last) {
+        printf("%d dst[%d] = %d\n", byte_index, out_index, s.data[j]);
         dst[out_index] = s.data[j];
       }
     }

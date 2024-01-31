@@ -130,6 +130,9 @@ __global__ void bucket_sum_kernel3(T* __restrict__ partial_sums, const T* __rest
   for (unsigned sum_index = thread_index; sum_index < num_buckets_per_group;
        sum_index += num_threads) {
     partial_sums[sum_index * num_tiles + tile_index] = sums[sum_index];
+    if (sums[sum_index].value != 0) {
+      printf("%d sums[%d] = %d\n", bucket_group_index, sum_index, sums[sum_index].value);
+    }
   }
 }
 
@@ -182,6 +185,10 @@ xena::future<> compute_bucket_sums3(basct::span<T> sums, basct::cspan<T> generat
   auto num_partial_sums = num_buckets * num_tiles;
   memmg::managed_array<T> partial_sums{num_partial_sums, &resource};
   co_await std::move(fut);
+  {
+    std::vector<uint8_t> scalars_t_host(scalars_t.size());
+    basdv::memcpy_device_to_host(scalars_t_host.data(), scalars_t.data(), scalars_t.size());
+  }
   bucket_sum_kernel3<T, 8u><<<dim3(num_bucket_groups, num_tiles, num_outputs), 32, 0, stream>>>(
       partial_sums.data(), generators_dev.data(), scalars_t.data(), n);
   scalars_t.reset();
