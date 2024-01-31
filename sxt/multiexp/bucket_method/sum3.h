@@ -26,8 +26,8 @@ namespace sxt::mtxbk {
 // bucket_sum_kernel 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, size_t BitWidth>
-__global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restrict__ generators,
-                                  const uint8_t* __restrict__ scalars_t, unsigned n) noexcept {
+__global__ void bucket_sum_kernel3(T* __restrict__ partial_sums, const T* __restrict__ generators,
+                                   const uint8_t* __restrict__ scalars_t, unsigned n) noexcept {
   constexpr unsigned items_per_thread = 1;
 
   auto thread_index = threadIdx.x;
@@ -136,7 +136,7 @@ __global__ void bucket_sum_kernel(T* __restrict__ partial_sums, const T* __restr
 // bucket_sum_combination_kernel
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-CUDA_CALLABLE void bucket_sum_combination_kernel(T* __restrict__ sums, T* __restrict__ partial_sums,
+CUDA_CALLABLE void bucket_sum_combination_kernel3(T* __restrict__ sums, T* __restrict__ partial_sums,
                                                  unsigned num_tiles,
                                                  unsigned bucket_index) noexcept {
   partial_sums += bucket_index * num_tiles;
@@ -152,9 +152,10 @@ CUDA_CALLABLE void bucket_sum_combination_kernel(T* __restrict__ sums, T* __rest
 // compute_bucket_sums
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generators,
-                                   basct::cspan<const uint8_t*> scalars, unsigned element_num_bytes,
-                                   unsigned bit_width, unsigned max_num_tiles = 4u) noexcept {
+xena::future<> compute_bucket_sums3(basct::span<T> sums, basct::cspan<T> generators,
+                                    basct::cspan<const uint8_t*> scalars,
+                                    unsigned element_num_bytes, unsigned bit_width,
+                                    unsigned max_num_tiles = 4u) noexcept {
   SXT_RELEASE_ASSERT(element_num_bytes == 32 && bit_width == 8,
                      "only support these values for now");
   auto n = static_cast<unsigned>(generators.size());
@@ -180,7 +181,7 @@ xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generato
   auto num_partial_sums = num_buckets * num_tiles;
   memmg::managed_array<T> partial_sums{num_partial_sums, &resource};
   co_await std::move(fut);
-  bucket_sum_kernel<T, 8u><<<dim3(num_bucket_groups, num_tiles, num_outputs), 32, 0, stream>>>(
+  bucket_sum_kernel3<T, 8u><<<dim3(num_bucket_groups, num_tiles, num_outputs), 32, 0, stream>>>(
       partial_sums.data(), generators_dev.data(), scalars_t.data(), n);
   scalars_t.reset();
   generators_dev.reset();
@@ -194,7 +195,7 @@ xena::future<> compute_bucket_sums(basct::span<T> sums, basct::cspan<T> generato
     num_tiles = num_tiles
                      // clang-format on
   ] __device__ __host__(unsigned /*num_buckets*/, unsigned bucket_index) noexcept {
-    bucket_sum_combination_kernel(sums, partial_sums, num_tiles, bucket_index);
+    bucket_sum_combination_kernel3(sums, partial_sums, num_tiles, bucket_index);
   };
   algi::launch_for_each_kernel(stream, combine, num_buckets);
   basdv::async_copy_device_to_host(sums, sums_dev, stream);
