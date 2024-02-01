@@ -74,7 +74,7 @@ boost_deps()
 # rules_cuda
 git_repository(
     name = "rules_cuda",
-    commit = "7a29239",
+    commit = "7e2d2ce",
     remote = "https://github.com/bazel-contrib/rules_cuda",
 )
 
