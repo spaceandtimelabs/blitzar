@@ -17,6 +17,18 @@ pkgs.stdenvNoCC.mkDerivation {
   unpackPhase = ''
     sh $src --keep --noexec
   '';
+  # Prepended to runpaths by autoPatchelf.
+  # The order inherited from older rpath preFixup code
+  runtimeDependencies = [
+    (placeholder "lib")
+    (placeholder "out")
+    "${placeholder "out"}/nvvm"
+    # NOTE: use the same libstdc++ as the rest of nixpkgs, not from backendStdenv
+    "${lib.getLib stdenv.cc.cc}/lib64"
+    "${placeholder "out"}/jre/lib/amd64/jli"
+    "${placeholder "out"}/lib64"
+    "${placeholder "out"}/nvvm/lib64"
+  ];
   installPhase = ''
     mkdir -p $out/bin $out/lib64 $out/include
     cp -r pkg/builds $out/builds
