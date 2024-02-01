@@ -1,8 +1,7 @@
 { pkgs }:
 let
   clang = import ./clang.nix { inherit pkgs; };
-  # cuda = import ./cuda.nix { inherit pkgs; };
-  cuda = import ./cudaX.nix { inherit pkgs; };
+  cuda = import ./cuda.nix { inherit pkgs; };
   bazel = import ./bazel.nix { inherit pkgs; inherit clang; inherit cuda; };
 in
 with pkgs;

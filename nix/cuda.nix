@@ -1,33 +1,40 @@
 { pkgs }:
 with pkgs;
-let
-  toolkit = cudaPackages_12_2.cudatoolkit;
-  toolkit-lib = cudaPackages_12_2.cudatoolkit.lib;
-in
 pkgs.stdenvNoCC.mkDerivation {
   name = "cudaWrapped";
-
-  buildInputs = [
-    toolkit
-    toolkit-lib
+  src = fetchurl {
+    url = "https://developer.download.nvidia.com/compute/cuda/12.3.2/local_installers/cuda_12.3.2_545.23.08_linux.run";
+    sha256 = "24b2afc9f770d8cf43d6fa7adc2ebfd47c4084db01bdda1ce3ce0a4d493ba65b";
+  };
+  patches = [
+    ./cuda_host_defines.patch
   ];
-
-  unpackPhase = "true";
-  buildPhase = "";
-
+  unpackPhase = ''
+    sh $src --keep --noexec
+  '';
   installPhase = ''
-    mkdir $out
-    for f in `ls -1 ${toolkit}`
-    do
-      if [[ $f != "lib64" && $f != "lib" ]]; then
-        ln -s ${toolkit}/$f $out/$f
+    mkdir -p $out/bin $out/lib64 $out/include
+    cp -r pkg/builds $out/builds
+    for dir in pkg/builds/*; do
+      if [ -d $dir/bin ]; then
+        mv $dir/bin/* $out/bin
       fi
+      if [ -L $dir/include ] || [ -d $dir/include ]; then
+        (cd $dir/include && find . -type d -exec mkdir -p $out/include/\{} \;)
+        (cd $dir/include && find . \( -type f -o -type l \) -exec mv \{} $out/include/\{} \;)
+      fi
+      if [ -L $dir/lib64 ] || [ -d $dir/lib64 ]; then
+        (cd $dir/lib64 && find . -type d -exec mkdir -p $out/lib64/\{} \;)
+        (cd $dir/lib64 && find . \( -type f -o -type l \) -exec mv \{} $out/lib64/\{} \;)
+      fi
+
     done
-    mkdir $out/lib64
-    for f in `ls -1 ${toolkit}/lib`
-    do
-      ln -s ${toolkit}/lib/$f $out/lib64/$f
-    done
-    ln -s ${toolkit-lib}/lib/libcudart_static.a $out/lib64/libcudart_static.a
+    mv pkg/builds/cuda_nvcc/nvvm $out/nvvm
+    mv pkg/builds/cuda_sanitizer_api $out/cuda_sanitizer_api
+    ln -s $out/cuda_sanitizer_api/compute-sanitizer/compute-sanitizer $out/bin/compute-sanitizer
+
+    mv pkg/builds/nsight_systems/target-linux-x64 $out/target-linux-x64
+    mv pkg/builds/nsight_systems/host-linux-x64 $out/host-linux-x64
+    rm $out/host-linux-x64/libstdc++.so*
   '';
 }
