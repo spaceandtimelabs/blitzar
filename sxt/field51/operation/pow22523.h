@@ -17,6 +17,9 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/field51/operation/mul.h"
+#include "sxt/field51/operation/sq.h"
+#include "sxt/field51/type/element.h"
 
 namespace sxt::f51t {
 class element;
@@ -31,5 +34,52 @@ namespace sxt::f51o {
  * used to compute square roots since we have p=5 (mod 8); see Cohen and Frey.
  */
 CUDA_CALLABLE
-void pow22523(f51t::element& out, const f51t::element& z) noexcept;
+inline void pow22523(f51t::element& out, const f51t::element& z) noexcept {
+  f51t::element t0, t1, t2;
+  int i;
+
+  sq(t0, z);
+  sq(t1, t0);
+  sq(t1, t1);
+  mul(t1, z, t1);
+  mul(t0, t0, t1);
+  sq(t0, t0);
+  mul(t0, t1, t0);
+  sq(t1, t0);
+  for (i = 1; i < 5; ++i) {
+    sq(t1, t1);
+  }
+  mul(t0, t1, t0);
+  sq(t1, t0);
+  for (i = 1; i < 10; ++i) {
+    sq(t1, t1);
+  }
+  mul(t1, t1, t0);
+  sq(t2, t1);
+  for (i = 1; i < 20; ++i) {
+    sq(t2, t2);
+  }
+  mul(t1, t2, t1);
+  for (i = 1; i < 11; ++i) {
+    sq(t1, t1);
+  }
+  mul(t0, t1, t0);
+  sq(t1, t0);
+  for (i = 1; i < 50; ++i) {
+    sq(t1, t1);
+  }
+  mul(t1, t1, t0);
+  sq(t2, t1);
+  for (i = 1; i < 100; ++i) {
+    sq(t2, t2);
+  }
+  mul(t1, t2, t1);
+  for (i = 1; i < 51; ++i) {
+    sq(t1, t1);
+  }
+  mul(t0, t1, t0);
+  sq(t0, t0);
+  sq(t0, t0);
+  mul(out, t0, z);
+}
 } // namespace sxt::f51o
