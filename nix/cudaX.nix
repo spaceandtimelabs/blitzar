@@ -10,7 +10,19 @@ pkgs.stdenvNoCC.mkDerivation {
     sh $src --keep --noexec
   '';
   installPhase = ''
-    mkdir $out
-    echo arf > $out/cat
+    mkdir -p $out/bin $out/lib64 $out/include
+    for dir in pkg/builds/*; do
+      if [ -d $dir/bin ]; then
+        mv $dir/bin/* $out/bin
+      fi
+      if [ -L $dir/include ] || [ -d $dir/include ]; then
+        (cd $dir/include && find . -type d -exec mkdir -p $out/include/\{} \;)
+        (cd $dir/include && find . \( -type f -o -type l \) -exec mv \{} $out/include/\{} \;)
+      fi
+      if [ -L $dir/lib64 ] || [ -d $dir/lib64 ]; then
+        (cd $dir/lib64 && find . -type d -exec mkdir -p $out/lib64/\{} \;)
+        (cd $dir/lib64 && find . \( -type f -o -type l \) -exec mv \{} $out/lib64/\{} \;)
+      fi
+    done
   '';
 }
