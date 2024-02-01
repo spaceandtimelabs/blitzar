@@ -169,11 +169,6 @@ xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const
   // a_vector
   work.a_vector = work.a_vector.subspan(0, mid);
   auto a_fut = async_fold_scalars(work.a_vector, a_vector, x, x_inv);
-  if (mid == 1) {
-    // no need to compute the other folded values if we reduce to a single element
-    co_await std::move(a_fut);
-    co_return;
-  }
 
   // b_vector
   work.b_vector = work.b_vector.subspan(0, mid);
