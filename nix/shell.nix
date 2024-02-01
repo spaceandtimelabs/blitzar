@@ -2,6 +2,7 @@
 let
   clang = import ./clang.nix { inherit pkgs; };
   cuda = import ./cuda.nix { inherit pkgs; };
+  cudaX = import ./cudaX.nix { inherit pkgs; };
   bazel = import ./bazel.nix { inherit pkgs; inherit clang; inherit cuda; };
 in
 with pkgs;
@@ -17,6 +18,7 @@ mkShell {
     bazel
     clang
     cuda
+    cudaX
   ];
   LD_LIBRARY_PATH = lib.makeLibraryPath [
     "/usr/lib/wsl"
