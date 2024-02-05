@@ -26,7 +26,6 @@ TEST_CASE("we can compute multiexponentiations") {
 
   memmg::managed_array<E> generators;
 
-#if 0
   SECTION("we handle the case of a single scalar of 1") {
     std::vector<uint8_t> scalars1(32);
     scalars1[0] = 1u;
@@ -38,6 +37,7 @@ TEST_CASE("we can compute multiexponentiations") {
     REQUIRE(res[0] == 33u);
   }
 
+#if 0
   SECTION("we handle the case of a single scalar of 2") {
     std::vector<uint8_t> scalars1(32);
     scalars1[0] = 2u;

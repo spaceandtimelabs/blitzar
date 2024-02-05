@@ -48,6 +48,35 @@ configure_make(
     remote = "https://github.com/ianlancetaylor/libbacktrace",
 )
 
+# spdlog
+git_repository(
+    name = "com_github_gabime_spdlog",
+    build_file_content = """
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+  name = "all_srcs",
+  srcs = glob(
+      include = ["**"],
+      exclude = ["*.bazel"],
+  ),
+)
+
+cmake(
+  name = "libspdlog",
+  cache_entries = {
+    "SPDLOG_BUILD_EXAMPLE": "OFF",
+    "CMAKE_CXX_FLAGS": "-stdlib=libc++",
+  },
+  lib_source = ":all_srcs",
+)
+  """,
+    commit = "7c02e20",
+    remote = "https://github.com/gabime/spdlog",
+)
+
 # catch2
 git_repository(
     name = "com_github_catchorg_catch2",
