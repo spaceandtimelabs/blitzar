@@ -14,6 +14,10 @@ sxt_cc_component(
         ":add",
         "//sxt/base/macro:cuda_callable",
         "//sxt/curve21/type:element_p3",
+        "//sxt/field51/constant:d",
+        "//sxt/field51/operation:add",
+        "//sxt/field51/operation:sub",
+        "//sxt/field51/operation:mul",
     ],
 )
 
