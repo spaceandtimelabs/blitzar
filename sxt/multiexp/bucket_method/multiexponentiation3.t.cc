@@ -6,6 +6,12 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
+#include "sxt/curve21/operation/overload.h"
+#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve21/type/literal.h"
 using namespace sxt;
 using namespace sxt::mtxbk;
 
@@ -119,5 +125,19 @@ TEST_CASE("we can compute multiexponentiations with curve21 elements") {
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 0x123_c21);
+  }
+
+  SECTION("we can compute a multiexponentiation with two elements that map to the same bucket") {
+    std::vector<uint8_t> scalars1(64);
+    scalars1[0] = 1u;
+    scalars1[32] = 1u;
+    scalars = {scalars1.data()};
+
+    generators = {0x123_c21, 0x456_c21};
+    auto fut =
+        multiexponentiate3<c21t::element_p3>(res, options, generators, scalars, element_num_bytes);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 0x123_c21 + 0x456_c21);
   }
 }
