@@ -5,18 +5,20 @@ let
   bazel = import ./bazel.nix { inherit pkgs; inherit clang; inherit cuda; };
 in
 with pkgs;
-mkShell {
+  stdenvNoCC.mkDerivation {
+  name = "shell";
   buildInputs = [
-    bazel-buildtools
-    python3
-    rust-bin.nightly."2023-12-01".default
-    rust-bindgen
-    patchelf
-    nodejs
-    # custom packages
-    bazel
-    clang
-    cuda
+     gcc13
+     bazel-buildtools
+     python3
+  #   rust-bin.nightly."2023-12-01".default
+  #   rust-bindgen
+  #   patchelf
+  #   nodejs
+  #   # custom packages
+     bazel
+  #   # clang
+     cuda
   ];
   LD_LIBRARY_PATH = lib.makeLibraryPath [
     "/usr/lib/wsl"

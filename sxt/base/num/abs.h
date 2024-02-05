@@ -20,15 +20,18 @@
 #include <concepts>
 
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/base/type/int.h"
 
 namespace sxt::basn {
 //--------------------------------------------------------------------------------------------------
 // abs
 //--------------------------------------------------------------------------------------------------
 /**
- * Support abs for integral types larger than 128 bits.
+ * Support abs for integral types as large as 128 bits.
  */
-template <std::signed_integral T> CUDA_CALLABLE T abs(T x) noexcept {
+template <class T> 
+  requires (std::signed_integral<T> || std::same_as<T, int128_t>)
+CUDA_CALLABLE T abs(T x) noexcept {
   if constexpr (sizeof(T) <= 8) {
     return std::abs(x);
   }

@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <format>
+/* #include <format> */
 #include <string_view>
 
 #include "sxt/base/log/log_impl.h"
@@ -27,7 +27,16 @@ namespace sxt::basl {
 //--------------------------------------------------------------------------------------------------
 inline void info(std::string_view s) noexcept { info_impl(s); }
 
+#if 0
 template <class... Args> void info(std::format_string<Args...> fmt, Args&&... args) noexcept {
-  info_impl(std::format(fmt, std::forward<Args>(args)...));
+  (void)fmt;
+  ((void)args,...);
+  /* info_impl(std::format(fmt, std::forward<Args>(args)...)); */
+}
+#endif
+
+template <class... Args> void info(Args&&... args) noexcept {
+  ((void)args,...);
+  /* info_impl(std::format(fmt, std::forward<Args>(args)...)); */
 }
 } // namespace sxt::basl

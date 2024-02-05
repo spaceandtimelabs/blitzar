@@ -7,9 +7,9 @@ sxt_cc_component(
     name = "abs",
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/base/type:int",
     ],
     deps = [
+        "//sxt/base/type:int",
         "//sxt/base/macro:cuda_callable",
     ],
 )

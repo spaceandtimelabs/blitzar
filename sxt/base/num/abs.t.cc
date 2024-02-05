@@ -24,15 +24,15 @@ using namespace sxt::basn;
 
 TEST_CASE("we can compute the absolute value of numbers") {
   SECTION("we can compute the absolute value of numbers up to 8 bytes") {
-    REQUIRE(abs(1) == 1);
-    REQUIRE(abs(-1) == 1);
-    REQUIRE(abs(-1ll) == 1ll);
+    REQUIRE(basn::abs(1) == 1);
+    REQUIRE(basn::abs(-1) == 1);
+    REQUIRE(basn::abs(-1ll) == 1ll);
   }
 
   SECTION("we can compute the absolute value of numbers larger than 8 bytes") {
-    REQUIRE(abs(int128_t{-1}) == 1);
-    REQUIRE(abs(int128_t{1}) == 1);
-    REQUIRE(abs(int128_t{-2}) == 2);
-    REQUIRE(abs(int128_t{2}) == 2);
+    REQUIRE(basn::abs(int128_t{-1}) == 1);
+    REQUIRE(basn::abs(int128_t{1}) == 1);
+    REQUIRE(basn::abs(int128_t{-2}) == 2);
+    REQUIRE(basn::abs(int128_t{2}) == 2);
   }
 }
