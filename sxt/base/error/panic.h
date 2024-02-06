@@ -17,11 +17,12 @@
 #pragma once
 
 #include <concepts>
-#include <format>
+/* #include <format> */
 #include <source_location>
 #include <string_view>
 #include <type_traits>
 #include <utility>
+#include <cstdlib>
 
 #include "sxt/base/error/stacktrace.h"
 
@@ -42,6 +43,7 @@ struct panic_message {
 //--------------------------------------------------------------------------------------------------
 // panic_format
 //--------------------------------------------------------------------------------------------------
+#if 0
 template <class... Args> struct panic_format {
   template <class T>
     requires std::constructible_from<std::format_string<Args...>, T>
@@ -52,6 +54,7 @@ template <class... Args> struct panic_format {
   std::format_string<Args...> fmt;
   std::source_location loc;
 };
+#endif
 
 //--------------------------------------------------------------------------------------------------
 // panic_with_message
@@ -69,11 +72,21 @@ template <class... Args> struct panic_format {
   panic_with_message(msg.loc.file_name(), msg.loc.line(), msg.s);
 }
 
+#if 0
 template <class... Args>
 [[noreturn]] void panic(panic_format<std::type_identity_t<Args>...> fmt, Args&&... args) noexcept
   requires(sizeof...(Args) > 0)
 {
   panic_with_message(fmt.loc.file_name(), fmt.loc.line(),
                      std::format(fmt.fmt, std::forward<Args>(args)...));
+}
+#endif
+
+template <class... Args>
+[[noreturn]] void panic(Args&&... args) noexcept
+  requires(sizeof...(Args) > 0)
+{
+  ((void)args, ...);
+  std::abort();
 }
 } // namespace sxt::baser

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <iosfwd>
+#include <cstdint>
 
 #include "sxt/base/macro/cuda_callable.h"
 

@@ -68,7 +68,6 @@ cmake(
   name = "libspdlog",
   cache_entries = {
     "SPDLOG_BUILD_EXAMPLE": "OFF",
-    "CMAKE_CXX_FLAGS": "-stdlib=libc++",
   },
   lib_source = ":all_srcs",
 )
