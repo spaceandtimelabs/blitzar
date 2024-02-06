@@ -34,10 +34,6 @@ public:
 private:
 };
 
-// Disable explicit instantiation. Workaround to
-// https://developer.nvidia.com/bugs/4288496
-/* extern template class future<void>; */
-
 //--------------------------------------------------------------------------------------------------
 // make_ready_future
 //--------------------------------------------------------------------------------------------------
@@ -104,16 +100,11 @@ public:
 
   template <class U>
   void await_suspend(std::coroutine_handle<coroutine_promise<U>> handle) noexcept {
-    auto pr = future_.promise();
-    pr->set_continuation(handle.promise());
+    (void)handle;
   }
 
   T await_resume() noexcept {
-    if constexpr (std::is_same_v<T, void>) {
-      return;
-    } else {
-      return T{std::move(future_.value())};
-    }
+    return T{};
   }
 
 private:
