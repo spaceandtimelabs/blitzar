@@ -51,7 +51,7 @@ namespace sxt::xena {
 // coroutine_promise_impl
 //--------------------------------------------------------------------------------------------------
 namespace detail {
-template <class T, class Promise> class coroutine_promise_impl : public task {
+template <class T, class Promise> class coroutine_promise_impl {
 public:
   coroutine_promise_impl() noexcept = default;
   coroutine_promise_impl(const coroutine_promise_impl&) = delete;
@@ -64,12 +64,6 @@ public:
   std::suspend_never final_suspend() const noexcept { return {}; }
 
   future<T> get_return_object() noexcept { return future<T>{promise_}; }
-
-  // task
-  void run_and_dispose() noexcept override {
-    auto handle = std::coroutine_handle<Promise>::from_promise(static_cast<Promise&>(*this));
-    handle.resume();
-  }
 
 protected:
   promise<T> promise_;
