@@ -4,14 +4,11 @@
 #include <type_traits>
 #include <utility>
 
-#include "sxt/execution/async/promise.h"
-#include "sxt/execution/async/promise_future_base.h"
-
 namespace sxt::xena {
 //--------------------------------------------------------------------------------------------------
 // future
 //--------------------------------------------------------------------------------------------------
-template <class T = void> class future final : protected future_base {
+template <class T = void> class future final {
 public:
   using value_type = T;
   using reference = std::add_lvalue_reference_t<T>;
@@ -48,10 +45,9 @@ public:
   std::suspend_never initial_suspend() const noexcept { return {}; }
   std::suspend_never final_suspend() const noexcept { return {}; }
 
-  future<T> get_return_object() noexcept { return future<T>{promise_}; }
+  future<T> get_return_object() noexcept { return future<T>{}; }
 
 protected:
-  promise<T> promise_;
 };
 } // namespace detail
 
