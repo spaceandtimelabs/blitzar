@@ -201,23 +201,3 @@ sxt_cc_component(
         "//sxt/execution/schedule:scheduler",
     ],
 )
-
-cc_library(
-  name = "t",
-  srcs = [
-    "t.cc",
-  ],
-  deps = [
-    "//sxt/execution/async:coroutine",
-  ],
-)
-
-cuda_library(
-  name = "tc",
-  srcs = [
-    "t.cc",
-  ],
-  deps = [
-    "//sxt/execution/async:coroutine",
-  ],
-)
