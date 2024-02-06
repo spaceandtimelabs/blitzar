@@ -20,10 +20,6 @@ public:
 
   bool ready() const noexcept { return true; }
 
-  xena::promise<T>* promise() const noexcept {
-    return static_cast<xena::promise<T>*>(static_cast<const future_base*>(this)->promise());
-  }
-
 private:
 };
 
