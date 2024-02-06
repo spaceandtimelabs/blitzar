@@ -5,11 +5,6 @@
 
 #include "sxt/execution/async/coroutine_promise.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/base/device/active_device_guard.h"
-#include "sxt/base/device/property.h"
-#include "sxt/base/error/assert.h"
-#include "sxt/execution/async/coroutine_promise.h"
-#include "sxt/execution/async/future.h"
 
 namespace sxt::xena {
 //--------------------------------------------------------------------------------------------------
