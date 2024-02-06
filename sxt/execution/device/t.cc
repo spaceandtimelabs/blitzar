@@ -7,9 +7,6 @@
 #include <utility>
 
 #include "sxt/execution/async/future.h"
-#include "sxt/base/error/panic.h"
-#include "sxt/execution/async/future.h"
-#include "sxt/execution/async/promise.h"
 #include "sxt/execution/async/task.h"
 
 namespace sxt::xena {
@@ -28,8 +25,6 @@ public:
 
   std::suspend_never initial_suspend() const noexcept { return {}; }
   std::suspend_never final_suspend() const noexcept { return {}; }
-
-  void unhandled_exception() noexcept { baser::panic("we don't support exceptions in coroutines"); }
 
   future<T> get_return_object() noexcept { return future<T>{promise_}; }
 
