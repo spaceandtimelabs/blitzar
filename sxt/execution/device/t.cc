@@ -11,13 +11,6 @@ namespace sxt::xena {
 //--------------------------------------------------------------------------------------------------
 // future
 //--------------------------------------------------------------------------------------------------
-/**
- * Manage asynchronous computations.
- *
- * This is a highly simplified version of a future derived from seastar
- *
- * See https://seastar.io/futures-promises/
- */
 template <class T = void> class future final : protected future_base {
 public:
   using value_type = T;
@@ -70,20 +63,27 @@ protected:
 // coroutine_promise
 //--------------------------------------------------------------------------------------------------
 template <class T>
-class coroutine_promise final : public detail::coroutine_promise_impl<T, coroutine_promise<T>> {
+class coroutine_promise final {
 public:
   template <class... Args>
     requires std::constructible_from<T, Args&&...>
   void return_value(Args&&... args) noexcept {
     ((void)args, ...);
   }
+
+  std::suspend_never initial_suspend() const noexcept { return {}; }
+  std::suspend_never final_suspend() const noexcept { return {}; }
+
+  future<T> get_return_object() noexcept { return {}; }
 };
 
 template <>
-class coroutine_promise<void> final
-    : public detail::coroutine_promise_impl<void, coroutine_promise<void>> {
+class coroutine_promise<void> final {
 public:
-  void return_void() noexcept { this->promise_.make_ready(); }
+  void return_void() noexcept { }
+
+  std::suspend_never initial_suspend() const noexcept { return {}; }
+  std::suspend_never final_suspend() const noexcept { return {}; }
 };
 } // namespace sxt::xena
 
