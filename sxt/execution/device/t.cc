@@ -5,9 +5,58 @@
 #include <concepts>
 #include <coroutine>
 #include <utility>
+#include <type_traits>
+#include <utility>
 
-#include "sxt/execution/async/future.h"
 #include "sxt/execution/async/task.h"
+#include "sxt/execution/async/continuation.h"
+#include "sxt/execution/async/continuation_fn.h"
+#include "sxt/execution/async/continuation_fn_utility.h"
+#include "sxt/execution/async/future_fwd.h"
+#include "sxt/execution/async/future_state.h"
+#include "sxt/execution/async/future_state_utility.h"
+#include "sxt/execution/async/leaf_continuation.h"
+#include "sxt/execution/async/promise.h"
+#include "sxt/execution/async/promise_future_base.h"
+
+namespace sxt::xena {
+//--------------------------------------------------------------------------------------------------
+// future
+//--------------------------------------------------------------------------------------------------
+/**
+ * Manage asynchronous computations.
+ *
+ * This is a highly simplified version of a future derived from seastar
+ *
+ * See https://seastar.io/futures-promises/
+ */
+template <class T> class future final : protected future_base {
+public:
+  using value_type = T;
+  using reference = std::add_lvalue_reference_t<T>;
+
+  future() noexcept = default;
+
+  bool ready() const noexcept { return true; }
+
+  xena::promise<T>* promise() const noexcept {
+    return static_cast<xena::promise<T>*>(static_cast<const future_base*>(this)->promise());
+  }
+
+private:
+};
+
+// Disable explicit instantiation. Workaround to
+// https://developer.nvidia.com/bugs/4288496
+/* extern template class future<void>; */
+
+//--------------------------------------------------------------------------------------------------
+// make_ready_future
+//--------------------------------------------------------------------------------------------------
+future<> make_ready_future() noexcept {
+  return {};
+}
+} // namespace sxt::xena
 
 namespace sxt::xena {
 //--------------------------------------------------------------------------------------------------
@@ -48,7 +97,7 @@ public:
   template <class... Args>
     requires std::constructible_from<T, Args&&...>
   void return_value(Args&&... args) noexcept {
-    this->promise_.set_value(std::forward<Args>(args)...);
+    ((void)args, ...);
   }
 };
 
