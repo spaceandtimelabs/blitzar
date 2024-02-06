@@ -28,6 +28,12 @@ using namespace sxt::xendv;
 static xena::future<memmg::managed_array<uint64_t>>
 f_gpu2(const memmg::managed_array<uint64_t>& a, const memmg::managed_array<uint64_t>& b) noexcept;
 
+template <class T>
+xena::future<> ft(const T& t) {
+  basdv::stream s;
+  co_await await_stream(s);
+}
+
 TEST_CASE("we can interact with coroutines") {
   SECTION("we handle gpu coroutines") {
     memmg::managed_array<uint64_t> a = {1, 2, 3};

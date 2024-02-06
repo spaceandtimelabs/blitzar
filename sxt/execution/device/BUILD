@@ -2,6 +2,7 @@ load(
     "//bazel:sxt_build_system.bzl",
     "sxt_cc_component",
 )
+load("@rules_cuda//cuda:defs.bzl", "cuda_library")
 
 sxt_cc_component(
     name = "device_viewable",
@@ -199,4 +200,24 @@ sxt_cc_component(
         "//sxt/execution/async:promise",
         "//sxt/execution/schedule:scheduler",
     ],
+)
+
+cc_library(
+  name = "t",
+  srcs = [
+    "t.cc",
+  ],
+  deps = [
+    "//sxt/execution/async:coroutine",
+  ],
+)
+
+cuda_library(
+  name = "tc",
+  srcs = [
+    "t.cc",
+  ],
+  deps = [
+    "//sxt/execution/async:coroutine",
+  ],
 )

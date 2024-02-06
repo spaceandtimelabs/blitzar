@@ -23,7 +23,7 @@ pkgs.writeShellScriptBin "bazel" ''
     "$1" == "test" ||
     "$1" == "run"
   ]]; then
-    exec CXX="${pkgs.gcc}/bin/g++" ${bazel} $1 \
+    exec ${bazel} $1 \
      --action_env PATH="${path}" \
      --action_env CC="${pkgs.gcc}/bin/gcc" \
      --action_env CXX="${pkgs.gcc}/bin/g++" \
