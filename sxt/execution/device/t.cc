@@ -1,21 +1,9 @@
 #include <iostream>
-
 #include <coroutine>
-#include <type_traits>
 #include <concepts>
-#include <coroutine>
-#include <utility>
 #include <type_traits>
 #include <utility>
 
-#include "sxt/execution/async/task.h"
-#include "sxt/execution/async/continuation.h"
-#include "sxt/execution/async/continuation_fn.h"
-#include "sxt/execution/async/continuation_fn_utility.h"
-#include "sxt/execution/async/future_fwd.h"
-#include "sxt/execution/async/future_state.h"
-#include "sxt/execution/async/future_state_utility.h"
-#include "sxt/execution/async/leaf_continuation.h"
 #include "sxt/execution/async/promise.h"
 #include "sxt/execution/async/promise_future_base.h"
 
@@ -30,7 +18,7 @@ namespace sxt::xena {
  *
  * See https://seastar.io/futures-promises/
  */
-template <class T> class future final : protected future_base {
+template <class T = void> class future final : protected future_base {
 public:
   using value_type = T;
   using reference = std::add_lvalue_reference_t<T>;
