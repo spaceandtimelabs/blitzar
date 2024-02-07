@@ -152,12 +152,15 @@ async_compute_multiexponentiation(basct::cspan<Element> generators,
   // try bucket method first
 #if 0
   auto res_maybe = co_await mtxbk::try_multiexponentiate(generators, exponents);
-#else
-  auto res_maybe = co_await mtxbk::try_multiexponentiate2(generators, exponents);
-#endif
   if (!res_maybe.empty()) {
     co_return res_maybe;
   }
+#else
+  auto res_maybe = co_await mtxbk::try_multiexponentiate3(generators, exponents);
+  if (!res_maybe.empty()) {
+    co_return res_maybe;
+  }
+#endif
 
   // use more general method
   auto num_outputs = exponents.size();

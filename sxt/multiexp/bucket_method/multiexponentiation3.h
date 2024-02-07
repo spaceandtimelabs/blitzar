@@ -59,7 +59,7 @@ xena::future<>
 multiexponentiate3(basct::span<Element> res, const multiexponentiate_options3& options,
                    basct::cspan<Element> generators, basct::cspan<const uint8_t*> scalars,
                    unsigned element_num_bytes) noexcept {
-  std::print("********\n");
+  /* std::print("********\n"); */
   auto num_outputs = res.size();
   auto n = generators.size();
 
@@ -119,9 +119,9 @@ multiexponentiate3(basct::span<Element> res, const multiexponentiate_options3& o
   auto mp = std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t1).count() / 1000.0;
   auto rest = std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count() / 1000.0;
   auto total = std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t1).count() / 1000.0;
-  std::print("total = {}\n", total);
-  std::print("mp = {}\n", mp);
-  std::print("rest = {}\n", rest);
+  /* std::print("total = {}\n", total); */
+  /* std::print("mp = {}\n", mp); */
+  /* std::print("rest = {}\n", rest); */
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -162,7 +162,7 @@ try_multiexponentiate3(basct::cspan<Element> generators,
   res.resize(num_outputs);
   multiexponentiate_options3 options;
   (void)options;
-  /* co_await multiexponentiate3<Element>(res, options, generators, scalars, element_num_bytes); */
+  co_await multiexponentiate3<Element>(res, options, generators, scalars, element_num_bytes);
   co_return res;
 }
 } // namespace sxt::mtxbk

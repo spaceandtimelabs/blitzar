@@ -174,7 +174,7 @@ template <bascrv::element T>
 xena::future<> compute_bucket_sums3(basct::span<T> sums, basct::cspan<T> generators,
                                     basct::cspan<const uint8_t*> scalars,
                                     unsigned element_num_bytes, unsigned bit_width,
-                                    unsigned max_num_tiles = 4u) noexcept {
+                                    unsigned max_num_tiles = 1u) noexcept {
   SXT_RELEASE_ASSERT(element_num_bytes == 32 && (bit_width == 8 || bit_width == 4),
                      "only support these values for now");
   auto n = static_cast<unsigned>(generators.size());
@@ -200,7 +200,7 @@ xena::future<> compute_bucket_sums3(basct::span<T> sums, basct::cspan<T> generat
   auto num_partial_sums = num_buckets * num_tiles;
   memmg::managed_array<T> partial_sums{num_partial_sums, &resource};
   co_await std::move(fut);
-  std::print(stderr, "required shared memory: {}\n", num_buckets_per_group * sizeof(T));
+  /* std::print(stderr, "required shared memory: {}\n", num_buckets_per_group * sizeof(T)); */
   if (bit_width == 8u) {
     bucket_sum_kernel3<T, 8u><<<dim3(num_bucket_groups, num_tiles, num_outputs), 32, 0, stream>>>(
         partial_sums.data(), generators_dev.data(), scalars_t.data(), n);

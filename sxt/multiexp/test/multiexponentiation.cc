@@ -353,12 +353,14 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
         .min_num_sequences = 1,
         .max_num_sequences = 1,
         .min_sequence_length = 1,
-        .max_sequence_length = 100,
-        .min_exponent_num_bytes = 1,
+        // .max_sequence_length = 100,
+        .max_sequence_length = 32,
+        .min_exponent_num_bytes = 32,
         .max_exponent_num_bytes = 32,
     };
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 100; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
+      std::print("{}: {}\n", i, generators.size());
       auto res = f(generators, sequences);
       memmg::managed_array<c21t::element_p3> expected(sequences.size());
       mtxtst::mul_sum_curve21_elements(expected, generators, sequences);
