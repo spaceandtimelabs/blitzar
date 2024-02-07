@@ -19,6 +19,8 @@
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/scalar25/type/element.h"
 
+#include "sxt/scalar25/operation/reduce.h"
+
 namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
 // complement
@@ -32,5 +34,30 @@ namespace sxt::s25o {
 //
 // where l = 2^252 + 27742317777372353535851937790883648493
 CUDA_CALLABLE
-void complement(s25t::element& comp, const s25t::element& s) noexcept;
+inline void complement(s25t::element& comp, const s25t::element& s) noexcept {
+  auto s_data = s.data();
+  uint8_t t_[64] = {/* 0 */
+                    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    /* 2^252+27742317777372353535851937790883648493 */
+                    0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7, 0xa2, 0xde,
+                    0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x10};
+
+  uint_fast16_t c = 0U;
+  for (size_t i = 0U; i < 32U; i++) {
+    c = static_cast<uint_fast16_t>(t_[i]) - static_cast<uint_fast16_t>(s_data[i]) - c;
+    t_[i] = static_cast<uint8_t>(c);
+    c = (c >> 8) & 1U;
+  }
+
+  for (size_t i = 32U; i < 64U; i++) {
+    c = static_cast<uint_fast16_t>(t_[i]) - c;
+    t_[i] = static_cast<uint8_t>(c);
+    c = (c >> 8) & 1U;
+  }
+
+  s25o::reduce64(comp, t_);  
+}
 } // namespace sxt::s25o

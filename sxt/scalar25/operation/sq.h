@@ -18,6 +18,8 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/scalar25/type/element.h"
+#include "sxt/base/bit/load.h"
+#include "sxt/scalar25/operation/mul.h"
 
 namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
@@ -31,5 +33,7 @@ namespace sxt::s25o {
 //
 // where l = 2^252 + 27742317777372353535851937790883648493.
 CUDA_CALLABLE
-void sq(s25t::element& s, const s25t::element& a) noexcept;
+inline void sq(s25t::element& s, const s25t::element& a) noexcept {
+  mul(s, a, a);
+}
 } // namespace sxt::s25o

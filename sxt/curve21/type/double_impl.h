@@ -20,6 +20,13 @@
 #include "sxt/curve21/type/conversion_utility.h"
 #include "sxt/curve21/type/element_p2.h"
 
+#include "sxt/curve21/type/element_p1p1.h"
+#include "sxt/field51/operation/add.h"
+#include "sxt/field51/operation/sq.h"
+#include "sxt/field51/operation/sub.h"
+#include "sxt/field51/type/element.h"
+
+
 namespace sxt::c21t {
 struct element_p1p1;
 struct element_p2;
@@ -33,7 +40,19 @@ struct element_p2;
  * Note: in the c21t package to support point formation
  */
 CUDA_CALLABLE
-void double_element_impl(c21t::element_p1p1& r, const c21t::element_p2& p) noexcept;
+inline void double_element_impl(c21t::element_p1p1& r, const c21t::element_p2& p) noexcept {
+  f51t::element t0;
+
+  f51o::sq(r.X, p.X);
+  f51o::sq(r.Z, p.Y);
+  f51o::sq2(r.T, p.Z);
+  f51o::add(r.Y, p.X, p.Y);
+  f51o::sq(t0, r.Y);
+  f51o::add(r.Y, r.Z, r.X);
+  f51o::sub(r.Z, r.Z, r.X);
+  f51o::sub(r.X, t0, r.Y);
+  f51o::sub(r.T, r.T, r.Z);
+}
 
 CUDA_CALLABLE
 inline void double_element_impl(c21t::element_p1p1& r, const c21t::element_p3& p) noexcept {

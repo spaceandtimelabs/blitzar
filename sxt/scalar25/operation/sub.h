@@ -19,6 +19,9 @@
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/scalar25/type/element.h"
 
+#include "sxt/scalar25/operation/add.h"
+#include "sxt/scalar25/operation/neg.h"
+
 namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
 // sub
@@ -33,5 +36,10 @@ namespace sxt::s25o {
 //
 // where l = 2^252 + 27742317777372353535851937790883648493
 CUDA_CALLABLE
-void sub(s25t::element& s, const s25t::element& a, const s25t::element& b) noexcept;
+inline void sub(s25t::element& s, const s25t::element& a, const s25t::element& b) noexcept {
+  s25t::element yn;
+
+  neg(yn, b);
+  add(s, a, yn);  
+}
 } // namespace sxt::s25o

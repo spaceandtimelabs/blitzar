@@ -19,6 +19,9 @@
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/scalar25/type/element.h"
 
+#include "sxt/scalar25/operation/mul.h"
+#include "sxt/scalar25/operation/sq.h"
+
 namespace sxt::s25o {
 //--------------------------------------------------------------------------------------------------
 // sqmul
@@ -34,5 +37,12 @@ namespace sxt::s25o {
 //
 // Overwrites s in place.
 CUDA_CALLABLE
-void sqmul(s25t::element& s, const uint32_t n, const s25t::element& a) noexcept;
+inline void sqmul(s25t::element& s, const uint32_t n, const s25t::element& a) noexcept {
+  // adopted from libsodium's sc25519_sqmul
+  for (uint32_t i = 0; i < n; i++) {
+    sq(s, s);
+  }
+
+  mul(s, s, a);  
+}
 } // namespace sxt::s25o
