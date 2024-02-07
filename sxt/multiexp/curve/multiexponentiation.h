@@ -39,6 +39,7 @@
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/bucket_method/multiexponentiation.h"
 #include "sxt/multiexp/bucket_method/multiexponentiation2.h"
+#include "sxt/multiexp/bucket_method/multiexponentiation3.h"
 #include "sxt/multiexp/curve/multiexponentiation_cpu_driver.h"
 #include "sxt/multiexp/curve/multiproduct.h"
 #include "sxt/multiexp/curve/multiproducts_combination.h"

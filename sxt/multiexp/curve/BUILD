@@ -73,6 +73,7 @@ sxt_cc_component(
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/bucket_method:multiexponentiation",
         "//sxt/multiexp/bucket_method:multiexponentiation2",
+        "//sxt/multiexp/bucket_method:multiexponentiation3",
         "//sxt/multiexp/pippenger:multiexponentiation",
         "//sxt/multiexp/pippenger:multiproduct_decomposition_gpu",
     ],
