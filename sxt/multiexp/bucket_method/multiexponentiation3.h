@@ -79,6 +79,7 @@ multiexponentiate3(basct::span<Element> res, const multiexponentiate_options3& o
   auto t2 = std::chrono::steady_clock::now();
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& chunk) noexcept -> xena::future<> {
+        std::print("chunk: {}-{}\n", chunk.a(), chunk.b());
         auto sums_slice =
             basct::subspan(bucket_sums_chunks, num_buckets * chunk_index, num_buckets);
         memmg::managed_array<const uint8_t*> scalars_slice(num_outputs);

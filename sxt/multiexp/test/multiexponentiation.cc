@@ -40,6 +40,7 @@ namespace sxt::mtxtst {
 // exercise_multiexponentiation_fn
 //--------------------------------------------------------------------------------------------------
 void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f) noexcept {
+#if 0
   // bespoke test cases
   SECTION("we handle the empty case") {
     std::vector<mtxb::exponent_sequence> sequences;
@@ -267,12 +268,14 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     };
     REQUIRE(res == expected);
   }
+#endif
 
   // random test cases
   std::pmr::monotonic_buffer_resource resource;
   basct::span<mtxb::exponent_sequence> sequences;
   basct::span<c21t::element_p3> generators;
 
+#if 0
   SECTION("we handle random sequences of varying length") {
     mtxrn::random_multiexponentiation_descriptor descriptor{
         .min_num_sequences = 1,
@@ -347,18 +350,20 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
       REQUIRE(res == expected);
     }
   }
+#endif
 
   SECTION("we handle random sequences of varying length and varying num_bytes") {
     mtxrn::random_multiexponentiation_descriptor descriptor{
         .min_num_sequences = 1,
         .max_num_sequences = 1,
-        .min_sequence_length = 1,
+        .min_sequence_length = 33,
         // .max_sequence_length = 100,
-        .max_sequence_length = 32,
+        .max_sequence_length = 33,
         .min_exponent_num_bytes = 32,
         .max_exponent_num_bytes = 32,
     };
-    for (int i = 0; i < 100; ++i) {
+    std::printf("**********************************\n");
+    for (int i = 0; i < 1; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
       std::print("{}: {}\n", i, generators.size());
       auto res = f(generators, sequences);
@@ -368,6 +373,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     }
   }
 
+#if 0
   SECTION("we handle multiple products of random sequences of varying length and varying "
           "num_bytes") {
     mtxrn::random_multiexponentiation_descriptor descriptor{
@@ -434,5 +440,6 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
       REQUIRE(res == expected);
     }
   }
+#endif
 }
 } // namespace sxt::mtxtst

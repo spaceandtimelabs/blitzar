@@ -105,20 +105,28 @@ __global__ void bucket_sum_kernel3(T* __restrict__ partial_sums, const T* __rest
   generator_first += 32;
 
   unsigned num_generators_consumed = 0;
+  unsigned iteration = 0;
   while (num_generators_consumed < consumption_target) {
     // sort digit-g pairs
     Sort(temp_storage.sort).Sort(digits, gis);
-    __syncthreads();
+    __syncwarp();
 
     // compute the difference between adjacent digit-g pairs
     Discontinuity(temp_storage.discontinuity)
         .FlagHeads(should_accumulate, digits, cub::Inequality());
-    __syncthreads();
+    __syncwarp();
     should_accumulate[0] = should_accumulate[0] && digits[0] != 0u;
+    if (bucket_group_index == 0) {
+      printf("digit: %d-%d: %d %d\n", thread_index, iteration, digits[0], should_accumulate[0]);
+    }
 
     // accumulate digits with no collisions
     if (should_accumulate[0]) {
-      add_inplace(sums[digits[0]-1u], gis[0].second);
+    if (bucket_group_index == 0) {
+        printf("%d: %d-%d: add_inplace(%d, %d)\n", output_index, thread_index, iteration,
+               digits[0] - 1u, gis[0].first);
+      }
+      add_inplace(sums[digits[0] - 1u], gis[0].second);
     }
     should_accumulate[0] = should_accumulate[0] || (digits[0] == 0u && gis[0].first < generator_last);
 
@@ -126,22 +134,32 @@ __global__ void bucket_sum_kernel3(T* __restrict__ partial_sums, const T* __rest
     uint8_t offsets[items_per_thread];
     Scan(temp_storage.scan).InclusiveSum(should_accumulate, offsets);
     if (thread_index == num_threads - 1) {
+      if (bucket_group_index == 0) {
+        printf("consumpution_counter = %d generator_first=%d\n", offsets[0], generator_first);
+      }
       temp_storage.consumption_counter = offsets[0];
     }
-    __syncthreads();
-    gis[0].first = generator_first + offsets[0] - 1u;
+    __syncwarp();
+    auto index_p = generator_first + offsets[0] - 1u;
     generator_first += temp_storage.consumption_counter;
     num_generators_consumed += temp_storage.consumption_counter;
 
     // if the generator was consumed, load a new element
     if (should_accumulate[0]) {
-      if (gis[0].first < generator_last) {
+      gis[0].first = index_p;
+      if (index_p < generator_last) {
         digits[0] = transform_to_digit<BitWidth>(scalars_t[gis[0].first], bucket_group_index);
         gis[0].second = generators[gis[0].first];
+        if (bucket_group_index == 0) {
+          printf("%d: gis[0].first = %d, digit=%d\n", thread_index, gis[0].first,
+                 digits[0]);
+        }
       } else {
         digits[0] = 0;
       }
     }
+    __syncwarp();
+    ++iteration;
   }
 
   // copy partial sums to global memory

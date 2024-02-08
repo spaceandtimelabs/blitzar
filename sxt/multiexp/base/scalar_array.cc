@@ -37,11 +37,12 @@ static __global__ void transpose_kernel(uint8_t* __restrict__ dst, const scalar3
   auto n_per_tile =
       basn::divide_up(basn::divide_up(n, element_num_bytes), num_tiles) * element_num_bytes;
 
-  auto last = min(n_per_tile * tile_index + n_per_tile, n);
+  auto first = tile_index * n_per_tile;
+  auto m = min(n_per_tile, n - first);
 
   // adjust pointers
-  src += tile_index * n_per_tile;
-  dst += byte_index * n + tile_index * n_per_tile;
+  src += first;
+  dst += byte_index * n + first;
 
   // set up algorithm
   using BlockExchange = cub::BlockExchange<uint8_t, element_num_bytes, element_num_bytes>;
@@ -51,14 +52,14 @@ static __global__ void transpose_kernel(uint8_t* __restrict__ dst, const scalar3
   scalar32 s;
   unsigned out_first = 0;
   for (unsigned i = byte_index; i < n_per_tile; i += element_num_bytes) {
-    if (i < last) {
+    if (i < m) {
       s = src[i];
     }
     BlockExchange(temp_storage).StripedToBlocked(s.data);
     __syncthreads();
     for (unsigned j=0; j<32u; ++j) {
       auto out_index = out_first + j;
-      if (out_index < last) {
+      if (out_index < m) {
         dst[out_index] = s.data[j];
       }
     }
