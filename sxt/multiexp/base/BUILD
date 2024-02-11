@@ -42,3 +42,26 @@ sxt_cc_component(
         ":exponent_sequence",
     ],
 )
+
+sxt_cc_component(
+    name = "scalar_array",
+    impl_deps = [
+        "@local_cuda//:cub",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
+        "//sxt/base/num:divide_up",
+        "//sxt/execution/async:future",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:synchronization",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
+    ],
+)
