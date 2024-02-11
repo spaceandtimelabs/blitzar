@@ -11,33 +11,57 @@ namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 // count_kernel 
 //--------------------------------------------------------------------------------------------------
+template <unsigned NumThreads, unsigned ItemsPerThread, unsigned NumBins>
 static __global__ void count_kernel(unsigned* __restrict__ counts,
                                     const uint8_t* __restrict__ digits, unsigned n) noexcept {
+  auto thread_index = threadIdx.x;
   auto tile_index = blockIdx.x;
   auto digit_index = blockIdx.y;
   auto output_index = blockIdx.z;
 
   auto num_tiles = gridDim.x;
   auto num_digits = gridDim.y;
-  auto tile_size = basn::divide_up(n, num_tiles);
 
-  auto cnt = min(n - tile_index * tile_size, tile_size);
+  auto tile_size = NumThreads * ItemsPerThread;
+  auto m = min(tile_size, n - tile_index * tile_size);
 
   // adjust pointers
   digits += output_index * num_digits * n;
   digits += n * digit_index;
   digits += tile_index * tile_size;
 
-  // count
-  (void)cnt;
-  // prefix sum counts
-  (void)tile_index;
-  (void)digit_index;
-  (void)output_index;
+  counts += tile_index;
+  counts += num_tiles * (NumBins - 1u) * digit_index;
+  counts += num_tiles * (NumBins - 1u) * num_digits * output_index;
 
-  (void)counts;
-  (void)digits;
-  (void)n;
+  // set up temporary workspace
+  using BlockHistogram = cub::BlockHistogram<uint8_t, NumThreads, ItemsPerThread, NumBins>;
+  __shared__ typename BlockHistogram::TempStorage temp_storage;
+  __shared__ uint16_t bin_counts[NumBins];
+
+  // load data
+  uint8_t data[ItemsPerThread];
+  for (unsigned i=0; i<ItemsPerThread; ++i) {
+    auto index = thread_index + i * ItemsPerThread;
+    if (index < m) {
+      data[i] = digits[i];
+    } else {
+      data[i] = 0;
+    }
+  }
+
+  // count
+  BlockHistogram(temp_storage).Histogram(data, bin_counts);
+
+  // write results
+  __syncthreads();
+  for (unsigned i = thread_index; i < NumBins; i+=NumThreads) {
+    // ignore zero counts
+    if (i == 0) {
+      continue;
+    }
+    counts[i * tile_size] = bin_counts[i];
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
