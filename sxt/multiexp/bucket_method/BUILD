@@ -91,6 +91,8 @@ sxt_cc_component(
       "//sxt/base/device:stream",
       "//sxt/base/error:assert",
       "//sxt/base/num:divide_up",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/management:managed_array",
     ],
     deps = [
         "//sxt/base/container:span",

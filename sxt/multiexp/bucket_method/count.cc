@@ -6,6 +6,8 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/num/divide_up.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/async_device_resource.h"
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
@@ -84,6 +86,18 @@ void inclusive_prefix_count_buckets(basct::span<unsigned> counts, const basdv::s
       basdv::is_active_device_pointer(digits.data())
       // clang-format on
   );
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<unsigned> counts_p{counts.size(), &resource};
+
+  // count
+  count_kernel<256, 4, 256>
+      <<<dim3(num_tiles, num_digits, num_outputs), 256>>>(counts_p.data(), digits.data(), n);
+  /* template <unsigned NumThreads, unsigned ItemsPerThread, unsigned NumBins> */
+  /* static __global__ void count_kernel(unsigned* __restrict__ counts, */
+  /*                                     const uint8_t* __restrict__ digits, unsigned n) noexcept {
+   */
+  
+  // compute prefix sums
   (void)counts;
   (void)stream;
   (void)digits;
