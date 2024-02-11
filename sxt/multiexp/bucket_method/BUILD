@@ -86,11 +86,13 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     impl_deps = [
+      "//sxt/base/device:memory_utility",
       "//sxt/base/device:stream",
+      "//sxt/base/error:assert",
+      "//sxt/base/num:divide_up",
     ],
     deps = [
         "//sxt/base/container:span",
-        "//sxt/base/error:assert",
     ],
 )
 
