@@ -21,6 +21,25 @@ public:
 
   template <unsigned ItemsPerThread>
   void count(CounterT counts[NumBins], T (&items)[ItemsPerThread]) noexcept {
+    auto thread_id = threadIdx.x;
+    for (unsigned i=thread_id; i<NumBins; i+=NumThreads) {
+      storage_.run_begin[i] = NumThreads * ItemsPerThread;
+      storage_.run_end[i] = NumThreads * ItemsPerThread;
+    }
+    int flags[ItemsPerThread];
+    auto flag_op = [&storage = storage_] (T a, T b, int b_index) noexcept {
+      storage.run_end[b] = static_cast<CounterT>(b_index); 
+      storage.run_begin[b] = static_cast<CounterT>(b_index); 
+    };
+    __syncthreads();
+    discontinuity_.FlagHeads(flags, items, flag_op);
+    if (thread_id == 0) {
+      storage_.run_begin[items[0]] = 0;
+    }
+    __syncthreads();
+    for (unsigned i=thread_id; i<NumBins; i+=NumThreads) {
+      counts[i] = storage_.run_end[i] - storage_.run_begin[i];
+    }
   } 
 
 private:
