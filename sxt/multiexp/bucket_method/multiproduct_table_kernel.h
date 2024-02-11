@@ -67,7 +67,7 @@ static __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_c
   for (unsigned i = 0; i < ItemsPerThread; ++i) {
     auto index = i + thread_index * ItemsPerThread;
     if (index >= zero_count) {
-      indexes[i - zero_count] = values[i];
+      indexes[index - zero_count] = values[i];
     }
   }
 }
