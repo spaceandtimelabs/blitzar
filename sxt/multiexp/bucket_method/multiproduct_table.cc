@@ -38,6 +38,10 @@ xena::future<> make_multiproduct_table(basct::span<unsigned> bucket_prefix_count
   memmg::managed_array<uint16_t> partial_prefix_tile_counts{num_buckets_total * num_tiles, &resource};
   inclusive_prefix_count_buckets(partial_prefix_counts, partial_prefix_tile_counts, stream, bytes,
                                  element_num_bytes, bit_width, num_outputs, tile_size, n);
+
+  // fill in bucket prefix counts
+
+  // fill in multiproduct table
   (void)stream;
   /* void inclusive_prefix_count_buckets(basct::span<unsigned> counts, basct::span<uint16_t>
    * tile_counts, */
