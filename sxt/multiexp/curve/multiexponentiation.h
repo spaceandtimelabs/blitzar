@@ -150,7 +150,7 @@ xena::future<memmg::managed_array<Element>>
 async_compute_multiexponentiation(basct::cspan<Element> generators,
                                   basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   // try bucket method first
-#if 0
+#if 1
   auto res_maybe = co_await mtxbk::try_multiexponentiate(generators, exponents);
   if (!res_maybe.empty()) {
     co_return res_maybe;
