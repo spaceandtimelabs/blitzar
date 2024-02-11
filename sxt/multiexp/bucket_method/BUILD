@@ -80,6 +80,21 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "count",
+    test_deps = [
+        "//sxt/base/curve:example_element",
+        "//sxt/base/test:unit_test",
+    ],
+    impl_deps = [
+      "//sxt/base/device:stream",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/error:assert",
+    ],
+)
+
+sxt_cc_component(
     name = "multiexponentiation",
     test_deps = [
         "//sxt/base/curve:example_element",
