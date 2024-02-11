@@ -5,6 +5,9 @@ load(
 
 sxt_cc_component(
   name = "runlength_count",
+  deps = [
+        "@local_cuda//:cub",
+  ],
   test_deps = [
     "//sxt/base/test:unit_test",
   ],
