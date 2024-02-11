@@ -11,8 +11,7 @@ namespace sxt::mtxbk {
 template <uint16_t NumThreads, uint16_t ItemsPerThread, unsigned BitWidth>
 static __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_counts,
                                                  uint16_t* __restrict__ indexes,
-                                                 const uint8_t* __restrict__ bytes,
-                                                 unsigned bit_width, unsigned n) {
+                                                 const uint8_t* __restrict__ bytes, unsigned n) {
   uint16_t thread_index = threadIdx.x;
   auto digit_index = blockDim.x;
   auto num_digits = gridDim.x;
