@@ -86,6 +86,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     impl_deps = [
+        "@local_cuda//:cub",
       "//sxt/base/device:memory_utility",
       "//sxt/base/device:stream",
       "//sxt/base/error:assert",
