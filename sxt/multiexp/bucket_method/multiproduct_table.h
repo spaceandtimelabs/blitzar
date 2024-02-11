@@ -15,4 +15,10 @@ xena::future<> make_multiproduct_table(basct::span<unsigned> bucket_prefix_count
                                        basct::cspan<const uint8_t*> scalars,
                                        unsigned element_num_bytes, unsigned bit_width,
                                        unsigned n) noexcept;
+
+xena::future<> make_multiproduct_table(basct::span<uint16_t> bucket_prefix_counts,
+                                       basct::span<uint16_t> indexes,
+                                       basct::cspan<const uint8_t*> scalars,
+                                       unsigned element_num_bytes, unsigned bit_width,
+                                       unsigned n) noexcept;
 } // namespace sxt::mtxb
