@@ -20,7 +20,7 @@ public:
       : storage_{storage}, discontinuity_{storage.discontinuity} {}
 
   template <unsigned ItemsPerThread>
-  void count(CounterT counts[NumBins], T (&items)[ItemsPerThread]) noexcept {
+  CounterT* count(T (&items)[ItemsPerThread]) noexcept {
     auto thread_id = threadIdx.x;
     for (unsigned i=thread_id; i<NumBins; i+=NumThreads) {
       storage_.run_begin[i] = NumThreads * ItemsPerThread;
@@ -38,8 +38,9 @@ public:
     }
     __syncthreads();
     for (unsigned i=thread_id; i<NumBins; i+=NumThreads) {
-      counts[i] = storage_.run_end[i] - storage_.run_begin[i];
+      storage_.run_end[i] -= storage_.run_begin[i];
     }
+    return storage_.run_end;
   } 
 
 private:

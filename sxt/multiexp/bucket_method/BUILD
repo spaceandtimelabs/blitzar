@@ -141,6 +141,20 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "multiproduct_table_kernel",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    impl_deps = [
+    ],
+    deps = [
+        "@local_cuda//:cub",
+        "//sxt/algorithm/block:runlength_count",
+    ],
+)
+
+sxt_cc_component(
     name = "multiproduct_table",
     test_deps = [
         "//sxt/base/curve:example_element",
