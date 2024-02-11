@@ -44,4 +44,23 @@ TEST_CASE("we can compute the inclusive prefix sum of bucket counts") {
     std::fill(expected.begin(), expected.end(), 1);
     REQUIRE(counts == expected);
   }
+
+  SECTION("we handle the case of two digits of one") {
+    bytes = {1u, 1u};
+    inclusive_prefix_count_buckets(counts, stream, bytes, element_num_bytes, bit_width,
+                                   num_outputs, tile_size, 2);
+    basdv::synchronize_stream(stream);
+    std::fill(expected.begin(), expected.end(), 2);
+    REQUIRE(counts == expected);
+  }
+
+  SECTION("we handle the case of two digits of one and two") {
+    bytes = {1u, 2u};
+    inclusive_prefix_count_buckets(counts, stream, bytes, element_num_bytes, bit_width,
+                                   num_outputs, tile_size, 2);
+    basdv::synchronize_stream(stream);
+    std::fill(expected.begin(), expected.end(), 2);
+    expected[0] = 1;
+    REQUIRE(counts == expected);
+  }
 }
