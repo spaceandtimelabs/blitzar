@@ -150,14 +150,17 @@ sxt_cc_component(
         "//sxt/base/device:synchronization",
     ],
     impl_deps = [
+      ":count",
         "@local_cuda//:cub",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",
         "//sxt/base/num:divide_up",
-        "//sxt/memory/resource:async_device_resource",
         "//sxt/execution/async:coroutine",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:device_resource",
         "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/base:scalar_array",
     ],
     deps = [
         "//sxt/memory/management:managed_array_fwd",
