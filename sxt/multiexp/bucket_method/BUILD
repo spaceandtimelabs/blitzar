@@ -139,3 +139,29 @@ sxt_cc_component(
         "//sxt/multiexp/base:exponent_sequence",
     ],
 )
+
+sxt_cc_component(
+    name = "multiproduct_table",
+    test_deps = [
+        "//sxt/base/curve:example_element",
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
+    ],
+    impl_deps = [
+        "@local_cuda//:cub",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
+        "//sxt/base/num:divide_up",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/execution/async:coroutine",
+        "//sxt/memory/management:managed_array",
+    ],
+    deps = [
+        "//sxt/memory/management:managed_array_fwd",
+        "//sxt/execution/async:future_fwd",
+        "//sxt/base/container:span",
+    ],
+)
