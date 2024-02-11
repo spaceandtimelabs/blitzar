@@ -84,9 +84,13 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/curve:example_element",
         "//sxt/base/test:unit_test",
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
     ],
     impl_deps = [
         "@local_cuda//:cub",
+      "//sxt/algorithm/transform:prefix_sum",
       "//sxt/base/device:memory_utility",
       "//sxt/base/device:stream",
       "//sxt/base/error:assert",

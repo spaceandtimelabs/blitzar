@@ -2,6 +2,7 @@
 
 #include "cub/cub.cuh"
 
+#include "sxt/algorithm/transform/prefix_sum.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
@@ -46,13 +47,14 @@ static __global__ void count_kernel(unsigned* __restrict__ counts,
   for (unsigned i=0; i<ItemsPerThread; ++i) {
     auto index = thread_index + i * ItemsPerThread;
     if (index < m) {
-      data[i] = digits[i];
+      data[i] = digits[index];
     } else {
       data[i] = 0;
     }
   }
 
   // count
+  BlockHistogram(temp_storage).InitHistogram(bin_counts);
   BlockHistogram(temp_storage).Histogram(data, bin_counts);
 
   // write results
@@ -62,7 +64,7 @@ static __global__ void count_kernel(unsigned* __restrict__ counts,
     if (i == 0) {
       continue;
     }
-    counts[i * tile_size] = bin_counts[i];
+    counts[(i - 1u) * num_tiles] = bin_counts[i];
   }
 }
 
@@ -86,25 +88,20 @@ void inclusive_prefix_count_buckets(basct::span<unsigned> counts, const basdv::s
       basdv::is_active_device_pointer(digits.data())
       // clang-format on
   );
+  SXT_RELEASE_ASSERT(bit_width == 8 && tile_size == 1024,
+                     "only support these values for now");
   memr::async_device_resource resource{stream};
   memmg::managed_array<unsigned> counts_p{counts.size(), &resource};
 
+  static constexpr unsigned num_threads = 128;
+  static constexpr unsigned items_per_thread = 8;
+  SXT_DEBUG_ASSERT(num_threads * items_per_thread == tile_size);
   // count
-  count_kernel<256, 4, 256>
-      <<<dim3(num_tiles, num_digits, num_outputs), 256>>>(counts_p.data(), digits.data(), n);
-  /* template <unsigned NumThreads, unsigned ItemsPerThread, unsigned NumBins> */
-  /* static __global__ void count_kernel(unsigned* __restrict__ counts, */
-  /*                                     const uint8_t* __restrict__ digits, unsigned n) noexcept {
-   */
-  
+  count_kernel<num_threads, items_per_thread, 256>
+      <<<dim3(num_tiles, num_digits, num_outputs), num_threads, 0, stream>>>(counts_p.data(),
+                                                                             digits.data(), n);
+
   // compute prefix sums
-  (void)counts;
-  (void)stream;
-  (void)digits;
-  (void)element_num_bytes;
-  (void)bit_width;
-  (void)num_outputs;
-  (void)n;
-  (void)tile_size;
+  algtr::inclusive_prefix_sum(counts, counts_p, stream);
 }
 } // namespace sxt::mtxbk
