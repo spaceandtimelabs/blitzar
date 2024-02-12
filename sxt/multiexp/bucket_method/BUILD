@@ -143,6 +143,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "multiproduct_table_kernel",
     test_deps = [
+        "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
         "//sxt/memory/resource:managed_device_resource",
     ],

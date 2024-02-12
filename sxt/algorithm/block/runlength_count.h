@@ -2,6 +2,8 @@
 
 #include "cub/cub.cuh"
 
+#include "sxt/base/macro/cuda_callable.h"
+
 namespace sxt::algbk {
 //--------------------------------------------------------------------------------------------------
 // runlength_count 
@@ -16,20 +18,25 @@ public:
     CounterT run_end[NumBins];
   };
 
-  explicit runlength_count(temp_storage& storage) noexcept
+  CUDA_CALLABLE explicit runlength_count(temp_storage& storage) noexcept
       : storage_{storage}, discontinuity_{storage.discontinuity} {}
 
   template <unsigned ItemsPerThread>
-  CounterT* count(T (&items)[ItemsPerThread]) noexcept {
+  CUDA_CALLABLE CounterT* count(T (&items)[ItemsPerThread]) noexcept {
     auto thread_id = threadIdx.x;
     for (unsigned i=thread_id; i<NumBins; i+=NumThreads) {
       storage_.run_begin[i] = NumThreads * ItemsPerThread;
       storage_.run_end[i] = NumThreads * ItemsPerThread;
     }
     int flags[ItemsPerThread];
-    auto flag_op = [&storage = storage_] (T a, T b, int b_index) noexcept {
-      storage.run_end[b] = static_cast<CounterT>(b_index); 
-      storage.run_begin[b] = static_cast<CounterT>(b_index); 
+    auto flag_op = [&storage = storage_](T a, T b, int b_index) noexcept {
+      if (a != b) {
+        storage.run_end[b] = static_cast<CounterT>(b_index);
+        storage.run_begin[b] = static_cast<CounterT>(b_index);
+        return true;
+      } else {
+        return false;
+      }
     };
     __syncthreads();
     discontinuity_.FlagHeads(flags, items, flag_op);

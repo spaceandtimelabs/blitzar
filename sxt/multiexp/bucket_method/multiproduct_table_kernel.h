@@ -57,9 +57,8 @@ static __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_c
 
   // write counts
   for (unsigned i = thread_index; i < num_buckets_per_digit; i += NumThreads) {
-    if (i > 0) {
-      bucket_counts[i - 1] = counts[i];
-    }
+    printf("bucket_counts[%d] = %d\n", i, counts[i+1]);
+    bucket_counts[i] = counts[i+1];
   }
 
   // write indexes
