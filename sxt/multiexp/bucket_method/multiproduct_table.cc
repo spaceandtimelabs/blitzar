@@ -3,6 +3,7 @@
 #include "cub/cub.cuh"
 
 #include "sxt/algorithm/iteration/for_each.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
@@ -29,7 +30,9 @@ xena::future<> make_multiproduct_table(basct::span<uint16_t> bucket_prefix_count
   auto num_buckets_total = num_buckets_per_output * num_outputs;
   SXT_DEBUG_ASSERT(
       bucket_prefix_counts.size() == num_buckets_total &&
-      indexes.size() == num_outputs * num_digits * n
+      indexes.size() == num_outputs * num_digits * n &&
+      basdv::is_active_device_pointer(bucket_prefix_counts.data()) &&
+      basdv::is_active_device_pointer(indexes.data())
   );
 
   // transpose scalars
