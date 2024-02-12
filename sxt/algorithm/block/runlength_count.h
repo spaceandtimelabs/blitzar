@@ -31,8 +31,8 @@ public:
     int flags[ItemsPerThread];
     auto flag_op = [&storage = storage_](T a, T b, int b_index) noexcept {
       if (a != b) {
-        storage.run_end[b] = static_cast<CounterT>(b_index);
         storage.run_begin[b] = static_cast<CounterT>(b_index);
+        storage.run_end[a] = static_cast<CounterT>(b_index);
         return true;
       } else {
         return false;

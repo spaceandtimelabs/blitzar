@@ -19,10 +19,23 @@ TEST_CASE("we can compute a bucket decomposition") {
   SECTION("we handle the case of a single element of 0") {
     bucket_counts.resize(1);
     indexes.resize(1);
-    bytes.resize(1);
+    bytes = {0u};
     multiproduct_table_kernel<32, 1, 1>
         <<<1, 32>>>(bucket_counts.data(), indexes.data(), bytes.data(), 1);
     expected_counts.resize(1);
+    expected_indexes.resize(1);
+    basdv::synchronize_device();
+    REQUIRE(bucket_counts == expected_counts);
+    REQUIRE(indexes == expected_indexes);
+  }
+
+  SECTION("we handle the case of a single element of 1") {
+    bucket_counts.resize(1);
+    indexes.resize(1);
+    bytes = {1u};
+    multiproduct_table_kernel<32, 1, 1>
+        <<<1, 32>>>(bucket_counts.data(), indexes.data(), bytes.data(), 1);
+    expected_counts = {1u};
     expected_indexes.resize(1);
     basdv::synchronize_device();
     REQUIRE(bucket_counts == expected_counts);

@@ -13,9 +13,9 @@ static __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_c
                                                  uint16_t* __restrict__ indexes,
                                                  const uint8_t* __restrict__ bytes, unsigned n) {
   uint16_t thread_index = threadIdx.x;
-  auto digit_index = blockDim.x;
+  auto digit_index = blockIdx.x;
+  auto output_index = blockIdx.y;
   auto num_digits = gridDim.x;
-  auto output_index = blockDim.y;
   auto num_buckets_per_digit = (1u << BitWidth) - 1u;
 
   // algorithms and shared memory
@@ -57,7 +57,6 @@ static __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_c
 
   // write counts
   for (unsigned i = thread_index; i < num_buckets_per_digit; i += NumThreads) {
-    printf("bucket_counts[%d] = %d\n", i, counts[i+1]);
     bucket_counts[i] = counts[i+1];
   }
 
