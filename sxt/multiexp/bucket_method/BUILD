@@ -160,9 +160,11 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/curve:example_element",
         "//sxt/base/test:unit_test",
-        "//sxt/memory/resource:managed_device_resource",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
     ],
     impl_deps = [
       ":multiproduct_table_kernel",
