@@ -30,7 +30,7 @@ xena::future<> multiexponentiate2(basct::span<T> res, basct::cspan<T> generators
   (void)res;
   (void)generators;
   (void)exponents;
-  return {};
+  return xena::make_ready_future();
 #if 0
   constexpr unsigned bucket_group_size = 255;
   constexpr unsigned num_bucket_groups = 32;
