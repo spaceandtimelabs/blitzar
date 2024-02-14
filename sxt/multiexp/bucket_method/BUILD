@@ -80,30 +80,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "count",
-    test_deps = [
-        "//sxt/base/curve:example_element",
-        "//sxt/base/test:unit_test",
-        "//sxt/memory/resource:managed_device_resource",
-        "//sxt/base/device:stream",
-        "//sxt/base/device:synchronization",
-    ],
-    impl_deps = [
-        "@local_cuda//:cub",
-      "//sxt/algorithm/transform:prefix_sum",
-      "//sxt/base/device:memory_utility",
-      "//sxt/base/device:stream",
-      "//sxt/base/error:assert",
-      "//sxt/base/num:divide_up",
-        "//sxt/memory/resource:async_device_resource",
-        "//sxt/memory/management:managed_array",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
     name = "multiexponentiation",
     test_deps = [
         "//sxt/base/curve:example_element",
