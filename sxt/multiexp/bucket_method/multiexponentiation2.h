@@ -27,6 +27,18 @@ namespace sxt::mtxbk {
 template <bascrv::element T>
 xena::future<> multiexponentiate2(basct::span<T> res, basct::cspan<T> generators,
                                  basct::cspan<const uint8_t*> exponents) noexcept {
+  auto num_outputs = static_cast<unsigned>(res.size());
+  static constexpr unsigned bit_width = 8;
+  static constexpr unsigned num_buckets_per_digit = (1u << bit_width) - 1u;
+  static constexpr unsigned num_digits = 32;
+  static constexpr unsigned num_buckets_per_output = num_buckets_per_digit * num_digits;
+  static const unsigned num_buckets_total = num_buckets_per_output * num_outputs;
+
+  // accumulate
+  memmg::managed_array<T> bucket_sums{num_buckets_total, memr::get_pinned_resource()};
+  (void)bucket_sums;
+
+  // reduce bucket sums
   (void)res;
   (void)generators;
   (void)exponents;
