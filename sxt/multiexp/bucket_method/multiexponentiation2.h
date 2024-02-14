@@ -22,7 +22,50 @@
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
-// try_multiexponentiate
+// multiexponentiate2
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+xena::future<> multiexponentiate2(basct::span<T> res, basct::cspan<T> generators,
+                                 basct::cspan<const uint8_t*> exponents) noexcept {
+  (void)res;
+  (void)generators;
+  (void)exponents;
+  return {};
+#if 0
+  constexpr unsigned bucket_group_size = 255;
+  constexpr unsigned num_bucket_groups = 32;
+  auto num_outputs = exponents.size();
+  SXT_DEBUG_ASSERT(res.size() == num_outputs);
+  if (res.empty()) {
+    co_return;
+  }
+
+  basdv::stream stream;
+
+  // accumulate
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> bucket_sums{bucket_group_size * num_bucket_groups * num_outputs,
+                                      &resource};
+  co_await accumulate_buckets<T>(bucket_sums, generators, exponents);
+
+  // reduce buckets
+  memmg::managed_array<T> reduced_buckets_dev{bucket_group_size * num_outputs, &resource};
+  static unsigned num_threads = 32;
+  dim3 block_dims(basn::divide_up(bucket_group_size, num_threads), num_outputs, 1);
+  combine_bucket_groups<bucket_group_size, num_bucket_groups>
+      <<<block_dims, num_threads, 0, stream>>>(reduced_buckets_dev.data(), bucket_sums.data());
+  memmg::managed_array<T> reduced_buckets{reduced_buckets_dev.size(), memr::get_pinned_resource()};
+  basdv::async_copy_device_to_host(reduced_buckets, reduced_buckets_dev, stream);
+  co_await xendv::await_stream(stream);
+  reduced_buckets_dev.reset();
+
+  // combine buckets
+  combine_buckets<T>(res, reduced_buckets);
+#endif
+}
+
+//--------------------------------------------------------------------------------------------------
+// try_multiexponentiate2
 //--------------------------------------------------------------------------------------------------
 /**
  * Attempt to compute a multi-exponentiation using the bucket method if the problem dimensions
@@ -30,8 +73,8 @@ namespace sxt::mtxbk {
  */
 template <bascrv::element Element>
 xena::future<memmg::managed_array<Element>>
-try_multiexponentiate(basct::cspan<Element> generators,
-                      basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
+try_multiexponentiate2(basct::cspan<Element> generators,
+                       basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   auto num_outputs = exponents.size();
   memmg::managed_array<Element> res;
   uint64_t min_n = std::numeric_limits<uint64_t>::max();
@@ -53,8 +96,8 @@ try_multiexponentiate(basct::cspan<Element> generators,
   for (size_t output_index = 0; output_index < num_outputs; ++output_index) {
     exponents_p[output_index] = exponents[output_index].data;
   }
-  // TODO: compute
   res.resize(num_outputs);
+  co_await multiexponentiate2(res, generators, exponents_p);
   co_return res;
 }
 } // namespace sxt::mtxbk
