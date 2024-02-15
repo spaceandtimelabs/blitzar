@@ -51,7 +51,7 @@ CUDA_CALLABLE void sum_bucket(T* __restrict__ sums, const T* __restrict__ genera
     sum = T::identity();
     return;
   }
-  T e = generators[indexes[first]];
+  T e = generators[indexes[first++]];
   for (; first != last; ++first) {
     auto t = generators[indexes[first]];
     add_inplace(e, t);
