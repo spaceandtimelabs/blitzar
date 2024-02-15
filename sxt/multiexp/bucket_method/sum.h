@@ -93,7 +93,8 @@ xena::future<> sum_buckets(basct::span<T> sums, basct::cspan<T> generators,
                                           output_index * element_num_bytes * n;
         }
         auto sums_slice =
-            basct::subspan(partial_sums, rng.a() * num_buckets_total, num_buckets_total);
+            basct::subspan(partial_sums, chunk_index * num_buckets_total, num_buckets_total);
+        ++chunk_index;
         co_await sum_buckets_chunk<T>(sums_slice, chunk_generators, chunk_exponents,
                                       element_num_bytes, bit_width);
       });

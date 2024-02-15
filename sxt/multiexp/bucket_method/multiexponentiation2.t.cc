@@ -22,10 +22,11 @@ TEST_CASE("we can compute a multiexponentiation") {
   std::vector<bascrv::element97> res(1);
   std::vector<bascrv::element97> generators;
   std::vector<const uint8_t*> exponents;
+  const unsigned element_num_bytes = 32;
 
   SECTION("we can compute a multiexponentiation with no elements") {
     res.clear();
-    auto fut = multiexponentiate2<bascrv::element97>(res, generators, exponents);
+    auto fut = multiexponentiate2<bascrv::element97>(res, generators, exponents, element_num_bytes);
     REQUIRE(fut.ready());
   }
 

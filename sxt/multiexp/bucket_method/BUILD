@@ -178,7 +178,7 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
-        ":multiproduct_table",
+        ":sum",
         "//sxt/base/container:span",
         "//sxt/base/container:span_utility",
         "//sxt/base/curve:element",

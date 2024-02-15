@@ -19,6 +19,7 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/multiexp/bucket_method/sum.h"
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
@@ -26,7 +27,8 @@ namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 xena::future<> multiexponentiate2(basct::span<T> res, basct::cspan<T> generators,
-                                 basct::cspan<const uint8_t*> exponents) noexcept {
+                                  basct::cspan<const uint8_t*> exponents,
+                                  unsigned element_num_bytes) noexcept {
   auto num_outputs = static_cast<unsigned>(res.size());
   static constexpr unsigned bit_width = 8;
   static constexpr unsigned num_buckets_per_digit = (1u << bit_width) - 1u;
@@ -35,14 +37,17 @@ xena::future<> multiexponentiate2(basct::span<T> res, basct::cspan<T> generators
   static const unsigned num_buckets_total = num_buckets_per_output * num_outputs;
 
   // accumulate
-  memmg::managed_array<T> bucket_sums{num_buckets_total, memr::get_pinned_resource()};
-  (void)bucket_sums;
+  memmg::managed_array<T> sums{num_buckets_total, memr::get_pinned_resource()};
+  co_await sum_buckets<T>(sums, generators, exponents, element_num_bytes, bit_width);
+/* template <bascrv::element T> */
+/* xena::future<> sum_buckets(basct::span<T> sums, basct::cspan<T> generators, */
+/*                            basct::cspan<const uint8_t*> exponents, unsigned element_num_bytes, */
+/*                            unsigned bit_width) noexcept { */
 
   // reduce bucket sums
   (void)res;
   (void)generators;
   (void)exponents;
-  return xena::make_ready_future();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -78,7 +83,7 @@ try_multiexponentiate2(basct::cspan<Element> generators,
     exponents_p[output_index] = exponents[output_index].data;
   }
   res.resize(num_outputs);
-  co_await multiexponentiate2(res, generators, exponents_p);
+  co_await multiexponentiate2(res, generators, exponents_p, 32);
   co_return res;
 }
 } // namespace sxt::mtxbk
