@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/curve/element.h"
@@ -28,10 +29,34 @@ namespace sxt::mtxbk {
 template <bascrv::element T>
 CUDA_CALLABLE void sum_bucket(T* __restrict__ sums, const T* __restrict__ generators,
                               const uint16_t* __restrict__ bucket_prefix_counts,
-                              const uint16_t* __restrict__ indexes, unsigned index) noexcept {
-  (void)sums;
-  (void)bucket_prefix_counts;
-  (void)indexes;
+                              const uint16_t* __restrict__ indexes, unsigned num_buckets_per_digit,
+                              unsigned n, unsigned index) noexcept {
+  auto digit_index = index / num_buckets_per_digit;
+  auto bucket_offset = index % num_buckets_per_digit;
+
+  // adjust pointers
+  auto& sum = sums[index];
+  bucket_prefix_counts += index;
+  indexes += digit_index * n;
+
+  // sum
+  uint16_t first;
+  if (bucket_offset == 0) {
+    first = 0;
+  } else {
+    first = bucket_prefix_counts[bucket_offset - 1u];
+  }
+  auto last = bucket_prefix_counts[bucket_offset];
+  if (first == last) {
+    sum = T::identity();
+    return;
+  }
+  T e = generators[indexes[first]];
+  for (; first != last; ++first) {
+    auto t = generators[indexes[first]];
+    add_inplace(e, t);
+  }
+  sum = e;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -41,6 +66,7 @@ template <bascrv::element T>
 xena::future<> sum_buckets_chunk(basct::span<T> sums, basct::cspan<T> generators,
                                  basct::cspan<const uint8_t*> exponents, unsigned element_num_bytes,
                                  unsigned bit_width) noexcept {
+  auto num_buckets_per_digit = (1u << bit_width) - 1u;
   auto num_digits = basn::divide_up(element_num_bytes * 8u, bit_width);  
   auto num_outputs = static_cast<unsigned>(exponents.size());
   auto num_buckets_total = static_cast<unsigned>(sums.size());
@@ -59,9 +85,24 @@ xena::future<> sum_buckets_chunk(basct::span<T> sums, basct::cspan<T> generators
   memmg::managed_array<T> generators_dev{n, &resource};
   basdv::async_copy_host_to_device(generators_dev, generators, stream);
 
-  // compute bucket sums
+  // sum buckets
   memmg::managed_array<T> sums_dev{num_buckets_total, &resource};
   co_await std::move(fut);
+  auto f = [
+               // clang-format off
+    sums = sums_dev.data(),
+    generators = generators_dev.data(),
+    bucket_prefix_counts = bucket_prefix_counts.data(),
+    indexes = indexes.data(),
+    num_buckets_per_digit = num_buckets_per_digit,
+    n = n
+               // clang-format on
+  ] __device__
+           __host__(unsigned /*num_buckets_total*/, unsigned index) noexcept {
+             sum_bucket<T>(sums, generators, bucket_prefix_counts, indexes, num_buckets_per_digit,
+                           n, index);
+           };
+  algi::launch_for_each_kernel(stream, f, num_buckets_total);
   basdv::async_copy_device_to_host(sums, sums_dev, stream);
   co_await xendv::await_stream(stream);
 }

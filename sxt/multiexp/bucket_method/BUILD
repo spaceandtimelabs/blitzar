@@ -209,6 +209,7 @@ sxt_cc_component(
     ],
     deps = [
       ":multiproduct_table",
+      "//sxt/algorithm/iteration:for_each",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
         "//sxt/base/device:memory_utility",
