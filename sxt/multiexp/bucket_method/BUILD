@@ -208,6 +208,7 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
+      ":multiproduct_table",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
         "//sxt/base/device:memory_utility",
@@ -222,6 +223,7 @@ sxt_cc_component(
         "//sxt/execution/async:future",
         "//sxt/execution/device:device_viewable",
         "//sxt/execution/device:for_each",
+        "//sxt/execution/device:synchronization",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:pinned_resource",
