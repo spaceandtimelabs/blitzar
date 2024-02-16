@@ -81,12 +81,9 @@ try_multiexponentiate2(basct::cspan<Element> generators,
   res.resize(num_outputs);
   co_await xendv::concurrent_for_each(
       basit::index_range{0, num_outputs}, [&](const basit::index_range& rng) {
-        memmg::managed_array<const uint8_t*> exponents_p(num_outputs);
-        for (size_t i=0; i<rng.size(); ++i) {
-          exponents_p[i] = exponents[rng.a() + i].data;
-        }
+        auto exponents_slice = basct::subspan(exponents, res.a(), res.size());
         auto res_slice = res.subspan(rng.a(), rng.size());
-        co_await multiexponentiate2(res_slice, generators, exponents_p, 32);
+        co_await multiexponentiate2(res_slice, generators, exponents_slice, 32);
       });
   co_return res;
 }
