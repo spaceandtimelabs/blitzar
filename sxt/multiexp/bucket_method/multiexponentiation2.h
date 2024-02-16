@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <iostream>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/container/span_utility.h"
@@ -30,6 +31,9 @@ template <bascrv::element T>
 xena::future<> multiexponentiate2(basct::span<T> res, basct::cspan<T> generators,
                                   basct::cspan<const uint8_t*> exponents,
                                   unsigned element_num_bytes) noexcept {
+  if (res.empty()) {
+    co_return;
+  }
   auto num_outputs = static_cast<unsigned>(res.size());
   static constexpr unsigned bit_width = 8;
   static constexpr unsigned num_buckets_per_digit = (1u << bit_width) - 1u;
@@ -38,12 +42,8 @@ xena::future<> multiexponentiate2(basct::span<T> res, basct::cspan<T> generators
   static const unsigned num_buckets_total = num_buckets_per_output * num_outputs;
 
   // accumulate
-  memmg::managed_array<T> sums{num_buckets_total, memr::get_pinned_resource()};
+  memmg::managed_array<T> sums{num_buckets_total, memr::get_device_resource()};
   co_await sum_buckets<T>(sums, generators, exponents, element_num_bytes, bit_width);
-/* template <bascrv::element T> */
-/* xena::future<> sum_buckets(basct::span<T> sums, basct::cspan<T> generators, */
-/*                            basct::cspan<const uint8_t*> exponents, unsigned element_num_bytes, */
-/*                            unsigned bit_width) noexcept { */
 
   // reduce bucket sums
   (void)res;

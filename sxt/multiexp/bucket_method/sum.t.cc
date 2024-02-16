@@ -24,7 +24,7 @@ TEST_CASE("we can compute the bucket sums for a chunk") {
   SECTION("we can compute bucket sums for a single exponent of zero") {
     std::vector<uint8_t> scalars1(32);
     scalars = {scalars1.data()};
-    auto fut = sum_buckets2<E>(sums, generators, scalars, element_num_bytes, bit_width);
+    auto fut = sum_buckets<E>(sums, generators, scalars, element_num_bytes, bit_width);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -36,7 +36,7 @@ TEST_CASE("we can compute the bucket sums for a chunk") {
     scalars1[0] = 1;
     scalars = {scalars1.data()};
     auto fut =
-        sum_buckets2<E>(sums, generators, scalars, element_num_bytes, bit_width);
+        sum_buckets<E>(sums, generators, scalars, element_num_bytes, bit_width);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
