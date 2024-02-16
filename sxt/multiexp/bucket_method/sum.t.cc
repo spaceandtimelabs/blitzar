@@ -20,8 +20,8 @@ TEST_CASE("we can compute the bucket sums for a chunk") {
   std::vector<E> expected(sums.size());
 
   SECTION("we can compute bucket sums for a single exponent of zero") {
-    std::vector<uint8_t> scalar1(32);
-    scalars = {scalar1.data()};
+    std::vector<uint8_t> scalars1(32);
+    scalars = {scalars1.data()};
     auto fut =
         sum_buckets_chunk<E>(sums, generators, scalars, element_num_bytes, bit_width);
     xens::get_scheduler().run();
@@ -29,9 +29,15 @@ TEST_CASE("we can compute the bucket sums for a chunk") {
     REQUIRE(sums == expected);
   }
 
-
+  SECTION("we can compute the bucket sums for a single exponent of one") {
+    std::vector<uint8_t> scalars1(32);
+    scalars1[0] = 1;
+    scalars = {scalars1.data()};
+    auto fut =
+        sum_buckets_chunk<E>(sums, generators, scalars, element_num_bytes, bit_width);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    expected[0] = generators[0];
+    REQUIRE(sums == expected);
+  }
 }
-/* template <bascrv::element T> */
-/* xena::future<> sum_buckets_chunk(basct::span<T> sums, basct::cspan<T> generators, */
-/*                                  basct::cspan<const uint8_t*> exponents, unsigned element_num_bytes, */
-/*                                  unsigned bit_width) noexcept { */
