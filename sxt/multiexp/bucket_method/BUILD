@@ -178,6 +178,7 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
+        ":reduce",
         ":sum",
         "//sxt/base/container:span",
         "//sxt/base/container:span_utility",
@@ -228,5 +229,21 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:pinned_resource",
+    ],
+)
+
+sxt_cc_component(
+    name = "reduce",
+    test_deps = [
+        "//sxt/base/curve:example_element",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+        "//sxt/base/curve:element",
+      "//sxt/base/container:span",
+        "//sxt/execution/async:coroutine",
     ],
 )

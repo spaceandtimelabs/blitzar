@@ -21,6 +21,7 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/multiexp/bucket_method/reduce.h"
 #include "sxt/multiexp/bucket_method/sum.h"
 
 namespace sxt::mtxbk {
@@ -46,9 +47,7 @@ xena::future<> multiexponentiate2(basct::span<T> res, basct::cspan<T> generators
   co_await sum_buckets<T>(sums, generators, exponents, element_num_bytes, bit_width);
 
   // reduce bucket sums
-  (void)res;
-  (void)generators;
-  (void)exponents;
+  co_await reduce_buckets<T>(res, sums, element_num_bytes, bit_width);
 }
 
 //--------------------------------------------------------------------------------------------------
