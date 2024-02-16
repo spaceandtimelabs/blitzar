@@ -3,8 +3,10 @@
 #include <vector>
 
 #include "sxt/base/curve/example_element.h"
+#include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/schedule/scheduler.h"
+#include "sxt/memory/resource/managed_device_resource.h"
 using namespace sxt;
 using namespace sxt::mtxbk;
 
@@ -13,19 +15,19 @@ TEST_CASE("we can compute the bucket sums for a chunk") {
   const unsigned element_num_bytes = 32;
   const unsigned bit_width = 8;
 
-  std::vector<E> sums(255 * 32);
+  std::pmr::vector<E> sums(255 * 32, memr::get_managed_device_resource());
   std::vector<E> generators = {3u};
   std::vector<const uint8_t*> scalars;
 
-  std::vector<E> expected(sums.size());
+  std::pmr::vector<E> expected(sums.size());
 
   SECTION("we can compute bucket sums for a single exponent of zero") {
     std::vector<uint8_t> scalars1(32);
     scalars = {scalars1.data()};
-    auto fut =
-        sum_buckets_chunk<E>(sums, generators, scalars, element_num_bytes, bit_width);
+    auto fut = sum_buckets2<E>(sums, generators, scalars, element_num_bytes, bit_width);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
+    basdv::synchronize_device();
     REQUIRE(sums == expected);
   }
 
@@ -34,9 +36,10 @@ TEST_CASE("we can compute the bucket sums for a chunk") {
     scalars1[0] = 1;
     scalars = {scalars1.data()};
     auto fut =
-        sum_buckets_chunk<E>(sums, generators, scalars, element_num_bytes, bit_width);
+        sum_buckets2<E>(sums, generators, scalars, element_num_bytes, bit_width);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
+    basdv::synchronize_device();
     expected[0] = generators[0];
     REQUIRE(sums == expected);
   }

@@ -142,4 +142,49 @@ xena::future<> sum_buckets(basct::span<T> sums, basct::cspan<T> generators,
 
   // combine partial sums
 }
+
+template <bascrv::element T>
+xena::future<> sum_buckets2(basct::span<T> sums, basct::cspan<T> generators,
+                            basct::cspan<const uint8_t*> exponents, unsigned element_num_bytes,
+                            unsigned bit_width) noexcept {
+  auto num_buckets_per_digit = (1u << bit_width) - 1u;
+  auto num_digits = basn::divide_up(element_num_bytes * 8u, bit_width);  
+  auto num_outputs = static_cast<unsigned>(exponents.size());
+  auto num_buckets_total = static_cast<unsigned>(sums.size());
+  auto n = static_cast<unsigned>(generators.size());
+  SXT_DEBUG_ASSERT( basdv::is_active_device_pointer(sums.data()));
+
+  // compute multiproduct table
+  memmg::managed_array<uint16_t> bucket_prefix_counts{num_buckets_total,
+                                                      memr::get_device_resource()};
+  memmg::managed_array<uint16_t> indexes{n * num_digits * num_outputs, memr::get_device_resource()};
+  auto fut = make_multiproduct_table(bucket_prefix_counts, indexes, exponents, element_num_bytes,
+                                     bit_width, n);
+
+  // copy generators to device
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> generators_dev{n, &resource};
+  basdv::async_copy_host_to_device(generators_dev, generators, stream);
+
+  // sum buckets
+  memmg::managed_array<T> sums_dev{num_buckets_total, &resource};
+  co_await std::move(fut);
+  auto f = [
+               // clang-format off
+    sums = sums.data(),
+    generators = generators_dev.data(),
+    bucket_prefix_counts = bucket_prefix_counts.data(),
+    indexes = indexes.data(),
+    num_buckets_per_digit = num_buckets_per_digit,
+    n = n
+               // clang-format on
+  ] __device__
+           __host__(unsigned /*num_buckets_total*/, unsigned index) noexcept {
+             sum_bucket<T>(sums, generators, bucket_prefix_counts, indexes, num_buckets_per_digit,
+                           n, index);
+           };
+  algi::launch_for_each_kernel(stream, f, num_buckets_total);
+  co_await xendv::await_stream(stream);
+}
 } // namespace sxt::mtxbk
