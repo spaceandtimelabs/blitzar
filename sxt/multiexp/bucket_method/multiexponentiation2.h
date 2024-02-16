@@ -14,6 +14,7 @@
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/device/for_each.h"
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
@@ -78,12 +79,16 @@ try_multiexponentiate2(basct::cspan<Element> generators,
   auto n = max_n;
   SXT_DEBUG_ASSERT(generators.size() >= n);
   generators = generators.subspan(0, n);
-  memmg::managed_array<const uint8_t*> exponents_p(num_outputs);
-  for (size_t output_index = 0; output_index < num_outputs; ++output_index) {
-    exponents_p[output_index] = exponents[output_index].data;
-  }
   res.resize(num_outputs);
-  co_await multiexponentiate2(res, generators, exponents_p, 32);
+  co_await xendv::concurrent_for_each(
+      basit::index_range{0, num_outputs}, [&](const basit::index_range& rng) {
+        memmg::managed_array<const uint8_t*> exponents_p(num_outputs);
+        for (size_t i=0; i<rng.size(); ++i) {
+          exponents_p[i] = exponents[rng.a() + i].data;
+        }
+        auto res_slice = res.subspan(rng.a(), rng.size());
+        co_await multiexponentiate2(res_slice, generators, exponents_p, 32);
+      });
   co_return res;
 }
 } // namespace sxt::mtxbk
