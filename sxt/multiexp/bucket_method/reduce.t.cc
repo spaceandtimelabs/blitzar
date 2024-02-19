@@ -17,7 +17,7 @@ TEST_CASE("we reduce bucket sums into a multiexponentiation result") {
   std::vector<E> expected(1);
   std::pmr::vector<E> sums{8, memr::get_managed_device_resource()};
 
-  SECTION("we can reduce a single bucket") {
+  SECTION("we can reduce a non-zero bucket in the identity position") {
     sums[0] = 33u;
     auto fut = reduce_buckets<E>(res, sums, 1, 1);
     xens::get_scheduler().run();
@@ -27,13 +27,46 @@ TEST_CASE("we reduce bucket sums into a multiexponentiation result") {
     REQUIRE(res == expected);
   }
 
-  SECTION("we can reduce a bucket in second position") {
+  SECTION("we can reduce a non-zero bucket in second position") {
     sums[1] = 33u;
     auto fut = reduce_buckets<E>(res, sums, 1, 1);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
     expected = {66u};
+    REQUIRE(res == expected);
+  }
+
+  SECTION("we handle bit widths greater than 1") {
+    sums.resize(3 * 4);
+    sums[0] = 33u;
+    auto fut = reduce_buckets<E>(res, sums, 1, 2);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected = {33u};
+    REQUIRE(res == expected);
+  }
+
+  SECTION("we can reduce a non-zero bucket in the second position with bit_width = 2") {
+    sums.resize(3 * 4);
+    sums[1] = 33u;
+    auto fut = reduce_buckets<E>(res, sums, 1, 2);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected = {66u};
+    REQUIRE(res == expected);
+  }
+
+  SECTION("we can reduce a non-zero bucket in the third position with bit_width = 2") {
+    sums.resize(3 * 4);
+    sums[2] = 33u;
+    auto fut = reduce_buckets<E>(res, sums, 1, 2);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected = {99u};
     REQUIRE(res == expected);
   }
 }
