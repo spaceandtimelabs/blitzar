@@ -242,8 +242,10 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
+      "//sxt/algorithm/iteration:for_each",
         "//sxt/base/curve:element",
       "//sxt/base/container:span",
+      "//sxt/base/device:stream",
       "//sxt/base/macro:cuda_callable",
         "//sxt/execution/async:coroutine",
     ],

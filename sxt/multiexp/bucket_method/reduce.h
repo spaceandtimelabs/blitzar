@@ -1,7 +1,9 @@
 #pragma once
 
+#include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/execution/async/coroutine.h"
 
