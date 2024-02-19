@@ -62,7 +62,6 @@ TEST_CASE("we can compute a multiexponentiation") {
     REQUIRE(res[0] == 24u);
   }
 
-#if 0
   SECTION("we can compute a multiexponentiation with a single element of 256") {
     std::vector<uint8_t> scalars1(32);
     scalars1[1] = 1;
@@ -74,6 +73,7 @@ TEST_CASE("we can compute a multiexponentiation") {
     REQUIRE(res[0] == 256u * 12u);
   }
 
+#if 0
   SECTION("we can compute a multiexponentiation with 2 generators") {
     uint8_t scalar_data[64] = {};
     scalar_data[0] = 2;
