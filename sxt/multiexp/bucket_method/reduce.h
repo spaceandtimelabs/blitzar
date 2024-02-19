@@ -15,20 +15,21 @@
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
-// reduce_digit
+// reduce_digits_rest
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-CUDA_CALLABLE void reduce_digit_rest(T& reduction, T& t, const T* __restrict__ sums,
+CUDA_CALLABLE void reduce_digits_rest(T& reduction, T& t, const T* __restrict__ sums,
                                      unsigned num_buckets_per_digit) noexcept {
   unsigned i = num_buckets_per_digit - 1u;
   while (i-- > 0) {
-    add_inplace(t, sums[i]);
+    auto e = sums[i];
+    add_inplace(t, e);
     add(reduction, reduction, t);
   }
 }
 
 //--------------------------------------------------------------------------------------------------
-// reduction_buckets 
+// reduction_kernel 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 CUDA_CALLABLE void reduction_kernel(T* __restrict__ res, const T* __restrict__ sums,
@@ -44,14 +45,14 @@ CUDA_CALLABLE void reduction_kernel(T* __restrict__ res, const T* __restrict__ s
   unsigned digit_index = num_digits - 1u;
   T t = sums[num_digits * num_buckets_per_digit - 1u];
   T reduction = t;
-  reduce_rest(reduction, t, sums + digit_index * num_buckets_per_digit, num_buckets_per_digit);
+  reduce_digits_rest(reduction, t, sums + digit_index * num_buckets_per_digit, num_buckets_per_digit);
   while (digit_index-- > 0) {
     for (unsigned i=0; i<bit_width; ++i) {
       double_element(reduction, reduction);
     }
     t = sums[(digit_index + 1u) * num_buckets_per_digit - 1u];
     add(reduction, reduction, t);
-    reduce_rest(reduction, t, sums + digit_index * num_buckets_per_digit, num_buckets_per_digit);
+    reduce_digits_rest(reduction, t, sums + digit_index * num_buckets_per_digit, num_buckets_per_digit);
   }
 
   // write result
@@ -86,7 +87,7 @@ xena::future<> reduce_buckets(basct::span<T> res, basct::cspan<T> bucket_sums,
     bit_width = bit_width
     // clang-format on
   ] __host__ __device__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
-    (void)output_index;
+    reduction_kernel(res, sums, num_digits, bit_width, output_index);
   };
   algi::launch_for_each_kernel(stream, f, num_outputs);
   basdv::async_copy_device_to_host(res, res_dev, stream);

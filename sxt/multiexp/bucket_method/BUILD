@@ -237,13 +237,13 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/curve:example_element",
         "//sxt/base/device:synchronization",
-        "//sxt/base/error:assert",
         "//sxt/base/test:unit_test",
         "//sxt/execution/schedule:scheduler",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
+        "//sxt/memory/resource:async_device_resource",
       "//sxt/algorithm/iteration:for_each",
         "//sxt/base/curve:element",
       "//sxt/base/container:span",
