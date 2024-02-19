@@ -3,9 +3,15 @@
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/synchronization.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/async_device_resource.h"
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
@@ -58,10 +64,32 @@ CUDA_CALLABLE void reduction_kernel(T* __restrict__ res, const T* __restrict__ s
 template <bascrv::element T>
 xena::future<> reduce_buckets(basct::span<T> res, basct::cspan<T> bucket_sums,
                               unsigned element_num_bytes, unsigned bit_width) noexcept {
-  (void)res;
-  (void)bucket_sums;
-  (void)element_num_bytes;
-  (void)bit_width;
-  co_return;
+  auto num_outputs = res.size();
+  auto num_buckets_per_digit = (1u << bit_width) - 1u;
+  auto num_digits = basn::divide_up(element_num_bytes * 8u, bit_width);
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      res.size() == num_outputs &&
+      basdv::is_host_pointer(res.data()) &&
+      bucket_sums.size() == num_outputs * num_digits * num_buckets_per_digit &&
+      basdv::is_active_device_pointer(bucket_sums.data())
+      // clang-format on
+  );
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> res_dev{num_outputs, &resource};
+  auto f = [
+    // clang-format off
+    res = res_dev.data(),
+    sums = bucket_sums.data(),
+    num_digits = num_digits,
+    bit_width = bit_width
+    // clang-format on
+  ] __host__ __device__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
+    (void)output_index;
+  };
+  algi::launch_for_each_kernel(stream, f, num_outputs);
+  basdv::async_copy_device_to_host(res, res_dev, stream);
+  co_await xendv::await_stream(stream);
 }
 } // namespace sxt::mtxbk
