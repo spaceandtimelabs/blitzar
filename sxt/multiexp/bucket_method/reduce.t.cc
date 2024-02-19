@@ -27,6 +27,19 @@ TEST_CASE("we reduce bucket sums into a multiexponentiation result") {
     REQUIRE(res == expected);
   }
 
+  SECTION("we handle multiple outputs") {
+    res.resize(2);
+    sums.resize(16);
+    sums[0] = 33u;
+    sums[8] = 77u;
+    auto fut = reduce_buckets<E>(res, sums, 1, 1);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected = {33u, 77u};
+    REQUIRE(res == expected);
+  }
+
   SECTION("we can reduce a non-zero bucket in second position") {
     sums[1] = 33u;
     auto fut = reduce_buckets<E>(res, sums, 1, 1);
