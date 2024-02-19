@@ -244,6 +244,7 @@ sxt_cc_component(
     deps = [
         "//sxt/base/curve:element",
       "//sxt/base/container:span",
+      "//sxt/base/macro:cuda_callable",
         "//sxt/execution/async:coroutine",
     ],
 )
