@@ -62,7 +62,7 @@ xena::future<memmg::managed_array<Element>>
 try_multiexponentiate2(basct::cspan<Element> generators,
                        basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   auto num_outputs = exponents.size();
-  memmg::managed_array<Element> res;
+  memmg::managed_array<Element> res{memr::get_pinned_resource()};
   uint64_t min_n = std::numeric_limits<uint64_t>::max();
   uint64_t max_n = 0;
   for (auto& exponent : exponents) {
