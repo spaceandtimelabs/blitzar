@@ -87,27 +87,25 @@ TEST_CASE("we can compute a multiexponentiation") {
     REQUIRE(res[0] == 2u * 12u + 3u * 34u);
   }
 
-#if 0
   SECTION("we can compute a multiexponetiation with multiple outputs") {
     res.resize(2);
 
-    uint8_t scalar_data1[64] = {};
-    scalar_data1[0] = 2;
-    scalar_data1[32] = 3;
-    exponents.push_back(scalar_data1);
+    std::vector<uint8_t> scalars1(64);
+    scalars1[0] = 2;
+    scalars1[32] = 3;
 
-    uint8_t scalar_data2[64] = {};
-    scalar_data2[0] = 7;
-    scalar_data2[32] = 4;
-    exponents.push_back(scalar_data2);
+    std::vector<uint8_t> scalars2(64);
+    scalars2[0] = 7;
+    scalars2[32] = 4;
+
+    scalars = {scalars1.data(), scalars2.data()};
 
     generators = {12u, 34u};
 
-    auto fut = multiexponentiate<bascrv::element97>(res, generators, exponents);
+    auto fut = multiexponentiate2<bascrv::element97>(res, generators, scalars, element_num_bytes);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 2u * 12u + 3u * 34u);
     REQUIRE(res[1] == 7u * 12u + 4u * 34u);
   }
-#endif
 }

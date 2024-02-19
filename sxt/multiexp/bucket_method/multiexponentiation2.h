@@ -40,7 +40,7 @@ xena::future<> multiexponentiate2(basct::span<T> res, basct::cspan<T> generators
   static constexpr unsigned num_buckets_per_digit = (1u << bit_width) - 1u;
   static constexpr unsigned num_digits = 32;
   static constexpr unsigned num_buckets_per_output = num_buckets_per_digit * num_digits;
-  static const unsigned num_buckets_total = num_buckets_per_output * num_outputs;
+  const unsigned num_buckets_total = num_buckets_per_output * num_outputs;
 
   // accumulate
   memmg::managed_array<T> sums{num_buckets_total, memr::get_device_resource()};
