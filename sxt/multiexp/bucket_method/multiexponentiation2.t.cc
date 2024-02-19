@@ -53,9 +53,9 @@ TEST_CASE("we can compute a multiexponentiation") {
 
   SECTION("we can compute a multiexponentiation with a single element of 2") {
     std::vector<uint8_t> scalars1(32);
-    scalars1[0] = 1;
+    scalars1[0] = 2;
     scalars = {scalars1.data()};
-    generators = {24u};
+    generators = {12u};
     auto fut = multiexponentiate2<bascrv::element97>(res, generators, scalars, element_num_bytes);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
@@ -64,11 +64,11 @@ TEST_CASE("we can compute a multiexponentiation") {
 
 #if 0
   SECTION("we can compute a multiexponentiation with a single element of 256") {
-    uint8_t scalar_data[32] = {};
-    scalar_data[1] = 1;
-    exponents.push_back(scalar_data);
+    std::vector<uint8_t> scalars1(32);
+    scalars1[1] = 1;
+    scalars = {scalars1.data()};
     generators = {12u};
-    auto fut = multiexponentiate<bascrv::element97>(res, generators, exponents);
+    auto fut = multiexponentiate2<bascrv::element97>(res, generators, scalars, element_num_bytes);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 256u * 12u);

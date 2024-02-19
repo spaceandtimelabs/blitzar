@@ -36,7 +36,7 @@ CUDA_CALLABLE void sum_bucket(T* __restrict__ sums, const T* __restrict__ genera
 
   // adjust pointers
   auto& sum = sums[index];
-  bucket_prefix_counts += index;
+  bucket_prefix_counts += digit_index * num_buckets_per_digit;
   indexes += digit_index * n;
 
   // sum
