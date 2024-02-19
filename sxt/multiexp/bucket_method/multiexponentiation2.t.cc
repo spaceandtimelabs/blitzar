@@ -21,26 +21,26 @@ using f51t::operator""_f51;
 TEST_CASE("we can compute a multiexponentiation") {
   std::vector<bascrv::element97> res(1);
   std::vector<bascrv::element97> generators;
-  std::vector<const uint8_t*> exponents;
+  std::vector<const uint8_t*> scalars;
   const unsigned element_num_bytes = 32;
 
   SECTION("we can compute a multiexponentiation with no elements") {
     res.clear();
-    auto fut = multiexponentiate2<bascrv::element97>(res, generators, exponents, element_num_bytes);
+    auto fut = multiexponentiate2<bascrv::element97>(res, generators, scalars, element_num_bytes);
     REQUIRE(fut.ready());
   }
 
-#if 0
   SECTION("we can compute a multiexponentiation with a single zero element") {
-    uint8_t scalar_data[32] = {};
-    exponents.push_back(scalar_data);
-    generators = {12u};
-    auto fut = multiexponentiate<bascrv::element97>(res, generators, exponents);
+    std::vector<uint8_t> scalars1(32);
+    scalars = {scalars1.data()};
+    generators = {33u};
+    auto fut = multiexponentiate2<bascrv::element97>(res, generators, scalars, element_num_bytes);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 0u);
   }
 
+#if 0
   SECTION("we can compute a multiexponentiation with a single element of 1") {
     uint8_t scalar_data[32] = {};
     scalar_data[0] = 1;
