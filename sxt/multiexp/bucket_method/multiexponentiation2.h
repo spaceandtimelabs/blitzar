@@ -57,12 +57,12 @@ xena::future<> multiexponentiate2(basct::span<T> res, basct::cspan<T> generators
  * Attempt to compute a multi-exponentiation using the bucket method if the problem dimensions
  * suggest it will give a performance benefit; otherwise, return an empty array.
  */
-template <bascrv::element Element>
-xena::future<memmg::managed_array<Element>>
-try_multiexponentiate2(basct::cspan<Element> generators,
+template <bascrv::element T>
+xena::future<memmg::managed_array<T>>
+try_multiexponentiate2(basct::cspan<T> generators,
                        basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
   auto num_outputs = exponents.size();
-  memmg::managed_array<Element> res{memr::get_pinned_resource()};
+  memmg::managed_array<T> res{memr::get_pinned_resource()};
   uint64_t min_n = std::numeric_limits<uint64_t>::max();
   uint64_t max_n = 0;
   for (auto& exponent : exponents) {
@@ -76,14 +76,21 @@ try_multiexponentiate2(basct::cspan<Element> generators,
     co_return res;
   }
   auto n = max_n;
+  if (n > 1024) {
+    co_return res;
+  }
   SXT_DEBUG_ASSERT(generators.size() >= n);
   generators = generators.subspan(0, n);
   res.resize(num_outputs);
+  memmg::managed_array<const uint8_t*> exponents_p(num_outputs);
+  for (size_t output_index=0; output_index<num_outputs; ++output_index) {
+    exponents_p[output_index] = exponents[output_index].data;
+  }
   co_await xendv::concurrent_for_each(
-      basit::index_range{0, num_outputs}, [&](const basit::index_range& rng) {
-        auto exponents_slice = basct::subspan(exponents, res.a(), res.size());
-        auto res_slice = res.subspan(rng.a(), rng.size());
-        co_await multiexponentiate2(res_slice, generators, exponents_slice, 32);
+      basit::index_range{0, num_outputs}, [&](const basit::index_range& rng) -> xena::future<> {
+        auto exponents_slice = basct::subspan(exponents_p, rng.a(), rng.size());
+        auto res_slice = basct::subspan(res, rng.a(), rng.size());
+        co_await multiexponentiate2<T>(res_slice, generators, exponents_slice, 32);
       });
   co_return res;
 }
