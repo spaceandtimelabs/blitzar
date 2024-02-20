@@ -5,6 +5,7 @@
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/log/log.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/synchronization.h"
@@ -36,11 +37,13 @@ xena::future<> make_multiproduct_table(basct::span<uint16_t> bucket_prefix_count
   );
 
   // transpose scalars
+  basl::info("copying scalars to device");
   memmg::managed_array<uint8_t> bytes{num_outputs * n * element_num_bytes,
                                       memr::get_device_resource()};
   co_await mtxb::transpose_scalars_to_device(bytes, scalars, element_num_bytes, bit_width, n);
 
   // compute buckets
+  basl::info("computing multiproduct decomposition");
   SXT_RELEASE_ASSERT(bit_width == 8u, "only support bit_width == 8u for now");
   SXT_RELEASE_ASSERT(n <= 1024, "only support n <= 1024 for now");
   static constexpr unsigned num_threads = 128;

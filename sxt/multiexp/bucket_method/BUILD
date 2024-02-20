@@ -148,6 +148,7 @@ sxt_cc_component(
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",
+        "//sxt/base/log:log",
         "//sxt/base/num:divide_up",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:synchronization",
