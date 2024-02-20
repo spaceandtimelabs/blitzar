@@ -12,6 +12,7 @@
 #include "sxt/base/iterator/index_range.h"
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/log/log.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/for_each.h"
@@ -89,6 +90,7 @@ xena::future<> sum_buckets(basct::span<T> sums, basct::cspan<T> generators,
   // sum buckets
   memmg::managed_array<T> sums_dev{num_buckets_total, &resource};
   co_await std::move(fut);
+  basl::info("summing {} buckets", num_buckets_total);
   auto f = [
                // clang-format off
     sums = sums.data(),

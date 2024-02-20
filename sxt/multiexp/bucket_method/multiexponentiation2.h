@@ -12,6 +12,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range.h"
 #include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/log/log.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
@@ -35,6 +36,8 @@ xena::future<> multiexponentiate2(basct::span<T> res, basct::cspan<T> generators
   if (res.empty()) {
     co_return;
   }
+  basl::info("compute a multiexponentiation with {} outputs of length {}", res.size(),
+             generators.size());
   auto num_outputs = static_cast<unsigned>(res.size());
   static constexpr unsigned bit_width = 8;
   static constexpr unsigned num_buckets_per_digit = (1u << bit_width) - 1u;
@@ -47,7 +50,10 @@ xena::future<> multiexponentiate2(basct::span<T> res, basct::cspan<T> generators
   co_await sum_buckets<T>(sums, generators, exponents, element_num_bytes, bit_width);
 
   // reduce bucket sums
+  basl::info("reducing {} buckets into {} outputs", sums.size(), num_outputs);
   co_await reduce_buckets<T>(res, sums, element_num_bytes, bit_width);
+  basl::info("finished multiexponentiation with {} outputs of length {}", res.size(),
+             generators.size());
 }
 
 //--------------------------------------------------------------------------------------------------
