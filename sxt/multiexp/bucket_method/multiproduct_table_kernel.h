@@ -1,12 +1,27 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2024-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include "cub/cub.cuh"
-
 #include "sxt/algorithm/block/runlength_count.h"
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
-// multiproduct_table_kernel 
+// multiproduct_table_kernel
 //--------------------------------------------------------------------------------------------------
 template <uint16_t NumThreads, uint16_t ItemsPerThread, unsigned BitWidth>
 static __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_counts,
@@ -37,7 +52,7 @@ static __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_c
   // load bytes
   uint8_t keys[ItemsPerThread];
   uint16_t values[ItemsPerThread];
-  for (uint16_t i=0; i<ItemsPerThread; ++i) {
+  for (uint16_t i = 0; i < ItemsPerThread; ++i) {
     auto index = thread_index + i * NumThreads;
     if (index < n) {
       keys[i] = bytes[index];
@@ -57,7 +72,7 @@ static __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_c
 
   // write counts
   for (unsigned i = thread_index; i < num_buckets_per_digit; i += NumThreads) {
-    bucket_counts[i] = counts[i+1];
+    bucket_counts[i] = counts[i + 1];
   }
 
   // write indexes

@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2024-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <vector>
@@ -25,7 +41,7 @@
 
 namespace sxt::mtxbk {
 //--------------------------------------------------------------------------------------------------
-// sum_bucket 
+// sum_bucket
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 CUDA_CALLABLE void sum_bucket(T* __restrict__ sums, const T* __restrict__ generators,
@@ -61,14 +77,14 @@ CUDA_CALLABLE void sum_bucket(T* __restrict__ sums, const T* __restrict__ genera
 }
 
 //--------------------------------------------------------------------------------------------------
-// sum_buckets 
+// sum_buckets
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 xena::future<> sum_buckets(basct::span<T> sums, basct::cspan<T> generators,
                            basct::cspan<const uint8_t*> exponents, unsigned element_num_bytes,
                            unsigned bit_width) noexcept {
   auto num_buckets_per_digit = (1u << bit_width) - 1u;
-  auto num_digits = basn::divide_up(element_num_bytes * 8u, bit_width);  
+  auto num_digits = basn::divide_up(element_num_bytes * 8u, bit_width);
   auto num_outputs = static_cast<unsigned>(exponents.size());
   auto num_buckets_total = static_cast<unsigned>(sums.size());
   auto n = static_cast<unsigned>(generators.size());

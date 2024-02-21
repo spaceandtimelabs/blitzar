@@ -1,8 +1,24 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2024-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <algorithm>
-#include <limits>
 #include <iostream>
+#include <limits>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/container/span_utility.h"
@@ -89,7 +105,7 @@ try_multiexponentiate2(basct::cspan<T> generators,
   generators = generators.subspan(0, n);
   res.resize(num_outputs);
   memmg::managed_array<const uint8_t*> exponents_p(num_outputs);
-  for (size_t output_index=0; output_index<num_outputs; ++output_index) {
+  for (size_t output_index = 0; output_index < num_outputs; ++output_index) {
     exponents_p[output_index] = exponents[output_index].data;
   }
   co_await xendv::concurrent_for_each(

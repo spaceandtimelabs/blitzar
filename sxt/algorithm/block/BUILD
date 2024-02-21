@@ -4,12 +4,14 @@ load(
 )
 
 sxt_cc_component(
-  name = "runlength_count",
-  deps = [
-        "@local_cuda//:cub",
+    name = "runlength_count",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+        "//sxt/base/device:synchronization",
         "//sxt/base/macro:cuda_callable",
-  ],
-  test_deps = [
-    "//sxt/base/test:unit_test",
-  ],
+        "@local_cuda//:cub",
+    ],
 )
