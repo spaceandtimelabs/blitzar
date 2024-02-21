@@ -42,7 +42,7 @@ public:
 
   /**
    * If items holds sorted items across threads in a block, count and return a
-   * pointer to a table of the items run lengths.
+   * pointer to a table of the items' run lengths.
    */
   template <unsigned ItemsPerThread>
   CUDA_CALLABLE CounterT* count(T (&items)[ItemsPerThread]) noexcept {
