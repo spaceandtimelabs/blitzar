@@ -14,17 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field51/operation/notsquare.h"
+#include "sxt/field51/operation/sq.h"
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/field51/type/element.h"
 #include "sxt/field51/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::f51o;
-using sxt::f51t::operator""_f51;
+using namespace sxt::f51t;
 
-TEST_CASE("we can detect if an element is not a square") {
-  REQUIRE(notsquare(0x4_f51) == 0);
-  REQUIRE(notsquare(0x123_f51) == 1);
-  REQUIRE(notsquare(0x48674afb484b050fdcccf508dfb8ce91c364ab4d15584711cba01736e1c59deb_f51) == 1);
+TEST_CASE("sq") {
+  SECTION("regular") {
+    auto e = 0x48674afb484b050fdcccf508dfb8ce91c364ab4d15584711cba01736e1c59deb_f51;
+    f51t::element res;
+    sq(res, e);
+    auto expected_res = 0x7fa13403b69cc40197d157d218f6f8afdfe95bc7e98ef46112480fe346aa6ec3_f51;
+    REQUIRE(res == expected_res);
+  }
+
+  SECTION("times two") {
+    auto e = 0x711a90c454965634b0962b2b4479551d887ad8d7f33d62f626648de22323dba0_f51;
+    f51t::element res;
+    sq2(res, e);
+    auto expected_res = 0x55a6d8f01f8a9a9a2385a64a8d3aeae2c0d8895a8027b9fc8725cce6360e0f2_f51;
+    REQUIRE(res == expected_res);
+  }
 }

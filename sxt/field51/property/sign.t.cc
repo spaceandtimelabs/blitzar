@@ -14,17 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field51/operation/notsquare.h"
+#include "sxt/field51/property/sign.h"
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/field51/type/literal.h"
 
-using namespace sxt;
-using namespace sxt::f51o;
-using sxt::f51t::operator""_f51;
+using namespace sxt::f51t;
+using namespace sxt::f51p;
 
-TEST_CASE("we can detect if an element is not a square") {
-  REQUIRE(notsquare(0x4_f51) == 0);
-  REQUIRE(notsquare(0x123_f51) == 1);
-  REQUIRE(notsquare(0x48674afb484b050fdcccf508dfb8ce91c364ab4d15584711cba01736e1c59deb_f51) == 1);
+TEST_CASE("we can determine if a field element is negative") {
+  REQUIRE(is_negative(0x0_f51) == 0);
+  REQUIRE(is_negative(0x1_f51) == 1);
+  REQUIRE(is_negative(0x2_f51) == 0);
+
+  // e = 2^255 - 19
+  auto e = 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffec_f51;
+  e[0] -= 1;
+  REQUIRE(is_negative(e) == 1);
+  e[0] -= 1;
+  REQUIRE(is_negative(e) == 0);
 }
