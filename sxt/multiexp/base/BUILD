@@ -47,6 +47,7 @@ sxt_cc_component(
     name = "scalar_array",
     impl_deps = [
         "@local_cuda//:cub",
+        "//sxt/base/container:span_utility",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",

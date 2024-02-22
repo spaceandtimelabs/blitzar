@@ -53,7 +53,8 @@ xena::future<> make_multiproduct_table(basct::span<uint16_t> bucket_prefix_count
   basl::info("copying scalars to device");
   memmg::managed_array<uint8_t> bytes{num_outputs * n * element_num_bytes,
                                       memr::get_device_resource()};
-  co_await mtxb::transpose_scalars_to_device(bytes, scalars, element_num_bytes, bit_width, n);
+  /* co_await mtxb::transpose_scalars_to_device(bytes, scalars, element_num_bytes, bit_width, n); */
+  co_await mtxb::transpose_scalars_to_device2(bytes, scalars, element_num_bytes, bit_width, n);
 
   // compute buckets
   basl::info("computing multiproduct decomposition");

@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "cub/cub.cuh"
+#include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/num/divide_up.h"
@@ -46,6 +47,7 @@ static __global__ void transpose_kernel(uint8_t* __restrict__ dst, const scalar3
 
   auto byte_index = threadIdx.x;
   auto tile_index = blockIdx.x;
+  auto output_index = blockIdx.y;
   auto num_tiles = gridDim.x;
   auto n_per_tile =
       basn::divide_up(basn::divide_up(n, element_num_bytes), num_tiles) * element_num_bytes;
@@ -55,7 +57,9 @@ static __global__ void transpose_kernel(uint8_t* __restrict__ dst, const scalar3
 
   // adjust pointers
   src += first;
+  src += output_index * n;
   dst += byte_index * n + first;
+  dst += output_index * element_num_bytes * n;
 
   // set up algorithm
   using BlockExchange = cub::BlockExchange<uint8_t, element_num_bytes, element_num_bytes>;
@@ -126,5 +130,31 @@ xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
   for (auto& fut : futs) {
     co_await std::move(fut);
   }
+}
+
+xena::future<> transpose_scalars_to_device2(basct::span<uint8_t> array,
+                                            basct::cspan<const uint8_t*> scalars,
+                                            unsigned element_num_bytes, unsigned bit_width,
+                                            unsigned n) noexcept {
+  auto num_outputs = scalars.size();
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      array.size() == num_outputs * element_num_bytes * n &&
+      basdv::is_active_device_pointer(array.data())
+      // clang-format on
+  );
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<uint8_t> array_p{array.size(), &resource};
+  auto num_bytes_per_output = element_num_bytes * n;
+  for (size_t output_index=0; output_index<num_outputs; ++output_index) {
+    basdv::async_copy_host_to_device(
+        basct::subspan(array_p, output_index * num_bytes_per_output, num_bytes_per_output),
+        basct::cspan<uint8_t>{scalars[output_index], num_bytes_per_output}, stream);
+  }
+  auto num_tiles = std::min(basn::divide_up(n, 32u), 64u);
+  transpose_kernel<<<dim3(num_tiles, num_outputs, 1), 32, 0, stream>>>(
+      array.data(), reinterpret_cast<scalar32*>(array_p.data()), n);
+  co_await xendv::await_stream(std::move(stream));
 }
 } // namespace sxt::mtxb

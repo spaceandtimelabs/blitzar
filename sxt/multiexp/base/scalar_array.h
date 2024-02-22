@@ -29,4 +29,9 @@ xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
                                            basct::cspan<const uint8_t*> scalars,
                                            unsigned element_num_bytes, unsigned bit_width,
                                            unsigned n) noexcept;
+
+xena::future<> transpose_scalars_to_device2(basct::span<uint8_t> array,
+                                            basct::cspan<const uint8_t*> scalars,
+                                            unsigned element_num_bytes, unsigned bit_width,
+                                            unsigned n) noexcept;
 } // namespace sxt::mtxb
