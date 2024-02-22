@@ -7,8 +7,8 @@ sxt_cc_component(
     name = "abs",
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/field51/type:literal",
     ],
-    with_test = False,
     deps = [
         ":cneg",
         "//sxt/base/macro:cuda_callable",
@@ -21,8 +21,8 @@ sxt_cc_component(
     name = "add",
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/field51/type:literal",
     ],
-    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
         "//sxt/field51/type:element",
@@ -46,8 +46,8 @@ sxt_cc_component(
     name = "neg",
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/field51/type:literal",
     ],
-    with_test = False,
     deps = [
         ":sub",
         "//sxt/base/macro:cuda_callable",
@@ -60,8 +60,8 @@ sxt_cc_component(
     name = "cneg",
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/field51/type:literal",
     ],
-    with_test = False,
     deps = [
         ":cmov",
         ":neg",
@@ -75,8 +75,8 @@ sxt_cc_component(
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/field51/type:literal",
     ],
-    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
         "//sxt/field51/type:element",
@@ -94,6 +94,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/field51/type:element",
         "//sxt/field51/type:literal",
+        "//sxt/field51/base:reduce"
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
@@ -125,8 +126,9 @@ sxt_cc_component(
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/field51/type:element",
+        "//sxt/field51/type:literal",
     ],
-    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
     ],
@@ -141,8 +143,9 @@ sxt_cc_component(
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/field51/type:element",
+        "//sxt/field51/type:literal",
     ],
-    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
     ],

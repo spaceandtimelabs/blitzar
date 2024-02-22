@@ -20,6 +20,9 @@
 #include "sxt/field51/type/element.h"
 #include "sxt/field51/type/literal.h"
 
+#include "sxt/field51/base/reduce.h"
+
+using namespace sxt;
 using namespace sxt::f51o;
 using namespace sxt::f51t;
 
@@ -34,10 +37,26 @@ TEST_CASE("we can multiply finite field elements") {
     REQUIRE(res == expected_res);
   }
 
+  SECTION("another one") {
+    auto e = 0x123_f51;
+    auto inv = 0x5e9208cc18a1de9208cc18a1de9208cc18a1de9208cc18a1de9208cc18a1de84_f51;
+    f51t::element ei;
+    mul(res, e, inv);
+    REQUIRE(res == 0x1_f51);
+  }
+
   SECTION("we can multiply by 32-bit integers") {
     mul32(res, e1, 0x123u);
     element expected;
     mul(expected, e1, 0x123_f51);
     REQUIRE(res == expected);
+  }
+
+  SECTION("1000 multiplies") {
+    element ret;
+    for (size_t i = 0; i < 1000; ++i) {
+      mul(ret, e1, e1);
+    }
+    REQUIRE(ret == 0x2ad36c780fc54d4d11c2d325469d7571606c44ad4013dcfe4392e6731b07079_f51);
   }
 }
