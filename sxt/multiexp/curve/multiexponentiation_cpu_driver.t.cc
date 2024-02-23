@@ -17,10 +17,10 @@
 #include "sxt/multiexp/curve/multiexponentiation_cpu_driver.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/operation/double.h"
-#include "sxt/curve21/operation/neg.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/operation/add.h"
+#include "sxt/curve32/operation/double.h"
+#include "sxt/curve32/operation/neg.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/curve/naive_multiproduct_solver.h"
@@ -31,13 +31,13 @@ using namespace sxt;
 using namespace sxt::mtxcrv;
 
 TEST_CASE("we can compute multiexponentiations") {
-  naive_multiproduct_solver<c21t::element_p3> solver;
-  multiexponentiation_cpu_driver<c21t::element_p3> drv{&solver};
-  auto f = [&](basct::cspan<c21t::element_p3> generators,
+  naive_multiproduct_solver<c32t::element_p3> solver;
+  multiexponentiation_cpu_driver<c32t::element_p3> drv{&solver};
+  auto f = [&](basct::cspan<c32t::element_p3> generators,
                basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
     return mtxpi::compute_multiexponentiation(drv, generators, exponents)
         .value()
-        .as_array<c21t::element_p3>();
+        .as_array<c32t::element_p3>();
   };
   std::mt19937 rng{9873324};
   mtxtst::exercise_multiexponentiation_fn(rng, f);

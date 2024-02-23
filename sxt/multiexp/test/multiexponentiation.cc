@@ -22,14 +22,14 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/operation/overload.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/operation/overload.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/base/exponent_sequence_utility.h"
 #include "sxt/multiexp/random/random_multiexponentiation_descriptor.h"
 #include "sxt/multiexp/random/random_multiexponentiation_generation.h"
-#include "sxt/multiexp/test/curve21_arithmetic.h"
+#include "sxt/multiexp/test/curve32_arithmetic.h"
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/literal.h"
 
@@ -51,8 +51,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     std::vector<mtxb::exponent_sequence> sequences = {
         {.element_nbytes = 1, .n = 0, .data = nullptr}};
     auto res = f({}, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
-        c21t::element_p3::identity(),
+    memmg::managed_array<c32t::element_p3> expected = {
+        c32t::element_p3::identity(),
     };
     REQUIRE(res == expected);
   }
@@ -62,12 +62,12 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     std::vector<mtxb::exponent_sequence> sequences = {
         mtxb::to_exponent_sequence(exponents),
     };
-    memmg::managed_array<c21t::element_p3> generators = {
+    memmg::managed_array<c32t::element_p3> generators = {
         0x123_rs,
     };
     auto res = f(generators, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
-        c21t::element_p3::identity(),
+    memmg::managed_array<c32t::element_p3> expected = {
+        c32t::element_p3::identity(),
     };
     REQUIRE(res == expected);
   }
@@ -77,7 +77,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     std::vector<mtxb::exponent_sequence> sequences = {
         mtxb::to_exponent_sequence(exponents),
     };
-    memmg::managed_array<c21t::element_p3> generators = {
+    memmg::managed_array<c32t::element_p3> generators = {
         0x123_rs,
     };
     auto res = f(generators, sequences);
@@ -89,11 +89,11 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     std::vector<mtxb::exponent_sequence> sequences = {
         mtxb::to_exponent_sequence(exponents),
     };
-    memmg::managed_array<c21t::element_p3> generators = {
+    memmg::managed_array<c32t::element_p3> generators = {
         0x123_rs,
     };
     auto res = f(generators, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
+    memmg::managed_array<c32t::element_p3> expected = {
         -generators[0],
     };
     REQUIRE(res == expected);
@@ -104,11 +104,11 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     std::vector<mtxb::exponent_sequence> sequences = {
         mtxb::to_exponent_sequence(exponents),
     };
-    memmg::managed_array<c21t::element_p3> generators = {
+    memmg::managed_array<c32t::element_p3> generators = {
         0x123_rs,
     };
     auto res = f(generators, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
+    memmg::managed_array<c32t::element_p3> expected = {
         generators[0] + generators[0],
     };
     REQUIRE(res == expected);
@@ -119,11 +119,11 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     std::vector<mtxb::exponent_sequence> sequences = {
         mtxb::to_exponent_sequence(exponents),
     };
-    memmg::managed_array<c21t::element_p3> generators = {
+    memmg::managed_array<c32t::element_p3> generators = {
         0x123_rs,
     };
     auto res = f(generators, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
+    memmg::managed_array<c32t::element_p3> expected = {
         generators[0] + generators[0] + generators[0],
     };
     REQUIRE(res == expected);
@@ -134,11 +134,11 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     std::vector<mtxb::exponent_sequence> sequences = {
         mtxb::to_exponent_sequence(exponents),
     };
-    memmg::managed_array<c21t::element_p3> generators = {
+    memmg::managed_array<c32t::element_p3> generators = {
         0x123_rs,
     };
     auto res = f(generators, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
+    memmg::managed_array<c32t::element_p3> expected = {
         exponents[0] * generators[0],
     };
     REQUIRE(res == expected);
@@ -149,12 +149,12 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     std::vector<mtxb::exponent_sequence> sequences = {
         mtxb::to_exponent_sequence(exponents),
     };
-    memmg::managed_array<c21t::element_p3> generators = {
+    memmg::managed_array<c32t::element_p3> generators = {
         0x123_rs,
         0x456_rs,
     };
     auto res = f(generators, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
+    memmg::managed_array<c32t::element_p3> expected = {
         3 * generators[0] + 2 * generators[1],
     };
     REQUIRE(res == expected);
@@ -165,14 +165,14 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     std::vector<mtxb::exponent_sequence> sequences = {
         mtxb::to_exponent_sequence(exponents),
     };
-    memmg::managed_array<c21t::element_p3> generators = {
+    memmg::managed_array<c32t::element_p3> generators = {
         0x123_rs,
         0x456_rs,
         0x789_rs,
         0x101_rs,
     };
     auto res = f(generators, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
+    memmg::managed_array<c32t::element_p3> expected = {
         3 * generators[0] - 2 * generators[1] + 4 * generators[2] - generators[3],
     };
     REQUIRE(res == expected);
@@ -183,9 +183,9 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
         {.element_nbytes = 1, .n = 0, .data = nullptr},
         {.element_nbytes = 1, .n = 0, .data = nullptr}};
     auto res = f({}, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
-        c21t::element_p3::identity(),
-        c21t::element_p3::identity(),
+    memmg::managed_array<c32t::element_p3> expected = {
+        c32t::element_p3::identity(),
+        c32t::element_p3::identity(),
     };
     REQUIRE(res == expected);
   }
@@ -197,11 +197,11 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
         mtxb::to_exponent_sequence(exponents1),
         mtxb::to_exponent_sequence(exponents2),
     };
-    memmg::managed_array<c21t::element_p3> generators = {
+    memmg::managed_array<c32t::element_p3> generators = {
         0x123_rs,
     };
     auto res = f(generators, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
+    memmg::managed_array<c32t::element_p3> expected = {
         generators[0],
         3 * generators[0],
     };
@@ -215,13 +215,13 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
         mtxb::to_exponent_sequence(exponents1),
         mtxb::to_exponent_sequence(exponents2),
     };
-    memmg::managed_array<c21t::element_p3> generators = {
+    memmg::managed_array<c32t::element_p3> generators = {
         0x123_rs,
         0x456_rs,
         0x789_rs,
     };
     auto res = f(generators, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
+    memmg::managed_array<c32t::element_p3> expected = {
         generators[0] + 10 * generators[1] + 3 * generators[2],
         2 * generators[0] + 6 * generators[1] + 4 * generators[2],
     };
@@ -235,14 +235,14 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
         mtxb::to_exponent_sequence(exponents1),
         mtxb::to_exponent_sequence(exponents2),
     };
-    memmg::managed_array<c21t::element_p3> generators = {
+    memmg::managed_array<c32t::element_p3> generators = {
         0x123_rs,
         0x456_rs,
         0x789_rs,
     };
     auto res = f(generators, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
-        c21t::element_p3::identity(),
+    memmg::managed_array<c32t::element_p3> expected = {
+        c32t::element_p3::identity(),
         2 * generators[0] + 6 * generators[1] + 4 * generators[2],
     };
     REQUIRE(res == expected);
@@ -255,13 +255,13 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
         mtxb::to_exponent_sequence(exponents1),
         mtxb::to_exponent_sequence(exponents2),
     };
-    memmg::managed_array<c21t::element_p3> generators = {
+    memmg::managed_array<c32t::element_p3> generators = {
         0x123_rs,
         0x456_rs,
         0x789_rs,
     };
     auto res = f(generators, sequences);
-    memmg::managed_array<c21t::element_p3> expected = {
+    memmg::managed_array<c32t::element_p3> expected = {
         10 * generators[0],
         2 * generators[0] + 6 * generators[1] + 4 * generators[2],
     };
@@ -271,7 +271,7 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
   // random test cases
   std::pmr::monotonic_buffer_resource resource;
   basct::span<mtxb::exponent_sequence> sequences;
-  basct::span<c21t::element_p3> generators;
+  basct::span<c32t::element_p3> generators;
 
   SECTION("we handle random sequences of varying length") {
     mtxrn::random_multiexponentiation_descriptor descriptor{
@@ -285,8 +285,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
       auto res = f(generators, sequences);
-      memmg::managed_array<c21t::element_p3> expected(sequences.size());
-      mtxtst::mul_sum_curve21_elements(expected, generators, sequences);
+      memmg::managed_array<c32t::element_p3> expected(sequences.size());
+      mtxtst::mul_sum_curve32_elements(expected, generators, sequences);
       REQUIRE(res == expected);
     }
   }
@@ -303,8 +303,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
       auto res = f(generators, sequences);
-      memmg::managed_array<c21t::element_p3> expected(sequences.size());
-      mtxtst::mul_sum_curve21_elements(expected, generators, sequences);
+      memmg::managed_array<c32t::element_p3> expected(sequences.size());
+      mtxtst::mul_sum_curve32_elements(expected, generators, sequences);
       REQUIRE(res == expected);
     }
   }
@@ -321,8 +321,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
       auto res = f(generators, sequences);
-      memmg::managed_array<c21t::element_p3> expected(sequences.size());
-      mtxtst::mul_sum_curve21_elements(expected, generators, sequences);
+      memmg::managed_array<c32t::element_p3> expected(sequences.size());
+      mtxtst::mul_sum_curve32_elements(expected, generators, sequences);
       REQUIRE(res == expected);
     }
   }
@@ -339,8 +339,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
       auto res = f(generators, sequences);
-      memmg::managed_array<c21t::element_p3> expected(sequences.size());
-      mtxtst::mul_sum_curve21_elements(expected, generators, sequences);
+      memmg::managed_array<c32t::element_p3> expected(sequences.size());
+      mtxtst::mul_sum_curve32_elements(expected, generators, sequences);
       REQUIRE(res == expected);
     }
   }
@@ -357,8 +357,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
       auto res = f(generators, sequences);
-      memmg::managed_array<c21t::element_p3> expected(sequences.size());
-      mtxtst::mul_sum_curve21_elements(expected, generators, sequences);
+      memmg::managed_array<c32t::element_p3> expected(sequences.size());
+      mtxtst::mul_sum_curve32_elements(expected, generators, sequences);
       REQUIRE(res == expected);
     }
   }
@@ -376,8 +376,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     for (int i = 0; i < 10; ++i) {
       mtxrn::generate_random_multiexponentiation(generators, sequences, &resource, rng, descriptor);
       auto res = f(generators, sequences);
-      memmg::managed_array<c21t::element_p3> expected(sequences.size());
-      mtxtst::mul_sum_curve21_elements(expected, generators, sequences);
+      memmg::managed_array<c32t::element_p3> expected(sequences.size());
+      mtxtst::mul_sum_curve32_elements(expected, generators, sequences);
       REQUIRE(res == expected);
     }
   }
@@ -398,8 +398,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
         seq.is_signed = index++ % 2;
       }
       auto res = f(generators, sequences);
-      memmg::managed_array<c21t::element_p3> expected(sequences.size());
-      mtxtst::mul_sum_curve21_elements(expected, generators, sequences);
+      memmg::managed_array<c32t::element_p3> expected(sequences.size());
+      mtxtst::mul_sum_curve32_elements(expected, generators, sequences);
       REQUIRE(res == expected);
     }
   }
@@ -424,8 +424,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
         seq.is_signed = index++ % 2;
       }
       auto res = f(generators, sequences);
-      memmg::managed_array<c21t::element_p3> expected(sequences.size());
-      mtxtst::mul_sum_curve21_elements(expected, generators, sequences);
+      memmg::managed_array<c32t::element_p3> expected(sequences.size());
+      mtxtst::mul_sum_curve32_elements(expected, generators, sequences);
       REQUIRE(res == expected);
     }
   }

@@ -20,16 +20,16 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/operation/double.h"
-#include "sxt/curve21/operation/neg.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/operation/add.h"
+#include "sxt/curve32/operation/double.h"
+#include "sxt/curve32/operation/neg.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/index/index_table.h"
 #include "sxt/multiexp/pippenger_multiprod/multiproduct.h"
 #include "sxt/multiexp/random/random_multiproduct_descriptor.h"
 #include "sxt/multiexp/random/random_multiproduct_generation.h"
-#include "sxt/multiexp/test/curve21_arithmetic.h"
+#include "sxt/multiexp/test/curve32_arithmetic.h"
 #include "sxt/ristretto/random/element.h"
 
 using namespace sxt;
@@ -38,16 +38,16 @@ using namespace sxt::mtxcrv;
 static void verify_random_example(std::mt19937& rng,
                                   const mtxrn::random_multiproduct_descriptor& descriptor) {
   mtxi::index_table products;
-  multiproduct_cpu_driver<c21t::element_p3> drv;
+  multiproduct_cpu_driver<c32t::element_p3> drv;
   size_t num_inputs, num_entries;
 
   mtxrn::generate_random_multiproduct(products, num_inputs, num_entries, rng, descriptor);
 
-  memmg::managed_array<c21t::element_p3> inout(num_entries);
-  rstrn::generate_random_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
+  memmg::managed_array<c32t::element_p3> inout(num_entries);
+  rstrn::generate_random_elements(basct::span<c32t::element_p3>{inout.data(), num_inputs}, rng);
 
-  memmg::managed_array<c21t::element_p3> expected_result(products.num_rows());
-  mtxtst::sum_curve21_elements(expected_result, products.cheader(), inout);
+  memmg::managed_array<c32t::element_p3> expected_result(products.num_rows());
+  mtxtst::sum_curve32_elements(expected_result, products.cheader(), inout);
 
   mtxpmp::compute_multiproduct(inout, products, drv, num_inputs);
 
@@ -56,12 +56,12 @@ static void verify_random_example(std::mt19937& rng,
   }
 }
 
-TEST_CASE("we can compute curve21 multiproducts") {
+TEST_CASE("we can compute curve32 multiproducts") {
   std::mt19937 rng{2022};
-  multiproduct_cpu_driver<c21t::element_p3> drv;
+  multiproduct_cpu_driver<c32t::element_p3> drv;
 
   SECTION("we handle the empty case") {
-    memmg::managed_array<c21t::element_p3> inout;
+    memmg::managed_array<c32t::element_p3> inout;
     mtxi::index_table products;
 
     mtxpmp::compute_multiproduct(inout, products, drv, 0);
@@ -71,13 +71,13 @@ TEST_CASE("we can compute curve21 multiproducts") {
 
   SECTION("we handle a multiproduct with a single term") {
     size_t num_inputs = 1;
-    memmg::managed_array<c21t::element_p3> inout(1);
-    rstrn::generate_random_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
+    memmg::managed_array<c32t::element_p3> inout(1);
+    rstrn::generate_random_elements(basct::span<c32t::element_p3>{inout.data(), num_inputs}, rng);
 
     mtxi::index_table products{{0}};
 
-    memmg::managed_array<c21t::element_p3> expected_result(1);
-    mtxtst::sum_curve21_elements(expected_result, products.cheader(), inout);
+    memmg::managed_array<c32t::element_p3> expected_result(1);
+    mtxtst::sum_curve32_elements(expected_result, products.cheader(), inout);
 
     mtxpmp::compute_multiproduct(inout, products, drv, num_inputs);
 
@@ -86,13 +86,13 @@ TEST_CASE("we can compute curve21 multiproducts") {
 
   SECTION("we handle a single output with multiple terms") {
     size_t num_inputs = 2;
-    memmg::managed_array<c21t::element_p3> inout(2);
-    rstrn::generate_random_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
+    memmg::managed_array<c32t::element_p3> inout(2);
+    rstrn::generate_random_elements(basct::span<c32t::element_p3>{inout.data(), num_inputs}, rng);
 
     mtxi::index_table products{{0, 1}};
 
-    memmg::managed_array<c21t::element_p3> expected_result(1);
-    mtxtst::sum_curve21_elements(expected_result, products.cheader(), inout);
+    memmg::managed_array<c32t::element_p3> expected_result(1);
+    mtxtst::sum_curve32_elements(expected_result, products.cheader(), inout);
 
     mtxpmp::compute_multiproduct(inout, products, drv, num_inputs);
 
@@ -101,13 +101,13 @@ TEST_CASE("we can compute curve21 multiproducts") {
 
   SECTION("we handle a multi-product with two outputs") {
     size_t num_inputs = 3;
-    memmg::managed_array<c21t::element_p3> inout(5);
-    rstrn::generate_random_elements(basct::span<c21t::element_p3>{inout.data(), num_inputs}, rng);
+    memmg::managed_array<c32t::element_p3> inout(5);
+    rstrn::generate_random_elements(basct::span<c32t::element_p3>{inout.data(), num_inputs}, rng);
 
     mtxi::index_table products{{0, 1, 2}, {0, 2}};
 
-    memmg::managed_array<c21t::element_p3> expected_result(2);
-    mtxtst::sum_curve21_elements(expected_result, products.cheader(), inout);
+    memmg::managed_array<c32t::element_p3> expected_result(2);
+    mtxtst::sum_curve32_elements(expected_result, products.cheader(), inout);
 
     mtxpmp::compute_multiproduct(inout, products, drv, num_inputs);
 
