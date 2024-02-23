@@ -10,7 +10,11 @@ sxt_cc_component(
         "//sxt/field32/base:reduce",
     ],
     test_deps = [
+        ":literal",
         "//sxt/base/test:unit_test",
+        "//sxt/field32/base:byte_conversion",
+        "//sxt/field51/base:byte_conversion",
+        "//sxt/field51/type:element",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",

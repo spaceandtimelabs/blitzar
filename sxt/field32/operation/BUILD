@@ -74,10 +74,10 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "sub",
-    is_cuda = True,
     impl_deps = [
-      "//sxt/field32/base:reduce",
+        "//sxt/field32/base:reduce",
     ],
+    is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/field32/type:literal",
@@ -203,4 +203,3 @@ sxt_cc_component(
         "//sxt/field32/type:literal",
     ],
 )
-

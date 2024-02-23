@@ -35,7 +35,8 @@ TEST_CASE("we can invert field elements") {
 
   // p_v + 1
   // Same return as in the curve25519 project's u32 mul implementation
-  f32t::element ret_from_curve25519{67108846, 33554431, 67108863, 33554431, 67108863, 33554431, 67108863, 33554431, 67108863, 33554431};
-  
+  f32t::element ret_from_curve25519{67108846, 33554431, 67108863, 33554431, 67108863,
+                                    33554431, 67108863, 33554431, 67108863, 33554431};
+
   REQUIRE(res == ret_from_curve25519);
 }

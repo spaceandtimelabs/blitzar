@@ -37,8 +37,9 @@ TEST_CASE("we can compute square roots of field elements") {
   oss << pow2;
   REQUIRE(oss.str() == "0x4_f32");
 
-  f32t::element p_v_plus_4{67108849, 33554431, 67108863, 33554431, 67108863, 33554431, 67108863, 33554431, 67108863, 33554431};
+  f32t::element p_v_plus_4{67108849, 33554431, 67108863, 33554431, 67108863,
+                           33554431, 67108863, 33554431, 67108863, 33554431};
   REQUIRE(pow2 == p_v_plus_4);
-  
+
   REQUIRE(sqrt(rt, 0x123_f32) != 0);
 }

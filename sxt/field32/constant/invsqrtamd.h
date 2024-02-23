@@ -26,7 +26,7 @@ namespace sxt::f32cn {
  * INVSQRT_A_MINUS_D
  * https://github.com/dalek-cryptography/curve25519-dalek/blob/a62e4a5c573ca9a68503a6fbe47e3f189a4765b0/curve25519-dalek/src/backend/serial/u32/constants.rs#L60-L63
  */
-static constexpr f32t::element invsqrtamd = {6111466, 4156064, 39310137, 12243467, 41204824,
-                                             120896, 20826367, 26493656, 6093567, 31568420};
+static constexpr f32t::element invsqrtamd = {6111466, 4156064,  39310137, 12243467, 41204824,
+                                             120896,  20826367, 26493656, 6093567,  31568420};
 
 } // namespace sxt::f32cn
