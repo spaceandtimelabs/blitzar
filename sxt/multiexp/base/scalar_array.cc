@@ -96,10 +96,14 @@ xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
                                            basct::cspan<const uint8_t*> scalars,
                                            unsigned element_num_bytes, unsigned n) noexcept {
   auto num_outputs = static_cast<unsigned>(scalars.size());
+  if (n == 0 || num_outputs == 0) {
+    co_return;
+  }
   SXT_DEBUG_ASSERT(
       // clang-format off
       array.size() == num_outputs * element_num_bytes * n &&
-      basdv::is_active_device_pointer(array.data())
+      basdv::is_active_device_pointer(array.data()) &&
+      basdv::is_host_pointer(scalars[0])
       // clang-format on
   );
   basdv::stream stream;
@@ -111,7 +115,7 @@ xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
         basct::subspan(array_p, output_index * num_bytes_per_output, num_bytes_per_output),
         basct::cspan<uint8_t>{scalars[output_index], num_bytes_per_output}, stream);
   }
-  auto num_tiles = std::min(basn::divide_up(n, num_outputs * 32u), 64u);
+  auto num_tiles = std::min(basn::divide_up(n, num_outputs * element_num_bytes), 64u);
   auto num_bytes_log2 = basn::ceil_log2(element_num_bytes);
   basn::constexpr_switch<6>(
       num_bytes_log2,

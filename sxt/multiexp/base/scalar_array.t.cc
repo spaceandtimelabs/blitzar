@@ -33,6 +33,15 @@ using namespace sxt::mtxb;
 TEST_CASE("we can copy transpose scalar arrays to device memory") {
   memmg::managed_array<uint8_t> array{memr::get_managed_device_resource()};
 
+  SECTION("we handle the empty case") {
+    std::vector<uint8_t> scalars1(0);
+    array.resize(0);
+    std::vector<const uint8_t*> scalars = {scalars1.data()};
+    auto fut = transpose_scalars_to_device(array, scalars, 1,  0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+  }
+
   SECTION("we can transpose a single scalar of 1 byte") {
     std::vector<uint8_t> scalars1(1);
     scalars1[0] = 123u;
