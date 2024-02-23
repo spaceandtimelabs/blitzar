@@ -59,7 +59,6 @@ TEST_CASE("we can multiply finite field elements") {
   SECTION("another one") {
     auto e = 0x123_f32;
     auto inv = 0x5e9208cc18a1de9208cc18a1de9208cc18a1de9208cc18a1de9208cc18a1de84_f32;
-    f32t::element ei;
     mul(res, e, inv);
 
     // p_v + 1
