@@ -42,6 +42,6 @@ void init_workspace(workspace& work) noexcept {
   work.b_vector = scalars.subspan(np_half);
 
   // g_vector
-  work.g_vector = basct::winked_span<c21t::element_p3>(&work.alloc, np_half);
+  work.g_vector = basct::winked_span<c32t::element_p3>(&work.alloc, np_half);
 }
 } // namespace sxt::prfip

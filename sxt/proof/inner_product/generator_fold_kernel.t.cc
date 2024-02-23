@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/operation/overload.h"
+#include "sxt/curve32/operation/overload.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/proof/inner_product/generator_fold.h"
@@ -42,8 +42,8 @@ TEST_CASE("we can fold generators using the GPU") {
   auto x2 = 0x321_s25;
   decompose_generator_fold(decomposition, x1, x2);
 
-  std::vector<c21t::element_p3> g_vector_p;
-  std::vector<c21t::element_p3> g_vector;
+  std::vector<c32t::element_p3> g_vector_p;
+  std::vector<c32t::element_p3> g_vector;
 
   rstt::compressed_element expected, actual;
 

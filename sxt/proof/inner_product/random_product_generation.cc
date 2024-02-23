@@ -19,7 +19,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/memory/alloc_utility.h"
 #include "sxt/base/num/ceil_log2.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/ristretto/random/element.h"
 #include "sxt/scalar25/random/element.h"
@@ -45,14 +45,14 @@ void generate_random_product(proof_descriptor& descriptor, basct::cspan<s25t::el
   descriptor.b_vector = {b_vector, n};
 
   // q_value
-  auto q_value = basm::allocate_object<c21t::element_p3>(alloc);
+  auto q_value = basm::allocate_object<c32t::element_p3>(alloc);
   rstrn::generate_random_element(*q_value, rng);
   descriptor.q_value = q_value;
 
   // g_vector
   auto n_lg2 = basn::ceil_log2(n);
   auto np = 1ull << n_lg2;
-  auto g_vector = basm::allocate_array<c21t::element_p3>(alloc, np);
+  auto g_vector = basm::allocate_array<c32t::element_p3>(alloc, np);
   for (size_t i = 0; i < np; ++i) {
     rstrn::generate_random_element(g_vector[i], rng);
   }

@@ -19,7 +19,7 @@
 #include "sxt/base/container/span.h"
 #include "sxt/execution/async/future_fwd.h"
 
-namespace sxt::c21t {
+namespace sxt::c32t {
 struct element_p3;
 }
 
@@ -27,7 +27,7 @@ namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
 // async_fold_generators
 //--------------------------------------------------------------------------------------------------
-xena::future<void> async_fold_generators(basct::span<c21t::element_p3> g_vector_p,
-                                         basct::cspan<c21t::element_p3> g_vector,
+xena::future<void> async_fold_generators(basct::span<c32t::element_p3> g_vector_p,
+                                         basct::cspan<c32t::element_p3> g_vector,
                                          basct::cspan<unsigned> decomposition) noexcept;
 } // namespace sxt::prfip

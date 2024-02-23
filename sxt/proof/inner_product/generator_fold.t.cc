@@ -20,7 +20,7 @@
 
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/operation/overload.h"
+#include "sxt/curve32/operation/overload.h"
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/literal.h"
 #include "sxt/scalar25/constant/max_bits.h"

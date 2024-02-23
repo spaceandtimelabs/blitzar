@@ -21,9 +21,9 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/log/log.h"
 #include "sxt/base/num/ceil_log2.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/operation/scalar_multiply.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/operation/add.h"
+#include "sxt/curve32/operation/scalar_multiply.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/proof/inner_product/driver.h"
@@ -112,7 +112,7 @@ xena::future<void> prove_inner_product(basct::span<rstt::compressed_element> l_v
 xena::future<bool> verify_inner_product(prft::transcript& transcript, const driver& drv,
                                         const proof_descriptor& descriptor,
                                         const s25t::element& product,
-                                        const c21t::element_p3& a_commit,
+                                        const c32t::element_p3& a_commit,
                                         basct::cspan<rstt::compressed_element> l_vector,
                                         basct::cspan<rstt::compressed_element> r_vector,
                                         const s25t::element& ap_value) noexcept {
@@ -145,9 +145,9 @@ xena::future<bool> verify_inner_product(prft::transcript& transcript, const driv
   co_await drv.compute_expected_commitment(expected_commit, descriptor, l_vector, r_vector,
                                            x_vector, ap_value);
 
-  c21t::element_p3 commit;
-  c21o::scalar_multiply(commit, product, *descriptor.q_value);
-  c21o::add(commit, commit, a_commit);
+  c32t::element_p3 commit;
+  c32o::scalar_multiply(commit, product, *descriptor.q_value);
+  c32o::add(commit, commit, a_commit);
   rstt::compressed_element commit_p;
   rsto::compress(commit_p, commit);
 
