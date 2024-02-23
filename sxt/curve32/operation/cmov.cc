@@ -18,8 +18,8 @@
 
 #include "sxt/curve32/constant/identity.h"
 #include "sxt/curve32/type/element_cached.h"
-#include "sxt/field51/operation/cmov.h"
-#include "sxt/field51/operation/neg.h"
+#include "sxt/field32/operation/cmov.h"
+#include "sxt/field32/operation/neg.h"
 
 namespace sxt::c32o {
 //--------------------------------------------------------------------------------------------------
@@ -56,10 +56,10 @@ static inline unsigned char equal(signed char b, signed char c) noexcept {
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 void cmov(c32t::element_cached& t, const c32t::element_cached& u, unsigned char b) noexcept {
-  f51o::cmov(t.YplusX, u.YplusX, b);
-  f51o::cmov(t.YminusX, u.YminusX, b);
-  f51o::cmov(t.Z, u.Z, b);
-  f51o::cmov(t.T2d, u.T2d, b);
+  f32o::cmov(t.YplusX, u.YplusX, b);
+  f32o::cmov(t.YminusX, u.YminusX, b);
+  f32o::cmov(t.Z, u.Z, b);
+  f32o::cmov(t.T2d, u.T2d, b);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ CUDA_CALLABLE void cmov8(c32t::element_cached& t, const c32t::element_cached cac
   minust.YplusX = t.YminusX;
   minust.YminusX = t.YplusX;
   minust.Z = t.Z;
-  f51o::neg(minust.T2d, t.T2d);
+  f32o::neg(minust.T2d, t.T2d);
   cmov(t, minust, bnegative);
 }
 } // namespace sxt::c32o

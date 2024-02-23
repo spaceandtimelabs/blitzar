@@ -25,10 +25,10 @@
 
 #include "sxt/curve32/operation/add.h"
 
-#include "sxt/field51/operation/add.h"
-#include "sxt/field51/operation/mul.h"
-#include "sxt/field51/operation/sub.h"
-#include "sxt/field51/type/element.h"
+#include "sxt/field32/operation/add.h"
+#include "sxt/field32/operation/mul.h"
+#include "sxt/field32/operation/sub.h"
+#include "sxt/field32/type/element.h"
 
 namespace sxt::c32o {
 //--------------------------------------------------------------------------------------------------
@@ -39,18 +39,18 @@ namespace sxt::c32o {
  */
 CUDA_CALLABLE
 void add(c32t::element_p1p1& r, const c32t::element_p3& p, const c32t::element_cached& q) noexcept {
-  f51t::element t0;
+  f32t::element t0;
 
-  f51o::add(r.X, p.Y, p.X);
-  f51o::sub(r.Y, p.Y, p.X);
-  f51o::mul(r.Z, r.X, q.YplusX);
-  f51o::mul(r.Y, r.Y, q.YminusX);
-  f51o::mul(r.T, q.T2d, p.T);
-  f51o::mul(r.X, p.Z, q.Z);
-  f51o::add(t0, r.X, r.X);
-  f51o::sub(r.X, r.Z, r.Y);
-  f51o::add(r.Y, r.Z, r.Y);
-  f51o::add(r.Z, t0, r.T);
-  f51o::sub(r.T, t0, r.T);
+  f32o::add(r.X, p.Y, p.X);
+  f32o::sub(r.Y, p.Y, p.X);
+  f32o::mul(r.Z, r.X, q.YplusX);
+  f32o::mul(r.Y, r.Y, q.YminusX);
+  f32o::mul(r.T, q.T2d, p.T);
+  f32o::mul(r.X, p.Z, q.Z);
+  f32o::add(t0, r.X, r.X);
+  f32o::sub(r.X, r.Z, r.Y);
+  f32o::add(r.Y, r.Z, r.Y);
+  f32o::add(r.Z, t0, r.T);
+  f32o::sub(r.T, t0, r.T);
 }
 } // namespace sxt::c32o

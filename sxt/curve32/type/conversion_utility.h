@@ -30,10 +30,10 @@
 #include "sxt/curve32/type/element_p1p1.h"
 #include "sxt/curve32/type/element_p2.h"
 #include "sxt/curve32/type/element_p3.h"
-#include "sxt/field51/constant/d.h"
-#include "sxt/field51/operation/add.h"
-#include "sxt/field51/operation/mul.h"
-#include "sxt/field51/operation/sub.h"
+#include "sxt/field32/constant/d.h"
+#include "sxt/field32/operation/add.h"
+#include "sxt/field32/operation/mul.h"
+#include "sxt/field32/operation/sub.h"
 
 namespace sxt::c32t {
 struct element_p3;
@@ -44,10 +44,10 @@ struct element_cached;
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 inline void to_element_cached(element_cached& r, const element_p3& p) noexcept {
-  f51o::add(r.YplusX, p.Y, p.X);
-  f51o::sub(r.YminusX, p.Y, p.X);
+  f32o::add(r.YplusX, p.Y, p.X);
+  f32o::sub(r.YminusX, p.Y, p.X);
   r.Z = p.Z;
-  f51o::mul(r.T2d, p.T, f51t::element{f51cn::d2_v});
+  f32o::mul(r.T2d, p.T, f32t::element{f32cn::d2_v});
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -62,9 +62,9 @@ inline void to_element_p2(element_p2& r, const element_p3& p) noexcept {
 
 CUDA_CALLABLE
 inline void to_element_p2(element_p2& r, const element_p1p1& p) noexcept {
-  f51o::mul(r.X, p.X, p.T);
-  f51o::mul(r.Y, p.Y, p.Z);
-  f51o::mul(r.Z, p.Z, p.T);
+  f32o::mul(r.X, p.X, p.T);
+  f32o::mul(r.Y, p.Y, p.Z);
+  f32o::mul(r.Z, p.Z, p.T);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -73,10 +73,10 @@ inline void to_element_p2(element_p2& r, const element_p1p1& p) noexcept {
 namespace detail {
 template <class T>
 CUDA_CALLABLE inline void to_element_p3_impl(T& r, const element_p1p1& p) noexcept {
-  f51o::mul(r.X, p.X, p.T);
-  f51o::mul(r.Y, p.Y, p.Z);
-  f51o::mul(r.Z, p.Z, p.T);
-  f51o::mul(r.T, p.X, p.Y);
+  f32o::mul(r.X, p.X, p.T);
+  f32o::mul(r.Y, p.Y, p.Z);
+  f32o::mul(r.Z, p.Z, p.T);
+  f32o::mul(r.T, p.X, p.Y);
 }
 
 } // namespace detail

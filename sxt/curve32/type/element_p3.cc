@@ -18,7 +18,7 @@
 
 #include <iostream>
 
-#include "sxt/field51/operation/mul.h"
+#include "sxt/field32/operation/mul.h"
 
 namespace sxt::c32t {
 //--------------------------------------------------------------------------------------------------
@@ -40,14 +40,14 @@ bool is_marked(const element_p3& e) noexcept { return e.Z[4] != unset_marker_v; 
 // operator==
 //--------------------------------------------------------------------------------------------------
 bool operator==(const element_p3& lhs, const element_p3& rhs) noexcept {
-  f51t::element lhs_p, rhs_p;
-  f51o::mul(lhs_p, lhs.X, rhs.Z);
-  f51o::mul(rhs_p, rhs.X, lhs.Z);
+  f32t::element lhs_p, rhs_p;
+  f32o::mul(lhs_p, lhs.X, rhs.Z);
+  f32o::mul(rhs_p, rhs.X, lhs.Z);
   if (lhs_p != rhs_p) {
     return false;
   }
-  f51o::mul(lhs_p, lhs.Y, rhs.Z);
-  f51o::mul(rhs_p, rhs.Y, lhs.Z);
+  f32o::mul(lhs_p, lhs.Y, rhs.Z);
+  f32o::mul(rhs_p, rhs.Y, lhs.Z);
   return lhs_p == rhs_p;
 }
 

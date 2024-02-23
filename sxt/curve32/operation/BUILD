@@ -6,10 +6,10 @@ load(
 sxt_cc_component(
     name = "add",
     impl_deps = [
-        "//sxt/field51/type:element",
-        "//sxt/field51/operation:add",
-        "//sxt/field51/operation:sub",
-        "//sxt/field51/operation:mul",
+        "//sxt/field32/type:element",
+        "//sxt/field32/operation:add",
+        "//sxt/field32/operation:sub",
+        "//sxt/field32/operation:mul",
     ],
     is_cuda = True,
     test_deps = [
@@ -22,7 +22,7 @@ sxt_cc_component(
         "//sxt/curve32/type:element_p1p1",
         "//sxt/curve32/type:element_p2",
         "//sxt/curve32/type:element_p3",
-        "//sxt/field51/constant:d",
+        "//sxt/field32/constant:d",
     ],
 )
 
@@ -31,8 +31,8 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/curve32/constant:identity",
         "//sxt/curve32/type:element_cached",
-        "//sxt/field51/operation:neg",
-        "//sxt/field51/operation:cmov",
+        "//sxt/field32/operation:neg",
+        "//sxt/field32/operation:cmov",
     ],
     is_cuda = True,
     test_deps = [
@@ -48,8 +48,8 @@ sxt_cc_component(
     impl_deps = [
         ":add",
         "//sxt/curve32/type:element_p3",
-        "//sxt/field51/operation:neg",
-        "//sxt/field51/operation:cmov",
+        "//sxt/field32/operation:neg",
+        "//sxt/field32/operation:cmov",
     ],
     is_cuda = True,
     test_deps = [
@@ -64,10 +64,10 @@ sxt_cc_component(
 sxt_cc_component(
     name = "double",
     impl_deps = [
-        "//sxt/field51/type:element",
-        "//sxt/field51/operation:add",
-        "//sxt/field51/operation:sub",
-        "//sxt/field51/operation:sq",
+        "//sxt/field32/type:element",
+        "//sxt/field32/operation:add",
+        "//sxt/field32/operation:sub",
+        "//sxt/field32/operation:sq",
     ],
     is_cuda = True,
     test_deps = [
@@ -97,10 +97,10 @@ sxt_cc_component(
         "//sxt/curve32/type:element_p1p1",
         "//sxt/curve32/type:element_p2",
         "//sxt/curve32/type:element_p3",
-        "//sxt/field51/type:element",
-        "//sxt/field51/operation:add",
-        "//sxt/field51/operation:sub",
-        "//sxt/field51/operation:sq",
+        "//sxt/field32/type:element",
+        "//sxt/field32/operation:add",
+        "//sxt/field32/operation:sub",
+        "//sxt/field32/operation:sq",
     ],
     is_cuda = True,
     test_deps = [

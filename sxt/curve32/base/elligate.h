@@ -16,7 +16,7 @@
  */
 #pragma once
 
-namespace sxt::f51t {
+namespace sxt::f32t {
 class element;
 }
 
@@ -24,6 +24,6 @@ namespace sxt::c32b {
 //--------------------------------------------------------------------------------------------------
 // apply_elligator
 //--------------------------------------------------------------------------------------------------
-void apply_elligator(f51t::element& x, f51t::element& y, int* notsquare_p,
-                     const f51t::element& r) noexcept;
+void apply_elligator(f32t::element& x, f32t::element& y, int* notsquare_p,
+                     const f32t::element& r) noexcept;
 } // namespace sxt::c32b

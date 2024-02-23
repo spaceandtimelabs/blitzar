@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include "sxt/field51/type/element.h"
+#include "sxt/field32/type/element.h"
 
 namespace sxt::c32t {
 //--------------------------------------------------------------------------------------------------
@@ -26,9 +26,9 @@ namespace sxt::c32t {
  *   (completed): ((X:Z),(Y:T)) satisfying x=X/Z, y=Y/T
  */
 struct element_p1p1 {
-  f51t::element X;
-  f51t::element Y;
-  f51t::element Z;
-  f51t::element T;
+  f32t::element X;
+  f32t::element Y;
+  f32t::element Z;
+  f32t::element T;
 };
 } // namespace sxt::c32t

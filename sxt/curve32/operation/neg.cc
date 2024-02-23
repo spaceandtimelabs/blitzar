@@ -26,8 +26,8 @@
 #include "sxt/curve32/operation/neg.h"
 
 #include "sxt/curve32/type/element_p3.h"
-#include "sxt/field51/operation/cmov.h"
-#include "sxt/field51/operation/neg.h"
+#include "sxt/field32/operation/cmov.h"
+#include "sxt/field32/operation/neg.h"
 
 namespace sxt::c32o {
 //--------------------------------------------------------------------------------------------------
@@ -35,10 +35,10 @@ namespace sxt::c32o {
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 void neg(c32t::element_p3& r, const c32t::element_p3& p) noexcept {
-  f51o::neg(r.X, p.X);
+  f32o::neg(r.X, p.X);
   r.Y = p.Y;
   r.Z = p.Z;
-  f51o::neg(r.T, p.T);
+  f32o::neg(r.T, p.T);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -47,10 +47,10 @@ void neg(c32t::element_p3& r, const c32t::element_p3& p) noexcept {
 /* r = -r if b = 1 else r */
 CUDA_CALLABLE
 void cneg(c32t::element_p3& r, unsigned int b) noexcept {
-  f51t::element t;
-  f51o::neg(t, r.X);
-  f51o::cmov(r.X, t, b);
-  f51o::neg(t, r.T);
-  f51o::cmov(r.T, t, b);
+  f32t::element t;
+  f32o::neg(t, r.X);
+  f32o::cmov(r.X, t, b);
+  f32o::neg(t, r.T);
+  f32o::cmov(r.T, t, b);
 }
 } // namespace sxt::c32o
