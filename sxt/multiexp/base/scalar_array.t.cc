@@ -33,6 +33,30 @@ using namespace sxt::mtxb;
 TEST_CASE("we can copy transpose scalar arrays to device memory") {
   memmg::managed_array<uint8_t> array{memr::get_managed_device_resource()};
 
+  SECTION("we can transpose a single scalar of 1 bytes") {
+    std::vector<uint8_t> scalars1(1);
+    scalars1[0] = 123u;
+    array.resize(1);
+    std::vector<const uint8_t*> scalars = {scalars1.data()};
+    auto fut = transpose_scalars_to_device(array, scalars, 1,  1);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(array[0] == 123u);
+  }
+
+  SECTION("we can transpose a single scalar of 2 bytes") {
+    std::vector<uint8_t> scalars1(2);
+    scalars1[0] = 1u;
+    scalars1[1] = 2u;
+    array.resize(2);
+    std::vector<const uint8_t*> scalars = {scalars1.data()};
+    auto fut = transpose_scalars_to_device(array, scalars, 2,  1);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(array[0] == 1u);
+    REQUIRE(array[1] == 2u);
+  }
+
   SECTION("we can transpose a single scalar of 32 bytes") {
     std::vector<uint8_t> scalars1(32);
     std::iota(scalars1.begin(), scalars1.end(), 0);
@@ -43,6 +67,32 @@ TEST_CASE("we can copy transpose scalar arrays to device memory") {
     REQUIRE(fut.ready());
     REQUIRE(array[0] == 0u);
     REQUIRE(array[31u] == 31u);
+  }
+
+  SECTION("we can transpose two scalars of 1 byte") {
+    std::vector<uint8_t> scalars1(2);
+    std::iota(scalars1.begin(), scalars1.end(), 0);
+    array.resize(2);
+    std::vector<const uint8_t*> scalars = {scalars1.data()};
+    auto fut = transpose_scalars_to_device(array, scalars, 1, 2);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(array[0] == 0u);
+    REQUIRE(array[1] == 1u);
+  }
+
+  SECTION("we can transpose two scalars of 2 byte") {
+    std::vector<uint8_t> scalars1(4);
+    std::iota(scalars1.begin(), scalars1.end(), 0);
+    array.resize(4);
+    std::vector<const uint8_t*> scalars = {scalars1.data()};
+    auto fut = transpose_scalars_to_device(array, scalars, 2, 2);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(array[0] == 0u);
+    REQUIRE(array[1] == 2u);
+    REQUIRE(array[2] == 1u);
+    REQUIRE(array[3] == 3u);
   }
 
   SECTION("we can transpose two scalars of 32 bytes") {
