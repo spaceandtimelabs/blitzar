@@ -22,7 +22,7 @@
 #include "sxt/base/container/span.h"
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::c21t {
+namespace sxt::c32t {
 struct element_p3;
 }
 namespace sxt::rstt {

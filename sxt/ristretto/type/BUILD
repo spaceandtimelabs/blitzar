@@ -17,14 +17,14 @@ sxt_cc_component(
     name = "literal",
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/curve21/property:curve",
+        "//sxt/curve32/property:curve",
     ],
     deps = [
         ":compressed_element",
         "//sxt/base/type:literal",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/field51/base:byte_conversion",
-        "//sxt/field51/type:element",
+        "//sxt/curve32/type:element_p3",
+        "//sxt/field32/base:byte_conversion",
+        "//sxt/field32/type:element",
         "//sxt/ristretto/base:byte_conversion",
         "//sxt/ristretto/base:point_formation",
     ],

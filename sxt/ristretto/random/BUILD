@@ -8,9 +8,9 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/macro:cuda_warning",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/field51/random:element",
-        "//sxt/field51/type:element",
+        "//sxt/curve32/type:element_p3",
+        "//sxt/field32/random:element",
+        "//sxt/field32/type:element",
         "//sxt/ristretto/base:byte_conversion",
         "//sxt/ristretto/base:point_formation",
         "//sxt/ristretto/type:compressed_element",
@@ -19,7 +19,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
-        "//sxt/curve21/property:curve",
+        "//sxt/curve32/property:curve",
     ],
     deps = [
         "//sxt/base/container:span",
