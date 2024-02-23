@@ -18,29 +18,32 @@
 
 #include "sxt/algorithm/base/reducer.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/operation/double.h"
-#include "sxt/curve21/operation/neg.h"
-#include "sxt/curve21/operation/overload.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/operation/add.h"
+#include "sxt/curve32/operation/double.h"
+#include "sxt/curve32/operation/neg.h"
+#include "sxt/curve32/operation/overload.h"
+#include "sxt/curve32/type/element_p3.h"
 
 using namespace sxt;
 using namespace sxt::mtxcrv;
 
-TEST_CASE("accumulator reduces curve21 elements") {
-  c21t::element_p3 e1{
-      {3990542415680775, 3398198340507945, 4322667446711068, 2814063955482877, 2839572215813860},
-      {1801439850948184, 1351079888211148, 450359962737049, 900719925474099, 1801439850948198},
-      {1, 0, 0, 0, 0},
-      {1841354044333475, 16398895984059, 755974180946558, 900171276175154, 1821297809914039},
+TEST_CASE("accumulator reduces curve32 elements") {
+  c32t::element_p3 e1{
+      {0x325d51a, 0x18b5823, 0xf6592a, 0x104a92d, 0x1a4b31d, 0x1d6dc5c, 0x27118fe, 0x7fd814,
+       0x13cd6e5, 0x85a4db},
+      {0x2666658, 0x1999999, 0xcccccc, 0x1333333, 0x1999999, 0x666666, 0x3333333, 0xcccccc,
+       0x2666666, 0x1999999},
+      {1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0x1b7dda3, 0x1a2ace9, 0x25eadbb, 0x3ba8a, 0x83c27e, 0xabe37d, 0x1274732, 0xccacdd, 0xfd78b7,
+       0x19e1d7c},
   };
 
-  REQUIRE(algb::reducer<accumulator<c21t::element_p3>>);
+  REQUIRE(algb::reducer<accumulator<c32t::element_p3>>);
 
-  SECTION("we can accumulate curve21 elements") {
+  SECTION("we can accumulate curve32 elements") {
     auto p1 = 2 * e1;
     auto p2 = 3 * e1;
-    accumulator<c21t::element_p3>::accumulate_inplace(p1, p2);
+    accumulator<c32t::element_p3>::accumulate_inplace(p1, p2);
     REQUIRE(p1 == 5 * e1);
   }
 }

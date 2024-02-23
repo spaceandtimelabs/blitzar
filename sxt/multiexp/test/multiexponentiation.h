@@ -22,7 +22,7 @@
 #include "sxt/base/functional/function_ref.h"
 #include "sxt/memory/management/managed_array_fwd.h"
 
-namespace sxt::c21t {
+namespace sxt::c32t {
 struct element_p3;
 }
 namespace sxt::mtxb {
@@ -33,8 +33,8 @@ namespace sxt::mtxtst {
 //--------------------------------------------------------------------------------------------------
 // multiexponentiation_fn
 //--------------------------------------------------------------------------------------------------
-using multiexponentiation_fn = basf::function_ref<memmg::managed_array<c21t::element_p3>(
-    basct::cspan<c21t::element_p3>, basct::cspan<mtxb::exponent_sequence> exponents)>;
+using multiexponentiation_fn = basf::function_ref<memmg::managed_array<c32t::element_p3>(
+    basct::cspan<c32t::element_p3>, basct::cspan<mtxb::exponent_sequence> exponents)>;
 
 //--------------------------------------------------------------------------------------------------
 // exercise_multiexponentiation_fn

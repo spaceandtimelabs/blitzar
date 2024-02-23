@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/test/curve21_arithmetic.h"
+#include "sxt/multiexp/test/curve32_arithmetic.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -26,18 +26,18 @@
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/constexpr_switch.h"
 #include "sxt/base/type/int.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/operation/neg.h"
-#include "sxt/curve21/operation/scalar_multiply.h"
-#include "sxt/curve21/property/curve.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/operation/add.h"
+#include "sxt/curve32/operation/neg.h"
+#include "sxt/curve32/operation/scalar_multiply.h"
+#include "sxt/curve32/property/curve.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 
 namespace sxt::mtxtst {
 //--------------------------------------------------------------------------------------------------
 // read_exponent
 //--------------------------------------------------------------------------------------------------
-static void read_exponent(c21t::element_p3& e, basct::span<uint8_t>& exponent,
+static void read_exponent(c32t::element_p3& e, basct::span<uint8_t>& exponent,
                           const mtxb::exponent_sequence& sequence, size_t index) noexcept {
   uint8_t element_nbytes = sequence.element_nbytes;
   exponent = {exponent.data(), element_nbytes};
@@ -55,38 +55,38 @@ static void read_exponent(c21t::element_p3& e, basct::span<uint8_t>& exponent,
         if (x == abs_x) {
           return;
         }
-        c21o::neg(e, e);
+        c32o::neg(e, e);
         std::copy_n(reinterpret_cast<uint8_t*>(&abs_x), element_nbytes, exponent.begin());
       });
 }
 
 //--------------------------------------------------------------------------------------------------
-// sum_curve21_elements
+// sum_curve32_elements
 //--------------------------------------------------------------------------------------------------
-void sum_curve21_elements(basct::span<c21t::element_p3> result,
+void sum_curve32_elements(basct::span<c32t::element_p3> result,
                           basct::cspan<basct::cspan<uint64_t>> terms,
-                          basct::cspan<c21t::element_p3> inputs) noexcept {
+                          basct::cspan<c32t::element_p3> inputs) noexcept {
   SXT_RELEASE_ASSERT(result.size() == terms.size());
   for (size_t result_index = 0; result_index < result.size(); ++result_index) {
     auto& res_i = result[result_index];
-    res_i = c21t::element_p3::identity();
+    res_i = c32t::element_p3::identity();
     for (auto term_index : terms[result_index]) {
       SXT_RELEASE_ASSERT(term_index < inputs.size());
-      c21o::add(res_i, res_i, inputs[term_index]);
+      c32o::add(res_i, res_i, inputs[term_index]);
     }
   }
 }
 
 //--------------------------------------------------------------------------------------------------
-// mul_sum_curve21_elements
+// mul_sum_curve32_elements
 //--------------------------------------------------------------------------------------------------
-void mul_sum_curve21_elements(basct::span<c21t::element_p3> result,
-                              basct::cspan<c21t::element_p3> generators,
+void mul_sum_curve32_elements(basct::span<c32t::element_p3> result,
+                              basct::cspan<c32t::element_p3> generators,
                               basct::cspan<mtxb::exponent_sequence> sequences) noexcept {
   SXT_RELEASE_ASSERT(result.size() == sequences.size());
   SXT_STACK_ARRAY(exponent, 32, uint8_t);
   for (size_t output_index = 0; output_index < result.size(); ++output_index) {
-    c21t::element_p3 output = c21t::element_p3::identity();
+    c32t::element_p3 output = c32t::element_p3::identity();
     auto sequence = sequences[output_index];
     SXT_RELEASE_ASSERT(sequence.n <= generators.size());
     for (size_t generator_index = 0; generator_index < sequence.n; ++generator_index) {
@@ -94,17 +94,17 @@ void mul_sum_curve21_elements(basct::span<c21t::element_p3> result,
       read_exponent(e, exponent, sequence, generator_index);
       if (exponent.size() == 32) {
         // split multiplication into multiple steps to avoid a scalar25 reduction -- this allows us
-        // to compare curve21 elements directly
-        c21o::scalar_multiply(e, exponent.subspan(1), e);
-        c21o::scalar_multiply(e, 1ul << 8, e);
-        c21o::add(output, output, e);
+        // to compare curve32 elements directly
+        c32o::scalar_multiply(e, exponent.subspan(1), e);
+        c32o::scalar_multiply(e, 1ul << 8, e);
+        c32o::add(output, output, e);
         e = generators[generator_index];
-        c21o::scalar_multiply(e, exponent.subspan(0, 1), e);
+        c32o::scalar_multiply(e, exponent.subspan(0, 1), e);
       } else {
-        c21o::scalar_multiply(e, exponent, e);
+        c32o::scalar_multiply(e, exponent, e);
       }
-      SXT_RELEASE_ASSERT(c21p::is_on_curve(e));
-      c21o::add(output, output, e);
+      SXT_RELEASE_ASSERT(c32p::is_on_curve(e));
+      c32o::add(output, output, e);
     }
     result[output_index] = output;
   }

@@ -16,7 +16,7 @@ sxt_cc_component(
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/base/error:assert",
         "//sxt/base/memory:alloc_utility",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/type:element_p3",
         "//sxt/ristretto/random:element",
     ],
     with_test = False,

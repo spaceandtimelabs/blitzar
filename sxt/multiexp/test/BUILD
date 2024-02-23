@@ -15,7 +15,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "curve21_arithmetic",
+    name = "curve32_arithmetic",
     impl_deps = [
         "//sxt/base/container:stack_array",
         "//sxt/base/num:abs",
@@ -23,11 +23,11 @@ sxt_cc_component(
         "//sxt/base/num:ceil_log2",
         "//sxt/base/type:int",
         "//sxt/multiexp/base:exponent_sequence",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/operation:add",
-        "//sxt/curve21/operation:neg",
-        "//sxt/curve21/operation:scalar_multiply",
-        "//sxt/curve21/property:curve",
+        "//sxt/curve32/type:element_p3",
+        "//sxt/curve32/operation:add",
+        "//sxt/curve32/operation:neg",
+        "//sxt/curve32/operation:scalar_multiply",
+        "//sxt/curve32/property:curve",
     ],
     with_test = False,
     deps = [
@@ -49,9 +49,9 @@ sxt_cc_component(
 sxt_cc_component(
     name = "multiexponentiation",
     impl_deps = [
-        ":curve21_arithmetic",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/operation:overload",
+        ":curve32_arithmetic",
+        "//sxt/curve32/type:element_p3",
+        "//sxt/curve32/operation:overload",
         "//sxt/ristretto/type:literal",
         "//sxt/ristretto/operation:compression",
         "//sxt/multiexp/base:exponent_sequence",

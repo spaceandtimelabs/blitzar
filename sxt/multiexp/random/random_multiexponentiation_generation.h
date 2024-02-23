@@ -26,7 +26,7 @@
 namespace sxt::mtxb {
 struct exponent_sequence;
 }
-namespace sxt::c21t {
+namespace sxt::c32t {
 struct element_p3;
 }
 
@@ -46,7 +46,7 @@ void generate_random_multiexponentiation(
     const random_multiexponentiation_descriptor& descriptor) noexcept;
 
 void generate_random_multiexponentiation(
-    basct::span<c21t::element_p3>& inputs, basct::span<mtxb::exponent_sequence>& exponents,
+    basct::span<c32t::element_p3>& inputs, basct::span<mtxb::exponent_sequence>& exponents,
     basm::alloc_t alloc, std::mt19937& rng,
     const random_multiexponentiation_descriptor& descriptor) noexcept;
 } // namespace sxt::mtxrn
