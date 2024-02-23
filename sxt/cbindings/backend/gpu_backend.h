@@ -32,7 +32,7 @@ public:
 
   void compute_commitments(basct::span<rstt::compressed_element> commitments,
                            basct::cspan<mtxb::exponent_sequence> value_sequences,
-                           basct::cspan<c21t::element_p3> generators) const noexcept override;
+                           basct::cspan<c32t::element_p3> generators) const noexcept override;
 
   void compute_commitments(basct::span<cg1t::compressed_element> commitments,
                            basct::cspan<mtxb::exponent_sequence> value_sequences,
@@ -42,8 +42,8 @@ public:
                            basct::cspan<mtxb::exponent_sequence> value_sequences,
                            basct::cspan<cn1t::element_p2> generators) const noexcept override;
 
-  basct::cspan<c21t::element_p3>
-  get_precomputed_generators(std::vector<c21t::element_p3>& temp_generators, uint64_t n,
+  basct::cspan<c32t::element_p3>
+  get_precomputed_generators(std::vector<c32t::element_p3>& temp_generators, uint64_t n,
                              uint64_t offset_generators) const noexcept override;
 
   void prove_inner_product(basct::span<rstt::compressed_element> l_vector,
@@ -52,7 +52,7 @@ public:
                            basct::cspan<s25t::element> a_vector) const noexcept override;
 
   bool verify_inner_product(prft::transcript& transcript, const prfip::proof_descriptor& descriptor,
-                            const s25t::element& product, const c21t::element_p3& a_commit,
+                            const s25t::element& product, const c32t::element_p3& a_commit,
                             basct::cspan<rstt::compressed_element> l_vector,
                             basct::cspan<rstt::compressed_element> r_vector,
                             const s25t::element& ap_value) const noexcept override;
