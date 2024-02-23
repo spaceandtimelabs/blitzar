@@ -37,7 +37,7 @@ TEST_CASE("we can copy transpose scalar arrays to device memory") {
     std::vector<uint8_t> scalars1(0);
     array.resize(0);
     std::vector<const uint8_t*> scalars = {scalars1.data()};
-    auto fut = transpose_scalars_to_device(array, scalars, 1,  0);
+    auto fut = transpose_scalars_to_device(array, scalars, 1, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
   }
@@ -47,7 +47,7 @@ TEST_CASE("we can copy transpose scalar arrays to device memory") {
     scalars1[0] = 123u;
     array.resize(1);
     std::vector<const uint8_t*> scalars = {scalars1.data()};
-    auto fut = transpose_scalars_to_device(array, scalars, 1,  1);
+    auto fut = transpose_scalars_to_device(array, scalars, 1, 1);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(array[0] == 123u);
@@ -59,7 +59,7 @@ TEST_CASE("we can copy transpose scalar arrays to device memory") {
     scalars1[1] = 2u;
     array.resize(2);
     std::vector<const uint8_t*> scalars = {scalars1.data()};
-    auto fut = transpose_scalars_to_device(array, scalars, 2,  1);
+    auto fut = transpose_scalars_to_device(array, scalars, 2, 1);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(array[0] == 1u);
@@ -71,7 +71,7 @@ TEST_CASE("we can copy transpose scalar arrays to device memory") {
     std::iota(scalars1.begin(), scalars1.end(), 0);
     array.resize(32);
     std::vector<const uint8_t*> scalars = {scalars1.data()};
-    auto fut = transpose_scalars_to_device(array, scalars, 32,  1);
+    auto fut = transpose_scalars_to_device(array, scalars, 32, 1);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(array[0] == 0u);

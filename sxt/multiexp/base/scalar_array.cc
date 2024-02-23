@@ -53,8 +53,7 @@ static __global__ void transpose_kernel(uint8_t* __restrict__ dst,
   auto tile_index = blockIdx.x;
   auto output_index = blockIdx.y;
   auto num_tiles = gridDim.x;
-  auto n_per_tile =
-      basn::divide_up(basn::divide_up(n, NumBytes), num_tiles) * NumBytes;
+  auto n_per_tile = basn::divide_up(basn::divide_up(n, NumBytes), num_tiles) * NumBytes;
 
   auto first = tile_index * n_per_tile;
   auto m = min(n_per_tile, n - first);
@@ -110,7 +109,7 @@ xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
   memr::async_device_resource resource{stream};
   memmg::managed_array<uint8_t> array_p{array.size(), &resource};
   auto num_bytes_per_output = element_num_bytes * n;
-  for (size_t output_index=0; output_index<num_outputs; ++output_index) {
+  for (size_t output_index = 0; output_index < num_outputs; ++output_index) {
     basdv::async_copy_host_to_device(
         basct::subspan(array_p, output_index * num_bytes_per_output, num_bytes_per_output),
         basct::cspan<uint8_t>{scalars[output_index], num_bytes_per_output}, stream);
