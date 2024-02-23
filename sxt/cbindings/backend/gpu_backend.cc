@@ -19,10 +19,10 @@
 #include <vector>
 
 #include "sxt/base/error/assert.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/operation/double.h"
-#include "sxt/curve21/operation/neg.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/operation/add.h"
+#include "sxt/curve32/operation/double.h"
+#include "sxt/curve32/operation/neg.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/curve_bng1/operation/add.h"
 #include "sxt/curve_bng1/operation/double.h"
 #include "sxt/curve_bng1/operation/neg.h"
@@ -58,7 +58,7 @@ namespace sxt::cbnbck {
 //--------------------------------------------------------------------------------------------------
 static void pre_initialize_gpu() noexcept {
   // A small dummy computation to avoid the future cost of JIT compiling PTX code
-  memmg::managed_array<c21t::element_p3> generators = {
+  memmg::managed_array<c32t::element_p3> generators = {
       0x123_rs,
   };
   memmg::managed_array<uint8_t> data = {1};
@@ -70,7 +70,7 @@ static void pre_initialize_gpu() noexcept {
       },
   };
   auto fut =
-      mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(generators, value_sequences);
+      mtxcrv::async_compute_multiexponentiation<c32t::element_p3>(generators, value_sequences);
   xens::get_scheduler().run();
 }
 
@@ -84,9 +84,9 @@ gpu_backend::gpu_backend() noexcept { pre_initialize_gpu(); }
 //--------------------------------------------------------------------------------------------------
 void gpu_backend::compute_commitments(basct::span<rstt::compressed_element> commitments,
                                       basct::cspan<mtxb::exponent_sequence> value_sequences,
-                                      basct::cspan<c21t::element_p3> generators) const noexcept {
+                                      basct::cspan<c32t::element_p3> generators) const noexcept {
   auto fut =
-      mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(generators, value_sequences);
+      mtxcrv::async_compute_multiexponentiation<c32t::element_p3>(generators, value_sequences);
   xens::get_scheduler().run();
   rsto::batch_compress(commitments, fut.value());
 }
@@ -118,8 +118,8 @@ void gpu_backend::compute_commitments(basct::span<cn1t::element_affine> commitme
 //--------------------------------------------------------------------------------------------------
 // get_precomputed_generators
 //--------------------------------------------------------------------------------------------------
-basct::cspan<c21t::element_p3>
-gpu_backend::get_precomputed_generators(std::vector<c21t::element_p3>& temp_generators, uint64_t n,
+basct::cspan<c32t::element_p3>
+gpu_backend::get_precomputed_generators(std::vector<c32t::element_p3>& temp_generators, uint64_t n,
                                         uint64_t offset_generators) const noexcept {
   return sqcgn::get_precomputed_generators(temp_generators, n, offset_generators, true);
 }
@@ -145,7 +145,7 @@ void gpu_backend::prove_inner_product(basct::span<rstt::compressed_element> l_ve
 bool gpu_backend::verify_inner_product(prft::transcript& transcript,
                                        const prfip::proof_descriptor& descriptor,
                                        const s25t::element& product,
-                                       const c21t::element_p3& a_commit,
+                                       const c32t::element_p3& a_commit,
                                        basct::cspan<rstt::compressed_element> l_vector,
                                        basct::cspan<rstt::compressed_element> r_vector,
                                        const s25t::element& ap_value) const noexcept {
