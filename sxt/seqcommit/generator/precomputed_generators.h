@@ -21,7 +21,7 @@
 
 #include "sxt/base/container/span.h"
 
-namespace sxt::c21t {
+namespace sxt::c32t {
 struct element_p3;
 }
 
@@ -34,9 +34,9 @@ void init_precomputed_generators(size_t n, bool use_gpu) noexcept;
 //--------------------------------------------------------------------------------------------------
 // get_precomputed_generators
 //--------------------------------------------------------------------------------------------------
-basct::cspan<c21t::element_p3> get_precomputed_generators() noexcept;
+basct::cspan<c32t::element_p3> get_precomputed_generators() noexcept;
 
-basct::cspan<c21t::element_p3>
-get_precomputed_generators(std::vector<c21t::element_p3>& generators_data,
+basct::cspan<c32t::element_p3>
+get_precomputed_generators(std::vector<c32t::element_p3>& generators_data,
                            size_t length_longest_sequence, size_t offset, bool use_gpu) noexcept;
 } // namespace sxt::sqcgn
