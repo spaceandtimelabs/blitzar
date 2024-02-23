@@ -9,7 +9,7 @@ sxt_cc_component(
         "//sxt/base/error:assert",
         "//sxt/ristretto/base:byte_conversion",
         "//sxt/ristretto/type:compressed_element",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/type:element_p3",
     ],
     with_test = False,
     deps = [
@@ -21,8 +21,8 @@ sxt_cc_component(
     name = "add",
     impl_deps = [
         "//sxt/ristretto/type:compressed_element",
-        "//sxt/curve21/operation:add",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/operation:add",
+        "//sxt/curve32/type:element_p3",
         "//sxt/ristretto/base:byte_conversion",
     ],
     is_cuda = True,
@@ -39,8 +39,8 @@ sxt_cc_component(
     impl_deps = [
         ":add",
         "//sxt/ristretto/type:compressed_element",
-        "//sxt/curve21/operation:scalar_multiply",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/operation:scalar_multiply",
+        "//sxt/curve32/type:element_p3",
         "//sxt/ristretto/base:byte_conversion",
     ],
     is_cuda = True,
@@ -58,13 +58,13 @@ sxt_cc_component(
     impl_deps = [
         ":compression",
         "//sxt/ristretto/type:compressed_element",
-        "//sxt/curve21/operation:overload",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/operation:overload",
+        "//sxt/curve32/type:element_p3",
     ],
     test_deps = [
         ":compression",
         "//sxt/base/test:unit_test",
-        "//sxt/curve21/operation:overload",
+        "//sxt/curve32/operation:overload",
         "//sxt/ristretto/type:literal",
         "//sxt/scalar25/type:literal",
     ],

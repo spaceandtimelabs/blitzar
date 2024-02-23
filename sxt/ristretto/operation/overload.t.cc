@@ -17,7 +17,7 @@
 #include "sxt/ristretto/operation/overload.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/operation/overload.h"
+#include "sxt/curve32/operation/overload.h"
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/literal.h"
 #include "sxt/scalar25/type/literal.h"

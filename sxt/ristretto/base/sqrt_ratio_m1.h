@@ -18,7 +18,7 @@
 
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::f51t {
+namespace sxt::f32t {
 class element;
 }
 
@@ -27,6 +27,6 @@ namespace sxt::rstb {
 // compute_sqrt_ratio_m1
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-int compute_sqrt_ratio_m1(f51t::element& x, const f51t::element& u,
-                          const f51t::element& v) noexcept;
+int compute_sqrt_ratio_m1(f32t::element& x, const f32t::element& u,
+                          const f32t::element& v) noexcept;
 } // namespace sxt::rstb
