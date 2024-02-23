@@ -17,7 +17,7 @@
 #include "sxt/seqcommit/generator/precomputed_one_commitments.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/seqcommit/generator/cpu_one_commitments.h"
 
 using namespace sxt;

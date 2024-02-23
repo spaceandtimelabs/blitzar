@@ -17,7 +17,7 @@
 #include "sxt/seqcommit/generator/precomputed_generators.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
 using namespace sxt;
@@ -34,14 +34,14 @@ TEST_CASE("we can precompute generators") {
   REQUIRE(generators.size() == 10);
 
   // the precomputed generators match the computed values
-  c21t::element_p3 e;
+  c32t::element_p3 e;
   compute_base_element(e, 0);
   REQUIRE(generators[0] == e);
 
   compute_base_element(e, 9);
   REQUIRE(generators[9] == e);
 
-  std::vector<c21t::element_p3> data;
+  std::vector<c32t::element_p3> data;
   generators = get_precomputed_generators(data, 10, 0, false);
   REQUIRE(data.empty());
   compute_base_element(e, 9);

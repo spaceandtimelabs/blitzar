@@ -7,7 +7,7 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/base/functional:function_ref",
         "//sxt/base/test:unit_test",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/type:element_p3",
         "//sxt/seqcommit/generator:base_element",
     ],
 )

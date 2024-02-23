@@ -18,7 +18,7 @@
 
 #include <cstddef>
 
-namespace sxt::c21t {
+namespace sxt::c32t {
 struct element_p3;
 }
 

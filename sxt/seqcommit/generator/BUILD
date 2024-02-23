@@ -6,14 +6,14 @@ load(
 sxt_cc_component(
     name = "precomputed_generators",
     impl_deps = [
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/type:element_p3",
         "//sxt/seqcommit/generator:cpu_generator",
         "//sxt/seqcommit/generator:gpu_generator",
     ],
     test_deps = [
         ":base_element",
         "//sxt/base/test:unit_test",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/type:element_p3",
     ],
     deps = [
         "//sxt/base/container:span",
@@ -24,12 +24,12 @@ sxt_cc_component(
     name = "precomputed_one_commitments",
     impl_deps = [
         ":cpu_one_commitments",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/type:element_p3",
     ],
     test_deps = [
         ":cpu_one_commitments",
         "//sxt/base/test:unit_test",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/type:element_p3",
     ],
     deps = [
         "//sxt/base/container:span",
@@ -53,14 +53,14 @@ sxt_cc_component(
     name = "cpu_one_commitments",
     impl_deps = [
         ":precomputed_generators",
-        "//sxt/curve21/type:element_p3",
-        "//sxt/curve21/operation:add",
+        "//sxt/curve32/type:element_p3",
+        "//sxt/curve32/operation:add",
     ],
     test_deps = [
         ":cpu_generator",
         "//sxt/base/test:unit_test",
-        "//sxt/curve21/operation:add",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/operation:add",
+        "//sxt/curve32/type:element_p3",
     ],
     deps = [
         "//sxt/base/container:span",
@@ -71,7 +71,7 @@ sxt_cc_component(
     name = "base_element",
     impl_deps = [
         "//sxt/base/num:fast_random_number_generator",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/type:element_p3",
         "//sxt/ristretto/random:element",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/ristretto/base:byte_conversion",
@@ -89,7 +89,7 @@ sxt_cc_component(
     name = "cpu_generator",
     impl_deps = [
         ":base_element",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/type:element_p3",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
@@ -105,7 +105,7 @@ sxt_cc_component(
     impl_deps = [
         ":base_element",
         "//sxt/base/num:divide_up",
-        "//sxt/curve21/type:element_p3",
+        "//sxt/curve32/type:element_p3",
         "//sxt/base/device:memory_utility",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
