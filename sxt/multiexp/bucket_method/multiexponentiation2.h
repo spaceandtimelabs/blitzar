@@ -98,7 +98,7 @@ try_multiexponentiate2(basct::cspan<T> generators,
     co_return res;
   }
   auto n = max_n;
-  if (n > 1024) {
+  if (n > 1024 || n < 256) {
     co_return res;
   }
   SXT_DEBUG_ASSERT(generators.size() >= n);
