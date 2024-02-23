@@ -24,8 +24,8 @@
 #include "cbindings/backend.h"
 #include "cbindings/get_generators.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/operation/add.h"
+#include "sxt/curve32/type/element_p3.h"
 
 using namespace sxt;
 
@@ -34,10 +34,10 @@ static void initialize_backend(int backend, uint64_t precomputed_elements) {
   REQUIRE(sxt_init(&config) == 0);
 }
 
-static std::vector<c21t::element_p3> initialize_generators(int backend, uint64_t num_generators) {
+static std::vector<c32t::element_p3> initialize_generators(int backend, uint64_t num_generators) {
   initialize_backend(backend, 0);
 
-  std::vector<c21t::element_p3> generators(num_generators);
+  std::vector<c32t::element_p3> generators(num_generators);
   REQUIRE(sxt_ristretto255_get_generators(reinterpret_cast<sxt_ristretto255*>(generators.data()),
                                           num_generators, 0) == 0);
 
@@ -47,12 +47,12 @@ static std::vector<c21t::element_p3> initialize_generators(int backend, uint64_t
 }
 
 static void verify_one_commit(int backend, uint64_t num_precomputed_els, uint64_t n,
-                              const c21t::element_p3& expected_element) {
+                              const c32t::element_p3& expected_element) {
   initialize_backend(backend, num_precomputed_els);
 
   sxt_ristretto255 one_commitment;
   REQUIRE(sxt_curve25519_get_one_commit(&one_commitment, n) == 0);
-  REQUIRE(reinterpret_cast<c21t::element_p3*>(&one_commitment)[0] == expected_element);
+  REQUIRE(reinterpret_cast<c32t::element_p3*>(&one_commitment)[0] == expected_element);
 
   sxt::cbn::reset_backend_for_testing();
 }
@@ -62,7 +62,7 @@ static void test_one_commit_with_given_backend(int backend) {
 
   SECTION("The first one_commit should be the identity") {
     uint64_t num_precomputed_els = 0, one_commit_n = 0;
-    verify_one_commit(backend, num_precomputed_els, one_commit_n, c21t::element_p3::identity());
+    verify_one_commit(backend, num_precomputed_els, one_commit_n, c32t::element_p3::identity());
   }
 
   SECTION("The second one_commit should be equal to the first generator") {
@@ -71,8 +71,8 @@ static void test_one_commit_with_given_backend(int backend) {
   }
 
   SECTION("The third one_commit should be equal to the first + second generators") {
-    c21t::element_p3 sum_gen_0_1;
-    c21o::add(sum_gen_0_1, generators[0], generators[1]);
+    c32t::element_p3 sum_gen_0_1;
+    c32o::add(sum_gen_0_1, generators[0], generators[1]);
 
     uint64_t num_precomputed_els = 0, one_commit_n = 2;
     verify_one_commit(backend, num_precomputed_els, one_commit_n, sum_gen_0_1);
@@ -80,8 +80,8 @@ static void test_one_commit_with_given_backend(int backend) {
 
   SECTION("The third one_commit should be equal to the first + second generators even when we "
           "precompute elements") {
-    c21t::element_p3 sum_gen_0_1;
-    c21o::add(sum_gen_0_1, generators[0], generators[1]);
+    c32t::element_p3 sum_gen_0_1;
+    c32o::add(sum_gen_0_1, generators[0], generators[1]);
 
     uint64_t num_precomputed_els = 1, one_commit_n = 2;
     verify_one_commit(backend, num_precomputed_els, one_commit_n, sum_gen_0_1);

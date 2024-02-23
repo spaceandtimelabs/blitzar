@@ -21,7 +21,7 @@
 #include "cbindings/backend.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
 using namespace sxt;
@@ -50,9 +50,9 @@ static void verify_generator(const std::vector<sxt_ristretto255>& generators, ui
                              uint64_t offset) {
   SXT_DEBUG_ASSERT(generators.size() > index);
 
-  c21t::element_p3 expected_gi;
+  c32t::element_p3 expected_gi;
   sqcgn::compute_base_element(expected_gi, index + offset);
-  REQUIRE(expected_gi == reinterpret_cast<const c21t::element_p3*>(generators.data())[index]);
+  REQUIRE(expected_gi == reinterpret_cast<const c32t::element_p3*>(generators.data())[index]);
 }
 
 static void test_generators_with_given_backend(int backend) {

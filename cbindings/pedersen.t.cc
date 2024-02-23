@@ -22,7 +22,7 @@
 #include "cbindings/backend.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/curve_bng1/constant/generator.h"
 #include "sxt/curve_bng1/operation/add.h"
 #include "sxt/curve_bng1/operation/scalar_multiply.h"
@@ -57,9 +57,9 @@ static void initialize_backend(int backend, uint64_t precomputed_elements) {
 //--------------------------------------------------------------------------------------------------
 // compute_random_curve25519_generators
 //--------------------------------------------------------------------------------------------------
-static std::vector<c21t::element_p3> compute_random_curve25519_generators(uint64_t seq_length,
+static std::vector<c32t::element_p3> compute_random_curve25519_generators(uint64_t seq_length,
                                                                           uint64_t offset) {
-  std::vector<c21t::element_p3> generators(seq_length);
+  std::vector<c32t::element_p3> generators(seq_length);
 
   for (uint64_t i = 0; i < seq_length; ++i) {
     sqcgn::compute_base_element(generators[i], offset + i);
@@ -125,11 +125,11 @@ static sxt_sequence_descriptor make_sequence_descriptor(const std::vector<T>& da
 template <class T>
 static rstt::compressed_element
 compute_expected_ristretto255_commitment(const std::vector<T>& data,
-                                         const std::vector<c21t::element_p3>& generators) {
+                                         const std::vector<c32t::element_p3>& generators) {
   SXT_DEBUG_ASSERT(data.size() == generators.size());
 
   rstt::compressed_element expected_commitment;
-  rstb::to_bytes(expected_commitment.data(), c21t::element_p3::identity());
+  rstb::to_bytes(expected_commitment.data(), c32t::element_p3::identity());
 
   for (uint64_t i = 0; i < data.size(); ++i) {
     rstt::compressed_element aux_h;

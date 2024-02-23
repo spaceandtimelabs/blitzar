@@ -109,7 +109,7 @@ void sxt_curve25519_prove_inner_product(struct sxt_ristretto255_compressed* l_ve
 
   auto backend = sxt::cbn::get_backend();
 
-  std::vector<c21t::element_p3> temp_generators;
+  std::vector<c32t::element_p3> temp_generators;
   auto precomputed_generators =
       backend->get_precomputed_generators(temp_generators, np + 1, generators_offset);
 
@@ -146,7 +146,7 @@ int sxt_curve25519_verify_inner_product(struct sxt_transcript* transcript, uint6
 
   auto backend = sxt::cbn::get_backend();
 
-  std::vector<c21t::element_p3> temp_generators;
+  std::vector<c32t::element_p3> temp_generators;
   auto precomputed_generators =
       backend->get_precomputed_generators(temp_generators, np + 1, generators_offset);
 
@@ -158,7 +158,7 @@ int sxt_curve25519_verify_inner_product(struct sxt_transcript* transcript, uint6
   auto res = backend->verify_inner_product(
       *reinterpret_cast<prft::transcript*>(transcript), descriptor,
       *reinterpret_cast<const s25t::element*>(product),
-      *reinterpret_cast<const c21t::element_p3*>(a_commit),
+      *reinterpret_cast<const c32t::element_p3*>(a_commit),
       {reinterpret_cast<const rstt::compressed_element*>(l_vector), n_lg2},
       {reinterpret_cast<const rstt::compressed_element*>(r_vector), n_lg2},
       *reinterpret_cast<const s25t::element*>(ap_value));

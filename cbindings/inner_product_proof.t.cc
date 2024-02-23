@@ -23,8 +23,8 @@
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/operation/overload.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/operation/overload.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/scalar25/operation/overload.h"
@@ -49,7 +49,7 @@ static void initialize_backend(int backend, uint64_t precomputed_elements) noexc
 //--------------------------------------------------------------------------------------------------
 static void generate_inner_product_input(std::vector<s25t::element>& a_vector,
                                          std::vector<s25t::element>& b_vector,
-                                         std::vector<c21t::element_p3>& g_vector,
+                                         std::vector<c32t::element_p3>& g_vector,
                                          std::vector<rstt::compressed_element>& l_vector,
                                          std::vector<rstt::compressed_element>& r_vector, size_t n,
                                          size_t generators_offset) noexcept {
@@ -79,7 +79,7 @@ static void test_prove_and_verify_with_given_n(uint64_t n, uint64_t generators_o
 
   s25t::element ap_value;
   prft::transcript transcript{"abc"};
-  std::vector<c21t::element_p3> g_vector;
+  std::vector<c32t::element_p3> g_vector;
   std::vector<s25t::element> a_vector, b_vector;
   std::vector<rstt::compressed_element> l_vector, r_vector;
 
