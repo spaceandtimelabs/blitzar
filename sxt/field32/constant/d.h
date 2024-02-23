@@ -23,12 +23,12 @@ namespace sxt::f32cn {
 // d_v
 //--------------------------------------------------------------------------------------------------
 /* (-121665/121666) % p_v
- * 37095705934669439343138083508754565189542113879843219016388785533085940283555 
+ * 37095705934669439343138083508754565189542113879843219016388785533085940283555
  * 0x52036cee2b6ffe738cc740797779e89800700a4d4141d8ab75eb4dca135978a3
  * EDWARDS_D
  * https://github.com/dalek-cryptography/curve25519-dalek/blob/a62e4a5c573ca9a68503a6fbe47e3f189a4765b0/curve25519-dalek/src/backend/serial/u32/constants.rs#L33-L36
  */
-static constexpr f32t::element d_v = {56195235, 13857412, 51736253, 6949390, 114729,
+static constexpr f32t::element d_v = {56195235, 13857412, 51736253, 6949390,  114729,
                                       24766616, 60832955, 30306712, 48412415, 21499315};
 
 //--------------------------------------------------------------------------------------------------
@@ -53,20 +53,20 @@ static constexpr f32t::element d2_v = {45281625, 27714825, 36363642, 13898781, 2
  * https://github.com/dalek-cryptography/curve25519-dalek/blob/a62e4a5c573ca9a68503a6fbe47e3f189a4765b0/curve25519-dalek/src/backend/serial/u32/constants.rs#L43-L46
  */
 static constexpr f32t::element onemsqd_v = {6275446, 16937061, 44170319, 29780721, 11667076,
-                                            7397348, 39186143, 1766194, 42675006, 672202};
+                                            7397348, 39186143, 1766194,  42675006, 672202};
 
 //--------------------------------------------------------------------------------------------------
 // sqdmone_v
 //--------------------------------------------------------------------------------------------------
-/* (d - 1) ^ 2 
+/* (d - 1) ^ 2
  * ((d_v-1)^2)%p_v
  * 40440834346308536858101042469323190826248399146238708352240133220865137265952
  * 0x5968b37af66c22414cdcd32f529b4eebd29e4a2cb01e199931ad5aaa44ed4d20
  * EDWARDS_D_MINUS_ONE_SQUARED
- * https://github.com/dalek-cryptography/curve25519-dalek/blob/a62e4a5c573ca9a68503a6fbe47e3f189a4765b0/curve25519-dalek/src/backend/serial/u32/constants.rs#L48-L52 
+ * https://github.com/dalek-cryptography/curve25519-dalek/blob/a62e4a5c573ca9a68503a6fbe47e3f189a4765b0/curve25519-dalek/src/backend/serial/u32/constants.rs#L48-L52
  */
 static constexpr f32t::element sqdmone_v = {15551776, 22456977, 53683765, 23429360, 55212328,
-                                            10178283, 40474537, 4729243, 61826754, 23438029};
+                                            10178283, 40474537, 4729243,  61826754, 23438029};
 
 //--------------------------------------------------------------------------------------------------
 // sqrtadm1_v
@@ -76,6 +76,6 @@ static constexpr f32t::element sqdmone_v = {15551776, 22456977, 53683765, 234293
  * SQRT_AD_MINUS_ONE
  * https://github.com/dalek-cryptography/curve25519-dalek/blob/a62e4a5c573ca9a68503a6fbe47e3f189a4765b0/curve25519-dalek/src/backend/serial/u32/constants.rs#L54-L58
  */
-static constexpr f32t::element sqrtadm1_v = {24849947, 33400850, 43495378, 6347714, 46036536,
+static constexpr f32t::element sqrtadm1_v = {24849947, 33400850, 43495378, 6347714,  46036536,
                                              32887293, 41837720, 18186727, 66238516, 14525638};
 } // namespace sxt::f32cn
