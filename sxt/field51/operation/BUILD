@@ -92,9 +92,9 @@ sxt_cc_component(
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/field51/base:reduce",
         "//sxt/field51/type:element",
         "//sxt/field51/type:literal",
-        "//sxt/field51/base:reduce"
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
