@@ -20,7 +20,7 @@
 
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/curve21/operation/overload.h"
+#include "sxt/curve32/operation/overload.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/proof/inner_product/driver.h"
@@ -47,7 +47,7 @@ static void exercise_fold_commit(const driver& drv) {
 
   rstt::compressed_element l_value, r_value;
   rstt::compressed_element expected_l_value, expected_r_value;
-  c21t::element_p3 t;
+  c32t::element_p3 t;
 
   auto& g_vector = descriptor.g_vector;
   auto& b_vector = descriptor.b_vector;
@@ -125,7 +125,7 @@ static void exercise_fold(const driver& drv) {
 
   rstt::compressed_element l_value, r_value;
   rstt::compressed_element expected_l_value, expected_r_value;
-  c21t::element_p3 t;
+  c32t::element_p3 t;
 
   auto& g_vector = descriptor.g_vector;
   auto& b_vector = descriptor.b_vector;

@@ -20,9 +20,9 @@
 #include <cstring>
 
 #include "sxt/base/error/assert.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/operation/double.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/operation/add.h"
+#include "sxt/curve32/operation/double.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/scalar25/constant/max_bits.h"
 
 namespace sxt::prfip {
@@ -60,17 +60,17 @@ void decompose_generator_fold(basct::span<unsigned>& res, const s25t::element& m
 // fold_generators
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-void fold_generators(c21t::element_p3& res, basct::cspan<unsigned> decomposition,
-                     const c21t::element_p3& g_low, const c21t::element_p3& g_high) noexcept {
+void fold_generators(c32t::element_p3& res, basct::cspan<unsigned> decomposition,
+                     const c32t::element_p3& g_low, const c32t::element_p3& g_high) noexcept {
   if (decomposition.empty()) {
     // this should never happen
-    res = c21t::element_p3::identity();
+    res = c32t::element_p3::identity();
     return;
   }
-  c21t::element_p3 terms[3];
+  c32t::element_p3 terms[3];
   terms[0] = g_low;
   terms[1] = g_high;
-  c21o::add(terms[2], g_low, g_high);
+  c32o::add(terms[2], g_low, g_high);
 
   size_t bit_index = decomposition.size();
   --bit_index;
@@ -79,12 +79,12 @@ void fold_generators(c21t::element_p3& res, basct::cspan<unsigned> decomposition
 
   while (bit_index > 0) {
     auto term_index = decomposition[--bit_index];
-    c21o::double_element(res, res);
+    c32o::double_element(res, res);
     assert(term_index < 4);
     if (term_index == 0) {
       continue;
     }
-    c21o::add(res, res, terms[term_index - 1]);
+    c32o::add(res, res, terms[term_index - 1]);
   }
 }
 } // namespace sxt::prfip

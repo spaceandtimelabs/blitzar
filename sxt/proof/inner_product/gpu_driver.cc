@@ -19,10 +19,10 @@
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/operation/double.h"
-#include "sxt/curve21/operation/neg.h"
-#include "sxt/curve21/operation/scalar_multiply.h"
+#include "sxt/curve32/operation/add.h"
+#include "sxt/curve32/operation/double.h"
+#include "sxt/curve32/operation/neg.h"
+#include "sxt/curve32/operation/scalar_multiply.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/synchronization.h"
@@ -49,16 +49,16 @@ namespace sxt::prfip {
 // commit_to_fold_partial
 //--------------------------------------------------------------------------------------------------
 static xena::future<void> commit_to_fold_partial(rstt::compressed_element& commit,
-                                                 basct::cspan<c21t::element_p3> g_vector,
-                                                 const c21t::element_p3& q_value,
+                                                 basct::cspan<c32t::element_p3> g_vector,
+                                                 const c32t::element_p3& q_value,
                                                  basct::cspan<s25t::element> u_vector,
                                                  basct::cspan<s25t::element> v_vector) noexcept {
-  auto u_commit_fut = mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(
+  auto u_commit_fut = mtxcrv::async_compute_multiexponentiation<c32t::element_p3>(
       g_vector.subspan(0, u_vector.size()), mtxb::to_exponent_sequence(u_vector));
   auto product_fut = s25o::async_inner_product(u_vector, v_vector);
-  c21t::element_p3 commit_p;
-  c21o::scalar_multiply(commit_p, co_await std::move(product_fut), q_value);
-  c21o::add(commit_p, co_await std::move(u_commit_fut), commit_p);
+  c32t::element_p3 commit_p;
+  c32o::scalar_multiply(commit_p, co_await std::move(product_fut), q_value);
+  c32o::add(commit_p, co_await std::move(u_commit_fut), commit_p);
   rsto::compress(commit, commit_p);
 }
 
@@ -66,7 +66,7 @@ static xena::future<void> commit_to_fold_partial(rstt::compressed_element& commi
 // setup_verification_generators
 //--------------------------------------------------------------------------------------------------
 static void
-setup_verification_generators(basct::span<c21t::element_p3> generators,
+setup_verification_generators(basct::span<c32t::element_p3> generators,
                               const proof_descriptor& descriptor,
                               basct::cspan<rstt::compressed_element> l_vector,
                               basct::cspan<rstt::compressed_element> r_vector) noexcept {
@@ -106,7 +106,7 @@ xena::future<void> gpu_driver::commit_to_fold(rstt::compressed_element& l_value,
                                               rstt::compressed_element& r_value,
                                               workspace& ws) const noexcept {
   auto& work = static_cast<workspace&>(ws);
-  basct::cspan<c21t::element_p3> g_vector;
+  basct::cspan<c32t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
   basct::cspan<s25t::element> b_vector;
   if (work.round_index == 0) {
@@ -139,7 +139,7 @@ xena::future<void> gpu_driver::commit_to_fold(rstt::compressed_element& l_value,
 //--------------------------------------------------------------------------------------------------
 xena::future<void> gpu_driver::fold(workspace& ws, const s25t::element& x) const noexcept {
   auto& work = static_cast<workspace&>(ws);
-  basct::cspan<c21t::element_p3> g_vector;
+  basct::cspan<c32t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
   basct::cspan<s25t::element> b_vector;
   if (work.round_index == 0) {
@@ -209,12 +209,12 @@ xena::future<void> gpu_driver::compute_expected_commitment(
       async_compute_verification_exponents(exponents, x_vector, ap_value, descriptor.b_vector);
 
   // generators
-  memmg::managed_array<c21t::element_p3> generators(num_exponents, memr::get_pinned_resource());
+  memmg::managed_array<c32t::element_p3> generators(num_exponents, memr::get_pinned_resource());
   setup_verification_generators(generators, descriptor, l_vector, r_vector);
 
   // commitment
   co_await std::move(fut);
-  auto commit_p = co_await mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(
+  auto commit_p = co_await mtxcrv::async_compute_multiexponentiation<c32t::element_p3>(
       generators, mtxb::to_exponent_sequence(exponents));
   rsto::compress(commit, commit_p);
 }

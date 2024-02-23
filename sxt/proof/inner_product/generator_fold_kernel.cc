@@ -19,7 +19,7 @@
 #include "sxt/algorithm/iteration/transform.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/device_viewable.h"
 #include "sxt/proof/inner_product/generator_fold.h"
@@ -28,8 +28,8 @@ namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
 // async_fold_generators
 //--------------------------------------------------------------------------------------------------
-xena::future<> async_fold_generators(basct::span<c21t::element_p3> g_vector_p,
-                                     basct::cspan<c21t::element_p3> g_vector,
+xena::future<> async_fold_generators(basct::span<c32t::element_p3> g_vector_p,
+                                     basct::cspan<c32t::element_p3> g_vector,
                                      basct::cspan<unsigned> decomposition) noexcept {
   auto np = g_vector_p.size();
   SXT_DEBUG_ASSERT(g_vector.size() == 2u * np);
@@ -37,8 +37,8 @@ xena::future<> async_fold_generators(basct::span<c21t::element_p3> g_vector_p,
     const unsigned* decomposition_data;
     unsigned decomposition_size;
 
-    __device__ __host__ void operator()(c21t::element_p3& lhs,
-                                        const c21t::element_p3& rhs) const noexcept {
+    __device__ __host__ void operator()(c32t::element_p3& lhs,
+                                        const c32t::element_p3& rhs) const noexcept {
       fold_generators(lhs, basct::cspan<unsigned>{decomposition_data, decomposition_size}, lhs,
                       rhs);
     }

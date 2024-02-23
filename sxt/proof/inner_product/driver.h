@@ -21,7 +21,7 @@
 #include "sxt/base/container/span.h"
 #include "sxt/execution/async/future_fwd.h"
 
-namespace sxt::c21t {
+namespace sxt::c32t {
 struct element_p3;
 }
 namespace sxt::s25t {

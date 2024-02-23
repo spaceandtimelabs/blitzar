@@ -24,7 +24,7 @@
 namespace sxt::s25t {
 class element;
 }
-namespace sxt::c21t {
+namespace sxt::c32t {
 struct element_p3;
 }
 
@@ -46,7 +46,7 @@ struct workspace {
   const proof_descriptor* descriptor;
   basct::cspan<s25t::element> a_vector0;
   size_t round_index;
-  basct::span<c21t::element_p3> g_vector;
+  basct::span<c32t::element_p3> g_vector;
   basct::span<s25t::element> a_vector;
   basct::span<s25t::element> b_vector;
 };

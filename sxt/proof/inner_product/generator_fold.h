@@ -19,7 +19,7 @@
 #include "sxt/base/container/span.h"
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::c21t {
+namespace sxt::c32t {
 struct element_p3;
 }
 namespace sxt::s25t {
@@ -36,7 +36,7 @@ void decompose_generator_fold(basct::span<unsigned>& res, const s25t::element& m
 //--------------------------------------------------------------------------------------------------
 // fold_generators
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE void fold_generators(c21t::element_p3& res, basct::cspan<unsigned> decomposition,
-                                   const c21t::element_p3& g_low,
-                                   const c21t::element_p3& g_high) noexcept;
+CUDA_CALLABLE void fold_generators(c32t::element_p3& res, basct::cspan<unsigned> decomposition,
+                                   const c32t::element_p3& g_low,
+                                   const c32t::element_p3& g_high) noexcept;
 } // namespace sxt::prfip

@@ -21,10 +21,10 @@
 #include <memory_resource>
 
 #include "sxt/base/error/assert.h"
-#include "sxt/curve21/operation/add.h"
-#include "sxt/curve21/operation/double.h"
-#include "sxt/curve21/operation/neg.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/operation/add.h"
+#include "sxt/curve32/operation/double.h"
+#include "sxt/curve32/operation/neg.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
@@ -45,8 +45,8 @@ namespace sxt::prfip {
 //--------------------------------------------------------------------------------------------------
 // fold_generators
 //--------------------------------------------------------------------------------------------------
-static void fold_generators(basct::span<c21t::element_p3>& gp_vector,
-                            basct::cspan<c21t::element_p3> g_vector, const s25t::element& m_low,
+static void fold_generators(basct::span<c32t::element_p3>& gp_vector,
+                            basct::cspan<c32t::element_p3> g_vector, const s25t::element& m_low,
                             const s25t::element& m_high, size_t mid) noexcept {
   unsigned data[s25cn::max_bits_v];
   basct::span<unsigned> decomposition{data};
@@ -60,7 +60,7 @@ static void fold_generators(basct::span<c21t::element_p3>& gp_vector,
 //--------------------------------------------------------------------------------------------------
 // multiexponentiate
 //--------------------------------------------------------------------------------------------------
-static void multiexponentiate(c21t::element_p3& res, basct::cspan<c21t::element_p3> g_vector,
+static void multiexponentiate(c32t::element_p3& res, basct::cspan<c32t::element_p3> g_vector,
                               basct::cspan<s25t::element> x_vector) noexcept {
   auto n = std::min(g_vector.size(), x_vector.size());
   g_vector = g_vector.subspan(0, n);
@@ -70,14 +70,14 @@ static void multiexponentiate(c21t::element_p3& res, basct::cspan<c21t::element_
       .data = reinterpret_cast<const uint8_t*>(x_vector.data()),
       .is_signed = 0,
   };
-  auto values = mtxcrv::compute_multiexponentiation<c21t::element_p3>(
+  auto values = mtxcrv::compute_multiexponentiation<c32t::element_p3>(
       g_vector, basct::cspan<mtxb::exponent_sequence>{&exponents, 1});
   res = values[0];
 }
 
-static void multiexponentiate(c21t::element_p3 c_commits[2], const c21t::element_p3& q_value,
+static void multiexponentiate(c32t::element_p3 c_commits[2], const c32t::element_p3& q_value,
                               const s25t::element c_values[2]) noexcept {
-  memmg::managed_array<c21t::element_p3> inout;
+  memmg::managed_array<c32t::element_p3> inout;
   mtxb::exponent_sequence exponents[2] = {
       {
           .element_nbytes = 32,
@@ -92,7 +92,7 @@ static void multiexponentiate(c21t::element_p3 c_commits[2], const c21t::element
           .is_signed = 0,
       },
   };
-  auto values = mtxcrv::compute_multiexponentiation<c21t::element_p3>({&q_value, 1}, exponents);
+  auto values = mtxcrv::compute_multiexponentiation<c32t::element_p3>({&q_value, 1}, exponents);
   c_commits[0] = values[0];
   c_commits[1] = values[1];
 }
@@ -121,7 +121,7 @@ xena::future<void> cpu_driver::commit_to_fold(rstt::compressed_element& l_value,
                                               rstt::compressed_element& r_value,
                                               workspace& ws) const noexcept {
   auto& work = static_cast<workspace&>(ws);
-  basct::cspan<c21t::element_p3> g_vector;
+  basct::cspan<c32t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
   basct::cspan<s25t::element> b_vector;
   if (work.round_index == 0) {
@@ -147,19 +147,19 @@ xena::future<void> cpu_driver::commit_to_fold(rstt::compressed_element& l_value,
   s25t::element c_values[2];
   s25o::inner_product(c_values[0], a_low, b_high);
   s25o::inner_product(c_values[1], a_high, b_low);
-  c21t::element_p3 c_commits[2];
+  c32t::element_p3 c_commits[2];
   multiexponentiate(c_commits, *work.descriptor->q_value, c_values);
 
   // l_value
-  c21t::element_p3 l_value_p;
+  c32t::element_p3 l_value_p;
   multiexponentiate(l_value_p, g_high, a_low);
-  c21o::add(l_value_p, l_value_p, c_commits[0]);
+  c32o::add(l_value_p, l_value_p, c_commits[0]);
   rsto::compress(l_value, l_value_p);
 
   // r_value
-  c21t::element_p3 r_value_p;
+  c32t::element_p3 r_value_p;
   multiexponentiate(r_value_p, g_low, a_high);
-  c21o::add(r_value_p, r_value_p, c_commits[1]);
+  c32o::add(r_value_p, r_value_p, c_commits[1]);
   rsto::compress(r_value, r_value_p);
 
   return xena::make_ready_future();
@@ -170,7 +170,7 @@ xena::future<void> cpu_driver::commit_to_fold(rstt::compressed_element& l_value,
 //--------------------------------------------------------------------------------------------------
 xena::future<void> cpu_driver::fold(workspace& ws, const s25t::element& x) const noexcept {
   auto& work = static_cast<workspace&>(ws);
-  basct::cspan<c21t::element_p3> g_vector;
+  basct::cspan<c32t::element_p3> g_vector;
   basct::cspan<s25t::element> a_vector;
   basct::cspan<s25t::element> b_vector;
   if (work.round_index == 0) {
@@ -231,7 +231,7 @@ xena::future<void> cpu_driver::compute_expected_commitment(
   compute_verification_exponents(exponents, x_vector, ap_value, descriptor.b_vector);
 
   // generators
-  memmg::managed_array<c21t::element_p3> generators(num_exponents);
+  memmg::managed_array<c32t::element_p3> generators(num_exponents);
   auto iter = generators.data();
   *iter++ = *descriptor.q_value;
   iter = std::copy(descriptor.g_vector.begin(), descriptor.g_vector.end(), iter);
@@ -249,7 +249,7 @@ xena::future<void> cpu_driver::compute_expected_commitment(
       .data = reinterpret_cast<const uint8_t*>(exponents.data()),
   };
   auto commits =
-      mtxcrv::compute_multiexponentiation<c21t::element_p3>(generators, {&exponent_sequence, 1});
+      mtxcrv::compute_multiexponentiation<c32t::element_p3>(generators, {&exponent_sequence, 1});
   rsto::compress(commit, commits[0]);
 
   return xena::make_ready_future();
