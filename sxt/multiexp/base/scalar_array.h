@@ -25,6 +25,13 @@ namespace sxt::mtxb {
 //--------------------------------------------------------------------------------------------------
 // transpose_scalars_to_device
 //--------------------------------------------------------------------------------------------------
+/**
+ * Copy scalars in host memory to the device and transpose their bytes. For example,
+ * if there are two scalars, s1 and s2, of 4 bytes on the host layed out as follows
+ *    s1[0], s1[1], s1[2], s1[3], s2[0], s2[1], s2[2], s2[3]
+ *  then this function will copy the scalars to device memory and lay them out like this
+ *    s1[0], s2[0], s1[1], s2[1], s1[2], s2[2], s1[3], s2[3]
+ */
 xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
                                            basct::cspan<const uint8_t*> scalars,
                                            unsigned element_num_bytes, unsigned n) noexcept;
