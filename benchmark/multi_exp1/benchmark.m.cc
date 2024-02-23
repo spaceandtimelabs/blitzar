@@ -23,12 +23,12 @@
 #include "benchmark/multi_exp1/multi_exp_cpu.h"
 #include "benchmark/multi_exp1/multi_exp_gpu.h"
 #include "sxt/base/error/panic.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 
 using namespace sxt;
 
-using bench_fn = void (*)(c21t::element_p3*, int, int) noexcept;
+using bench_fn = void (*)(c32t::element_p3*, int, int) noexcept;
 
 static bench_fn select_backend_fn(const std::string_view backend) noexcept {
   if (backend == "cpu") {
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
 
   auto f = select_backend_fn(backend);
 
-  memmg::managed_array<c21t::element_p3> res(m);
+  memmg::managed_array<c32t::element_p3> res(m);
 
   // invoke f with small values to avoid measuring one-time initialization costs
   f(res.data(), 1, 1);
