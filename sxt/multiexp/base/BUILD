@@ -51,6 +51,8 @@ sxt_cc_component(
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/base/num:constexpr_switch",
         "//sxt/base/num:divide_up",
         "//sxt/execution/async:future",
         "//sxt/execution/async:coroutine",

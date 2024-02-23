@@ -22,6 +22,8 @@
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/num/ceil_log2.h"
+#include "sxt/base/num/constexpr_switch.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/synchronization.h"
@@ -30,27 +32,29 @@
 
 namespace sxt::mtxb {
 //--------------------------------------------------------------------------------------------------
-// scalar32
+// scalar_blob
 //--------------------------------------------------------------------------------------------------
 namespace {
-struct scalar32 {
-  uint8_t data[32];
+template <unsigned NumBytes> struct scalar_blob {
+  uint8_t data[NumBytes];
 };
 } // namespace
 
 //--------------------------------------------------------------------------------------------------
 // transpose_kernel
 //--------------------------------------------------------------------------------------------------
-static __global__ void transpose_kernel(uint8_t* __restrict__ dst, const scalar32* __restrict__ src,
+template <unsigned NumBytes>
+static __global__ void transpose_kernel(uint8_t* __restrict__ dst,
+                                        const scalar_blob<NumBytes>* __restrict__ src,
                                         unsigned n) noexcept {
-  static constexpr unsigned element_num_bytes = 32u;
+  using Scalar = scalar_blob<NumBytes>;
 
   auto byte_index = threadIdx.x;
   auto tile_index = blockIdx.x;
   auto output_index = blockIdx.y;
   auto num_tiles = gridDim.x;
   auto n_per_tile =
-      basn::divide_up(basn::divide_up(n, element_num_bytes), num_tiles) * element_num_bytes;
+      basn::divide_up(basn::divide_up(n, NumBytes), num_tiles) * NumBytes;
 
   auto first = tile_index * n_per_tile;
   auto m = min(n_per_tile, n - first);
@@ -59,28 +63,28 @@ static __global__ void transpose_kernel(uint8_t* __restrict__ dst, const scalar3
   src += first;
   src += output_index * n;
   dst += byte_index * n + first;
-  dst += output_index * element_num_bytes * n;
+  dst += output_index * NumBytes * n;
 
   // set up algorithm
-  using BlockExchange = cub::BlockExchange<uint8_t, element_num_bytes, element_num_bytes>;
-  __shared__ BlockExchange::TempStorage temp_storage;
+  using BlockExchange = cub::BlockExchange<uint8_t, NumBytes, NumBytes>;
+  __shared__ typename BlockExchange::TempStorage temp_storage;
 
   // transpose
-  scalar32 s;
+  Scalar s;
   unsigned out_first = 0;
-  for (unsigned i = byte_index; i < n_per_tile; i += element_num_bytes) {
+  for (unsigned i = byte_index; i < n_per_tile; i += NumBytes) {
     if (i < m) {
       s = src[i];
     }
     BlockExchange(temp_storage).StripedToBlocked(s.data);
     __syncthreads();
-    for (unsigned j = 0; j < 32u; ++j) {
+    for (unsigned j = 0; j < NumBytes; ++j) {
       auto out_index = out_first + j;
       if (out_index < m) {
         dst[out_index] = s.data[j];
       }
     }
-    out_first += element_num_bytes;
+    out_first += NumBytes;
     __syncthreads();
   }
 }
@@ -108,8 +112,15 @@ xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
         basct::cspan<uint8_t>{scalars[output_index], num_bytes_per_output}, stream);
   }
   auto num_tiles = std::min(basn::divide_up(n, num_outputs * 32u), 64u);
-  transpose_kernel<<<dim3(num_tiles, num_outputs, 1), 32, 0, stream>>>(
-      array.data(), reinterpret_cast<scalar32*>(array_p.data()), n);
+  auto num_bytes_log2 = basn::ceil_log2(element_num_bytes);
+  basn::constexpr_switch<6>(
+      num_bytes_log2,
+      [&]<unsigned LogNumBytes>(std::integral_constant<unsigned, LogNumBytes>) noexcept {
+        constexpr auto NumBytes = 1u << LogNumBytes;
+        SXT_DEBUG_ASSERT(NumBytes == element_num_bytes);
+        transpose_kernel<NumBytes><<<dim3(num_tiles, num_outputs, 1), NumBytes, 0, stream>>>(
+            array.data(), reinterpret_cast<scalar_blob<NumBytes>*>(array_p.data()), n);
+      });
   co_await xendv::await_stream(std::move(stream));
 }
 } // namespace sxt::mtxb
