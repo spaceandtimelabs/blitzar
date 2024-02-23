@@ -37,5 +37,4 @@ int main() {
   std::cout << "e5 = " << e5 << "\n";
 
   return 0;
-
 }

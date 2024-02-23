@@ -17,10 +17,9 @@
 #include "sxt/field51/operation/mul.h"
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/field51/base/reduce.h"
 #include "sxt/field51/type/element.h"
 #include "sxt/field51/type/literal.h"
-
-#include "sxt/field51/base/reduce.h"
 
 using namespace sxt;
 using namespace sxt::f51o;
