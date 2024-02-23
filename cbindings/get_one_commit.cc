@@ -20,7 +20,7 @@
 
 #include "cbindings/backend.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/seqcommit/generator/precomputed_one_commitments.h"
 
 using namespace sxt;
@@ -36,7 +36,7 @@ int sxt_curve25519_get_one_commit(struct sxt_ristretto255* one_commit, uint64_t 
       one_commit != nullptr,
       "one_commit input to `sxt_curve25519_get_one_commit` c binding function is null");
 
-  reinterpret_cast<sxt::c21t::element_p3*>(one_commit)[0] =
+  reinterpret_cast<sxt::c32t::element_p3*>(one_commit)[0] =
       sxt::sqcgn::get_precomputed_one_commit(n);
 
   return 0;

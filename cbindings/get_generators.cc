@@ -22,7 +22,7 @@
 
 #include "cbindings/backend.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/type/element_p3.h"
 
 using namespace sxt;
 
@@ -49,11 +49,11 @@ int sxt_ristretto255_get_generators(struct sxt_ristretto255* generators, uint64_
 
   auto backend = sxt::cbn::get_backend();
 
-  std::vector<c21t::element_p3> temp_generators;
+  std::vector<c32t::element_p3> temp_generators;
   auto precomputed_generators =
       backend->get_precomputed_generators(temp_generators, num_generators, offset_generators);
   std::copy_n(precomputed_generators.begin(), num_generators,
-              reinterpret_cast<c21t::element_p3*>(generators));
+              reinterpret_cast<c32t::element_p3*>(generators));
 
   return 0;
 }

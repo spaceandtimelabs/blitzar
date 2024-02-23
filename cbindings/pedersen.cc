@@ -20,7 +20,7 @@
 
 #include "cbindings/backend.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/curve_bng1/type/conversion_utility.h"
 #include "sxt/curve_bng1/type/element_affine.h"
 #include "sxt/curve_bng1/type/element_p2.h"
@@ -69,7 +69,7 @@ static uint64_t populate_exponent_sequence(basct::span<mtxb::exponent_sequence> 
 //--------------------------------------------------------------------------------------------------
 static void process_compute_pedersen_commitments(struct sxt_ristretto255_compressed* commitments,
                                                  basct::cspan<sxt_sequence_descriptor> descriptors,
-                                                 const c21t::element_p3* generators,
+                                                 const c32t::element_p3* generators,
                                                  uint64_t offset_generators) {
   if (descriptors.size() == 0)
     return;
@@ -83,14 +83,14 @@ static void process_compute_pedersen_commitments(struct sxt_ristretto255_compres
   auto num_generators = populate_exponent_sequence(sequences, descriptors);
 
   auto backend = cbn::get_backend();
-  std::vector<c21t::element_p3> temp_generators;
-  basct::cspan<c21t::element_p3> generators_span;
+  std::vector<c32t::element_p3> temp_generators;
+  basct::cspan<c32t::element_p3> generators_span;
 
   if (generators == nullptr) {
     generators_span =
         backend->get_precomputed_generators(temp_generators, num_generators, offset_generators);
   } else {
-    generators_span = basct::cspan<c21t::element_p3>(generators, num_generators);
+    generators_span = basct::cspan<c32t::element_p3>(generators, num_generators);
   }
 
   backend->compute_commitments(
@@ -168,7 +168,7 @@ void sxt_curve25519_compute_pedersen_commitments_with_generators(
     struct sxt_ristretto255_compressed* commitments, uint32_t num_sequences,
     const struct sxt_sequence_descriptor* descriptors, const struct sxt_ristretto255* generators) {
   cbn::process_compute_pedersen_commitments(commitments, {descriptors, num_sequences},
-                                            reinterpret_cast<const c21t::element_p3*>(generators),
+                                            reinterpret_cast<const c32t::element_p3*>(generators),
                                             0);
 }
 
