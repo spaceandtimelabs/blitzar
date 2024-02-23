@@ -32,7 +32,7 @@
 #include "sxt/cbindings/backend/computational_backend.h"
 #include "sxt/cbindings/backend/cpu_backend.h"
 #include "sxt/cbindings/backend/gpu_backend.h"
-#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve32/type/element_p3.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/ristretto/base/byte_conversion.h"
@@ -136,7 +136,7 @@ static void print_result(uint64_t num_commitments,
 static void populate_table(bool is_boolean, uint64_t num_commitments, uint64_t commitment_length,
                            uint8_t element_nbytes, memmg::managed_array<uint8_t>& data_table,
                            memmg::managed_array<mtxb::exponent_sequence>& data_commitments,
-                           memmg::managed_array<c21t::element_p3>& generators) {
+                           memmg::managed_array<c32t::element_p3>& generators) {
 
   std::mt19937 gen{0};
   std::uniform_int_distribution<uint8_t> distribution;
@@ -186,7 +186,7 @@ int main(int argc, char* argv[]) {
   std::cout << "********************************************" << std::endl;
 
   // populate data section
-  memmg::managed_array<c21t::element_p3> generators(p.commitment_length);
+  memmg::managed_array<c32t::element_p3> generators(p.commitment_length);
   memmg::managed_array<mtxb::exponent_sequence> data_commitments(p.num_commitments);
   memmg::managed_array<rstt::compressed_element> commitments_per_sequence(p.num_commitments);
   memmg::managed_array<uint8_t> data_table(p.commitment_length * p.num_commitments *
@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
   cudaProfilerStart();
   for (int i = 0; i < p.num_samples; ++i) {
     // populate generators
-    basct::span<c21t::element_p3> span_generators(generators.data(), p.commitment_length);
+    basct::span<c32t::element_p3> span_generators(generators.data(), p.commitment_length);
 
     p.trigger_timer();
     SXT_TOGGLE_COLLECT;
