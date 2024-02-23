@@ -27,10 +27,10 @@
 
 #include "sxt/curve32/type/element_p1p1.h"
 #include "sxt/curve32/type/element_p2.h"
-#include "sxt/field51/operation/add.h"
-#include "sxt/field51/operation/sq.h"
-#include "sxt/field51/operation/sub.h"
-#include "sxt/field51/type/element.h"
+#include "sxt/field32/operation/add.h"
+#include "sxt/field32/operation/sq.h"
+#include "sxt/field32/operation/sub.h"
+#include "sxt/field32/type/element.h"
 
 namespace sxt::c32t {
 //--------------------------------------------------------------------------------------------------
@@ -41,16 +41,16 @@ namespace sxt::c32t {
 */
 CUDA_CALLABLE
 void double_element_impl(c32t::element_p1p1& r, const c32t::element_p2& p) noexcept {
-  f51t::element t0;
+  f32t::element t0;
 
-  f51o::sq(r.X, p.X);
-  f51o::sq(r.Z, p.Y);
-  f51o::sq2(r.T, p.Z);
-  f51o::add(r.Y, p.X, p.Y);
-  f51o::sq(t0, r.Y);
-  f51o::add(r.Y, r.Z, r.X);
-  f51o::sub(r.Z, r.Z, r.X);
-  f51o::sub(r.X, t0, r.Y);
-  f51o::sub(r.T, r.T, r.Z);
+  f32o::sq(r.X, p.X);
+  f32o::sq(r.Z, p.Y);
+  f32o::sq2(r.T, p.Z);
+  f32o::add(r.Y, p.X, p.Y);
+  f32o::sq(t0, r.Y);
+  f32o::add(r.Y, r.Z, r.X);
+  f32o::sub(r.Z, r.Z, r.X);
+  f32o::sub(r.X, t0, r.Y);
+  f32o::sub(r.T, r.T, r.Z);
 }
 } // namespace sxt::c32t

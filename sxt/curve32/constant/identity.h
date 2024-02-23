@@ -18,17 +18,17 @@
 
 #include "sxt/curve32/type/element_cached.h"
 #include "sxt/curve32/type/element_p3.h"
-#include "sxt/field51/constant/one.h"
-#include "sxt/field51/constant/zero.h"
+#include "sxt/field32/constant/one.h"
+#include "sxt/field32/constant/zero.h"
 
 namespace sxt::c32cn {
 //--------------------------------------------------------------------------------------------------
 // identity_cached_v
 //--------------------------------------------------------------------------------------------------
 static constexpr c32t::element_cached identity_cached_v{
-    .YplusX{f51cn::one_v},
-    .YminusX{f51cn::one_v},
-    .Z{f51cn::one_v},
-    .T2d{f51cn::zero_v},
+    .YplusX{f32cn::one_v},
+    .YminusX{f32cn::one_v},
+    .Z{f32cn::one_v},
+    .T2d{f32cn::zero_v},
 };
 } // namespace sxt::c32cn

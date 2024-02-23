@@ -19,9 +19,9 @@
 #include <iosfwd>
 
 #include "sxt/curve32/type/operation_adl_stub.h"
-#include "sxt/field51/constant/one.h"
-#include "sxt/field51/constant/zero.h"
-#include "sxt/field51/type/element.h"
+#include "sxt/field32/constant/one.h"
+#include "sxt/field32/constant/zero.h"
+#include "sxt/field32/type/element.h"
 
 namespace sxt::c32t {
 //--------------------------------------------------------------------------------------------------
@@ -33,17 +33,17 @@ namespace sxt::c32t {
 struct element_p3 : c32o::operation_adl_stub {
   element_p3() noexcept = default;
 
-  constexpr element_p3(const f51t::element& X, const f51t::element& Y, const f51t::element& Z,
-                       const f51t::element& T) noexcept
+  constexpr element_p3(const f32t::element& X, const f32t::element& Y, const f32t::element& Z,
+                       const f32t::element& T) noexcept
       : X{X}, Y{Y}, Z{Z}, T{T} {}
 
-  f51t::element X;
-  f51t::element Y;
-  f51t::element Z;
-  f51t::element T;
+  f32t::element X;
+  f32t::element Y;
+  f32t::element Z;
+  f32t::element T;
 
   static constexpr element_p3 identity() noexcept {
-    return element_p3{f51cn::zero_v, f51cn::one_v, f51cn::one_v, f51cn::zero_v};
+    return element_p3{f32cn::zero_v, f32cn::one_v, f32cn::one_v, f32cn::zero_v};
   }
 };
 

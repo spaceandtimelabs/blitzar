@@ -16,16 +16,16 @@
  */
 #pragma once
 
-#include "sxt/field51/type/element.h"
+#include "sxt/field32/type/element.h"
 
 namespace sxt::c32t {
 //--------------------------------------------------------------------------------------------------
 // element_cached
 //--------------------------------------------------------------------------------------------------
 struct element_cached {
-  f51t::element YplusX;
-  f51t::element YminusX;
-  f51t::element Z;
-  f51t::element T2d;
+  f32t::element YplusX;
+  f32t::element YminusX;
+  f32t::element Z;
+  f32t::element T2d;
 };
 } // namespace sxt::c32t
