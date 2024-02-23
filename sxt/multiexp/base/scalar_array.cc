@@ -86,57 +86,13 @@ static __global__ void transpose_kernel(uint8_t* __restrict__ dst, const scalar3
 }
 
 //--------------------------------------------------------------------------------------------------
-// transpose_scalars_to_device_impl
-//--------------------------------------------------------------------------------------------------
-static xena::future<> transpose_scalars_to_device_impl(basct::span<uint8_t> array_slice,
-                                                       basct::cspan<uint8_t> scalars,
-                                                       unsigned element_num_bytes,
-                                                       unsigned bit_width, unsigned n) noexcept {
-  SXT_RELEASE_ASSERT(element_num_bytes == 32 && bit_width == 8,
-                     "we only support 32 byte scalars for now");
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<uint8_t> scalars_dev{scalars.size(), &resource};
-  basdv::async_copy_host_to_device(scalars_dev, scalars, stream);
-  auto num_tiles = std::min(basn::divide_up(n, 32u), 64u);
-
-  transpose_kernel<<<num_tiles, 32, 0, stream>>>(
-      array_slice.data(), reinterpret_cast<const scalar32*>(scalars_dev.data()), n);
-
-  return xendv::await_and_own_stream(std::move(stream));
-}
-
-//--------------------------------------------------------------------------------------------------
 // transpose_scalars_to_device
 //--------------------------------------------------------------------------------------------------
 xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
                                            basct::cspan<const uint8_t*> scalars,
                                            unsigned element_num_bytes, unsigned bit_width,
                                            unsigned n) noexcept {
-  auto num_outputs = scalars.size();
-  SXT_DEBUG_ASSERT(
-      // clang-format off
-      array.size() == num_outputs * element_num_bytes * n &&
-      basdv::is_active_device_pointer(array.data())
-      // clang-format on
-  );
-  std::vector<xena::future<>> futs(num_outputs);
-  for (size_t output_index = 0; output_index < num_outputs; ++output_index) {
-    futs[output_index] = transpose_scalars_to_device_impl(
-        array.subspan(output_index * element_num_bytes * n, element_num_bytes * n),
-        basct::cspan<uint8_t>{scalars[output_index], n * element_num_bytes}, element_num_bytes,
-        bit_width, n);
-  }
-  for (auto& fut : futs) {
-    co_await std::move(fut);
-  }
-}
-
-xena::future<> transpose_scalars_to_device2(basct::span<uint8_t> array,
-                                            basct::cspan<const uint8_t*> scalars,
-                                            unsigned element_num_bytes, unsigned bit_width,
-                                            unsigned n) noexcept {
-  auto num_outputs = scalars.size();
+  auto num_outputs = static_cast<unsigned>(scalars.size());
   SXT_DEBUG_ASSERT(
       // clang-format off
       array.size() == num_outputs * element_num_bytes * n &&
@@ -152,7 +108,7 @@ xena::future<> transpose_scalars_to_device2(basct::span<uint8_t> array,
         basct::subspan(array_p, output_index * num_bytes_per_output, num_bytes_per_output),
         basct::cspan<uint8_t>{scalars[output_index], num_bytes_per_output}, stream);
   }
-  auto num_tiles = std::min(basn::divide_up(n, 32u), 64u);
+  auto num_tiles = std::min(basn::divide_up(n, num_outputs * 32u), 64u);
   transpose_kernel<<<dim3(num_tiles, num_outputs, 1), 32, 0, stream>>>(
       array.data(), reinterpret_cast<scalar32*>(array_p.data()), n);
   co_await xendv::await_stream(std::move(stream));
