@@ -90,8 +90,7 @@ static __global__ void transpose_kernel(uint8_t* __restrict__ dst, const scalar3
 //--------------------------------------------------------------------------------------------------
 xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
                                            basct::cspan<const uint8_t*> scalars,
-                                           unsigned element_num_bytes, unsigned bit_width,
-                                           unsigned n) noexcept {
+                                           unsigned element_num_bytes, unsigned n) noexcept {
   auto num_outputs = static_cast<unsigned>(scalars.size());
   SXT_DEBUG_ASSERT(
       // clang-format off
