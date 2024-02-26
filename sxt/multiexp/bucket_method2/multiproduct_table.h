@@ -22,7 +22,7 @@
 #include "sxt/execution/async/future_fwd.h"
 #include "sxt/memory/management/managed_array_fwd.h"
 
-namespace sxt::mtxbk {
+namespace sxt::mtxbk2 {
 //--------------------------------------------------------------------------------------------------
 // make_multiproduct_table
 //--------------------------------------------------------------------------------------------------
@@ -31,4 +31,4 @@ xena::future<> make_multiproduct_table(basct::span<uint16_t> bucket_prefix_count
                                        basct::cspan<const uint8_t*> scalars,
                                        unsigned element_num_bytes, unsigned bit_width,
                                        unsigned n) noexcept;
-} // namespace sxt::mtxbk
+} // namespace sxt::mtxbk2

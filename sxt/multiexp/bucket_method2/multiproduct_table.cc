@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/bucket_method/multiproduct_table.h"
+#include "sxt/multiexp/bucket_method2/multiproduct_table.h"
 
 #include "cub/cub.cuh"
 #include "sxt/algorithm/iteration/for_each.h"
@@ -30,7 +30,7 @@
 #include "sxt/multiexp/base/scalar_array.h"
 #include "sxt/multiexp/bucket_method/multiproduct_table_kernel.h"
 
-namespace sxt::mtxbk {
+namespace sxt::mtxbk2 {
 //--------------------------------------------------------------------------------------------------
 // make_multiproduct_table
 //--------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ xena::future<> make_multiproduct_table(basct::span<uint16_t> bucket_prefix_count
   static constexpr unsigned num_threads = 128;
   static constexpr unsigned items_per_thread = 8;
   basdv::stream stream;
-  multiproduct_table_kernel<num_threads, items_per_thread, 8>
+  mtxbk::multiproduct_table_kernel<num_threads, items_per_thread, 8>
       <<<dim3(num_digits, num_outputs, 1), num_threads, 0, stream>>>(
           bucket_prefix_counts.data(), indexes.data(), bytes.data(), n);
 
@@ -78,4 +78,4 @@ xena::future<> make_multiproduct_table(basct::span<uint16_t> bucket_prefix_count
   algi::launch_for_each_kernel(stream, f, num_digits * num_outputs);
   co_await xendv::await_stream(stream);
 }
-} // namespace sxt::mtxbk
+} // namespace sxt::mtxbk2
