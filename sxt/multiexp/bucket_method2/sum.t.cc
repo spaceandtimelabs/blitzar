@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/bucket_method/sum.h"
+#include "sxt/multiexp/bucket_method2/sum.h"
 
 #include <vector>
 
@@ -25,7 +25,7 @@
 #include "sxt/memory/resource/managed_device_resource.h"
 
 using namespace sxt;
-using namespace sxt::mtxbk;
+using namespace sxt::mtxbk2;
 
 TEST_CASE("we can compute the bucket sums for a chunk") {
   using E = bascrv::element97;

@@ -39,7 +39,7 @@
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/bucket_method/multiproduct_table.h"
 
-namespace sxt::mtxbk {
+namespace sxt::mtxbk2 {
 //--------------------------------------------------------------------------------------------------
 // sum_bucket
 //--------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ xena::future<> sum_buckets(basct::span<T> sums, basct::cspan<T> generators,
   memmg::managed_array<uint16_t> bucket_prefix_counts{num_buckets_total,
                                                       memr::get_device_resource()};
   memmg::managed_array<uint16_t> indexes{n * num_digits * num_outputs, memr::get_device_resource()};
-  auto fut = make_multiproduct_table(bucket_prefix_counts, indexes, exponents, element_num_bytes,
+  auto fut = mtxbk::make_multiproduct_table(bucket_prefix_counts, indexes, exponents, element_num_bytes,
                                      bit_width, n);
 
   // copy generators to device
@@ -124,4 +124,4 @@ xena::future<> sum_buckets(basct::span<T> sums, basct::cspan<T> generators,
   algi::launch_for_each_kernel(stream, f, num_buckets_total);
   co_await xendv::await_stream(stream);
 }
-} // namespace sxt::mtxbk
+} // namespace sxt::mtxbk2
