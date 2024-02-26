@@ -137,6 +137,8 @@ sxt_cc_component(
     ],
     test_deps = [
         "//sxt/base/device:synchronization",
+        "//sxt/base/num:constexpr_switch",
+        "//sxt/base/num:divide_up",
         "//sxt/base/test:unit_test",
         "//sxt/memory/resource:managed_device_resource",
     ],

@@ -16,11 +16,20 @@
  */
 #pragma once
 
+#include <utility>
+
 #include "cub/cub.cuh"
 #include "sxt/algorithm/block/runlength_count.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/num/constexpr_switch.h"
+#include "sxt/base/num/divide_up.h"
 
 namespace sxt::mtxbk2 {
+//--------------------------------------------------------------------------------------------------
+// max_multiexponentiation_length_v 
+//--------------------------------------------------------------------------------------------------
+static constexpr unsigned max_multiexponentiation_length_v = 128 * 32;
+
 //--------------------------------------------------------------------------------------------------
 // multiproduct_table_kernel
 //--------------------------------------------------------------------------------------------------
@@ -87,6 +96,21 @@ __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_counts,
 }
 
 //--------------------------------------------------------------------------------------------------
+// fit_multiproduct_table_kernel 
+//--------------------------------------------------------------------------------------------------
+template <class F>
+void fit_multiproduct_table_kernel(F f, unsigned n) noexcept {
+  SXT_RELEASE_ASSERT(n <= max_multiexponentiation_length_v);
+  if (n < 128) {
+    return f(std::integral_constant<unsigned, 128>{}, std::integral_constant<unsigned, 1>{});
+  }
+  basn::constexpr_switch<1, max_multiexponentiation_length_v / 128u + 1u>(
+      basn::divide_up(n, 128u), [&]<unsigned K>(std::integral_constant<unsigned, K>) noexcept {
+        return f(std::integral_constant<unsigned, 128>{}, std::integral_constant<unsigned, K>{});
+      });
+}
+
+//--------------------------------------------------------------------------------------------------
 // launch_multiproduct_table_kernel
 //--------------------------------------------------------------------------------------------------
 template <unsigned BitWidth>
@@ -96,6 +120,7 @@ void launch_multiproduct_table_kernel(uint16_t* __restrict__ bucket_counts,
                                       const uint8_t* __restrict__ bytes, 
                                       unsigned num_digits, unsigned num_outputs,
                                       unsigned n) {
+
   if (n <= 128) {
     return multiproduct_table_kernel<128, 1, BitWidth>
         <<<dim3(num_digits, num_outputs, 1), 128, 0, stream>>>(bucket_counts, indexes, bytes, n);
