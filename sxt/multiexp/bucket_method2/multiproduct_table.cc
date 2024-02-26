@@ -58,13 +58,17 @@ xena::future<> make_multiproduct_table(basct::span<uint16_t> bucket_prefix_count
   // compute buckets
   basl::info("computing multiproduct decomposition");
   SXT_RELEASE_ASSERT(bit_width == 8u, "only support bit_width == 8u for now");
-  SXT_RELEASE_ASSERT(n <= 1024, "only support n <= 1024 for now");
-  static constexpr unsigned num_threads = 128;
-  static constexpr unsigned items_per_thread = 8;
+  SXT_RELEASE_ASSERT(n <= max_multiexponentiation_length_v, "only support n <= 1024 for now");
   basdv::stream stream;
-  multiproduct_table_kernel<num_threads, items_per_thread, 8>
-      <<<dim3(num_digits, num_outputs, 1), num_threads, 0, stream>>>(
-          bucket_prefix_counts.data(), indexes.data(), bytes.data(), n);
+  fit_multiproduct_table_kernel(
+      [&]<unsigned NumThreads, unsigned ItemsPerThread>(
+          std::integral_constant<unsigned, NumThreads>,
+          std::integral_constant<unsigned, ItemsPerThread>) noexcept {
+        multiproduct_table_kernel<NumThreads, ItemsPerThread, 8>
+            <<<dim3(num_digits, num_outputs, 1), NumThreads, 0, stream>>>(
+                bucket_prefix_counts.data(), indexes.data(), bytes.data(), n);
+      },
+      n);
 
   // prefix sum
   auto f = [bucket_prefix_counts = bucket_prefix_counts.data(),
