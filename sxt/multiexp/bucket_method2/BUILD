@@ -18,7 +18,7 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
-        "//sxt/multiexp/bucket_method:reduce",
+      ":reduce",
         "//sxt/multiexp/bucket_method:sum",
         "//sxt/base/container:span",
         "//sxt/base/container:span_utility",
