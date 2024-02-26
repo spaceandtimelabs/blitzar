@@ -28,7 +28,7 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/base/scalar_array.h"
-#include "sxt/multiexp/bucket_method/multiproduct_table_kernel.h"
+#include "sxt/multiexp/bucket_method2/multiproduct_table_kernel.h"
 
 namespace sxt::mtxbk2 {
 //--------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ xena::future<> make_multiproduct_table(basct::span<uint16_t> bucket_prefix_count
   static constexpr unsigned num_threads = 128;
   static constexpr unsigned items_per_thread = 8;
   basdv::stream stream;
-  mtxbk::multiproduct_table_kernel<num_threads, items_per_thread, 8>
+  multiproduct_table_kernel<num_threads, items_per_thread, 8>
       <<<dim3(num_digits, num_outputs, 1), num_threads, 0, stream>>>(
           bucket_prefix_counts.data(), indexes.data(), bytes.data(), n);
 

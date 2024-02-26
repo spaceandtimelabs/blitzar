@@ -19,7 +19,7 @@
 #include "cub/cub.cuh"
 #include "sxt/algorithm/block/runlength_count.h"
 
-namespace sxt::mtxbk {
+namespace sxt::mtxbk2 {
 //--------------------------------------------------------------------------------------------------
 // multiproduct_table_kernel
 //--------------------------------------------------------------------------------------------------
@@ -84,4 +84,4 @@ static __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_c
     }
   }
 }
-} // namespace sxt::mtxbk
+} // namespace sxt::mtxbk2

@@ -100,7 +100,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "multiproduct_table",
     impl_deps = [
-        "//sxt/multiexp/bucket_method:multiproduct_table_kernel",
+        ":multiproduct_table_kernel",
         "//sxt/algorithm/iteration:for_each",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
@@ -127,5 +127,21 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
         "//sxt/memory/management:managed_array_fwd",
+    ],
+)
+
+
+sxt_cc_component(
+    name = "multiproduct_table_kernel",
+    impl_deps = [
+    ],
+    test_deps = [
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+        "//sxt/algorithm/block:runlength_count",
+        "@local_cuda//:cub",
     ],
 )

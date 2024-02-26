@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/multiexp/bucket_method/multiproduct_table_kernel.h"
+#include "sxt/multiexp/bucket_method2/multiproduct_table_kernel.h"
 
 #include <vector>
 
@@ -23,7 +23,7 @@
 #include "sxt/memory/resource/managed_device_resource.h"
 
 using namespace sxt;
-using namespace sxt::mtxbk;
+using namespace sxt::mtxbk2;
 
 TEST_CASE("we can compute a bucket decomposition") {
   std::pmr::vector<uint16_t> bucket_counts{memr::get_managed_device_resource()};
