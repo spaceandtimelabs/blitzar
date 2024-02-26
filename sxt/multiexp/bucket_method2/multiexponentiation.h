@@ -38,7 +38,7 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/multiexp/bucket_method/reduce.h"
+#include "sxt/multiexp/bucket_method2/reduce.h"
 #include "sxt/multiexp/bucket_method/sum.h"
 
 namespace sxt::mtxbk2 {
@@ -67,7 +67,7 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
 
   // reduce bucket sums
   basl::info("reducing {} buckets into {} outputs", sums.size(), num_outputs);
-  co_await mtxbk::reduce_buckets<T>(res, sums, element_num_bytes, bit_width);
+  co_await reduce_buckets<T>(res, sums, element_num_bytes, bit_width);
   basl::info("finished multiexponentiation with {} outputs of length {}", res.size(),
              generators.size());
 }

@@ -38,7 +38,7 @@
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/bucket_method/multiexponentiation.h"
-#include "sxt/multiexp/bucket_method/multiexponentiation2.h"
+#include "sxt/multiexp/bucket_method2/multiexponentiation.h"
 #include "sxt/multiexp/curve/multiexponentiation_cpu_driver.h"
 #include "sxt/multiexp/curve/multiproduct.h"
 #include "sxt/multiexp/curve/multiproducts_combination.h"
@@ -152,7 +152,7 @@ async_compute_multiexponentiation(basct::cspan<Element> generators,
 #if 0
   auto res_maybe = co_await mtxbk::try_multiexponentiate(generators, exponents);
 #else
-  auto res_maybe = co_await mtxbk::try_multiexponentiate2(generators, exponents);
+  auto res_maybe = co_await mtxbk2::try_multiexponentiate(generators, exponents);
 #endif
   if (!res_maybe.empty()) {
     co_return res_maybe;
