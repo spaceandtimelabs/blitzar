@@ -18,15 +18,16 @@
 
 #include "cub/cub.cuh"
 #include "sxt/algorithm/block/runlength_count.h"
+#include "sxt/base/device/stream.h"
 
 namespace sxt::mtxbk2 {
 //--------------------------------------------------------------------------------------------------
 // multiproduct_table_kernel
 //--------------------------------------------------------------------------------------------------
 template <uint16_t NumThreads, uint16_t ItemsPerThread, unsigned BitWidth>
-static __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_counts,
-                                                 uint16_t* __restrict__ indexes,
-                                                 const uint8_t* __restrict__ bytes, unsigned n) {
+__global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_counts,
+                                          uint16_t* __restrict__ indexes,
+                                          const uint8_t* __restrict__ bytes, unsigned n) {
   uint16_t thread_index = threadIdx.x;
   auto digit_index = blockIdx.x;
   auto output_index = blockIdx.y;
@@ -83,5 +84,37 @@ static __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_c
       indexes[index - zero_count] = values[i];
     }
   }
+}
+
+//--------------------------------------------------------------------------------------------------
+// launch_multiproduct_table_kernel
+//--------------------------------------------------------------------------------------------------
+template <unsigned BitWidth>
+void launch_multiproduct_table_kernel(uint16_t* __restrict__ bucket_counts,
+                                      uint16_t* __restrict__ indexes,
+                                      const basdv::stream& stream,
+                                      const uint8_t* __restrict__ bytes, 
+                                      unsigned num_digits, unsigned num_outputs,
+                                      unsigned n) {
+  if (n <= 128) {
+    return multiproduct_table_kernel<128, 1, BitWidth>
+        <<<dim3(num_digits, num_outputs, 1), 128, 0, stream>>>(bucket_counts, indexes, bytes, n);
+  }
+  if (n <= 256) {
+    return multiproduct_table_kernel<128, 2, BitWidth>
+        <<<dim3(num_digits, num_outputs, 1), 128, 0, stream>>>(bucket_counts, indexes, bytes, n);
+  }
+  if (n <= 512) {
+    return multiproduct_table_kernel<128, 4, BitWidth>
+        <<<dim3(num_digits, num_outputs, 1), 128, 0, stream>>>(bucket_counts, indexes, bytes, n);
+  }
+  if (n <= 1028) {
+    return multiproduct_table_kernel<128, 8, BitWidth>
+        <<<dim3(num_digits, num_outputs, 1), 128, 0, stream>>>(bucket_counts, indexes, bytes, n);
+  }
+  (void)bucket_counts;
+  (void)indexes;
+  (void)bytes;
+  (void)n;
 }
 } // namespace sxt::mtxbk2

@@ -142,6 +142,7 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/algorithm/block:runlength_count",
+        "//sxt/base/device:stream",
         "@local_cuda//:cub",
     ],
 )

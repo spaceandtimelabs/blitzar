@@ -115,18 +115,3 @@ sxt_cc_component(
         "//sxt/multiexp/base:exponent_sequence",
     ],
 )
-
-# sxt_cc_component(
-#     name = "multiproduct_table_kernel",
-#     impl_deps = [
-#     ],
-#     test_deps = [
-#         "//sxt/base/device:synchronization",
-#         "//sxt/base/test:unit_test",
-#         "//sxt/memory/resource:managed_device_resource",
-#     ],
-#     deps = [
-#         "//sxt/algorithm/block:runlength_count",
-#         "@local_cuda//:cub",
-#     ],
-# )
