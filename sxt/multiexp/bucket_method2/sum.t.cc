@@ -59,4 +59,18 @@ TEST_CASE("we can compute the bucket sums for a chunk") {
     expected[0] = generators[0];
     REQUIRE(sums == expected);
   }
+
+  SECTION("we can compute the bucket sums for two exponents of one") {
+    generators = {3u, 4u};
+    std::vector<uint8_t> scalars1(64);
+    scalars1[0] = 1;
+    scalars1[32] = 1;
+    scalars = {scalars1.data()};
+    auto fut = sum_buckets<E>(sums, generators, scalars, element_num_bytes, bit_width);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected[0] = generators[0].value + generators[1].value;
+    REQUIRE(sums == expected);
+  }
 }
