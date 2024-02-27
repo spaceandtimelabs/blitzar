@@ -79,6 +79,14 @@ CUDA_CALLABLE void sum_bucket(T* __restrict__ sums, const T* __restrict__ genera
 //--------------------------------------------------------------------------------------------------
 // sum_buckets
 //--------------------------------------------------------------------------------------------------
+/**
+ * Sum generators into buckets.
+ *
+ * This function corresponds roughly to the 1st loop of Algorithm 1 described in
+ *
+ *    PipeMSM: Hardware Acceleration for Multi-Scalar Multiplication
+ *    https://eprint.iacr.org/2022/999.pdf
+ */
 template <bascrv::element T>
 xena::future<> sum_buckets(basct::span<T> sums, basct::cspan<T> generators,
                            basct::cspan<const uint8_t*> exponents, unsigned element_num_bytes,
