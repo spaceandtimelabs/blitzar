@@ -87,13 +87,14 @@ TEST_CASE("we can compute a bucket decomposition") {
 }
 
 TEST_CASE("we can fit parameters for a multiproduct kernel") {
-  for (unsigned n=1; n<=max_multiexponentiation_length_v; ++n) {
+  for (unsigned n = 1; n <= max_multiexponentiation_length_v; ++n) {
     fit_multiproduct_table_kernel(
         [&]<unsigned NumThreads, unsigned ItemsPerThread>(
             std::integral_constant<unsigned, NumThreads>,
             std::integral_constant<unsigned, ItemsPerThread>) noexcept {
-        REQUIRE(NumThreads * ItemsPerThread >= n);
-        REQUIRE(NumThreads * (ItemsPerThread - 1) < n);
-    }, n);
+          REQUIRE(NumThreads * ItemsPerThread >= n);
+          REQUIRE(NumThreads * (ItemsPerThread - 1) < n);
+        },
+        n);
   }
 }

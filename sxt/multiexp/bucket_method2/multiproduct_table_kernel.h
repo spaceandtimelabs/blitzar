@@ -26,7 +26,7 @@
 
 namespace sxt::mtxbk2 {
 //--------------------------------------------------------------------------------------------------
-// max_multiexponentiation_length_v 
+// max_multiexponentiation_length_v
 //--------------------------------------------------------------------------------------------------
 static constexpr unsigned max_multiexponentiation_length_v = 128 * 32;
 
@@ -96,10 +96,9 @@ __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_counts,
 }
 
 //--------------------------------------------------------------------------------------------------
-// fit_multiproduct_table_kernel 
+// fit_multiproduct_table_kernel
 //--------------------------------------------------------------------------------------------------
-template <class F>
-void fit_multiproduct_table_kernel(F f, unsigned n) noexcept {
+template <class F> void fit_multiproduct_table_kernel(F f, unsigned n) noexcept {
   SXT_RELEASE_ASSERT(n <= max_multiexponentiation_length_v);
   if (n < 128) {
     return f(std::integral_constant<unsigned, 128>{}, std::integral_constant<unsigned, 1>{});

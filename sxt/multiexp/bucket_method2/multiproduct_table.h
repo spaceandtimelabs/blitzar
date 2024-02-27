@@ -26,6 +26,12 @@ namespace sxt::mtxbk2 {
 //--------------------------------------------------------------------------------------------------
 // make_multiproduct_table
 //--------------------------------------------------------------------------------------------------
+/**
+ * Create a table with the multiproducts needed for each bucket of a multiexponentiation.
+ *
+ * bucket_prefix_counts contains the inclusive prefix sum of the number of bucket entries
+ * and indexes contains the generator indexes for a buckets multiproduct laid out sequentially.
+ */
 xena::future<> make_multiproduct_table(basct::span<uint16_t> bucket_prefix_counts,
                                        basct::span<uint16_t> indexes,
                                        basct::cspan<const uint8_t*> scalars,
