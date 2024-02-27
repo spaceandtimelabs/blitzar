@@ -100,9 +100,6 @@ __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_counts,
 //--------------------------------------------------------------------------------------------------
 template <class F> void fit_multiproduct_table_kernel(F f, unsigned n) noexcept {
   SXT_RELEASE_ASSERT(n <= max_multiexponentiation_length_v);
-  if (n < 128) {
-    return f(std::integral_constant<unsigned, 128>{}, std::integral_constant<unsigned, 1>{});
-  }
   basn::constexpr_switch<1, max_multiexponentiation_length_v / 128u + 1u>(
       basn::divide_up(n, 128u), [&]<unsigned K>(std::integral_constant<unsigned, K>) noexcept {
         return f(std::integral_constant<unsigned, 128>{}, std::integral_constant<unsigned, K>{});
