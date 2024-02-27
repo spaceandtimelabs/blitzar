@@ -58,7 +58,7 @@ xena::future<> make_multiproduct_table(basct::span<uint16_t> bucket_prefix_count
   // compute buckets
   basl::info("computing multiproduct decomposition");
   SXT_RELEASE_ASSERT(bit_width == 8u, "only support bit_width == 8u for now");
-  SXT_RELEASE_ASSERT(n <= max_multiexponentiation_length_v, "only support n <= 1024 for now");
+  SXT_RELEASE_ASSERT(n <= max_multiexponentiation_length_v, "limit length for now");
   basdv::stream stream;
   fit_multiproduct_table_kernel(
       [&]<unsigned NumThreads, unsigned ItemsPerThread>(
