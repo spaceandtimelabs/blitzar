@@ -81,14 +81,14 @@ CUDA_CALLABLE void reduction_kernel(T* __restrict__ res, const T* __restrict__ s
 // reduce_buckets
 //--------------------------------------------------------------------------------------------------
 /**
- * Combine buckets for a multi-exponentiation.
+ * Combine and reduce buckets for a multi-exponentiation.
  *
  * This function corresponds roughly to the 2nd and 3rd loops of Algorithm 1 described in
  *
  *    PipeMSM: Hardware Acceleration for Multi-Scalar Multiplication
  *    https://eprint.iacr.org/2022/999.pdf
  *
- * This is targeted more for the case of many outputs, so each thread does the full reduction for a
+ * This is targeted for the case of many outputs so each thread does the full reduction for a
  * single output.
  */
 template <bascrv::element T>
