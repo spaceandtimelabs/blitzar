@@ -41,29 +41,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "reduce",
-    test_deps = [
-        "//sxt/base/curve:example_element",
-        "//sxt/base/device:synchronization",
-        "//sxt/base/test:unit_test",
-        "//sxt/execution/schedule:scheduler",
-        "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:managed_device_resource",
-    ],
-    deps = [
-        "//sxt/algorithm/iteration:for_each",
-        "//sxt/base/container:span",
-        "//sxt/base/curve:element",
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/device:stream",
-        "//sxt/base/macro:cuda_callable",
-        "//sxt/execution/async:coroutine",
-        "//sxt/execution/device:synchronization",
-        "//sxt/memory/resource:async_device_resource",
-    ],
-)
-
-sxt_cc_component(
     name = "sum",
     test_deps = [
         "//sxt/base/curve:example_element",
@@ -145,5 +122,28 @@ sxt_cc_component(
         "//sxt/algorithm/block:runlength_count",
         "//sxt/base/device:stream",
         "@local_cuda//:cub",
+    ],
+)
+
+sxt_cc_component(
+    name = "reduce",
+    test_deps = [
+        "//sxt/base/curve:example_element",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+        "//sxt/algorithm/iteration:for_each",
+        "//sxt/base/container:span",
+        "//sxt/base/curve:element",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/macro:cuda_callable",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:synchronization",
+        "//sxt/memory/resource:async_device_resource",
     ],
 )
