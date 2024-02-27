@@ -92,4 +92,24 @@ TEST_CASE("we can construct the multi-product table for the bucket method") {
     REQUIRE(bucket_prefix_counts == expected_counts);
     REQUIRE(indexes == expected_indexes);
   }
+
+  SECTION("we handle two scalars of one") {
+    n = 2;
+    std::vector<uint8_t> scalars1(32 * n);
+    scalars1[0] = 1;
+    scalars1[element_num_bytes] = 1;
+    scalars = {scalars1.data()};
+    indexes.resize(num_digits * n);
+    auto fut = make_multiproduct_table(bucket_prefix_counts, indexes, scalars, element_num_bytes,
+                                       bit_width, n);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    std::fill_n(expected_counts.begin(), num_buckets_per_digit, 2u);
+    expected_indexes.resize(indexes.size());
+    expected_indexes[0] = 0;
+    expected_indexes[1] = 1;
+    basdv::synchronize_device();
+    REQUIRE(bucket_prefix_counts == expected_counts);
+    REQUIRE(indexes == expected_indexes);
+  }
 }
