@@ -21,6 +21,7 @@ sxt_cc_library(
         "curve_addition_bls12_381.h",
     ],
     deps = [
+        "//sxt/base/num:divide_up",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/curve_g1/operation:add",
         "//sxt/curve_g1/operation:double",
