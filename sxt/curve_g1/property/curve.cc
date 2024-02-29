@@ -63,6 +63,7 @@ bool is_on_curve(const cg1t::element_affine& p) noexcept {
 /**
  * Returns true if the element is on the curve: (y^2 * z) = x^3 + (b_v * z^3)
  */
+CUDA_CALLABLE
 bool is_on_curve(const cg1t::element_p2& p) noexcept {
   f12t::element y2;
   f12t::element y2_z;

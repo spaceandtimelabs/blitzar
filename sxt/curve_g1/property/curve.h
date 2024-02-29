@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include "sxt/base/macro/cuda_callable.h"
+
 namespace sxt::cg1t {
 struct element_affine;
 struct element_p2;
@@ -30,5 +32,6 @@ bool is_on_curve(const cg1t::element_affine& p) noexcept;
 //--------------------------------------------------------------------------------------------------
 // is_on_curve
 //--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
 bool is_on_curve(const cg1t::element_p2& p) noexcept;
 } // namespace sxt::cg1p

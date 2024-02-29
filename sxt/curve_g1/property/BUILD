@@ -16,7 +16,9 @@ sxt_cc_component(
         "//sxt/field12/property:zero",
         "//sxt/field12/type:element",
     ],
+    is_cuda = True,
     test_deps = [
+        "//sxt/base/macro:cuda_callable",
         "//sxt/base/test:unit_test",
         "//sxt/curve_g1/constant:b",
         "//sxt/curve_g1/constant:generator",
