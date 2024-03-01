@@ -76,3 +76,32 @@ sxt_cc_component(
         "//sxt/memory/resource:async_device_resource",
     ],
 )
+
+sxt_cc_component(
+    name = "sum",
+    test_deps = [
+        "//sxt/base/curve:example_element",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+        ":multiproduct_table",
+        "//sxt/algorithm/iteration:for_each",
+        "//sxt/base/container:span",
+        "//sxt/base/curve:element",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
+        "//sxt/base/log",
+        "//sxt/base/num:divide_up",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/execution/device:for_each",
+        "//sxt/execution/device:synchronization",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:pinned_resource",
+    ],
+)
