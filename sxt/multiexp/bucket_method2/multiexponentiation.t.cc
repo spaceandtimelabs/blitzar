@@ -125,3 +125,30 @@ TEST_CASE("we can compute a multiexponentiation") {
     REQUIRE(res[1] == 7u * 12u + 4u * 34u);
   }
 }
+
+TEST_CASE("we can compute multiexponentiations with mtxb::exponent_sequence") {
+  std::vector<mtxb::exponent_sequence> exponents;
+  std::vector<bascrv::element97> generators;
+  const unsigned element_num_bytes = 32;
+
+  SECTION("we handle exponents in the target range") {
+    unsigned n = 1000;
+    generators.resize(n);
+    std::vector<uint8_t> scalars1(element_num_bytes * n);
+    for (unsigned i = 0; i < n; ++i) {
+      scalars1[i * element_num_bytes] = 1u;
+      generators[i] = i;
+    }
+    exponents.push_back(mtxb::exponent_sequence{
+        .element_nbytes = element_num_bytes,
+        .n = n,
+        .data = scalars1.data(),
+        .is_signed = 0,
+    });
+    auto fut = try_multiexponentiate<bascrv::element97>(generators, exponents);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    memmg::managed_array<bascrv::element97> expected = {n * (n - 1u) / 2u};
+    REQUIRE(fut.value() == expected);
+  }
+}
