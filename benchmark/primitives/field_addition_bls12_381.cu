@@ -78,7 +78,7 @@ void init_random_array(f12t::element* rand, unsigned n_elements) {
 // add_bls12_381_g1_field_elements
 //--------------------------------------------------------------------------------------------------
 void add_bls12_381_g1_field_elements(unsigned vector_size, unsigned repetitions) noexcept {
-  std::print("add_bls12_381_g1_field_elements");
+  std::print("add_bls12_381_g1_field_elements\n");
 
   // Allocate memory for the input and output vectors
   memmg::managed_array<f12t::element> a(vector_size, memr::get_device_resource());

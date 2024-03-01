@@ -78,7 +78,7 @@ void init_random_array(cg1t::element_p2* rand, unsigned n_elements) {
 // add_bls12_381_g1_curve_elements
 //--------------------------------------------------------------------------------------------------
 void add_bls12_381_g1_curve_elements(unsigned vector_size, unsigned repetitions) noexcept {
-  std::print("add_bls12_381_g1_curve_elements");
+  std::print("add_bls12_381_g1_curve_elements\n");
   
   // Allocate memory for the input and output vectors
   memmg::managed_array<cg1t::element_p2> a(vector_size, memr::get_device_resource());
