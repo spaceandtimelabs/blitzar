@@ -14,20 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <iostream>
+#pragma once
 
-#include "benchmark/primatives/curve_addition_bls12_381.h"
-
-int main(int argc, char* argv[]) {
-  if (argc < 3) {
-    std::cerr << "Usage: benchmark <vector_size> <repetitions>\n";
-    return -1;
-  }
-
-  auto vector_size = std::atoi(argv[2]);
-  auto repetitions = std::atoi(argv[3]);
-
-  sxt::add(vector_size, repetitions);
-
-  return 0;
-}
+namespace sxt {
+//--------------------------------------------------------------------------------------------------
+// add_bls12_381_g1_field_elements
+//--------------------------------------------------------------------------------------------------
+void add_bls12_381_g1_field_elements(unsigned vector_size, unsigned repetitions) noexcept;
+} // namespace sxt

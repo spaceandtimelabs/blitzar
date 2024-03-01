@@ -4,7 +4,7 @@ Currently only supports benchmarks for addition with `bls12-381` `G1` curve elem
 This benchmark is similar to the Icicle's [example/multiply](https://github.com/ingonyama-zk/icicle/tree/40309329fbf6c5fc7e77d629c72b4a3d28036444/examples/c%2B%2B/multiply), but updated to measure curve addition operations.
 
 ## Usages
-`bazel run -c opt //benchmark/primatives:benchmark -- gpu <vector_size> <repetitions>`
+`bazel run -c opt //benchmark/primitives:benchmark <vector_size> <repetitions>`
 
 ## Example
-`bazel run -c opt //benchmark/primatives:benchmark -- gpu 1048576 16384`
+`bazel run -c opt //benchmark/primitives:benchmark 1048576 16384`

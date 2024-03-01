@@ -16,13 +16,9 @@
  */
 #pragma once
 
-namespace sxt::cg1t {
-struct element_p2;
-}
-
 namespace sxt {
 //--------------------------------------------------------------------------------------------------
-// add
+// add_bls12_381_g1_curve_elements
 //--------------------------------------------------------------------------------------------------
-void add(size_t vector_size, size_t repetitions) noexcept;
+void add_bls12_381_g1_curve_elements(unsigned vector_size, unsigned repetitions) noexcept;
 } // namespace sxt

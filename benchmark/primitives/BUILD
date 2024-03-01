@@ -9,6 +9,7 @@ sxt_cc_benchmark(
     visibility = ["//visibility:public"],
     deps = [
         ":curve_addition_bls12_381",
+        ":field_addition_bls12_381",
     ],
 )
 
@@ -24,10 +25,27 @@ sxt_cc_library(
         "//sxt/base/num:divide_up",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/curve_g1/operation:add",
-        "//sxt/curve_g1/operation:double",
-        "//sxt/curve_g1/operation:neg",
         "//sxt/curve_g1/random:element_p2",
         "//sxt/curve_g1/type:element_p2",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:device_resource",
+    ],
+)
+
+sxt_cc_library(
+    name = "field_addition_bls12_381",
+    srcs = [
+        "field_addition_bls12_381.cu",
+    ],
+    hdrs = [
+        "field_addition_bls12_381.h",
+    ],
+    deps = [
+        "//sxt/base/num:divide_up",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/field12/operation:add",
+        "//sxt/field12/random:element",
+        "//sxt/field12/type:element",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:device_resource",
     ],
