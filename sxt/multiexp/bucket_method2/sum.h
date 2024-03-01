@@ -20,14 +20,9 @@
 
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
-#include "sxt/base/container/span_utility.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/memory_utility.h"
-#include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
-#include "sxt/base/iterator/index_range.h"
-#include "sxt/base/iterator/index_range_iterator.h"
-#include "sxt/base/iterator/index_range_utility.h"
 #include "sxt/base/log/log.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
@@ -79,6 +74,14 @@ CUDA_CALLABLE void sum_bucket(T* __restrict__ sums, const T* __restrict__ genera
 //--------------------------------------------------------------------------------------------------
 // sum_buckets
 //--------------------------------------------------------------------------------------------------
+/**
+ * Sum generators into buckets.
+ *
+ * This function corresponds roughly to the 1st loop of Algorithm 1 described in
+ *
+ *    PipeMSM: Hardware Acceleration for Multi-Scalar Multiplication
+ *    https://eprint.iacr.org/2022/999.pdf
+ */
 template <bascrv::element T>
 xena::future<> sum_buckets(basct::span<T> sums, basct::cspan<T> generators,
                            basct::cspan<const uint8_t*> exponents, unsigned element_num_bytes,
