@@ -38,6 +38,7 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
+#include "sxt/multiexp/bucket_method2/multiproduct_table_kernel.h"
 #include "sxt/multiexp/bucket_method2/reduce.h"
 #include "sxt/multiexp/bucket_method2/sum.h"
 
@@ -98,7 +99,7 @@ try_multiexponentiate(basct::cspan<T> generators,
     co_return res;
   }
   auto n = max_n;
-  if (n > 1024 || n < 256) {
+  if (n > max_multiexponentiation_length_v || n < 256) {
     co_return res;
   }
   SXT_DEBUG_ASSERT(generators.size() >= n);

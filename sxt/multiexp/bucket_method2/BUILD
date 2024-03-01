@@ -18,6 +18,7 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
+        ":multiproduct_table_kernel",
         ":reduce",
         ":sum",
         "//sxt/base/container:span",
