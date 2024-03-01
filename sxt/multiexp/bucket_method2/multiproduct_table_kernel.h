@@ -75,6 +75,7 @@ __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_counts,
 
   // sort
   RadixSort(temp_storage.sort).Sort(keys, values);
+  __syncthreads();
 
   // count
   auto counts = RunlengthCount(temp_storage.count).count(keys);
