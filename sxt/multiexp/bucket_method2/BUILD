@@ -4,6 +4,11 @@ load(
 )
 
 sxt_cc_component(
+    name = "constants",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "multiexponentiation",
     test_deps = [
         "//sxt/base/curve:example_element",
@@ -18,7 +23,7 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
-        ":multiproduct_table_kernel",
+        ":constants",
         ":reduce",
         ":sum",
         "//sxt/base/container:span",
@@ -86,6 +91,7 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
+      ":constants",
         "//sxt/algorithm/block:runlength_count",
         "//sxt/base/device:stream",
         "@local_cuda//:cub",

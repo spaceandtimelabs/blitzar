@@ -38,7 +38,7 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
-#include "sxt/multiexp/bucket_method2/multiproduct_table_kernel.h"
+#include "sxt/multiexp/bucket_method2/constants.h"
 #include "sxt/multiexp/bucket_method2/reduce.h"
 #include "sxt/multiexp/bucket_method2/sum.h"
 
