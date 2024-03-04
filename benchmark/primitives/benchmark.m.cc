@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
   std::print("repetitions : {}\n", repetitions);
   std::print("*****************************\n");
 
-  add_bls12_381_g1_curve_elements(vector_size, repetitions);
+  // add_bls12_381_g1_curve_elements(vector_size, repetitions);
   add_bls12_381_g1_field_elements(vector_size, repetitions);
 
   std::print("******************************\n");

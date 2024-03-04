@@ -25,6 +25,10 @@
  */
 #pragma once
 
+#include <cstdint>
+
+// #include <cuda_runtime.h>
+
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/type/int.h"
 #include "sxt/base/type/narrow_cast.h"
@@ -34,7 +38,7 @@ namespace sxt::basfld {
 // mac
 //--------------------------------------------------------------------------------------------------
 /*
- Compute a + (b * c) + carry, returning the result and the new carry over.
+ * Compute a + (b * c) + carry, returning the result and the new carry over.
  */
 CUDA_CALLABLE void inline mac(uint64_t& ret, uint64_t& carry, const uint64_t a, const uint64_t b,
                               const uint64_t c) noexcept {
@@ -48,27 +52,44 @@ CUDA_CALLABLE void inline mac(uint64_t& ret, uint64_t& carry, const uint64_t a, 
 // adc
 //--------------------------------------------------------------------------------------------------
 /*
- Compute a + b + carry, returning the result and the new carry over.
+ * Compute a + b + carry, returning the result and the new carry over.
  */
 CUDA_CALLABLE void inline adc(uint64_t& ret, uint64_t& carry, const uint64_t a, const uint64_t b,
                               const uint64_t c) noexcept {
+#ifdef __CUDA_ARCH__
+  asm volatile("add.u64 %0, %3, %4;\n\t"    // ret = b + c
+               "add.cc.u64 %0, %0, %2;\n\t" // ret = ret + a
+               "addc.u64 %1, 0, 0;\n\t"     // carry -> captured from add.cc
+               : "=l"(ret), "=l"(carry)     // Set outputs
+               : "l"(a), "l"(b), "l"(c)     // Set inputs
+               :);
+#else
   uint128_t ret_tmp = uint128_t{a} + uint128_t{b} + uint128_t{c};
-
   ret = bast::narrow_cast<uint64_t>(ret_tmp);
   carry = bast::narrow_cast<uint64_t>(ret_tmp >> 64);
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------
 // sbb
 //--------------------------------------------------------------------------------------------------
 /*
- Compute a - (b + borrow), returning the result and the new borrow.
+ * Compute a - (b + borrow), returning the result and the new borrow.
  */
 CUDA_CALLABLE void inline sbb(uint64_t& ret, uint64_t& borrow, const uint64_t a,
                               const uint64_t b) noexcept {
+#ifdef __CUDA_ARCH__
+  asm volatile("sub.u64 %0, %2, %3;\n"             // ret = a - b
+               "subc.u64 %0, %0, %4;\n"            // ret = ret - (borrow >> 63)
+               "subc.u64 %1, 0, 0;"                // borrow
+               : "=l"(ret), "=l"(borrow)           // Set outputs
+               : "l"(a), "l"(b), "l"(borrow >> 63) // Set inputs
+  );
+#else
   uint128_t ret_tmp = uint128_t{a} - (uint128_t{b} + uint128_t{(borrow >> 63)});
 
   ret = bast::narrow_cast<uint64_t>(ret_tmp);
   borrow = bast::narrow_cast<uint64_t>(ret_tmp >> 64);
+#endif
 }
 } // namespace sxt::basfld
