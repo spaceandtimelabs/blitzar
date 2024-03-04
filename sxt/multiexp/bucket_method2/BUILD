@@ -91,7 +91,7 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
-      ":constants",
+        ":constants",
         "//sxt/algorithm/block:runlength_count",
         "//sxt/base/device:stream",
         "@local_cuda//:cub",

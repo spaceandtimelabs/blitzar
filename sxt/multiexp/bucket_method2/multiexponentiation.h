@@ -79,6 +79,9 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> generators,
 /**
  * Attempt to compute a multi-exponentiation using the bucket method if the problem dimensions
  * suggest it will give a performance benefit; otherwise, return an empty array.
+ *
+ * This version of the bucket method targets cases where the multiexponention length
+ * is shorter and the number of outputs is larger.
  */
 template <bascrv::element T>
 xena::future<memmg::managed_array<T>>

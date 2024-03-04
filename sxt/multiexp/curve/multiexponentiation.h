@@ -148,9 +148,8 @@ template <bascrv::element Element>
 xena::future<memmg::managed_array<Element>>
 async_compute_multiexponentiation(basct::cspan<Element> generators,
                                   basct::cspan<mtxb::exponent_sequence> exponents) noexcept {
-  // try bucket method first
+  // try bucket methods first
   auto res_maybe = co_await mtxbk2::try_multiexponentiate(generators, exponents);
-  /* auto res_maybe = co_await mtxbk::try_multiexponentiate(generators, exponents); */
   if (res_maybe.empty()) {
     res_maybe = co_await mtxbk::try_multiexponentiate(generators, exponents);
   }
