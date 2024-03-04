@@ -38,13 +38,14 @@
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/bucket_method/multiexponentiation.h"
-#include "sxt/multiexp/bucket_method2/multiexponentiation.h"
 #include "sxt/multiexp/curve/multiexponentiation_cpu_driver.h"
 #include "sxt/multiexp/curve/multiproduct.h"
 #include "sxt/multiexp/curve/multiproducts_combination.h"
 #include "sxt/multiexp/curve/pippenger_multiproduct_solver.h"
 #include "sxt/multiexp/pippenger/multiexponentiation.h"
 #include "sxt/multiexp/pippenger/multiproduct_decomposition_gpu.h"
+
+#include "sxt/multiexp/bucket_method2/multiexponentiation.h"
 
 namespace sxt::mtxcrv {
 //--------------------------------------------------------------------------------------------------
