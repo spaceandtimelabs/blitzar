@@ -16,10 +16,19 @@
  */
 #include "sxt/field12/base/subtract_p.h"
 
+#include <random>
+
 #include "sxt/base/test/unit_test.h"
 #include "sxt/field12/base/constants.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/managed_device_resource.h"
 
+using namespace sxt;
 using namespace sxt::f12b;
+
+// __global__ void subtract_p_device(uint64_t* __restrict__ ret, const uint64_t* __restrict__ a) {
+//   subtract_p(ret, a);
+// }
 
 TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
   SECTION("with minimum value") {
@@ -77,3 +86,29 @@ TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
     REQUIRE(expect == ret);
   }
 }
+
+// TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
+//   SECTION("matches non GPU version") {
+//     memmg::managed_array<std::array<uint64_t, 6>> a(1, memr::get_managed_device_resource());
+//     memmg::managed_array<std::array<uint64_t, 6>> ret(1, memr::get_managed_device_resource());
+
+//     std::random_device rd;
+//     std::mt19937_64 gen(rd());
+//     std::uniform_int_distribution<uint64_t> uni_dis;
+
+//     constexpr unsigned iter = 100;
+//     for (unsigned i = 0; i < iter; ++i) {
+//       for (unsigned i = 0; i < 6; ++i) {
+//         a[0][i] = uni_dis(gen);
+//       }
+
+//       std::array<uint64_t, 6> ret_expected;
+//       subtract_p(ret_expected.data(), a[0].data());
+
+//       subtract_p_device<<<1, 1>>>(ret.data(), a.data());
+//       cudaDeviceSynchronize();
+
+//       REQUIRE(ret[0] == ret_expected);
+//     }
+//   }
+// }

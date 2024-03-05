@@ -159,4 +159,32 @@ __device__ __forceinline__ uint64_t addc_cc(const uint64_t x, const uint64_t y)
   asm volatile("addc.cc.u64 %0, %1, %2;" : "=l"(result) : "l"(x), "l"(y));
   return result;
 }
+
+__device__ __forceinline__ uint64_t sub(const uint64_t x, const uint64_t y)
+{
+  uint64_t result;
+  asm("sub.u64 %0, %1, %2;" : "=l"(result) : "l"(x), "l"(y));
+  return result;
+}
+
+__device__ __forceinline__ uint64_t sub_cc(const uint64_t x, const uint64_t y)
+{
+  uint64_t result;
+  asm volatile("sub.cc.u64 %0, %1, %2;" : "=l"(result) : "l"(x), "l"(y));
+  return result;
+}
+
+__device__ __forceinline__ uint64_t subc(const uint64_t x, const uint64_t y)
+{
+  uint64_t result;
+  asm volatile("subc.u64 %0, %1, %2;" : "=l"(result) : "l"(x), "l"(y));
+  return result;
+}
+
+__device__ __forceinline__ uint64_t subc_cc(const uint64_t x, const uint64_t y)
+{
+  uint64_t result;
+  asm volatile("subc.cc.u64 %0, %1, %2;" : "=l"(result) : "l"(x), "l"(y));
+  return result;
+}
 } // namespace sxt::basfld
