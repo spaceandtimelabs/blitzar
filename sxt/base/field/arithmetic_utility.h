@@ -27,8 +27,6 @@
 
 #include <cstdint>
 
-// #include <cuda_runtime.h>
-
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/type/int.h"
 #include "sxt/base/type/narrow_cast.h"
@@ -78,18 +76,10 @@ CUDA_CALLABLE void inline adc(uint64_t& ret, uint64_t& carry, const uint64_t a, 
  */
 CUDA_CALLABLE void inline sbb(uint64_t& ret, uint64_t& borrow, const uint64_t a,
                               const uint64_t b) noexcept {
-#ifdef __CUDA_ARCH__
-  asm volatile("sub.u64 %0, %2, %3;\n"             // ret = a - b
-               "subc.u64 %0, %0, %4;\n"            // ret = ret - (borrow >> 63)
-               "subc.u64 %1, 0, 0;"                // borrow
-               : "=l"(ret), "=l"(borrow)           // Set outputs
-               : "l"(a), "l"(b), "l"(borrow >> 63) // Set inputs
-  );
-#else
+
   uint128_t ret_tmp = uint128_t{a} - (uint128_t{b} + uint128_t{(borrow >> 63)});
 
   ret = bast::narrow_cast<uint64_t>(ret_tmp);
   borrow = bast::narrow_cast<uint64_t>(ret_tmp >> 64);
-#endif
 }
 } // namespace sxt::basfld
