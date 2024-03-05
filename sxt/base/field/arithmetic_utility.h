@@ -40,10 +40,51 @@ namespace sxt::basfld {
  */
 CUDA_CALLABLE void inline mac(uint64_t& ret, uint64_t& carry, const uint64_t a, const uint64_t b,
                               const uint64_t c) noexcept {
-  uint128_t ret_tmp = uint128_t{a} + (uint128_t{b} * uint128_t{c}) + uint128_t{carry};
+  #ifdef __CUDA_ARCH__
+    uint64_t mul_lo, mul_hi;
+    uint64_t add_temp_lo;
+    uint64_t overflow;
 
-  ret = bast::narrow_cast<uint64_t>(ret_tmp);
-  carry = bast::narrow_cast<uint64_t>((ret_tmp >> 64));
+    // Step 1: Multiply b and c
+    asm volatile(
+        "mul.lo.u64 %0, %2, %3;\n\t" // Compute lower 64 bits of b*c
+        "mul.hi.u64 %1, %2, %3;\n\t" // Compute upper 64 bits of b*c
+        : "=l"(mul_lo), "=l"(mul_hi)
+        : "l"(b), "l"(c)
+    );
+
+    // Step 2: Add a to the lower part of the product
+    asm volatile(
+        "add.cc.u64 %0, %2, %3;\n\t" // Compute a + mul_lo, check for carry
+        "addc.u64 %1, 0, 0;\n\t"     // Add carry to 0, effectively capturing the carry
+        : "=l"(add_temp_lo), "=l"(overflow)
+        : "l"(a), "l"(mul_lo)
+    );
+
+    // Step 3: Add carry to the result of the previous addition, handle overflow
+    asm volatile(
+        "add.cc.u64 %0, %2, %3;\n\t" // Compute add_temp_lo + carry, check for carry
+        "addc.u64 %1, %1, 0;\n\t"    // Add carry to the previous overflow
+        : "+l"(add_temp_lo), "+l"(overflow)
+        : "l"(add_temp_lo), "l"(carry)
+    );
+
+    // Step 4: Add any overflow from the multiplication to the accumulated overflow
+    asm volatile(
+        "add.cc.u64 %0, %1, %2;\n\t" // Add mul_hi to overflow, check for carry
+        "addc.u64 %0, %0, 0;\n\t"    // Add any additional carry
+        : "+l"(overflow)
+        : "l"(overflow), "l"(mul_hi)
+    );
+
+    ret = add_temp_lo; // The lower 64 bits of the result
+    carry = overflow;    // The upper 64 bits (including all carries and overflow)
+  #else
+    uint128_t ret_tmp = uint128_t{a} + (uint128_t{b} * uint128_t{c}) + uint128_t{carry};
+
+    ret = bast::narrow_cast<uint64_t>(ret_tmp);
+    carry = bast::narrow_cast<uint64_t>((ret_tmp >> 64));
+  #endif
 }
 
 //--------------------------------------------------------------------------------------------------

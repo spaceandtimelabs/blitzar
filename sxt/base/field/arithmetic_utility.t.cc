@@ -36,6 +36,11 @@ __global__ void sub(uint64_t* __restrict__ ret, uint64_t* __restrict__ borrow,
   sbb(ret[0], borrow[0], a[0], b[0]);
 }
 
+__global__ void mul(uint64_t* __restrict__ ret, uint64_t* __restrict__ carry,
+                    const uint64_t* __restrict__ a, const uint64_t* __restrict__ b, const uint64_t* __restrict__ c) {
+  mac(ret[0], carry[0], a[0], b[0], c[0]);
+}
+
 TEST_CASE("mac (multiplication and carry) can handle computation") {
   SECTION("with minimum values") {
     constexpr uint64_t a{0x0};
@@ -81,6 +86,44 @@ TEST_CASE("mac (multiplication and carry) can handle computation") {
     REQUIRE(carry == 0xffffffffffffffff);
   }
 }
+
+
+
+
+TEST_CASE("mac (multiplication and carry) can handle computation on the GPU") {
+  memmg::managed_array<uint64_t> a(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> b(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> c(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> ret(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> carry(1, memr::get_managed_device_resource());
+
+
+  SECTION("by matching the non-GPU implementation on random values") {
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    std::uniform_int_distribution<uint64_t> uni_dis;
+    std::bernoulli_distribution ber_d(0.5);
+
+    for (unsigned i = 0; i < 1; ++i) {
+      a[0] = uni_dis(gen);
+      b[0] = uni_dis(gen);
+      c[0] = uni_dis(gen);
+      carry[0] = ber_d(gen) ? 0x0 : 0x0;
+      ret[0] = 0x0;
+
+      uint64_t ret_expected{0};
+      uint64_t carry_expected{0};
+      mac(ret_expected, carry_expected, a[0], b[0], c[0]);
+
+      mul<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), c.data());
+      cudaDeviceSynchronize();
+
+      REQUIRE(ret[0] == ret_expected);
+      REQUIRE(carry[0] == carry_expected);
+    }
+  }
+}
+
 
 TEST_CASE("adc (addition and carry) can handle computation") {
   SECTION("with minimum values") {
@@ -130,9 +173,6 @@ TEST_CASE("adc (addition and carry) can handle computation on the GPU") {
   memmg::managed_array<uint64_t> ret(1, memr::get_managed_device_resource());
   memmg::managed_array<uint64_t> carry(1, memr::get_managed_device_resource());
 
-  memmg::managed_array<uint64_t> h_ret(1);
-  memmg::managed_array<uint64_t> h_carry(1);
-
   SECTION("with minimum values on the GPU") {
     a[0] = 0x0;
     b[0] = 0x0;
@@ -142,11 +182,8 @@ TEST_CASE("adc (addition and carry) can handle computation on the GPU") {
     add<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), carry.data());
     cudaDeviceSynchronize();
 
-    cudaMemcpy(h_ret.data(), ret.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
-    cudaMemcpy(h_carry.data(), carry.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
-
-    REQUIRE(h_ret[0] == 0x0);
-    REQUIRE(h_carry[0] == 0x0);
+    REQUIRE(ret[0] == 0x0);
+    REQUIRE(carry[0] == 0x0);
   }
 
   SECTION("without carryover on pre-comuputed values") {
@@ -158,11 +195,8 @@ TEST_CASE("adc (addition and carry) can handle computation on the GPU") {
     add<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), carry.data());
     cudaDeviceSynchronize();
 
-    cudaMemcpy(h_ret.data(), ret.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
-    cudaMemcpy(h_carry.data(), carry.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
-
-    REQUIRE(h_ret[0] == 0x11);
-    REQUIRE(h_carry[0] == 0x0);
+    REQUIRE(ret[0] == 0x11);
+    REQUIRE(carry[0] == 0x0);
   }
 
   SECTION("with carryover on pre-comuputed values") {
@@ -174,11 +208,8 @@ TEST_CASE("adc (addition and carry) can handle computation on the GPU") {
     add<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), carry.data());
     cudaDeviceSynchronize();
 
-    cudaMemcpy(h_ret.data(), ret.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
-    cudaMemcpy(h_carry.data(), carry.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
-
-    REQUIRE(h_ret[0] == 0x0);
-    REQUIRE(h_carry[0] == 0x1);
+    REQUIRE(ret[0] == 0x0);
+    REQUIRE(carry[0] == 0x1);
   }
 
   SECTION("by matching the non-GPU implementation on random values") {
@@ -200,11 +231,8 @@ TEST_CASE("adc (addition and carry) can handle computation on the GPU") {
       add<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), carry.data());
       cudaDeviceSynchronize();
 
-      cudaMemcpy(h_ret.data(), ret.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_carry.data(), carry.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
-
-      REQUIRE(h_ret[0] == ret_expected);
-      REQUIRE(h_carry[0] == carry_expected);
+      REQUIRE(ret[0] == ret_expected);
+      REQUIRE(carry[0] == carry_expected);
     }
   }
 
@@ -217,11 +245,8 @@ TEST_CASE("adc (addition and carry) can handle computation on the GPU") {
     add<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), carry.data());
     cudaDeviceSynchronize();
 
-    cudaMemcpy(h_ret.data(), ret.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
-    cudaMemcpy(h_carry.data(), carry.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
-
-    REQUIRE(h_ret[0] == 0xfffffffffffffffe);
-    REQUIRE(h_carry[0] == 0x1);
+    REQUIRE(ret[0] == 0xfffffffffffffffe);
+    REQUIRE(carry[0] == 0x1);
   }
 }
 
@@ -273,9 +298,6 @@ TEST_CASE("sbb (subtraction and borrow) can handle computation on the GPU") {
   memmg::managed_array<uint64_t> ret(1, memr::get_managed_device_resource());
   memmg::managed_array<uint64_t> borrow(1, memr::get_managed_device_resource());
 
-  memmg::managed_array<uint64_t> h_ret(1);
-  memmg::managed_array<uint64_t> h_borrow(1);
-
   SECTION("by matching the non-GPU implementation on random values") {
     std::random_device rd;
     std::mt19937_64 gen(rd());
@@ -295,11 +317,8 @@ TEST_CASE("sbb (subtraction and borrow) can handle computation on the GPU") {
       sub<<<1, 1>>>(ret.data(), borrow.data(), a.data(), b.data());
       cudaDeviceSynchronize();
 
-      cudaMemcpy(h_ret.data(), ret.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_borrow.data(), borrow.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
-
-      REQUIRE(h_ret[0] == ret_expected);
-      REQUIRE(h_borrow[0] == borrow_expected);
+      REQUIRE(ret[0] == ret_expected);
+      REQUIRE(borrow[0] == borrow_expected);
     }
   }
 }
