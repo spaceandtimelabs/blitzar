@@ -32,6 +32,8 @@
 #include "sxt/field12/base/constants.h"
 #include "sxt/field12/base/subtract_p.h"
 #include "sxt/field12/type/element.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/managed_device_resource.h"
 
 namespace sxt::f12o {
 //--------------------------------------------------------------------------------------------------
@@ -40,14 +42,22 @@ namespace sxt::f12o {
 CUDA_CALLABLE inline void add(f12t::element& h, const f12t::element& f,
                               const f12t::element& g) noexcept {
   uint64_t h_tmp[6] = {};
-  uint64_t carry{0};
 
-  basfld::adc(h_tmp[0], carry, f[0], g[0], carry);
-  basfld::adc(h_tmp[1], carry, f[1], g[1], carry);
-  basfld::adc(h_tmp[2], carry, f[2], g[2], carry);
-  basfld::adc(h_tmp[3], carry, f[3], g[3], carry);
-  basfld::adc(h_tmp[4], carry, f[4], g[4], carry);
-  basfld::adc(h_tmp[5], carry, f[5], g[5], carry);
+  #ifdef __CUDA_ARCH___
+    h_tmp[0] = basfld::add_cc(f[0], g[0]);
+    for (unsigned i = 1; i < f12t::element::num_limbs_v; ++i) {
+      h_tmp[i] = basfld::addc_cc(f[i], g[i]);
+    }
+  #else
+    uint64_t carry{0};
+
+    basfld::adc(h_tmp[0], carry, f[0], g[0], carry);
+    basfld::adc(h_tmp[1], carry, f[1], g[1], carry);
+    basfld::adc(h_tmp[2], carry, f[2], g[2], carry);
+    basfld::adc(h_tmp[3], carry, f[3], g[3], carry);
+    basfld::adc(h_tmp[4], carry, f[4], g[4], carry);
+    basfld::adc(h_tmp[5], carry, f[5], g[5], carry);
+  #endif
 
   f12b::subtract_p(h.data(), h_tmp);
 }

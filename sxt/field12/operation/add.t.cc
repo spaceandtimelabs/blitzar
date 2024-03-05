@@ -16,12 +16,20 @@
  */
 #include "sxt/field12/operation/add.h"
 
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/field12/constant/zero.h"
+#include "sxt/field12/random/element.h"
 #include "sxt/field12/type/element.h"
 
 using namespace sxt;
 using namespace sxt::f12o;
+
+__global__ void device_add(f12t::element* __restrict__ ret,
+                          const f12t::element* __restrict__ a, 
+                          const f12t::element* __restrict__ b) {
+  add(ret[0], a[0], b[0]);
+}
 
 TEST_CASE("addition") {
   SECTION("of pre-computed value and zero returns pre-computed value") {
@@ -59,5 +67,29 @@ TEST_CASE("addition") {
     add(ret, a, b);
 
     REQUIRE(f12cn::zero_v == ret);
+  }
+}
+
+TEST_CASE("addition on GPU") {
+  SECTION("matches non GPU version") {
+    memmg::managed_array<f12t::element> a(1, memr::get_managed_device_resource());
+    memmg::managed_array<f12t::element> b(1, memr::get_managed_device_resource());
+    memmg::managed_array<f12t::element> ret(1, memr::get_managed_device_resource());
+
+    constexpr unsigned iter = 100;
+    for (unsigned i = 0; i < iter; ++i) {
+      basn::fast_random_number_generator rng{static_cast<uint64_t>(i),
+                                             static_cast<uint64_t>(iter + i)};
+      f12rn::generate_random_element(a[0], rng);
+      f12rn::generate_random_element(b[0], rng);
+
+      f12t::element ret_expected;
+      add(ret_expected, a[0], b[0]);
+
+      device_add<<<1, 1>>>(ret.data(), a.data(), b.data());
+      cudaDeviceSynchronize();
+
+      REQUIRE(ret[0] == ret_expected);
+    }
   }
 }

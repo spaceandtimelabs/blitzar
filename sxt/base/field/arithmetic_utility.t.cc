@@ -87,9 +87,6 @@ TEST_CASE("mac (multiplication and carry) can handle computation") {
   }
 }
 
-
-
-
 TEST_CASE("mac (multiplication and carry) can handle computation on the GPU") {
   memmg::managed_array<uint64_t> a(1, memr::get_managed_device_resource());
   memmg::managed_array<uint64_t> b(1, memr::get_managed_device_resource());
@@ -123,7 +120,6 @@ TEST_CASE("mac (multiplication and carry) can handle computation on the GPU") {
     }
   }
 }
-
 
 TEST_CASE("adc (addition and carry) can handle computation") {
   SECTION("with minimum values") {
