@@ -31,6 +31,11 @@ __global__ void add(uint64_t* __restrict__ ret, uint64_t* __restrict__ carry,
   adc(ret[0], carry[0], a[0], b[0], c[0]);
 }
 
+__global__ void sub(uint64_t* __restrict__ ret, uint64_t* __restrict__ borrow,
+                    const uint64_t* __restrict__ a, const uint64_t* __restrict__ b) {
+  sbb(ret[0], borrow[0], a[0], b[0]);
+}
+
 TEST_CASE("mac (multiplication and carry) can handle computation") {
   SECTION("with minimum values") {
     constexpr uint64_t a{0x0};
@@ -259,5 +264,42 @@ TEST_CASE("sbb (subtraction and borrow) can handle computation") {
     sbb(ret, borrow, a, b);
     REQUIRE(ret == 0xdd5902076eb30a06);
     REQUIRE(borrow == 0x0);
+  }
+}
+
+TEST_CASE("sbb (subtraction and borrow) can handle computation on the GPU") {
+  memmg::managed_array<uint64_t> a(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> b(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> ret(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> borrow(1, memr::get_managed_device_resource());
+
+  memmg::managed_array<uint64_t> h_ret(1);
+  memmg::managed_array<uint64_t> h_borrow(1);
+
+  SECTION("by matching the non-GPU implementation on random values") {
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    std::uniform_int_distribution<uint64_t> uni_dis;
+    std::bernoulli_distribution ber_d(0.5);
+
+    for (unsigned i = 0; i < 100; ++i) {
+      a[0] = uni_dis(gen);
+      b[0] = uni_dis(gen);
+      borrow[0] = ber_d(gen) ? 0x0 : static_cast<uint64_t>(-1);
+      ret[0] = 0x0;
+
+      uint64_t ret_expected{0};
+      uint64_t borrow_expected{borrow[0]};
+      sbb(ret_expected, borrow_expected, a[0], b[0]);
+
+      sub<<<1, 1>>>(ret.data(), borrow.data(), a.data(), b.data());
+      cudaDeviceSynchronize();
+
+      cudaMemcpy(h_ret.data(), ret.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_borrow.data(), borrow.data(), sizeof(uint64_t), cudaMemcpyDeviceToHost);
+
+      REQUIRE(h_ret[0] == ret_expected);
+      REQUIRE(h_borrow[0] == borrow_expected);
+    }
   }
 }
