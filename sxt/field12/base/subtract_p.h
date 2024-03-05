@@ -40,20 +40,20 @@ namespace sxt::f12b {
 CUDA_CALLABLE inline void subtract_p(uint64_t ret[6], const uint64_t a[6]) noexcept {
   uint64_t borrow{0};
 
-  #ifdef __CUDA_ARCH__
-    ret[0] = basfld::sub_cc(a[0], p_v[0]);
-    for (unsigned i = 1; i < 6; ++i) {
-      ret[i] = basfld::subc_cc(a[i], p_v[i]);
-    }
-    borrow = basfld::subc(0, 0);
-  #else
+  //#ifdef __CUDA_ARCH__
+  //  ret[0] = basfld::sub_cc(a[0], p_v[0]);
+  //  for (unsigned i = 1; i < 6; ++i) {
+  //    ret[i] = basfld::subc_cc(a[i], p_v[i]);
+  //  }
+  //  borrow = basfld::subc(0, 0);
+  //#else
     basfld::sbb(ret[0], borrow, a[0], p_v[0]);
     basfld::sbb(ret[1], borrow, a[1], p_v[1]);
     basfld::sbb(ret[2], borrow, a[2], p_v[2]);
     basfld::sbb(ret[3], borrow, a[3], p_v[3]);
     basfld::sbb(ret[4], borrow, a[4], p_v[4]);
     basfld::sbb(ret[5], borrow, a[5], p_v[5]);
-  #endif
+  //#endif
 
   // If underflow occurred on the final limb, borrow = 0xfff...fff, otherwise
   // borrow = 0x000...000. Thus, we use it as a mask!
