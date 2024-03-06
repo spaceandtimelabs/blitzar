@@ -29,7 +29,7 @@ __device__ void reduce_partitions(T items[(1u << ItemsPerThreadLg2)], const uint
   for (int i = ItemsPerThreadLg2; i-- > 0;) {
     auto k = 1u << i;
     for (int j = 0u; j < k; ++j) {
-      add_inplace(items[2u * j], items[2u * j + 1u]);
+      add_inplace(items[j], items[k + j]);
     }
   }
 }
