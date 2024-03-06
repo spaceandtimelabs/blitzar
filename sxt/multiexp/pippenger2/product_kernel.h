@@ -27,11 +27,12 @@ __global__ void reduce_partitions(T items[(1u << ItemsPerThreadLg2)], const uint
   }
 
   // reduce
-  for (unsigned i=0; i<ItemsPerThreadLg2; ++i) {
+  for (unsigned i = ItemsPerThreadLg2 - 1u; i-- > 0u;) {
+    auto k = 1u << i;
+    for (unsigned j = 0u; j < k; ++j) {
+      add_inplace(items[j], items[k + j]);
+    }
   }
-  (void)items;
-  (void)bitsets;
-  (void)table;
 }
 
 //--------------------------------------------------------------------------------------------------
