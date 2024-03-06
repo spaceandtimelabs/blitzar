@@ -10,6 +10,8 @@ sxt_cc_component(
     "//sxt/base/num:log2p1",
   ],
   test_deps = [
+    "//sxt/base/curve:example_element",
     "//sxt/base/test:unit_test",
+    "//sxt/memory/resource:managed_device_resource",
   ],
 )
