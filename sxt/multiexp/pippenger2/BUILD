@@ -11,6 +11,7 @@ sxt_cc_component(
   ],
   test_deps = [
     "//sxt/base/curve:example_element",
+    "//sxt/base/device:synchronization",
     "//sxt/base/test:unit_test",
     "//sxt/memory/resource:managed_device_resource",
   ],

@@ -26,9 +26,9 @@ __device__ void reduce_partitions(T items[(1u << ItemsPerThreadLg2)], const uint
   }
 
   // reduce
-  for (unsigned i = ItemsPerThreadLg2 - 1u; i-- > 0u;) {
+  for (int i = ItemsPerThreadLg2; i-- > 0;) {
     auto k = 1u << i;
-    for (unsigned j = 0u; j < k; ++j) {
+    for (int j = 0u; j < k; ++j) {
       add_inplace(items[2u * j], items[2u * j + 1u]);
     }
   }
@@ -56,11 +56,11 @@ __global__ void product_kernel(T* __restrict__ products, const uint16_t* __restr
 
   // reduce rest
   T res = items[0];
-  for (unsigned i=1u; i<n; ++i) {
+  for (unsigned i=items_per_thread; i<n; i+=items_per_thread) {
     bitsets += items_per_thread * num_products;
     table += items_per_thread * num_entries;
     reduce_partitions<ItemsPerThreadLg2>(items, bitsets, table, num_products);
-    add_inplace(res, res, items[0]);
+    add_inplace(res, items[0]);
   }
 
   // write result
