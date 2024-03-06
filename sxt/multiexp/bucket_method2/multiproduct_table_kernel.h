@@ -23,13 +23,9 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/num/constexpr_switch.h"
 #include "sxt/base/num/divide_up.h"
+#include "sxt/multiexp/bucket_method2/constants.h"
 
 namespace sxt::mtxbk2 {
-//--------------------------------------------------------------------------------------------------
-// max_multiexponentiation_length_v
-//--------------------------------------------------------------------------------------------------
-static constexpr unsigned max_multiexponentiation_length_v = 128 * 32;
-
 //--------------------------------------------------------------------------------------------------
 // multiproduct_table_kernel
 //--------------------------------------------------------------------------------------------------
@@ -75,6 +71,7 @@ __global__ void multiproduct_table_kernel(uint16_t* __restrict__ bucket_counts,
 
   // sort
   RadixSort(temp_storage.sort).Sort(keys, values);
+  __syncthreads();
 
   // count
   auto counts = RunlengthCount(temp_storage.count).count(keys);
