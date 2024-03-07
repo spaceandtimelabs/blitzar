@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "sxt/base/curve/example_element.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/memory/resource/managed_device_resource.h"
@@ -22,10 +23,12 @@ TEST_CASE("we can compute products with a lookup table") {
 
   std::pmr::vector<bascrv::element97> expected;
 
+  basdv::stream stream;
+
   SECTION("we handle the case of a single partition") {
     table[0] = 123u;
-    product_kernel<0><<<1, 1>>>(products.data(), bitsets.data(), table.data(), 1, 1);
-    basdv::synchronize_device();
+    launch_product_kernel<0>(products.data(), stream, bitsets.data(), table.data(), 1, 1);
+    basdv::synchronize_stream(stream);
     expected = {123u};
     REQUIRE(products == expected);
   }
@@ -35,7 +38,7 @@ TEST_CASE("we can compute products with a lookup table") {
     bitsets = {1, 2};
     table[1] = 123u;
     table[num_elements + 2] = 456u;
-    product_kernel<1><<<1, 1>>>(products.data(), bitsets.data(), table.data(), 1, 2);
+    launch_product_kernel<1>(products.data(), stream, bitsets.data(), table.data(), 1, 2);
     basdv::synchronize_device();
     expected = {123u + 456u};
     REQUIRE(products == expected);
@@ -46,7 +49,7 @@ TEST_CASE("we can compute products with a lookup table") {
     bitsets = {1, 2};
     table[1] = 123u;
     table[num_elements + 2] = 456u;
-    product_kernel<0><<<1, 1>>>(products.data(), bitsets.data(), table.data(), 1, 2);
+    launch_product_kernel<0>(products.data(), stream, bitsets.data(), table.data(), 1, 2);
     basdv::synchronize_device();
     expected = {123u + 456u};
     REQUIRE(products == expected);
@@ -57,7 +60,7 @@ TEST_CASE("we can compute products with a lookup table") {
     table[1] = 456u;
     bitsets = {1, 0};
     products.resize(2);
-    product_kernel<0><<<1, 2>>>(products.data(), bitsets.data(), table.data(), 2, 1);
+    launch_product_kernel<0>(products.data(), stream, bitsets.data(), table.data(), 2, 1);
     basdv::synchronize_device();
     expected = {456u, 123u};
     REQUIRE(products == expected);

@@ -2,14 +2,16 @@
 
 #include <cstdint>
 
+#include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/curve/element.h"
+#include "sxt/base/macro/cuda_callable.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 // reduce_partitions 
 //--------------------------------------------------------------------------------------------------
 template <unsigned ItemsPerThreadLg2, bascrv::element T>
-__device__ void reduce_partitions(T items[(1u << ItemsPerThreadLg2)], const uint16_t* __restrict__ bitsets,
+CUDA_CALLABLE void reduce_partitions(T items[(1u << ItemsPerThreadLg2)], const uint16_t* __restrict__ bitsets,
                                   const T* __restrict__ table, unsigned num_products) noexcept {
   constexpr unsigned items_per_thread = 1u << ItemsPerThreadLg2;
   constexpr unsigned num_entries = (1u << 16u);
@@ -35,19 +37,15 @@ __device__ void reduce_partitions(T items[(1u << ItemsPerThreadLg2)], const uint
 }
 
 //--------------------------------------------------------------------------------------------------
-// product_kernel 
+// product_kernel_impl
 //--------------------------------------------------------------------------------------------------
 template <unsigned ItemsPerThreadLg2, bascrv::element T>
-__global__ void product_kernel(T* __restrict__ products, const uint16_t* __restrict__ bitsets,
-                               const T* __restrict__ table, unsigned num_products,
-                               unsigned n) {
+CUDA_CALLABLE void product_kernel_impl(T* __restrict__ products,
+                                       const uint16_t* __restrict__ bitsets,
+                                       const T* __restrict__ table, unsigned num_products,
+                                       unsigned n, unsigned product_index) {
   constexpr auto items_per_thread = 1u << ItemsPerThreadLg2;
   constexpr unsigned num_entries = (1u << 16u);
-
-  auto product_index = blockIdx.x * blockDim.x + threadIdx.x;
-  if (product_index >= num_products) {
-    return;
-  }
 
   // adjust pointers
   bitsets += product_index;
@@ -68,5 +66,26 @@ __global__ void product_kernel(T* __restrict__ products, const uint16_t* __restr
 
   // write result
   *products = res;
+}
+
+//--------------------------------------------------------------------------------------------------
+// launch_product_kernel 
+//--------------------------------------------------------------------------------------------------
+template <unsigned ItemsPerThreadLg2, bascrv::element T>
+void launch_product_kernel(T* __restrict__ products, bast::raw_stream_t stream,
+                           const uint16_t* __restrict__ bitsets, const T* __restrict__ table,
+                           unsigned num_products, unsigned n) {
+  auto f = [
+    // clang-format off
+    products = products,
+    bitsets = bitsets,
+    table = table,
+    n = n
+    // clang-format on
+  ] __device__ __host__(unsigned num_products, unsigned product_index) noexcept {
+    product_kernel_impl<ItemsPerThreadLg2>(products, bitsets, table, num_products, n,
+                                           product_index);
+  };
+  algi::launch_for_each_kernel(stream, f, num_products);
 }
 } // namespace sxt::mtxpp2
