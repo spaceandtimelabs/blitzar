@@ -41,11 +41,25 @@ TEST_CASE("we can compute products with a lookup table") {
     REQUIRE(products == expected);
   }
 
-  (void)products;
-  (void)table;
-  (void)bitsets;
-/* template <unsigned ItemsPerThreadLg2, bascrv::element T> */
-/* __global__ void product_kernel(T* __restrict__ products, const uint16_t* __restrict__ bitsets, */
-/*                                const T* __restrict__ table, unsigned num_products, */
-/*                                unsigned n) { */
+  SECTION("we handle two partitions with one item per thread") {
+    table.resize(num_elements * 2);
+    bitsets = {1, 2};
+    table[1] = 123u;
+    table[num_elements + 2] = 456u;
+    product_kernel<0><<<1, 1>>>(products.data(), bitsets.data(), table.data(), 1, 2);
+    basdv::synchronize_device();
+    expected = {123u + 456u};
+    REQUIRE(products == expected);
+  }
+
+  SECTION("we handle two products") {
+    table[0] = 123u;
+    table[1] = 456u;
+    bitsets = {1, 0};
+    products.resize(2);
+    product_kernel<0><<<1, 2>>>(products.data(), bitsets.data(), table.data(), 2, 1);
+    basdv::synchronize_device();
+    expected = {456u, 123u};
+    REQUIRE(products == expected);
+  }
 }

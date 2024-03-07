@@ -28,7 +28,7 @@ __device__ void reduce_partitions(T items[(1u << ItemsPerThreadLg2)], const uint
   // reduce
   for (int i = ItemsPerThreadLg2; i-- > 0;) {
     auto k = 1u << i;
-    for (int j = 0u; j < k; ++j) {
+    for (int j = 0; j < k; ++j) {
       add_inplace(items[j], items[k + j]);
     }
   }
@@ -45,6 +45,9 @@ __global__ void product_kernel(T* __restrict__ products, const uint16_t* __restr
   constexpr unsigned num_entries = (1u << 16u);
 
   auto product_index = blockIdx.x * blockDim.x + threadIdx.x;
+  if (product_index >= num_products) {
+    return;
+  }
 
   // adjust pointers
   bitsets += product_index;
