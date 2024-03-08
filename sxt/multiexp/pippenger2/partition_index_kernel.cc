@@ -11,16 +11,17 @@ struct scalar32 {
 } // namespace
 
 //--------------------------------------------------------------------------------------------------
-// fill_partition_index_kernel_impl
+// fill_partition_indexes_kernel
 //--------------------------------------------------------------------------------------------------
-__device__ void fill_partition_index_kernel_impl(uint16_t* __restrict__ indexes,
-                                                 const scalar32* __restrict__ scalars,
-                                                 unsigned num_outputs, unsigned n) {
+static __global__ void fill_partition_indexes_kernel(uint16_t* __restrict__ indexes,
+                                                     const scalar32* __restrict__ scalars,
+                                                     unsigned n) {
   auto thread_index = threadIdx.x;
   auto output_index = blockIdx.x;
   auto byte_index = thread_index / 8u;
   auto bit_index = thread_index % 8u;
   uint8_t mask = static_cast<uint8_t>(1u << bit_index);
+  auto num_outputs = gridDim.x;
 
   // adjust pointers
   indexes += output_index * 256u;
@@ -52,12 +53,13 @@ __device__ void fill_partition_index_kernel_impl(uint16_t* __restrict__ indexes,
 }
 
 //--------------------------------------------------------------------------------------------------
-// fill_partition_index_kernel 
+// launch_fill_partition_indexes_kernel 
 //--------------------------------------------------------------------------------------------------
-__global__ void fill_partition_index_kernel(uint16_t* __restrict__ indexes,
-                                            const uint8_t* __restrict__ scalars,
-                                            unsigned num_outputs, unsigned n) {
-  fill_partition_index_kernel_impl(indexes, reinterpret_cast<const scalar32*>(scalars), num_outputs,
-                                   n);
+void launch_fill_partition_indexes_kernel(uint16_t* __restrict__ indexes,
+                                          bast::raw_stream_t stream,
+                                          const uint8_t* __restrict__ scalars, unsigned num_outputs,
+                                          unsigned n) {
+  fill_partition_indexes_kernel<<<num_outputs, 256, 0, stream>>>(
+      indexes, reinterpret_cast<const scalar32*>(scalars), n);
 }
 } // namespace sxt::mtxpp2
