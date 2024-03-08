@@ -34,6 +34,21 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+  name = "partition_index",
+  deps = [
+    "//sxt/base/container:span",
+    "//sxt/execution/async:future_fwd",
+  ],
+  impl_deps = [
+    "//sxt/execution/async:future",
+  ],
+  test_deps = [
+    "//sxt/base/test:unit_test",
+    "//sxt/memory/resource:managed_device_resource",
+  ],
+)
+
+sxt_cc_component(
   name = "multiexponentiation",
   deps = [
     "//sxt/base/container:span",
