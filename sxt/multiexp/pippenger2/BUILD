@@ -23,8 +23,10 @@ sxt_cc_component(
 sxt_cc_component(
   name = "partition_index_kernel",
   deps = [
+    "//sxt/base/type:raw_stream",
   ],
   test_deps = [
+    "//sxt/base/device:stream",
     "//sxt/base/device:synchronization",
     "//sxt/base/test:unit_test",
     "//sxt/memory/resource:managed_device_resource",

@@ -2,8 +2,10 @@
 
 #include <vector>
 
-#include "sxt/memory/resource/managed_device_resource.h"
+#include "sxt/base/device/stream.h"
+#include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/memory/resource/managed_device_resource.h"
 using namespace sxt;
 using namespace sxt::mtxpp2;
 
@@ -14,10 +16,13 @@ TEST_CASE("we can compute the partition indexes for a multiexponentiation") {
   indexes.resize(256);
   scalars.resize(32);
 
+  std::pmr::vector<uint16_t> expected(indexes.size());
+
+  basdv::stream stream;
+
   SECTION("we handle a single scalar of zero") {
-    /* fill_partition_indexes_kernel<<<1, 256>>>(indexes.data(), scalars.data(), 1, 1); */
+    launch_fill_partition_indexes_kernel(indexes.data(), stream, scalars.data(), 1, 1);
+    basdv::synchronize_stream(stream);
+    REQUIRE(indexes == expected);
   }
-  /* __global__ void fill_partition_index_kernel(uint16_t* __restrict__ indexes, */
-  /*                                             const uint8_t* __restrict__ scalars, */
-  /*                                             unsigned num_outputs, unsigned n); */
 }
