@@ -25,4 +25,12 @@ TEST_CASE("we can compute the partition indexes for a multiexponentiation") {
     basdv::synchronize_stream(stream);
     REQUIRE(indexes == expected);
   }
+
+  SECTION("we handle a single scalar of one") {
+    scalars[0] = 1;
+    launch_fill_partition_indexes_kernel(indexes.data(), stream, scalars.data(), 1, 1);
+    basdv::synchronize_stream(stream);
+    expected[0] = 1;
+    REQUIRE(indexes == expected);
+  }
 }
