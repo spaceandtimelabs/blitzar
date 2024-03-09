@@ -41,10 +41,13 @@ sxt_cc_component(
     "//sxt/execution/async:future_fwd",
   ],
   impl_deps = [
+    "//sxt/base/container:span_utility",
     "//sxt/base/device:stream",
     "//sxt/base/device:memory_utility",
     "//sxt/base/num:divide_up",
     "//sxt/execution/async:future",
+    "//sxt/memory/management:managed_array",
+    "//sxt/memory/resource:async_device_resource",
   ],
   test_deps = [
     "//sxt/base/test:unit_test",
