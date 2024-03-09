@@ -37,9 +37,13 @@ sxt_cc_component(
   name = "partition_index",
   deps = [
     "//sxt/base/container:span",
+    "//sxt/base/error:assert",
     "//sxt/execution/async:future_fwd",
   ],
   impl_deps = [
+    "//sxt/base/device:stream",
+    "//sxt/base/device:memory_utility",
+    "//sxt/base/num:divide_up",
     "//sxt/execution/async:future",
   ],
   test_deps = [
