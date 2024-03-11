@@ -31,8 +31,8 @@ int main(int argc, char* argv[]) {
   const std::string op = argv[2];
   auto n_elements = std::atoi(argv[3]);
   auto repetitions = std::atoi(argv[4]);
-  auto n_threads = (argc > 6) ? std::atoi(argv[5]) : 256;
-  auto n_executions = (argc > 7) ? std::atoi(argv[6]) : 10;
+  auto n_threads = (argc > 5) ? std::atoi(argv[5]) : 256;
+  auto n_executions = (argc > 6) ? std::atoi(argv[6]) : 10;
 
   std::println("===== benchmark results =====");
   std::println("backend : GPU");
