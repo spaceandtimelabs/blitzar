@@ -31,6 +31,8 @@ namespace sxt::cg1rn {
 /**
  * Generates a random scalar point and multiplies by
  * the generator to generate a random point on the curve.
+ * Note: the random scalar does not respect the modulus of the curve's scalar field.
+ * This is okay for benchmarks, but not for secure random element generation.*
  */
 CUDA_CALLABLE
 inline void generate_random_element(cg1t::element_p2& a,
