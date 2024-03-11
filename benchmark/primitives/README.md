@@ -7,5 +7,5 @@ This benchmark is similar to the Icicle's [example/multiply](https://github.com/
 `bazel run -c opt //benchmark/primitives:benchmark <vector_size> <repetitions>`
 
 ## Example
-`bazel run -c opt //benchmark/primitives:benchmark 1000000 1000`
-`bazel run -c opt //benchmark/primitives:benchmark 10000 1000`
+`bazel run -c opt //benchmark/primitives:benchmark bls12_381 field 1000000 1000 256 10`
+`bazel run -c opt //benchmark/primitives:benchmark bls12_381 curve 10000 1000 256 10`

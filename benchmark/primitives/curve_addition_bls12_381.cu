@@ -17,6 +17,7 @@
 #include <chrono>
 #include <print>
 
+#include "stats.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/curve_g1/operation/add.h"
@@ -81,8 +82,8 @@ void init_random_array(cg1t::element_p2* rand, unsigned n_elements, unsigned n_t
 //--------------------------------------------------------------------------------------------------
 // add_bls12_381_g1_curve_elements
 //--------------------------------------------------------------------------------------------------
-void add_bls12_381_g1_curve_elements(unsigned n_elements, unsigned repetitions, unsigned n_threads) noexcept {
-  std::print("add_bls12_381_g1_curve_elements\n");
+void add_bls12_381_g1_curve_elements(unsigned n_elements, unsigned repetitions, unsigned n_threads, unsigned n_executions) noexcept {
+  std::println("add_bls12_381_g1_curve_elements");
   
   // Allocate memory for the input and output vectors
   memmg::managed_array<cg1t::element_p2> a(n_elements, memr::get_device_resource());
@@ -98,25 +99,34 @@ void add_bls12_381_g1_curve_elements(unsigned n_elements, unsigned repetitions, 
   // Report any errors from the warmup loop
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess) {
-    std::print("CUDA error: {}\n", cudaGetErrorString(err));
+    std::println("CUDA error: {}", cudaGetErrorString(err));
   }
 
   // Benchmarking loop
-  auto start_time = std::chrono::steady_clock::now();
-  vector_add(ret.data(), a.data(), n_elements, repetitions, n_threads);
-  cudaDeviceSynchronize();
-  auto end_time = std::chrono::steady_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-
-  // Report any errors from the benchmark loop
-  err = cudaGetLastError();
-  if (err != cudaSuccess) {
-    std::print("CUDA error: {}\n", cudaGetErrorString(err));
+  std::vector<double> elapsed_times;
+  for (unsigned i = 0; i < n_executions; ++i) {
+    auto start_time = std::chrono::steady_clock::now();
+    vector_add(ret.data(), a.data(), n_elements, repetitions, n_threads);
+    cudaDeviceSynchronize();
+    auto end_time = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    elapsed_times.push_back(duration.count());
+      
+    // Report any errors from the benchmark loop
+    err = cudaGetLastError();
+    if (err != cudaSuccess) {
+      std::println("CUDA error: {}", cudaGetErrorString(err));
+    }
   }
 
   // Report data
-  std::print("Elapsed time: {} milliseconds\n", duration.count());
-  auto GMPS = 1.0e-9 * repetitions * n_elements / (1.0e-3 * duration.count());
-  std::print("Performance: {} Giga curve additions Per Second\n", GMPS);
+  std::println("Final benchmarks over {} executions", n_executions);
+  std::println("...Median : {} ms", sxt::median(elapsed_times));
+  std::println("...Min    : {} ms", sxt::min(elapsed_times));
+  std::println("...Max    : {} ms", sxt::max(elapsed_times));
+  std::println("...Mean   : {} ms", sxt::mean(elapsed_times));
+  std::println("...STD    : {} ms", sxt::std_dev(elapsed_times));
+  std::println("...Performance : {} Giga Curve Additions Per Second", sxt::gmps(elapsed_times, repetitions, n_elements));
+  std::println("");
 }
 }

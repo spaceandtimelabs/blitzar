@@ -2,12 +2,13 @@ load("//bazel:sxt_benchmark.bzl", "sxt_cc_benchmark")
 load("//bazel:sxt_build_system.bzl", "sxt_cc_library")
 
 sxt_cc_benchmark(
-    name = "field_ops",
+    name = "benchmark",
     srcs = [
-        "benchmarks_field_ops.m.cc",
+        "benchmark.m.cc",
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":curve_addition_bls12_381",
         ":field_ops_bls12_381",
     ],
 )

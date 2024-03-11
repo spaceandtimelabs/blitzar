@@ -166,6 +166,12 @@ void mul_bls12_381_field_elements(unsigned n_elements, unsigned repetitions, uns
   // Warm-up loop
   vector_mul(ret.data(), a.data(), n_elements, repetitions, n_threads);
   cudaDeviceSynchronize();
+  
+  // Report any errors from the warm up loop
+  cudaError_t err = cudaGetLastError();
+  if (err != cudaSuccess) {
+    std::println("CUDA error: {}", cudaGetErrorString(err));
+  }
 
   // Benchmarking loop
   std::vector<double> elapsed_times;
@@ -176,6 +182,12 @@ void mul_bls12_381_field_elements(unsigned n_elements, unsigned repetitions, uns
     auto end_time = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
     elapsed_times.push_back(duration.count());
+      
+    // Report any errors from the benchmark loop
+    err = cudaGetLastError();
+    if (err != cudaSuccess) {
+      std::println("CUDA error: {}", cudaGetErrorString(err));
+    }
   }
 
   // Report data
@@ -185,7 +197,7 @@ void mul_bls12_381_field_elements(unsigned n_elements, unsigned repetitions, uns
   std::println("...Max    : {} ms", sxt::max(elapsed_times));
   std::println("...Mean   : {} ms", sxt::mean(elapsed_times));
   std::println("...STD    : {} ms", sxt::std_dev(elapsed_times));
-  std::println("...Performance : {} Giga Field Additions Per Second", sxt::gmps(elapsed_times, repetitions, n_elements));
+  std::println("...Performance : {} Giga Field Mul Per Second", sxt::gmps(elapsed_times, repetitions, n_elements));
   std::println("");
 }
 }

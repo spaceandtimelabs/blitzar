@@ -22,27 +22,38 @@
 using namespace sxt;
 
 int main(int argc, char* argv[]) {
-  if (argc < 3) {
-    std::print("Usage: benchmark <n_elements> <repetitions> <optional - n_threads> <optional - n_executions>\n");
+  if (argc < 5) {
+    std::print("Usage: benchmark <curve> <op> <n_elements> <repetitions> <optional - n_threads> <optional - n_executions>\n");
     return -1;
   }
 
-  auto n_elements = std::atoi(argv[1]);
-  auto repetitions = std::atoi(argv[2]);
-  auto n_threads = (argc > 4) ? std::atoi(argv[3]) : 256;
-  auto n_executions = (argc > 5) ? std::atoi(argv[4]) : 10;
+  const std::string curve = argv[1];
+  const std::string op = argv[2];
+  auto n_elements = std::atoi(argv[3]);
+  auto repetitions = std::atoi(argv[4]);
+  auto n_threads = (argc > 6) ? std::atoi(argv[5]) : 256;
+  auto n_executions = (argc > 7) ? std::atoi(argv[6]) : 10;
 
   std::println("===== benchmark results =====");
   std::println("backend : GPU");
+  std::println("curve : {}", curve);
+  std::println("operation : {}", op);
   std::println("Number of elements : {}", n_elements);
   std::println("Repetitions : {}", repetitions);
   std::println("Max threads per block : {}", n_threads);
   std::println("Number of executions : {}", n_executions);
   std::println("*****************************");
 
-  //add_bls12_381_g1_curve_elements(n_elements, repetitions);
-  add_bls12_381_field_elements(n_elements, repetitions, n_threads, n_executions);
-  mul_bls12_381_field_elements(n_elements, repetitions, n_threads, n_executions);
+  if (op == "curve") {
+    if (curve == "bls12_381") {
+      add_bls12_381_g1_curve_elements(n_elements, repetitions,  n_threads, n_executions);
+    }
+  } else if (op == "field") {
+    if (curve == "bls12_381") {
+      add_bls12_381_field_elements(n_elements, repetitions, n_threads, n_executions);
+      mul_bls12_381_field_elements(n_elements, repetitions, n_threads, n_executions);
+    }
+  }
 
   std::println("******************************");
   std::println("===== benchmark complete =====");
