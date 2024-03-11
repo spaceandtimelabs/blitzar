@@ -1,8 +1,13 @@
 #pragma once
 
-#include "sxt/base/curve/element.h"
 #include "sxt/base/container/span.h"
+#include "sxt/base/curve/element.h"
+#include "sxt/base/num/divide_up.h"
+#include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/device_resource.h"
+#include "sxt/multiexp/pippenger2/partition_index.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -11,14 +16,25 @@ namespace sxt::mtxpp2 {
 template <bascrv::element T>
 xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> partition_table,
                                  basct::cspan<const uint8_t*> exponents,
-                                 unsigned element_num_bytes) noexcept {
+                                 unsigned element_num_bytes,
+                                 unsigned n) noexcept {
+  auto num_outputs = res.size();
+  auto num_partitions_per_product = basn::divide_up(n, 16u);
+
+  memmg::managed_array<uint16_t> indexes{num_outputs * element_num_bytes * 8u *
+                                             num_partitions_per_product,
+                                         memr::get_device_resource()};
+
   // make the index table
+  co_await fill_partition_indexes(indexes, exponents, element_num_bytes, n);
+  /* xena::future<> fill_partition_indexes(basct::span<uint16_t> indexes, basct::cspan<const
+   * uint8_t*> scalars, */
+  /*                                       unsigned element_num_bytes, unsigned n) noexcept; */
   // compute sums from indexes
   // reduce
   (void)res;
   (void)partition_table;
   (void)exponents;
   (void)element_num_bytes;
-  return {};
 }
 } // namespace sxt::mtxpp2
