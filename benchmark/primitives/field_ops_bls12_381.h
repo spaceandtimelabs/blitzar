@@ -18,7 +18,12 @@
 
 namespace sxt {
 //--------------------------------------------------------------------------------------------------
-// add_bls12_381_g1_curve_elements
+// add_bls12_381_field_elements
 //--------------------------------------------------------------------------------------------------
-void add_bls12_381_g1_curve_elements(unsigned n_elements, unsigned repetitions, unsigned n_threads = 256) noexcept;
+void add_bls12_381_field_elements(unsigned n_elements, unsigned repetitions, unsigned n_threads = 256, unsigned n_executions = 10) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// mul_bls12_381_field_elements
+//--------------------------------------------------------------------------------------------------
+void mul_bls12_381_field_elements(unsigned n_elements, unsigned repetitions, unsigned n_threads = 256, unsigned n_executions = 10) noexcept;
 } // namespace sxt

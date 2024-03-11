@@ -14,11 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
-
-namespace sxt {
-//--------------------------------------------------------------------------------------------------
-// add_bls12_381_g1_field_elements
-//--------------------------------------------------------------------------------------------------
-void add_bls12_381_g1_field_elements(unsigned vector_size, unsigned repetitions) noexcept;
-} // namespace sxt
+#include "stats.h"
