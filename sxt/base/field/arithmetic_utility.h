@@ -38,25 +38,10 @@ namespace sxt::basfld {
  */
 CUDA_CALLABLE void inline mac(uint64_t& ret, uint64_t& carry, const uint64_t a, const uint64_t b,
                               const uint64_t c) noexcept {
-  #ifdef __CUDA_ARCH__
-    uint64_t mul_hi = 0;
-    asm volatile(
-        "mul.lo.u64 %0, %2, %3;\n\t" // ret = (b*c).lo
-        "mul.hi.u64 %1, %2, %3;\n\t" // mul_hi = (b*c).hi
-        "add.cc.u64 %0, %0, %4;\n\t" // ret = ret + a, check for carry
-        "addc.u64 %1, %1, 0;\n\t"    // mul_hi = mul_hi + carry
-        "add.cc.u64 %0, %0, %5;\n\t" // ret = ret + carry, check for carry
-        "addc.u64 %1, %1, 0;\n\t"    // mul_hi = mul_hi + carry
-        : "+l"(ret), "+l"(mul_hi)
-        : "l"(b), "l"(c), "l"(a), "l"(carry)
-    );
-    carry = mul_hi;
-  #else
-    uint128_t ret_tmp = uint128_t{a} + (uint128_t{b} * uint128_t{c}) + uint128_t{carry};
+  uint128_t ret_tmp = uint128_t{a} + (uint128_t{b} * uint128_t{c}) + uint128_t{carry};
 
-    ret = bast::narrow_cast<uint64_t>(ret_tmp);
-    carry = bast::narrow_cast<uint64_t>((ret_tmp >> 64));
-  #endif
+  ret = bast::narrow_cast<uint64_t>(ret_tmp);
+  carry = bast::narrow_cast<uint64_t>((ret_tmp >> 64));
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -67,18 +52,9 @@ CUDA_CALLABLE void inline mac(uint64_t& ret, uint64_t& carry, const uint64_t a, 
  */
 CUDA_CALLABLE void inline adc(uint64_t& ret, uint64_t& carry, const uint64_t a, const uint64_t b,
                               const uint64_t c) noexcept {
-  #ifdef __CUDA_ARCH__
-    asm volatile("add.u64 %0, %3, %4;\n\t"    // ret = b + c
-                 "add.cc.u64 %0, %0, %2;\n\t" // ret = ret + a
-                 "addc.u64 %1, 0, 0;\n\t"     // Update carry
-                 : "=l"(ret), "=l"(carry)     // Set outputs
-                 : "l"(a), "l"(b), "l"(c)     // Set inputs
-    );
-  #else
-    uint128_t ret_tmp = uint128_t{a} + uint128_t{b} + uint128_t{c};
-    ret = bast::narrow_cast<uint64_t>(ret_tmp);
-    carry = bast::narrow_cast<uint64_t>(ret_tmp >> 64);
-  #endif
+  uint128_t ret_tmp = uint128_t{a} + uint128_t{b} + uint128_t{c};
+  ret = bast::narrow_cast<uint64_t>(ret_tmp);
+  carry = bast::narrow_cast<uint64_t>(ret_tmp >> 64);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -89,18 +65,9 @@ CUDA_CALLABLE void inline adc(uint64_t& ret, uint64_t& carry, const uint64_t a, 
  */
 CUDA_CALLABLE void inline sbb(uint64_t& ret, uint64_t& borrow, const uint64_t a,
                               const uint64_t b) noexcept {
-  #ifdef __CUDA_ARCH__
-    asm volatile("add.u64 %1, %3, %4;\n"             // ret = b + borrow >> 63
-                 "sub.cc.u64 %0, %2, %1;\n"          // ret = ret - borrow
-                 "subc.u64 %1, 0, 0;"                // Update the borrow
-                 : "=l"(ret), "=l"(borrow)           // Set outputs
-                 : "l"(a), "l"(b), "l"(borrow >> 63) // Set inputs
-    );
-  #else
-    uint128_t ret_tmp = uint128_t{a} - (uint128_t{b} + uint128_t{(borrow >> 63)});
+  uint128_t ret_tmp = uint128_t{a} - (uint128_t{b} + uint128_t{(borrow >> 63)});
 
-    ret = bast::narrow_cast<uint64_t>(ret_tmp);
-    borrow = bast::narrow_cast<uint64_t>(ret_tmp >> 64);
-  #endif
+  ret = bast::narrow_cast<uint64_t>(ret_tmp);
+  borrow = bast::narrow_cast<uint64_t>(ret_tmp >> 64);
 }
 } // namespace sxt::basfld
