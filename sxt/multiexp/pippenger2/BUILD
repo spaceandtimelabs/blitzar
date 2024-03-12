@@ -25,6 +25,9 @@ sxt_cc_component(
   deps = [
     "//sxt/algorithm/iteration:for_each",
     "//sxt/base/curve:element",
+    "//sxt/base/container:span",
+    "//sxt/base/device:memory_utility",
+    "//sxt/base/type:raw_stream",
     "//sxt/base/macro:cuda_callable",
   ],
   test_deps = [
