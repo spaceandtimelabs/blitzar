@@ -7,10 +7,12 @@
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/pippenger2/partition_index.h"
+#include "sxt/multiexp/pippenger2/product_kernel.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -23,9 +25,9 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> partition_t
                                  unsigned n) noexcept {
   auto num_outputs = res.size();
   auto num_partitions_per_product = basn::divide_up(n, 16u);
+  auto num_products = num_outputs * element_num_bytes * 8u;
 
-  memmg::managed_array<uint16_t> indexes{num_outputs * element_num_bytes * 8u *
-                                             num_partitions_per_product,
+  memmg::managed_array<uint16_t> indexes{num_products * num_partitions_per_product,
                                          memr::get_device_resource()};
 
   // make the index table
@@ -34,9 +36,15 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> partition_t
   // compute sums from indexes
   basdv::stream stream;
   memr::async_device_resource resource{stream};
-  memmg::managed_array<T> product_table_dev{n * (1u << 16u), &resource};
-
+  memmg::managed_array<T> partition_table_dev{n * (1u << 16u), &resource};
+  basdv::async_copy_host_to_device(partition_table_dev, partition_table, stream);
   co_await std::move(fut);
+  memmg::managed_array<T> products{num_products, &resource};
+  launch_product_kernel<2, T>(products.data(), stream, indexes, partition_table_dev.data(),
+                              num_products, n);
+  co_await xendv::await_stream(stream);
+  partition_table_dev.reset();
+  indexes.reset();
 
   // reduce
   (void)res;
