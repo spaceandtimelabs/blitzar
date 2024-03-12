@@ -10,11 +10,11 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
-// reduce_product 
+// reduce_output 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-CUDA_CALLABLE void reduce_product(T* __restrict__ reduction, const T* __restrict__ products,
-                                  unsigned n) noexcept {
+CUDA_CALLABLE void reduce_output(T* __restrict__ reduction, const T* __restrict__ products,
+                                 unsigned n) noexcept {
   T res = products[n - 1];
   --n;
   while (n-- > 0) {
@@ -40,7 +40,18 @@ void reduce_product(basct::span<T> reductions, bast::raw_stream_t stream, basct:
       basdv::is_active_device_pointer(products.data())
       // clang-format on
   );
-  (void)reductions;
-  (void)products;
+  auto f = [
+               // clang-format off
+    reductions = reductions.data(),
+    products = products.data(),
+    reduction_size = reduction_size
+               // clang-format on
+  ] __device__
+           __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
+             reductions += output_index;
+             products += output_index * reduction_size;
+             reduce_output(reductions, products, reduction_size);
+           };
+  algi::launch_for_each_kernel(stream, f, num_outputs);
 }
 } // namespace sxt::mtxpp2
