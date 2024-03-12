@@ -21,6 +21,22 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+  name = "reduce",
+  deps = [
+    "//sxt/algorithm/iteration:for_each",
+    "//sxt/base/curve:element",
+    "//sxt/base/macro:cuda_callable",
+  ],
+  test_deps = [
+    "//sxt/base/curve:example_element",
+    "//sxt/base/device:synchronization",
+    "//sxt/base/device:stream",
+    "//sxt/base/test:unit_test",
+    "//sxt/memory/resource:managed_device_resource",
+  ],
+)
+
+sxt_cc_component(
   name = "partition_index_kernel",
   deps = [
     "//sxt/base/type:raw_stream",
