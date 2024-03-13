@@ -26,13 +26,12 @@ CUDA_CALLABLE void reduce_output(T* __restrict__ reduction, const T* __restrict_
 }
 
 //--------------------------------------------------------------------------------------------------
-// reduce_product 
+// reduce_products
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-void reduce_product(basct::span<T> reductions, bast::raw_stream_t stream, basct::cspan<T> products,
-                    unsigned element_num_bytes) noexcept {
+void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream, basct::cspan<T> products) noexcept {
   auto num_outputs = reductions.size();
-  auto reduction_size = element_num_bytes * 8u;
+  auto reduction_size = products.size() / reductions.size();
   SXT_DEBUG_ASSERT(
       // clang-format off
       basdv::is_active_device_pointer(reductions.data()) &&
@@ -48,9 +47,8 @@ void reduce_product(basct::span<T> reductions, bast::raw_stream_t stream, basct:
                // clang-format on
   ] __device__
            __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
-             reductions += output_index;
-             products += output_index * reduction_size;
-             reduce_output(reductions, products, reduction_size);
+             reduce_output(reductions + output_index, products + output_index * reduction_size,
+                           reduction_size);
            };
   algi::launch_for_each_kernel(stream, f, num_outputs);
 }

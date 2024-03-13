@@ -13,6 +13,7 @@
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/pippenger2/partition_index.h"
 #include "sxt/multiexp/pippenger2/product_kernel.h"
+#include "sxt/multiexp/pippenger2/reduce.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------

@@ -83,6 +83,7 @@ sxt_cc_component(
   deps = [
     ":partition_index",
     ":product_kernel",
+    ":reduce",
     "//sxt/base/container:span",
     "//sxt/base/curve:element",
     "//sxt/base/device:memory_utility",
