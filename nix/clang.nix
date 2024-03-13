@@ -10,7 +10,7 @@ stdenvNoCC.mkDerivation {
     owner = "llvm";
     repo = "llvm-project";
     rev = "15a5548";
-    hash = "sha256-kipkrgqzSgdsHwYz5P2NpUo6miulE/Nd9zRgeKAHeHM=";
+    hash = "sha256-gHf0jhn2K10FOX+2hn8T2HUwAUMjmEMXCXLgdrB4v54=";
   };
   nativeBuildInputs = [
     cmake
