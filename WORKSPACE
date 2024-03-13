@@ -80,7 +80,8 @@ cmake(
 # catch2
 git_repository(
     name = "com_github_catchorg_catch2",
-    commit = "53d0d91",
+    # commit = "53d0d91",
+    commit = "a2a3c55",
     remote = "https://github.com/catchorg/Catch2",
 )
 
