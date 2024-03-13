@@ -29,7 +29,8 @@ CUDA_CALLABLE void reduce_output(T* __restrict__ reduction, const T* __restrict_
 // reduce_products
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream, basct::cspan<T> products) noexcept {
+void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
+                     basct::cspan<T> products) noexcept {
   auto num_outputs = reductions.size();
   auto reduction_size = products.size() / reductions.size();
   SXT_DEBUG_ASSERT(

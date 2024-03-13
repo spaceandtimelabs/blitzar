@@ -48,9 +48,9 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> partition_t
   indexes.reset();
 
   // reduce
-  (void)res;
-  (void)partition_table;
-  (void)exponents;
-  (void)element_num_bytes;
+  memmg::managed_array<T> res_dev{num_outputs, &resource};
+  reduce_products<T>(res_dev, stream, products);
+  products.reset();
+  basdv::async_copy_device_to_host(res, res_dev, stream);
 }
 } // namespace sxt::mtxpp2
