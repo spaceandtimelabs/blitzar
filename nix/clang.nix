@@ -9,7 +9,7 @@ stdenvNoCC.mkDerivation {
   src = pkgs.fetchFromGitHub {
     owner = "llvm";
     repo = "llvm-project";
-    rev = "fdbff88";
+    rev = "15a5548";
     hash = "sha256-kipkrgqzSgdsHwYz5P2NpUo6miulE/Nd9zRgeKAHeHM=";
   };
   nativeBuildInputs = [
