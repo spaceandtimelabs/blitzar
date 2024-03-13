@@ -17,5 +17,11 @@ This benchmark is similar to the Icicle's [example/multiply](https://github.com/
 Run curve operations using `bls12-381` elements.  
 `bazel run -c opt //benchmark/primitives:benchmark bls12_381 curve 10000 1000 256 10`
 
+Run curve operations using `bn254` elements.  
+`bazel run -c opt //benchmark/primitives:benchmark bn254 curve 10000 1000 256 10`
+
 Run field operations (addition and multiplication) using `bls12-381` elements.  
 `bazel run -c opt //benchmark/primitives:benchmark bls12_381 field 1000000 1000 256 10`
+
+Run field operations (addition and multiplication) using `bn254` elements.  
+`bazel run -c opt //benchmark/primitives:benchmark bn254 field 1000000 1000 256 10`
