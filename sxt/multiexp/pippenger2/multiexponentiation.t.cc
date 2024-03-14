@@ -48,7 +48,22 @@ TEST_CASE("we can compute multiexponentiations") {
     auto fut = multiexponentiate<E>(res, partition_table, scalars, 32, 2);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
-    expected = {123u + 2u * 456};
+    expected = {123u + 2u * 456u};
+    REQUIRE(res == expected);
+  }
+
+  SECTION("we handle more than 16 elements") {
+    partition_table.resize(2u * partition_table.size());
+    std::vector<uint8_t> scalars1(32u * 17u);
+    scalars1[0] = 1u;
+    scalars1[32u * 16u] = 1u;
+    scalars = {scalars1.data()};
+    partition_table[1] = 123u;
+    partition_table[(1u << 16u) + 1u] = 456u;
+    auto fut = multiexponentiate<E>(res, partition_table, scalars, 32, 17);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    expected = {123u + 456u};
     REQUIRE(res == expected);
   }
 }

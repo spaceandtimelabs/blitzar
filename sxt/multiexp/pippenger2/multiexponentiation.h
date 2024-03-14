@@ -42,7 +42,7 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> partition_t
   co_await std::move(fut);
   memmg::managed_array<T> products{num_products, &resource};
   launch_product_kernel<0, T>(products.data(), stream, indexes.data(), partition_table_dev.data(),
-                              num_products, n);
+                              num_products, num_partitions_per_product);
   co_await xendv::await_stream(stream);
   partition_table_dev.reset();
   indexes.reset();

@@ -14,7 +14,7 @@ template <unsigned ItemsPerThreadLg2, bascrv::element T>
 CUDA_CALLABLE void reduce_partitions(T items[(1u << ItemsPerThreadLg2)], const uint16_t* __restrict__ bitsets,
                                   const T* __restrict__ table, unsigned num_products) noexcept {
   constexpr unsigned items_per_thread = 1u << ItemsPerThreadLg2;
-  constexpr unsigned num_entries = (1u << 16u);
+  constexpr unsigned num_entries = 1u << 16u;
 
   // load keys
   uint16_t keys[items_per_thread];
