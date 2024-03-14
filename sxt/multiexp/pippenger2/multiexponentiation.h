@@ -37,7 +37,7 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> partition_t
   // compute sums from indexes
   basdv::stream stream;
   memr::async_device_resource resource{stream};
-  memmg::managed_array<T> partition_table_dev{n * (1u << 16u), &resource};
+  memmg::managed_array<T> partition_table_dev{partition_table.size(), &resource};
   basdv::async_copy_host_to_device(partition_table_dev, partition_table, stream);
   co_await std::move(fut);
   memmg::managed_array<T> products{num_products, &resource};
