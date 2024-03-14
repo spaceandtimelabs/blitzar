@@ -51,7 +51,7 @@ template <class T> static T std_dev(const std::vector<T>& data) {
                                      [mean](T accumulator, T val) {
                                        return accumulator + (val - mean) * (val - mean);
                                      }) /
-                     data.size();
+                     (data.size() - 1);
   return std::sqrt(variance);
 }
 
@@ -60,11 +60,15 @@ template <class T> static T std_dev(const std::vector<T>& data) {
 //--------------------------------------------------------------------------------------------------
 template <class T> static T median(const std::vector<T>& data) {
   std::vector<T> sorted_data = data;
-  std::sort(sorted_data.begin(), sorted_data.end());
+
+  auto n = sorted_data.size() / 2;
+  std::nth_element(sorted_data.begin(), sorted_data.begin() + n, sorted_data.end());
+
   if (sorted_data.size() % 2 == 0) {
-    return (sorted_data[sorted_data.size() / 2 - 1] + sorted_data[sorted_data.size() / 2]) / 2;
+    T max_of_lower_half = *std::max_element(sorted_data.begin(), sorted_data.begin() + n);
+    return (max_of_lower_half + sorted_data[n]) / 2;
   } else {
-    return sorted_data[sorted_data.size() / 2];
+    return sorted_data[n];
   }
 }
 
