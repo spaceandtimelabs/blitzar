@@ -66,4 +66,19 @@ TEST_CASE("we can compute multiexponentiations") {
     expected = {123u + 456u};
     REQUIRE(res == expected);
   }
+
+  SECTION("we handle more than one output") {
+    std::vector<uint8_t> scalars1(32);
+    scalars1[0] = 1u;
+    std::vector<uint8_t> scalars2(32);
+    scalars2[0] = 2u;
+    scalars = {scalars1.data(), scalars2.data()};
+    partition_table[1] = 123u;
+    res.resize(2);
+    auto fut = multiexponentiate<E>(res, partition_table, scalars, 32, 1);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    expected = {123u, 2u * 123u};
+    REQUIRE(res == expected);
+  }
 }
