@@ -17,7 +17,9 @@
 #include <print>
 
 #include "benchmark/primitives/curve_ops_bls12_381.h"
+#include "benchmark/primitives/curve_ops_bn254.h"
 #include "benchmark/primitives/field_ops_bls12_381.h"
+#include "benchmark/primitives/field_ops_bn254.h"
 
 using namespace sxt;
 
@@ -52,6 +54,15 @@ int main(int argc, char* argv[]) {
       field_ops_bls12_381("add", n_elements, repetitions, n_threads, n_executions);
       field_ops_bls12_381("mul", n_elements, repetitions, n_threads, n_executions);
     }
+  } else if (curve == "bn254") {
+    if (op == "curve") {
+      curve_ops_bn254(n_elements, repetitions, n_threads, n_executions);
+    } else if (op == "field") {
+      field_ops_bn254("add", n_elements, repetitions, n_threads, n_executions);
+      field_ops_bn254("mul", n_elements, repetitions, n_threads, n_executions);
+    }
+  } else {
+    std::println("curve not supported");
   }
 
   std::println("******************************");
