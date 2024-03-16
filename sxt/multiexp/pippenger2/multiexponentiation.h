@@ -17,14 +17,13 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
-// multiexponentiate 
+// multiexponentiate_chunk 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> partition_table,
-                                 basct::cspan<const uint8_t*> exponents,
-                                 unsigned element_num_bytes,
-                                 unsigned n) noexcept {
-  auto num_outputs = res.size();
+xena::future<> multiexponentiate_chunk(basct::span<T> res, basct::cspan<T> partition_table,
+                                       basct::cspan<const uint8_t*> exponents,
+                                       unsigned element_num_bytes, unsigned n) noexcept {
+  auto num_outputs = exponents.size();
   auto num_partitions_per_product = basn::divide_up(n, 16u);
   auto num_products = num_outputs * element_num_bytes * 8u;
 
@@ -40,17 +39,33 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> partition_t
   memmg::managed_array<T> partition_table_dev{partition_table.size(), &resource};
   basdv::async_copy_host_to_device(partition_table_dev, partition_table, stream);
   co_await std::move(fut);
-  memmg::managed_array<T> products{num_products, &resource};
-  launch_product_kernel<0, T>(products.data(), stream, indexes.data(), partition_table_dev.data(),
+  launch_product_kernel<0, T>(res.data(), stream, indexes.data(), partition_table_dev.data(),
                               num_products, num_partitions_per_product);
   co_await xendv::await_stream(stream);
-  partition_table_dev.reset();
-  indexes.reset();
+}
+
+//--------------------------------------------------------------------------------------------------
+// multiexponentiate 
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> partition_table,
+                                 basct::cspan<const uint8_t*> exponents, unsigned element_num_bytes,
+                                 unsigned n) noexcept {
+  auto num_outputs = res.size();
+  auto num_products = num_outputs * element_num_bytes * 8u;
+
+  // compute product chunks
+  memmg::managed_array<T> products{num_products, memr::get_device_resource()};
+  co_await multiexponentiate_chunk<T>(products, partition_table, exponents, element_num_bytes, n);
+
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
 
   // reduce
   memmg::managed_array<T> res_dev{num_outputs, &resource};
   reduce_products<T>(res_dev, stream, products);
   products.reset();
   basdv::async_copy_device_to_host(res, res_dev, stream);
+  co_await xendv::await_stream(stream);
 }
 } // namespace sxt::mtxpp2
