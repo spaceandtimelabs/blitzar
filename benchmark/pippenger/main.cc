@@ -1,5 +1,6 @@
 #include <iostream>
 #include <random>
+#include <chrono>
 
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
@@ -54,10 +55,9 @@ static void generate_scalars(memmg::managed_array<const uint8_t*>& scalars,
 int main() {
   /* auto n = 16u * 100; */
   auto n = 1024u;
-  /* auto num_outputs = 1024u; */
-  auto num_outputs = 128u;
+  auto num_outputs = 1024u;
+  auto num_iterations = 4u;
 
-  std::cout << "arf\n";
   // make lookup table
   auto table = make_lookup_array(n);
 
@@ -67,16 +67,18 @@ int main() {
   generate_scalars(scalars, data, num_outputs, n);
 
   // compute multi-exponentiation
-  std::cout << "mx" << std::endl;
   memmg::managed_array<E> res(num_outputs);
-  auto fut = mtxpp2::multiexponentiate<E>(res, table, scalars, element_num_bytes, n);
-  xens::get_scheduler().run();
-  std::cout << "nuf" << std::endl;
-  (void)generate_scalars;
-/* template <bascrv::element T> */
-/* xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> partition_table, */
-/*                                  basct::cspan<const uint8_t*> exponents, */
-/*                                  unsigned element_num_bytes, */
-/*                                  unsigned n) noexcept { */
+  double duration = 0.0;
+  for (unsigned i = 0; i < num_iterations; ++i) {
+    auto t1 = std::chrono::steady_clock::now();
+    auto fut = mtxpp2::multiexponentiate<E>(res, table, scalars, element_num_bytes, n);
+    xens::get_scheduler().run();
+    auto t2 = std::chrono::steady_clock::now();
+    duration += std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+  }
+  duration /= num_iterations;
+  std::cout << res[0] << std::endl;
+  std::cout << duration / 1000.0 << std::endl;;
+
   return 0;
 }

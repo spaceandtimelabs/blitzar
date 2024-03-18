@@ -6,8 +6,6 @@
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
-#include "sxt/base/iterator/index_range.h"
-#include "sxt/base/iterator/index_range_utility.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
@@ -60,11 +58,6 @@ xena::future<> multiexponentiate(basct::span<T> res, basct::cspan<T> partition_t
   auto num_partitions_per_product = basn::divide_up(n, 16u);
 
   // compute product chunks
-  auto chunks = basit::split(
-      basit::index_range{0, num_partitions_per_product}.max_chunk_size(max_partition_chunk_size),
-      1u);
-  std::cerr << "chunks: " << (chunks.second - chunks.first) << std::endl;
-  (void)chunks;
   memmg::managed_array<T> products{num_products, memr::get_device_resource()};
   co_await multiexponentiate_chunk<T>(products, partition_table, exponents, element_num_bytes, n);
 
