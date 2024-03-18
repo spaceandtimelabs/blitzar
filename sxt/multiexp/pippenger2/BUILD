@@ -88,6 +88,8 @@ sxt_cc_component(
     "//sxt/base/curve:element",
     "//sxt/base/device:memory_utility",
     "//sxt/base/device:stream",
+    "//sxt/base/iterator:index_range",
+    "//sxt/base/iterator:index_range_utility",
     "//sxt/base/num:divide_up",
     "//sxt/execution/async:coroutine",
     "//sxt/execution/device:synchronization",

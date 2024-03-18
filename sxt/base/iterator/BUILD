@@ -40,13 +40,14 @@ sxt_cc_component(
     name = "index_range_utility",
     impl_deps = [
         ":index_range",
-        ":index_range_iterator",
         "//sxt/base/error:assert",
         "//sxt/base/num:divide_up",
     ],
+    deps = [
+        ":index_range_iterator",
+    ],
     test_deps = [
         ":index_range",
-        ":index_range_iterator",
         "//sxt/base/test:unit_test",
     ],
 )

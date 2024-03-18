@@ -31,7 +31,7 @@ static memmg::managed_array<E> make_lookup_array(unsigned n) {
 // generate_scalars
 //--------------------------------------------------------------------------------------------------
 static void generate_scalars(memmg::managed_array<const uint8_t*>& scalars,
-                             memmg::managed_array<uint8_t> data_table, unsigned num_outputs,
+                             memmg::managed_array<uint8_t>& data_table, unsigned num_outputs,
                              unsigned n) {
   scalars.resize(num_outputs);
   data_table.resize(element_num_bytes * num_outputs * n);
@@ -52,9 +52,10 @@ static void generate_scalars(memmg::managed_array<const uint8_t*>& scalars,
 // main
 //--------------------------------------------------------------------------------------------------
 int main() {
-  /* auto n = 16u * 12u; */
+  /* auto n = 16u * 100; */
   auto n = 1024u;
-  auto num_outputs = 1024u;
+  /* auto num_outputs = 1024u; */
+  auto num_outputs = 128u;
 
   std::cout << "arf\n";
   // make lookup table

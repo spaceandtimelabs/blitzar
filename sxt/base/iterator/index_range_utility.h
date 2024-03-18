@@ -19,9 +19,10 @@
 #include <cstddef>
 #include <utility>
 
+#include "sxt/base/iterator/index_range_iterator.h"
+
 namespace sxt::basit {
 class index_range;
-class index_range_iterator;
 
 //--------------------------------------------------------------------------------------------------
 // split
