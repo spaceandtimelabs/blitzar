@@ -38,10 +38,23 @@ namespace sxt::basfld {
  */
 CUDA_CALLABLE void inline mac(uint64_t& ret, uint64_t& carry, const uint64_t a, const uint64_t b,
                               const uint64_t c) noexcept {
+#ifdef __CUDA_ARCH__
+  uint64_t mul_hi = 0;
+  asm volatile("mul.lo.u64 %0, %2, %3;\n\t" // ret    = (b*c).lo
+               "mul.hi.u64 %1, %2, %3;\n\t" // mul_hi = (b*c).hi
+               "add.cc.u64 %0, %0, %4;\n\t" // ret    = ret + a -> carry out
+               "addc.u64 %1, %1, 0;\n\t"    // mul_hi = mul_hi + carry in
+               "add.cc.u64 %0, %0, %5;\n\t" // ret    = ret + carry -> carry out
+               "addc.u64 %1, %1, 0;\n\t"    // mul_hi = mul_hi + carry in
+               : "+l"(ret), "+l"(mul_hi)
+               : "l"(b), "l"(c), "l"(a), "l"(carry));
+  carry = mul_hi;
+#else
   uint128_t ret_tmp = uint128_t{a} + (uint128_t{b} * uint128_t{c}) + uint128_t{carry};
 
   ret = bast::narrow_cast<uint64_t>(ret_tmp);
   carry = bast::narrow_cast<uint64_t>((ret_tmp >> 64));
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -16,9 +16,19 @@
  */
 #include "sxt/base/field/arithmetic_utility.h"
 
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/managed_device_resource.h"
 
+using namespace sxt;
 using namespace sxt::basfld;
+
+__global__ void mac(uint64_t* __restrict__ ret, uint64_t* __restrict__ carry,
+                    const uint64_t* __restrict__ a, const uint64_t* __restrict__ b,
+                    const uint64_t* __restrict__ c) {
+  mac(ret[0], carry[0], a[0], b[0], c[0]);
+}
 
 TEST_CASE("mac (multiplication and carry) can handle computation") {
   SECTION("with minimum values") {
@@ -63,6 +73,90 @@ TEST_CASE("mac (multiplication and carry) can handle computation") {
     mac(ret, carry, a, b, c);
     REQUIRE(ret == 0xffffffffffffffff);
     REQUIRE(carry == 0xffffffffffffffff);
+  }
+}
+
+TEST_CASE("mac (multiplication and carry) can handle computation on the GPU") {
+  memmg::managed_array<uint64_t> a(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> b(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> c(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> ret(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> carry(1, memr::get_managed_device_resource());
+
+  SECTION("with minimum values") {
+    a[0] = 0;
+    b[0] = 0;
+    c[0] = 0;
+    carry[0] = 0;
+    ret[0] = 0;
+
+    mac<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), c.data());
+    cudaDeviceSynchronize();
+
+    REQUIRE(ret[0] == 0);
+    REQUIRE(carry[0] == 0x0);
+  }
+
+  SECTION("without carryover on pre-comuputed values") {
+    a[0] = 0x1;
+    b[0] = 0x2;
+    c[0] = 0x3;
+    carry[0] = 0x4;
+    ret[0] = 0x0;
+
+    mac<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), c.data());
+    cudaDeviceSynchronize();
+
+    REQUIRE(ret[0] == 0xb);
+    REQUIRE(carry[0] == 0x0);
+  }
+
+  SECTION("with carryover on pre-comuputed values") {
+    a[0] = 0xb9feffffffffaaab;
+    b[0] = 0x1eabfffeb153ffff;
+    c[0] = 0x6730d2a0f6b0f624;
+    carry[0] = 0x64774b84f38512bf;
+    ret[0] = 0x0;
+
+    mac<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), c.data());
+    cudaDeviceSynchronize();
+
+    REQUIRE(ret[0] == 0xc974d8dba4a3c746);
+    REQUIRE(carry[0] == 0xc5d0d7bda277422);
+  }
+
+  SECTION("with maximum values") {
+    a[0] = 0xffffffffffffffff;
+    b[0] = 0xffffffffffffffff;
+    c[0] = 0xffffffffffffffff;
+    carry[0] = 0xffffffffffffffff;
+    ret[0] = 0x0;
+
+    mac<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), c.data());
+    cudaDeviceSynchronize();
+
+    REQUIRE(ret[0] == 0xffffffffffffffff);
+    REQUIRE(carry[0] == 0xffffffffffffffff);
+  }
+
+  SECTION("by matching the non-GPU implementation on a random value") {
+    basn::fast_random_number_generator rng{1, 2};
+
+    a[0] = rng();
+    b[0] = rng();
+    c[0] = rng();
+    carry[0] = rng();
+    ret[0] = 0;
+
+    uint64_t ret_expected{0};
+    uint64_t carry_expected{carry[0]};
+    mac(ret_expected, carry_expected, a[0], b[0], c[0]);
+
+    mac<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), c.data());
+    cudaDeviceSynchronize();
+
+    REQUIRE(ret[0] == ret_expected);
+    REQUIRE(carry[0] == carry_expected);
   }
 }
 
