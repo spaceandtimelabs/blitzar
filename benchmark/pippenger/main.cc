@@ -56,7 +56,7 @@ int main() {
   /* auto n = 16u * 100; */
   auto n = 1024u;
   auto num_outputs = 1024u;
-  auto num_iterations = 4u;
+  auto num_iterations = 5u;
 
   // make lookup table
   auto table = make_lookup_array(n);
@@ -77,8 +77,7 @@ int main() {
     duration += std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
   }
   duration /= num_iterations;
-  std::cout << res[0] << std::endl;
-  std::cout << duration / 1000.0 << std::endl;;
+  std::cout << "duration (s): " << duration / 1000.0 << std::endl;;
 
   return 0;
 }

@@ -23,6 +23,8 @@ namespace sxt::basbt {
 //--------------------------------------------------------------------------------------------------
 // count_trailing_zeros
 //--------------------------------------------------------------------------------------------------
+inline int count_trailing_zeros(unsigned x) noexcept { return __builtin_ctz(x); }
+
 inline int count_trailing_zeros(unsigned long x) noexcept { return __builtin_ctzl(x); }
 
 inline int count_trailing_zeros(unsigned long long x) noexcept { return __builtin_ctzll(x); }
