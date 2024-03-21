@@ -12,7 +12,7 @@ namespace sxt::basbt {
 template <std::unsigned_integral T>
 T next_permutation(T x) noexcept {
   static constexpr T one{1};
-  T t = x | x - one;
+  T t = x | (x - one);
   return (t + one) | (((~t & -~t) - one) >> (basbt::count_trailing_zeros(x) + 1));
 }
 } // namespace sxt::basbt
