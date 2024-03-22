@@ -19,4 +19,5 @@ TEST_CASE("we can fill the partition table") {
   std::cout << sums[0b010] << "\n";
   std::cout << sums[0b100] << "\n";
   std::cout << sums[0b110] << "\n";
+  std::cout << sums[0b111] << "\n";
 }
