@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <concepts>
 
 namespace sxt::basbt {
 //--------------------------------------------------------------------------------------------------
@@ -28,6 +29,12 @@ inline int count_trailing_zeros(unsigned x) noexcept { return __builtin_ctz(x); 
 inline int count_trailing_zeros(unsigned long x) noexcept { return __builtin_ctzl(x); }
 
 inline int count_trailing_zeros(unsigned long long x) noexcept { return __builtin_ctzll(x); }
+
+template<std::unsigned_integral T>
+  requires (sizeof(T) < sizeof(unsigned))
+inline int count_trailing_zeros(T x) noexcept {
+  return count_trailing_zeros(static_cast<unsigned>(x));
+}
 
 //--------------------------------------------------------------------------------------------------
 // count_leading_zeros
