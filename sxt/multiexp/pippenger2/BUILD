@@ -6,6 +6,7 @@ load(
 sxt_cc_component(
   name = "partition_table",
   deps = [
+    "//sxt/base/bit:permutation",
     "//sxt/algorithm/iteration:for_each",
     "//sxt/base/curve:element",
     "//sxt/base/macro:cuda_callable",

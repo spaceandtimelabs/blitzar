@@ -2,6 +2,7 @@
 
 #include <limits>
 
+#include "sxt/base/bit/permutation.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/choose.h"
@@ -22,7 +23,7 @@ CUDA_CALLABLE void compute_partition_values(T* __restrict__ sums,
 
   // multi-entry sums
   for (unsigned k = 2; k <= 16; ++k) {
-    auto partition = std::numeric_limits<uint16_t>::max() >> (16u - k);
+    uint16_t partition = std::numeric_limits<uint16_t>::max() >> (16u - k);
     auto n = basn::choose_k(16u, k);
     for (unsigned i = 0; i < n; ++i) {
       auto rest = partition & (partition - uint16_t{1});
@@ -31,6 +32,7 @@ CUDA_CALLABLE void compute_partition_values(T* __restrict__ sums,
       auto e = sums[t];
       add_inplace(sum, e);
       sums[partition] = sum;
+      partition = basbt::next_permutation(partition);
     }
   }
 }
