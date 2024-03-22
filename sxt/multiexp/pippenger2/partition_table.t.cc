@@ -28,6 +28,6 @@ TEST_CASE("we can fill the partition table") {
         auto g = generators[index];
         add_inplace(e, g);
     });
-    std::cout << e.value << " " << sums[i] << "\n";
+    std::cout << i << ": " << e.value << " " << sums[i] << "\n";
   }
 }
