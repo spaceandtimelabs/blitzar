@@ -8,6 +8,8 @@ sxt_cc_component(
   deps = [
     "//sxt/base/bit:iteration",
     "//sxt/base/bit:permutation",
+    "//sxt/base/container:span",
+    "//sxt/base/error:assert",
     "//sxt/algorithm/iteration:for_each",
     "//sxt/base/curve:element",
     "//sxt/base/macro:cuda_callable",
