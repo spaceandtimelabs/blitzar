@@ -12,6 +12,10 @@ sxt_cc_binary(
     "//sxt/base/num:divide_up",
     "//sxt/base/num:fast_random_number_generator",
     "//sxt/curve21/type:element_p3",
+    "//sxt/curve21/operation:add",
+    "//sxt/curve21/operation:double",
+    "//sxt/curve21/operation:neg",
+    "//sxt/multiexp/pippenger2:partition_table",
     "//sxt/ristretto/random:element",
   ],
 )

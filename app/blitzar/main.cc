@@ -5,7 +5,11 @@
 
 #include "sxt/base/num/divide_up.h"
 #include "sxt/base/num/fast_random_number_generator.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/multiexp/pippenger2/partition_table.h"
 #include "sxt/ristretto/random/element.h"
 using namespace sxt;
 
@@ -22,6 +26,10 @@ static void make_partition_table(std::string_view filename, unsigned n) noexcept
   rstrn::generate_random_elements(generators, rng);
 
   // compute precomputed partition values
+  auto num_elements = 1u << 16u;
+  std::vector<c21t::element_p3> sums(num_elements * n / 16u);
+  mtxpp2::compute_partition_table<c21t::element_p3>(sums, generators);
+
   // write table
   (void)filename;
   (void)n;
