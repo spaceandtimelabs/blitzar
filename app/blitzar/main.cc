@@ -1,12 +1,28 @@
 #include <print>
 #include <string_view>
 #include <charconv>
+#include <vector>
+
+#include "sxt/base/num/divide_up.h"
+#include "sxt/base/num/fast_random_number_generator.h"
+#include "sxt/curve21/type/element_p3.h"
+#include "sxt/ristretto/random/element.h"
+using namespace sxt;
 
 //--------------------------------------------------------------------------------------------------
 // make_partition_table 
 //--------------------------------------------------------------------------------------------------
 static void make_partition_table(std::string_view filename, unsigned n) noexcept {
+  n = basn::divide_up(n, 16u) * 16u;
   std::print("creating table {} {}\n", filename, n);
+
+  // make generators
+  basn::fast_random_number_generator rng{1u, 2u};
+  std::vector<c21t::element_p3> generators(n);
+  rstrn::generate_random_elements(generators, rng);
+
+  // compute precomputed partition values
+  // write table
   (void)filename;
   (void)n;
 }

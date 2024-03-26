@@ -8,4 +8,10 @@ sxt_cc_binary(
   srcs = [
     "main.cc",
   ],
+  deps = [
+    "//sxt/base/num:divide_up",
+    "//sxt/base/num:fast_random_number_generator",
+    "//sxt/curve21/type:element_p3",
+    "//sxt/ristretto/random:element",
+  ],
 )
