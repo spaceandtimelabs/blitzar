@@ -9,6 +9,7 @@ sxt_cc_binary(
     "main.cc",
   ],
   deps = [
+    "//sxt/base/error:panic",
     "//sxt/base/num:divide_up",
     "//sxt/base/num:fast_random_number_generator",
     "//sxt/curve21/type:element_p3",

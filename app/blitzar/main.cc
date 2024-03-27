@@ -1,8 +1,12 @@
+#include <cerrno>
+#include <charconv>
+#include <cstring>
+#include <fstream>
 #include <print>
 #include <string_view>
-#include <charconv>
 #include <vector>
 
+#include "sxt/base/error/panic.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/curve21/operation/add.h"
@@ -31,8 +35,11 @@ static void make_partition_table(std::string_view filename, unsigned n) noexcept
   mtxpp2::compute_partition_table<c21t::element_p3>(sums, generators);
 
   // write table
-  (void)filename;
-  (void)n;
+  std::ofstream out{filename};
+  if (!out.good()) {
+    baser::panic("failed to open {}: {}", filename, std::strerror(errno));
+  }
+  out.write(reinterpret_cast<const char*>(sums.data()), sums.size() * sizeof(sums[0]));
 }
 
 //--------------------------------------------------------------------------------------------------
