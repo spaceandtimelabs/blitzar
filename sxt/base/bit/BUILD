@@ -30,6 +30,16 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "permutation",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":count",
+    ],
+)
+
+sxt_cc_component(
     name = "span_op",
     test_deps = [
         "//sxt/base/test:unit_test",
