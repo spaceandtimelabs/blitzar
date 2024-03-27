@@ -24,7 +24,11 @@ namespace sxt::basbt {
 //--------------------------------------------------------------------------------------------------
 // next_permutation
 //--------------------------------------------------------------------------------------------------
-// adopted from https://stackoverflow.com/a/8281965
+/**
+ * Iterate over all permutations of a number with a given number of bits set to 1.
+ *
+ * Adopted from https://stackoverflow.com/a/8281965
+ */
 template <std::unsigned_integral T> T next_permutation(T x) noexcept {
   static constexpr T one{1};
   T t = x | (x - one);
