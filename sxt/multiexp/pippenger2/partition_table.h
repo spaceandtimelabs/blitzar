@@ -26,7 +26,7 @@ CUDA_CALLABLE void compute_partition_values(T* __restrict__ sums,
 
   // multi-entry sums
   for (unsigned k = 2; k <= 16; ++k) {
-    auto partition = std::numeric_limits<uint16_t>::max() >> (16u - k);
+    unsigned partition = std::numeric_limits<uint16_t>::max() >> (16u - k);
     auto partition_last = partition << (16u - k);
     while (true) {
       auto rest = partition & (partition - 1u);
