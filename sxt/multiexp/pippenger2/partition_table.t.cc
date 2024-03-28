@@ -16,7 +16,6 @@
  */
 #include "sxt/multiexp/pippenger2/partition_table.h"
 
-#include <iostream>
 #include <vector>
 
 #include "sxt/base/bit/iteration.h"
