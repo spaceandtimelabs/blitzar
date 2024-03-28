@@ -12,10 +12,10 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
-// compute_partition_values
+// compute_partition_table_slice
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-CUDA_CALLABLE void compute_partition_values(T* __restrict__ sums,
+CUDA_CALLABLE void compute_partition_table_slice(T* __restrict__ sums,
                                             const T* __restrict__ generators) noexcept {
   sums[0] = T::identity();
 
@@ -59,7 +59,7 @@ void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) no
   for (unsigned i=0; i<n; ++i) {
     auto sums_slice = sums.subspan(i * num_entries, num_entries);
     auto generators_slice = generators.subspan(i * 16u, 16u);
-    compute_partition_values<T>(sums_slice.data(), generators_slice.data());
+    compute_partition_table_slice<T>(sums_slice.data(), generators_slice.data());
   }
 }
 } // namespace sxt::mtxpp2
