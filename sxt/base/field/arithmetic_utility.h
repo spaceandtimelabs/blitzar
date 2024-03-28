@@ -33,22 +33,27 @@ namespace sxt::basfld {
 //--------------------------------------------------------------------------------------------------
 // mac
 //--------------------------------------------------------------------------------------------------
-/*
- Compute a + (b * c) + carry, returning the result and the new carry over.
+/**
+ * Compute a + (b * c) + carry, returning the result and the new carry over.
  */
 CUDA_CALLABLE void inline mac(uint64_t& ret, uint64_t& carry, const uint64_t a, const uint64_t b,
                               const uint64_t c) noexcept {
 #ifdef __CUDA_ARCH__
-  uint64_t mul_hi = 0;
-  asm volatile("mul.lo.u64 %0, %2, %3;\n\t" // ret    = (b*c).lo
-               "mul.hi.u64 %1, %2, %3;\n\t" // mul_hi = (b*c).hi
-               "add.cc.u64 %0, %0, %4;\n\t" // ret    = ret + a -> carry out
-               "addc.u64 %1, %1, 0;\n\t"    // mul_hi = mul_hi + carry in
-               "add.cc.u64 %0, %0, %5;\n\t" // ret    = ret + carry -> carry out
-               "addc.u64 %1, %1, 0;\n\t"    // mul_hi = mul_hi + carry in
-               : "+l"(ret), "+l"(mul_hi)
-               : "l"(b), "l"(c), "l"(a), "l"(carry));
-  carry = mul_hi;
+  uint64_t c_in = carry;
+  asm volatile("{\n\t"                             // scope registers
+               ".reg .u64 lo, hi;\n\t"             // create registers lo and hi
+               "mul.lo.u64 lo, %2, %3;\n\t"        // lo = (b*c).lo
+               "mul.hi.u64 hi, %2, %3;\n\t"        // hi = (b*c).hi
+               "add.cc.u64 lo, lo, %4;\n\t"        // lo = lo + a -> CC.CF
+               "addc.u64 hi, hi, 0;\n\t"           // hi = hi + CC.CF
+               "add.cc.u64 lo, lo, %5;\n\t"        // lo = lo + carry -> CC.CF
+               "addc.u64 hi, hi, 0;\n\t"           // hi = hi + CC.CF
+               "mov.u64 %0, lo;\n\t"               // ret = lo
+               "mov.u64 %1, hi;\n\t"               // carry = hi
+               "}"                                 // end scope
+               : "=l"(ret), "=l"(carry)            // outputs
+               : "l"(b), "l"(c), "l"(a), "l"(c_in) // inputs
+  );
 #else
   uint128_t ret_tmp = uint128_t{a} + (uint128_t{b} * uint128_t{c}) + uint128_t{carry};
 
@@ -60,8 +65,8 @@ CUDA_CALLABLE void inline mac(uint64_t& ret, uint64_t& carry, const uint64_t a, 
 //--------------------------------------------------------------------------------------------------
 // adc
 //--------------------------------------------------------------------------------------------------
-/*
- Compute a + b + carry, returning the result and the new carry over.
+/**
+ * Compute a + b + carry, returning the result and the new carry over.
  */
 CUDA_CALLABLE void inline adc(uint64_t& ret, uint64_t& carry, const uint64_t a, const uint64_t b,
                               const uint64_t c) noexcept {
@@ -74,8 +79,8 @@ CUDA_CALLABLE void inline adc(uint64_t& ret, uint64_t& carry, const uint64_t a, 
 //--------------------------------------------------------------------------------------------------
 // sbb
 //--------------------------------------------------------------------------------------------------
-/*
- Compute a - (b + borrow), returning the result and the new borrow.
+/**
+ * Compute a - (b + borrow), returning the result and the new borrow.
  */
 CUDA_CALLABLE void inline sbb(uint64_t& ret, uint64_t& borrow, const uint64_t a,
                               const uint64_t b) noexcept {
