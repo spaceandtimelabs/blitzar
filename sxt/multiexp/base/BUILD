@@ -4,6 +4,16 @@ load(
 )
 
 sxt_cc_component(
+    name = "generator_accessor",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+      "//sxt/base/curve:element",
+    ],
+)
+
+sxt_cc_component(
     name = "generator_utility",
     test_deps = [
         "//sxt/base/test:unit_test",
