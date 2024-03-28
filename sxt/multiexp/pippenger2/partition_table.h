@@ -16,9 +16,7 @@
  */
 #pragma once
 
-#include <cassert>
 #include <limits>
-#include <print>
 
 #include "sxt/base/bit/permutation.h"
 #include "sxt/base/container/span.h"
