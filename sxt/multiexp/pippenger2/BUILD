@@ -38,6 +38,7 @@ sxt_cc_component(
     deps = [
       ":partition_table_accessor",
         "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
     ],
     test_deps = [
       "//sxt/base/test:unit_test",
