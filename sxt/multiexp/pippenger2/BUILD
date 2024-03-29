@@ -24,6 +24,16 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "partition_table_accessor",
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/curve:element",
+        "//sxt/execution/async:future_fwd",
+    ],
+)
+
+sxt_cc_component(
     name = "product_kernel",
     test_deps = [
         "//sxt/base/curve:example_element",
