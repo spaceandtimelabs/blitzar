@@ -34,6 +34,17 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "in_memory_partition_table_accessor",
+    deps = [
+      ":partition_table_accessor",
+        "//sxt/execution/async:future",
+    ],
+    test_deps = [
+      "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "product_kernel",
     test_deps = [
         "//sxt/base/curve:example_element",
