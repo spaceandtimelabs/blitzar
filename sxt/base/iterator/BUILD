@@ -43,12 +43,12 @@ sxt_cc_component(
         "//sxt/base/error:assert",
         "//sxt/base/num:divide_up",
     ],
-    deps = [
-        ":index_range_iterator",
-    ],
     test_deps = [
         ":index_range",
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":index_range_iterator",
     ],
 )
 

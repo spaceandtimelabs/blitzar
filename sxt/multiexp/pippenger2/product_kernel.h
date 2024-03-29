@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2024-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <cstdint>
@@ -8,17 +24,18 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
-// reduce_partitions 
+// reduce_partitions
 //--------------------------------------------------------------------------------------------------
 template <unsigned ItemsPerThreadLg2, bascrv::element T>
-CUDA_CALLABLE void reduce_partitions(T items[(1u << ItemsPerThreadLg2)], const uint16_t* __restrict__ bitsets,
-                                  const T* __restrict__ table, unsigned num_products) noexcept {
+CUDA_CALLABLE void reduce_partitions(T items[(1u << ItemsPerThreadLg2)],
+                                     const uint16_t* __restrict__ bitsets,
+                                     const T* __restrict__ table, unsigned num_products) noexcept {
   constexpr unsigned items_per_thread = 1u << ItemsPerThreadLg2;
   constexpr unsigned num_entries = 1u << 16u;
 
   // load keys
   uint16_t keys[items_per_thread];
-  for (unsigned i=0; i<items_per_thread; ++i) {
+  for (unsigned i = 0; i < items_per_thread; ++i) {
     keys[i] = bitsets[i * num_products];
   }
 
@@ -57,7 +74,7 @@ CUDA_CALLABLE void product_kernel_impl(T* __restrict__ products,
 
   // reduce rest
   T res = items[0];
-  for (unsigned i=items_per_thread; i<n; i+=items_per_thread) {
+  for (unsigned i = items_per_thread; i < n; i += items_per_thread) {
     bitsets += items_per_thread * num_products;
     table += items_per_thread * num_entries;
     reduce_partitions<ItemsPerThreadLg2>(items, bitsets, table, num_products);
@@ -69,23 +86,24 @@ CUDA_CALLABLE void product_kernel_impl(T* __restrict__ products,
 }
 
 //--------------------------------------------------------------------------------------------------
-// launch_product_kernel 
+// launch_product_kernel
 //--------------------------------------------------------------------------------------------------
 template <unsigned ItemsPerThreadLg2, bascrv::element T>
 void launch_product_kernel(T* __restrict__ products, bast::raw_stream_t stream,
                            const uint16_t* __restrict__ bitsets, const T* __restrict__ table,
                            unsigned num_products, unsigned n) {
   auto f = [
-    // clang-format off
+               // clang-format off
     products = products,
     bitsets = bitsets,
     table = table,
     n = n
-    // clang-format on
-  ] __device__ __host__(unsigned num_products, unsigned product_index) noexcept {
-    product_kernel_impl<ItemsPerThreadLg2>(products, bitsets, table, num_products, n,
-                                           product_index);
-  };
+               // clang-format on
+  ] __device__
+           __host__(unsigned num_products, unsigned product_index) noexcept {
+             product_kernel_impl<ItemsPerThreadLg2>(products, bitsets, table, num_products, n,
+                                                    product_index);
+           };
   algi::launch_for_each_kernel(stream, f, num_products);
 }
 } // namespace sxt::mtxpp2

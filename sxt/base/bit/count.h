@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <concepts>
 #include <cstdint>
-#include <concepts>
 
 namespace sxt::basbt {
 //--------------------------------------------------------------------------------------------------
