@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2023-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/base/bit/permutation.h"
+#pragma once
 
-#include <iostream>
-
-#include "sxt/base/test/unit_test.h"
-using namespace sxt;
-using namespace sxt::basbt;
-
-TEST_CASE("we can compute the next bit permutation") {
-  SECTION("we can permute over a single bit") {
-    REQUIRE(next_permutation(0b1u) == 0b10u);
-    REQUIRE(next_permutation(0b10u) == 0b100u);
-  }
-
-  SECTION("we can permute over two bits") {
-    REQUIRE(next_permutation(0b11u) == 0b101u);
-    REQUIRE(next_permutation(0b101u) == 0b110u);
-    REQUIRE(next_permutation(0b110u) == 0b1001u);
-  }
-}
+namespace sxt {
+//--------------------------------------------------------------------------------------------------
+// curve_ops_bn254
+//--------------------------------------------------------------------------------------------------
+void curve_ops_bn254(unsigned n_elements, unsigned repetitions, unsigned n_threads = 256,
+                     unsigned n_executions = 10) noexcept;
+} // namespace sxt

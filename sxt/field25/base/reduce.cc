@@ -25,57 +25,9 @@
  */
 #include "sxt/field25/base/reduce.h"
 
-#include "sxt/base/field/arithmetic_utility.h"
 #include "sxt/base/type/narrow_cast.h"
-#include "sxt/field25/base/constants.h"
-#include "sxt/field25/base/subtract_p.h"
 
 namespace sxt::f25b {
-//--------------------------------------------------------------------------------------------------
-// reduce
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE void reduce(uint64_t h[4], const uint64_t t[8]) noexcept {
-  uint64_t tmp = 0;
-  uint64_t carry = 0;
-  uint64_t ret[8];
-
-  uint64_t k = t[0] * inv_v;
-  basfld::mac(tmp, carry, t[0], k, p_v[0]);
-  basfld::mac(ret[1], carry, t[1], k, p_v[1]);
-  basfld::mac(ret[2], carry, t[2], k, p_v[2]);
-  basfld::mac(ret[3], carry, t[3], k, p_v[3]);
-  basfld::adc(ret[4], ret[5], t[4], 0, carry);
-
-  carry = 0;
-  k = ret[1] * inv_v;
-  basfld::mac(tmp, carry, ret[1], k, p_v[0]);
-  basfld::mac(ret[2], carry, ret[2], k, p_v[1]);
-  basfld::mac(ret[3], carry, ret[3], k, p_v[2]);
-  basfld::mac(ret[4], carry, ret[4], k, p_v[3]);
-  basfld::adc(ret[5], ret[6], t[5], ret[5], carry);
-
-  carry = 0;
-  k = ret[2] * inv_v;
-  basfld::mac(tmp, carry, ret[2], k, p_v[0]);
-  basfld::mac(ret[3], carry, ret[3], k, p_v[1]);
-  basfld::mac(ret[4], carry, ret[4], k, p_v[2]);
-  basfld::mac(ret[5], carry, ret[5], k, p_v[3]);
-  basfld::adc(ret[6], ret[7], t[6], ret[6], carry);
-
-  carry = 0;
-  k = ret[3] * inv_v;
-  basfld::mac(tmp, carry, ret[3], k, p_v[0]);
-  basfld::mac(ret[4], carry, ret[4], k, p_v[1]);
-  basfld::mac(ret[5], carry, ret[5], k, p_v[2]);
-  basfld::mac(ret[6], carry, ret[6], k, p_v[3]);
-  basfld::adc(ret[7], tmp, t[7], ret[7], carry);
-
-  // Attempt to subtract the modulus,
-  // to ensure the value is smaller than the modulus.
-  uint64_t a[4] = {ret[4], ret[5], ret[6], ret[7]};
-  subtract_p(h, a);
-}
-
 //--------------------------------------------------------------------------------------------------
 // is_below_modulus
 //--------------------------------------------------------------------------------------------------

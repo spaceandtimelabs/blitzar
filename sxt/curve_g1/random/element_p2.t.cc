@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2023-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/base/bit/permutation.h"
+#include "sxt/curve_g1/random/element_p2.h"
 
-#include <iostream>
-
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve_g1/property/curve.h"
+#include "sxt/curve_g1/type/element_p2.h"
+
 using namespace sxt;
-using namespace sxt::basbt;
+using namespace sxt::cg1rn;
 
-TEST_CASE("we can compute the next bit permutation") {
-  SECTION("we can permute over a single bit") {
-    REQUIRE(next_permutation(0b1u) == 0b10u);
-    REQUIRE(next_permutation(0b10u) == 0b100u);
-  }
+TEST_CASE("random element generation") {
+  basn::fast_random_number_generator rng{1, 2};
 
-  SECTION("we can permute over two bits") {
-    REQUIRE(next_permutation(0b11u) == 0b101u);
-    REQUIRE(next_permutation(0b101u) == 0b110u);
-    REQUIRE(next_permutation(0b110u) == 0b1001u);
+  SECTION("will return different values on the curve if called multiple times") {
+    cg1t::element_p2 e1, e2;
+    generate_random_element(e1, rng);
+    generate_random_element(e2, rng);
+    REQUIRE(e1 != e2);
+    REQUIRE(cg1p::is_on_curve(e1));
+    REQUIRE(cg1p::is_on_curve(e2));
   }
 }

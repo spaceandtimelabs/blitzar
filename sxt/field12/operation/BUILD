@@ -74,19 +74,16 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "neg",
-    impl_deps = [
-        "//sxt/base/field:arithmetic_utility",
-        "//sxt/field12/base:constants",
-        "//sxt/field12/type:element",
-    ],
-    is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/field12/base:constants",
         "//sxt/field12/type:element",
     ],
     deps = [
+        "//sxt/base/field:arithmetic_utility",
         "//sxt/base/macro:cuda_callable",
+        "//sxt/field12/base:constants",
+        "//sxt/field12/type:element",
     ],
 )
 

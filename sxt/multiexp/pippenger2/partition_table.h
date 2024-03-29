@@ -1,8 +1,22 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2024-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
-#include <cassert>
 #include <limits>
-#include <print>
 
 #include "sxt/base/bit/permutation.h"
 #include "sxt/base/container/span.h"
@@ -16,11 +30,11 @@ namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 CUDA_CALLABLE void compute_partition_table_slice(T* __restrict__ sums,
-                                            const T* __restrict__ generators) noexcept {
+                                                 const T* __restrict__ generators) noexcept {
   sums[0] = T::identity();
 
   // single entry sums
-  for (unsigned i=0; i<16; ++i) {
+  for (unsigned i = 0; i < 16; ++i) {
     sums[1 << i] = generators[i];
   }
 
@@ -28,7 +42,11 @@ CUDA_CALLABLE void compute_partition_table_slice(T* __restrict__ sums,
   for (unsigned k = 2; k <= 16; ++k) {
     unsigned partition = std::numeric_limits<uint16_t>::max() >> (16u - k);
     auto partition_last = partition << (16u - k);
+
+    // iterate over all possible permutations with k bits set to 1
+    // until we reach partition_last
     while (true) {
+      // compute the k bit sum from a (k-1) bit sum and a 1 bit sum
       auto rest = partition & (partition - 1u);
       auto t = partition ^ rest;
       auto sum = sums[rest];
@@ -44,8 +62,12 @@ CUDA_CALLABLE void compute_partition_table_slice(T* __restrict__ sums,
 }
 
 //--------------------------------------------------------------------------------------------------
-// compute_partition_table 
+// compute_partition_table
 //--------------------------------------------------------------------------------------------------
+/**
+ * Compute table of sums used for Pippenger's partition step with a width of 16. Each slice of the
+ * table contains all possible sums of a group of 16 generators.
+ */
 template <bascrv::element T>
 void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) noexcept {
   auto num_entries = 1u << 16u;
@@ -56,7 +78,7 @@ void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) no
       // clang-format on
   );
   auto n = generators.size() / 16u;
-  for (unsigned i=0; i<n; ++i) {
+  for (unsigned i = 0; i < n; ++i) {
     auto sums_slice = sums.subspan(i * num_entries, num_entries);
     auto generators_slice = generators.subspan(i * 16u, 16u);
     compute_partition_table_slice<T>(sums_slice.data(), generators_slice.data());
