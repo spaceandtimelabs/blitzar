@@ -52,7 +52,7 @@ static void make_partition_table(std::string_view filename, unsigned n) noexcept
   mtxpp2::compute_partition_table<c21t::element_p3>(sums, generators);
 
   // write table
-  std::ofstream out{filename};
+  std::ofstream out{filename, std::ios::binary};
   if (!out.good()) {
     baser::panic("failed to open {}: {}", filename, std::strerror(errno));
   }
