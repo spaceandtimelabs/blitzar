@@ -37,6 +37,7 @@ sxt_cc_component(
     name = "in_memory_partition_table_accessor",
     deps = [
       ":partition_table_accessor",
+      "//sxt/base/error:panic",
         "//sxt/memory/management:managed_array",
     ],
     test_deps = [
