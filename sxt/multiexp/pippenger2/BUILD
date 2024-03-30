@@ -29,7 +29,7 @@ sxt_cc_component(
     deps = [
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
-        "//sxt/execution/async:future_fwd",
+        "//sxt/base/type:raw_stream",
     ],
 )
 
@@ -37,7 +37,6 @@ sxt_cc_component(
     name = "in_memory_partition_table_accessor",
     deps = [
       ":partition_table_accessor",
-        "//sxt/execution/async:future",
         "//sxt/memory/management:managed_array",
     ],
     test_deps = [

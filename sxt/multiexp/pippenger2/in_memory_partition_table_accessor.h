@@ -2,7 +2,6 @@
 
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 
-#include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 
 namespace sxt::mtxpp2 {
@@ -12,9 +11,10 @@ namespace sxt::mtxpp2 {
 template <bascrv::element T>
 class in_memory_partition_table_accessor final : public partition_table_accessor<T> {
  public:
-   xena::future<> copy_precomputed_sums_to_device(basct::span<T> dest,
-                                                  unsigned first) const noexcept {
+   void async_copy_precomputed_sums_to_device(basct::span<T> dest, bast::raw_stream_t stream,
+                                              unsigned first) const noexcept {
      (void)dest;
+     (void)stream;
      (void)first;
    }
 
