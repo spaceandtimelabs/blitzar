@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string_view>
 
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/error/panic.h"
 #include "sxt/memory/management/managed_array.h"
@@ -35,9 +36,13 @@ class in_memory_partition_table_accessor final : public partition_table_accessor
 
    void async_copy_precomputed_sums_to_device(basct::span<T> dest, bast::raw_stream_t stream,
                                               unsigned first) const noexcept override {
-     (void)dest;
-     (void)stream;
-     (void)first;
+     SXT_DEBUG_ASSERT(
+         // clang-format off
+         table_.size() >= dest.size() + first &&
+         basdv::is_active_device_pointer(dest.data())
+         // clang-format on
+     );
+     basdv::async_copy_host_to_device(dest, table_.subspan(first, dest.size()), stream);
    }
 
  private:
