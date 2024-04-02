@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string_view>
 
+#include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/error/panic.h"
@@ -42,7 +43,7 @@ class in_memory_partition_table_accessor final : public partition_table_accessor
          basdv::is_active_device_pointer(dest.data())
          // clang-format on
      );
-     basdv::async_copy_host_to_device(dest, table_.subspan(first, dest.size()), stream);
+     basdv::async_copy_host_to_device(dest, basct::subspan(table_, first, dest.size()), stream);
    }
 
  private:

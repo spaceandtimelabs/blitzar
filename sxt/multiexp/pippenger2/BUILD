@@ -38,12 +38,15 @@ sxt_cc_component(
     deps = [
       ":partition_table_accessor",
       "//sxt/base/device:memory_utility",
+      "//sxt/base/container:span_utility",
       "//sxt/base/error:assert",
       "//sxt/base/error:panic",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:pinned_resource",
     ],
     test_deps = [
+      "//sxt/base/curve:example_element",
+      "//sxt/base/test:temp_file",
       "//sxt/base/test:unit_test",
     ],
 )
