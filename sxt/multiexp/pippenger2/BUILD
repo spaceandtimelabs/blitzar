@@ -46,8 +46,11 @@ sxt_cc_component(
     ],
     test_deps = [
       "//sxt/base/curve:example_element",
+      "//sxt/base/device:synchronization",
+      "//sxt/base/device:stream",
       "//sxt/base/test:temp_file",
       "//sxt/base/test:unit_test",
+        "//sxt/memory/resource:device_resource",
     ],
 )
 
