@@ -53,3 +53,16 @@ sxt_cc_component(
         "//sxt/memory/resource:device_resource",
     ],
 )
+
+sxt_cc_component(
+  name = "multiexponentiation",
+  deps = [
+    ":partition_table_accessor",
+    "//sxt/base/container:span",
+    "//sxt/base/curve:element",
+    "//sxt/execution/async:future",
+  ],
+  test_deps = [
+    "//sxt/base/test:unit_test",
+  ],
+)
