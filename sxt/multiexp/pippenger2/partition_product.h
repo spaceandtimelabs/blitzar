@@ -7,6 +7,7 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/synchronization.h"
@@ -16,6 +17,35 @@
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 
 namespace sxt::mtxpp2 {
+//--------------------------------------------------------------------------------------------------
+// compute_partition_index 
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE inline uint16_t compute_partition_index(const uint8_t* __restrict__ scalars,
+                                                      unsigned step, unsigned n,
+                                                      unsigned bit_index) noexcept {
+  uint16_t res = 0;
+  unsigned num_elements = min(16u, n);
+  for (unsigned i = 0; i < num_elements; ++i) {
+    auto byte = scalars[i * step];
+    auto bit_value = byte & (1u << bit_index);
+    res |= static_cast<uint16_t>(bit_value << i);
+  }
+  return res;
+}
+
+//--------------------------------------------------------------------------------------------------
+// partition_product_kernel 
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+__global__ void partition_product_kernel(T* __restrict__ products,
+                                         const T* __restrict__ partition_table,
+                                         const uint8_t* __restrict__ scalars, unsigned n) noexcept {
+  (void)products;
+  (void)partition_table;
+  (void)scalars;
+  (void)n;
+}
+
 //--------------------------------------------------------------------------------------------------
 // partition_product 
 //--------------------------------------------------------------------------------------------------
