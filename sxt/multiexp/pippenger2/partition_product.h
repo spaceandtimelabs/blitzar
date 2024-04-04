@@ -40,6 +40,16 @@ template <bascrv::element T>
 __global__ void partition_product_kernel(T* __restrict__ products,
                                          const T* __restrict__ partition_table,
                                          const uint8_t* __restrict__ scalars, unsigned n) noexcept {
+  auto byte_index = threadIdx.x;
+  auto bit_offset = threadIdx.y;
+  auto output_index = blockIdx.x;
+  auto num_bytes_per_output = blockDim.x;
+  auto num_outputs = gridDim.x;
+  auto step = num_bytes_per_output * num_outputs;
+
+  scalars += byte_index + output_index * num_bytes_per_output;
+
+  (void)step;
   (void)products;
   (void)partition_table;
   (void)scalars;
