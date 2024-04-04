@@ -19,7 +19,10 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
         "//sxt/base/error:assert",
+        "//sxt/base/num:divide_up",
         "//sxt/base/macro:cuda_callable",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:device_resource",
     ],
 )
 
