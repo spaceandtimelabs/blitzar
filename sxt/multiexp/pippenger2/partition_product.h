@@ -12,6 +12,7 @@
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
+#include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 
 namespace sxt::mtxpp2 {
@@ -40,8 +41,8 @@ xena::future<> partition_product(basct::span<T> products,
 
   // partition_table
   basdv::stream stream;
-  memmg::managed_array<T> partition_table{num_partitions * num_table_entries,
-                                          memr::get_device_resource()};
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> partition_table{num_partitions * num_table_entries, &resource};
   accessor.async_copy_precomputed_sums_to_device(partition_table, stream, offset / 16u);
   co_await std::move(scalars_fut);
 
