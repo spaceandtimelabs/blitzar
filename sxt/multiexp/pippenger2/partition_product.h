@@ -38,12 +38,13 @@ xena::future<> partition_product(basct::span<T> products,
     co_await xendv::await_stream(stream);
   };
 
+  // partition_table
+  basdv::stream stream;
   memmg::managed_array<T> partition_table{num_partitions * num_table_entries,
                                           memr::get_device_resource()};
-  (void)products;
-  (void)accessor;
-  (void)scalars;
-  (void)offset;
-  return {};
+  accessor.async_copy_precoputed_sums_to_device(partition_table, stream, offset / 16u);
+  co_await std::move(scalars_fut);
+
+  // product
 }
 } // namespace sxt::mtxpp2
