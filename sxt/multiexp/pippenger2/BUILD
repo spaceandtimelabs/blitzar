@@ -35,21 +35,21 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "in_memory_partition_table_accessor",
+    test_deps = [
+        "//sxt/base/curve:example_element",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:temp_file",
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/resource:device_resource",
+    ],
     deps = [
-      ":partition_table_accessor",
-      "//sxt/base/device:memory_utility",
-      "//sxt/base/container:span_utility",
-      "//sxt/base/error:assert",
-      "//sxt/base/error:panic",
+        ":partition_table_accessor",
+        "//sxt/base/container:span_utility",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/error:assert",
+        "//sxt/base/error:panic",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:pinned_resource",
-    ],
-    test_deps = [
-      "//sxt/base/curve:example_element",
-      "//sxt/base/device:synchronization",
-      "//sxt/base/device:stream",
-      "//sxt/base/test:temp_file",
-      "//sxt/base/test:unit_test",
-        "//sxt/memory/resource:device_resource",
     ],
 )
