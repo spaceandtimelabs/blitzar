@@ -84,7 +84,8 @@ for production use.
 #### Installation
 We provide prebuilt binaries for glibc-based, x86-64 linux distributions.
 
-Dependencies are statically linked and set to have internal linkage with [export maps](https://accu.org/journals/overload/15/79/wakeling_1372/) to ensure portability.The only run-time dependency to use GPU acceleration is an GPU up-to-date driver.
+Dependencies are statically linked and set to have internal linkage with [export maps](https://accu.org/journals/overload/15/79/wakeling_1372/) to ensure 
+portability. The only run-time dependency to use GPU acceleration is an GPU up-to-date driver.
 
 For most users, we recommend installing with cargo via [blitzar-rs](https://github.com/spaceandtimelabs/blitzar-rs).
 
