@@ -81,6 +81,15 @@ The library is adopted from code in [libsodium](https://github.com/jedisct1/libs
 **WARNING**: This project has not undergone a security audit and is NOT ready
 for production use.
 
+#### Installation
+We provide prebuilt binaries for glibc-based, x86-64 linux distributions.
+
+Dependencies are statically linked and set to have internal linkage with [export maps](https://accu.org/journals/overload/15/79/wakeling_1372/) to ensure portability.The only run-time dependency to use GPU acceleration is an GPU up-to-date driver.
+
+For most users, we recommend installing with cargo via [blitzar-rs](https://github.com/spaceandtimelabs/blitzar-rs).
+
+Alternatively, users that want to use the c api directly can download the shared library and header file from the github release.
+
 #### Computational Backends
 Although the primary goal of this library is to provide GPU acceleration for cryptographic zk-proof algorithms, the library also provides CPU support for the sake of testing. The following backends are supported:
 
