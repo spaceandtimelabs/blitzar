@@ -1,24 +1,40 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2024-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <cstdint>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
-#include "sxt/base/device/stream.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
-#include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
-// compute_partition_index 
+// compute_partition_index
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE inline uint16_t compute_partition_index(const uint8_t* __restrict__ scalars,
                                                       unsigned step, unsigned n,
@@ -34,7 +50,7 @@ CUDA_CALLABLE inline uint16_t compute_partition_index(const uint8_t* __restrict_
 }
 
 //--------------------------------------------------------------------------------------------------
-// partition_product_kernel 
+// partition_product_kernel
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 __global__ void partition_product_kernel(T* __restrict__ products,
@@ -57,7 +73,7 @@ __global__ void partition_product_kernel(T* __restrict__ products,
 }
 
 //--------------------------------------------------------------------------------------------------
-// partition_product 
+// partition_product
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 xena::future<> partition_product(basct::span<T> products,
@@ -67,9 +83,7 @@ xena::future<> partition_product(basct::span<T> products,
   auto n = scalars.size() * 8u / num_products;
   auto num_partitions = basn::divide_up(n, 16u);
   auto num_table_entries = 1u << 16u;
-  SXT_DEBUG_ASSERT(
-      offset % 16u == 0
-  );
+  SXT_DEBUG_ASSERT(offset % 16u == 0);
 
   // scalars_dev
   memmg::managed_array<uint8_t> scalars_dev{scalars.size(), memr::get_device_resource()};
