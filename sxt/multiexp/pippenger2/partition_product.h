@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 
 #include "sxt/base/container/span.h"
@@ -40,7 +41,7 @@ CUDA_CALLABLE inline uint16_t compute_partition_index(const uint8_t* __restrict_
                                                       unsigned step, unsigned n,
                                                       unsigned bit_index) noexcept {
   uint16_t res = 0;
-  unsigned num_elements = min(16u, n);
+  unsigned num_elements = std::min(16u, n);
   for (unsigned i = 0; i < num_elements; ++i) {
     auto byte = scalars[i * step];
     auto bit_value = byte & (1u << bit_index);

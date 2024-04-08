@@ -17,5 +17,28 @@
 #include "sxt/multiexp/pippenger2/partition_product.h"
 
 #include "sxt/base/test/unit_test.h"
+using namespace sxt;
+using namespace sxt::mtxpp2;
 
-TEST_CASE("todo") {}
+TEST_CASE("we can compute the index used to lookup the precomputed sum for a partition") {
+  uint8_t scalars[32] = {};
+
+  SECTION("we handle the zero case") {
+    auto index = compute_partition_index(scalars, 1, 16, 0);
+    REQUIRE(index == 0);
+  }
+
+  SECTION("we handle non-zero cases") {
+    scalars[0] = 1u;
+    scalars[2] = 1u;
+    auto index = compute_partition_index(scalars, 1, 16, 0);
+    REQUIRE(index == 5);
+  }
+
+  SECTION("we handle n < 16") {
+    scalars[0] = 1u;
+    scalars[2] = 1u;
+    auto index = compute_partition_index(scalars, 1, 2, 0);
+    REQUIRE(index == 1);
+  }
+}
