@@ -29,10 +29,16 @@ TEST_CASE("we can compute the index used to lookup the precomputed sum for a par
   }
 
   SECTION("we handle non-zero cases") {
-    scalars[0] = 1u;
-    scalars[2] = 1u;
+    scalars[0] = 1;
+    scalars[2] = 1;
     auto index = compute_partition_index(scalars, 1, 16, 0);
     REQUIRE(index == 5);
+  }
+
+  SECTION("we handle a bit index of 2") {
+    scalars[0] = 2;
+    auto index = compute_partition_index(scalars, 1, 16, 1);
+    REQUIRE(index == 1);
   }
 
   SECTION("we handle n < 16") {
@@ -40,5 +46,11 @@ TEST_CASE("we can compute the index used to lookup the precomputed sum for a par
     scalars[2] = 1u;
     auto index = compute_partition_index(scalars, 1, 2, 0);
     REQUIRE(index == 1);
+  }
+
+  SECTION("we handle a step size of 2") {
+    scalars[16] = 1;
+    auto index = compute_partition_index(scalars, 2, 16, 0);
+    REQUIRE(index == 1u << 8u);
   }
 }

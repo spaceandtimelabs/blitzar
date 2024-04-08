@@ -42,9 +42,10 @@ CUDA_CALLABLE inline uint16_t compute_partition_index(const uint8_t* __restrict_
                                                       unsigned bit_index) noexcept {
   uint16_t res = 0;
   unsigned num_elements = std::min(16u, n);
+  auto mask = 1u << bit_index;
   for (unsigned i = 0; i < num_elements; ++i) {
     auto byte = scalars[i * step];
-    auto bit_value = byte & (1u << bit_index);
+    auto bit_value = static_cast<uint16_t>((byte & mask) != 0);
     res |= static_cast<uint16_t>(bit_value << i);
   }
   return res;
@@ -54,9 +55,10 @@ CUDA_CALLABLE inline uint16_t compute_partition_index(const uint8_t* __restrict_
 // partition_product_kernel
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-__global__ void partition_product_kernel(T* __restrict__ products,
+CUDA_CALLABLE void partition_product_kernel(T* __restrict__ products,
                                          const T* __restrict__ partition_table,
-                                         const uint8_t* __restrict__ scalars, unsigned n) noexcept {
+                                         const uint8_t* __restrict__ scalars, 
+                                         unsigned n) noexcept {
   constexpr unsigned num_partition_entries = 1u << 16u;
   auto byte_index = threadIdx.x;
   auto bit_offset = threadIdx.y;
