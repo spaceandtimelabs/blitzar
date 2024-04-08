@@ -56,6 +56,7 @@ template <bascrv::element T>
 __global__ void partition_product_kernel(T* __restrict__ products,
                                          const T* __restrict__ partition_table,
                                          const uint8_t* __restrict__ scalars, unsigned n) noexcept {
+  constexpr unsigned num_partition_entries = 1u << 16u;
   auto byte_index = threadIdx.x;
   auto bit_offset = threadIdx.y;
   auto output_index = blockIdx.x;
@@ -64,12 +65,26 @@ __global__ void partition_product_kernel(T* __restrict__ products,
   auto step = num_bytes_per_output * num_outputs;
 
   scalars += byte_index + output_index * num_bytes_per_output;
+  products += 8u * num_bytes_per_output * output_index;
+  products += byte_index * 8u + bit_offset;
 
-  (void)step;
-  (void)products;
-  (void)partition_table;
-  (void)scalars;
-  (void)n;
+  // lookup the first entry
+  auto partition_index = compute_partition_index(scalars, step, n, bit_offset);
+  auto res = partition_table[partition_index];
+
+  // sum remaining entries
+  while (n >= 16u) {
+    n -= 16u;
+    partition_table += num_partition_entries;
+    scalars += 16u * step;
+
+    partition_index = compute_partition_index(scalars, step, n, bit_offset);
+    auto e = partition_table[partition_index];
+    add_inplace(res, e);
+  }
+
+  // write result
+  *products = res;
 }
 
 //--------------------------------------------------------------------------------------------------
