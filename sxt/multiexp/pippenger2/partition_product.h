@@ -58,17 +58,15 @@ template <bascrv::element T>
 CUDA_CALLABLE void partition_product_kernel(T* __restrict__ products,
                                          const T* __restrict__ partition_table,
                                          const uint8_t* __restrict__ scalars, 
+                                         unsigned byte_index,
+                                         unsigned bit_offset,
+                                         unsigned num_products,
                                          unsigned n) noexcept {
   constexpr unsigned num_partition_entries = 1u << 16u;
-  auto byte_index = threadIdx.x;
-  auto bit_offset = threadIdx.y;
-  auto output_index = blockIdx.x;
-  auto num_bytes_per_output = blockDim.x;
-  auto num_outputs = gridDim.x;
-  auto step = num_bytes_per_output * num_outputs;
 
-  scalars += byte_index + output_index * num_bytes_per_output;
-  products += 8u * num_bytes_per_output * output_index;
+  auto step = num_products / 8u;
+
+  scalars += byte_index;
   products += byte_index * 8u + bit_offset;
 
   // lookup the first entry
