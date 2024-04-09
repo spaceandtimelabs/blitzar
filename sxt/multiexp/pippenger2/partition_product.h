@@ -119,19 +119,17 @@ xena::future<> partition_product(basct::span<T> products,
 
   // product
   auto f = [
+    // clang-format off
+    products = products.data(),
+    scalars = scalars_dev.data(),
+    partition_table = partition_table.data(),
+    n = n
+    // clang-format on
   ] __device__ __host__(unsigned num_products, unsigned product_index) noexcept {
     auto byte_index = product_index / 8u;
     auto bit_offset = product_index % 8u;
-    (void)num_products;
-    (void)product_index;
-/* template <bascrv::element T> */
-/* CUDA_CALLABLE void partition_product_kernel(T* __restrict__ products, */
-/*                                          const T* __restrict__ partition_table, */
-/*                                          const uint8_t* __restrict__ scalars,  */
-/*                                          unsigned byte_index, */
-/*                                          unsigned bit_offset, */
-/*                                          unsigned num_products, */
-/*                                          unsigned n) noexcept { */
+    partition_product_kernel<T>(products, partition_table, scalars, byte_index, bit_offset,
+                                num_products, n);
   };
   algi::launch_for_each_kernel(stream, f, num_products);
 }
