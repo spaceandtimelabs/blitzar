@@ -10,8 +10,10 @@ sxt_cc_benchmark(
     deps = [
         ":curve_ops_bls12_381",
         ":curve_ops_bn254",
+        ":curve_ops_bn254_32",
         ":field_ops_bls12_381",
         ":field_ops_bn254",
+        ":field_ops_bn254_32",
     ],
 )
 
@@ -54,6 +56,25 @@ sxt_cc_library(
 )
 
 sxt_cc_library(
+    name = "curve_ops_bn254_32",
+    srcs = [
+        "curve_ops_bn254_32.cu",
+    ],
+    hdrs = [
+        "curve_ops_bn254_32.h",
+    ],
+    deps = [
+        "//sxt/base/num:divide_up",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/curve_bng1_32/operation:add",
+        "//sxt/curve_bng1_32/random:element_p2",
+        "//sxt/curve_bng1_32/type:element_p2",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:device_resource",
+    ],
+)
+
+sxt_cc_library(
     name = "field_ops_bls12_381",
     srcs = [
         "field_ops_bls12_381.cu",
@@ -90,6 +111,27 @@ sxt_cc_library(
         "//sxt/field25/operation:mul",
         "//sxt/field25/random:element",
         "//sxt/field25/type:element",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:device_resource",
+    ],
+)
+
+sxt_cc_library(
+    name = "field_ops_bn254_32",
+    srcs = [
+        "field_ops_bn254_32.cu",
+    ],
+    hdrs = [
+        "field_ops_bn254_32.h",
+    ],
+    deps = [
+        ":stats",
+        "//sxt/base/num:divide_up",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/field32/operation:add",
+        "//sxt/field32/operation:mul",
+        "//sxt/field32/random:element",
+        "//sxt/field32/type:element",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:device_resource",
     ],

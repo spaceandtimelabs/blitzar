@@ -18,8 +18,10 @@
 
 #include "benchmark/primitives/curve_ops_bls12_381.h"
 #include "benchmark/primitives/curve_ops_bn254.h"
+#include "benchmark/primitives/curve_ops_bn254_32.h"
 #include "benchmark/primitives/field_ops_bls12_381.h"
 #include "benchmark/primitives/field_ops_bn254.h"
+#include "benchmark/primitives/field_ops_bn254_32.h"
 
 using namespace sxt;
 
@@ -56,10 +58,17 @@ int main(int argc, char* argv[]) {
     }
   } else if (curve == "bn254") {
     if (op == "curve") {
+      std::println("64-bit base field limbs");
       curve_ops_bn254(n_elements, repetitions, n_threads, n_executions);
+      std::println("32-bit base field limbs");
+      curve_ops_bn254_32(n_elements, repetitions, n_threads, n_executions);
     } else if (op == "field") {
+      std::println("64-bit base field limbs");
       field_ops_bn254("add", n_elements, repetitions, n_threads, n_executions);
       field_ops_bn254("mul", n_elements, repetitions, n_threads, n_executions);
+      std::println("32-bit base field limbs");
+      field_ops_bn254_32("add", n_elements, repetitions, n_threads, n_executions);
+      field_ops_bn254_32("mul", n_elements, repetitions, n_threads, n_executions);
     }
   } else {
     std::println("curve not supported");
