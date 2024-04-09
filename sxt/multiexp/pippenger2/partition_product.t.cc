@@ -84,13 +84,24 @@ TEST_CASE("we can compute the product of partitions") {
   }
   in_memory_partition_table_accessor accessor{memmg::managed_array<E>{partition_table}};
 
-  SECTION("we handle a product with a single element") {
+  SECTION("we handle a product with a single scalar") {
     scalars[0] = 1;
     auto fut = partition_product<E>(products, accessor, scalars, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
     expected[0] = partition_table[1];
+    REQUIRE(products == expected);
+  }
+
+  SECTION("we handle a product with two scalars") {
+    scalars = {1u, 3u};
+    auto fut = partition_product<E>(products, accessor, scalars, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected[0] = partition_table[3];
+    expected[1] = partition_table[2];
     REQUIRE(products == expected);
   }
 }
