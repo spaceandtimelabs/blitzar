@@ -16,7 +16,10 @@
  */
 #include "sxt/multiexp/pippenger2/partition_product.h"
 
+#include <random>
+
 #include "sxt/base/curve/example_element.h"
+#include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
@@ -63,22 +66,31 @@ TEST_CASE("we can compute the index used to lookup the precomputed sum for a par
 TEST_CASE("we can compute the product of partitions") {
   constexpr auto num_entries = 1u << 16u;
   using E = bascrv::element97;
-  memmg::managed_array<E> products{memr::get_managed_device_resource()};
-  memmg::managed_array<uint8_t> scalars;
-  memmg::managed_array<E> partition_table;
+  memmg::managed_array<E> products{8, memr::get_managed_device_resource()};
+  memmg::managed_array<uint8_t> scalars(1);
+  memmg::managed_array<E> expected(8);
+  for (auto& e : expected) {
+    e = 0u;
+  }
+
+  memmg::managed_array<E> partition_table((1u << 16) * 10);
+  std::mt19937 rng{0};
+  for (unsigned i=0; i<partition_table.size(); ++i) {
+    if (i % (1u << 16u) == 0) {
+      partition_table[i] = 0u;
+    } else {
+      partition_table[i] = std::uniform_int_distribution<unsigned>{0, 96}(rng);
+    }
+  }
+  in_memory_partition_table_accessor accessor{memmg::managed_array<E>{partition_table}};
 
   SECTION("we handle a product with a single element") {
-    products.resize(8);
-    scalars.resize(1);
-    partition_table.resize(num_entries);
-    in_memory_partition_table_accessor accessor{std::move(partition_table)};
+    scalars[0] = 1;
     auto fut = partition_product<E>(products, accessor, scalars, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected[0] = partition_table[1];
+    REQUIRE(products == expected);
   }
-  // memmg::managed_array<
-/* template <bascrv::element T> */
-/* xena::future<> partition_product(basct::span<T> products, */
-/*                                  const partition_table_accessor<T>& accessor, */
-/*                                  basct::cspan<uint8_t> scalars, unsigned offset) noexcept { */
 }
