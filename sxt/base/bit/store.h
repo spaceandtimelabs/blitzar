@@ -32,11 +32,29 @@ inline void store64_le(uint8_t dst[8], uint64_t w) noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
+// store32_le
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+inline void store32_le(uint8_t dst[8], uint32_t w) noexcept {
+  // note: assume the architecture is little endian
+  std::memcpy(static_cast<void*>(dst), static_cast<const void*>(&w), sizeof(w));
+}
+
+//--------------------------------------------------------------------------------------------------
 // store64_be
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 inline void store64_be(uint8_t dst[8], uint64_t w) noexcept {
   // note: assume the architecture is little endian
   store64_le(dst, __builtin_bswap64(w));
+}
+
+//--------------------------------------------------------------------------------------------------
+// store32_be
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+inline void store32_be(uint8_t dst[8], uint32_t w) noexcept {
+  // note: assume the architecture is little endian
+  store32_le(dst, __builtin_bswap32(w));
 }
 } // namespace sxt::basbt

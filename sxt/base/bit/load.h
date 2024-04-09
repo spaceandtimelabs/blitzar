@@ -42,6 +42,17 @@ inline uint64_t load64_le(const uint8_t src[8]) noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
+// load32_le
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+inline uint32_t load32_le(const uint8_t src[8]) noexcept {
+  // note: assume the architecture is little endian
+  uint32_t res;
+  std::memcpy(static_cast<void*>(&res), static_cast<const void*>(src), sizeof(res));
+  return res;
+}
+
+//--------------------------------------------------------------------------------------------------
 // load64_be
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
@@ -49,6 +60,16 @@ inline uint64_t load64_be(const uint8_t src[8]) noexcept {
   // note: assume the architecture is little endian
   uint64_t res{load64_le(src)};
   return __builtin_bswap64(res);
+}
+
+//--------------------------------------------------------------------------------------------------
+// load32_be
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+inline uint32_t load32_be(const uint8_t src[8]) noexcept {
+  // note: assume the architecture is little endian
+  uint32_t res{load32_le(src)};
+  return __builtin_bswap32(res);
 }
 
 //--------------------------------------------------------------------------------------------------

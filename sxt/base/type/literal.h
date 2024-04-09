@@ -39,6 +39,22 @@ void parse_literal_impl(std::array<uint64_t, N>& bytes) noexcept {
     parse_literal_impl<N, Rest...>(bytes);
   }
 }
+
+//--------------------------------------------------------------------------------------------------
+// parse_literal_impl_32
+//--------------------------------------------------------------------------------------------------
+template <size_t N, char First, char... Rest>
+void parse_literal_impl_32(std::array<uint32_t, N>& bytes) noexcept {
+  static_assert(basn::is_hex_digit(First), "invalid digit");
+  auto digit_index = sizeof...(Rest);
+  auto element_index = digit_index / 8;
+  auto offset = (digit_index % 8) * 4;
+  uint32_t val = basn::to_hex_value(First);
+  bytes[element_index] += val << offset;
+  if constexpr (sizeof...(Rest) > 0) {
+    parse_literal_impl_32<N, Rest...>(bytes);
+  }
+}
 } // namespace detail
 
 //--------------------------------------------------------------------------------------------------
@@ -50,5 +66,16 @@ void parse_literal(std::array<uint64_t, N>& bytes) noexcept {
                 "invalid field literal");
   bytes = {};
   detail::parse_literal_impl<N, Digits...>(bytes);
+}
+
+//--------------------------------------------------------------------------------------------------
+// parse_literal_32
+//--------------------------------------------------------------------------------------------------
+template <size_t N, char Z, char X, char... Digits>
+void parse_literal_32(std::array<uint32_t, N>& bytes) noexcept {
+  static_assert(Z == '0' && X == 'x' && sizeof...(Digits) > 0 && sizeof...(Digits) <= N * 8,
+                "invalid field literal");
+  bytes = {};
+  detail::parse_literal_impl_32<N, Digits...>(bytes);
 }
 } // namespace sxt::bast
