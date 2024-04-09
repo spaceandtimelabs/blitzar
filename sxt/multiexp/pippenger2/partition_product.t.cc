@@ -63,6 +63,8 @@ TEST_CASE("we can compute the index used to lookup the precomputed sum for a par
 TEST_CASE("we can compute the product of partitions") {
   using E = bascrv::element97;
   memmg::managed_array<E> products{memr::get_managed_device_resource()};
+  memmg::managed_array<uint8_t> scalars;
+  memmg::managed_array<E> partition_table;
   // memmg::managed_array<
 /* template <bascrv::element T> */
 /* xena::future<> partition_product(basct::span<T> products, */
