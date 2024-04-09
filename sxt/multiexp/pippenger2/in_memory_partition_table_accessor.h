@@ -51,6 +51,9 @@ public:
     in.read(reinterpret_cast<char*>(table_.data()), size);
   }
 
+  explicit in_memory_partition_table_accessor(memmg::managed_array<T>&& table) noexcept
+      : table_{std::move(table)} {}
+
   void async_copy_precomputed_sums_to_device(basct::span<T> dest, bast::raw_stream_t stream,
                                              unsigned first) const noexcept override {
     SXT_DEBUG_ASSERT(

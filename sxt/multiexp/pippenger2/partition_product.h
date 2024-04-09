@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cstdint>
 
+#include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/memory_utility.h"
@@ -117,5 +118,21 @@ xena::future<> partition_product(basct::span<T> products,
   co_await std::move(scalars_fut);
 
   // product
+  auto f = [
+  ] __device__ __host__(unsigned num_products, unsigned product_index) noexcept {
+    auto byte_index = product_index / 8u;
+    auto bit_offset = product_index % 8u;
+    (void)num_products;
+    (void)product_index;
+/* template <bascrv::element T> */
+/* CUDA_CALLABLE void partition_product_kernel(T* __restrict__ products, */
+/*                                          const T* __restrict__ partition_table, */
+/*                                          const uint8_t* __restrict__ scalars,  */
+/*                                          unsigned byte_index, */
+/*                                          unsigned bit_offset, */
+/*                                          unsigned num_products, */
+/*                                          unsigned n) noexcept { */
+  };
+  algi::launch_for_each_kernel(stream, f, num_products);
 }
 } // namespace sxt::mtxpp2
