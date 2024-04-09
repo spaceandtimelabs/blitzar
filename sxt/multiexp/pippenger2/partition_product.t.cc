@@ -61,10 +61,21 @@ TEST_CASE("we can compute the index used to lookup the precomputed sum for a par
 }
 
 TEST_CASE("we can compute the product of partitions") {
+  constexpr auto num_entries = 1u << 16u;
   using E = bascrv::element97;
   memmg::managed_array<E> products{memr::get_managed_device_resource()};
   memmg::managed_array<uint8_t> scalars;
   memmg::managed_array<E> partition_table;
+
+  SECTION("we handle a product with a single element") {
+    products.resize(8);
+    scalars.resize(1);
+    partition_table.resize(num_entries);
+    in_memory_partition_table_accessor accessor{std::move(partition_table)};
+    auto fut = partition_product<E>(products, accessor, scalars, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+  }
   // memmg::managed_array<
 /* template <bascrv::element T> */
 /* xena::future<> partition_product(basct::span<T> products, */

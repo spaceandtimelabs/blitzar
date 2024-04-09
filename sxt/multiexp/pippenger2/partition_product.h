@@ -27,7 +27,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/divide_up.h"
-#include "sxt/execution/async/future.h"
+#include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
@@ -97,7 +97,7 @@ xena::future<> partition_product(basct::span<T> products,
                                  const partition_table_accessor<T>& accessor,
                                  basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
   auto num_products = products.size();
-  auto n = scalars.size() * 8u / num_products;
+  auto n = static_cast<unsigned>(scalars.size() * 8u / num_products);
   auto num_partitions = basn::divide_up(n, 16u);
   auto num_table_entries = 1u << 16u;
   SXT_DEBUG_ASSERT(offset % 16u == 0);
@@ -108,7 +108,7 @@ xena::future<> partition_product(basct::span<T> products,
     basdv::stream stream;
     basdv::async_copy_host_to_device(scalars_dev, scalars, stream);
     co_await xendv::await_stream(stream);
-  };
+  }();
 
   // partition_table
   basdv::stream stream;
