@@ -16,7 +16,12 @@
  */
 #include "sxt/multiexp/pippenger2/partition_product.h"
 
+#include "sxt/base/curve/example_element.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/execution/schedule/scheduler.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/managed_device_resource.h"
+#include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor.h"
 using namespace sxt;
 using namespace sxt::mtxpp2;
 
@@ -53,4 +58,14 @@ TEST_CASE("we can compute the index used to lookup the precomputed sum for a par
     auto index = compute_partition_index(scalars, 2, 16, 0);
     REQUIRE(index == 1u << 8u);
   }
+}
+
+TEST_CASE("we can compute the product of partitions") {
+  using E = bascrv::element97;
+  memmg::managed_array<E> products{memr::get_managed_device_resource()};
+  // memmg::managed_array<
+/* template <bascrv::element T> */
+/* xena::future<> partition_product(basct::span<T> products, */
+/*                                  const partition_table_accessor<T>& accessor, */
+/*                                  basct::cspan<uint8_t> scalars, unsigned offset) noexcept { */
 }

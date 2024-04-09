@@ -6,10 +6,12 @@ load(
 sxt_cc_component(
     name = "partition_product",
     test_deps = [
+        ":in_memory_partition_table_accessor",
         "//sxt/base/curve:example_element",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [

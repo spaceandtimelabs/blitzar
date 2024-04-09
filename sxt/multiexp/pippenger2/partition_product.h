@@ -132,5 +132,6 @@ xena::future<> partition_product(basct::span<T> products,
                                 num_products, n);
   };
   algi::launch_for_each_kernel(stream, f, num_products);
+  co_await xendv::await_stream(stream);
 }
 } // namespace sxt::mtxpp2
