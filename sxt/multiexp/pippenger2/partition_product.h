@@ -38,6 +38,9 @@ namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 // compute_partition_index
 //--------------------------------------------------------------------------------------------------
+/**
+ * Compute the index in the partition table of the product for a group of 16 scalars.
+ */
 CUDA_CALLABLE inline uint16_t compute_partition_index(const uint8_t* __restrict__ scalars,
                                                       unsigned step, unsigned n,
                                                       unsigned bit_index) noexcept {
@@ -89,6 +92,10 @@ partition_product_kernel(T* __restrict__ products, const T* __restrict__ partiti
 //--------------------------------------------------------------------------------------------------
 // partition_product
 //--------------------------------------------------------------------------------------------------
+/**
+ * Compute the multiproduct for the bits of an array of scalars using an accessor to
+ * precomputed sums for each group of generators.
+ */
 template <bascrv::element T>
 xena::future<> partition_product(basct::span<T> products,
                                  const partition_table_accessor<T>& accessor,
