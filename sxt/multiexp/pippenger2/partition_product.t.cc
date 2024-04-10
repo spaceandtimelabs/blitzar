@@ -95,6 +95,16 @@ TEST_CASE("we can compute the product of partitions") {
     REQUIRE(products == expected);
   }
 
+  SECTION("we handle a product with an offset") {
+    scalars[0] = 1;
+    auto fut = partition_product<E>(products, accessor, scalars, 16);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected[0] = partition_table[num_entries + 1];
+    REQUIRE(products == expected);
+  }
+
   SECTION("we handle a product with two scalars") {
     scalars = {1u, 3u};
     auto fut = partition_product<E>(products, accessor, scalars, 0);

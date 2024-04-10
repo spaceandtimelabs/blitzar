@@ -56,13 +56,15 @@ public:
 
   void async_copy_precomputed_sums_to_device(basct::span<T> dest, bast::raw_stream_t stream,
                                              unsigned first) const noexcept override {
+    static unsigned num_entries = 1u << 16u;
     SXT_DEBUG_ASSERT(
         // clang-format off
-         table_.size() >= dest.size() + first &&
+         table_.size() >= dest.size() + first * num_entries &&
          basdv::is_active_device_pointer(dest.data())
         // clang-format on
     );
-    basdv::async_copy_host_to_device(dest, basct::subspan(table_, first, dest.size()), stream);
+    basdv::async_copy_host_to_device(dest, basct::subspan(table_, first * num_entries, dest.size()),
+                                     stream);
   }
 
 private:
