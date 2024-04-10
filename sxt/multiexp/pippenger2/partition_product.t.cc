@@ -26,6 +26,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor.h"
+
 using namespace sxt;
 using namespace sxt::mtxpp2;
 
@@ -76,7 +77,7 @@ TEST_CASE("we can compute the product of partitions") {
 
   memmg::managed_array<E> partition_table((1u << 16) * 10);
   std::mt19937 rng{0};
-  for (unsigned i=0; i<partition_table.size(); ++i) {
+  for (unsigned i = 0; i < partition_table.size(); ++i) {
     if (i % (1u << 16u) == 0) {
       partition_table[i] = 0u;
     } else {
