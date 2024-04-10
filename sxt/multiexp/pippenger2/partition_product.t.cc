@@ -17,6 +17,7 @@
 #include "sxt/multiexp/pippenger2/partition_product.h"
 
 #include <random>
+#include <vector>
 
 #include "sxt/base/curve/example_element.h"
 #include "sxt/base/device/synchronization.h"
@@ -67,7 +68,7 @@ TEST_CASE("we can compute the product of partitions") {
   constexpr auto num_entries = 1u << 16u;
   using E = bascrv::element97;
   memmg::managed_array<E> products{8, memr::get_managed_device_resource()};
-  memmg::managed_array<uint8_t> scalars(1);
+  std::vector<uint8_t> scalars(1);
   memmg::managed_array<E> expected(8);
   for (auto& e : expected) {
     e = 0u;
@@ -102,6 +103,18 @@ TEST_CASE("we can compute the product of partitions") {
     basdv::synchronize_device();
     expected[0] = partition_table[3];
     expected[1] = partition_table[2];
+    REQUIRE(products == expected);
+  }
+
+  SECTION("we handle a product with more than 16 scalars") {
+    scalars.resize(32);
+    scalars[0] = 1u;
+    scalars[16] = 1u;
+    auto fut = partition_product<E>(products, accessor, scalars, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected[0] = partition_table[1].value + partition_table[num_entries + 1].value;
     REQUIRE(products == expected);
   }
 }
