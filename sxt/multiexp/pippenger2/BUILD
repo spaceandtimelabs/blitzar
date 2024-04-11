@@ -91,9 +91,11 @@ sxt_cc_component(
     ],
     deps = [
       ":in_memory_partition_table_accessor",
+      ":partition_table",
       "//sxt/base/container:span",
       "//sxt/base/curve:element",
       "//sxt/base/num:divide_up",
+      "//sxt/memory/resource:pinned_resource",
     ],
 )
 
