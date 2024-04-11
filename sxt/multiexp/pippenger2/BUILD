@@ -90,10 +90,14 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
+        ":partition_product",
         ":partition_table_accessor",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
         "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:device_resource",
     ],
 )
 
