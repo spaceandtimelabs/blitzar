@@ -85,6 +85,13 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "in_memory_partition_table_accessor_utility",
+    test_deps = [
+      "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "multiexponentiation",
     test_deps = [
         "//sxt/base/test:unit_test",

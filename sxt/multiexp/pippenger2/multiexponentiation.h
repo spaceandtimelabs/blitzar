@@ -51,9 +51,9 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> res_dev{num_outputs, stream};
   reduce_products<T>(res_dev, stream, products);
+  products.reset();
 
   // copy result
-  products.reset();
   basdv::async_copy_device_to_host(res, stream, res_dev);
   co_await xendv::await_stream(stream);
 }
