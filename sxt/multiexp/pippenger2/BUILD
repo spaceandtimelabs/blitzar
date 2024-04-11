@@ -93,6 +93,7 @@ sxt_cc_component(
       ":in_memory_partition_table_accessor",
       "//sxt/base/container:span",
       "//sxt/base/curve:element",
+      "//sxt/base/num:divide_up",
     ],
 )
 
