@@ -30,6 +30,6 @@ make_in_memory_partition_table_accessor(basct::cspan<T> generators) noexcept {
   auto num_entries = 1u << 16u;
   memmg::managed_array<T> sums{num_entries * num_partitions, memr::get_pinned_resource()};
   compute_partition_table<T>(sums, generators);
-  return std::make_unique<in_memory_partition_table_accessor>(std::move(sums));
+  return std::make_unique<in_memory_partition_table_accessor<T>>(std::move(sums));
 }
 } // namespace sxt:mtxpp2

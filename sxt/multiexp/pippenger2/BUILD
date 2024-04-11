@@ -87,6 +87,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "in_memory_partition_table_accessor_utility",
     test_deps = [
+      "//sxt/base/curve:example_element",
       "//sxt/base/test:unit_test",
     ],
     deps = [
