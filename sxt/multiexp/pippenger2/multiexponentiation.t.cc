@@ -47,4 +47,12 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     REQUIRE(fut.ready());
     REQUIRE(res[0] == E::identity());
   }
+
+  SECTION("we can compute a sum sum with a scalar of one") {
+    scalars[0] = 1;
+    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == generators[0]);
+  }
 }
