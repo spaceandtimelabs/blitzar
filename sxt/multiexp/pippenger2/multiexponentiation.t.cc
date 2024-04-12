@@ -16,8 +16,27 @@
  */
 #include "sxt/multiexp/pippenger2/multiexponentiation.h"
 
+#include <random>
+#include <vector>
+
+#include "sxt/base/curve/example_element.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
 
 using namespace sxt;
+using namespace sxt::mtxpp2;
 
-TEST_CASE("todo") {}
+TEST_CASE("we can compute multiexponentiations using a precomputed table of partition sums") {
+  using E = bascrv::element97;
+
+  std::vector<E> generators(10);
+  std::mt19937 rng{0};
+  for (auto& g : generators) {
+    g = std::uniform_int_distribution<unsigned>{0, 96}(rng);
+  }
+
+  auto accessor = make_in_memory_partition_table_accessor<E>(generators);
+
+  SECTION("we can compute a sum with a zero scalar") {
+  }
+}
