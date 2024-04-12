@@ -21,6 +21,7 @@
 
 #include "sxt/base/curve/example_element.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
 
 using namespace sxt;
@@ -37,6 +38,16 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
 
   auto accessor = make_in_memory_partition_table_accessor<E>(generators);
 
+  std::vector<uint8_t> scalars(1);
+  std::vector<E> res(1);
+
   SECTION("we can compute a sum with a zero scalar") {
+    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+/* template <bascrv::element T> */
+/* xena::future<> multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor, */
+/*                                  unsigned element_num_bytes, */
+/*                                  basct::cspan<uint8_t> scalars) noexcept { */
   }
 }

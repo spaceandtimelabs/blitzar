@@ -25,6 +25,7 @@
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/pippenger2/partition_product.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
+#include "sxt/multiexp/pippenger2/reduce.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -49,12 +50,12 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
   // reduce products
   basdv::stream stream;
   memr::async_device_resource resource{stream};
-  memmg::managed_array<T> res_dev{num_outputs, stream};
+  memmg::managed_array<T> res_dev{num_outputs, &resource};
   reduce_products<T>(res_dev, stream, products);
   products.reset();
 
   // copy result
-  basdv::async_copy_device_to_host(res, stream, res_dev);
+  basdv::async_copy_device_to_host(res, res_dev, stream);
   co_await xendv::await_stream(stream);
 }
 } // namespace sxt::mtxpp2

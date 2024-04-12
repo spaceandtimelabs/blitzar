@@ -109,10 +109,12 @@ sxt_cc_component(
     test_deps = [
       ":in_memory_partition_table_accessor_utility",
         "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
     ],
     deps = [
         ":partition_product",
         ":partition_table_accessor",
+        ":reduce",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
         "//sxt/base/curve:example_element",
