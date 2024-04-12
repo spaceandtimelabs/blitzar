@@ -55,4 +55,20 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     REQUIRE(fut.ready());
     REQUIRE(res[0] == generators[0]);
   }
+
+  SECTION("we can compute a sum with a scalar of two") {
+    scalars[0] = 2;
+    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 2u * generators[0].value);
+  }
+
+  SECTION("we can compute a sum with a scalar of three") {
+    scalars[0] = 3;
+    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 3u * generators[0].value);
+  }
 }
