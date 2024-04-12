@@ -88,7 +88,11 @@ sxt_cc_component(
     name = "in_memory_partition_table_accessor_utility",
     test_deps = [
       "//sxt/base/curve:example_element",
+      "//sxt/base/device:stream",
+      "//sxt/base/device:synchronization",
       "//sxt/base/test:unit_test",
+      "//sxt/memory/management:managed_array",
+      "//sxt/memory/resource:device_resource",
     ],
     deps = [
       ":in_memory_partition_table_accessor",
