@@ -91,4 +91,16 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     REQUIRE(fut.ready());
     REQUIRE(res[0] == generators[0].value + generators[16].value);
   }
+
+  SECTION("we can compute a multiexponentiation with more than one output") {
+    res.resize(2);
+    scalars.resize(2);
+    scalars[0] = 1u;
+    scalars[1] = 2u;
+    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == generators[0].value);
+    REQUIRE(res[1] == 2u * generators[0].value);
+  }
 }
