@@ -45,9 +45,6 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
-/* template <bascrv::element T> */
-/* xena::future<> multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor, */
-/*                                  unsigned element_num_bytes, */
-/*                                  basct::cspan<uint8_t> scalars) noexcept { */
+    REQUIRE(res[0] == E::identity());
   }
 }
