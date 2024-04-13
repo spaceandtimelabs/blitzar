@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 #include <charconv>
-#include <print>
-#include <string_view>
+#include <limits>
 #include <memory>
+#include <print>
+#include <random>
+#include <string_view>
 
 #include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/curve21/operation/add.h"
@@ -28,6 +30,9 @@
 
 using namespace sxt;
 
+//--------------------------------------------------------------------------------------------------
+// make_partition_table_accessor
+//--------------------------------------------------------------------------------------------------
 static std::unique_ptr<mtxpp2::partition_table_accessor<c21t::element_p3>>
 make_partition_table_accessor(unsigned n) noexcept {
   std::vector<c21t::element_p3> generators(n);
@@ -37,6 +42,24 @@ make_partition_table_accessor(unsigned n) noexcept {
   return mtxpp2::make_in_memory_partition_table_accessor<c21t::element_p3>(generators);
 }
 
+//--------------------------------------------------------------------------------------------------
+// fill_exponents 
+//--------------------------------------------------------------------------------------------------
+static void fill_exponents(memmg::managed_array<uint8_t>& exponents, unsigned num_outputs,
+                           unsigned n) noexcept {
+  exponents.resize(num_outputs * n);
+  std::mt19937 rng{0};
+  std::uniform_int_distribution<uint8_t> dist{0, std::numeric_limits<uint8_t>::max()};
+  for (unsigned output_index = 0; output_index < num_outputs; ++output_index) {
+    for (unsigned i = 0; i < n; ++i) {
+      exponents[output_index + num_outputs * i] = dist(rng);
+    }
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+// main
+//--------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
   if (argc != 3) {
     std::println("Usage: benchmark <num_outputs> <n>");
@@ -57,6 +80,9 @@ int main(int argc, char* argv[]) {
   std::println("n = {}", n);
   auto accessor = make_partition_table_accessor(n);
   std::println("accessor created");
+
+  memmg::managed_array<uint8_t> exponents;
+  fill_exponents(exponents, num_outputs, n);
   (void)accessor;
   (void)argc;
   (void)argv;
