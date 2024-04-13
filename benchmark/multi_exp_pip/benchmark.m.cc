@@ -17,7 +17,9 @@
 #include <charconv>
 #include <print>
 #include <string_view>
+#include <memory>
 
+#include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/operation/neg.h"
@@ -25,6 +27,15 @@
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
 
 using namespace sxt;
+
+static std::unique_ptr<mtxpp2::partition_table_accessor<c21t::element_p3>>
+make_partition_table_accessor(unsigned n) noexcept {
+  std::vector<c21t::element_p3> generators(n);
+  for (unsigned i=0; i<n; ++i) {
+    sqcgn::compute_base_element(generators[i], i); 
+  }
+  return mtxpp2::make_in_memory_partition_table_accessor<c21t::element_p3>(generators);
+}
 
 int main(int argc, char* argv[]) {
   if (argc != 3) {
@@ -43,8 +54,11 @@ int main(int argc, char* argv[]) {
     std::println("invalid argument: {}\n", n_str);
     return -1;
   }
+  std::println("n = {}", n);
+  auto accessor = make_partition_table_accessor(n);
+  std::println("accessor created");
+  (void)accessor;
   (void)argc;
   (void)argv;
-  std::println("arf");
   return 0;
 }
