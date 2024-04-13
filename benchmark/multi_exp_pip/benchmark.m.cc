@@ -2,6 +2,13 @@
 #include <string_view>
 #include <charconv>
 
+#include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
+#include "sxt/curve21/type/element_p3.h"
+using namespace sxt;
+
 int main(int argc, char* argv[]) {
   if (argc != 3) {
     std::println("Usage: benchmark <num_outputs> <n>");
