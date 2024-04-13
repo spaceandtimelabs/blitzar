@@ -7,7 +7,7 @@ sxt_cc_benchmark(
     ],
     visibility = ["//visibility:public"],
     deps = [
-      "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
+        "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
         "//sxt/curve21/operation:neg",
@@ -24,4 +24,3 @@ sxt_cc_benchmark(
         # "//sxt/seqcommit/generator:base_element",
     ],
 )
-

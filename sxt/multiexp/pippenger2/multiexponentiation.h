@@ -42,7 +42,7 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
       scalars.size() % (num_outputs * element_num_bytes) == 0
       // clang-format on
   );
-  
+
   // compute bitwise products
   memmg::managed_array<T> products(num_products, memr::get_device_resource());
   co_await partition_product<T>(products, accessor, scalars, 0);
