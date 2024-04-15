@@ -15,6 +15,8 @@ sxt_cc_benchmark(
         "//sxt/curve21/operation:double",
         "//sxt/curve21/operation:neg",
         "//sxt/curve21/type:element_p3",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/ristretto/operation:compression",
         "//sxt/seqcommit/generator:base_element",
         # "//sxt/base/container:span",
         # "//sxt/base/profile:callgrind",

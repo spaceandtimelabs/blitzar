@@ -16,6 +16,7 @@
  */
 #include <charconv>
 #include <limits>
+#include <iostream>
 #include <memory>
 #include <print>
 #include <random>
@@ -29,6 +30,8 @@
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
 #include "sxt/multiexp/pippenger2/multiexponentiation.h"
+#include "sxt/ristretto/operation/compression.h"
+#include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/generator/base_element.h"
 
 using namespace sxt;
@@ -65,6 +68,18 @@ static void fill_exponents(memmg::managed_array<uint8_t>& exponents, unsigned nu
 }
 
 //--------------------------------------------------------------------------------------------------
+// print_elements 
+//--------------------------------------------------------------------------------------------------
+static void print_elements(basct::cspan<c21t::element_p3> elements) noexcept {
+  rstt::compressed_element r;
+  size_t index = 0;
+  for (auto& e : elements) {
+    rsto::compress(r, e);
+    std::cout << index++ << ": " << r << "\n";
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
 // main
 //--------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
@@ -94,14 +109,8 @@ int main(int argc, char* argv[]) {
   memmg::managed_array<c21t::element_p3> res{num_outputs, memr::get_pinned_resource()};
   auto fut = mtxpp2::multiexponentiate<c21t::element_p3>(res, *accessor, 32, exponents);
   xens::get_scheduler().run();
-  (void)res;
-  // auto fut = mtxpp2::multiexponentiate<c21t::element_p3>(
-/* template <bascrv::element T> */
-/* xena::future<> multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor, */
-/*                                  unsigned element_num_bytes, */
-/*                                  basct::cspan<uint8_t> scalars) noexcept { */
-  (void)accessor;
-  (void)argc;
-  (void)argv;
+
+  print_elements(res);
+
   return 0;
 }
