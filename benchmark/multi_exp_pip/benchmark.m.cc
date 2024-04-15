@@ -21,12 +21,15 @@
 #include <random>
 #include <string_view>
 
-#include "sxt/seqcommit/generator/base_element.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/execution/schedule/scheduler.h"
+#include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
+#include "sxt/multiexp/pippenger2/multiexponentiation.h"
+#include "sxt/seqcommit/generator/base_element.h"
 
 using namespace sxt;
 
@@ -47,12 +50,16 @@ make_partition_table_accessor(unsigned n) noexcept {
 //--------------------------------------------------------------------------------------------------
 static void fill_exponents(memmg::managed_array<uint8_t>& exponents, unsigned num_outputs,
                            unsigned n) noexcept {
-  exponents.resize(num_outputs * n);
+  unsigned element_num_bytes = 32;
+  exponents.resize(num_outputs * n * element_num_bytes);
   std::mt19937 rng{0};
   std::uniform_int_distribution<uint8_t> dist{0, std::numeric_limits<uint8_t>::max()};
   for (unsigned output_index = 0; output_index < num_outputs; ++output_index) {
     for (unsigned i = 0; i < n; ++i) {
-      exponents[output_index + num_outputs * i] = dist(rng);
+      for (unsigned byte_index=0; byte_index<element_num_bytes; ++byte_index) {
+        exponents[byte_index + element_num_bytes * output_index +
+                  element_num_bytes * num_outputs * i] = dist(rng);
+      }
     }
   }
 }
@@ -83,6 +90,16 @@ int main(int argc, char* argv[]) {
 
   memmg::managed_array<uint8_t> exponents;
   fill_exponents(exponents, num_outputs, n);
+
+  memmg::managed_array<c21t::element_p3> res{num_outputs, memr::get_pinned_resource()};
+  auto fut = mtxpp2::multiexponentiate<c21t::element_p3>(res, *accessor, 32, exponents);
+  xens::get_scheduler().run();
+  (void)res;
+  // auto fut = mtxpp2::multiexponentiate<c21t::element_p3>(
+/* template <bascrv::element T> */
+/* xena::future<> multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor, */
+/*                                  unsigned element_num_bytes, */
+/*                                  basct::cspan<uint8_t> scalars) noexcept { */
   (void)accessor;
   (void)argc;
   (void)argv;

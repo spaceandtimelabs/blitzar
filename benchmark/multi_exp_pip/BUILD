@@ -7,7 +7,10 @@ sxt_cc_benchmark(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:pinned_resource",
         "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
+        "//sxt/multiexp/pippenger2:multiexponentiation",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
         "//sxt/curve21/operation:neg",
