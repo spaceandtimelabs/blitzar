@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 #include <charconv>
-#include <limits>
+#include <chrono>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <print>
 #include <random>
@@ -84,6 +85,7 @@ static void print_elements(basct::cspan<c21t::element_p3> elements) noexcept {
 //--------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
   if (argc != 3) {
+    // Usage: benchmark <cpu|gpu> <n> <num_samples> <num_commitments> <element_nbytes> <verbose>
     std::println("Usage: benchmark <num_outputs> <n>");
     return -1;
   }
@@ -107,10 +109,16 @@ int main(int argc, char* argv[]) {
   fill_exponents(exponents, num_outputs, n);
 
   memmg::managed_array<c21t::element_p3> res{num_outputs, memr::get_pinned_resource()};
-  auto fut = mtxpp2::multiexponentiate<c21t::element_p3>(res, *accessor, 32, exponents);
-  xens::get_scheduler().run();
+  for (unsigned i = 0; i < 5; ++i) {
+    auto t1 = std::chrono::steady_clock::now();
+    auto fut = mtxpp2::multiexponentiate<c21t::element_p3>(res, *accessor, 32, exponents);
+    xens::get_scheduler().run();
+    auto t2 = std::chrono::steady_clock::now();
+    auto elapse = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+    std::cout << "elapse: " << elapse.count() / 1e3 << "\n";
+  }
 
-  print_elements(res);
+  // print_elements(res);
 
   return 0;
 }
