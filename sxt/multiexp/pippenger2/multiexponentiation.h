@@ -16,8 +16,6 @@
  */
 #pragma once
 
-#include <print>
-
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/error/assert.h"
@@ -47,9 +45,7 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
 
   // compute bitwise products
   memmg::managed_array<T> products(num_products, memr::get_device_resource());
-  std::println("partition_product");
   co_await partition_product<T>(products, accessor, scalars, 0);
-  std::println("done partition_product");
 
   // reduce products
   basdv::stream stream;

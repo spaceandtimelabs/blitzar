@@ -101,6 +101,7 @@ int main(int argc, char* argv[]) {
     std::println("invalid argument: {}\n", n_str);
     return -1;
   }
+  std::println("num_outputs = {}", num_outputs);
   std::println("n = {}", n);
   auto accessor = make_partition_table_accessor(n);
   std::println("accessor created");
@@ -109,14 +110,21 @@ int main(int argc, char* argv[]) {
   fill_exponents(exponents, num_outputs, n);
 
   memmg::managed_array<c21t::element_p3> res{num_outputs, memr::get_pinned_resource()};
-  for (unsigned i = 0; i < 5; ++i) {
+  auto fut = mtxpp2::multiexponentiate<c21t::element_p3>(res, *accessor, 32, exponents);
+  xens::get_scheduler().run();
+
+  double times = 0;
+  unsigned num_samples = 5;
+  for (unsigned i = 0; i < num_samples; ++i) {
     auto t1 = std::chrono::steady_clock::now();
     auto fut = mtxpp2::multiexponentiate<c21t::element_p3>(res, *accessor, 32, exponents);
     xens::get_scheduler().run();
     auto t2 = std::chrono::steady_clock::now();
     auto elapse = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-    std::cout << "elapse: " << elapse.count() / 1e3 << "\n";
+    times += elapse.count() / 1e3;
+    // std::cout << "elapse: " << elapse.count() / 1e3 << "\n";
   }
+  std::cout << "compute duration (s): " << times / num_samples << "\n";
 
   // print_elements(res);
 
