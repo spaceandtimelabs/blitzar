@@ -75,7 +75,7 @@ partition_product_kernel(T* __restrict__ products, const T* __restrict__ partiti
   auto res = partition_table[partition_index];
 
   // sum remaining entries
-  while (n >= 16u) {
+  while (n > 16u) {
     n -= 16u;
     partition_table += num_partition_entries;
     scalars += 16u * step;
