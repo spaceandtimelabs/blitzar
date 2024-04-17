@@ -43,14 +43,14 @@ using namespace sxt;
 static std::unique_ptr<mtxpp2::partition_table_accessor<c21t::element_p3>>
 make_partition_table_accessor(unsigned n) noexcept {
   std::vector<c21t::element_p3> generators(n);
-  for (unsigned i=0; i<n; ++i) {
-    sqcgn::compute_base_element(generators[i], i); 
+  for (unsigned i = 0; i < n; ++i) {
+    sqcgn::compute_base_element(generators[i], i);
   }
   return mtxpp2::make_in_memory_partition_table_accessor<c21t::element_p3>(generators);
 }
 
 //--------------------------------------------------------------------------------------------------
-// fill_exponents 
+// fill_exponents
 //--------------------------------------------------------------------------------------------------
 static void fill_exponents(memmg::managed_array<uint8_t>& exponents, unsigned num_outputs,
                            unsigned n) noexcept {
@@ -60,7 +60,7 @@ static void fill_exponents(memmg::managed_array<uint8_t>& exponents, unsigned nu
   std::uniform_int_distribution<uint8_t> dist{0, std::numeric_limits<uint8_t>::max()};
   for (unsigned output_index = 0; output_index < num_outputs; ++output_index) {
     for (unsigned i = 0; i < n; ++i) {
-      for (unsigned byte_index=0; byte_index<element_num_bytes; ++byte_index) {
+      for (unsigned byte_index = 0; byte_index < element_num_bytes; ++byte_index) {
         exponents[byte_index + element_num_bytes * output_index +
                   element_num_bytes * num_outputs * i] = dist(rng);
       }
@@ -69,7 +69,7 @@ static void fill_exponents(memmg::managed_array<uint8_t>& exponents, unsigned nu
 }
 
 //--------------------------------------------------------------------------------------------------
-// print_elements 
+// print_elements
 //--------------------------------------------------------------------------------------------------
 static void print_elements(basct::cspan<c21t::element_p3> elements) noexcept {
   rstt::compressed_element r;
