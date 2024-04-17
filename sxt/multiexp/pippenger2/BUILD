@@ -108,7 +108,14 @@ sxt_cc_component(
     name = "multiexponentiation",
     test_deps = [
         ":in_memory_partition_table_accessor_utility",
+        "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
+        "//sxt/curve21/operation:neg",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/type:literal",
+        "//sxt/ristretto/random:element",
         "//sxt/execution/schedule:scheduler",
     ],
     deps = [

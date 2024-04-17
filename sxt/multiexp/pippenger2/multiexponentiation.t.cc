@@ -20,9 +20,17 @@
 #include <vector>
 
 #include "sxt/base/curve/example_element.h"
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
+#include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve21/type/literal.h"
 #include "sxt/execution/schedule/scheduler.h"
+#include "sxt/field51/type/literal.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
+#include "sxt/ristretto/random/element.h"
 
 using namespace sxt;
 using namespace sxt::mtxpp2;
@@ -103,4 +111,35 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     REQUIRE(res[0] == generators[0].value);
     REQUIRE(res[1] == 2u * generators[0].value);
   }
+}
+
+TEST_CASE("we can compute multiexponentiations with curve-21") {
+#if 0
+  std::vector<c21t::element_p3> res(1);
+  std::vector<c21t::element_p3> generators;
+  std::vector<const uint8_t*> exponents;
+
+  SECTION("we can compute a multiexponentiation with a single element of 1") {
+    uint8_t scalar_data[32] = {};
+    scalar_data[0] = 1;
+    exponents.push_back(scalar_data);
+    generators = {0x123_c21};
+    auto fut = multiexponentiate<c21t::element_p3>(res, generators, exponents, 32);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 0x123_c21);
+  }
+#endif
+  using E = c21t::element_p3;
+
+  std::vector<E> generators(32);
+  basn::fast_random_number_generator rng{1, 2};
+  for (auto& g : generators) {
+    rstrn::generate_random_element(g, rng);
+  }
+
+  auto accessor = make_in_memory_partition_table_accessor<E>(generators);
+
+  std::vector<uint8_t> scalars(1);
+  std::vector<E> res(1);
 }
