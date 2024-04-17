@@ -31,6 +31,12 @@ namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 // multiexponentiate
 //--------------------------------------------------------------------------------------------------
+/**
+ * Compute a multi-exponentiation using an accessor to precompute sums of partition groups.
+ *
+ * This implements the partition part of Pipenger's algorithm. See Algorithm 7 of
+ * https://cacr.uwaterloo.ca/techreports/2010/cacr2010-26.pdf
+ */
 template <bascrv::element T>
 xena::future<> multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
                                  unsigned element_num_bytes,
