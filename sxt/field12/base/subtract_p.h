@@ -16,16 +16,19 @@
  */
 /**
  * Adopted from zkcrypto/bls12_381
- *
  * Copyright (c) 2021
  * Sean Bowe <ewillbefull@gmail.com>
  * Jack Grigg <thestr4d@gmail.com>
- *
  * See third_party/license/zkcrypto.LICENSE
+ *
+ * Adopted from ingonyama-zk/icicle
+ * Copyright (c) 2023
+ * See third_party/license/ingonyama-zk.LICENSE
  */
 #pragma once
 
 #include "sxt/base/field/arithmetic_utility.h"
+#include "sxt/base/field/ptx.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/cmov.h"
 #include "sxt/field12/base/constants.h"
@@ -40,12 +43,22 @@ namespace sxt::f12b {
 CUDA_CALLABLE inline void subtract_p(uint64_t ret[6], const uint64_t a[6]) noexcept {
   uint64_t borrow{0};
 
+#ifdef __CUDA_ARCH__
+  constexpr unsigned n = 6;
+  ret[0] = basfld::sub_cc(a[0], p_v[0]);
+#pragma unroll
+  for (unsigned i = 1; i < n; ++i) {
+    ret[i] = basfld::subc_cc(a[i], p_v[i]);
+  }
+  borrow = basfld::subc(0, 0);
+#else
   basfld::sbb(ret[0], borrow, a[0], p_v[0]);
   basfld::sbb(ret[1], borrow, a[1], p_v[1]);
   basfld::sbb(ret[2], borrow, a[2], p_v[2]);
   basfld::sbb(ret[3], borrow, a[3], p_v[3]);
   basfld::sbb(ret[4], borrow, a[4], p_v[4]);
   basfld::sbb(ret[5], borrow, a[5], p_v[5]);
+#endif
 
   // If underflow occurred on the final limb, borrow = 0xfff...fff, otherwise
   // borrow = 0x000...000. Thus, we use it as a mask!

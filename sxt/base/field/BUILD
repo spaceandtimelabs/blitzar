@@ -14,3 +14,8 @@ sxt_cc_component(
         "//sxt/base/type:narrow_cast",
     ],
 )
+
+sxt_cc_component(
+    name = "ptx",
+    with_test = False,
+)

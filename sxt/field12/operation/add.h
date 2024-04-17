@@ -16,18 +16,21 @@
  */
 /**
  * Adopted from zkcrypto/bls12_381
- *
  * Copyright (c) 2021
  * Sean Bowe <ewillbefull@gmail.com>
  * Jack Grigg <thestr4d@gmail.com>
- *
  * See third_party/license/zkcrypto.LICENSE
+ *
+ * Adopted from ingonyama-zk/icicle
+ * Copyright (c) 2023
+ * See third_party/license/ingonyama-zk.LICENSE
  */
 #pragma once
 
 #include <cstdint>
 
 #include "sxt/base/field/arithmetic_utility.h"
+#include "sxt/base/field/ptx.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/field12/base/constants.h"
 #include "sxt/field12/base/subtract_p.h"
@@ -37,9 +40,18 @@ namespace sxt::f12o {
 //--------------------------------------------------------------------------------------------------
 // add
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE inline void add(f12t::element& h, const f12t::element& f,
-                              const f12t::element& g) noexcept {
+CUDA_CALLABLE inline void add(uint64_t* h, const uint64_t* f, const uint64_t* g) noexcept {
   uint64_t h_tmp[6] = {};
+
+#ifdef __CUDA_ARCH__
+  constexpr unsigned n = 6;
+  h_tmp[0] = basfld::add_cc(f[0], g[0]);
+#pragma unroll
+  for (unsigned i = 1; i < n - 1; ++i) {
+    h_tmp[i] = basfld::addc_cc(f[i], g[i]);
+  }
+  h_tmp[n - 1] = basfld::addc(f[n - 1], g[n - 1]);
+#else
   uint64_t carry{0};
 
   basfld::adc(h_tmp[0], carry, f[0], g[0], carry);
@@ -48,7 +60,16 @@ CUDA_CALLABLE inline void add(f12t::element& h, const f12t::element& f,
   basfld::adc(h_tmp[3], carry, f[3], g[3], carry);
   basfld::adc(h_tmp[4], carry, f[4], g[4], carry);
   basfld::adc(h_tmp[5], carry, f[5], g[5], carry);
+#endif
 
-  f12b::subtract_p(h.data(), h_tmp);
+  f12b::subtract_p(h, h_tmp);
+}
+
+//--------------------------------------------------------------------------------------------------
+// add
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE inline void add(f12t::element& h, const f12t::element& f,
+                              const f12t::element& g) noexcept {
+  add(h.data(), f.data(), g.data());
 }
 } // namespace sxt::f12o

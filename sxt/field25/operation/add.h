@@ -16,18 +16,21 @@
  */
 /**
  * Adopted from zkcrypto/bls12_381
- *
  * Copyright (c) 2021
  * Sean Bowe <ewillbefull@gmail.com>
  * Jack Grigg <thestr4d@gmail.com>
- *
  * See third_party/license/zkcrypto.LICENSE
+ *
+ * Adopted from ingonyama-zk/icicle
+ * Copyright (c) 2023
+ * See third_party/license/ingonyama-zk.LICENSE
  */
 #pragma once
 
 #include <cstdint>
 
 #include "sxt/base/field/arithmetic_utility.h"
+#include "sxt/base/field/ptx.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/field25/base/constants.h"
 #include "sxt/field25/base/subtract_p.h"
@@ -37,16 +40,34 @@ namespace sxt::f25o {
 //--------------------------------------------------------------------------------------------------
 // add
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE inline void add(f25t::element& h, const f25t::element& f,
-                              const f25t::element& g) noexcept {
+CUDA_CALLABLE inline void add(uint64_t* h, const uint64_t* f, const uint64_t* g) noexcept {
   uint64_t h_tmp[4] = {};
+
+#ifdef __CUDA_ARCH__
+  constexpr unsigned n = 4;
+  h_tmp[0] = basfld::add_cc(f[0], g[0]);
+#pragma unroll
+  for (unsigned i = 1; i < n - 1; ++i) {
+    h_tmp[i] = basfld::addc_cc(f[i], g[i]);
+  }
+  h_tmp[n - 1] = basfld::addc(f[n - 1], g[n - 1]);
+#else
   uint64_t carry{0};
 
   basfld::adc(h_tmp[0], carry, f[0], g[0], carry);
   basfld::adc(h_tmp[1], carry, f[1], g[1], carry);
   basfld::adc(h_tmp[2], carry, f[2], g[2], carry);
   basfld::adc(h_tmp[3], carry, f[3], g[3], carry);
+#endif
 
-  f25b::subtract_p(h.data(), h_tmp);
+  f25b::subtract_p(h, h_tmp);
+}
+
+//--------------------------------------------------------------------------------------------------
+// add
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE inline void add(f25t::element& h, const f25t::element& f,
+                              const f25t::element& g) noexcept {
+  add(h.data(), f.data(), g.data());
 }
 } // namespace sxt::f25o

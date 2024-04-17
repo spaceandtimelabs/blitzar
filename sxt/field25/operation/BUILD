@@ -13,6 +13,7 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/field:arithmetic_utility",
+        "//sxt/base/field:ptx",
         "//sxt/base/macro:cuda_callable",
         "//sxt/field25/base:constants",
         "//sxt/field25/base:subtract_p",
