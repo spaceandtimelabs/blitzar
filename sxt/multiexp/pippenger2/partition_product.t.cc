@@ -117,6 +117,18 @@ TEST_CASE("we can compute the product of partitions") {
     REQUIRE(products == expected);
   }
 
+  SECTION("we handle a product with more 16 scalars") {
+    scalars.resize(16);
+    scalars[0] = 1u;
+    scalars[15] = 1u;
+    auto fut = partition_product<E>(products, accessor, scalars, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected[0] = partition_table[1 + (1u << 15u)].value;
+    REQUIRE(products == expected);
+  }
+
   SECTION("we handle a product with more than 16 scalars") {
     scalars.resize(32);
     scalars[0] = 1u;
