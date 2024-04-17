@@ -114,22 +114,6 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
 }
 
 TEST_CASE("we can compute multiexponentiations with curve-21") {
-#if 0
-  std::vector<c21t::element_p3> res(1);
-  std::vector<c21t::element_p3> generators;
-  std::vector<const uint8_t*> exponents;
-
-  SECTION("we can compute a multiexponentiation with a single element of 1") {
-    uint8_t scalar_data[32] = {};
-    scalar_data[0] = 1;
-    exponents.push_back(scalar_data);
-    generators = {0x123_c21};
-    auto fut = multiexponentiate<c21t::element_p3>(res, generators, exponents, 32);
-    xens::get_scheduler().run();
-    REQUIRE(fut.ready());
-    REQUIRE(res[0] == 0x123_c21);
-  }
-#endif
   using E = c21t::element_p3;
 
   std::vector<E> generators(32);
@@ -142,4 +126,12 @@ TEST_CASE("we can compute multiexponentiations with curve-21") {
 
   std::vector<uint8_t> scalars(1);
   std::vector<E> res(1);
+
+  SECTION("we can compute a multiexponentiation multiexponentiation with a scalar of one") {
+    scalars[0] = 1;
+    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == generators[0]);
+  }
 }
