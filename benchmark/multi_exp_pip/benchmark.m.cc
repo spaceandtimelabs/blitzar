@@ -83,9 +83,8 @@ static void print_elements(basct::cspan<c21t::element_p3> elements) noexcept {
 // main
 //--------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-  if (argc != 5) {
-    // Usage: benchmark <cpu|gpu> <n> <num_samples> <num_commitments> <element_nbytes> <verbose>
-    std::println("Usage: benchmark <n> <num_samples> <num_outputs> <element_nbytes>");
+  if (argc != 6) {
+    std::println("Usage: benchmark <n> <num_samples> <num_outputs> <element_nbytes> <verbose>");
     return -1;
   }
 
@@ -94,6 +93,7 @@ int main(int argc, char* argv[]) {
   std::string_view num_samples_str{argv[2]};
   std::string_view num_outputs_str{argv[3]};
   std::string_view element_num_bytes_str{argv[4]};
+  bool verbose = std::string_view{argv[5]} != "0";
   unsigned n, num_samples, num_outputs, element_num_bytes;
   if (std::from_chars(n_str.begin(), n_str.end(), n).ec != std::errc{}) {
     std::println("invalid argument: {}\n", n_str);
@@ -147,7 +147,9 @@ int main(int argc, char* argv[]) {
   }
   std::cout << "compute duration (s): " << times / num_samples << "\n";
 
-  // print_elements(res);
+  if (verbose) {
+    print_elements(res);
+  }
 
   return 0;
 }
