@@ -115,8 +115,8 @@ sxt_cc_component(
         "//sxt/curve21/operation:neg",
         "//sxt/curve21/type:element_p3",
         "//sxt/curve21/type:literal",
-        "//sxt/ristretto/random:element",
         "//sxt/execution/schedule:scheduler",
+        "//sxt/ristretto/random:element",
     ],
     deps = [
         ":partition_product",
