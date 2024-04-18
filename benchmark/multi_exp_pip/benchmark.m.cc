@@ -84,23 +84,33 @@ static void print_elements(basct::cspan<c21t::element_p3> elements) noexcept {
 // main
 //--------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-  if (argc != 3) {
+  if (argc != 4) {
     // Usage: benchmark <cpu|gpu> <n> <num_samples> <num_commitments> <element_nbytes> <verbose>
-    std::println("Usage: benchmark <num_outputs> <n>");
+    std::println("Usage: benchmark <n> <num_samples> <num_outputs>");
     return -1;
   }
-  std::string_view num_outputs_str{argv[1]};
-  std::string_view n_str{argv[2]};
-  unsigned num_outputs, n;
+
+  // read arguments
+  std::string_view n_str{argv[1]};
+  std::string_view num_samples_str{argv[2]};
+  std::string_view num_outputs_str{argv[3]};
+  unsigned n, num_samples, num_outputs;
+  if (std::from_chars(n_str.begin(), n_str.end(), n).ec != std::errc{}) {
+    std::println("invalid argument: {}\n", n_str);
+    return -1;
+  }
+  if (std::from_chars(num_samples_str.begin(), num_samples_str.end(), num_samples).ec !=
+      std::errc{}) {
+    std::println("invalid argument: {}\n", num_samples_str);
+    return -1;
+  }
   if (std::from_chars(num_outputs_str.begin(), num_outputs_str.end(), num_outputs).ec !=
       std::errc{}) {
     std::println("invalid argument: {}\n", num_outputs_str);
     return -1;
   }
-  if (std::from_chars(n_str.begin(), n_str.end(), n).ec != std::errc{}) {
-    std::println("invalid argument: {}\n", n_str);
-    return -1;
-  }
+
+  // set up data
   std::println("num_outputs = {}", num_outputs);
   std::println("n = {}", n);
   auto accessor = make_partition_table_accessor(n);
@@ -113,8 +123,8 @@ int main(int argc, char* argv[]) {
   auto fut = mtxpp2::multiexponentiate<c21t::element_p3>(res, *accessor, 32, exponents);
   xens::get_scheduler().run();
 
+  // run benchmark
   double times = 0;
-  unsigned num_samples = 5;
   for (unsigned i = 0; i < num_samples; ++i) {
     auto t1 = std::chrono::steady_clock::now();
     auto fut = mtxpp2::multiexponentiate<c21t::element_p3>(res, *accessor, 32, exponents);
