@@ -105,6 +105,34 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "multiexponentiation",
+    test_deps = [
+        ":in_memory_partition_table_accessor_utility",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
+        "//sxt/curve21/operation:neg",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/type:literal",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/ristretto/random:element",
+    ],
+    deps = [
+        ":partition_product",
+        ":partition_table_accessor",
+        ":reduce",
+        "//sxt/base/container:span",
+        "//sxt/base/curve:element",
+        "//sxt/base/curve:example_element",
+        "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:device_resource",
+    ],
+)
+
+sxt_cc_component(
     name = "reduce",
     test_deps = [
         "//sxt/base/curve:example_element",
