@@ -18,7 +18,10 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
+#include "sxt/base/device/property.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/iterator/index_range_iterator.h"
+#include "sxt/base/iterator/index_range_utility.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
@@ -42,12 +45,18 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
                                  unsigned element_num_bytes,
                                  basct::cspan<uint8_t> scalars) noexcept {
   auto num_outputs = res.size();
+  auto n = scalars.size() / (num_outputs * element_num_bytes);
   auto num_products = num_outputs * element_num_bytes * 8u;
   SXT_DEBUG_ASSERT(
       // clang-format off
       scalars.size() % (num_outputs * element_num_bytes) == 0
       // clang-format on
   );
+
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}, basdv::get_num_devices());
+  (void)n;
+  (void)chunk_first;
+  (void)chunk_last;
 
   // compute bitwise products
   memmg::managed_array<T> products(num_products, memr::get_device_resource());
