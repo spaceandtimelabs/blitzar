@@ -108,6 +108,7 @@ sxt_cc_component(
     name = "multiexponentiation",
     test_deps = [
         ":in_memory_partition_table_accessor_utility",
+        "//sxt/base/curve:example_element",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
         "//sxt/curve21/operation:add",
@@ -124,7 +125,6 @@ sxt_cc_component(
         ":reduce",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
-        "//sxt/base/curve:example_element",
         "//sxt/execution/async:future",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
