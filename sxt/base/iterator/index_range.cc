@@ -23,10 +23,12 @@ namespace sxt::basit {
 // constructor
 //--------------------------------------------------------------------------------------------------
 index_range::index_range(size_t a, size_t b) noexcept
-    : index_range{a, b, 1, std::numeric_limits<size_t>::max()} {}
+    : index_range{a, b, 1, std::numeric_limits<size_t>::max(), 1} {}
 
-index_range::index_range(size_t a, size_t b, size_t min_chunk_size, size_t max_chunk_size) noexcept
-    : a_{a}, b_{b}, min_chunk_size_{min_chunk_size}, max_chunk_size_{max_chunk_size} {
+index_range::index_range(size_t a, size_t b, size_t min_chunk_size, size_t max_chunk_size,
+                         size_t chunk_multiple) noexcept
+    : a_{a}, b_{b}, min_chunk_size_{min_chunk_size}, max_chunk_size_{max_chunk_size},
+      chunk_multiple_{chunk_multiple} {
   SXT_DEBUG_ASSERT(
       // clang-format off
       0 <= a && a <= b &&
@@ -44,6 +46,7 @@ index_range index_range::min_chunk_size(size_t val) const noexcept {
       b_,
       val,
       max_chunk_size_,
+      chunk_multiple_,
   };
 }
 
@@ -56,6 +59,16 @@ index_range index_range::max_chunk_size(size_t val) const noexcept {
       b_,
       min_chunk_size_,
       val,
+      chunk_multiple_,
+  };
+}
+
+//--------------------------------------------------------------------------------------------------
+// chunk_multiple
+//--------------------------------------------------------------------------------------------------
+index_range index_range::chunk_multiple(size_t val) const noexcept {
+  return {
+      a_, b_, min_chunk_size_, max_chunk_size_, val,
   };
 }
 } // namespace sxt::basit
