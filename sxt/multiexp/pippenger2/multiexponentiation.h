@@ -19,13 +19,17 @@
 #include <iterator>
 
 #include "sxt/base/container/span.h"
+#include "sxt/base/container/span_utility.h"
 #include "sxt/base/curve/element.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/property.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/iterator/index_range_utility.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/for_each.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
@@ -100,12 +104,20 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
   (void)chunk_last;
 
   // compute bitwise products
-  memmg::managed_array<T> products(num_products * num_chunks, memr::get_pinned_resource());
+  memmg::managed_array<T> products{num_products * num_chunks, memr::get_pinned_resource()};
   size_t chunk_index = 0;
   co_await xendv::concurrent_for_each(
-      chunk_first, chunk_last,
-      [&](const basit::index_range& rng) noexcept -> xena::future<> { co_return; });
-  co_await partition_product<T>(products, accessor, scalars, 0);
+      chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+        memmg::managed_array<T> products_dev{num_products, memr::get_device_resource()};
+        auto scalars_slice = scalars.subspan(num_outputs * element_num_bytes * rng.a(),
+                                             rng.size() * num_outputs * element_num_bytes);
+        co_await partition_product<T>(products_dev, accessor, scalars_slice, rng.a());
+        basdv::stream stream;
+        basdv::async_copy_device_to_host(
+            basct::subspan(products, num_products * chunk_index, num_products), products_dev,
+            stream);
+        co_await xendv::await_stream(stream);
+      });
 
   // reduce products
   basdv::stream stream;
