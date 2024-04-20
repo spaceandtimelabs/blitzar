@@ -116,6 +116,7 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
         basdv::async_copy_device_to_host(
             basct::subspan(products, num_products * chunk_index, num_products), products_dev,
             stream);
+        ++chunk_index;
         co_await xendv::await_stream(stream);
       });
 
