@@ -24,10 +24,12 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/iterator/index_range_utility.h"
-#include "sxt/execution/async/future.h"
+#include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/for_each.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
+#include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/partition_product.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 #include "sxt/multiexp/pippenger2/reduce.h"
@@ -88,7 +90,8 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
 
   auto [chunk_first, chunk_last] =
       basit::split(basit::index_range{0, n}.chunk_multiple(16), basdv::get_num_devices());
-  if (std::distance(chunk_first, chunk_last) == 1) {
+  auto num_chunks = std::distance(chunk_first, chunk_last);
+  if (num_chunks == 1) {
     multiexponentiate_no_chunks(res, accessor, element_num_bytes, scalars);
     co_return;
   }
@@ -97,7 +100,11 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
   (void)chunk_last;
 
   // compute bitwise products
-  memmg::managed_array<T> products(num_products, memr::get_device_resource());
+  memmg::managed_array<T> products(num_products * num_chunks, memr::get_pinned_resource());
+  size_t chunk_index = 0;
+  co_await xendv::concurrent_for_each(
+      chunk_first, chunk_last,
+      [&](const basit::index_range& rng) noexcept -> xena::future<> { co_return; });
   co_await partition_product<T>(products, accessor, scalars, 0);
 
   // reduce products

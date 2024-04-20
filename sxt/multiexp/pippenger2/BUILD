@@ -128,10 +128,12 @@ sxt_cc_component(
         "//sxt/base/iterator:index_range_utility",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
-        "//sxt/execution/async:future",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:for_each",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:pinned_resource",
     ],
 )
 
