@@ -4,6 +4,20 @@ load(
 )
 
 sxt_cc_component(
+    name = "combination",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+      "//sxt/base/error:assert",
+      "//sxt/base/container:span",
+      "//sxt/base/curve:element",
+      "//sxt/base/device:property",
+      "//sxt/base/type:raw_stream",
+    ],
+)
+
+sxt_cc_component(
     name = "partition_product",
     test_deps = [
         ":in_memory_partition_table_accessor",
