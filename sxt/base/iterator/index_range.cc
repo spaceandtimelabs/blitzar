@@ -42,11 +42,7 @@ index_range::index_range(size_t a, size_t b, size_t min_chunk_size, size_t max_c
 //--------------------------------------------------------------------------------------------------
 index_range index_range::min_chunk_size(size_t val) const noexcept {
   return {
-      a_,
-      b_,
-      val,
-      max_chunk_size_,
-      chunk_multiple_,
+      a_, b_, val, max_chunk_size_, chunk_multiple_,
   };
 }
 
@@ -55,11 +51,7 @@ index_range index_range::min_chunk_size(size_t val) const noexcept {
 //--------------------------------------------------------------------------------------------------
 index_range index_range::max_chunk_size(size_t val) const noexcept {
   return {
-      a_,
-      b_,
-      min_chunk_size_,
-      val,
-      chunk_multiple_,
+      a_, b_, min_chunk_size_, val, chunk_multiple_,
   };
 }
 
