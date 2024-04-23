@@ -44,12 +44,12 @@ CUDA_CALLABLE inline void subtract_p(uint64_t ret[6], const uint64_t a[6]) noexc
   uint64_t borrow{0};
 
 #ifdef __CUDA_ARCH__
-  constexpr unsigned n = 6;
   ret[0] = basfld::sub_cc(a[0], p_v[0]);
-#pragma unroll
-  for (unsigned i = 1; i < n; ++i) {
-    ret[i] = basfld::subc_cc(a[i], p_v[i]);
-  }
+  ret[1] = basfld::subc_cc(a[1], p_v[1]);
+  ret[2] = basfld::subc_cc(a[2], p_v[2]);
+  ret[3] = basfld::subc_cc(a[3], p_v[3]);
+  ret[4] = basfld::subc_cc(a[4], p_v[4]);
+  ret[5] = basfld::subc_cc(a[5], p_v[5]);
   borrow = basfld::subc(0, 0);
 #else
   basfld::sbb(ret[0], borrow, a[0], p_v[0]);

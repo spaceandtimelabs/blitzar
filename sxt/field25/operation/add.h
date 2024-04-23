@@ -44,13 +44,10 @@ CUDA_CALLABLE inline void add(uint64_t* h, const uint64_t* f, const uint64_t* g)
   uint64_t h_tmp[4] = {};
 
 #ifdef __CUDA_ARCH__
-  constexpr unsigned n = 4;
   h_tmp[0] = basfld::add_cc(f[0], g[0]);
-#pragma unroll
-  for (unsigned i = 1; i < n - 1; ++i) {
-    h_tmp[i] = basfld::addc_cc(f[i], g[i]);
-  }
-  h_tmp[n - 1] = basfld::addc(f[n - 1], g[n - 1]);
+  h_tmp[1] = basfld::addc_cc(f[1], g[1]);
+  h_tmp[2] = basfld::addc_cc(f[2], g[2]);
+  h_tmp[3] = basfld::addc(f[3], g[3]);
 #else
   uint64_t carry{0};
 
