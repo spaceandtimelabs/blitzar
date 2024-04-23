@@ -29,7 +29,7 @@ CUDA_CALLABLE void combine_impl(T* __restrict__ reduction, const T* __restrict__
 template <bascrv::element T>
 void combine(basct::span<T> res, bast::raw_stream_t stream, basct::cspan<T> elements) noexcept {
   auto n = static_cast<unsigned>(res.size());
-  STRIX_DEBU_ASSERT(
+  SXT_DEBUG_ASSERT(
       // clang-format off
       elements.size() >= n && 
       elements.size() % n == 0 &&
