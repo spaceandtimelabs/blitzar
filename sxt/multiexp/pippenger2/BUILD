@@ -6,7 +6,11 @@ load(
 sxt_cc_component(
     name = "combination",
     test_deps = [
+      "//sxt/base/curve:example_element",
+      "//sxt/base/device:stream",
         "//sxt/base/test:unit_test",
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/memory/management:managed_array",
     ],
     deps = [
       "//sxt/algorithm/iteration:for_each",
