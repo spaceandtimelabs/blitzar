@@ -9,10 +9,12 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
+      "//sxt/algorithm/iteration:for_each",
       "//sxt/base/error:assert",
+      "//sxt/base/macro:cuda_callable",
       "//sxt/base/container:span",
       "//sxt/base/curve:element",
-      "//sxt/base/device:property",
+      "//sxt/base/device:memory_utility",
       "//sxt/base/type:raw_stream",
     ],
 )
