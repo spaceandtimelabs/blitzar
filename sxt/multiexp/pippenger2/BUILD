@@ -20,6 +20,7 @@ sxt_cc_component(
         "//sxt/base/error:assert",
         "//sxt/base/macro:cuda_callable",
         "//sxt/base/type:raw_stream",
+        "//sxt/execution/async:coroutine",
     ],
 )
 

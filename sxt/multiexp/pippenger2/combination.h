@@ -23,6 +23,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/type/raw_stream.h"
+#include "sxt/execution/async/coroutine.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -65,5 +66,18 @@ void combine(basct::span<T> res, bast::raw_stream_t stream, basct::cspan<T> elem
              combine_impl(reductions + index, elements + index, n, reduction_size);
            };
   algi::launch_for_each_kernel(stream, f, n);
+}
+
+//--------------------------------------------------------------------------------------------------
+// combine_partial 
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+xena::future<> combine_partial(basct::span<T> res, basct::cspan<T> elements, unsigned n,
+                               unsigned first) noexcept {
+  (void)res;
+  (void)elements;
+  (void)n;
+  (void)first;
+  return {};
 }
 } // namespace sxt::mtxpp2
