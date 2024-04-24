@@ -24,6 +24,8 @@
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/type/raw_stream.h"
 #include "sxt/execution/async/coroutine.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/device_resource.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -74,6 +76,15 @@ void combine(basct::span<T> res, bast::raw_stream_t stream, basct::cspan<T> elem
 template <bascrv::element T>
 xena::future<> combine_partial(basct::span<T> res, basct::cspan<T> elements, unsigned n,
                                unsigned first) noexcept {
+  auto np = static_cast<unsigned>(res.size());
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      n >= first + np &&
+      elements.size() % n == 0 &&
+      basdv::is_active_device_pointer(res.data()) &&
+      basdv::is_host_pointer(elements.data())
+      // clang-format on
+  );
   (void)res;
   (void)elements;
   (void)n;
