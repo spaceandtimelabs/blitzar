@@ -24,6 +24,7 @@
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/type/raw_stream.h"
 #include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 
@@ -89,11 +90,11 @@ xena::future<> combine_partial(basct::span<T> res, basct::cspan<T> elements, uns
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> elements_p{np * reduction_size, &resource};
-  (void)elements_p;
-  (void)res;
-  (void)elements;
-  (void)n;
-  (void)first;
-  return {};
+  for (unsigned i=0; i<reduction_size; ++i) {
+    basdv::async_copy_host_to_device(elements_p.subspan(i * np, np),
+                                     elements.subspan(first + i * n, np), stream);
+  }
+  combine(res, stream, elements_p);
+  co_await xendv::await_stream(stream);
 }
 } // namespace sxt::mtxpp2

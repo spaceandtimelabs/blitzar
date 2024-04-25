@@ -21,6 +21,7 @@ sxt_cc_component(
         "//sxt/base/macro:cuda_callable",
         "//sxt/base/type:raw_stream",
         "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:synchronization",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
     ],
