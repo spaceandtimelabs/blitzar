@@ -15,23 +15,3 @@
  * limitations under the License.
  */
 #include "sxt/curve_g1/operation/mul_by_3b.h"
-
-#include "sxt/field12/operation/add.h"
-#include "sxt/field12/type/element.h"
-
-namespace sxt::cg1o {
-//--------------------------------------------------------------------------------------------------
-// mul_by_3b
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void mul_by_3b(f12t::element& h, const f12t::element& p) noexcept {
-  f12t::element p2;
-  f12t::element p4;
-  f12t::element p8;
-
-  f12o::add(p2, p, p);
-  f12o::add(p4, p2, p2);
-  f12o::add(p8, p4, p4);
-  f12o::add(h, p8, p4);
-}
-} // namespace sxt::cg1o
