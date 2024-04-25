@@ -38,10 +38,28 @@ namespace sxt::basfld {
  */
 CUDA_CALLABLE void inline mac(uint64_t& ret, uint64_t& carry, const uint64_t a, const uint64_t b,
                               const uint64_t c) noexcept {
+#ifdef __CUDA_ARCH__
+  uint64_t c_in = carry;
+  asm volatile("{\n\t"                             // scope registers
+               ".reg .u64 lo, hi;\n\t"             // create registers lo and hi
+               "mul.lo.u64 lo, %2, %3;\n\t"        // lo = (b*c).lo
+               "mul.hi.u64 hi, %2, %3;\n\t"        // hi = (b*c).hi
+               "add.cc.u64 lo, lo, %4;\n\t"        // lo = lo + a -> CC.CF
+               "addc.u64 hi, hi, 0;\n\t"           // hi = hi + CC.CF
+               "add.cc.u64 lo, lo, %5;\n\t"        // lo = lo + carry -> CC.CF
+               "addc.u64 hi, hi, 0;\n\t"           // hi = hi + CC.CF
+               "mov.u64 %0, lo;\n\t"               // ret = lo
+               "mov.u64 %1, hi;\n\t"               // carry = hi
+               "}"                                 // end scope
+               : "=l"(ret), "=l"(carry)            // outputs
+               : "l"(b), "l"(c), "l"(a), "l"(c_in) // inputs
+  );
+#else
   uint128_t ret_tmp = uint128_t{a} + (uint128_t{b} * uint128_t{c}) + uint128_t{carry};
 
   ret = bast::narrow_cast<uint64_t>(ret_tmp);
   carry = bast::narrow_cast<uint64_t>((ret_tmp >> 64));
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------
