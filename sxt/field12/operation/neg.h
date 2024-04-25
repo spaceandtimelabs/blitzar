@@ -50,8 +50,11 @@ inline void neg(f12t::element& h, const f12t::element& f) noexcept {
   // the result of the subtraction is p.
   uint64_t mask = uint64_t{((f[0] | f[1] | f[2] | f[3] | f[4] | f[5]) == 0)} - uint64_t{1};
 
-  for (int i = 0; i < 6; ++i) {
-    h[i] = d[i] & mask;
-  }
+  h[0] = d[0] & mask;
+  h[1] = d[1] & mask;
+  h[2] = d[2] & mask;
+  h[3] = d[3] & mask;
+  h[4] = d[4] & mask;
+  h[5] = d[5] & mask;
 }
 } // namespace sxt::f12o
