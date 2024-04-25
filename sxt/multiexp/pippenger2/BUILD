@@ -22,7 +22,7 @@ sxt_cc_component(
         "//sxt/base/type:raw_stream",
         "//sxt/execution/async:coroutine",
         "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:async_device_resource",
     ],
 )
 

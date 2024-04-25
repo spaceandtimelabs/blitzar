@@ -25,7 +25,7 @@
 #include "sxt/base/type/raw_stream.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/memory/management/managed_array.h"
-#include "sxt/memory/resource/device_resource.h"
+#include "sxt/memory/resource/async_device_resource.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -85,6 +85,11 @@ xena::future<> combine_partial(basct::span<T> res, basct::cspan<T> elements, uns
       basdv::is_host_pointer(elements.data())
       // clang-format on
   );
+  auto reduction_size = static_cast<unsigned>(elements.size() / n);
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> elements_p{np * reduction_size, &resource};
+  (void)elements_p;
   (void)res;
   (void)elements;
   (void)n;
