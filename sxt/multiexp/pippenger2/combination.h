@@ -18,6 +18,7 @@
 
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
+#include "sxt/base/container/span_utility.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
@@ -91,10 +92,10 @@ xena::future<> combine_partial(basct::span<T> res, basct::cspan<T> elements, uns
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> elements_p{np * reduction_size, &resource};
   for (unsigned i=0; i<reduction_size; ++i) {
-    basdv::async_copy_host_to_device(elements_p.subspan(i * np, np),
+    basdv::async_copy_host_to_device(basct::subspan(elements_p, i * np, np),
                                      elements.subspan(first + i * n, np), stream);
   }
-  combine(res, stream, elements_p);
+  combine<T>(res, stream, elements_p);
   co_await xendv::await_stream(stream);
 }
 } // namespace sxt::mtxpp2

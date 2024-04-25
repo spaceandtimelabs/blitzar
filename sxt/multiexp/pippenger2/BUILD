@@ -10,11 +10,13 @@ sxt_cc_component(
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
         "//sxt/algorithm/iteration:for_each",
         "//sxt/base/container:span",
+        "//sxt/base/container:span_utility",
         "//sxt/base/curve:element",
         "//sxt/base/device:memory_utility",
         "//sxt/base/error:assert",

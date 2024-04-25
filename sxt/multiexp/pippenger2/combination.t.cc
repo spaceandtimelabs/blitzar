@@ -22,12 +22,13 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/resource/managed_device_resource.h"
 
 using namespace sxt;
 using namespace sxt::mtxpp2;
 
-TEST_CASE("todo") {
+TEST_CASE("we can combine elements") {
   using E = bascrv::element97;
 
   std::pmr::vector<E> reduction{1, memr::get_managed_device_resource()};
@@ -63,5 +64,25 @@ TEST_CASE("todo") {
 
     expected = {3 + 2, 4 + 6, 1 + 5};
     REQUIRE(reduction == expected);
+  }
+}
+
+TEST_CASE("we can partially combine elements") {
+  using E = bascrv::element97;
+
+  std::pmr::vector<E> reduction{1, memr::get_managed_device_resource()};
+
+  std::pmr::vector<E> elements;
+
+  std::pmr::vector<E> expected;
+
+  SECTION("we can partially combine a single element") {
+    elements = {123u};
+    auto fut = combine_partial<E>(reduction, elements, 1, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+/* template <bascrv::element T> */
+/* xena::future<> combine_partial(basct::span<T> res, basct::cspan<T> elements, unsigned n, */
+/*                                unsigned first) noexcept { */
   }
 }
