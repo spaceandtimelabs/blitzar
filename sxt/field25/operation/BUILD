@@ -87,13 +87,19 @@ sxt_cc_component(
 sxt_cc_component(
     name = "neg",
     test_deps = [
+        "//sxt/base/device:synchronization",
+        "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
         "//sxt/field25/base:constants",
         "//sxt/field25/constant:zero",
+        "//sxt/field25/random:element",
         "//sxt/field25/type:element",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
         "//sxt/base/field:arithmetic_utility",
+        "//sxt/base/field:ptx",
         "//sxt/base/macro:cuda_callable",
         "//sxt/field25/base:constants",
         "//sxt/field25/type:element",

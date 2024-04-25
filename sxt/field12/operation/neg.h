@@ -26,6 +26,7 @@
 #pragma once
 
 #include "sxt/base/field/arithmetic_utility.h"
+#include "sxt/base/field/ptx.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/field12/base/constants.h"
 #include "sxt/field12/type/element.h"
@@ -37,14 +38,23 @@ namespace sxt::f12o {
 CUDA_CALLABLE
 inline void neg(f12t::element& h, const f12t::element& f) noexcept {
   uint64_t d[6] = {};
-  uint64_t borrow{0};
 
+#ifdef __CUDA_ARCH__
+  d[0] = basfld::sub_cc(f12b::p_v[0], f[0]);
+  d[1] = basfld::subc_cc(f12b::p_v[1], f[1]);
+  d[2] = basfld::subc_cc(f12b::p_v[2], f[2]);
+  d[3] = basfld::subc_cc(f12b::p_v[3], f[3]);
+  d[4] = basfld::subc_cc(f12b::p_v[4], f[4]);
+  d[5] = basfld::subc(f12b::p_v[5], f[5]);
+#else
+  uint64_t borrow{0};
   basfld::sbb(d[0], borrow, f12b::p_v[0], f[0]);
   basfld::sbb(d[1], borrow, f12b::p_v[1], f[1]);
   basfld::sbb(d[2], borrow, f12b::p_v[2], f[2]);
   basfld::sbb(d[3], borrow, f12b::p_v[3], f[3]);
   basfld::sbb(d[4], borrow, f12b::p_v[4], f[4]);
   basfld::sbb(d[5], borrow, f12b::p_v[5], f[5]);
+#endif
 
   // Let's use a mask if `self` was zero, which would mean
   // the result of the subtraction is p.
