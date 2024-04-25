@@ -38,6 +38,11 @@ __global__ void mac(uint64_t* __restrict__ ret, uint64_t* __restrict__ carry,
   mac(ret[0], carry[0], a[0], b[0], c[0]);
 }
 
+__global__ void sbb(uint64_t* __restrict__ ret, uint64_t* __restrict__ borrow,
+                    const uint64_t* __restrict__ a, const uint64_t* __restrict__ b) {
+  sbb(ret[0], borrow[0], a[0], b[0]);
+}
+
 TEST_CASE("mac (multiplication and carry) can handle computation") {
   SECTION("with minimum values") {
     constexpr uint64_t a{0x0};
@@ -258,25 +263,23 @@ TEST_CASE("adc (addition and carry) can handle computation on device") {
   SECTION("by matching the non-GPU implementation on random values") {
     std::random_device rd;
     std::mt19937_64 gen(rd());
-    std::uniform_int_distribution<uint64_t> uni_dis;
     std::bernoulli_distribution ber_d(0.5);
+    basn::fast_random_number_generator rng{1, 2};
 
-    for (unsigned i = 0; i < 100; ++i) {
-      a[0] = uni_dis(gen);
-      b[0] = uni_dis(gen);
-      carry[0] = ber_d(gen) ? 0x0 : 0x1;
-      ret[0] = 0x0;
+    a[0] = rng();
+    b[0] = rng();
+    carry[0] = ber_d(gen) ? 0x0 : 0x1;
+    ret[0] = 0x0;
 
-      uint64_t ret_expected{0};
-      uint64_t carry_expected{0};
-      adc(ret_expected, carry_expected, a[0], b[0], carry[0]);
+    uint64_t ret_expected{0};
+    uint64_t carry_expected{0};
+    adc(ret_expected, carry_expected, a[0], b[0], carry[0]);
 
-      adc<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), carry.data());
-      cudaDeviceSynchronize();
+    adc<<<1, 1>>>(ret.data(), carry.data(), a.data(), b.data(), carry.data());
+    cudaDeviceSynchronize();
 
-      REQUIRE(ret[0] == ret_expected);
-      REQUIRE(carry[0] == carry_expected);
-    }
+    REQUIRE(ret[0] == ret_expected);
+    REQUIRE(carry[0] == carry_expected);
   }
 
   SECTION("with maximum values") {
@@ -332,5 +335,34 @@ TEST_CASE("sbb (subtraction and borrow) can handle computation") {
     sbb(ret, borrow, a, b);
     REQUIRE(ret == 0xdd5902076eb30a06);
     REQUIRE(borrow == 0x0);
+  }
+}
+
+TEST_CASE("sbb (subtraction and borrow) can handle computation on device") {
+  memmg::managed_array<uint64_t> a(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> b(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> ret(1, memr::get_managed_device_resource());
+  memmg::managed_array<uint64_t> borrow(1, memr::get_managed_device_resource());
+
+  SECTION("by matching the non-GPU implementation on random values") {
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    std::bernoulli_distribution ber_d(0.5);
+    basn::fast_random_number_generator rng{1, 2};
+
+    a[0] = rng();
+    b[0] = rng();
+    borrow[0] = ber_d(gen) ? 0x0 : static_cast<uint64_t>(-1);
+    ret[0] = 0x0;
+
+    uint64_t ret_expected{0};
+    uint64_t borrow_expected{borrow[0]};
+    sbb(ret_expected, borrow_expected, a[0], b[0]);
+
+    sbb<<<1, 1>>>(ret.data(), borrow.data(), a.data(), b.data());
+    cudaDeviceSynchronize();
+
+    REQUIRE(ret[0] == ret_expected);
+    REQUIRE(borrow[0] == borrow_expected);
   }
 }

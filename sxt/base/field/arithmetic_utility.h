@@ -92,9 +92,18 @@ CUDA_CALLABLE void inline adc(uint64_t& ret, uint64_t& carry, const uint64_t a, 
  */
 CUDA_CALLABLE void inline sbb(uint64_t& ret, uint64_t& borrow, const uint64_t a,
                               const uint64_t b) noexcept {
+#ifdef __CUDA_ARCH__
+  asm volatile("add.u64 %1, %3, %4;\n"             // ret = b + borrow >> 63
+              "sub.cc.u64 %0, %2, %1;\n"          // ret = ret - borrow
+              "subc.u64 %1, 0, 0;"                // Update the borrow
+              : "=l"(ret), "=l"(borrow)           // Set outputs
+              : "l"(a), "l"(b), "l"(borrow >> 63) // Set inputs
+  );
+#else
   uint128_t ret_tmp = uint128_t{a} - (uint128_t{b} + uint128_t{(borrow >> 63)});
 
   ret = bast::narrow_cast<uint64_t>(ret_tmp);
   borrow = bast::narrow_cast<uint64_t>(ret_tmp >> 64);
+#endif
 }
 } // namespace sxt::basfld
