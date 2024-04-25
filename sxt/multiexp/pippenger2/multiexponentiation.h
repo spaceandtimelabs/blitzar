@@ -71,6 +71,21 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<T
 }
 
 //--------------------------------------------------------------------------------------------------
+// complete_multiexponentiation 
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+xena::future<> complete_multiexponentiation(basct::span<T> res, unsigned element_num_bytes,
+                                            basct::cspan<T> partial_products, unsigned num_products,
+                                            unsigned offset) noexcept {
+  (void)res;
+  (void)element_num_bytes;
+  (void)partial_products;
+  (void)num_products;
+  (void)offset;
+  return {};
+}
+
+//--------------------------------------------------------------------------------------------------
 // multiexponentiate
 //--------------------------------------------------------------------------------------------------
 /**
@@ -120,15 +135,12 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
         co_await xendv::await_stream(stream);
       });
 
-  // reduce products
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<T> res_dev{num_outputs, &resource};
-  reduce_products<T>(res_dev, stream, products);
-  products.reset();
-
-  // copy result
-  basdv::async_copy_device_to_host(res, res_dev, stream);
-  co_await xendv::await_stream(stream);
+  // complete the multi-exponentiation by splitting the remaining work by output
+  co_await xendv::concurrent_for_each(
+      basit::index_range{0, num_outputs},
+      [&](const basit::index_range& rng) noexcept -> xena::future<> {
+        co_await complete_multiexponentiation<T>(
+            res.subspan(rng.a(), rng.size()), element_num_bytes, products, num_products, rng.a());
+      });
 }
 } // namespace sxt::mtxpp2
