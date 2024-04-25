@@ -81,8 +81,28 @@ TEST_CASE("we can partially combine elements") {
     auto fut = combine_partial<E>(reduction, elements, 1, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
-/* template <bascrv::element T> */
-/* xena::future<> combine_partial(basct::span<T> res, basct::cspan<T> elements, unsigned n, */
-/*                                unsigned first) noexcept { */
+
+    expected = {123u};
+    REQUIRE(reduction == expected);
+  }
+
+  SECTION("we can partially combine one of two elements") {
+    elements = {3u, 7u, 2u, 10u};
+    auto fut = combine_partial<E>(reduction, elements, 2, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+
+    expected = {5u};
+    REQUIRE(reduction == expected);
+  }
+
+  SECTION("we can partially combine one of two elements with an offset") {
+    elements = {3u, 7u, 2u, 10u};
+    auto fut = combine_partial<E>(reduction, elements, 2, 1);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+
+    expected = {17u};
+    REQUIRE(reduction == expected);
   }
 }
