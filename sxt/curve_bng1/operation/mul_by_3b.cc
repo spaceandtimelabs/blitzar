@@ -15,23 +15,3 @@
  * limitations under the License.
  */
 #include "sxt/curve_bng1/operation/mul_by_3b.h"
-
-#include "sxt/field25/operation/add.h"
-#include "sxt/field25/type/element.h"
-
-namespace sxt::cn1o {
-//--------------------------------------------------------------------------------------------------
-// mul_by_3b
-//--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void mul_by_3b(f25t::element& h, const f25t::element& p) noexcept {
-  f25t::element p2;
-  f25t::element p4;
-  f25t::element p8;
-
-  f25o::add(p2, p, p);
-  f25o::add(p4, p2, p2);
-  f25o::add(p8, p4, p4);
-  f25o::add(h, p8, p);
-}
-} // namespace sxt::cn1o

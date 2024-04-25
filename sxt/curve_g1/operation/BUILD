@@ -107,11 +107,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "mul_by_3b",
-    impl_deps = [
-        "//sxt/field12/operation:add",
-        "//sxt/field12/type:element",
-    ],
-    is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/field12/constant:one",
@@ -120,6 +115,8 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
+        "//sxt/field12/operation:add",
+        "//sxt/field12/type:element",
     ],
 )
 
