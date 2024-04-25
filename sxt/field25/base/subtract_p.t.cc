@@ -17,6 +17,7 @@
 #include "sxt/field25/base/subtract_p.h"
 
 #include "sxt/base/device/synchronization.h"
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/field25/base/constants.h"
 #include "sxt/memory/management/managed_array.h"
@@ -73,11 +74,11 @@ TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
 TEST_CASE("subtract_p (subtraction with the modulus) can handle on device computation") {
   memmg::managed_array<uint64_t> a(4, memr::get_managed_device_resource());
   memmg::managed_array<uint64_t> ret(4, memr::get_managed_device_resource());
-  
+
   SECTION("of zero") {
     std::fill(a.begin(), a.end(), 0);
 
-    subtract_p_device<<<1,1>>>(ret.data(), a.data());
+    subtract_p_device<<<1, 1>>>(ret.data(), a.data());
     basdv::synchronize_device();
 
     for (unsigned i = 0; i < 4; ++i) {
@@ -90,8 +91,8 @@ TEST_CASE("subtract_p (subtraction with the modulus) can handle on device comput
     a[1] = 0x97816a916871ca8d;
     a[2] = 0xb85045b68181585d;
     a[3] = 0x30644e72e131a029;
-    
-    subtract_p_device<<<1,1>>>(ret.data(), a.data());
+
+    subtract_p_device<<<1, 1>>>(ret.data(), a.data());
     basdv::synchronize_device();
 
     for (unsigned i = 0; i < 4; ++i) {
@@ -105,7 +106,7 @@ TEST_CASE("subtract_p (subtraction with the modulus) can handle on device comput
       a[i] = p_v[i];
     }
 
-    subtract_p_device<<<1,1>>>(ret.data(), a.data());
+    subtract_p_device<<<1, 1>>>(ret.data(), a.data());
     basdv::synchronize_device();
 
     for (unsigned i = 0; i < 4; ++i) {
@@ -120,7 +121,7 @@ TEST_CASE("subtract_p (subtraction with the modulus) can handle on device comput
     a[3] = 0x30644e72e131a029;
     constexpr std::array<uint64_t, 4> expect = {1, 0, 0, 0};
 
-    subtract_p_device<<<1,1>>>(ret.data(), a.data());
+    subtract_p_device<<<1, 1>>>(ret.data(), a.data());
     basdv::synchronize_device();
 
     for (unsigned i = 0; i < 4; ++i) {
@@ -129,17 +130,20 @@ TEST_CASE("subtract_p (subtraction with the modulus) can handle on device comput
   }
 
   SECTION("matches a random host output") {
-    a[0] = 0x3c208c16d87cfd48;
-    a[1] = 0x97816a916871ca8d;
-    a[2] = 0xb85045b68181585d;
-    a[3] = 0x30644e72e131a029;
-    constexpr std::array<uint64_t, 4> expect = {1, 0, 0, 0};
+    basn::fast_random_number_generator rng{1, 2};
+    a[0] = rng();
+    a[1] = rng();
+    a[2] = rng();
+    a[3] = rng();
+    std::array<uint64_t, 4> ret_host;
 
-    subtract_p_device<<<1,1>>>(ret.data(), a.data());
+    subtract_p(ret_host.data(), a.data());
+
+    subtract_p_device<<<1, 1>>>(ret.data(), a.data());
     basdv::synchronize_device();
 
     for (unsigned i = 0; i < 4; ++i) {
-      REQUIRE(expect[i] == ret[i]);
+      REQUIRE(ret_host[i] == ret[i]);
     }
-  } 
+  }
 }
