@@ -70,10 +70,18 @@ CUDA_CALLABLE void inline mac(uint64_t& ret, uint64_t& carry, const uint64_t a, 
  */
 CUDA_CALLABLE void inline adc(uint64_t& ret, uint64_t& carry, const uint64_t a, const uint64_t b,
                               const uint64_t c) noexcept {
+#ifdef __CUDA_ARCH__
+  asm volatile("add.u64 %0, %3, %4;\n\t"    // ret = b + c
+               "add.cc.u64 %0, %0, %2;\n\t" // ret = ret + a
+               "addc.u64 %1, 0, 0;\n\t"     // Update carry
+               : "=l"(ret), "=l"(carry)     // Set outputs
+               : "l"(a), "l"(b), "l"(c)     // Set inputs
+  );
+#else
   uint128_t ret_tmp = uint128_t{a} + uint128_t{b} + uint128_t{c};
-
   ret = bast::narrow_cast<uint64_t>(ret_tmp);
   carry = bast::narrow_cast<uint64_t>(ret_tmp >> 64);
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------
