@@ -41,6 +41,13 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
+// multiexponentiate_options
+//--------------------------------------------------------------------------------------------------
+struct multiexponentiate_options {
+  unsigned split_factor;
+};
+
+//--------------------------------------------------------------------------------------------------
 // multiexponentiate_no_chunks
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
@@ -83,14 +90,14 @@ xena::future<> complete_multiexponentiation(basct::span<T> res, unsigned element
 
   // combine the partial results
   memmg::managed_array<T> products_slice{num_products_slice, memr::get_device_resource()};
-  co_await combine_partial<T>(products_slice, partial_products, num_products,
-                              offset * element_num_bytes * 8u);
+  co_await combine_partial<T>(products_slice, partial_products, num_products, offset);
 
   // reduce the products
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> res_dev{num_outputs_slice, &resource};
   reduce_products<T>(res_dev, stream, products_slice);
+  products_slice.reset();
 
   // copy result
   basdv::async_copy_device_to_host(res, res_dev, stream);
@@ -98,18 +105,13 @@ xena::future<> complete_multiexponentiation(basct::span<T> res, unsigned element
 }
 
 //--------------------------------------------------------------------------------------------------
-// multiexponentiate
+// multiexponentiate_impl
 //--------------------------------------------------------------------------------------------------
-/**
- * Compute a multi-exponentiation using an accessor to precompute sums of partition groups.
- *
- * This implements the partition part of Pipenger's algorithm. See Algorithm 7 of
- * https://cacr.uwaterloo.ca/techreports/2010/cacr2010-26.pdf
- */
 template <bascrv::element T>
-xena::future<> multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
-                                 unsigned element_num_bytes,
-                                 basct::cspan<uint8_t> scalars) noexcept {
+xena::future<> multiexponentiate_impl(basct::span<T> res,
+                                      const partition_table_accessor<T>& accessor,
+                                      unsigned element_num_bytes, basct::cspan<uint8_t> scalars,
+                                      const multiexponentiate_options& options) noexcept {
   auto num_outputs = res.size();
   auto n = scalars.size() / (num_outputs * element_num_bytes);
   auto num_products = num_outputs * element_num_bytes * 8u;
@@ -120,7 +122,7 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
   );
 
   auto [chunk_first, chunk_last] =
-      basit::split(basit::index_range{0, n}.chunk_multiple(16), basdv::get_num_devices());
+      basit::split(basit::index_range{0, n}.chunk_multiple(16), options.split_factor);
   auto num_chunks = std::distance(chunk_first, chunk_last);
   if (num_chunks == 1) {
     multiexponentiate_no_chunks(res, accessor, element_num_bytes, scalars);
@@ -145,11 +147,31 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
       });
 
   // complete the multi-exponentiation by splitting the remaining work by output
+  auto [output_first, output_last] =
+      basit::split(basit::index_range{0, num_outputs}, options.split_factor);
   co_await xendv::concurrent_for_each(
-      basit::index_range{0, num_outputs},
-      [&](const basit::index_range& rng) noexcept -> xena::future<> {
-        co_await complete_multiexponentiation<T>(
-            res.subspan(rng.a(), rng.size()), element_num_bytes, products, num_products, rng.a());
+      output_first, output_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+        co_await complete_multiexponentiation<T>(res.subspan(rng.a(), rng.size()),
+                                                 element_num_bytes, products, num_products,
+                                                 rng.a() * element_num_bytes * 8u);
       });
+}
+
+//--------------------------------------------------------------------------------------------------
+// multiexponentiate
+//--------------------------------------------------------------------------------------------------
+/**
+ * Compute a multi-exponentiation using an accessor to precompute sums of partition groups.
+ *
+ * This implements the partition part of Pipenger's algorithm. See Algorithm 7 of
+ * https://cacr.uwaterloo.ca/techreports/2010/cacr2010-26.pdf
+ */
+template <bascrv::element T>
+xena::future<> multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
+                                 unsigned element_num_bytes,
+                                 basct::cspan<uint8_t> scalars) noexcept {
+  return multiexponentiate_impl(
+      res, accessor, element_num_bytes, scalars,
+      multiexponentiate_options{.split_factor = static_cast<unsigned>(basdv::get_num_devices())});
 }
 } // namespace sxt::mtxpp2
