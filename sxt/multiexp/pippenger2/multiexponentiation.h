@@ -34,6 +34,7 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
+#include "sxt/multiexp/pippenger2/combination.h"
 #include "sxt/multiexp/pippenger2/partition_product.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 #include "sxt/multiexp/pippenger2/reduce.h"
@@ -77,12 +78,23 @@ template <bascrv::element T>
 xena::future<> complete_multiexponentiation(basct::span<T> res, unsigned element_num_bytes,
                                             basct::cspan<T> partial_products, unsigned num_products,
                                             unsigned offset) noexcept {
-  (void)res;
-  (void)element_num_bytes;
-  (void)partial_products;
-  (void)num_products;
-  (void)offset;
-  return {};
+  auto num_outputs_slice = res.size();
+  auto num_products_slice = num_outputs_slice * element_num_bytes * 8u;
+
+  // combine the partial results
+  memmg::managed_array<T> products_slice{num_products_slice, memr::get_device_resource()};
+  co_await combine_partial<T>(products_slice, partial_products, num_products,
+                              offset * element_num_bytes * 8u);
+
+  // reduce the products
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> res_dev{num_outputs_slice, &resource};
+  reduce_products<T>(res_dev, stream, products_slice);
+
+  // copy result
+  basdv::async_copy_device_to_host(res, res_dev, stream);
+  co_await xendv::await_stream(stream);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -114,9 +126,6 @@ xena::future<> multiexponentiate(basct::span<T> res, const partition_table_acces
     multiexponentiate_no_chunks(res, accessor, element_num_bytes, scalars);
     co_return;
   }
-  (void)n;
-  (void)chunk_first;
-  (void)chunk_last;
 
   // compute bitwise products
   memmg::managed_array<T> products{num_products * num_chunks, memr::get_pinned_resource()};

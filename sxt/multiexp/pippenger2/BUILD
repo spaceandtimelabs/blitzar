@@ -146,6 +146,7 @@ sxt_cc_component(
         "//sxt/ristretto/random:element",
     ],
     deps = [
+        ":combination",
         ":partition_product",
         ":partition_table_accessor",
         ":reduce",
