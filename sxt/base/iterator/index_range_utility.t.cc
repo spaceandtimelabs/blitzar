@@ -76,4 +76,12 @@ TEST_CASE("we can split an index_range") {
     REQUIRE(*iter++ == index_range{2, 4});
     REQUIRE(iter == last);
   }
+
+  SECTION("we respect the chunk multiple") {
+    auto [iter, last] = split(index_range{0, 4}.chunk_multiple(3), 4);
+    REQUIRE(std::distance(iter, last) == 2);
+    REQUIRE(*iter++ == index_range{0, 3});
+    REQUIRE(*iter++ == index_range{3, 4});
+    REQUIRE(iter == last);
+  }
 }
