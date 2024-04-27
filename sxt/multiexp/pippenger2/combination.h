@@ -18,11 +18,16 @@
 
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
+#include "sxt/base/container/span_utility.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/type/raw_stream.h"
+#include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/synchronization.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/async_device_resource.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -65,5 +70,32 @@ void combine(basct::span<T> res, bast::raw_stream_t stream, basct::cspan<T> elem
              combine_impl(reductions + index, elements + index, n, reduction_size);
            };
   algi::launch_for_each_kernel(stream, f, n);
+}
+
+//--------------------------------------------------------------------------------------------------
+// combine_partial 
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+xena::future<> combine_partial(basct::span<T> res, basct::cspan<T> elements, unsigned n,
+                               unsigned first) noexcept {
+  auto np = static_cast<unsigned>(res.size());
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      n >= first + np &&
+      elements.size() % n == 0 &&
+      basdv::is_active_device_pointer(res.data()) &&
+      basdv::is_host_pointer(elements.data())
+      // clang-format on
+  );
+  auto reduction_size = static_cast<unsigned>(elements.size() / n);
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> elements_p{np * reduction_size, &resource};
+  for (unsigned i=0; i<reduction_size; ++i) {
+    basdv::async_copy_host_to_device(basct::subspan(elements_p, i * np, np),
+                                     elements.subspan(first + i * n, np), stream);
+  }
+  combine<T>(res, stream, elements_p);
+  co_await xendv::await_stream(stream);
 }
 } // namespace sxt::mtxpp2
