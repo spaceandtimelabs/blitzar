@@ -81,7 +81,7 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<T
 }
 
 //--------------------------------------------------------------------------------------------------
-// complete_multiexponentiation 
+// complete_multiexponentiation
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 xena::future<> complete_multiexponentiation(basct::span<T> res, unsigned element_num_bytes,
@@ -123,6 +123,11 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
       // clang-format on
   );
 
+  // compute bitwise products
+  //
+  // We split the work by groups of generators so that a single chunk will process
+  // all the outputs for those generators. This minimizes the amount of host->device
+  // copying we need to do for the table of precomputed sums.
   auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}
                                                     .chunk_multiple(16)
                                                     .min_chunk_size(options.min_chunk_size)
@@ -134,7 +139,6 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
     co_return;
   }
 
-  // compute bitwise products
   memmg::managed_array<T> products{num_products * num_chunks, memr::get_pinned_resource()};
   size_t chunk_index = 0;
   co_await xendv::concurrent_for_each(

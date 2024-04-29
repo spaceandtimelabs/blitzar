@@ -73,7 +73,7 @@ void combine(basct::span<T> res, bast::raw_stream_t stream, basct::cspan<T> elem
 }
 
 //--------------------------------------------------------------------------------------------------
-// combine_partial 
+// combine_partial
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 xena::future<> combine_partial(basct::span<T> res, basct::cspan<T> elements, unsigned n,
@@ -91,7 +91,7 @@ xena::future<> combine_partial(basct::span<T> res, basct::cspan<T> elements, uns
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> elements_p{np * reduction_size, &resource};
-  for (unsigned i=0; i<reduction_size; ++i) {
+  for (unsigned i = 0; i < reduction_size; ++i) {
     basdv::async_copy_host_to_device(basct::subspan(elements_p, i * np, np),
                                      elements.subspan(first + i * n, np), stream);
   }
