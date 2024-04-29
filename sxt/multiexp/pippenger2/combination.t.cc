@@ -22,12 +22,13 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/resource/managed_device_resource.h"
 
 using namespace sxt;
 using namespace sxt::mtxpp2;
 
-TEST_CASE("todo") {
+TEST_CASE("we can combine elements") {
   using E = bascrv::element97;
 
   std::pmr::vector<E> reduction{1, memr::get_managed_device_resource()};
@@ -62,6 +63,46 @@ TEST_CASE("todo") {
     basdv::synchronize_stream(stream);
 
     expected = {3 + 2, 4 + 6, 1 + 5};
+    REQUIRE(reduction == expected);
+  }
+}
+
+TEST_CASE("we can partially combine elements") {
+  using E = bascrv::element97;
+
+  std::pmr::vector<E> reduction{1, memr::get_managed_device_resource()};
+
+  std::pmr::vector<E> elements;
+
+  std::pmr::vector<E> expected;
+
+  SECTION("we can partially combine a single element") {
+    elements = {123u};
+    auto fut = combine_partial<E>(reduction, elements, 1, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+
+    expected = {123u};
+    REQUIRE(reduction == expected);
+  }
+
+  SECTION("we can partially combine one of two elements") {
+    elements = {3u, 7u, 2u, 10u};
+    auto fut = combine_partial<E>(reduction, elements, 2, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+
+    expected = {5u};
+    REQUIRE(reduction == expected);
+  }
+
+  SECTION("we can partially combine one of two elements with an offset") {
+    elements = {3u, 7u, 2u, 10u};
+    auto fut = combine_partial<E>(reduction, elements, 2, 1);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+
+    expected = {17u};
     REQUIRE(reduction == expected);
   }
 }
