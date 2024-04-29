@@ -44,7 +44,9 @@ namespace sxt::mtxpp2 {
 // multiexponentiate_options
 //--------------------------------------------------------------------------------------------------
 struct multiexponentiate_options {
-  unsigned split_factor;
+  unsigned split_factor = 1;
+  unsigned min_chunk_size = 64u;
+  unsigned max_chunk_size = 1024u;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -121,8 +123,11 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
       // clang-format on
   );
 
-  auto [chunk_first, chunk_last] =
-      basit::split(basit::index_range{0, n}.chunk_multiple(16), options.split_factor);
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}
+                                                    .chunk_multiple(16)
+                                                    .min_chunk_size(options.min_chunk_size)
+                                                    .max_chunk_size(options.max_chunk_size),
+                                                options.split_factor);
   auto num_chunks = std::distance(chunk_first, chunk_last);
   if (num_chunks == 1) {
     multiexponentiate_no_chunks(res, accessor, element_num_bytes, scalars);
@@ -170,8 +175,8 @@ template <bascrv::element T>
 xena::future<> multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
                                  unsigned element_num_bytes,
                                  basct::cspan<uint8_t> scalars) noexcept {
-  return multiexponentiate_impl(
-      res, accessor, element_num_bytes, scalars,
-      multiexponentiate_options{.split_factor = static_cast<unsigned>(basdv::get_num_devices())});
+  multiexponentiate_options options;
+  options.split_factor = static_cast<unsigned>(basdv::get_num_devices());
+  return multiexponentiate_impl(res, accessor, element_num_bytes, scalars, options);
 }
 } // namespace sxt::mtxpp2
