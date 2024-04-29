@@ -23,6 +23,7 @@
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/property.h"
+#include "sxt/base/device/state.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range_iterator.h"
@@ -145,8 +146,12 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
 
   memmg::managed_array<T> products{num_products * num_chunks, memr::get_pinned_resource()};
   size_t chunk_index = 0;
+  basl::info("computing {} bitwise multiexponentiation products of length {} using {} chunks",
+             num_products, n, num_chunks);
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+        basl::info("computing a multiproduct for generators [{}, {}] on device {}", rng.a(),
+                   rng.b(), basdv::get_device());
         memmg::managed_array<T> products_dev{num_products, memr::get_device_resource()};
         auto scalars_slice = scalars.subspan(num_outputs * element_num_bytes * rng.a(),
                                              rng.size() * num_outputs * element_num_bytes);

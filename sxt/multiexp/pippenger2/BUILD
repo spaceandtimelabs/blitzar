@@ -155,6 +155,7 @@ sxt_cc_component(
         "//sxt/base/curve:element",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:property",
+        "//sxt/base/device:state",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
         "//sxt/base/iterator:index_range_iterator",
