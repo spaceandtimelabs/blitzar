@@ -27,6 +27,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/log/log.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/for_each.h"
 #include "sxt/execution/device/synchronization.h"
@@ -57,6 +58,7 @@ xena::future<>
 multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<T>& accessor,
                             unsigned element_num_bytes, basct::cspan<uint8_t> scalars) noexcept {
   auto num_outputs = res.size();
+  auto n = scalars.size() / (num_outputs * element_num_bytes);
   auto num_products = num_outputs * element_num_bytes * 8u;
   SXT_DEBUG_ASSERT(
       // clang-format off
@@ -65,10 +67,12 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<T
   );
 
   // compute bitwise products
+  basl::info("computing {} bitwise multiexponentiation products of length {}", num_products, n);
   memmg::managed_array<T> products(num_products, memr::get_device_resource());
   co_await partition_product<T>(products, accessor, scalars, 0);
 
   // reduce products
+  basl::info("reducing {} products to {} outputs", num_products, num_products);
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> res_dev{num_outputs, &resource};

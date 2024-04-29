@@ -159,6 +159,7 @@ sxt_cc_component(
         "//sxt/base/device:synchronization",
         "//sxt/base/iterator:index_range_iterator",
         "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/log",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:for_each",
         "//sxt/memory/management:managed_array",
