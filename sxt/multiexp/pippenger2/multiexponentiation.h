@@ -150,8 +150,8 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
              num_products, n, num_chunks);
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
-        basl::info("computing a multiproduct for generators [{}, {}] on device {}", rng.a(),
-                   rng.b(), basdv::get_device());
+        basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
+                   rng.a(), rng.b(), basdv::get_device());
         memmg::managed_array<T> products_dev{num_products, memr::get_device_resource()};
         auto scalars_slice = scalars.subspan(num_outputs * element_num_bytes * rng.a(),
                                              rng.size() * num_outputs * element_num_bytes);
