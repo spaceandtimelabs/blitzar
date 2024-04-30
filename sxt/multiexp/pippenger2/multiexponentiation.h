@@ -167,8 +167,12 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
   // complete the multi-exponentiation by splitting the remaining work by output
   auto [output_first, output_last] =
       basit::split(basit::index_range{0, num_outputs}, options.split_factor);
+  basl::info("reducing products for {} outputs using {} chunks", num_outputs,
+             std::distance(output_first, output_last));
   co_await xendv::concurrent_for_each(
       output_first, output_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+        basl::info("reducing products for outputs [{}, {}] on device {}", rng.a(), rng.b(),
+                   basdv::get_device());
         co_await complete_multiexponentiation<T>(res.subspan(rng.a(), rng.size()),
                                                  element_num_bytes, products, num_products,
                                                  rng.a() * element_num_bytes * 8u);
