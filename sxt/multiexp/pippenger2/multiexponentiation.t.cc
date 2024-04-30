@@ -111,6 +111,38 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     REQUIRE(res[0] == generators[0].value);
     REQUIRE(res[1] == 2u * generators[0].value);
   }
+
+  SECTION("we can split a multi-exponentiation") {
+    multiexponentiate_options options{
+        .split_factor = 2,
+        .min_chunk_size = 16u,
+    };
+    scalars.resize(32);
+    scalars[0] = 1;
+    scalars[16] = 1;
+    auto fut = multiexponentiate_impl<E>(res, *accessor, 1, scalars, options);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == generators[0].value + generators[16].value);
+  }
+
+  SECTION("we can split a multi-exponentiation with more than one output") {
+    multiexponentiate_options options{
+        .split_factor = 2,
+        .min_chunk_size = 16u,
+    };
+    scalars.resize(64);
+    scalars[0] = 1;
+    scalars[1] = 2;
+    scalars[32] = 3;
+    scalars[33] = 4;
+    res.resize(2);
+    auto fut = multiexponentiate_impl<E>(res, *accessor, 1, scalars, options);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == generators[0].value + 3 * generators[16].value);
+    REQUIRE(res[1] == 2 * generators[0].value + 4 * generators[16].value);
+  }
 }
 
 TEST_CASE("we can compute multiexponentiations with curve-21") {
