@@ -47,8 +47,8 @@ namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 struct multiexponentiate_options {
   unsigned split_factor = 1;
-  unsigned min_chunk_size = 64u;
-  unsigned max_chunk_size = 1024u;
+  unsigned min_chunk_size = 64;
+  unsigned max_chunk_size = 1024;
 };
 
 //--------------------------------------------------------------------------------------------------
