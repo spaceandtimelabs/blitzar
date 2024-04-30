@@ -26,6 +26,7 @@
 #include "sxt/field12/operation/mul.h"
 
 #include "sxt/base/field/arithmetic_utility.h"
+#include "sxt/base/field/ptx.h"
 #include "sxt/field12/base/reduce.h"
 #include "sxt/field12/type/element.h"
 
@@ -36,6 +37,10 @@ namespace sxt::f12o {
 CUDA_CALLABLE
 void mul(f12t::element& h, const f12t::element& f, const f12t::element& g) noexcept {
   uint64_t t[12] = {};
+
+#ifdef __CUDA_ARCH__
+  basfld::mul_wide_limbs<f12t::element::num_limbs_v>(t, f.data(), g.data());
+#else
   uint64_t carry{0};
 
   basfld::mac(t[0], carry, 0, f[0], g[0]);
@@ -45,8 +50,8 @@ void mul(f12t::element& h, const f12t::element& f, const f12t::element& g) noexc
   basfld::mac(t[4], carry, 0, f[0], g[4]);
   basfld::mac(t[5], carry, 0, f[0], g[5]);
   t[6] = carry;
-  carry = 0;
 
+  carry = 0;
   basfld::mac(t[1], carry, t[1], f[1], g[0]);
   basfld::mac(t[2], carry, t[2], f[1], g[1]);
   basfld::mac(t[3], carry, t[3], f[1], g[2]);
@@ -54,8 +59,8 @@ void mul(f12t::element& h, const f12t::element& f, const f12t::element& g) noexc
   basfld::mac(t[5], carry, t[5], f[1], g[4]);
   basfld::mac(t[6], carry, t[6], f[1], g[5]);
   t[7] = carry;
-  carry = 0;
 
+  carry = 0;
   basfld::mac(t[2], carry, t[2], f[2], g[0]);
   basfld::mac(t[3], carry, t[3], f[2], g[1]);
   basfld::mac(t[4], carry, t[4], f[2], g[2]);
@@ -63,8 +68,8 @@ void mul(f12t::element& h, const f12t::element& f, const f12t::element& g) noexc
   basfld::mac(t[6], carry, t[6], f[2], g[4]);
   basfld::mac(t[7], carry, t[7], f[2], g[5]);
   t[8] = carry;
-  carry = 0;
 
+  carry = 0;
   basfld::mac(t[3], carry, t[3], f[3], g[0]);
   basfld::mac(t[4], carry, t[4], f[3], g[1]);
   basfld::mac(t[5], carry, t[5], f[3], g[2]);
@@ -72,8 +77,8 @@ void mul(f12t::element& h, const f12t::element& f, const f12t::element& g) noexc
   basfld::mac(t[7], carry, t[7], f[3], g[4]);
   basfld::mac(t[8], carry, t[8], f[3], g[5]);
   t[9] = carry;
-  carry = 0;
 
+  carry = 0;
   basfld::mac(t[4], carry, t[4], f[4], g[0]);
   basfld::mac(t[5], carry, t[5], f[4], g[1]);
   basfld::mac(t[6], carry, t[6], f[4], g[2]);
@@ -81,8 +86,8 @@ void mul(f12t::element& h, const f12t::element& f, const f12t::element& g) noexc
   basfld::mac(t[8], carry, t[8], f[4], g[4]);
   basfld::mac(t[9], carry, t[9], f[4], g[5]);
   t[10] = carry;
-  carry = 0;
 
+  carry = 0;
   basfld::mac(t[5], carry, t[5], f[5], g[0]);
   basfld::mac(t[6], carry, t[6], f[5], g[1]);
   basfld::mac(t[7], carry, t[7], f[5], g[2]);
@@ -90,6 +95,7 @@ void mul(f12t::element& h, const f12t::element& f, const f12t::element& g) noexc
   basfld::mac(t[9], carry, t[9], f[5], g[4]);
   basfld::mac(t[10], carry, t[10], f[5], g[5]);
   t[11] = carry;
+#endif
 
   f12b::reduce(h.data(), t);
 }

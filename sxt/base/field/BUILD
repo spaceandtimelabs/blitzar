@@ -21,4 +21,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "ptx",
     with_test = False,
+    deps = [
+        "//sxt/base/num:cmov",
+    ],
 )

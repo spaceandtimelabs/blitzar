@@ -66,11 +66,13 @@ sxt_cc_component(
     name = "mul",
     impl_deps = [
         "//sxt/base/field:arithmetic_utility",
+        "//sxt/base/field:ptx",
         "//sxt/field25/base:reduce",
         "//sxt/field25/type:element",
     ],
     is_cuda = True,
     test_deps = [
+        "//sxt/base/device:synchronization",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
         "//sxt/field25/base:constants",
@@ -78,6 +80,8 @@ sxt_cc_component(
         "//sxt/field25/constant:zero",
         "//sxt/field25/random:element",
         "//sxt/field25/type:element",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:managed_device_resource",        
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",

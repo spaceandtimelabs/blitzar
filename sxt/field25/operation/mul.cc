@@ -25,6 +25,7 @@
  */
 #include "sxt/field25/operation/mul.h"
 
+#include "sxt/base/field/ptx.h"
 #include "sxt/base/field/arithmetic_utility.h"
 #include "sxt/field25/base/reduce.h"
 #include "sxt/field25/type/element.h"
@@ -36,6 +37,10 @@ namespace sxt::f25o {
 CUDA_CALLABLE
 void mul(f25t::element& h, const f25t::element& f, const f25t::element& g) noexcept {
   uint64_t t[8] = {};
+
+#ifdef __CUDA_ARCH__
+  basfld::mul_wide_limbs<f25t::element::num_limbs_v>(t, f.data(), g.data());
+#else  
   uint64_t carry{0};
 
   basfld::mac(t[0], carry, 0, f[0], g[0]);
@@ -43,27 +48,28 @@ void mul(f25t::element& h, const f25t::element& f, const f25t::element& g) noexc
   basfld::mac(t[2], carry, 0, f[0], g[2]);
   basfld::mac(t[3], carry, 0, f[0], g[3]);
   t[4] = carry;
+  
   carry = 0;
-
   basfld::mac(t[1], carry, t[1], f[1], g[0]);
   basfld::mac(t[2], carry, t[2], f[1], g[1]);
   basfld::mac(t[3], carry, t[3], f[1], g[2]);
   basfld::mac(t[4], carry, t[4], f[1], g[3]);
   t[5] = carry;
+  
   carry = 0;
-
   basfld::mac(t[2], carry, t[2], f[2], g[0]);
   basfld::mac(t[3], carry, t[3], f[2], g[1]);
   basfld::mac(t[4], carry, t[4], f[2], g[2]);
   basfld::mac(t[5], carry, t[5], f[2], g[3]);
   t[6] = carry;
+  
   carry = 0;
-
   basfld::mac(t[3], carry, t[3], f[3], g[0]);
   basfld::mac(t[4], carry, t[4], f[3], g[1]);
   basfld::mac(t[5], carry, t[5], f[3], g[2]);
   basfld::mac(t[6], carry, t[6], f[3], g[3]);
   t[7] = carry;
+#endif
 
   f25b::reduce(h.data(), t);
 }
