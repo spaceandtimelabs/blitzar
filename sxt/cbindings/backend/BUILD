@@ -8,6 +8,7 @@ sxt_cc_component(
     with_test = False,
     deps = [
         "//sxt/base/container:span",
+        "//sxt/cbindings/base:curve_id",
         "//sxt/curve21/type:element_p3",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/ristretto/type:compressed_element",
@@ -53,7 +54,6 @@ sxt_cc_component(
     deps = [
         ":computational_backend",
         "//sxt/base/container:span",
-        "//sxt/cbindings/base:curve_id",
     ],
 )
 

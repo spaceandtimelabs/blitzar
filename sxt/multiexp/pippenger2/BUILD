@@ -80,9 +80,17 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "partition_table_accessor_base",
+    with_test = False,
+    deps = [
+    ],
+)
+
+sxt_cc_component(
     name = "partition_table_accessor",
     with_test = False,
     deps = [
+      ":partition_table_accessor_base",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
         "//sxt/base/type:raw_stream",

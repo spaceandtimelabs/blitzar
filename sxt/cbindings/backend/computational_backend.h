@@ -20,6 +20,7 @@
 #include <vector>
 #include <memory>
 
+#include "sxt/cbindings/base/curve_id.h"
 #include "sxt/base/container/span.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 
@@ -58,7 +59,6 @@ struct proof_descriptor;
 }
 
 namespace sxt::cbnbck {
-
 //--------------------------------------------------------------------------------------------------
 // computational_backend
 //--------------------------------------------------------------------------------------------------
@@ -94,6 +94,9 @@ public:
                                     basct::cspan<rstt::compressed_element> l_vector,
                                     basct::cspan<rstt::compressed_element> r_vector,
                                     const s25t::element& ap_value) const noexcept = 0;
-};
 
+  /* std::unique_ptr<mtxpp2::partition_table_accessor> */
+  /* make_partition_table_accessor(cnbb::curve_id_t curve_id, const void* generators, */
+  /*                               unsigned n) const noexcept; */
+};
 } // namespace sxt::cbnbck
