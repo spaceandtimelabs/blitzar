@@ -67,6 +67,14 @@ public:
                                      stream);
   }
 
+  void write_to_file(std::string_view filename) const noexcept override {
+    std::ofstream out{filename, std::ios::binary};
+    if (!out.good()) {
+      baser::panic("failed to open {}: {}", filename, std::strerror(errno));
+    }
+    out.write(reinterpret_cast<const char*>(table_.data()), table_.size() * sizeof(T));
+  }
+
 private:
   memmg::managed_array<T> table_;
 };
