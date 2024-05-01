@@ -53,6 +53,7 @@ sxt_cc_component(
     deps = [
         ":computational_backend",
         "//sxt/base/container:span",
+        "//sxt/cbindings/base:curve_id",
     ],
 )
 

@@ -18,8 +18,10 @@
 
 #include <cinttypes>
 #include <vector>
+#include <memory>
 
 #include "sxt/base/container/span.h"
+#include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 
 namespace sxt::mtxb {
 struct exponent_sequence;

@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "sxt/base/container/span.h"
+#include "sxt/cbindings/base/curve_id.h"
 #include "sxt/cbindings/backend/computational_backend.h"
 
 namespace sxt::cbnbck {
