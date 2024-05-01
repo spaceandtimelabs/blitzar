@@ -63,4 +63,22 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
     std::vector<E> expected = {12u};
     REQUIRE(v == expected);
   }
+
+  SECTION("we can write an accessor to a file") {
+    memmg::managed_array<E> data((1u << 16u) * 2);
+    unsigned cnt = 0;
+    for (auto& val : data) {
+      val = cnt++;
+    }
+    in_memory_partition_table_accessor<E> accessor{memmg::managed_array<E>{data}};
+    temp_file.stream().close();
+    accessor.write_to_file(temp_file.name());
+    in_memory_partition_table_accessor<E> accessor_p{temp_file.name()};
+    memmg::managed_array<E> data_dev{data.size(), memr::get_device_resource()};
+    accessor_p.async_copy_precomputed_sums_to_device(data_dev, stream, 0);
+    memmg::managed_array<E> data_p(data.size());
+    basdv::async_copy_device_to_host(data_p, data_dev, stream);
+    basdv::synchronize_stream(stream);
+    REQUIRE(data == data_p);
+  }
 }
