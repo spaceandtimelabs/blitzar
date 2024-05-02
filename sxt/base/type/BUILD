@@ -9,6 +9,11 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "type",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "value_type",
     test_deps = [
         "//sxt/base/test:unit_test",

@@ -1,12 +1,9 @@
 #pragma once
 
-namespace sxt::cbnb {
+namespace sxt::bast {
 //--------------------------------------------------------------------------------------------------
-// curve_id_t
+// type_t
 //--------------------------------------------------------------------------------------------------
-enum class curve_id_t : int {
-  curve21,
-  bls381,
-  bnp,
-};
-} // namespace sxt::cbnb
+template <class T>
+struct type_t {};
+} // namespace sxt::bast

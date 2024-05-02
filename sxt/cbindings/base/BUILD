@@ -14,6 +14,8 @@ sxt_cc_component(
     name = "curve_id_utility",
     deps = [
       ":curve_id",
+      "//sxt/base/error:panic",
+      "//sxt/base/type:type",
       "//sxt/base/test:unit_test",
       "//sxt/curve21/type:element_p3",
       "//sxt/curve_g1/type:element_p2",
