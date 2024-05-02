@@ -20,13 +20,13 @@ namespace sxt::cbnbck {
 //--------------------------------------------------------------------------------------------------
 // make_partition_table_accessor
 //--------------------------------------------------------------------------------------------------
-/* std::unique_ptr<mtxpp2::partition_table_accessor> */
-/* computational_backend::make_partition_table_accessor(cnbb::curve_id_t curve_id, */
-/*                                                      const void* generators, */
-/*                                                      unsigned n) const noexcept { */
-/*   (void)curve_id; */
-/*   (void)generators; */
-/*   (void)n; */
-/*   return nullptr; */
-/* } */
+std::unique_ptr<mtxpp2::partition_table_accessor_base>
+computational_backend::make_partition_table_accessor(cbnb::curve_id_t curve_id,
+                                                     const void* generators,
+                                                     unsigned n) const noexcept {
+  (void)curve_id;
+  (void)generators;
+  (void)n;
+  return nullptr;
+}
 } // namespace sxt::cbnbck

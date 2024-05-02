@@ -11,6 +11,7 @@ sxt_cc_component(
         "//sxt/cbindings/base:curve_id",
         "//sxt/curve21/type:element_p3",
         "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/multiexp/pippenger2:partition_table_accessor_base",
         "//sxt/ristretto/type:compressed_element",
     ],
 )
