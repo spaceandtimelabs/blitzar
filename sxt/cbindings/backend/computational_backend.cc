@@ -26,9 +26,11 @@ std::unique_ptr<mtxpp2::partition_table_accessor_base>
 computational_backend::make_partition_table_accessor(cbnb::curve_id_t curve_id,
                                                      const void* generators,
                                                      unsigned n) const noexcept {
-  (void)curve_id;
-  (void)generators;
-  (void)n;
-  return nullptr;
+  std::unique_ptr<mtxpp2::partition_table_accessor_base> res;
+  cbnb::switch_curve_type(curve_id, [&]<class T>(bast::type_t<T>) noexcept {
+    res = mtxpp2::make_in_memory_partition_table_accessor<T>(
+        basct::cspan<T>{static_cast<const T*>(generators), n});
+  });
+  return res;
 }
 } // namespace sxt::cbnbck

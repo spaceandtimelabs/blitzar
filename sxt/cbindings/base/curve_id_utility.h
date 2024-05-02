@@ -3,8 +3,17 @@
 #include "sxt/base/error/panic.h"
 #include "sxt/base/type/type.h"
 #include "sxt/cbindings/base/curve_id.h"
+#include "sxt/curve21/operation/add.h"
+#include "sxt/curve21/operation/double.h"
+#include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
+#include "sxt/curve_bng1/operation/add.h"
+#include "sxt/curve_bng1/operation/double.h"
+#include "sxt/curve_bng1/operation/neg.h"
 #include "sxt/curve_bng1/type/element_p2.h"
+#include "sxt/curve_g1/operation/add.h"
+#include "sxt/curve_g1/operation/double.h"
+#include "sxt/curve_g1/operation/neg.h"
 #include "sxt/curve_g1/type/element_p2.h"
 
 namespace sxt::cbnb {
