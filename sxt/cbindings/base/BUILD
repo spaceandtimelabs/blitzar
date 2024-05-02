@@ -13,6 +13,10 @@ sxt_cc_component(
 sxt_cc_component(
     name = "curve_id_utility",
     deps = [
+      ":curve_id",
       "//sxt/base/test:unit_test",
+      "//sxt/curve21/type:element_p3",
+      "//sxt/curve_g1/type:element_p2",
+      "//sxt/curve_bng1/type:element_p2",
     ],
 )
