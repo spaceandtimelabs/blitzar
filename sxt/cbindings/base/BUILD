@@ -9,3 +9,10 @@ sxt_cc_component(
     deps = [
     ],
 )
+
+sxt_cc_component(
+    name = "curve_id_utility",
+    deps = [
+      "//sxt/base/test:unit_test",
+    ],
+)
