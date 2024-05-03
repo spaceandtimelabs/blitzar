@@ -513,8 +513,13 @@ int sxt_curve25519_verify_inner_product(struct sxt_transcript* transcript, uint6
 /**
  * TODO(rnburn): fill me in
  */
-struct multiexp_handle* sxt_make_multiexp_handle(unsigned curve_id, const void* generators,
-                                                 unsigned n);
+struct multiexp_handle* sxt_multiexp_handle_new(unsigned curve_id, const void* generators,
+                                                unsigned n);
+
+/**
+ * TODO(rnburn): fill me in
+ */
+void sxt_multiexp_handle_free(struct multiexp_handle* handle);
 
 #ifdef __cplusplus
 } // extern "C"
