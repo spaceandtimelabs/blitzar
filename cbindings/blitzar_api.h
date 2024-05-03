@@ -112,6 +112,9 @@ struct sxt_sequence_descriptor {
   int is_signed;
 };
 
+/** resources for multiexponentiations with pre-specified generators */
+struct sxt_multiexp_handle;
+
 /**
  * Initializes the library.
  *
@@ -505,6 +508,13 @@ int sxt_curve25519_verify_inner_product(struct sxt_transcript* transcript, uint6
                                         const struct sxt_ristretto255_compressed* l_vector,
                                         const struct sxt_ristretto255_compressed* r_vector,
                                         const struct sxt_curve25519_scalar* ap_value);
+
+
+/**
+ * TODO(rnburn): fill me in
+ */
+struct multiexp_handle* sxt_make_multiexp_handle(unsigned curve_id, const void* generators,
+                                                 unsigned n);
 
 #ifdef __cplusplus
 } // extern "C"

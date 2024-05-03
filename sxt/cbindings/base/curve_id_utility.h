@@ -29,7 +29,7 @@ template <class F> void switch_curve_type(curve_id_t id, F f) {
     case curve_id_t::bnp:
       f(bast::type_t<cn1t::element_p2>{});
     default:
-      baser::panic("unsupported curve id {}", static_cast<int>(id));
+      baser::panic("unsupported curve id {}", static_cast<unsigned>(id));
   }
 }
 } // namespace sxt::cbnb
