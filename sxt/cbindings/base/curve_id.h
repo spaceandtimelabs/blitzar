@@ -5,8 +5,8 @@ namespace sxt::cbnb {
 // curve_id_t
 //--------------------------------------------------------------------------------------------------
 enum class curve_id_t : int {
-  curve21,
-  bls381,
-  bnp,
+  curve21 = 0,
+  bls381 = 1,
+  bnp = 2,
 };
 } // namespace sxt::cbnb
