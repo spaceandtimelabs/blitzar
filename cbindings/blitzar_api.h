@@ -68,11 +68,25 @@ struct sxt_bls12_381_g1 {
   uint64_t Y[6];
 };
 
+/** encodes an affine element of the `bls12-381` `G1` group in projective form */
+struct sxt_bls12_381_g1_p2 {
+  uint64_t X[6];
+  uint64_t Y[6];
+  uint64_t Z[6];
+};
+
 /** encodes an affine element of the `bn254` `G1` group */
 struct sxt_bn254_g1 {
   uint64_t X[4];
   uint64_t Y[4];
   uint8_t infinity;
+};
+
+/** encodes an affine element of the `bn254` `G1` group in projective form */
+struct sxt_bn254_g1_p2 {
+  uint64_t X[4];
+  uint64_t Y[4];
+  uint64_t Z[4];
 };
 
 /** describes a sequence of values */
