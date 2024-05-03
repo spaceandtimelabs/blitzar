@@ -31,3 +31,12 @@ sxt_cc_component(
       "//sxt/curve21/type:element_p3",
     ],
 )
+
+sxt_cc_component(
+    name = "multiexp_handle",
+    with_test = False,
+    deps = [
+      ":curve_id",
+      "//sxt/multiexp/pippenger2:partition_table_accessor_base",
+    ],
+)
