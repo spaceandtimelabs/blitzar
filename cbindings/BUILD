@@ -151,7 +151,8 @@ sxt_cc_component(
 sxt_cc_component(
     name = "fixed_pedersen",
     impl_deps = [
-        # ":backend",
+        ":backend",
+        "//sxt/cbindings/base:multiexp_handle",
         # "//sxt/base/error:assert",
         # "//sxt/curve_bng1/type:conversion_utility",
         # "//sxt/curve_bng1/type:element_affine",
