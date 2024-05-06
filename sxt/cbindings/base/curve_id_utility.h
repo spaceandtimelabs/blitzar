@@ -24,10 +24,13 @@ template <class F> void switch_curve_type(curve_id_t id, F f) {
   switch(id) {
     case curve_id_t::curve21:
       f(bast::type_t<c21t::element_p3>{});
+      break;
     case curve_id_t::bls381:
       f(bast::type_t<cg1t::element_p2>{});
+      break;
     case curve_id_t::bnp:
       f(bast::type_t<cn1t::element_p2>{});
+      break;
     default:
       baser::panic("unsupported curve id {}", static_cast<unsigned>(id));
   }
