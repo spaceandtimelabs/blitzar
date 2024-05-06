@@ -12,10 +12,10 @@ cuda_library(
     rdc = 1,
     deps = [
         ":backend",
+        ":fixed_pedersen",
         ":get_generators",
         ":get_one_commit",
         ":inner_product_proof",
-        ":fixed_pedersen",
         ":pedersen",
     ],
     alwayslink = 1,

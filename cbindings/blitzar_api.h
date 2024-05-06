@@ -509,12 +509,11 @@ int sxt_curve25519_verify_inner_product(struct sxt_transcript* transcript, uint6
                                         const struct sxt_ristretto255_compressed* r_vector,
                                         const struct sxt_curve25519_scalar* ap_value);
 
-
 /**
  * TODO(rnburn): fill me in
  */
 struct sxt_multiexp_handle* sxt_multiexp_handle_new(unsigned curve_id, const void* generators,
-                                                unsigned n);
+                                                    unsigned n);
 
 /**
  * TODO(rnburn): fill me in

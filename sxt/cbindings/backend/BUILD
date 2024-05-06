@@ -5,11 +5,11 @@ load(
 
 sxt_cc_component(
     name = "computational_backend",
-    with_test = False,
     impl_deps = [
-      "//sxt/cbindings/base:curve_id_utility",
+        "//sxt/cbindings/base:curve_id_utility",
         "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
     ],
+    with_test = False,
     deps = [
         "//sxt/base/container:span",
         "//sxt/cbindings/base:curve_id",

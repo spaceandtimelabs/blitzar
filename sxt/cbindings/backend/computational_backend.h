@@ -17,8 +17,8 @@
 #pragma once
 
 #include <cinttypes>
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "sxt/base/container/span.h"
 #include "sxt/cbindings/base/curve_id.h"
