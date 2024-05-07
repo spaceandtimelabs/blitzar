@@ -39,6 +39,7 @@ TEST_CASE("we can compute multi-exponentiations with a fixed set of generators")
   SECTION("we can create and free a handle") {
     auto h =
         sxt_multiexp_handle_new(SXT_CURVE_RISTRETTO255, static_cast<void*>(generators.data()), 1);
+    REQUIRE(h != nullptr);
     sxt_multiexp_handle_free(h);
   }
 }
