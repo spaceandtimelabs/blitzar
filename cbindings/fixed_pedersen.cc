@@ -23,6 +23,9 @@
 
 using namespace sxt;
 
+//--------------------------------------------------------------------------------------------------
+// sxt_multiexp_handle_new
+//--------------------------------------------------------------------------------------------------
 struct sxt_multiexp_handle* sxt_multiexp_handle_new(unsigned curve_id, const void* generators,
                                                     unsigned n) {
   auto res = std::make_unique<cbnb::multiexp_handle>();
@@ -33,6 +36,9 @@ struct sxt_multiexp_handle* sxt_multiexp_handle_new(unsigned curve_id, const voi
   return reinterpret_cast<sxt_multiexp_handle*>(res.release());
 }
 
+//--------------------------------------------------------------------------------------------------
+// sxt_multiexp_handle_free
+//--------------------------------------------------------------------------------------------------
 void sxt_multiexp_handle_free(struct sxt_multiexp_handle* handle) {
   delete reinterpret_cast<cbnb::multiexp_handle*>(handle);
 }
