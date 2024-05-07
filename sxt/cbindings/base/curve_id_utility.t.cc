@@ -16,6 +16,15 @@
  */
 #include "sxt/cbindings/base/curve_id_utility.h"
 
+#include <type_traits>
+
 #include "sxt/base/test/unit_test.h"
 
-TEST_CASE("todo") {}
+using namespace sxt;
+using namespace sxt::cbnb;
+
+TEST_CASE("we can translate a runtime curve id value to a compile-time type") {
+  switch_curve_type(curve_id_t::curve21, [&]<class T>(std::type_identity<T>) {
+    REQUIRE(std::is_same_v<T, c21t::element_p3>);
+  });
+}
