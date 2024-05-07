@@ -31,5 +31,7 @@ template <bascrv::element T> class partition_table_accessor : public partition_t
 public:
   virtual void async_copy_precomputed_sums_to_device(basct::span<T> dest, bast::raw_stream_t stream,
                                                      unsigned first) const noexcept = 0;
+
+  virtual void write_to_file(std::string_view filename) const noexcept = 0;
 };
 } // namespace sxt::mtxpp2
