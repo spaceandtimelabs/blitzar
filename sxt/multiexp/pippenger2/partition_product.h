@@ -104,7 +104,13 @@ xena::future<> partition_product(basct::span<T> products,
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products);
   auto num_partitions = basn::divide_up(n, 16u);
   auto num_table_entries = 1u << 16u;
-  SXT_DEBUG_ASSERT(offset % 16u == 0);
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      offset % 16u == 0 &&
+      basdv::is_active_device_pointer(products.data()) &&
+      basdv::is_host_pointer(scalars.data())
+      // clang-format on
+  );
 
   // scalars_dev
   memmg::managed_array<uint8_t> scalars_dev{scalars.size(), memr::get_device_resource()};
