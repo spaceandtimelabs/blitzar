@@ -17,6 +17,7 @@
 #pragma once
 
 #include <string_view>
+#include <memory>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
@@ -32,6 +33,9 @@ public:
 
   virtual void async_copy_precomputed_sums_to_device(basct::span<T> dest, bast::raw_stream_t stream,
                                                      unsigned first) const noexcept = 0;
+
+  virtual basct::cspan<T> host_view(std::pmr::polymorphic_allocator<> alloc, unsigned first,
+                                    unsigned n) const noexcept = 0;
 
   virtual void write_to_file(std::string_view filename) const noexcept = 0;
 };

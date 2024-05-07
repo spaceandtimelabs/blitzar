@@ -67,6 +67,11 @@ public:
                                      stream);
   }
 
+  basct::cspan<T> host_view(std::pmr::polymorphic_allocator<> /*alloc*/, unsigned first,
+                            unsigned n) const noexcept override {
+    return basct::subspan(table_, first, n);
+  }
+
   void write_to_file(std::string_view filename) const noexcept override {
     std::ofstream out{filename, std::ios::binary};
     if (!out.good()) {
