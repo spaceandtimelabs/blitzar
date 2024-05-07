@@ -95,7 +95,7 @@ public:
                                     basct::cspan<rstt::compressed_element> r_vector,
                                     const s25t::element& ap_value) const noexcept = 0;
 
-  std::unique_ptr<mtxpp2::partition_table_accessor_base>
+  virtual std::unique_ptr<mtxpp2::partition_table_accessor_base>
   make_partition_table_accessor(cbnb::curve_id_t curve_id, const void* generators,
                                 unsigned n) const noexcept;
 };

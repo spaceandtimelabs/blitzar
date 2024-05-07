@@ -16,8 +16,9 @@
  */
 #pragma once
 
+#include <type_traits>
+
 #include "sxt/base/error/panic.h"
-#include "sxt/base/type/type.h"
 #include "sxt/cbindings/base/curve_id.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
@@ -39,13 +40,13 @@ namespace sxt::cbnb {
 template <class F> void switch_curve_type(curve_id_t id, F f) {
   switch (id) {
   case curve_id_t::curve21:
-    f(bast::type_t<c21t::element_p3>{});
+    f(std::type_identity<c21t::element_p3>{});
     break;
   case curve_id_t::bls381:
-    f(bast::type_t<cg1t::element_p2>{});
+    f(std::type_identity<cg1t::element_p2>{});
     break;
   case curve_id_t::bnp:
-    f(bast::type_t<cn1t::element_p2>{});
+    f(std::type_identity<cn1t::element_p2>{});
     break;
   default:
     baser::panic("unsupported curve id {}", static_cast<unsigned>(id));

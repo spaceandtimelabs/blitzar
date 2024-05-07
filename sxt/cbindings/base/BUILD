@@ -16,7 +16,6 @@ sxt_cc_component(
         ":curve_id",
         "//sxt/base/error:panic",
         "//sxt/base/test:unit_test",
-        "//sxt/base/type",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
         "//sxt/curve21/operation:neg",

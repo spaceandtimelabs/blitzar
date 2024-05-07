@@ -20,6 +20,11 @@ namespace sxt::cbnb {
 //--------------------------------------------------------------------------------------------------
 // curve_id_t
 //--------------------------------------------------------------------------------------------------
+/**
+ * Ids for the various curves we support.
+ *
+ * Note: The values should match those in blitzar_api.h.
+ */
 enum class curve_id_t : unsigned {
   curve21 = 0,
   bls381 = 1,
