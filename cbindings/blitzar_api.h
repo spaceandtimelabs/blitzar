@@ -510,13 +510,20 @@ int sxt_curve25519_verify_inner_product(struct sxt_transcript* transcript, uint6
                                         const struct sxt_curve25519_scalar* ap_value);
 
 /**
- * TODO(rnburn): fill me in
+ * Create a handle for computing multiexponentiations using a fixed sequence of generators.
+ *
+ * Note: `generators` must match the type indicated by `curve_id`
+ *
+ * curve_id                        generators type
+ * SXT_CURVE_RISTRETTO255          struct sxt_ristretto255*
+ * SXT_CURVE_BLS_381               struct sxt_bls12_381_g1_p2*
+ * SXT_CURVE_BN_254                struct sxt_bn254_g1_p2*
  */
 struct sxt_multiexp_handle* sxt_multiexp_handle_new(unsigned curve_id, const void* generators,
                                                     unsigned n);
 
 /**
- * TODO(rnburn): fill me in
+ * Free resources for a multiexponentiation handle
  */
 void sxt_multiexp_handle_free(struct sxt_multiexp_handle* handle);
 
