@@ -26,8 +26,8 @@ namespace sxt::cbnb {
  * Note: The values should match those in blitzar_api.h.
  */
 enum class curve_id_t : unsigned {
-  curve21 = 0,
-  bls381 = 1,
-  bnp = 2,
+  curve25519 = 0,
+  bls12_381 = 1,
+  bn254 = 2,
 };
 } // namespace sxt::cbnb

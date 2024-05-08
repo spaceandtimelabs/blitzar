@@ -39,13 +39,13 @@ namespace sxt::cbnb {
 //--------------------------------------------------------------------------------------------------
 template <class F> void switch_curve_type(curve_id_t id, F f) {
   switch (id) {
-  case curve_id_t::curve21:
+  case curve_id_t::curve25519:
     f(std::type_identity<c21t::element_p3>{});
     break;
-  case curve_id_t::bls381:
+  case curve_id_t::bls12_381:
     f(std::type_identity<cg1t::element_p2>{});
     break;
-  case curve_id_t::bnp:
+  case curve_id_t::bn254:
     f(std::type_identity<cn1t::element_p2>{});
     break;
   default:
