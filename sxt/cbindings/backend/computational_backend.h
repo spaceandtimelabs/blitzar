@@ -17,9 +17,12 @@
 #pragma once
 
 #include <cinttypes>
+#include <memory>
 #include <vector>
 
 #include "sxt/base/container/span.h"
+#include "sxt/cbindings/base/curve_id.h"
+#include "sxt/multiexp/pippenger2/partition_table_accessor_base.h"
 
 namespace sxt::mtxb {
 struct exponent_sequence;
@@ -56,7 +59,6 @@ struct proof_descriptor;
 }
 
 namespace sxt::cbnbck {
-
 //--------------------------------------------------------------------------------------------------
 // computational_backend
 //--------------------------------------------------------------------------------------------------
@@ -92,6 +94,9 @@ public:
                                     basct::cspan<rstt::compressed_element> l_vector,
                                     basct::cspan<rstt::compressed_element> r_vector,
                                     const s25t::element& ap_value) const noexcept = 0;
-};
 
+  virtual std::unique_ptr<mtxpp2::partition_table_accessor_base>
+  make_partition_table_accessor(cbnb::curve_id_t curve_id, const void* generators,
+                                unsigned n) const noexcept;
+};
 } // namespace sxt::cbnbck

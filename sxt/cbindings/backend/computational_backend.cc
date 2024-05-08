@@ -15,3 +15,23 @@
  * limitations under the License.
  */
 #include "sxt/cbindings/backend/computational_backend.h"
+
+#include "sxt/cbindings/base/curve_id_utility.h"
+#include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
+
+namespace sxt::cbnbck {
+//--------------------------------------------------------------------------------------------------
+// make_partition_table_accessor
+//--------------------------------------------------------------------------------------------------
+std::unique_ptr<mtxpp2::partition_table_accessor_base>
+computational_backend::make_partition_table_accessor(cbnb::curve_id_t curve_id,
+                                                     const void* generators,
+                                                     unsigned n) const noexcept {
+  std::unique_ptr<mtxpp2::partition_table_accessor_base> res;
+  cbnb::switch_curve_type(curve_id, [&]<class T>(std::type_identity<T>) noexcept {
+    res = mtxpp2::make_in_memory_partition_table_accessor<T>(
+        basct::cspan<T>{static_cast<const T*>(generators), n});
+  });
+  return res;
+}
+} // namespace sxt::cbnbck

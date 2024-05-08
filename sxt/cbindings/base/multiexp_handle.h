@@ -16,22 +16,17 @@
  */
 #pragma once
 
-#include <string_view>
+#include <memory>
 
-#include "sxt/base/container/span.h"
-#include "sxt/base/curve/element.h"
-#include "sxt/base/type/raw_stream.h"
+#include "sxt/cbindings/base/curve_id.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor_base.h"
 
-namespace sxt::mtxpp2 {
+namespace sxt::cbnb {
 //--------------------------------------------------------------------------------------------------
-// partition_table_accessor
+// multiexp_handle
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T> class partition_table_accessor : public partition_table_accessor_base {
-public:
-  virtual void async_copy_precomputed_sums_to_device(basct::span<T> dest, bast::raw_stream_t stream,
-                                                     unsigned first) const noexcept = 0;
-
-  virtual void write_to_file(std::string_view filename) const noexcept = 0;
+struct multiexp_handle {
+  curve_id_t curve_id;
+  std::unique_ptr<mtxpp2::partition_table_accessor_base> partition_table_accessor;
 };
-} // namespace sxt::mtxpp2
+} // namespace sxt::cbnb

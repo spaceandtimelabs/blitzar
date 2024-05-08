@@ -18,19 +18,13 @@
 
 #include <string_view>
 
-#include "sxt/base/container/span.h"
-#include "sxt/base/curve/element.h"
-#include "sxt/base/type/raw_stream.h"
-#include "sxt/multiexp/pippenger2/partition_table_accessor_base.h"
-
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
-// partition_table_accessor
+// partition_table_accessor_base
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T> class partition_table_accessor : public partition_table_accessor_base {
+class partition_table_accessor_base {
 public:
-  virtual void async_copy_precomputed_sums_to_device(basct::span<T> dest, bast::raw_stream_t stream,
-                                                     unsigned first) const noexcept = 0;
+  virtual ~partition_table_accessor_base() noexcept = default;
 
   virtual void write_to_file(std::string_view filename) const noexcept = 0;
 };
