@@ -119,6 +119,21 @@ bool cpu_backend::verify_inner_product(prft::transcript& transcript,
 }
 
 //--------------------------------------------------------------------------------------------------
+// fixed_multiexponentiation
+//--------------------------------------------------------------------------------------------------
+void cpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id,
+                                            const mtxpp2::partition_table_accessor_base& accessor,
+                                            unsigned num_outputs, unsigned n,
+                                            const void* scalars) const noexcept {
+  (void)res;
+  (void)curve_id;
+  (void)accessor;
+  (void)num_outputs;
+  (void)n;
+  (void)scalars;
+}
+
+//--------------------------------------------------------------------------------------------------
 // get_cpu_backend
 //--------------------------------------------------------------------------------------------------
 cpu_backend* get_cpu_backend() {

@@ -56,6 +56,11 @@ public:
                             basct::cspan<rstt::compressed_element> l_vector,
                             basct::cspan<rstt::compressed_element> r_vector,
                             const s25t::element& ap_value) const noexcept override;
+
+  void fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id,
+                                 const mtxpp2::partition_table_accessor_base& accessor,
+                                 unsigned num_outputs, unsigned n,
+                                 const void* scalars) const noexcept override;
 };
 
 //--------------------------------------------------------------------------------------------------
