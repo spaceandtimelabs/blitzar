@@ -47,7 +47,8 @@ void sxt_multiexp_handle_free(struct sxt_multiexp_handle* handle) {
 // sxt_fixed_multiexponentiation
 //--------------------------------------------------------------------------------------------------
 void sxt_fixed_multiexponentiation(void* res, const struct sxt_multiexp_handle* handle,
-                                   unsigned num_outputs, unsigned n, const void* scalars) {
+                                   unsigned element_num_bytes, unsigned num_outputs, unsigned n,
+                                   const void* scalars) {
   (void)res;
   (void)handle;
   (void)num_outputs;
