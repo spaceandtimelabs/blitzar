@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "sxt/base/error/assert.h"
+#include "sxt/base/error/panic.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/operation/neg.h"
@@ -131,6 +132,7 @@ void cpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
   (void)num_outputs;
   (void)n;
   (void)scalars;
+  baser::panic("not implemented yet");
 }
 
 //--------------------------------------------------------------------------------------------------
