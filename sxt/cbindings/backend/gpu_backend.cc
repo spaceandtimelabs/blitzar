@@ -165,26 +165,13 @@ void gpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
                                             const mtxpp2::partition_table_accessor_base& accessor,
                                             unsigned element_num_bytes, unsigned num_outputs,
                                             unsigned n, const uint8_t* scalars) const noexcept {
-  (void)res;
-  (void)curve_id;
-  (void)accessor;
-  (void)element_num_bytes;
-  (void)num_outputs;
-  (void)n;
-  (void)scalars;
   cbnb::switch_curve_type(curve_id, [&]<class T>(std::type_identity<T>) noexcept {
     basct::span<T> res_span{static_cast<T*>(res), num_outputs};
     basct::cspan<uint8_t> scalars_span{scalars, element_num_bytes * num_outputs * n};
-    (void)res_span;
     auto fut = mtxpp2::multiexponentiate<T>(
         res_span, static_cast<const mtxpp2::partition_table_accessor<T>&>(accessor),
         element_num_bytes, scalars_span);
     xens::get_scheduler().run();
-    /* template <bascrv::element T> */
-    /* xena::future<> multiexponentiate(basct::span<T> res, const partition_table_accessor<T>&
-     * accessor, */
-    /*                                  unsigned element_num_bytes, */
-    /*                                  basct::cspan<uint8_t> scalars) noexcept { */
   });
 }
 
