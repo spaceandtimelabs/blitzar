@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "sxt/base/error/assert.h"
+#include "sxt/base/error/panic.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/operation/neg.h"
@@ -116,6 +117,22 @@ bool cpu_backend::verify_inner_product(prft::transcript& transcript,
   return prfip::verify_inner_product(transcript, drv, descriptor, product, a_commit, l_vector,
                                      r_vector, ap_value)
       .value();
+}
+
+//--------------------------------------------------------------------------------------------------
+// fixed_multiexponentiation
+//--------------------------------------------------------------------------------------------------
+void cpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id,
+                                            const mtxpp2::partition_table_accessor_base& accessor,
+                                            unsigned element_num_bytes, unsigned num_outputs,
+                                            unsigned n, const uint8_t* scalars) const noexcept {
+  (void)res;
+  (void)curve_id;
+  (void)accessor;
+  (void)num_outputs;
+  (void)n;
+  (void)scalars;
+  baser::panic("not implemented yet");
 }
 
 //--------------------------------------------------------------------------------------------------
