@@ -528,7 +528,28 @@ struct sxt_multiexp_handle* sxt_multiexp_handle_new(unsigned curve_id, const voi
 void sxt_multiexp_handle_free(struct sxt_multiexp_handle* handle);
 
 /**
- * TODO(rnburn): fill me in
+ * Compute a multiexponentiation using a handle to pre-specified generators.
+ *
+ * On completion `res` contains an array of size `num_outputs` for the multiexponentiation
+ * of the given `scalars` array.
+ *
+ * `scalars` specifies a contiguous multi-dimension `num_outputs` by `n` array laid out in
+ * column-major order. An entry in the array specifies the `element_num_bytes` bytes of a
+ * particular scalar.
+ *
+ * For example, if g1, g2, ..., gn are the generators associated with `handle` and
+ *
+ *      s11, s12, ..., s1n
+ *      s21, s22, ..., s2n
+ *
+ * is the scalar array (laid out in memory as s11, s21, s12, s22, ..., s1n, s2n), then `res`
+ * will contain the two values r1, r2 where
+ *
+ *      r1 = g1^s11 g2^s12 ... gn^s1n
+ *      r2 = g1^s21 g2^s22 ... gn^s2n
+ *
+ * Note: `res` must match the generator type of the curve. See `sxt_multiexp_handle_new` for
+ * the types.
  */
 void sxt_fixed_multiexponentiation(void* res, const struct sxt_multiexp_handle* handle,
                                    unsigned element_num_bytes, unsigned num_outputs, unsigned n,
