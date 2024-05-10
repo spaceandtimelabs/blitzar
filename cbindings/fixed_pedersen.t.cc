@@ -34,9 +34,7 @@ struct wrapped_handle {
     h = sxt_multiexp_handle_new(SXT_CURVE_RISTRETTO255, static_cast<const void*>(generators), n);
   }
 
-  ~wrapped_handle() noexcept {
-    sxt_multiexp_handle_free(h);
-  }
+  ~wrapped_handle() noexcept { sxt_multiexp_handle_free(h); }
 
   sxt_multiexp_handle* h;
 };
