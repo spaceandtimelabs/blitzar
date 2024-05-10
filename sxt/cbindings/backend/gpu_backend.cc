@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "sxt/base/error/assert.h"
+#include "sxt/cbindings/base/curve_id_utility.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/operation/neg.h"
@@ -40,6 +41,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/curve/multiexponentiation.h"
+#include "sxt/multiexp/pippenger2/multiexponentiation.h"
 #include "sxt/proof/inner_product/gpu_driver.h"
 #include "sxt/proof/inner_product/proof_computation.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
@@ -170,6 +172,12 @@ void gpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
   (void)num_outputs;
   (void)n;
   (void)scalars;
+  cbnb::switch_curve_type(curve_id, [&]<class T>(std::type_identity<T>) noexcept {
+/* template <bascrv::element T> */
+/* xena::future<> multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor, */
+/*                                  unsigned element_num_bytes, */
+/*                                  basct::cspan<uint8_t> scalars) noexcept { */
+  });
 }
 
 //--------------------------------------------------------------------------------------------------
