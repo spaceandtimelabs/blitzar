@@ -537,16 +537,20 @@ void sxt_multiexp_handle_free(struct sxt_multiexp_handle* handle);
  * column-major order. An entry in the array specifies the `element_num_bytes` bytes of a
  * particular scalar.
  *
- * For example, if g1, g2, ..., gn are the generators associated with `handle` and
+ * For example, if `g_1, g_2, ..., g_n` are the generators associated with `handle` and
  *
- *      s11, s12, ..., s1n
- *      s21, s22, ..., s2n
+ * ```text
+ *      s_11, s_12, ..., s_1n
+ *      s_21, s_22, ..., s_2n
+ * ```
  *
- * is the scalar array (laid out in memory as s11, s21, s12, s22, ..., s1n, s2n), then `res`
- * will contain the two values r1, r2 where
+ * is the scalar array (laid out in memory as `s_11, s_21, s_12, s_22, ..., s_1n, s_2n`), then `res`
+ * will contain the two values
  *
- *      r1 = g1^s11 g2^s12 ... gn^s1n
- *      r2 = g1^s21 g2^s22 ... gn^s2n
+ * ```text
+ *      res[0] = g1^s11 g2^s12 ... gn^s1n
+ *      res[1] = g1^s21 g2^s22 ... gn^s2n
+ * ```
  *
  * Note: `res` must match the generator type of the curve. See `sxt_multiexp_handle_new` for
  * the types.
