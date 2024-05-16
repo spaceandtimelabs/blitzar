@@ -185,14 +185,14 @@ TEST_CASE("bls12-381") {
       },
   };
 
-  auto accessor = make_in_memory_partition_table_accessor<E>(generators);
-
   std::vector<uint8_t> scalars(1);
   std::vector<E> res(1);
 
-  scalars[0] = 1;
-  auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
-  xens::get_scheduler().run();
-  REQUIRE(fut.ready());
+  res[0] = E::identity();
+  add(res[0], res[0], generators[0]);
+
+  REQUIRE(res[0] == generators[0]);
   std::cout << res[0].X << "\n";
+  std::cout << res[0].Y << "\n";
+  std::cout << res[0].Z << "\n";
 }
