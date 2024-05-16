@@ -28,9 +28,8 @@
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/curve21/type/literal.h"
 #include "sxt/curve_g1/operation/add.h"
-#include "sxt/curve_g1/operation/scalar_multiply.h"
-#include "sxt/curve_g1/type/compressed_element.h"
-#include "sxt/curve_g1/type/conversion_utility.h"
+#include "sxt/curve_g1/operation/double.h"
+#include "sxt/curve_g1/operation/neg.h"
 #include "sxt/curve_g1/type/element_p2.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/field12/type/literal.h"
@@ -185,4 +184,15 @@ TEST_CASE("bls12-381") {
           0x58d3f7ec6e94ac9c2e26c290f9d9f998db317263129f0bba7efa00e95356b6c6ad00900117ceaa9699e2e4defa88861_f12,
       },
   };
+
+  auto accessor = make_in_memory_partition_table_accessor<E>(generators);
+
+  std::vector<uint8_t> scalars(1);
+  std::vector<E> res(1);
+
+  scalars[0] = 1;
+  auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+  xens::get_scheduler().run();
+  REQUIRE(fut.ready());
+  std::cout << res[0].X << "\n";
 }
