@@ -27,13 +27,20 @@
 #include "sxt/curve21/operation/neg.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/curve21/type/literal.h"
+#include "sxt/curve_g1/operation/add.h"
+#include "sxt/curve_g1/operation/scalar_multiply.h"
+#include "sxt/curve_g1/type/compressed_element.h"
+#include "sxt/curve_g1/type/conversion_utility.h"
+#include "sxt/curve_g1/type/element_p2.h"
 #include "sxt/execution/schedule/scheduler.h"
+#include "sxt/field12/type/literal.h"
 #include "sxt/field51/type/literal.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
 #include "sxt/ristretto/random/element.h"
 
 using namespace sxt;
 using namespace sxt::mtxpp2;
+using sxt::f12t::operator""_f12;
 
 TEST_CASE("we can compute multiexponentiations using a precomputed table of partition sums") {
   using E = bascrv::element97;
@@ -166,4 +173,16 @@ TEST_CASE("we can compute multiexponentiations with curve-21") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == generators[0]);
   }
+}
+
+TEST_CASE("bls12-381") {
+  using E = cg1t::element_p2;
+
+  std::vector<E> generators = {
+      E{
+          0x4005f2b5f3219723bfda1ddd9d03a6945ce490be5e7af4c624928479d0c32b71d8778cbf12af7cae858d870bafccbcc_f12,
+          0x10d29fe9eb281085fbb26c8bc30bd26b696ef7189ecf15779a65a424a611f8238049102988ff7ca09335b7c9956ba27f_f12,
+          0x58d3f7ec6e94ac9c2e26c290f9d9f998db317263129f0bba7efa00e95356b6c6ad00900117ceaa9699e2e4defa88861_f12,
+      },
+  };
 }
