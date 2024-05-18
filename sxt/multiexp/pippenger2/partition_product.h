@@ -145,4 +145,20 @@ xena::future<> async_partition_product(basct::span<T> products,
   algi::launch_for_each_kernel(stream, f, num_products);
   co_await xendv::await_stream(stream);
 }
+
+//--------------------------------------------------------------------------------------------------
+// partition_product
+//--------------------------------------------------------------------------------------------------
+/**
+ * Compute the multiproduct for the bits of an array of scalars using an accessor to
+ * precomputed sums for each group of generators.
+ */
+template <bascrv::element T>
+void partition_product(basct::span<T> products, const partition_table_accessor<T>& accessor,
+                       basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
+  (void)products;
+  (void)accessor;
+  (void)scalars;
+  (void)offset;
+}
 } // namespace sxt::mtxpp2
