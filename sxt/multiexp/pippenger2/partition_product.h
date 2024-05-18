@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <memory_resource>
 
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
@@ -156,9 +157,22 @@ xena::future<> async_partition_product(basct::span<T> products,
 template <bascrv::element T>
 void partition_product(basct::span<T> products, const partition_table_accessor<T>& accessor,
                        basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
-  (void)products;
-  (void)accessor;
-  (void)scalars;
-  (void)offset;
+  auto num_products = products.size();
+  auto n = static_cast<unsigned>(scalars.size() * 8u / num_products);
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      offset % 16u == 0
+      // clang-format on
+  );
+  std::pmr::monotonic_buffer_resource alloc;
+  
+  auto partition_table = accessor.host_view(&alloc, offset, n);
+
+  for (unsigned product_index=0; product_index<num_products; ++product_index) {
+    auto byte_index = product_index / 8u;
+    auto bit_offset = product_index % 8u;
+    partition_product_kernel<T>(products.data(), partition_table.data(), scalars.data(), byte_index,
+                                bit_offset, num_products, n);
+  }
 }
 } // namespace sxt::mtxpp2
