@@ -90,16 +90,16 @@ partition_product_kernel(T* __restrict__ products, const T* __restrict__ partiti
 }
 
 //--------------------------------------------------------------------------------------------------
-// partition_product
+// async_partition_product
 //--------------------------------------------------------------------------------------------------
 /**
  * Compute the multiproduct for the bits of an array of scalars using an accessor to
  * precomputed sums for each group of generators.
  */
 template <bascrv::element T>
-xena::future<> partition_product(basct::span<T> products,
-                                 const partition_table_accessor<T>& accessor,
-                                 basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
+xena::future<> async_partition_product(basct::span<T> products,
+                                       const partition_table_accessor<T>& accessor,
+                                       basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
   auto num_products = products.size();
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products);
   auto num_partitions = basn::divide_up(n, 16u);

@@ -70,7 +70,7 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<T
   // compute bitwise products
   basl::info("computing {} bitwise multiexponentiation products of length {}", num_products, n);
   memmg::managed_array<T> products(num_products, memr::get_device_resource());
-  co_await partition_product<T>(products, accessor, scalars, 0);
+  co_await async_partition_product<T>(products, accessor, scalars, 0);
 
   // reduce products
   basl::info("reducing {} products to {} outputs", num_products, num_products);
@@ -155,7 +155,7 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
         memmg::managed_array<T> products_dev{num_products, memr::get_device_resource()};
         auto scalars_slice = scalars.subspan(num_outputs * element_num_bytes * rng.a(),
                                              rng.size() * num_outputs * element_num_bytes);
-        co_await partition_product<T>(products_dev, accessor, scalars_slice, rng.a());
+        co_await async_partition_product<T>(products_dev, accessor, scalars_slice, rng.a());
         basdv::stream stream;
         basdv::async_copy_device_to_host(
             basct::subspan(products, num_products * chunk_index, num_products), products_dev,

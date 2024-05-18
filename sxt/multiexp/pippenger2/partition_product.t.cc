@@ -88,7 +88,7 @@ TEST_CASE("we can compute the product of partitions") {
 
   SECTION("we handle a product with a single scalar") {
     scalars[0] = 1;
-    auto fut = partition_product<E>(products, accessor, scalars, 0);
+    auto fut = async_partition_product<E>(products, accessor, scalars, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -98,7 +98,7 @@ TEST_CASE("we can compute the product of partitions") {
 
   SECTION("we handle a product with an offset") {
     scalars[0] = 1;
-    auto fut = partition_product<E>(products, accessor, scalars, 16);
+    auto fut = async_partition_product<E>(products, accessor, scalars, 16);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -108,7 +108,7 @@ TEST_CASE("we can compute the product of partitions") {
 
   SECTION("we handle a product with two scalars") {
     scalars = {1u, 3u};
-    auto fut = partition_product<E>(products, accessor, scalars, 0);
+    auto fut = async_partition_product<E>(products, accessor, scalars, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -121,7 +121,7 @@ TEST_CASE("we can compute the product of partitions") {
     scalars.resize(16);
     scalars[0] = 1u;
     scalars[15] = 1u;
-    auto fut = partition_product<E>(products, accessor, scalars, 0);
+    auto fut = async_partition_product<E>(products, accessor, scalars, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -133,7 +133,7 @@ TEST_CASE("we can compute the product of partitions") {
     scalars.resize(32);
     scalars[0] = 1u;
     scalars[16] = 1u;
-    auto fut = partition_product<E>(products, accessor, scalars, 0);
+    auto fut = async_partition_product<E>(products, accessor, scalars, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
