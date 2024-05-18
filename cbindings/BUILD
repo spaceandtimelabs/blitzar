@@ -12,6 +12,7 @@ cuda_library(
     rdc = 1,
     deps = [
         ":backend",
+        ":fixed_pedersen",
         ":get_generators",
         ":get_one_commit",
         ":inner_product_proof",
@@ -140,6 +141,27 @@ sxt_cc_component(
         "//sxt/ristretto/operation:scalar_multiply",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",
+    ],
+    deps = [
+        ":blitzar_api",
+    ],
+    alwayslink = 1,
+)
+
+sxt_cc_component(
+    name = "fixed_pedersen",
+    impl_deps = [
+        ":backend",
+        "//sxt/cbindings/base:multiexp_handle",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/operation:add",
+        "//sxt/curve21/operation:double",
+        "//sxt/curve21/operation:neg",
+        "//sxt/curve21/operation:overload",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/type:literal",
     ],
     deps = [
         ":blitzar_api",

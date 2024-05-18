@@ -16,26 +16,18 @@
  */
 #pragma once
 
-#include <string_view>
-#include <memory>
-
-#include "sxt/base/container/span.h"
-#include "sxt/base/curve/element.h"
-#include "sxt/base/type/raw_stream.h"
-#include "sxt/multiexp/pippenger2/partition_table_accessor_base.h"
-
-namespace sxt::mtxpp2 {
+namespace sxt::cbnb {
 //--------------------------------------------------------------------------------------------------
-// partition_table_accessor
+// curve_id_t
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T> class partition_table_accessor : public partition_table_accessor_base {
-public:
-  virtual void async_copy_precomputed_sums_to_device(basct::span<T> dest, bast::raw_stream_t stream,
-                                                     unsigned first) const noexcept = 0;
-
-  virtual basct::cspan<T> host_view(std::pmr::polymorphic_allocator<> alloc, unsigned first,
-                                    unsigned n) const noexcept = 0;
-
-  virtual void write_to_file(std::string_view filename) const noexcept = 0;
+/**
+ * Ids for the various curves we support.
+ *
+ * Note: The values should match those in blitzar_api.h.
+ */
+enum class curve_id_t : unsigned {
+  curve25519 = 0,
+  bls12_381 = 1,
+  bn254 = 2,
 };
-} // namespace sxt::mtxpp2
+} // namespace sxt::cbnb
