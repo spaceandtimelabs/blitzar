@@ -69,4 +69,15 @@ void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
            };
   algi::launch_for_each_kernel(stream, f, num_outputs);
 }
+
+template <bascrv::element T>
+void reduce_products(basct::span<T> reductions, basct::cspan<T> products) noexcept {
+  auto num_outputs = reductions.size();
+  auto reduction_size = products.size() / reductions.size();
+  SXT_DEBUG_ASSERT(products.size() == reduction_size * num_outputs);
+  for (unsigned output_index=0; output_index<num_outputs; ++output_index) {
+    reduce_output(reductions + output_index, products + output_index * reduction_size,
+                  reduction_size);
+  }
+}
 } // namespace sxt::mtxpp2
