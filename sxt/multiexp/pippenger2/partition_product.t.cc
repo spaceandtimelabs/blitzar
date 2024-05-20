@@ -140,4 +140,13 @@ TEST_CASE("we can compute the product of partitions") {
     expected[0] = partition_table[1].value + partition_table[num_entries + 1].value;
     REQUIRE(products == expected);
   }
+
+  SECTION("we can compute products on the host") {
+    scalars.resize(32);
+    scalars[0] = 1u;
+    scalars[16] = 1u;
+    partition_product<E>(products, accessor, scalars, 0);
+    expected[0] = partition_table[1].value + partition_table[num_entries + 1].value;
+    REQUIRE(products == expected);
+  }
 }
