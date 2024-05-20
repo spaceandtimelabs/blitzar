@@ -76,7 +76,7 @@ void reduce_products(basct::span<T> reductions, basct::cspan<T> products) noexce
   auto reduction_size = products.size() / reductions.size();
   SXT_DEBUG_ASSERT(products.size() == reduction_size * num_outputs);
   for (unsigned output_index=0; output_index<num_outputs; ++output_index) {
-    reduce_output(reductions + output_index, products + output_index * reduction_size,
+    reduce_output(reductions.data() + output_index, products.data() + output_index * reduction_size,
                   reduction_size);
   }
 }

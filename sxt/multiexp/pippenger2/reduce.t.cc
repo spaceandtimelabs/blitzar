@@ -55,4 +55,14 @@ TEST_CASE("we can reduce products") {
     expected = {123u + 2u * 456u};
     REQUIRE(outputs == expected);
   }
+
+  SECTION("we can reduce products on the host") {
+    outputs.resize(1);
+    products.resize(2);
+    products[0] = 123u;
+    products[1] = 456u;
+    reduce_products<E>(outputs, products);
+    expected = {123u + 2u * 456u};
+    REQUIRE(outputs == expected);
+  }
 }
