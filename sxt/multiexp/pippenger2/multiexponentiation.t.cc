@@ -112,6 +112,16 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     REQUIRE(res[1] == 2u * generators[0].value);
   }
 
+  SECTION("we can compute a multiexponentiation on the host") {
+    res.resize(2);
+    scalars.resize(2);
+    scalars[0] = 1u;
+    scalars[1] = 2u;
+    multiexponentiate<E>(res, *accessor, 1, scalars);
+    REQUIRE(res[0] == generators[0].value);
+    REQUIRE(res[1] == 2u * generators[0].value);
+  }
+
   SECTION("we can split a multi-exponentiation") {
     multiexponentiate_options options{
         .split_factor = 2,
