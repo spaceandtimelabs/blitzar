@@ -206,9 +206,22 @@ async_multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& a
 template <bascrv::element T>
 void multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
                        unsigned element_num_bytes, basct::cspan<uint8_t> scalars) noexcept {
-  (void)res;
-  (void)accessor;
-  (void)element_num_bytes;
-  (void)scalars;
+  auto num_outputs = res.size();
+  auto n = scalars.size() / (num_outputs * element_num_bytes);
+  auto num_products = num_outputs * element_num_bytes * 8u;
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      scalars.size() % (num_outputs * element_num_bytes) == 0
+      // clang-format on
+  );
+
+  // compute bitwise products
+  basl::info("computing {} bitwise multiexponentiation products of length {}", num_products, n);
+  memmg::managed_array<T> products(num_products);
+  partition_product<T>(products, accessor, scalars, 0);
+
+  // reduce products
+  basl::info("reducing {} products to {} outputs", num_products, num_products);
+  reduce_products<T>(res, products);
 }
 } // namespace sxt::mtxpp2
