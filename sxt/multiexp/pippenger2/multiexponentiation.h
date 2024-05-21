@@ -196,4 +196,19 @@ async_multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& a
   options.split_factor = static_cast<unsigned>(basdv::get_num_devices());
   return multiexponentiate_impl(res, accessor, element_num_bytes, scalars, options);
 }
+
+//--------------------------------------------------------------------------------------------------
+// multiexponentiate
+//--------------------------------------------------------------------------------------------------
+/**
+ * Host version of async_multiexponentiate.
+ */
+template <bascrv::element T>
+void multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
+                       unsigned element_num_bytes, basct::cspan<uint8_t> scalars) noexcept {
+  (void)res;
+  (void)accessor;
+  (void)element_num_bytes;
+  (void)scalars;
+}
 } // namespace sxt::mtxpp2
