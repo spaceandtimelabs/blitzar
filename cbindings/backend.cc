@@ -78,8 +78,6 @@ cbnbck::computational_backend* get_backend() noexcept {
 // reset_backend_for_testing
 //--------------------------------------------------------------------------------------------------
 void reset_backend_for_testing() noexcept {
-  SXT_RELEASE_ASSERT(backend != nullptr);
-
   backend = nullptr;
 }
 } // namespace sxt::cbn

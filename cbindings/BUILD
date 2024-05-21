@@ -155,6 +155,7 @@ sxt_cc_component(
         "//sxt/cbindings/base:multiexp_handle",
     ],
     test_deps = [
+        ":backend",
         "//sxt/base/test:unit_test",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
