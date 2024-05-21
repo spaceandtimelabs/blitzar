@@ -129,8 +129,8 @@ int main(int argc, char* argv[]) {
 
   // discard initial run
   {
-    auto fut =
-        mtxpp2::multiexponentiate<c21t::element_p3>(res, *accessor, element_num_bytes, exponents);
+    auto fut = mtxpp2::async_multiexponentiate<c21t::element_p3>(res, *accessor, element_num_bytes,
+                                                                 exponents);
     xens::get_scheduler().run();
   }
 
@@ -138,8 +138,8 @@ int main(int argc, char* argv[]) {
   double times = 0;
   for (unsigned i = 0; i < num_samples; ++i) {
     auto t1 = std::chrono::steady_clock::now();
-    auto fut =
-        mtxpp2::multiexponentiate<c21t::element_p3>(res, *accessor, element_num_bytes, exponents);
+    auto fut = mtxpp2::async_multiexponentiate<c21t::element_p3>(res, *accessor, element_num_bytes,
+                                                                 exponents);
     xens::get_scheduler().run();
     auto t2 = std::chrono::steady_clock::now();
     auto elapse = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);

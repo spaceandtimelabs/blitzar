@@ -180,7 +180,7 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
 }
 
 //--------------------------------------------------------------------------------------------------
-// multiexponentiate
+// async_multiexponentiate
 //--------------------------------------------------------------------------------------------------
 /**
  * Compute a multi-exponentiation using an accessor to precompute sums of partition groups.
@@ -189,9 +189,9 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
  * https://cacr.uwaterloo.ca/techreports/2010/cacr2010-26.pdf
  */
 template <bascrv::element T>
-xena::future<> multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
-                                 unsigned element_num_bytes,
-                                 basct::cspan<uint8_t> scalars) noexcept {
+xena::future<>
+async_multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
+                        unsigned element_num_bytes, basct::cspan<uint8_t> scalars) noexcept {
   multiexponentiate_options options;
   options.split_factor = static_cast<unsigned>(basdv::get_num_devices());
   return multiexponentiate_impl(res, accessor, element_num_bytes, scalars, options);
