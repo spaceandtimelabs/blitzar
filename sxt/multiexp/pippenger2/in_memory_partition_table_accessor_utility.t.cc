@@ -44,7 +44,7 @@ TEST_CASE("we can create a partition table accessor from given generators") {
 
   SECTION("we can create an accessor from a single generators") {
     auto accessor = make_in_memory_partition_table_accessor<E>(basct::subspan(generators, 0, 1));
-    accessor->async_copy_precomputed_sums_to_device(table_dev, stream, 0);
+    accessor->async_copy_to_device(table_dev, stream, 0);
     basdv::async_copy_device_to_host(table, table_dev, stream);
     basdv::synchronize_stream(stream);
     REQUIRE(table[1] == generators[0]);
@@ -53,7 +53,7 @@ TEST_CASE("we can create a partition table accessor from given generators") {
 
   SECTION("we can create an accessor from multiple generators") {
     auto accessor = make_in_memory_partition_table_accessor<E>(generators);
-    accessor->async_copy_precomputed_sums_to_device(table_dev, stream, 0);
+    accessor->async_copy_to_device(table_dev, stream, 0);
     basdv::async_copy_device_to_host(table, table_dev, stream);
     basdv::synchronize_stream(stream);
     REQUIRE(table[1] == generators[0]);

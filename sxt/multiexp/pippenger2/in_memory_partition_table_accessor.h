@@ -54,8 +54,8 @@ public:
   explicit in_memory_partition_table_accessor(memmg::managed_array<T>&& table) noexcept
       : table_{std::move(table)} {}
 
-  void async_copy_precomputed_sums_to_device(basct::span<T> dest, bast::raw_stream_t stream,
-                                             unsigned first) const noexcept override {
+  void async_copy_to_device(basct::span<T> dest, bast::raw_stream_t stream,
+                            unsigned first) const noexcept override {
     static unsigned num_entries = 1u << 16u;
     SXT_DEBUG_ASSERT(
         // clang-format off

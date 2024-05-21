@@ -125,7 +125,7 @@ xena::future<> async_partition_product(basct::span<T> products,
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> partition_table{num_partitions * num_table_entries, &resource};
-  accessor.async_copy_precomputed_sums_to_device(partition_table, stream, offset / 16u);
+  accessor.async_copy_to_device(partition_table, stream, offset / 16u);
   co_await std::move(scalars_fut);
 
   // product

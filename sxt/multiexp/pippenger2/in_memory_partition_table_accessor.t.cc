@@ -41,7 +41,7 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
     temp_file.stream().close();
     in_memory_partition_table_accessor<E> accessor{temp_file.name()};
     memmg::managed_array<E> v_dev{1, memr::get_device_resource()};
-    accessor.async_copy_precomputed_sums_to_device(v_dev, stream, 0);
+    accessor.async_copy_to_device(v_dev, stream, 0);
     std::vector<E> v(1);
     basdv::async_copy_device_to_host(v, v_dev, stream);
     basdv::synchronize_stream(stream);
@@ -56,7 +56,7 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
     temp_file.stream().close();
     in_memory_partition_table_accessor<E> accessor{temp_file.name()};
     memmg::managed_array<E> v_dev{1, memr::get_device_resource()};
-    accessor.async_copy_precomputed_sums_to_device(v_dev, stream, 1);
+    accessor.async_copy_to_device(v_dev, stream, 1);
     std::vector<E> v(1);
     basdv::async_copy_device_to_host(v, v_dev, stream);
     basdv::synchronize_stream(stream);
@@ -75,7 +75,7 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
     accessor.write_to_file(temp_file.name());
     in_memory_partition_table_accessor<E> accessor_p{temp_file.name()};
     memmg::managed_array<E> data_dev{data.size(), memr::get_device_resource()};
-    accessor_p.async_copy_precomputed_sums_to_device(data_dev, stream, 0);
+    accessor_p.async_copy_to_device(data_dev, stream, 0);
     memmg::managed_array<E> data_p(data.size());
     basdv::async_copy_device_to_host(data_p, data_dev, stream);
     basdv::synchronize_stream(stream);

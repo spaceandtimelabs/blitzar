@@ -30,8 +30,8 @@ namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T> class partition_table_accessor : public partition_table_accessor_base {
 public:
-  virtual void async_copy_precomputed_sums_to_device(basct::span<T> dest, bast::raw_stream_t stream,
-                                                     unsigned first) const noexcept = 0;
+  virtual void async_copy_to_device(basct::span<T> dest, bast::raw_stream_t stream,
+                                    unsigned first) const noexcept = 0;
 
   virtual basct::cspan<T> host_view(std::pmr::polymorphic_allocator<> alloc, unsigned first,
                                     unsigned n) const noexcept = 0;
