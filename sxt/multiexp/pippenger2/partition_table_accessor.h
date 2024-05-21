@@ -28,13 +28,35 @@ namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 // partition_table_accessor
 //--------------------------------------------------------------------------------------------------
+/**
+ * Support accessing precomputed sums for groups of 16 generators.
+ *
+ * For example, if there are 32 generators
+ *
+ *    g0, ..., g15, g16, ..., g31
+ *
+ * an accessor will contain two tables each of 2^16 entries with all the sums of
+ * generators g0 to g15 and all the sums of generators g16 to g31, respectively.
+ */
 template <bascrv::element T> class partition_table_accessor : public partition_table_accessor_base {
 public:
+  /**
+   * Asynchronously copy precomputed sums of partitions to device.
+   *
+   * `first` specifies the partition group offset to use.
+   */
   virtual void async_copy_to_device(basct::span<T> dest, bast::raw_stream_t stream,
                                     unsigned first) const noexcept = 0;
 
+  /**
+   * Make a view into precomputed sums of partitions available to host memory.
+   *
+   * `first` specifies the partition group offset to use. If memory needs to be allocated
+   * to make the view available, it will be allocated using alloc. Make sure that alloc uses
+   * a resource that frees memory upon destruction (e.g. std::pmr::monotonic_buffer_resource).
+   */
   virtual basct::cspan<T> host_view(std::pmr::polymorphic_allocator<> alloc, unsigned first,
-                                    unsigned n) const noexcept = 0;
+                                    unsigned size) const noexcept = 0;
 
   virtual void write_to_file(std::string_view filename) const noexcept = 0;
 };
