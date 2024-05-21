@@ -104,7 +104,7 @@ xena::future<> async_partition_product(basct::span<T> products,
   auto num_products = products.size();
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products);
   auto num_partitions = basn::divide_up(n, 16u);
-  auto num_table_entries = 1u << 16u;
+  constexpr auto num_table_entries = 1u << 16u;
   SXT_DEBUG_ASSERT(
       // clang-format off
       offset % 16u == 0 &&
@@ -159,6 +159,7 @@ void partition_product(basct::span<T> products, const partition_table_accessor<T
                        basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
   auto num_products = products.size();
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products);
+  constexpr auto num_table_entries = 1u << 16u;
   SXT_DEBUG_ASSERT(
       // clang-format off
       offset % 16u == 0
@@ -166,7 +167,8 @@ void partition_product(basct::span<T> products, const partition_table_accessor<T
   );
   std::pmr::monotonic_buffer_resource alloc;
 
-  auto partition_table = accessor.host_view(&alloc, offset, n);
+  auto partition_table =
+      accessor.host_view(&alloc, offset, basn::divide_up(n, 16u) * num_table_entries);
 
   for (unsigned product_index = 0; product_index < num_products; ++product_index) {
     auto byte_index = product_index / 8u;

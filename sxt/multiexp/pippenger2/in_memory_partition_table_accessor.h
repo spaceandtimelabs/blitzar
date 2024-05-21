@@ -19,6 +19,7 @@
 #include <cerrno>
 #include <cstring>
 #include <fstream>
+#include <print>
 #include <string_view>
 
 #include "sxt/base/container/span_utility.h"
@@ -65,9 +66,9 @@ public:
   }
 
   basct::cspan<T> host_view(std::pmr::polymorphic_allocator<> /*alloc*/, unsigned first,
-                            unsigned n) const noexcept override {
-    SXT_RELEASE_ASSERT(table_.size() >= (n + first) * num_entries);
-    return basct::subspan(table_, first * num_entries, n * num_entries);
+                            unsigned size) const noexcept override {
+    SXT_RELEASE_ASSERT(table_.size() >= size + first * num_entries);
+    return basct::subspan(table_, first * num_entries, size);
   }
 
   void write_to_file(std::string_view filename) const noexcept override {

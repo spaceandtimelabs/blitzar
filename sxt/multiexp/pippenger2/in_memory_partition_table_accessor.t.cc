@@ -16,6 +16,7 @@
  */
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor.h"
 
+#include <memory_resource>
 #include <vector>
 
 #include "sxt/base/curve/example_element.h"
@@ -62,6 +63,18 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
     basdv::synchronize_stream(stream);
     std::vector<E> expected = {12u};
     REQUIRE(v == expected);
+  }
+
+  SECTION("we can access elements from the host") {
+    std::vector<E> data((1u << 16u) * 2);
+    data[1u << 16u] = 12;
+    temp_file.stream().write(reinterpret_cast<const char*>(data.data()), sizeof(E) * data.size());
+    temp_file.stream().close();
+    in_memory_partition_table_accessor<E> accessor{temp_file.name()};
+    std::pmr::monotonic_buffer_resource alloc;
+    auto v = accessor.host_view(&alloc, 1, 1);
+    REQUIRE(v.size() == 1);
+    REQUIRE(v[0] == 12);
   }
 
   SECTION("we can write an accessor to a file") {
