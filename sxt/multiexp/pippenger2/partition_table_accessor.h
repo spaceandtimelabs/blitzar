@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <string_view>
 #include <memory>
+#include <string_view>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"

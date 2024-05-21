@@ -165,10 +165,10 @@ void partition_product(basct::span<T> products, const partition_table_accessor<T
       // clang-format on
   );
   std::pmr::monotonic_buffer_resource alloc;
-  
+
   auto partition_table = accessor.host_view(&alloc, offset, n);
 
-  for (unsigned product_index=0; product_index<num_products; ++product_index) {
+  for (unsigned product_index = 0; product_index < num_products; ++product_index) {
     auto byte_index = product_index / 8u;
     auto bit_offset = product_index % 8u;
     partition_product_kernel<T>(products.data(), partition_table.data(), scalars.data(), byte_index,

@@ -46,7 +46,6 @@ TEST_CASE("we can compute multi-exponentiations with a fixed set of generators")
       0x456_c21,
   };
 
-
   SECTION("we can compute a multiexponentiation with the gpu backend") {
     cbn::reset_backend_for_testing();
     const sxt_config config = {SXT_GPU_BACKEND, 0};
