@@ -27,6 +27,7 @@
 #include "sxt/base/error/panic.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/pinned_resource.h"
+#include "sxt/multiexp/pippenger2/constants.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 
 namespace sxt::mtxpp2 {
@@ -35,7 +36,6 @@ namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 class in_memory_partition_table_accessor final : public partition_table_accessor<T> {
-  static constexpr unsigned num_entries = 1u << 16u;
 
 public:
   explicit in_memory_partition_table_accessor(std::string_view filename) noexcept
@@ -58,16 +58,16 @@ public:
 
   void async_copy_to_device(basct::span<T> dest, bast::raw_stream_t stream,
                             unsigned first) const noexcept override {
-    SXT_RELEASE_ASSERT(table_.size() >= dest.size() + first * num_entries);
+    SXT_RELEASE_ASSERT(table_.size() >= dest.size() + first * partition_table_size_v);
     SXT_DEBUG_ASSERT(basdv::is_active_device_pointer(dest.data()));
-    basdv::async_copy_host_to_device(dest, basct::subspan(table_, first * num_entries, dest.size()),
-                                     stream);
+    basdv::async_copy_host_to_device(
+        dest, basct::subspan(table_, first * partition_table_size_v, dest.size()), stream);
   }
 
   basct::cspan<T> host_view(std::pmr::polymorphic_allocator<> /*alloc*/, unsigned first,
                             unsigned size) const noexcept override {
-    SXT_RELEASE_ASSERT(table_.size() >= size + first * num_entries);
-    return basct::subspan(table_, first * num_entries, size);
+    SXT_RELEASE_ASSERT(table_.size() >= size + first * partition_table_size_v);
+    return basct::subspan(table_, first * partition_table_size_v, size);
   }
 
   void write_to_file(std::string_view filename) const noexcept override {

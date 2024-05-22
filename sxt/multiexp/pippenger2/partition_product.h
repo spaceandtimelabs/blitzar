@@ -33,6 +33,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
+#include "sxt/multiexp/pippenger2/constants.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 
 namespace sxt::mtxpp2 {
@@ -104,7 +105,6 @@ xena::future<> async_partition_product(basct::span<T> products,
   auto num_products = products.size();
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products);
   auto num_partitions = basn::divide_up(n, 16u);
-  constexpr auto num_table_entries = 1u << 16u;
   SXT_DEBUG_ASSERT(
       // clang-format off
       offset % 16u == 0 &&
@@ -124,7 +124,7 @@ xena::future<> async_partition_product(basct::span<T> products,
   // partition_table
   basdv::stream stream;
   memr::async_device_resource resource{stream};
-  memmg::managed_array<T> partition_table{num_partitions * num_table_entries, &resource};
+  memmg::managed_array<T> partition_table{num_partitions * partition_table_size_v, &resource};
   accessor.async_copy_to_device(partition_table, stream, offset / 16u);
   co_await std::move(scalars_fut);
 
@@ -159,7 +159,7 @@ void partition_product(basct::span<T> products, const partition_table_accessor<T
                        basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
   auto num_products = products.size();
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products);
-  constexpr auto num_table_entries = 1u << 16u;
+  constexpr auto partition_table_size_v = 1u << 16u;
   SXT_DEBUG_ASSERT(
       // clang-format off
       offset % 16u == 0
@@ -168,7 +168,7 @@ void partition_product(basct::span<T> products, const partition_table_accessor<T
   std::pmr::monotonic_buffer_resource alloc;
 
   auto partition_table =
-      accessor.host_view(&alloc, offset, basn::divide_up(n, 16u) * num_table_entries);
+      accessor.host_view(&alloc, offset, basn::divide_up(n, 16u) * partition_table_size_v);
 
   for (unsigned product_index = 0; product_index < num_products; ++product_index) {
     auto byte_index = product_index / 8u;
