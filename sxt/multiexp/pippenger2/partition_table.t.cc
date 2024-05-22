@@ -21,6 +21,7 @@
 #include "sxt/base/bit/iteration.h"
 #include "sxt/base/curve/example_element.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/multiexp/pippenger2/constants.h"
 
 using namespace sxt;
 using namespace sxt::mtxpp2;
@@ -44,13 +45,12 @@ TEST_CASE("we can compute a slice of the partition table") {
 TEST_CASE("we can compute the full partition table") {
   using E = bascrv::element97;
   auto n = 2u;
-  auto num_entries = 1u << 16u;
-  std::vector<E> sums(num_entries * n);
+  std::vector<E> sums(partition_table_size_v * n);
   std::vector<E> generators(16u * n);
   for (unsigned i = 0; i < generators.size(); ++i) {
     generators[i] = i + 1u;
   }
   compute_partition_table<E>(sums, generators);
   REQUIRE(sums[1] == generators[0]);
-  REQUIRE(sums[num_entries + 1] == generators[16]);
+  REQUIRE(sums[partition_table_size_v + 1] == generators[16]);
 }

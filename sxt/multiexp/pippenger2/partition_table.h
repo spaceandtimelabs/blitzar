@@ -23,6 +23,7 @@
 #include "sxt/base/curve/element.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/multiexp/pippenger2/constants.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -70,16 +71,15 @@ CUDA_CALLABLE void compute_partition_table_slice(T* __restrict__ sums,
  */
 template <bascrv::element T>
 void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) noexcept {
-  auto num_entries = 1u << 16u;
   SXT_DEBUG_ASSERT(
       // clang-format off
-     sums.size() == num_entries * generators.size() / 16u &&
+     sums.size() == partition_table_size_v * generators.size() / 16u &&
      generators.size() % 16 == 0
       // clang-format on
   );
   auto n = generators.size() / 16u;
   for (unsigned i = 0; i < n; ++i) {
-    auto sums_slice = sums.subspan(i * num_entries, num_entries);
+    auto sums_slice = sums.subspan(i * partition_table_size_v, partition_table_size_v);
     auto generators_slice = generators.subspan(i * 16u, 16u);
     compute_partition_table_slice<T>(sums_slice.data(), generators_slice.data());
   }

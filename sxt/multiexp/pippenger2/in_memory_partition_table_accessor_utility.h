@@ -43,8 +43,8 @@ make_in_memory_partition_table_accessor(basct::cspan<T> generators) noexcept {
     std::fill(iter, generators_data.end(), T::identity());
     generators = generators_data;
   }
-  auto num_entries = 1u << 16u;
-  memmg::managed_array<T> sums{num_entries * num_partitions, memr::get_pinned_resource()};
+  memmg::managed_array<T> sums{partition_table_size_v * num_partitions,
+                               memr::get_pinned_resource()};
   compute_partition_table<T>(sums, generators);
   return std::make_unique<in_memory_partition_table_accessor<T>>(std::move(sums));
 }

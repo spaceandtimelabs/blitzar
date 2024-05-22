@@ -70,7 +70,7 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<T
   // compute bitwise products
   basl::info("computing {} bitwise multiexponentiation products of length {}", num_products, n);
   memmg::managed_array<T> products(num_products, memr::get_device_resource());
-  co_await partition_product<T>(products, accessor, scalars, 0);
+  co_await async_partition_product<T>(products, accessor, scalars, 0);
 
   // reduce products
   basl::info("reducing {} products to {} outputs", num_products, num_products);
@@ -155,7 +155,7 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
         memmg::managed_array<T> products_dev{num_products, memr::get_device_resource()};
         auto scalars_slice = scalars.subspan(num_outputs * element_num_bytes * rng.a(),
                                              rng.size() * num_outputs * element_num_bytes);
-        co_await partition_product<T>(products_dev, accessor, scalars_slice, rng.a());
+        co_await async_partition_product<T>(products_dev, accessor, scalars_slice, rng.a());
         basdv::stream stream;
         basdv::async_copy_device_to_host(
             basct::subspan(products, num_products * chunk_index, num_products), products_dev,
@@ -180,7 +180,7 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
 }
 
 //--------------------------------------------------------------------------------------------------
-// multiexponentiate
+// async_multiexponentiate
 //--------------------------------------------------------------------------------------------------
 /**
  * Compute a multi-exponentiation using an accessor to precompute sums of partition groups.
@@ -189,11 +189,39 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
  * https://cacr.uwaterloo.ca/techreports/2010/cacr2010-26.pdf
  */
 template <bascrv::element T>
-xena::future<> multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
-                                 unsigned element_num_bytes,
-                                 basct::cspan<uint8_t> scalars) noexcept {
+xena::future<>
+async_multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
+                        unsigned element_num_bytes, basct::cspan<uint8_t> scalars) noexcept {
   multiexponentiate_options options;
   options.split_factor = static_cast<unsigned>(basdv::get_num_devices());
   return multiexponentiate_impl(res, accessor, element_num_bytes, scalars, options);
+}
+
+//--------------------------------------------------------------------------------------------------
+// multiexponentiate
+//--------------------------------------------------------------------------------------------------
+/**
+ * Host version of async_multiexponentiate.
+ */
+template <bascrv::element T>
+void multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
+                       unsigned element_num_bytes, basct::cspan<uint8_t> scalars) noexcept {
+  auto num_outputs = res.size();
+  auto n = scalars.size() / (num_outputs * element_num_bytes);
+  auto num_products = num_outputs * element_num_bytes * 8u;
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      scalars.size() % (num_outputs * element_num_bytes) == 0
+      // clang-format on
+  );
+
+  // compute bitwise products
+  basl::info("computing {} bitwise multiexponentiation products of length {}", num_products, n);
+  memmg::managed_array<T> products(num_products);
+  partition_product<T>(products, accessor, scalars, 0);
+
+  // reduce products
+  basl::info("reducing {} products to {} outputs", num_products, num_products);
+  reduce_products<T>(res, products);
 }
 } // namespace sxt::mtxpp2

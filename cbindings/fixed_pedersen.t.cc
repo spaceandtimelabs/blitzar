@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "cbindings/backend.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
@@ -45,13 +46,28 @@ TEST_CASE("we can compute multi-exponentiations with a fixed set of generators")
       0x456_c21,
   };
 
-  const sxt_config config = {SXT_GPU_BACKEND, 0};
-  REQUIRE(sxt_init(&config) == 0);
+  SECTION("we can compute a multiexponentiation with the gpu backend") {
+    cbn::reset_backend_for_testing();
+    const sxt_config config = {SXT_GPU_BACKEND, 0};
+    REQUIRE(sxt_init(&config) == 0);
 
-  wrapped_handle h{generators.data(), 2};
-  REQUIRE(h.h != nullptr);
+    wrapped_handle h{generators.data(), 2};
+    REQUIRE(h.h != nullptr);
 
-  SECTION("we can compute a multiexponentiation") {
+    uint8_t scalars[] = {1, 0, 0, 2};
+    c21t::element_p3 res;
+    sxt_fixed_multiexponentiation(&res, h.h, 2, 1, 2, scalars);
+    REQUIRE(res == generators[0] + 2 * 256 * generators[1]);
+  }
+
+  SECTION("we can compute a multiexponentiation with the cpu backend") {
+    cbn::reset_backend_for_testing();
+    const sxt_config config = {SXT_CPU_BACKEND, 0};
+    REQUIRE(sxt_init(&config) == 0);
+
+    wrapped_handle h{generators.data(), 2};
+    REQUIRE(h.h != nullptr);
+
     uint8_t scalars[] = {1, 0, 0, 2};
     c21t::element_p3 res;
     sxt_fixed_multiexponentiation(&res, h.h, 2, 1, 2, scalars);

@@ -68,6 +68,7 @@ sxt_cc_component(
     name = "cpu_backend",
     impl_deps = [
         "//sxt/base/error:panic",
+        "//sxt/cbindings/base:curve_id_utility",
         "//sxt/proof/transcript:transcript",
         "//sxt/scalar25/type:element",
         "//sxt/curve_bng1/operation:add",
@@ -89,6 +90,7 @@ sxt_cc_component(
         "//sxt/execution/async:future",
         "//sxt/execution/schedule:scheduler",
         "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/pippenger2:multiexponentiation",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/ristretto/operation:compression",
         "//sxt/multiexp/base:exponent_sequence",

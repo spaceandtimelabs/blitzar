@@ -16,6 +16,7 @@
  */
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor.h"
 
+#include <memory_resource>
 #include <vector>
 
 #include "sxt/base/curve/example_element.h"
@@ -41,7 +42,7 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
     temp_file.stream().close();
     in_memory_partition_table_accessor<E> accessor{temp_file.name()};
     memmg::managed_array<E> v_dev{1, memr::get_device_resource()};
-    accessor.async_copy_precomputed_sums_to_device(v_dev, stream, 0);
+    accessor.async_copy_to_device(v_dev, stream, 0);
     std::vector<E> v(1);
     basdv::async_copy_device_to_host(v, v_dev, stream);
     basdv::synchronize_stream(stream);
@@ -50,13 +51,13 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
   }
 
   SECTION("we can access a elements with offset") {
-    std::vector<E> data((1u << 16u) * 2);
+    std::vector<E> data(partition_table_size_v * 2);
     data[1u << 16u] = 12u;
     temp_file.stream().write(reinterpret_cast<const char*>(data.data()), sizeof(E) * data.size());
     temp_file.stream().close();
     in_memory_partition_table_accessor<E> accessor{temp_file.name()};
     memmg::managed_array<E> v_dev{1, memr::get_device_resource()};
-    accessor.async_copy_precomputed_sums_to_device(v_dev, stream, 1);
+    accessor.async_copy_to_device(v_dev, stream, 1);
     std::vector<E> v(1);
     basdv::async_copy_device_to_host(v, v_dev, stream);
     basdv::synchronize_stream(stream);
@@ -64,8 +65,20 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
     REQUIRE(v == expected);
   }
 
+  SECTION("we can access elements from the host") {
+    std::vector<E> data(partition_table_size_v * 2);
+    data[partition_table_size_v] = 12;
+    temp_file.stream().write(reinterpret_cast<const char*>(data.data()), sizeof(E) * data.size());
+    temp_file.stream().close();
+    in_memory_partition_table_accessor<E> accessor{temp_file.name()};
+    std::pmr::monotonic_buffer_resource alloc;
+    auto v = accessor.host_view(&alloc, 1, 1);
+    REQUIRE(v.size() == 1);
+    REQUIRE(v[0] == 12);
+  }
+
   SECTION("we can write an accessor to a file") {
-    memmg::managed_array<E> data((1u << 16u) * 2);
+    memmg::managed_array<E> data(partition_table_size_v * 2);
     unsigned cnt = 0;
     for (auto& val : data) {
       val = cnt++;
@@ -75,7 +88,7 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
     accessor.write_to_file(temp_file.name());
     in_memory_partition_table_accessor<E> accessor_p{temp_file.name()};
     memmg::managed_array<E> data_dev{data.size(), memr::get_device_resource()};
-    accessor_p.async_copy_precomputed_sums_to_device(data_dev, stream, 0);
+    accessor_p.async_copy_to_device(data_dev, stream, 0);
     memmg::managed_array<E> data_p(data.size());
     basdv::async_copy_device_to_host(data_p, data_dev, stream);
     basdv::synchronize_stream(stream);

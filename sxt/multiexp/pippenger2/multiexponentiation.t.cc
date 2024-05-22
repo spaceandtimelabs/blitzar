@@ -50,7 +50,7 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
   std::vector<E> res(1);
 
   SECTION("we can compute a multiexponentiation with a zero scalar") {
-    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    auto fut = async_multiexponentiate<E>(res, *accessor, 1, scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == E::identity());
@@ -58,7 +58,7 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
 
   SECTION("we can compute a multiexponentiation multiexponentiation with a scalar of one") {
     scalars[0] = 1;
-    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    auto fut = async_multiexponentiate<E>(res, *accessor, 1, scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == generators[0]);
@@ -66,7 +66,7 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
 
   SECTION("we can compute a multiexponentiation with a scalar of two") {
     scalars[0] = 2;
-    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    auto fut = async_multiexponentiate<E>(res, *accessor, 1, scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 2u * generators[0].value);
@@ -74,7 +74,7 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
 
   SECTION("we can compute a multiexponentiation with a scalar of three") {
     scalars[0] = 3;
-    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    auto fut = async_multiexponentiate<E>(res, *accessor, 1, scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 3u * generators[0].value);
@@ -84,7 +84,7 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     scalars.resize(2);
     scalars[0] = 1;
     scalars[1] = 1;
-    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    auto fut = async_multiexponentiate<E>(res, *accessor, 1, scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == generators[0].value + generators[1].value);
@@ -94,7 +94,7 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     scalars.resize(17);
     scalars[0] = 1;
     scalars[16] = 1;
-    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    auto fut = async_multiexponentiate<E>(res, *accessor, 1, scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == generators[0].value + generators[16].value);
@@ -105,9 +105,19 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     scalars.resize(2);
     scalars[0] = 1u;
     scalars[1] = 2u;
-    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    auto fut = async_multiexponentiate<E>(res, *accessor, 1, scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
+    REQUIRE(res[0] == generators[0].value);
+    REQUIRE(res[1] == 2u * generators[0].value);
+  }
+
+  SECTION("we can compute a multiexponentiation on the host") {
+    res.resize(2);
+    scalars.resize(2);
+    scalars[0] = 1u;
+    scalars[1] = 2u;
+    multiexponentiate<E>(res, *accessor, 1, scalars);
     REQUIRE(res[0] == generators[0].value);
     REQUIRE(res[1] == 2u * generators[0].value);
   }
@@ -161,7 +171,7 @@ TEST_CASE("we can compute multiexponentiations with curve-21") {
 
   SECTION("we can compute a multiexponentiation multiexponentiation with a scalar of one") {
     scalars[0] = 1;
-    auto fut = multiexponentiate<E>(res, *accessor, 1, scalars);
+    auto fut = async_multiexponentiate<E>(res, *accessor, 1, scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == generators[0]);

@@ -21,6 +21,7 @@
 
 #include "sxt/base/error/assert.h"
 #include "sxt/base/error/panic.h"
+#include "sxt/cbindings/base/curve_id_utility.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/operation/neg.h"
@@ -40,6 +41,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/curve/multiexponentiation.h"
+#include "sxt/multiexp/pippenger2/multiexponentiation.h"
 #include "sxt/proof/inner_product/cpu_driver.h"
 #include "sxt/proof/inner_product/proof_computation.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
@@ -126,13 +128,14 @@ void cpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
                                             const mtxpp2::partition_table_accessor_base& accessor,
                                             unsigned element_num_bytes, unsigned num_outputs,
                                             unsigned n, const uint8_t* scalars) const noexcept {
-  (void)res;
-  (void)curve_id;
-  (void)accessor;
-  (void)num_outputs;
-  (void)n;
-  (void)scalars;
-  baser::panic("not implemented yet");
+  cbnb::switch_curve_type(curve_id, [&]<class T>(std::type_identity<T>) noexcept {
+    basct::span<T> res_span{static_cast<T*>(res), num_outputs};
+    basct::cspan<uint8_t> scalars_span{scalars, element_num_bytes * num_outputs * n};
+    mtxpp2::multiexponentiate<T>(res_span,
+                                 static_cast<const mtxpp2::partition_table_accessor<T>&>(accessor),
+                                 element_num_bytes, scalars_span);
+    xens::get_scheduler().run();
+  });
 }
 
 //--------------------------------------------------------------------------------------------------
