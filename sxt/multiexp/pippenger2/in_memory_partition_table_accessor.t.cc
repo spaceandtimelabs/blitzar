@@ -51,7 +51,7 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
   }
 
   SECTION("we can access a elements with offset") {
-    std::vector<E> data((1u << 16u) * 2);
+    std::vector<E> data(partition_table_size_v * 2);
     data[1u << 16u] = 12u;
     temp_file.stream().write(reinterpret_cast<const char*>(data.data()), sizeof(E) * data.size());
     temp_file.stream().close();
@@ -66,8 +66,8 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
   }
 
   SECTION("we can access elements from the host") {
-    std::vector<E> data((1u << 16u) * 2);
-    data[1u << 16u] = 12;
+    std::vector<E> data(partition_table_size_v * 2);
+    data[partition_table_size_v] = 12;
     temp_file.stream().write(reinterpret_cast<const char*>(data.data()), sizeof(E) * data.size());
     temp_file.stream().close();
     in_memory_partition_table_accessor<E> accessor{temp_file.name()};
@@ -78,7 +78,7 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
   }
 
   SECTION("we can write an accessor to a file") {
-    memmg::managed_array<E> data((1u << 16u) * 2);
+    memmg::managed_array<E> data(partition_table_size_v * 2);
     unsigned cnt = 0;
     for (auto& val : data) {
       val = cnt++;

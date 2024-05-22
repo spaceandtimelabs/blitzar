@@ -159,7 +159,6 @@ void partition_product(basct::span<T> products, const partition_table_accessor<T
                        basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
   auto num_products = products.size();
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products);
-  constexpr auto partition_table_size_v = 1u << 16u;
   SXT_DEBUG_ASSERT(
       // clang-format off
       offset % 16u == 0
