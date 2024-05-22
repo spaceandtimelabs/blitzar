@@ -19,7 +19,6 @@
 #include <cerrno>
 #include <cstring>
 #include <fstream>
-#include <print>
 #include <string_view>
 
 #include "sxt/base/container/span_utility.h"
