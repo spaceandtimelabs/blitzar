@@ -21,8 +21,8 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
-#include "sxt/base/num/divide_up.h"
 #include "sxt/base/memory/alloc.h"
+#include "sxt/base/num/divide_up.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor.h"
 #include "sxt/multiexp/pippenger2/partition_table.h"

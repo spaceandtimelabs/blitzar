@@ -141,8 +141,8 @@ sxt_cc_component(
         ":partition_table",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
-        "//sxt/base/num:divide_up",
         "//sxt/base/memory:alloc",
+        "//sxt/base/num:divide_up",
         "//sxt/memory/resource:pinned_resource",
     ],
 )
