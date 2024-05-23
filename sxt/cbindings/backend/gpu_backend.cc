@@ -41,6 +41,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/multiexp/curve/multiexponentiation.h"
+#include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
 #include "sxt/multiexp/pippenger2/multiexponentiation.h"
 #include "sxt/proof/inner_product/gpu_driver.h"
 #include "sxt/proof/inner_product/proof_computation.h"
@@ -156,6 +157,20 @@ bool gpu_backend::verify_inner_product(prft::transcript& transcript,
                                          r_vector, ap_value);
   xens::get_scheduler().run();
   return fut.value();
+}
+
+//--------------------------------------------------------------------------------------------------
+// make_partition_table_accessor
+//--------------------------------------------------------------------------------------------------
+std::unique_ptr<mtxpp2::partition_table_accessor_base>
+gpu_backend::make_partition_table_accessor(cbnb::curve_id_t curve_id, const void* generators,
+                                           unsigned n) const noexcept {
+  std::unique_ptr<mtxpp2::partition_table_accessor_base> res;
+  cbnb::switch_curve_type(curve_id, [&]<class T>(std::type_identity<T>) noexcept {
+    res = mtxpp2::make_in_memory_partition_table_accessor<T>(
+        basct::cspan<T>{static_cast<const T*>(generators), n});
+  });
+  return res;
 }
 
 //--------------------------------------------------------------------------------------------------

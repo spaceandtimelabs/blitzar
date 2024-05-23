@@ -51,6 +51,7 @@ sxt_cc_component(
         "//sxt/ristretto/operation:compression",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/curve:multiexponentiation",
+        "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
         "//sxt/multiexp/pippenger2:multiexponentiation",
         "//sxt/seqcommit/generator:precomputed_generators",
         "//sxt/proof/inner_product:proof_descriptor",
