@@ -142,6 +142,7 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
         "//sxt/base/num:divide_up",
+        "//sxt/base/memory:alloc",
         "//sxt/memory/resource:pinned_resource",
     ],
 )
