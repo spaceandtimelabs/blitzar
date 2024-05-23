@@ -5,10 +5,6 @@ load(
 
 sxt_cc_component(
     name = "computational_backend",
-    impl_deps = [
-        "//sxt/cbindings/base:curve_id_utility",
-        "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
-    ],
     with_test = False,
     deps = [
         "//sxt/base/container:span",
@@ -51,6 +47,7 @@ sxt_cc_component(
         "//sxt/ristretto/operation:compression",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/curve:multiexponentiation",
+        "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
         "//sxt/multiexp/pippenger2:multiexponentiation",
         "//sxt/seqcommit/generator:precomputed_generators",
         "//sxt/proof/inner_product:proof_descriptor",
@@ -90,6 +87,7 @@ sxt_cc_component(
         "//sxt/execution/async:future",
         "//sxt/execution/schedule:scheduler",
         "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
         "//sxt/multiexp/pippenger2:multiexponentiation",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/ristretto/operation:compression",

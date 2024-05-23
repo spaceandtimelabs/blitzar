@@ -97,7 +97,7 @@ public:
 
   virtual std::unique_ptr<mtxpp2::partition_table_accessor_base>
   make_partition_table_accessor(cbnb::curve_id_t curve_id, const void* generators,
-                                unsigned n) const noexcept;
+                                unsigned n) const noexcept = 0;
 
   virtual void fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id,
                                          const mtxpp2::partition_table_accessor_base& accessor,
