@@ -90,6 +90,7 @@ sxt_cc_component(
         "//sxt/execution/async:future",
         "//sxt/execution/schedule:scheduler",
         "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
         "//sxt/multiexp/pippenger2:multiexponentiation",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/ristretto/operation:compression",
