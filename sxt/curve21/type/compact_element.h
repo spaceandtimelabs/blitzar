@@ -8,13 +8,13 @@ namespace sxt::c21t {
 //--------------------------------------------------------------------------------------------------
 // compact_element
 //--------------------------------------------------------------------------------------------------
-struct element_affine {
+struct compact_element {
   f51t::element X;
   f51t::element Y;
   f51t::element T;
 
-  static constexpr element_affine identity() noexcept {
-    return element_affine{f51cn::zero_v, f51cn::one_v, f51cn::one_v};
+  static constexpr compact_element identity() noexcept {
+    return compact_element{f51cn::zero_v, f51cn::one_v, f51cn::one_v};
   }
 };
 } // namespace sxt::c21t
