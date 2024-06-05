@@ -137,6 +137,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "element_p3",
     impl_deps = [
+        "//sxt/field51/operation:invert",
         "//sxt/field51/operation:mul",
     ],
     with_test = False,
