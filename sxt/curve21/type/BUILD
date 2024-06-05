@@ -101,6 +101,14 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "element_affine",
+    with_test = False,
+    deps = [
+        "//sxt/field51/type:element",
+    ],
+)
+
+sxt_cc_component(
     name = "element_cached",
     with_test = False,
     deps = [
