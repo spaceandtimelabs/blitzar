@@ -101,10 +101,12 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "element_affine",
+    name = "compact_element",
     with_test = False,
     deps = [
         "//sxt/field51/type:element",
+        "//sxt/field51/constant:one",
+        "//sxt/field51/constant:zero",
     ],
 )
 
@@ -139,7 +141,6 @@ sxt_cc_component(
     ],
     with_test = False,
     deps = [
-        ":element_affine",
         ":operation_adl_stub",
         "//sxt/field51/constant:one",
         "//sxt/field51/constant:zero",

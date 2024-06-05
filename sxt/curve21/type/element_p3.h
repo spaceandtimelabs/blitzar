@@ -18,7 +18,6 @@
 
 #include <iosfwd>
 
-#include "sxt/curve21/type/element_affine.h"
 #include "sxt/curve21/type/operation_adl_stub.h"
 #include "sxt/field51/constant/one.h"
 #include "sxt/field51/constant/zero.h"
