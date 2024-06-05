@@ -140,7 +140,6 @@ sxt_cc_component(
         "//sxt/field51/operation:invert",
         "//sxt/field51/operation:mul",
     ],
-    with_test = False,
     deps = [
         ":compact_element",
         ":operation_adl_stub",
