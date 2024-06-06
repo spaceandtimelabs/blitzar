@@ -40,7 +40,7 @@ struct element_p3 : c21o::operation_adl_stub {
       : X{X}, Y{Y}, Z{Z}, T{T} {}
 
   explicit element_p3(const compact_element& e) noexcept
-    : X{e.X}, Y{e.Y}, Z{f51cn::one_v}, T{e.T} {}
+      : X{e.X}, Y{e.Y}, Z{f51cn::one_v}, T{e.T} {}
 
   explicit operator compact_element() const noexcept;
 

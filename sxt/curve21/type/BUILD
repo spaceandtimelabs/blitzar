@@ -104,9 +104,9 @@ sxt_cc_component(
     name = "compact_element",
     with_test = False,
     deps = [
-        "//sxt/field51/type:element",
         "//sxt/field51/constant:one",
         "//sxt/field51/constant:zero",
+        "//sxt/field51/type:element",
     ],
 )
 
