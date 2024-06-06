@@ -33,7 +33,7 @@ struct compact_element {
   f51t::element T;
 
   static constexpr compact_element identity() noexcept {
-    return compact_element{f51cn::zero_v, f51cn::one_v, f51cn::one_v};
+    return compact_element{f51cn::zero_v, f51cn::one_v, f51cn::zero_v};
   }
 };
 } // namespace sxt::c21t

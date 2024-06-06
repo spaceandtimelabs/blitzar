@@ -23,7 +23,7 @@ using namespace sxt;
 using namespace sxt::c21t;
 using sxt::f51t::operator""_f51;
 
-TEST_CASE("todo") {
+TEST_CASE("we can convert between compact_elements") {
   element_p3 e{0x3b6f8891960f6ad45776d1e1213c1bd9de44f888163a76921515e6cf9f3fd67e_f51,
                0x336d9ece4cdb30925921f40f14dab827d6e156675107378db6d34c9a874a007e_f51,
                0x59e4ea1a52a20ea2fd9cb81712f675b450b27bff31b598ba722d5b0bf61c8608_f51,
@@ -37,6 +37,10 @@ TEST_CASE("todo") {
 
   SECTION("we can convert the identity from compact form") {
     element_p3 i{compact_element::identity()};
-    REQUIRE(i == element_p3::identity());
+    auto ip = element_p3::identity();
+    REQUIRE(ip.X == i.X);
+    REQUIRE(ip.Y == i.Y);
+    REQUIRE(ip.Z == i.Z);
+    REQUIRE(ip.T == i.T);
   }
 }
