@@ -33,7 +33,7 @@ namespace sxt::f51o {
 //--------------------------------------------------------------------------------------------------
 // invert
 //--------------------------------------------------------------------------------------------------
-void invert(f51t::element& out, const f51t::element& z) noexcept {
+CUDA_CALLABLE void invert(f51t::element& out, const f51t::element& z) noexcept {
   f51t::element t0, t1, t2, t3;
   int i;
 

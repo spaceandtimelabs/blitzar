@@ -30,7 +30,7 @@ constexpr uint64_t unset_marker_v = static_cast<uint64_t>(-1);
 //--------------------------------------------------------------------------------------------------
 // operator conversion
 //--------------------------------------------------------------------------------------------------
-element_p3::operator compact_element() const noexcept {
+CUDA_CALLABLE element_p3::operator compact_element() const noexcept {
   f51t::element Z_inv;
   f51o::invert(Z_inv, this->Z);
   f51t::element Xp, Yp, Tp;

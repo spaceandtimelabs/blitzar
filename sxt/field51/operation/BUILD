@@ -107,6 +107,9 @@ sxt_cc_component(
         ":sq",
         "//sxt/field51/type:element",
     ],
+    deps = [
+      "//sxt/base/macro:cuda_callable",
+    ],
     test_deps = [
         ":mul",
         "//sxt/base/test:unit_test",
