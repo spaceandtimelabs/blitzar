@@ -18,6 +18,8 @@
 
 #include <iosfwd>
 
+#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/curve21/type/compact_element.h"
 #include "sxt/curve21/type/operation_adl_stub.h"
 #include "sxt/field51/constant/one.h"
 #include "sxt/field51/constant/zero.h"
@@ -36,6 +38,11 @@ struct element_p3 : c21o::operation_adl_stub {
   constexpr element_p3(const f51t::element& X, const f51t::element& Y, const f51t::element& Z,
                        const f51t::element& T) noexcept
       : X{X}, Y{Y}, Z{Z}, T{T} {}
+
+  constexpr explicit element_p3(const compact_element& e) noexcept
+      : X{e.X}, Y{e.Y}, Z{f51cn::one_v}, T{e.T} {}
+
+  CUDA_CALLABLE explicit operator compact_element() const noexcept;
 
   f51t::element X;
   f51t::element Y;

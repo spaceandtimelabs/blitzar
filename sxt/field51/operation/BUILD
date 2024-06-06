@@ -113,6 +113,9 @@ sxt_cc_component(
         "//sxt/field51/type:element",
         "//sxt/field51/type:literal",
     ],
+    deps = [
+        "//sxt/base/macro:cuda_callable",
+    ],
 )
 
 sxt_cc_component(

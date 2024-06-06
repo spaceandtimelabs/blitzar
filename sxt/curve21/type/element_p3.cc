@@ -18,6 +18,7 @@
 
 #include <iostream>
 
+#include "sxt/field51/operation/invert.h"
 #include "sxt/field51/operation/mul.h"
 
 namespace sxt::c21t {
@@ -25,6 +26,19 @@ namespace sxt::c21t {
 // unset_marker_v
 //--------------------------------------------------------------------------------------------------
 constexpr uint64_t unset_marker_v = static_cast<uint64_t>(-1);
+
+//--------------------------------------------------------------------------------------------------
+// operator conversion
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE element_p3::operator compact_element() const noexcept {
+  f51t::element Z_inv;
+  f51o::invert(Z_inv, this->Z);
+  f51t::element Xp, Yp, Tp;
+  f51o::mul(Xp, this->X, Z_inv);
+  f51o::mul(Yp, this->Y, Z_inv);
+  f51o::mul(Tp, Xp, Yp);
+  return compact_element{Xp, Yp, Tp};
+}
 
 //--------------------------------------------------------------------------------------------------
 // mark

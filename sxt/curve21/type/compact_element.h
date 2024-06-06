@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,24 @@
  */
 #pragma once
 
-#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/field51/constant/one.h"
+#include "sxt/field51/constant/zero.h"
+#include "sxt/field51/type/element.h"
 
-namespace sxt::f51t {
-class element;
-}
-
-namespace sxt::f51o {
+namespace sxt::c21t {
 //--------------------------------------------------------------------------------------------------
-// invert
+// compact_element
 //--------------------------------------------------------------------------------------------------
-/*
- * Inversion - returns 0 if z=0
+/**
+ *  point (X,Y) and T = XY
  */
-CUDA_CALLABLE void invert(f51t::element& out, const f51t::element& z) noexcept;
-} // namespace sxt::f51o
+struct compact_element {
+  f51t::element X;
+  f51t::element Y;
+  f51t::element T;
+
+  static constexpr compact_element identity() noexcept {
+    return compact_element{f51cn::zero_v, f51cn::one_v, f51cn::zero_v};
+  }
+};
+} // namespace sxt::c21t
