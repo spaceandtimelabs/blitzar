@@ -143,6 +143,7 @@ sxt_cc_component(
     deps = [
         ":compact_element",
         ":operation_adl_stub",
+        "//sxt/base/macro:cuda_callable",
         "//sxt/field51/constant:one",
         "//sxt/field51/constant:zero",
         "//sxt/field51/type:element",

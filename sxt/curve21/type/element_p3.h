@@ -18,6 +18,7 @@
 
 #include <iosfwd>
 
+#include "sxt/base/macro/cuda_callable.h"
 #include "sxt/curve21/type/compact_element.h"
 #include "sxt/curve21/type/operation_adl_stub.h"
 #include "sxt/field51/constant/one.h"
