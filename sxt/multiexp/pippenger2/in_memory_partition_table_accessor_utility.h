@@ -31,8 +31,12 @@ namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 // make_in_memory_partition_table_accessor
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
-std::unique_ptr<partition_table_accessor<T>> make_in_memory_partition_table_accessor(
+template <class U, bascrv::element T>
+  requires requires(const U& u, const T& e) {
+    static_cast<U>(e);
+    T{u};
+  }
+std::unique_ptr<partition_table_accessor<U>> make_in_memory_partition_table_accessor(
     basct::cspan<T> generators, basm::alloc_t alloc = memr::get_pinned_resource()) noexcept {
   auto n = generators.size();
   std::vector<T> generators_data;
@@ -48,4 +52,10 @@ std::unique_ptr<partition_table_accessor<T>> make_in_memory_partition_table_acce
   compute_partition_table<T>(sums, generators);
   return std::make_unique<in_memory_partition_table_accessor<T>>(std::move(sums));
 }
+
+/* template <bascrv::element T> */
+/* std::unique_ptr<partition_table_accessor<T>> make_in_memory_partition_table_accessor( */
+/*     basct::cspan<T> generators, basm::alloc_t alloc = memr::get_pinned_resource()) noexcept { */
+/*   return make_in_memory_partition_table_accessor<T, T>(generators, alloc); */
+/* } */
 } // namespace sxt::mtxpp2

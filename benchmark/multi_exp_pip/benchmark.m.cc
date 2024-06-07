@@ -46,7 +46,8 @@ make_partition_table_accessor(unsigned n) noexcept {
   for (unsigned i = 0; i < n; ++i) {
     sqcgn::compute_base_element(generators[i], i);
   }
-  return mtxpp2::make_in_memory_partition_table_accessor<c21t::element_p3>(generators);
+  return mtxpp2::make_in_memory_partition_table_accessor<c21t::element_p3, c21t::element_p3>(
+      generators);
 }
 
 //--------------------------------------------------------------------------------------------------

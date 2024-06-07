@@ -44,7 +44,7 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     g = std::uniform_int_distribution<unsigned>{0, 96}(rng);
   }
 
-  auto accessor = make_in_memory_partition_table_accessor<E>(generators);
+  auto accessor = make_in_memory_partition_table_accessor<E, E>(generators);
 
   std::vector<uint8_t> scalars(1);
   std::vector<E> res(1);
@@ -164,7 +164,7 @@ TEST_CASE("we can compute multiexponentiations with curve-21") {
     rstrn::generate_random_element(g, rng);
   }
 
-  auto accessor = make_in_memory_partition_table_accessor<E>(generators);
+  auto accessor = make_in_memory_partition_table_accessor<E, E>(generators);
 
   std::vector<uint8_t> scalars(1);
   std::vector<E> res(1);
