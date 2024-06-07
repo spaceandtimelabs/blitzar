@@ -69,8 +69,11 @@ CUDA_CALLABLE void compute_partition_table_slice(T* __restrict__ sums,
  * Compute table of sums used for Pippenger's partition step with a width of 16. Each slice of the
  * table contains all possible sums of a group of 16 generators.
  */
-template <bascrv::element T>
-void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) noexcept {
+template <class U, bascrv::element T>
+  requires requires(const T& e) {
+    static_cast<U>(e);
+  }
+void compute_partition_table(basct::span<U> sums, basct::cspan<T> generators) noexcept {
   SXT_DEBUG_ASSERT(
       // clang-format off
      sums.size() == partition_table_size_v * generators.size() / 16u &&
@@ -83,5 +86,10 @@ void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) no
     auto generators_slice = generators.subspan(i * 16u, 16u);
     compute_partition_table_slice<T>(sums_slice.data(), generators_slice.data());
   }
+}
+
+template <bascrv::element T>
+void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) noexcept {
+  compute_partition_table<T, T>(sums, generators);
 }
 } // namespace sxt::mtxpp2
