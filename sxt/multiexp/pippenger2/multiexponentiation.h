@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <concepts>
 #include <iterator>
 
 #include "sxt/base/container/span.h"
@@ -203,8 +204,9 @@ async_multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& a
 /**
  * Host version of async_multiexponentiate.
  */
-template <bascrv::element T>
-void multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
+template <bascrv::element T, class U>
+   requires std::constructible_from<T, U> 
+void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& accessor,
                        unsigned element_num_bytes, basct::cspan<uint8_t> scalars) noexcept {
   auto num_outputs = res.size();
   auto n = scalars.size() / (num_outputs * element_num_bytes);

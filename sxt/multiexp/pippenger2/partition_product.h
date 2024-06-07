@@ -17,6 +17,7 @@
 #pragma once
 
 #include <algorithm>
+#include <concepts>
 #include <cstdint>
 #include <memory_resource>
 
@@ -61,9 +62,7 @@ CUDA_CALLABLE inline uint16_t compute_partition_index(const uint8_t* __restrict_
 // partition_product_kernel
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, class U>
-  requires requires(const U& u) {
-    T{u};
-  }
+  requires std::constructible_from<T, U>
 CUDA_CALLABLE void
 partition_product_kernel(T* __restrict__ products, const U* __restrict__ partition_table,
                          const uint8_t* __restrict__ scalars, unsigned byte_index,
@@ -102,9 +101,7 @@ partition_product_kernel(T* __restrict__ products, const U* __restrict__ partiti
  * precomputed sums for each group of generators.
  */
 template <bascrv::element T, class U>
-  requires requires (const U& u) {
-    T{u};
-  }
+  requires std::constructible_from<T, U>
 xena::future<> async_partition_product(basct::span<T> products,
                                        const partition_table_accessor<U>& accessor,
                                        basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
@@ -161,9 +158,7 @@ xena::future<> async_partition_product(basct::span<T> products,
  * precomputed sums for each group of generators.
  */
 template <bascrv::element T, class U>
-  requires requires (const U& u) {
-    T{u};
-  }
+  requires std::constructible_from<T, U>
 void partition_product(basct::span<T> products, const partition_table_accessor<U>& accessor,
                        basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
   auto num_products = products.size();
