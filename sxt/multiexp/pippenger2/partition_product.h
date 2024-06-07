@@ -60,9 +60,12 @@ CUDA_CALLABLE inline uint16_t compute_partition_index(const uint8_t* __restrict_
 //--------------------------------------------------------------------------------------------------
 // partition_product_kernel
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
+template <bascrv::element T, class U>
+  requires requires(const U& u) {
+    T{u};
+  }
 CUDA_CALLABLE void
-partition_product_kernel(T* __restrict__ products, const T* __restrict__ partition_table,
+partition_product_kernel(T* __restrict__ products, const U* __restrict__ partition_table,
                          const uint8_t* __restrict__ scalars, unsigned byte_index,
                          unsigned bit_offset, unsigned num_products, unsigned n) noexcept {
   constexpr unsigned num_partition_entries = 1u << 16u;
@@ -83,7 +86,7 @@ partition_product_kernel(T* __restrict__ products, const T* __restrict__ partiti
     scalars += 16u * step;
 
     partition_index = compute_partition_index(scalars, step, n, bit_offset);
-    auto e = partition_table[partition_index];
+    T e{partition_table[partition_index]};
     add_inplace(res, e);
   }
 
