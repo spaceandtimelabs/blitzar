@@ -178,4 +178,12 @@ TEST_CASE("we can compute multiexponentiations with curve-21") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == generators[0]);
   }
+
+  SECTION("we can compute a multi-exponentiation with an accessor using a different curve form") {
+    scalars[0] = 1;
+    auto fut = async_multiexponentiate<E>(res, *accessor_p, 1, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == generators[0]);
+  }
 }

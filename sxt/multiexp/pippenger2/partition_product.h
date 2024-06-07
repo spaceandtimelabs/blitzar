@@ -76,7 +76,7 @@ partition_product_kernel(T* __restrict__ products, const U* __restrict__ partiti
 
   // lookup the first entry
   auto partition_index = compute_partition_index(scalars, step, n, bit_offset);
-  auto res = partition_table[partition_index];
+  T res{partition_table[partition_index]};
 
   // sum remaining entries
   while (n > 16u) {
@@ -127,7 +127,7 @@ xena::future<> async_partition_product(basct::span<T> products,
   // partition_table
   basdv::stream stream;
   memr::async_device_resource resource{stream};
-  memmg::managed_array<T> partition_table{num_partitions * partition_table_size_v, &resource};
+  memmg::managed_array<U> partition_table{num_partitions * partition_table_size_v, &resource};
   accessor.async_copy_to_device(partition_table, stream, offset / 16u);
   co_await std::move(scalars_fut);
 
