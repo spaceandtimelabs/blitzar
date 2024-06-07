@@ -36,11 +36,11 @@ template <class U, bascrv::element T>
   }
 CUDA_CALLABLE void compute_partition_table_slice(U* __restrict__ sums,
                                                  const T* __restrict__ generators) noexcept {
-  sums[0] = T::identity();
+  sums[0] = static_cast<U>(T::identity());
 
   // single entry sums
   for (unsigned i = 0; i < 16; ++i) {
-    sums[1 << i] = generators[i];
+    sums[1 << i] = static_cast<U>(generators[i]);
   }
 
   // multi-entry sums
@@ -89,7 +89,7 @@ void compute_partition_table(basct::span<U> sums, basct::cspan<T> generators) no
   for (unsigned i = 0; i < n; ++i) {
     auto sums_slice = sums.subspan(i * partition_table_size_v, partition_table_size_v);
     auto generators_slice = generators.subspan(i * 16u, 16u);
-    compute_partition_table_slice<T>(sums_slice.data(), generators_slice.data());
+    compute_partition_table_slice(sums_slice.data(), generators_slice.data());
   }
 }
 

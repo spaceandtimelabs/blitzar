@@ -48,9 +48,9 @@ std::unique_ptr<partition_table_accessor<U>> make_in_memory_partition_table_acce
     std::fill(iter, generators_data.end(), T::identity());
     generators = generators_data;
   }
-  memmg::managed_array<T> sums{partition_table_size_v * num_partitions, alloc};
-  compute_partition_table<T>(sums, generators);
-  return std::make_unique<in_memory_partition_table_accessor<T>>(std::move(sums));
+  memmg::managed_array<U> sums{partition_table_size_v * num_partitions, alloc};
+  compute_partition_table<U, T>(sums, generators);
+  return std::make_unique<in_memory_partition_table_accessor<U>>(std::move(sums));
 }
 
 /* template <bascrv::element T> */
