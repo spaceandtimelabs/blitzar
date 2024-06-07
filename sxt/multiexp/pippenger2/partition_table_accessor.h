@@ -20,7 +20,6 @@
 #include <string_view>
 
 #include "sxt/base/container/span.h"
-#include "sxt/base/curve/element.h"
 #include "sxt/base/type/raw_stream.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor_base.h"
 
@@ -38,7 +37,7 @@ namespace sxt::mtxpp2 {
  * an accessor will contain two tables each of 2^16 entries with all the sums of
  * generators g0 to g15 and all the sums of generators g16 to g31, respectively.
  */
-template <bascrv::element T> class partition_table_accessor : public partition_table_accessor_base {
+template <class T> class partition_table_accessor : public partition_table_accessor_base {
 public:
   /**
    * Asynchronously copy precomputed sums of partitions to device.

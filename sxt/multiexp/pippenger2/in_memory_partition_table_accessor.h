@@ -34,7 +34,7 @@ namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 // in_memory_partition_table_accessor
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
+template <class T>
 class in_memory_partition_table_accessor final : public partition_table_accessor<T> {
 
 public:
