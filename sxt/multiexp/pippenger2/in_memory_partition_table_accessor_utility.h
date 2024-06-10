@@ -52,10 +52,4 @@ std::unique_ptr<partition_table_accessor<U>> make_in_memory_partition_table_acce
   compute_partition_table<U, T>(sums, generators);
   return std::make_unique<in_memory_partition_table_accessor<U>>(std::move(sums));
 }
-
-/* template <bascrv::element T> */
-/* std::unique_ptr<partition_table_accessor<T>> make_in_memory_partition_table_accessor( */
-/*     basct::cspan<T> generators, basm::alloc_t alloc = memr::get_pinned_resource()) noexcept { */
-/*   return make_in_memory_partition_table_accessor<T, T>(generators, alloc); */
-/* } */
 } // namespace sxt::mtxpp2
