@@ -69,7 +69,7 @@ make_partition_table_accessor(unsigned n, GeneratorFunc generatorFunc) noexcept 
 }
 
 //--------------------------------------------------------------------------------------------------
-// make_partition_table_accessor
+// curve25519_generator
 //--------------------------------------------------------------------------------------------------
 static void curve25519_generator(c21t::element_p3& element, unsigned i) {
   sqcgn::compute_base_element(element, i);
