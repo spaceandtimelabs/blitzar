@@ -65,7 +65,7 @@ make_partition_table_accessor(unsigned n, GeneratorFunc generatorFunc) noexcept 
   for (unsigned i = 0; i < n; ++i) {
     generatorFunc(generators[i], i);
   }
-  return mtxpp2::make_in_memory_partition_table_accessor<T, T>(generators);
+  return mtxpp2::make_in_memory_partition_table_accessor<T>(generators);
 }
 
 //--------------------------------------------------------------------------------------------------
