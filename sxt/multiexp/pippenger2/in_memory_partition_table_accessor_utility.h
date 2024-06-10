@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <concepts>
 #include <memory>
 #include <vector>
 
@@ -29,11 +30,16 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
-// make_in_memory_partition_table_accessor
+// make_in_memory_partition_table_accessor_impl
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
-std::unique_ptr<partition_table_accessor<T>> make_in_memory_partition_table_accessor(
-    basct::cspan<T> generators, basm::alloc_t alloc = memr::get_pinned_resource()) noexcept {
+template <class U, bascrv::element T>
+  requires requires(const U& u, const T& e) {
+    static_cast<U>(e);
+    T{u};
+  }
+std::unique_ptr<partition_table_accessor<U>>
+make_in_memory_partition_table_accessor_impl(basct::cspan<T> generators,
+                                             basm::alloc_t alloc) noexcept {
   auto n = generators.size();
   std::vector<T> generators_data;
   auto num_partitions = basn::divide_up(n, size_t{16});
@@ -44,8 +50,24 @@ std::unique_ptr<partition_table_accessor<T>> make_in_memory_partition_table_acce
     std::fill(iter, generators_data.end(), T::identity());
     generators = generators_data;
   }
-  memmg::managed_array<T> sums{partition_table_size_v * num_partitions, alloc};
-  compute_partition_table<T>(sums, generators);
-  return std::make_unique<in_memory_partition_table_accessor<T>>(std::move(sums));
+  memmg::managed_array<U> sums{partition_table_size_v * num_partitions, alloc};
+  compute_partition_table<U, T>(sums, generators);
+  return std::make_unique<in_memory_partition_table_accessor<U>>(std::move(sums));
+}
+
+//--------------------------------------------------------------------------------------------------
+// make_in_memory_partition_table_accessor
+//--------------------------------------------------------------------------------------------------
+template <class U, class T>
+  requires(!std::same_as<U, T>)
+std::unique_ptr<partition_table_accessor<U>> make_in_memory_partition_table_accessor(
+    basct::cspan<T> generators, basm::alloc_t alloc = memr::get_pinned_resource()) noexcept {
+  return make_in_memory_partition_table_accessor_impl<U, T>(generators, alloc);
+}
+
+template <class T>
+std::unique_ptr<partition_table_accessor<T>> make_in_memory_partition_table_accessor(
+    basct::cspan<T> generators, basm::alloc_t alloc = memr::get_pinned_resource()) noexcept {
+  return make_in_memory_partition_table_accessor_impl<T, T>(generators, alloc);
 }
 } // namespace sxt::mtxpp2

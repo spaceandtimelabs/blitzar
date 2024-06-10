@@ -17,6 +17,7 @@
 #pragma once
 
 #include <algorithm>
+#include <concepts>
 #include <cstdint>
 #include <memory_resource>
 
@@ -60,9 +61,10 @@ CUDA_CALLABLE inline uint16_t compute_partition_index(const uint8_t* __restrict_
 //--------------------------------------------------------------------------------------------------
 // partition_product_kernel
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
 CUDA_CALLABLE void
-partition_product_kernel(T* __restrict__ products, const T* __restrict__ partition_table,
+partition_product_kernel(T* __restrict__ products, const U* __restrict__ partition_table,
                          const uint8_t* __restrict__ scalars, unsigned byte_index,
                          unsigned bit_offset, unsigned num_products, unsigned n) noexcept {
   constexpr unsigned num_partition_entries = 1u << 16u;
@@ -74,7 +76,7 @@ partition_product_kernel(T* __restrict__ products, const T* __restrict__ partiti
 
   // lookup the first entry
   auto partition_index = compute_partition_index(scalars, step, n, bit_offset);
-  auto res = partition_table[partition_index];
+  T res{partition_table[partition_index]};
 
   // sum remaining entries
   while (n > 16u) {
@@ -83,7 +85,7 @@ partition_product_kernel(T* __restrict__ products, const T* __restrict__ partiti
     scalars += 16u * step;
 
     partition_index = compute_partition_index(scalars, step, n, bit_offset);
-    auto e = partition_table[partition_index];
+    T e{partition_table[partition_index]};
     add_inplace(res, e);
   }
 
@@ -98,9 +100,10 @@ partition_product_kernel(T* __restrict__ products, const T* __restrict__ partiti
  * Compute the multiproduct for the bits of an array of scalars using an accessor to
  * precomputed sums for each group of generators.
  */
-template <bascrv::element T>
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
 xena::future<> async_partition_product(basct::span<T> products,
-                                       const partition_table_accessor<T>& accessor,
+                                       const partition_table_accessor<U>& accessor,
                                        basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
   auto num_products = products.size();
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products);
@@ -124,7 +127,7 @@ xena::future<> async_partition_product(basct::span<T> products,
   // partition_table
   basdv::stream stream;
   memr::async_device_resource resource{stream};
-  memmg::managed_array<T> partition_table{num_partitions * partition_table_size_v, &resource};
+  memmg::managed_array<U> partition_table{num_partitions * partition_table_size_v, &resource};
   accessor.async_copy_to_device(partition_table, stream, offset / 16u);
   co_await std::move(scalars_fut);
 
@@ -154,8 +157,9 @@ xena::future<> async_partition_product(basct::span<T> products,
  * Compute the multiproduct for the bits of an array of scalars using an accessor to
  * precomputed sums for each group of generators.
  */
-template <bascrv::element T>
-void partition_product(basct::span<T> products, const partition_table_accessor<T>& accessor,
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
+void partition_product(basct::span<T> products, const partition_table_accessor<U>& accessor,
                        basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
   auto num_products = products.size();
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products);

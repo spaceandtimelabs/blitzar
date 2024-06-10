@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <concepts>
 #include <iterator>
 
 #include "sxt/base/container/span.h"
@@ -54,9 +55,10 @@ struct multiexponentiate_options {
 //--------------------------------------------------------------------------------------------------
 // multiexponentiate_no_chunks
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
 xena::future<>
-multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<T>& accessor,
+multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<U>& accessor,
                             unsigned element_num_bytes, basct::cspan<uint8_t> scalars) noexcept {
   auto num_outputs = res.size();
   auto n = scalars.size() / (num_outputs * element_num_bytes);
@@ -114,9 +116,10 @@ xena::future<> complete_multiexponentiation(basct::span<T> res, unsigned element
 //--------------------------------------------------------------------------------------------------
 // multiexponentiate_impl
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
 xena::future<> multiexponentiate_impl(basct::span<T> res,
-                                      const partition_table_accessor<T>& accessor,
+                                      const partition_table_accessor<U>& accessor,
                                       unsigned element_num_bytes, basct::cspan<uint8_t> scalars,
                                       const multiexponentiate_options& options) noexcept {
   auto num_outputs = res.size();
@@ -188,9 +191,10 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
  * This implements the partition part of Pipenger's algorithm. See Algorithm 7 of
  * https://cacr.uwaterloo.ca/techreports/2010/cacr2010-26.pdf
  */
-template <bascrv::element T>
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
 xena::future<>
-async_multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
+async_multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& accessor,
                         unsigned element_num_bytes, basct::cspan<uint8_t> scalars) noexcept {
   multiexponentiate_options options;
   options.split_factor = static_cast<unsigned>(basdv::get_num_devices());
@@ -203,8 +207,9 @@ async_multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& a
 /**
  * Host version of async_multiexponentiate.
  */
-template <bascrv::element T>
-void multiexponentiate(basct::span<T> res, const partition_table_accessor<T>& accessor,
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
+void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& accessor,
                        unsigned element_num_bytes, basct::cspan<uint8_t> scalars) noexcept {
   auto num_outputs = res.size();
   auto n = scalars.size() / (num_outputs * element_num_bytes);

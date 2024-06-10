@@ -29,14 +29,18 @@ namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 // compute_partition_table_slice
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
-CUDA_CALLABLE void compute_partition_table_slice(T* __restrict__ sums,
+template <class U, bascrv::element T>
+  requires requires(const U& u, const T& e) {
+    static_cast<U>(e);
+    T{u};
+  }
+CUDA_CALLABLE void compute_partition_table_slice(U* __restrict__ sums,
                                                  const T* __restrict__ generators) noexcept {
-  sums[0] = T::identity();
+  sums[0] = static_cast<U>(T::identity());
 
   // single entry sums
   for (unsigned i = 0; i < 16; ++i) {
-    sums[1 << i] = generators[i];
+    sums[1 << i] = static_cast<U>(generators[i]);
   }
 
   // multi-entry sums
@@ -50,10 +54,10 @@ CUDA_CALLABLE void compute_partition_table_slice(T* __restrict__ sums,
       // compute the k bit sum from a (k-1) bit sum and a 1 bit sum
       auto rest = partition & (partition - 1u);
       auto t = partition ^ rest;
-      auto sum = sums[rest];
-      auto e = sums[t];
+      T sum{sums[rest]};
+      T e{sums[t]};
       add_inplace(sum, e);
-      sums[partition] = sum;
+      sums[partition] = static_cast<U>(sum);
       if (partition == partition_last) {
         break;
       }
@@ -69,8 +73,12 @@ CUDA_CALLABLE void compute_partition_table_slice(T* __restrict__ sums,
  * Compute table of sums used for Pippenger's partition step with a width of 16. Each slice of the
  * table contains all possible sums of a group of 16 generators.
  */
-template <bascrv::element T>
-void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) noexcept {
+template <class U, bascrv::element T>
+  requires requires(const U& u, const T& e) {
+    static_cast<U>(e);
+    T{u};
+  }
+void compute_partition_table(basct::span<U> sums, basct::cspan<T> generators) noexcept {
   SXT_DEBUG_ASSERT(
       // clang-format off
      sums.size() == partition_table_size_v * generators.size() / 16u &&
@@ -81,7 +89,12 @@ void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) no
   for (unsigned i = 0; i < n; ++i) {
     auto sums_slice = sums.subspan(i * partition_table_size_v, partition_table_size_v);
     auto generators_slice = generators.subspan(i * 16u, 16u);
-    compute_partition_table_slice<T>(sums_slice.data(), generators_slice.data());
+    compute_partition_table_slice(sums_slice.data(), generators_slice.data());
   }
+}
+
+template <bascrv::element T>
+void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) noexcept {
+  compute_partition_table<T, T>(sums, generators);
 }
 } // namespace sxt::mtxpp2

@@ -157,6 +157,7 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
 
 TEST_CASE("we can compute multiexponentiations with curve-21") {
   using E = c21t::element_p3;
+  using Ep = c21t::compact_element;
 
   std::vector<E> generators(32);
   basn::fast_random_number_generator rng{1, 2};
@@ -165,6 +166,7 @@ TEST_CASE("we can compute multiexponentiations with curve-21") {
   }
 
   auto accessor = make_in_memory_partition_table_accessor<E>(generators);
+  auto accessor_p = make_in_memory_partition_table_accessor<Ep, E>(generators);
 
   std::vector<uint8_t> scalars(1);
   std::vector<E> res(1);
@@ -172,6 +174,14 @@ TEST_CASE("we can compute multiexponentiations with curve-21") {
   SECTION("we can compute a multiexponentiation multiexponentiation with a scalar of one") {
     scalars[0] = 1;
     auto fut = async_multiexponentiate<E>(res, *accessor, 1, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == generators[0]);
+  }
+
+  SECTION("we can compute a multi-exponentiation with an accessor using a different curve form") {
+    scalars[0] = 1;
+    auto fut = async_multiexponentiate<E>(res, *accessor_p, 1, scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == generators[0]);
