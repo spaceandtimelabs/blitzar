@@ -208,7 +208,7 @@ async_multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& a
  * Host version of async_multiexponentiate.
  */
 template <bascrv::element T, class U>
-   requires std::constructible_from<T, U> 
+  requires std::constructible_from<T, U>
 void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& accessor,
                        unsigned element_num_bytes, basct::cspan<uint8_t> scalars) noexcept {
   auto num_outputs = res.size();
