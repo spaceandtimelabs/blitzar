@@ -232,12 +232,8 @@ int main(int argc, char* argv[]) {
 
   if (curve_str == "curve25519") {
     std::println("running {} benchmark...", curve_str);
-#if 0
-    auto accessor = make_partition_table_accessor<c21t::element_p3, c21t::element_p3>(n, curve25519_generator);
-#else
     auto accessor = make_partition_table_accessor<c21t::compact_element, c21t::element_p3>(
         n, curve25519_generator);
-#endif
     const auto average_time = run_benchmark<c21t::element_p3>(accessor, num_samples, num_outputs,
                                                               element_num_bytes, n, verbose);
     std::println("compute duration (s): {}", average_time);
