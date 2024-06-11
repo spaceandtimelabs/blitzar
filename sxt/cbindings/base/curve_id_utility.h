@@ -52,4 +52,20 @@ template <class F> void switch_curve_type(curve_id_t id, F f) {
     baser::panic("unsupported curve id {}", static_cast<unsigned>(id));
   }
 }
+
+template <class F> void switch_curve_type2(curve_id_t id, F f) {
+  switch (id) {
+  case curve_id_t::curve25519:
+    f(std::type_identity<c21t::compact_element>{}, std::type_identity<c21t::element_p3>{});
+    break;
+  case curve_id_t::bls12_381:
+    f(std::type_identity<cg1t::element_p2>{}, std::type_identity<cg1t::element_p2>{});
+    break;
+  case curve_id_t::bn254:
+    f(std::type_identity<cn1t::element_p2>{}, std::type_identity<cn1t::element_p2>{});
+    break;
+  default:
+    baser::panic("unsupported curve id {}", static_cast<unsigned>(id));
+  }
+}
 } // namespace sxt::cbnb
