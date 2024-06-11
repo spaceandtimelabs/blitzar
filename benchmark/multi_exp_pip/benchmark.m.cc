@@ -58,14 +58,18 @@ using namespace sxt;
 //--------------------------------------------------------------------------------------------------
 // make_partition_table_accessor
 //--------------------------------------------------------------------------------------------------
-template <typename T, typename GeneratorFunc>
-static std::unique_ptr<mtxpp2::partition_table_accessor<T>>
+template <class U, typename T, typename GeneratorFunc>
+static std::unique_ptr<mtxpp2::partition_table_accessor<U>>
 make_partition_table_accessor(unsigned n, GeneratorFunc generatorFunc) noexcept {
   std::vector<T> generators(n);
   for (unsigned i = 0; i < n; ++i) {
     generatorFunc(generators[i], i);
   }
-  return mtxpp2::make_in_memory_partition_table_accessor<T>(generators);
+  if constexpr (std::is_same_v<U, T>) {
+    return mtxpp2::make_in_memory_partition_table_accessor<T>(generators);
+  } else {
+    return mtxpp2::make_in_memory_partition_table_accessor<U, T>(generators);
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -148,8 +152,8 @@ static void print_elements(basct::cspan<cn1t::element_p2> elements) noexcept {
 //--------------------------------------------------------------------------------------------------
 // run_benchmark
 //--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
-double run_benchmark(std::unique_ptr<mtxpp2::partition_table_accessor<T>>& accessor,
+template <bascrv::element T, class U>
+double run_benchmark(std::unique_ptr<mtxpp2::partition_table_accessor<U>>& accessor,
                      unsigned num_samples, unsigned num_outputs, unsigned element_num_bytes,
                      unsigned n, bool verbose) {
 
@@ -228,19 +232,22 @@ int main(int argc, char* argv[]) {
 
   if (curve_str == "curve25519") {
     std::println("running {} benchmark...", curve_str);
-    auto accessor = make_partition_table_accessor<c21t::element_p3>(n, curve25519_generator);
+    auto accessor = make_partition_table_accessor<c21t::compact_element, c21t::element_p3>(
+        n, curve25519_generator);
     const auto average_time = run_benchmark<c21t::element_p3>(accessor, num_samples, num_outputs,
                                                               element_num_bytes, n, verbose);
     std::println("compute duration (s): {}", average_time);
   } else if (curve_str == "bls12_381" || curve_str == "bls12-381") {
     std::println("running {} benchmark...", curve_str);
-    auto accessor = make_partition_table_accessor<cg1t::element_p2>(n, bls12_381_generator);
+    auto accessor =
+        make_partition_table_accessor<cg1t::element_p2, cg1t::element_p2>(n, bls12_381_generator);
     const auto average_time = run_benchmark<cg1t::element_p2>(accessor, num_samples, num_outputs,
                                                               element_num_bytes, n, verbose);
     std::println("compute duration (s): {}", average_time);
   } else if (curve_str == "bn254") {
     std::println("running {} benchmark...", curve_str);
-    auto accessor = make_partition_table_accessor<cn1t::element_p2>(n, bn254_generator);
+    auto accessor =
+        make_partition_table_accessor<cn1t::element_p2, cn1t::element_p2>(n, bn254_generator);
     const auto average_time = run_benchmark<cn1t::element_p2>(accessor, num_samples, num_outputs,
                                                               element_num_bytes, n, verbose);
     std::println("compute duration (s): {}", average_time);

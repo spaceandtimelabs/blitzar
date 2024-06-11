@@ -24,7 +24,9 @@ using namespace sxt;
 using namespace sxt::cbnb;
 
 TEST_CASE("we can translate a runtime curve id value to a compile-time type") {
-  switch_curve_type(curve_id_t::curve25519, [&]<class T>(std::type_identity<T>) {
-    REQUIRE(std::is_same_v<T, c21t::element_p3>);
-  });
+  switch_curve_type(curve_id_t::curve25519,
+                    [&]<class U, class T>(std::type_identity<U>, std::type_identity<T>) {
+                      REQUIRE(std::is_same_v<U, c21t::compact_element>);
+                      REQUIRE(std::is_same_v<T, c21t::element_p3>);
+                    });
 }
