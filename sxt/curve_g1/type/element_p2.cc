@@ -25,6 +25,7 @@
  */
 #include "sxt/curve_g1/type/element_p2.h"
 
+#include "sxt/field12/operation/invert.h"
 #include "sxt/field12/operation/mul.h"
 #include "sxt/field12/property/zero.h"
 #include "sxt/field12/type/element.h"
@@ -44,6 +45,25 @@ void mark(element_p2& e) noexcept { e.Z[5] = unset_marker_v; }
 // is_marked
 //--------------------------------------------------------------------------------------------------
 bool is_marked(const element_p2& e) noexcept { return e.Z[5] != unset_marker_v; }
+
+//--------------------------------------------------------------------------------------------------
+// operator compact_element
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE element_p2::operator compact_element() const noexcept {
+  f12t::element z_inv;
+  const bool is_zero{f12o::invert(z_inv, Z)};
+  f12o::cmov(z_inv, f12cn::zero_v, is_zero);
+
+  f12t::element x;
+  f12t::element y;
+  f12o::mul(x, X, z_inv);
+  f12o::mul(y, Y, z_inv);
+  
+  f12o::cmov(x, compact_element::identity().X, is_zero);
+  f12o::cmov(y, compact_element::identity().Y, is_zero);
+
+  return {x, y};
+}
 
 //--------------------------------------------------------------------------------------------------
 // operator==

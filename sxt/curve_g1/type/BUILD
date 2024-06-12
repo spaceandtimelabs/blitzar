@@ -62,6 +62,7 @@ sxt_cc_component(
     name = "element_p2",
     impl_deps = [
         "//sxt/field12/operation:mul",
+        "//sxt/field12/operation:invert",
         "//sxt/field12/property:zero",
     ],
     test_deps = [
