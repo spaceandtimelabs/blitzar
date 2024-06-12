@@ -239,8 +239,8 @@ int main(int argc, char* argv[]) {
     std::println("compute duration (s): {}", average_time);
   } else if (curve_str == "bls12_381" || curve_str == "bls12-381") {
     std::println("running {} benchmark...", curve_str);
-    auto accessor =
-        make_partition_table_accessor<cg1t::element_p2, cg1t::element_p2>(n, bls12_381_generator);
+    auto accessor = make_partition_table_accessor<cg1t::compact_element, cg1t::element_p2>(
+        n, bls12_381_generator);
     const auto average_time = run_benchmark<cg1t::element_p2>(accessor, num_samples, num_outputs,
                                                               element_num_bytes, n, verbose);
     std::println("compute duration (s): {}", average_time);
