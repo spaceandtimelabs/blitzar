@@ -65,3 +65,11 @@ TEST_CASE("projective element equality") {
     REQUIRE(c != b);
   }
 }
+
+TEST_CASE("we can convert between elements") {
+  SECTION("we can convert the identity element") {
+    auto id = element_p2::identity();
+    auto id_p = element_p2{static_cast<compact_element>(id)};
+    REQUIRE(id == id_p);
+  }
+}
