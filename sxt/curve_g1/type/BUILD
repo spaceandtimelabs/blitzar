@@ -68,6 +68,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/field12/operation:mul",
+        "//sxt/field12/type:literal",
     ],
     deps = [
         ":operation_adl_stub",
