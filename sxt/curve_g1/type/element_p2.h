@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "sxt/curve_g1/type/compact_element.h"
 #include "sxt/curve_g1/type/operation_adl_stub.h"
 #include "sxt/field12/constant/one.h"
 #include "sxt/field12/constant/zero.h"
