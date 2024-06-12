@@ -58,7 +58,7 @@ CUDA_CALLABLE element_p2::operator compact_element() const noexcept {
   f12t::element y;
   f12o::mul(x, X, z_inv);
   f12o::mul(y, Y, z_inv);
-  
+
   f12o::cmov(x, compact_element::identity().X, is_zero);
   f12o::cmov(y, compact_element::identity().Y, is_zero);
 
