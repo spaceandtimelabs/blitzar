@@ -4,6 +4,14 @@ load(
 )
 
 sxt_cc_component(
+  name = "compact_element",
+  with_test = False,
+  deps = [
+        "//sxt/field25/type:element",
+  ]
+)
+
+sxt_cc_component(
     name = "compressed_element",
     test_deps = [
         "//sxt/base/test:unit_test",
