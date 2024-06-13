@@ -69,9 +69,12 @@ sxt_cc_component(
         "//sxt/field25/random:element",
     ],
     deps = [
+        ":compact_element",
         ":operation_adl_stub",
+        "//sxt/base/macro:cuda_callable",
         "//sxt/field25/constant:one",
         "//sxt/field25/constant:zero",
+        "//sxt/field25/operation:cmov",
         "//sxt/field25/type:element",
     ],
 )
