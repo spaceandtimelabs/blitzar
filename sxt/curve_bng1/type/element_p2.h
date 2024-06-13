@@ -16,9 +16,12 @@
  */
 #pragma once
 
+#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/curve_bng1/type/compact_element.h"
 #include "sxt/curve_bng1/type/operation_adl_stub.h"
 #include "sxt/field25/constant/one.h"
 #include "sxt/field25/constant/zero.h"
+#include "sxt/field25/operation/cmov.h"
 #include "sxt/field25/type/element.h"
 
 namespace sxt::cn1t {
@@ -35,6 +38,15 @@ struct element_p2 : cn1o::operation_adl_stub {
   constexpr element_p2(const f25t::element& X, const f25t::element& Y,
                        const f25t::element& Z) noexcept
       : X{X}, Y{Y}, Z{Z} {}
+
+  CUDA_CALLABLE explicit element_p2(const compact_element& e) noexcept
+      : X{e.X}, Y{e.Y}, Z{f25cn::one_v} {
+    auto is_identity = e.is_identity();
+    f25o::cmov(X, f25cn::zero_v, is_identity);
+    f25o::cmov(Z, f25cn::zero_v, is_identity);
+  }
+
+  CUDA_CALLABLE explicit operator compact_element() const noexcept;
 
   f25t::element X;
   f25t::element Y;

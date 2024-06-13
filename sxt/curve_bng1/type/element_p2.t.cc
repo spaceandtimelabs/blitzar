@@ -32,9 +32,11 @@
 #include "sxt/field25/operation/mul.h"
 #include "sxt/field25/random/element.h"
 #include "sxt/field25/type/element.h"
+#include "sxt/field25/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::cn1t;
+using f25t::operator""_f25;
 
 TEST_CASE("projective element equality") {
   SECTION("can distinguish the generator from the identity") {
@@ -66,5 +68,21 @@ TEST_CASE("projective element equality") {
     REQUIRE(b != c);
     REQUIRE(c == a);
     REQUIRE(c != b);
+  }
+}
+
+TEST_CASE("we can convert between elements") {
+  SECTION("we can convert the identity element") {
+    auto id = element_p2::identity();
+    auto id_p = element_p2{static_cast<compact_element>(id)};
+    REQUIRE(id == id_p);
+  }
+
+  SECTION("we can covert an arbitrary element") {
+    element_p2 e{0x30644e72e131a029b85045b63db22989a0ca93286ebbf9d9bc5fd495e1a92d47_f25,
+                 0x30644e72e131a029b85045b668f629f0d4ae64afaa9d239050df4dd8b672b147_f25,
+                 0x307084c8417aab1f9ec8866edfd3f27acc230000_f25};
+    auto ep = element_p2{static_cast<compact_element>(e)};
+    REQUIRE(e == ep);
   }
 }

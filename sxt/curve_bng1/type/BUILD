@@ -4,6 +4,15 @@ load(
 )
 
 sxt_cc_component(
+    name = "compact_element",
+    with_test = False,
+    deps = [
+        "//sxt/field25/constant:one",
+        "//sxt/field25/type:element",
+    ],
+)
+
+sxt_cc_component(
     name = "compressed_element",
     test_deps = [
         "//sxt/base/test:unit_test",
@@ -50,6 +59,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "element_p2",
     impl_deps = [
+        "//sxt/field25/operation:invert",
         "//sxt/field25/operation:mul",
         "//sxt/field25/property:zero",
     ],
@@ -58,11 +68,15 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/field25/operation:mul",
         "//sxt/field25/random:element",
+        "//sxt/field25/type:literal",
     ],
     deps = [
+        ":compact_element",
         ":operation_adl_stub",
+        "//sxt/base/macro:cuda_callable",
         "//sxt/field25/constant:one",
         "//sxt/field25/constant:zero",
+        "//sxt/field25/operation:cmov",
         "//sxt/field25/type:element",
     ],
 )

@@ -46,7 +46,7 @@ template <class F> void switch_curve_type(curve_id_t id, F f) {
     f(std::type_identity<cg1t::compact_element>{}, std::type_identity<cg1t::element_p2>{});
     break;
   case curve_id_t::bn254:
-    f(std::type_identity<cn1t::element_p2>{}, std::type_identity<cn1t::element_p2>{});
+    f(std::type_identity<cn1t::compact_element>{}, std::type_identity<cn1t::element_p2>{});
     break;
   default:
     baser::panic("unsupported curve id {}", static_cast<unsigned>(id));
