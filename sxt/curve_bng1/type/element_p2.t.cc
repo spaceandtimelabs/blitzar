@@ -71,7 +71,6 @@ TEST_CASE("projective element equality") {
   }
 }
 
-
 TEST_CASE("we can convert between elements") {
   SECTION("we can convert the identity element") {
     auto id = element_p2::identity();
