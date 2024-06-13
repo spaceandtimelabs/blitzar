@@ -67,6 +67,7 @@ sxt_cc_component(
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
         "//sxt/field25/operation:mul",
+        "//sxt/field25/type:literal",
         "//sxt/field25/random:element",
     ],
     deps = [
