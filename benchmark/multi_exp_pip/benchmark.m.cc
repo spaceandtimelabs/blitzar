@@ -65,11 +65,7 @@ make_partition_table_accessor(unsigned n, GeneratorFunc generatorFunc) noexcept 
   for (unsigned i = 0; i < n; ++i) {
     generatorFunc(generators[i], i);
   }
-  if constexpr (std::is_same_v<U, T>) {
-    return mtxpp2::make_in_memory_partition_table_accessor<T>(generators);
-  } else {
-    return mtxpp2::make_in_memory_partition_table_accessor<U, T>(generators);
-  }
+  return mtxpp2::make_in_memory_partition_table_accessor<U, T>(generators);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -247,7 +243,7 @@ int main(int argc, char* argv[]) {
   } else if (curve_str == "bn254") {
     std::println("running {} benchmark...", curve_str);
     auto accessor =
-        make_partition_table_accessor<cn1t::element_p2, cn1t::element_p2>(n, bn254_generator);
+        make_partition_table_accessor<cn1t::compact_element, cn1t::element_p2>(n, bn254_generator);
     const auto average_time = run_benchmark<cn1t::element_p2>(accessor, num_samples, num_outputs,
                                                               element_num_bytes, n, verbose);
     std::println("compute duration (s): {}", average_time);
