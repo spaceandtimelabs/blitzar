@@ -18,6 +18,7 @@
 
 #include <concepts>
 #include <iterator>
+#include <numeric>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/container/span_utility.h"
@@ -194,8 +195,10 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
   (void)scalars;
   (void)options;
   return {};
-#if 0
   auto num_outputs = res.size();
+  auto bit_sum = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
+  (void)bit_sum;
+#if 0
   auto n = scalars.size() / (num_outputs * element_num_bytes);
   auto num_products = num_outputs * element_num_bytes * 8u;
   SXT_DEBUG_ASSERT(
