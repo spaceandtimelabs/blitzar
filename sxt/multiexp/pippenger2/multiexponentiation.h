@@ -189,23 +189,21 @@ xena::future<>
 multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& accessor,
                        basct::cspan<unsigned> output_bit_table, basct::cspan<uint8_t> scalars,
                        const multiexponentiate_options& options) noexcept {
+  auto num_outputs = res.size();
+  auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
+  auto num_bytes_per_output = basn::divide_up<size_t>(num_products, 8);
+  auto n = scalars.size() / (num_outputs * num_bytes_per_output);
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      scalars.size() % num_products == 0
+      // clang-format on
+  );
   (void)res;
   (void)accessor;
   (void)output_bit_table;
   (void)scalars;
   (void)options;
   return {};
-  auto num_outputs = res.size();
-  auto bit_sum = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
-  (void)bit_sum;
-#if 0
-  auto n = scalars.size() / (num_outputs * element_num_bytes);
-  auto num_products = num_outputs * element_num_bytes * 8u;
-  SXT_DEBUG_ASSERT(
-      // clang-format off
-      scalars.size() % (num_outputs * element_num_bytes) == 0
-      // clang-format on
-  );
 
   // compute bitwise products
   //
@@ -217,6 +215,9 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
                                                     .min_chunk_size(options.min_chunk_size)
                                                     .max_chunk_size(options.max_chunk_size),
                                                 options.split_factor);
+  (void)chunk_first;
+  (void)chunk_last;
+#if 0
   auto num_chunks = std::distance(chunk_first, chunk_last);
   if (num_chunks == 1) {
     multiexponentiate_no_chunks(res, accessor, element_num_bytes, scalars);
