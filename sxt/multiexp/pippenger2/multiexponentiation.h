@@ -211,12 +211,6 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
       scalars.size() % num_products == 0
       // clang-format on
   );
-  (void)res;
-  (void)accessor;
-  (void)output_bit_table;
-  (void)scalars;
-  (void)options;
-  return {};
 
   // compute bitwise products
   //
@@ -230,13 +224,14 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
                                                 options.split_factor);
   (void)chunk_first;
   (void)chunk_last;
-#if 0
   auto num_chunks = std::distance(chunk_first, chunk_last);
   if (num_chunks == 1) {
-    multiexponentiate_no_chunks(res, accessor, element_num_bytes, scalars);
+    multiexponentiate_no_chunks(res, accessor, output_bit_table, scalars);
     co_return;
   }
 
+  baser::panic("not implemented yet");
+#if 0
   memmg::managed_array<T> products{num_products * num_chunks, memr::get_pinned_resource()};
   size_t chunk_index = 0;
   basl::info("computing {} bitwise multiexponentiation products of length {} using {} chunks",
