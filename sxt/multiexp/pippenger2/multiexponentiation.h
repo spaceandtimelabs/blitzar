@@ -88,6 +88,19 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<U
   co_await xendv::await_stream(stream);
 }
 
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
+xena::future<> multiexponentiate_no_chunks(basct::span<T> res,
+                                           const partition_table_accessor<U>& accessor,
+                                           basct::cspan<unsigned> output_bit_table,
+                                           basct::cspan<uint8_t> scalars) noexcept {
+  (void)res;
+  (void)accessor;
+  (void)output_bit_table;
+  (void)scalars;
+  return {};
+}
+
 //--------------------------------------------------------------------------------------------------
 // complete_multiexponentiation
 //--------------------------------------------------------------------------------------------------
