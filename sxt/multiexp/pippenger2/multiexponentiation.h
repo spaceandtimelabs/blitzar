@@ -85,6 +85,7 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<U
   // copy result
   basdv::async_copy_device_to_host(res, res_dev, stream);
   co_await xendv::await_stream(stream);
+  basl::info("completed {} reductions", num_outputs);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -180,6 +181,7 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
                                                  element_num_bytes, products, num_products,
                                                  rng.a() * element_num_bytes * 8u);
       });
+  basl::info("completed {} reductions", num_outputs);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -226,7 +228,8 @@ void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& ac
   partition_product<T>(products, accessor, scalars, 0);
 
   // reduce products
-  basl::info("reducing {} products to {} outputs", num_products, num_products);
+  basl::info("reducing {} products to {} outputs", num_products, num_outputs);
   reduce_products<T>(res, products);
+  basl::info("completed {} reductions", num_outputs);
 }
 } // namespace sxt::mtxpp2
