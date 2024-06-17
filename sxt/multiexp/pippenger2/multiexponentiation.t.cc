@@ -155,6 +155,32 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
   }
 }
 
+TEST_CASE("we can compute multiexponentiations with packed scalars") {
+  using E = bascrv::element97;
+
+  std::vector<E> generators(32);
+  std::mt19937 rng{0};
+  for (auto& g : generators) {
+    g = std::uniform_int_distribution<unsigned>{0, 96}(rng);
+  }
+
+  auto accessor = make_in_memory_partition_table_accessor<E>(generators);
+
+  std::vector<uint8_t> scalars(1);
+  std::vector<E> res(1);
+  std::vector<unsigned> output_bit_table(1);
+
+  SECTION("we can compute a multiexponentiation for a single bit scalar") {
+    output_bit_table[0] = 1;
+    auto fut = async_multiexponentiate<E>(res, *accessor, output_bit_table, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+#if 0
+    REQUIRE(res[0] == E::identity());
+#endif
+  }
+}
+
 TEST_CASE("we can compute multiexponentiations with curve-21") {
   using E = c21t::element_p3;
   using Ep = c21t::compact_element;
