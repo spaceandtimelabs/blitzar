@@ -111,6 +111,14 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<U
   co_await async_partition_product<T>(products, accessor, scalars, 0);
 
   // baser::panic("reduction not implemented yet");
+  // reduce products
+  basl::info("reducing {} products to {} outputs", num_products, num_products);
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> res_dev{num_outputs, &resource};
+  (void)res_dev;
+  /* reduce_products<T>(res_dev, stream, products); */
+  /* products.reset(); */
   (void)res;
   (void)accessor;
   (void)output_bit_table;
