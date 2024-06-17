@@ -71,6 +71,38 @@ void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
 }
 
 template <bascrv::element T>
+void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
+                     basct::cspan<unsigned> output_bit_table, basct::cspan<T> products) noexcept {
+  (void)reductions;
+  (void)stream;
+  (void)output_bit_table;
+  (void)products;
+#if 0
+  auto num_outputs = reductions.size();
+  auto reduction_size = products.size() / reductions.size();
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      basdv::is_active_device_pointer(reductions.data()) &&
+      products.size() == reduction_size * num_outputs &&
+      basdv::is_active_device_pointer(products.data())
+      // clang-format on
+  );
+  auto f = [
+               // clang-format off
+    reductions = reductions.data(),
+    products = products.data(),
+    reduction_size = reduction_size
+               // clang-format on
+  ] __device__
+           __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
+             reduce_output(reductions + output_index, products + output_index * reduction_size,
+                           reduction_size);
+           };
+  algi::launch_for_each_kernel(stream, f, num_outputs);
+#endif
+}
+
+template <bascrv::element T>
 void reduce_products(basct::span<T> reductions, basct::cspan<T> products) noexcept {
   auto num_outputs = reductions.size();
   auto reduction_size = products.size() / reductions.size();
