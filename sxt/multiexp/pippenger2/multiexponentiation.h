@@ -94,12 +94,28 @@ xena::future<>
 multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<U>& accessor,
                             basct::cspan<unsigned> output_bit_table, unsigned num_products,
                             basct::cspan<uint8_t> scalars) noexcept {
+  auto num_outputs = res.size();
+  auto num_bytes_per_output = basn::divide_up<size_t>(num_products, 8);
+  auto n = scalars.size() / (num_outputs * num_bytes_per_output);
+#if 0
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      scalars.size() % (num_outputs * element_num_bytes) == 0
+      // clang-format on
+  );
+#endif
+
+  // compute bitwise products
+  basl::info("computing {} bitwise multiexponentiation products of length {}", num_products, n);
+  memmg::managed_array<T> products(num_products, memr::get_device_resource());
+  co_await async_partition_product<T>(products, accessor, scalars, 0);
+
+  baser::panic("reduction not implemented yet");
   (void)res;
   (void)accessor;
   (void)output_bit_table;
   (void)num_products;
   (void)scalars;
-  return {};
 }
 
 //--------------------------------------------------------------------------------------------------
