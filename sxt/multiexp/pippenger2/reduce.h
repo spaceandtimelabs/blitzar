@@ -23,6 +23,8 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/type/raw_stream.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/async_device_resource.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -73,6 +75,10 @@ void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
 template <bascrv::element T>
 void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
                      basct::cspan<unsigned> output_bit_table, basct::cspan<T> products) noexcept {
+  auto num_outputs = reductions.size();
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<unsigned> bit_table_dev{num_outputs, &resource};
+  basdv::async_copy_host_to_device(bit_table_dev, output_bit_table, stream);
   (void)reductions;
   (void)stream;
   (void)output_bit_table;
