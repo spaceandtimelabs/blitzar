@@ -90,13 +90,14 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<U
 
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
-xena::future<> multiexponentiate_no_chunks(basct::span<T> res,
-                                           const partition_table_accessor<U>& accessor,
-                                           basct::cspan<unsigned> output_bit_table,
-                                           basct::cspan<uint8_t> scalars) noexcept {
+xena::future<>
+multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<U>& accessor,
+                            basct::cspan<unsigned> output_bit_table, unsigned num_products,
+                            basct::cspan<uint8_t> scalars) noexcept {
   (void)res;
   (void)accessor;
   (void)output_bit_table;
+  (void)num_products;
   (void)scalars;
   return {};
 }
@@ -226,7 +227,7 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
   (void)chunk_last;
   auto num_chunks = std::distance(chunk_first, chunk_last);
   if (num_chunks == 1) {
-    multiexponentiate_no_chunks(res, accessor, output_bit_table, scalars);
+    multiexponentiate_no_chunks(res, accessor, output_bit_table, num_products, scalars);
     co_return;
   }
 
