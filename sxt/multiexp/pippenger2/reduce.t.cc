@@ -66,3 +66,26 @@ TEST_CASE("we can reduce products") {
     REQUIRE(outputs == expected);
   }
 }
+
+TEST_CASE("we can reduce products with a bit table") {
+  using E = bascrv::element97;
+
+  std::pmr::vector<E> outputs{memr::get_managed_device_resource()};
+  std::pmr::vector<E> products{memr::get_managed_device_resource()};
+  basdv::stream stream;
+
+  std::vector<unsigned> bit_table;
+
+  std::pmr::vector<E> expected;
+
+  SECTION("we can reduce a single product") {
+    outputs.resize(1);
+    products.resize(1);
+    bit_table = {1};
+    products[0] = 123u;
+    reduce_products<E>(outputs, stream, bit_table, products);
+    basdv::synchronize_stream(stream);
+    expected = {123u};
+    REQUIRE(outputs == expected);
+  }
+}

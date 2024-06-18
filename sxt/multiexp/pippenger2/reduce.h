@@ -92,10 +92,6 @@ void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
   }
   memmg::managed_array<unsigned> bit_table_partial_sums_dev{num_outputs, &resource};
   basdv::async_copy_host_to_device(bit_table_partial_sums_dev, bit_table_partial_sums, stream);
-  (void)reductions;
-  (void)stream;
-  (void)output_bit_table;
-  (void)products;
 #if 0
   SXT_DEBUG_ASSERT(
       // clang-format off
