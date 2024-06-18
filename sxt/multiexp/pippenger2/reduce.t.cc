@@ -78,7 +78,7 @@ TEST_CASE("we can reduce products with a bit table") {
 
   std::pmr::vector<E> expected;
 
-  SECTION("we can reduce a single product") {
+  SECTION("we can reduce a single product of one bit") {
     outputs.resize(1);
     products.resize(1);
     bit_table = {1};
@@ -86,6 +86,16 @@ TEST_CASE("we can reduce products with a bit table") {
     reduce_products<E>(outputs, stream, bit_table, products);
     basdv::synchronize_stream(stream);
     expected = {123u};
+    REQUIRE(outputs == expected);
+  }
+
+  SECTION("we can reduce a single product of two bits") {
+    outputs.resize(1);
+    bit_table = {2};
+    products = {123, 456};
+    reduce_products<E>(outputs, stream, bit_table, products);
+    basdv::synchronize_stream(stream);
+    expected = {123u + 2u * 456u};
     REQUIRE(outputs == expected);
   }
 }
