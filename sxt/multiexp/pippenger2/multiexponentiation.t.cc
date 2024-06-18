@@ -175,9 +175,16 @@ TEST_CASE("we can compute multiexponentiations with packed scalars") {
     auto fut = async_multiexponentiate<E>(res, *accessor, output_bit_table, scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
-#if 0
     REQUIRE(res[0] == E::identity());
-#endif
+  }
+
+  SECTION("we can compute a multiexponentiation for a two bit scalar") {
+    output_bit_table[0] = 2;
+    scalars[0] = 2u;
+    auto fut = async_multiexponentiate<E>(res, *accessor, output_bit_table, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 2u * generators[0].value);
   }
 }
 

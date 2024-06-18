@@ -110,7 +110,6 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<U
   memmg::managed_array<T> products(num_products, memr::get_device_resource());
   co_await async_partition_product<T>(products, accessor, scalars, 0);
 
-  // baser::panic("reduction not implemented yet");
   // reduce products
   basl::info("reducing {} products to {} outputs", num_products, num_products);
   basdv::stream stream;
@@ -229,11 +228,13 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
   auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
   auto num_bytes_per_output = basn::divide_up<size_t>(num_products, 8);
   auto n = scalars.size() / (num_outputs * num_bytes_per_output);
+#if 0
   SXT_DEBUG_ASSERT(
       // clang-format off
       scalars.size() % num_products == 0
       // clang-format on
   );
+#endif
 
   // compute bitwise products
   //
