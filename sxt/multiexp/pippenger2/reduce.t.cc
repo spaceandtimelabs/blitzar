@@ -118,4 +118,14 @@ TEST_CASE("we can reduce products with a bit table") {
     expected = {123u, 456};
     REQUIRE(outputs == expected);
   }
+
+  SECTION("we can reduce multiple outputs with varying numbers of bits") {
+    outputs.resize(3);
+    bit_table = {3, 1, 2};
+    products = {2u, 7u, 5u, 3u, 9u , 11u};
+    reduce_products<E>(outputs, stream, bit_table, products);
+    basdv::synchronize_stream(stream);
+    expected = {2u + 2u *7u + 4u * 5u, 3u, 9u + 2u * 11u};
+    REQUIRE(outputs == expected);
+  }
 }
