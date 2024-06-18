@@ -25,6 +25,7 @@
 #include "sxt/base/type/raw_stream.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/memory/resource/pinned_resource.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -77,15 +78,25 @@ void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
                      basct::cspan<unsigned> output_bit_table, basct::cspan<T> products) noexcept {
   auto num_outputs = reductions.size();
   memr::async_device_resource resource{stream};
+
+  // copy bit sums to device
   memmg::managed_array<unsigned> bit_table_dev{num_outputs, &resource};
   basdv::async_copy_host_to_device(bit_table_dev, output_bit_table, stream);
+
+  // make partial bit table sums
+  memmg::managed_array<unsigned> bit_table_partial_sums{num_outputs, memr::get_pinned_resource()};
+  unsigned sum = 0;
+  for (unsigned output_index=0; output_index<num_outputs; ++output_index) {
+    bit_table_partial_sums[output_index] = sum;
+    sum += output_bit_table[output_index];
+  }
+  memmg::managed_array<unsigned> bit_table_partial_sums_dev{num_outputs, &resource};
+  basdv::async_copy_host_to_device(bit_table_partial_sums_dev, bit_table_partial_sums, stream);
   (void)reductions;
   (void)stream;
   (void)output_bit_table;
   (void)products;
 #if 0
-  auto num_outputs = reductions.size();
-  auto reduction_size = products.size() / reductions.size();
   SXT_DEBUG_ASSERT(
       // clang-format off
       basdv::is_active_device_pointer(reductions.data()) &&
@@ -93,19 +104,21 @@ void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
       basdv::is_active_device_pointer(products.data())
       // clang-format on
   );
+#endif
   auto f = [
                // clang-format off
     reductions = reductions.data(),
-    products = products.data(),
-    reduction_size = reduction_size
+    bit_table = bit_table_dev.data(),
+    bit_table_partial_sums = bit_table_partial_sums_dev.data(),
+    products = products.data()
                // clang-format on
   ] __device__
            __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
-             reduce_output(reductions + output_index, products + output_index * reduction_size,
-                           reduction_size);
+             auto reduction_size = bit_table[output_index];
+             reduce_output(reductions + output_index,
+                           products + bit_table_partial_sums[output_index], reduction_size);
            };
   algi::launch_for_each_kernel(stream, f, num_outputs);
-#endif
 }
 
 template <bascrv::element T>
