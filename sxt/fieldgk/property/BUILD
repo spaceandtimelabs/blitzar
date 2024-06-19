@@ -27,6 +27,8 @@ sxt_cc_component(
     name = "zero",
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/fieldgk/constant:one",
+        "//sxt/fieldgk/constant:zero",
     ],
     deps = [
         "//sxt/base/bit:zero_equality",

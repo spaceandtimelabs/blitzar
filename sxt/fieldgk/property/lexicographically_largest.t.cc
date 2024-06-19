@@ -21,9 +21,11 @@
 #include "sxt/fieldgk/constant/one.h"
 #include "sxt/fieldgk/constant/zero.h"
 #include "sxt/fieldgk/type/element.h"
+#include "sxt/fieldgk/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::fgkp;
+using namespace sxt::fgkt;
 
 TEST_CASE("lexicographically largest correctly identifies") {
   SECTION("zero is not largest") { REQUIRE(!lexicographically_largest(fgkcn::zero_v)); }
@@ -31,18 +33,16 @@ TEST_CASE("lexicographically largest correctly identifies") {
   SECTION("one is not largest") { REQUIRE(!lexicographically_largest(fgkcn::one_v)); }
 
   SECTION("(p_v-1)/2 in Montgomery form is not largest") {
-    constexpr fgkt::element e{0x9e10460b6c3e7ea3, 0xcbc0b548b438e546, 0xdc2822db40c0ac2e,
-                              0x183227397098d014};
-    fgkt::element e_montgomery;
+    element e = 0x183227397098d014dc2822db40c0ac2e9419f4243cdcb848a1f0fac9f8000000_fgk;
+    element e_montgomery;
     fgkb::to_montgomery_form(e_montgomery.data(), e.data());
 
     REQUIRE(!lexicographically_largest(e_montgomery));
   }
 
   SECTION("((p_v-1)/2)+1 in Montgomery form is largest") {
-    constexpr fgkt::element e{0x9e10460b6c3e7ea4, 0xcbc0b548b438e546, 0xdc2822db40c0ac2e,
-                              0x183227397098d014};
-    fgkt::element e_montgomery;
+    element e = 0x183227397098d014dc2822db40c0ac2e9419f4243cdcb848a1f0fac9f8000001_fgk;
+    element e_montgomery;
     fgkb::to_montgomery_form(e_montgomery.data(), e.data());
 
     REQUIRE(lexicographically_largest(e_montgomery));

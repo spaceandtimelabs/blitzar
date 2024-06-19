@@ -46,17 +46,17 @@ TEST_CASE("literal element printing") {
   }
 
   SECTION("of the modulus prints 0x0_fgk") {
-    oss << 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47_fgk;
+    oss << 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001_fgk;
     REQUIRE(oss.str() == "0x0_fgk");
   }
 
   SECTION("of the modulus minus one prints a pre-computed value") {
-    oss << 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd46_fgk;
-    REQUIRE(oss.str() == "0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd46_fgk");
+    oss << 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000_fgk;
+    REQUIRE(oss.str() == "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000_fgk");
   }
 
   SECTION("of the modulus plus one prints as one") {
-    oss << 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd48_fgk;
+    oss << 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000002_fgk;
     REQUIRE(oss.str() == "0x1_fgk");
   }
 }

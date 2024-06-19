@@ -32,7 +32,7 @@ TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
   }
 
   SECTION("of one below the modulus p_v") {
-    constexpr std::array<uint64_t, 4> a = {0x3c208c16d87cfd46, 0x97816a916871ca8d,
+    constexpr std::array<uint64_t, 4> a = {0x43e1f593f0000000, 0x2833e84879b97091,
                                            0xb85045b68181585d, 0x30644e72e131a029};
     std::array<uint64_t, 4> ret;
 
@@ -51,7 +51,7 @@ TEST_CASE("subtract_p (subtraction with the modulus) can handle computation") {
   }
 
   SECTION("of one above the modulus p_v") {
-    constexpr std::array<uint64_t, 4> a = {0x3c208c16d87cfd48, 0x97816a916871ca8d,
+    constexpr std::array<uint64_t, 4> a = {0x43e1f593f0000002, 0x2833e84879b97091,
                                            0xb85045b68181585d, 0x30644e72e131a029};
     constexpr std::array<uint64_t, 4> expect = {1, 0, 0, 0};
     std::array<uint64_t, 4> ret;

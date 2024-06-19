@@ -17,17 +17,12 @@
 #include "sxt/fieldgk/property/zero.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/fieldgk/type/element.h"
+#include "sxt/fieldgk/constant/one.h"
+#include "sxt/fieldgk/constant/zero.h"
 
 using namespace sxt;
 using namespace sxt::fgkp;
 
-TEST_CASE("is zero can identify a zero element") {
-  constexpr fgkt::element e_zero{0, 0, 0, 0};
-  REQUIRE(is_zero(e_zero));
-}
+TEST_CASE("is zero can identify a zero element") { REQUIRE(is_zero(fgkcn::zero_v)); }
 
-TEST_CASE("is zero can identify a non-zero element") {
-  constexpr fgkt::element e_one{1, 0, 0, 0};
-  REQUIRE(!is_zero(e_one));
-}
+TEST_CASE("is zero can identify a non-zero element") { REQUIRE(!is_zero(fgkcn::one_v)); }

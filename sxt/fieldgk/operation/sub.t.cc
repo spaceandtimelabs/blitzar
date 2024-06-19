@@ -18,12 +18,15 @@
 
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/fieldgk/constant/one.h"
 #include "sxt/fieldgk/constant/zero.h"
 #include "sxt/fieldgk/random/element.h"
 #include "sxt/fieldgk/type/element.h"
+#include "sxt/fieldgk/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::fgko;
+using namespace sxt::fgkt;
 
 TEST_CASE("subtraction") {
   SECTION("of a random field element and zero returns the random field element") {
@@ -39,14 +42,11 @@ TEST_CASE("subtraction") {
   }
 
   SECTION("of pre-computed values returns expected value") {
-    // Random bn254 base field element generated using the SAGE library.
-    constexpr fgkt::element a{0x5277392d1dd1c9b6, 0xd4128bfefd8e4cf5, 0xa7d5b7f3662a0ee9,
-                              0x0994b748e9d2dbe7};
-    constexpr fgkt::element b{0x9412b919732aa7c6, 0x714691531e314d76, 0xcf45bbcd6cf10aa2,
-                              0x1295b5038773df78};
-    constexpr fgkt::element expected{0xfa850c2a83241f37, 0xfa4d653d47ceca0b, 0x90e041dc7aba5ca4,
-                                     0x276350b843909c98};
-    fgkt::element ret;
+    // Random Grumpkin base field element generated using the SAGE library.
+    element a = 0x160d1ee279a8b33aaad264b6b74af54dd1e8c7c51d515b66287e4cff880df122_fgk;
+    element b = 0x249b84b7a5b659ee923591385e5e6370e5a91354f48eff9a234a35efe01e7ce0_fgk;
+    element expected = 0x21d5e89db523f975d0ed1934da6dea3a14739cb8a27bcc5d49160ca397ef7443_fgk;
+    element ret;
 
     sub(ret, a, b);
 
@@ -54,12 +54,10 @@ TEST_CASE("subtraction") {
   }
 
   SECTION("of zero and one returns the modulus minus one") {
-    constexpr fgkt::element b{1, 0, 0, 0};
-    constexpr fgkt::element expected{0x3c208c16d87cfd46, 0x97816a916871ca8d, 0xb85045b68181585d,
-                                     0x30644e72e131a029};
-    fgkt::element ret;
+    element expected = 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000_fgk;
+    element ret;
 
-    sub(ret, fgkcn::zero_v, b);
+    sub(ret, fgkcn::zero_v, fgkcn::one_v);
 
     REQUIRE(expected == ret);
   }

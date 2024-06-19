@@ -40,7 +40,7 @@ namespace sxt::fgko {
  * Therefore, for any f in Fp: f^{-1} == f^{p-2}.
  */
 CUDA_CALLABLE bool invert(fgkt::element& h, const fgkt::element& f) noexcept {
-  constexpr fgkt::element p_v_minus_2{0x3c208c16d87cfd45, 0x97816a916871ca8d, 0xb85045b68181585d,
+  constexpr fgkt::element p_v_minus_2{0x43e1f593efffffff, 0x2833e84879b97091, 0xb85045b68181585d,
                                       0x30644e72e131a029};
 
   fgko::pow_vartime(h, f, p_v_minus_2);

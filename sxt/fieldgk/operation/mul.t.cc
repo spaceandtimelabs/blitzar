@@ -23,16 +23,18 @@
 #include "sxt/fieldgk/constant/zero.h"
 #include "sxt/fieldgk/random/element.h"
 #include "sxt/fieldgk/type/element.h"
+#include "sxt/fieldgk/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::fgko;
+using namespace sxt::fgkt;
 
 TEST_CASE("multiplication") {
   SECTION("of a random field element and zero returns zero") {
-    fgkt::element a;
+    element a;
     basn::fast_random_number_generator rng{1, 2};
     fgkrn::generate_random_element(a, rng);
-    fgkt::element ret;
+    element ret;
 
     mul(ret, a, fgkcn::zero_v);
 
@@ -40,8 +42,8 @@ TEST_CASE("multiplication") {
   }
 
   SECTION("of one with itself returns one") {
-    constexpr fgkt::element one{fgkb::r_v.data()};
-    fgkt::element ret;
+    constexpr element one{fgkb::r_v.data()};
+    element ret;
 
     mul(ret, one, one);
 
@@ -49,14 +51,12 @@ TEST_CASE("multiplication") {
   }
 
   SECTION("of pre-computed values returns expected value") {
-    // Random bn254 base field element generated using the SAGE library.
-    constexpr fgkt::element a{0x5d19786fd5f59520, 0xa80980aec93386cf, 0x6f49109c5fb69712,
-                              0x19803c04269ae364};
-    constexpr fgkt::element b{0x0746f2e0932048bf, 0xc05bea62ab71831e, 0x1342f6ebbc9497e9,
-                              0x12b50c2429b1a851};
-    constexpr fgkt::element expected{0x241cac338ef8e513, 0x98220ca91953d8c1, 0x0bf0a5fd342762a0,
-                                     0x0e616e612ed86a67};
-    fgkt::element ret;
+    // Random Grumpkin base field element generated using the SAGE library.
+    element a = 0x229385b6f3293f3646e2983182d91281f2f74a46ec96e25e9a6ebbaad85225f3_fgk;
+    element b = 0x2e9503fd6a1e68cc189d9975664c2ce4f1e8cde24ed7b3666a3ec40f6661667b_fgk;
+    element expected = 0x8cc1965a7cd255d59bb9c710d850c3ea5765dcddf21646694c8f38740811249_fgk;
+
+    element ret;
 
     mul(ret, a, b);
 

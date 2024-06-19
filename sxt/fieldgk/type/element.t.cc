@@ -48,6 +48,6 @@ TEST_CASE("element conversion") {
   SECTION("of r2_v is r_v") {
     element e(fgkb::r2_v.data());
     oss << e;
-    REQUIRE(oss.str() == "0xe0a77c19a07df2f666ea36f7879462c0a78eb28f5c70b3dd35d438dc58f0d9d_fgk");
+    REQUIRE(oss.str() == "0xe0a77c19a07df2f666ea36f7879462e36fc76959f60cd29ac96341c4ffffffb_fgk");
   }
 }

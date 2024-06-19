@@ -8,8 +8,10 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
+        "//sxt/fieldgk/constant:one",
         "//sxt/fieldgk/constant:zero",
         "//sxt/fieldgk/random:element",
+        "//sxt/fieldgk/type:literal",
     ],
     deps = [
         "//sxt/base/field:arithmetic_utility",
@@ -74,6 +76,7 @@ sxt_cc_component(
         "//sxt/fieldgk/constant:zero",
         "//sxt/fieldgk/random:element",
         "//sxt/fieldgk/type:element",
+        "//sxt/fieldgk/type:literal",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
@@ -85,8 +88,10 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/fieldgk/base:constants",
+        "//sxt/fieldgk/constant:one",
         "//sxt/fieldgk/constant:zero",
         "//sxt/fieldgk/type:element",
+        "//sxt/fieldgk/type:literal",
     ],
     deps = [
         "//sxt/base/field:arithmetic_utility",
@@ -105,10 +110,7 @@ sxt_cc_component(
         "//sxt/fieldgk/type:element",
     ],
     is_cuda = True,
-    test_deps = [
-        "//sxt/base/test:unit_test",
-        "//sxt/fieldgk/type:element",
-    ],
+    with_test = False,
     deps = [
         "//sxt/base/macro:cuda_callable",
     ],
@@ -139,8 +141,10 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
+        "//sxt/fieldgk/constant:one",
         "//sxt/fieldgk/constant:zero",
         "//sxt/fieldgk/random:element",
+        "//sxt/fieldgk/type:literal",
     ],
     deps = [
         ":add",

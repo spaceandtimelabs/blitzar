@@ -73,7 +73,7 @@ TEST_CASE("reducing using Montgomery reduction") {
 
 TEST_CASE("the below modulus function") {
   SECTION("returns true if one below the modulus p_v") {
-    constexpr std::array<uint64_t, 4> h = {0x3c208c16d87cfd46, 0x97816a916871ca8d,
+    constexpr std::array<uint64_t, 4> h = {0x43e1f593f0000000, 0x2833e84879b97091,
                                            0xb85045b68181585d, 0x30644e72e131a029};
 
     REQUIRE(is_below_modulus(h.data()) == true);
@@ -84,7 +84,7 @@ TEST_CASE("the below modulus function") {
   }
 
   SECTION("returns false if one above the modulus p_v") {
-    constexpr std::array<uint64_t, 4> h = {0x3c208c16d87cfd48, 0x97816a916871ca8d,
+    constexpr std::array<uint64_t, 4> h = {0x43e1f593f0000002, 0x2833e84879b97091,
                                            0xb85045b68181585d, 0x30644e72e131a029};
 
     REQUIRE(is_below_modulus(h.data()) == false);

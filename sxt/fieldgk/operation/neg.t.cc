@@ -18,16 +18,19 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/fieldgk/base/constants.h"
+#include "sxt/fieldgk/constant/one.h"
 #include "sxt/fieldgk/constant/zero.h"
 #include "sxt/fieldgk/type/element.h"
+#include "sxt/fieldgk/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::fgko;
+using namespace sxt::fgkt;
 
 TEST_CASE("negation") {
   SECTION("of zero and the modulus are equal") {
-    fgkt::element ret_zero;
-    fgkt::element ret_modulus;
+    element ret_zero;
+    element ret_modulus;
 
     neg(ret_zero, fgkcn::zero_v);
     neg(ret_modulus, fgkb::p_v.data());
@@ -36,23 +39,21 @@ TEST_CASE("negation") {
   }
 
   SECTION("of the modulus minus one is one") {
-    constexpr fgkt::element modulus_minus_one{0x3c208c16d87cfd46, 0x97816a916871ca8d,
-                                              0xb85045b68181585d, 0x30644e72e131a029};
-    constexpr fgkt::element one{1, 0, 0, 0};
-    fgkt::element ret;
+    element modulus_minus_one =
+        0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000_fgk;
+    element ret;
 
     neg(ret, modulus_minus_one);
 
-    REQUIRE(ret == one);
+    REQUIRE(ret == fgkcn::one_v);
   }
 
   SECTION("of a pre-computed value is expected") {
-    // Random bn254 base field element generated using the SAGE library.
-    constexpr fgkt::element a{0x1149c21473b043fd, 0x5610b2a5c08c7ecf, 0xc9e31f2d914c45b5,
-                              0x066031eb7a3ca7fd};
-    constexpr fgkt::element expected{0x2ad6ca0264ccb94a, 0x4170b7eba7e54bbe, 0xee6d2688f03512a8,
-                                     0x2a041c8766f4f82b};
-    fgkt::element ret;
+    // Random Grumpkin base field element generated using the SAGE library.
+    element a = 0x11d00c6953e75d5492d56f7f4902850ea43757d7568ac00b6462df193faa5a05_fgk;
+    element expected = 0x1e9442098d4a42d5257ad637387ed34e83fc9071232eb085df7f167ab055a5fc_fgk;
+
+    element ret;
 
     neg(ret, a);
 
