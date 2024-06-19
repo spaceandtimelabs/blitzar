@@ -57,6 +57,7 @@ sxt_cc_component(
         "//sxt/base/error:assert",
         "//sxt/base/macro:cuda_callable",
         "//sxt/base/num:divide_up",
+        "//sxt/base/num:round_up",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:synchronization",
         "//sxt/memory/management:managed_array",

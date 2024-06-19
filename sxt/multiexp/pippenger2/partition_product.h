@@ -29,6 +29,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/num/divide_up.h"
+#include "sxt/base/num/round_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
@@ -106,7 +107,7 @@ xena::future<> async_partition_product(basct::span<T> products,
                                        const partition_table_accessor<U>& accessor,
                                        basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
   auto num_products = products.size();
-  auto num_products_round_8 = basn::divide_up<size_t>(num_products, 8u) * 8u;
+  auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products_round_8);
   auto num_partitions = basn::divide_up(n, 16u);
   SXT_DEBUG_ASSERT(
@@ -144,7 +145,7 @@ xena::future<> async_partition_product(basct::span<T> products,
            __host__(unsigned num_products, unsigned product_index) noexcept {
              auto byte_index = product_index / 8u;
              auto bit_offset = product_index % 8u;
-             auto num_products_round_8 = basn::divide_up(num_products, 8u) * 8u;
+             auto num_products_round_8 = basn::round_up(num_products, 8u);
              partition_product_kernel<T>(products, partition_table, scalars, byte_index, bit_offset,
                                          num_products_round_8, n);
            };
@@ -180,7 +181,7 @@ void partition_product(basct::span<T> products, const partition_table_accessor<U
   for (unsigned product_index = 0; product_index < num_products; ++product_index) {
     auto byte_index = product_index / 8u;
     auto bit_offset = product_index % 8u;
-    auto num_products_round_8 = basn::divide_up<size_t>(num_products, 8u) * 8u;
+    auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
     partition_product_kernel<T>(products.data(), partition_table.data(), scalars.data(), byte_index,
                                 bit_offset, num_products_round_8, n);
   }
