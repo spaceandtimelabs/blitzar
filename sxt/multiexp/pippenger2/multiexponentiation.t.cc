@@ -199,7 +199,8 @@ TEST_CASE("we can compute multiexponentiations with packed scalars") {
     REQUIRE(res[2] == 6u * generators[0].value);
   }
 
-  SECTION("we can compute a multiexponentiation with multiple outputs of varying bit sizes and length 2") {
+  SECTION("we can compute a multiexponentiation with multiple outputs of varying bit sizes and "
+          "length 2") {
     output_bit_table = {2, 1, 3};
     scalars = {0b110011, 0b101101};
     res.resize(3);

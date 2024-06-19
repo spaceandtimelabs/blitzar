@@ -86,7 +86,7 @@ void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
   // make partial bit table sums
   memmg::managed_array<unsigned> bit_table_partial_sums{num_outputs, memr::get_pinned_resource()};
   unsigned sum = 0;
-  for (unsigned output_index=0; output_index<num_outputs; ++output_index) {
+  for (unsigned output_index = 0; output_index < num_outputs; ++output_index) {
     bit_table_partial_sums[output_index] = sum;
     sum += output_bit_table[output_index];
   }

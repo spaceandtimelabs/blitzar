@@ -117,7 +117,7 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<U
   memmg::managed_array<T> res_dev{num_outputs, &resource};
   reduce_products<T>(res_dev, stream, output_bit_table, products);
   products.reset();
-  
+
   // copy result
   basdv::async_copy_device_to_host(res, res_dev, stream);
   co_await xendv::await_stream(stream);
