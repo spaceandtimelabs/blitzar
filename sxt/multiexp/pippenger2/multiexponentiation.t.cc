@@ -198,6 +198,18 @@ TEST_CASE("we can compute multiexponentiations with packed scalars") {
     REQUIRE(res[1] == 0u);
     REQUIRE(res[2] == 6u * generators[0].value);
   }
+
+  SECTION("we can compute a multiexponentiation with multiple outputs of varying bit sizes and length 2") {
+    output_bit_table = {2, 1, 3};
+    scalars = {0b110011, 0b101101};
+    res.resize(3);
+    auto fut = async_multiexponentiate<E>(res, *accessor, output_bit_table, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 3u * generators[0].value + generators[1].value);
+    REQUIRE(res[1] == generators[1].value);
+    REQUIRE(res[2] == 6u * generators[0].value + 5u * generators[1].value);
+  }
 }
 
 TEST_CASE("we can compute multiexponentiations with curve-21") {
