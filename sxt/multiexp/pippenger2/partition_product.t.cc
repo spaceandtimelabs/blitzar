@@ -96,6 +96,20 @@ TEST_CASE("we can compute the product of partitions") {
     REQUIRE(products == expected);
   }
 
+  SECTION("we can compute a multiproduct where the number of products is not a multiple of 8") {
+    scalars = {1u, 3u};
+    products.resize(2);
+    auto fut = async_partition_product<E>(products, accessor, scalars, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected = {
+        partition_table[3],
+        partition_table[2],
+    };
+    REQUIRE(products == expected);
+  }
+
   SECTION("we handle a product with an offset") {
     scalars[0] = 1;
     auto fut = async_partition_product<E>(products, accessor, scalars, 16);
