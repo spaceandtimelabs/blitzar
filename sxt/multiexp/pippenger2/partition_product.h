@@ -166,7 +166,7 @@ template <bascrv::element T, class U>
 void partition_product(basct::span<T> products, const partition_table_accessor<U>& accessor,
                        basct::cspan<uint8_t> scalars, unsigned offset) noexcept {
   auto num_products = products.size();
-  auto num_products_round_8 = basn::divide_up<size_t>(num_products, 8u) * 8u;
+  auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products_round_8);
   SXT_DEBUG_ASSERT(
       // clang-format off
