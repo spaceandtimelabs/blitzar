@@ -113,6 +113,7 @@ xena::future<> async_partition_product(basct::span<T> products,
   SXT_DEBUG_ASSERT(
       // clang-format off
       offset % 16u == 0 &&
+      scalars.size() * 8u % num_products_round_8 == 0 &&
       basdv::is_active_device_pointer(products.data()) &&
       basdv::is_host_pointer(scalars.data())
       // clang-format on
