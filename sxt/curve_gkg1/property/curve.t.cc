@@ -21,9 +21,9 @@
 #include "sxt/curve_gkg1/constant/generator.h"
 #include "sxt/curve_gkg1/type/element_affine.h"
 #include "sxt/curve_gkg1/type/element_p2.h"
-#include "sxt/field25/constant/one.h"
-#include "sxt/field25/operation/mul.h"
-#include "sxt/field25/operation/neg.h"
+#include "sxt/fieldgk/constant/one.h"
+#include "sxt/fieldgk/operation/mul.h"
+#include "sxt/fieldgk/operation/neg.h"
 
 using namespace sxt;
 using namespace sxt::ck1p;
@@ -38,7 +38,7 @@ TEST_CASE("an affine element") {
   }
 
   SECTION("equal to (1,1) is not on the curve") {
-    constexpr ck1t::element_affine one_one{f25cn::one_v, f25cn::one_v, false};
+    constexpr ck1t::element_affine one_one{fgkcn::one_v, fgkcn::one_v, false};
 
     REQUIRE(!is_on_curve(one_one));
   }
@@ -49,23 +49,23 @@ TEST_CASE("a projective element") {
 
   SECTION("equal to the generator projected by z is on the curve") {
     // z is arbitrarily chosen to be 3 in Montgomery form for this section of the test.
-    constexpr f25t::element z{ck1cn::b_v};
-    f25t::element x_projected;
-    f25t::element y_projected;
-    f25o::mul(x_projected, ck1cn::generator_p2_v.X, z);
-    f25o::mul(y_projected, ck1cn::generator_p2_v.Y, z);
+    constexpr fgkt::element z{ck1cn::b_v};
+    fgkt::element x_projected;
+    fgkt::element y_projected;
+    fgko::mul(x_projected, ck1cn::generator_p2_v.X, z);
+    fgko::mul(y_projected, ck1cn::generator_p2_v.Y, z);
     ck1t::element_p2 generator_projected{x_projected, y_projected, z};
 
     REQUIRE(is_on_curve(generator_projected));
 
-    f25t::element neg_y;
-    f25o::neg(neg_y, generator_projected.Y);
+    fgkt::element neg_y;
+    fgko::neg(neg_y, generator_projected.Y);
     generator_projected.Y = neg_y;
 
     REQUIRE(is_on_curve(generator_projected));
 
-    f25t::element neg_x;
-    f25o::neg(neg_x, generator_projected.X);
+    fgkt::element neg_x;
+    fgko::neg(neg_x, generator_projected.X);
     generator_projected.X = neg_x;
 
     REQUIRE(!is_on_curve(generator_projected));
@@ -76,7 +76,7 @@ TEST_CASE("a projective element") {
   }
 
   SECTION("equal to (1,1,1) is not on the curve") {
-    constexpr ck1t::element_p2 one_one{f25cn::one_v, f25cn::one_v, f25cn::one_v};
+    constexpr ck1t::element_p2 one_one{fgkcn::one_v, fgkcn::one_v, fgkcn::one_v};
 
     REQUIRE(!is_on_curve(one_one));
   }

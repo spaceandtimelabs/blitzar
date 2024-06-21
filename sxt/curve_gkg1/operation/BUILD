@@ -19,16 +19,16 @@ sxt_cc_component(
         "//sxt/curve_gkg1/property:curve",
         "//sxt/curve_gkg1/property:identity",
         "//sxt/curve_gkg1/type:element_affine",
-        "//sxt/field25/random:element",
-        "//sxt/field25/type:element",
+        "//sxt/fieldgk/random:element",
+        "//sxt/fieldgk/type:element",
     ],
     deps = [
         ":mul_by_3b",
         "//sxt/base/macro:cuda_callable",
         "//sxt/curve_gkg1/type:element_p2",
-        "//sxt/field25/operation:add",
-        "//sxt/field25/operation:mul",
-        "//sxt/field25/operation:sub",
+        "//sxt/fieldgk/operation:add",
+        "//sxt/fieldgk/operation:mul",
+        "//sxt/fieldgk/operation:sub",
     ],
 )
 
@@ -37,7 +37,7 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/curve_gkg1/type:element_affine",
         "//sxt/curve_gkg1/type:element_p2",
-        "//sxt/field25/operation:cmov",
+        "//sxt/fieldgk/operation:cmov",
     ],
     is_cuda = True,
     test_deps = [
@@ -58,11 +58,11 @@ sxt_cc_component(
         ":mul_by_3b",
         "//sxt/curve_gkg1/property:identity",
         "//sxt/curve_gkg1/type:element_p2",
-        "//sxt/field25/operation:add",
-        "//sxt/field25/operation:mul",
-        "//sxt/field25/operation:square",
-        "//sxt/field25/operation:sub",
-        "//sxt/field25/type:element",
+        "//sxt/fieldgk/operation:add",
+        "//sxt/fieldgk/operation:mul",
+        "//sxt/fieldgk/operation:square",
+        "//sxt/fieldgk/operation:sub",
+        "//sxt/fieldgk/type:element",
     ],
     is_cuda = True,
     test_deps = [
@@ -71,7 +71,7 @@ sxt_cc_component(
         "//sxt/curve_gkg1/property:curve",
         "//sxt/curve_gkg1/property:identity",
         "//sxt/curve_gkg1/type:element_p2",
-        "//sxt/field25/constant:zero",
+        "//sxt/fieldgk/constant:zero",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
@@ -82,14 +82,14 @@ sxt_cc_component(
     name = "mul_by_3b",
     test_deps = [
         "//sxt/base/test:unit_test",
-        "//sxt/field25/constant:one",
-        "//sxt/field25/type:element",
-        "//sxt/field25/type:literal",
+        "//sxt/fieldgk/constant:one",
+        "//sxt/fieldgk/type:element",
+        "//sxt/fieldgk/type:literal",
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
-        "//sxt/field25/operation:add",
-        "//sxt/field25/type:element",
+        "//sxt/fieldgk/operation:add",
+        "//sxt/fieldgk/type:element",
     ],
 )
 
@@ -97,9 +97,9 @@ sxt_cc_component(
     name = "neg",
     impl_deps = [
         "//sxt/curve_gkg1/type:element_p2",
-        "//sxt/field25/operation:cmov",
-        "//sxt/field25/operation:neg",
-        "//sxt/field25/type:element",
+        "//sxt/fieldgk/operation:cmov",
+        "//sxt/fieldgk/operation:neg",
+        "//sxt/fieldgk/type:element",
     ],
     is_cuda = True,
     test_deps = [

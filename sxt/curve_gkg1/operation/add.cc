@@ -35,35 +35,35 @@ namespace sxt::ck1o {
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 void add(ck1t::element_p2& h, const ck1t::element_p2& p, const ck1t::element_affine& q) noexcept {
-  f25t::element t0, t1, t2, t3, t4;
-  f25t::element x3, y3, z3;
+  fgkt::element t0, t1, t2, t3, t4;
+  fgkt::element x3, y3, z3;
 
-  f25o::mul(t0, p.X, q.X);
-  f25o::mul(t1, p.Y, q.Y);
-  f25o::add(t3, q.X, q.Y);
-  f25o::add(t4, p.X, p.Y);
-  f25o::mul(t3, t3, t4);
-  f25o::add(t4, t0, t1);
-  f25o::sub(t3, t3, t4);
-  f25o::mul(t4, q.Y, p.Z);
-  f25o::add(t4, t4, p.Y);
-  f25o::mul(y3, q.X, p.Z);
-  f25o::add(y3, y3, p.X);
-  f25o::add(x3, t0, t0);
-  f25o::add(t0, x3, t0);
+  fgko::mul(t0, p.X, q.X);
+  fgko::mul(t1, p.Y, q.Y);
+  fgko::add(t3, q.X, q.Y);
+  fgko::add(t4, p.X, p.Y);
+  fgko::mul(t3, t3, t4);
+  fgko::add(t4, t0, t1);
+  fgko::sub(t3, t3, t4);
+  fgko::mul(t4, q.Y, p.Z);
+  fgko::add(t4, t4, p.Y);
+  fgko::mul(y3, q.X, p.Z);
+  fgko::add(y3, y3, p.X);
+  fgko::add(x3, t0, t0);
+  fgko::add(t0, x3, t0);
   mul_by_3b(t2, p.Z);
-  f25o::add(z3, t1, t2);
-  f25o::sub(t1, t1, t2);
+  fgko::add(z3, t1, t2);
+  fgko::sub(t1, t1, t2);
   mul_by_3b(y3, y3);
-  f25o::mul(x3, t4, y3);
-  f25o::mul(t2, t3, t1);
-  f25o::sub(x3, t2, x3);
-  f25o::mul(y3, y3, t0);
-  f25o::mul(t1, t1, z3);
-  f25o::add(y3, t1, y3);
-  f25o::mul(t0, t0, t3);
-  f25o::mul(z3, z3, t4);
-  f25o::add(z3, z3, t0);
+  fgko::mul(x3, t4, y3);
+  fgko::mul(t2, t3, t1);
+  fgko::sub(x3, t2, x3);
+  fgko::mul(y3, y3, t0);
+  fgko::mul(t1, t1, z3);
+  fgko::add(y3, t1, y3);
+  fgko::mul(t0, t0, t3);
+  fgko::mul(z3, z3, t4);
+  fgko::add(z3, z3, t0);
 
   h.X = x3;
   h.Y = y3;

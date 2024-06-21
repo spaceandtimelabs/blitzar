@@ -24,9 +24,9 @@
 #include "sxt/curve_gkg1/property/identity.h"
 #include "sxt/curve_gkg1/type/element_affine.h"
 #include "sxt/curve_gkg1/type/element_p2.h"
-#include "sxt/field25/operation/mul.h"
-#include "sxt/field25/random/element.h"
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/operation/mul.h"
+#include "sxt/fieldgk/random/element.h"
+#include "sxt/fieldgk/type/element.h"
 
 using namespace sxt;
 using namespace sxt::ck1o;
@@ -41,14 +41,14 @@ TEST_CASE("addition with projective elements") {
   }
 
   SECTION("is commutative") {
-    f25t::element z;
+    fgkt::element z;
     basn::fast_random_number_generator rng{1, 2};
-    f25rn::generate_random_element(z, rng);
+    fgkrn::generate_random_element(z, rng);
 
-    f25t::element x;
-    f25t::element y;
-    f25o::mul(x, ck1cn::generator_p2_v.X, z);
-    f25o::mul(y, ck1cn::generator_p2_v.Y, z);
+    fgkt::element x;
+    fgkt::element y;
+    fgko::mul(x, ck1cn::generator_p2_v.X, z);
+    fgko::mul(y, ck1cn::generator_p2_v.Y, z);
     const ck1t::element_p2 projected_generator{x, y, z};
     ck1t::element_p2 ret;
 
@@ -108,14 +108,14 @@ TEST_CASE("addition with mixed elements") {
   }
 
   SECTION("keeps the generator on the curve") {
-    f25t::element z;
+    fgkt::element z;
     basn::fast_random_number_generator rng{1, 2};
-    f25rn::generate_random_element(z, rng);
+    fgkrn::generate_random_element(z, rng);
 
-    f25t::element x;
-    f25t::element y;
-    f25o::mul(x, ck1cn::generator_p2_v.X, z);
-    f25o::mul(y, ck1cn::generator_p2_v.Y, z);
+    fgkt::element x;
+    fgkt::element y;
+    fgko::mul(x, ck1cn::generator_p2_v.X, z);
+    fgko::mul(y, ck1cn::generator_p2_v.Y, z);
     const ck1t::element_p2 projected_generator{x, y, z};
     ck1t::element_p2 ret;
 

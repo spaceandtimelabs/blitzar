@@ -17,20 +17,20 @@
 #include "sxt/curve_gkg1/operation/mul_by_3b.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field25/constant/one.h"
-#include "sxt/field25/type/element.h"
-#include "sxt/field25/type/literal.h"
+#include "sxt/fieldgk/constant/one.h"
+#include "sxt/fieldgk/type/element.h"
+#include "sxt/fieldgk/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::ck1o;
-using namespace sxt::f25t;
+using namespace sxt::fgkt;
 
 TEST_CASE("multiply by 3b") {
   SECTION("returns nine if one in Montgomery form is the input") {
-    f25t::element ret;
+    fgkt::element ret;
 
-    mul_by_3b(ret, f25cn::one_v);
+    mul_by_3b(ret, fgkcn::one_v);
 
-    REQUIRE(0x9_f25 == ret);
+    REQUIRE(0x9_fgk == ret);
   }
 }

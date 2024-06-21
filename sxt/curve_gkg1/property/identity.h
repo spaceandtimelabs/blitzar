@@ -19,7 +19,7 @@
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/curve_gkg1/type/element_affine.h"
 #include "sxt/curve_gkg1/type/element_p2.h"
-#include "sxt/field25/property/zero.h"
+#include "sxt/fieldgk/property/zero.h"
 
 namespace sxt::ck1p {
 //--------------------------------------------------------------------------------------------------
@@ -32,5 +32,5 @@ inline bool is_identity(const ck1t::element_affine& p) noexcept { return p.infin
 // is_identity
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
-inline bool is_identity(const ck1t::element_p2& p) noexcept { return f25p::is_zero(p.Z); }
+inline bool is_identity(const ck1t::element_p2& p) noexcept { return fgkp::is_zero(p.Z); }
 } // namespace sxt::ck1p

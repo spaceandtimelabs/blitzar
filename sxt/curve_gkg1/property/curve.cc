@@ -28,12 +28,12 @@
 #include "sxt/curve_gkg1/constant/b.h"
 #include "sxt/curve_gkg1/type/element_affine.h"
 #include "sxt/curve_gkg1/type/element_p2.h"
-#include "sxt/field25/operation/add.h"
-#include "sxt/field25/operation/mul.h"
-#include "sxt/field25/operation/square.h"
-#include "sxt/field25/operation/sub.h"
-#include "sxt/field25/property/zero.h"
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/operation/add.h"
+#include "sxt/fieldgk/operation/mul.h"
+#include "sxt/fieldgk/operation/square.h"
+#include "sxt/fieldgk/operation/sub.h"
+#include "sxt/fieldgk/property/zero.h"
+#include "sxt/fieldgk/type/element.h"
 
 namespace sxt::ck1p {
 //--------------------------------------------------------------------------------------------------
@@ -43,16 +43,16 @@ namespace sxt::ck1p {
  * Returns true if the element is on the curve: y^2 - x^3 = b_v
  */
 bool is_on_curve(const ck1t::element_affine& p) noexcept {
-  f25t::element y2;
-  f25o::square(y2, p.Y);
+  fgkt::element y2;
+  fgko::square(y2, p.Y);
 
-  f25t::element x2;
-  f25t::element x3;
-  f25o::square(x2, p.X);
-  f25o::mul(x3, x2, p.X);
+  fgkt::element x2;
+  fgkt::element x3;
+  fgko::square(x2, p.X);
+  fgko::mul(x3, x2, p.X);
 
-  f25t::element y2_x3;
-  f25o::sub(y2_x3, y2, x3);
+  fgkt::element y2_x3;
+  fgko::sub(y2_x3, y2, x3);
 
   return (y2_x3 == ck1cn::b_v) || p.infinity;
 }
@@ -64,26 +64,26 @@ bool is_on_curve(const ck1t::element_affine& p) noexcept {
  * Returns true if the element is on the curve: (y^2 * z) = x^3 + (b_v * z^3)
  */
 bool is_on_curve(const ck1t::element_p2& p) noexcept {
-  f25t::element y2;
-  f25t::element y2_z;
-  f25o::square(y2, p.Y);
-  f25o::mul(y2_z, y2, p.Z);
+  fgkt::element y2;
+  fgkt::element y2_z;
+  fgko::square(y2, p.Y);
+  fgko::mul(y2_z, y2, p.Z);
 
-  f25t::element x2;
-  f25t::element x3;
-  f25o::square(x2, p.X);
-  f25o::mul(x3, x2, p.X);
+  fgkt::element x2;
+  fgkt::element x3;
+  fgko::square(x2, p.X);
+  fgko::mul(x3, x2, p.X);
 
-  f25t::element z2;
-  f25t::element z3;
-  f25t::element b_z3;
-  f25o::square(z2, p.Z);
-  f25o::mul(z3, z2, p.Z);
-  f25o::mul(b_z3, f25t::element{ck1cn::b_v}, z3);
+  fgkt::element z2;
+  fgkt::element z3;
+  fgkt::element b_z3;
+  fgko::square(z2, p.Z);
+  fgko::mul(z3, z2, p.Z);
+  fgko::mul(b_z3, fgkt::element{ck1cn::b_v}, z3);
 
-  f25t::element x3_b_z3;
-  f25o::add(x3_b_z3, x3, b_z3);
+  fgkt::element x3_b_z3;
+  fgko::add(x3_b_z3, x3, b_z3);
 
-  return (y2_z == x3_b_z3) || f25p::is_zero(p.Z);
+  return (y2_z == x3_b_z3) || fgkp::is_zero(p.Z);
 }
 } // namespace sxt::ck1p

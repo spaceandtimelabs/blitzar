@@ -19,9 +19,9 @@
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/curve_gkg1/operation/mul_by_3b.h"
 #include "sxt/curve_gkg1/type/element_p2.h"
-#include "sxt/field25/operation/add.h"
-#include "sxt/field25/operation/mul.h"
-#include "sxt/field25/operation/sub.h"
+#include "sxt/fieldgk/operation/add.h"
+#include "sxt/fieldgk/operation/mul.h"
+#include "sxt/fieldgk/operation/sub.h"
 
 namespace sxt::ck1t {
 struct element_affine;
@@ -35,42 +35,42 @@ namespace sxt::ck1o {
  * p = p + q
  */
 CUDA_CALLABLE inline void add_inplace(ck1t::element_p2& p, const ck1t::element_p2& q) noexcept {
-  f25t::element t0, t1, t2, t3, t4;
-  const f25t::element px{p.X};
+  fgkt::element t0, t1, t2, t3, t4;
+  const fgkt::element px{p.X};
 
-  f25o::mul(t0, p.X, q.X);
-  f25o::mul(t1, p.Y, q.Y);
-  f25o::mul(t2, p.Z, q.Z);
-  f25o::add(t3, p.X, p.Y);
-  f25o::add(t4, q.X, q.Y);
-  f25o::mul(t3, t3, t4);
-  f25o::add(t4, t0, t1);
-  f25o::sub(t3, t3, t4);
-  f25o::add(t4, p.Y, p.Z);
-  f25o::add(p.X, q.Y, q.Z);
-  f25o::mul(t4, t4, p.X);
-  f25o::add(p.X, t1, t2);
-  f25o::sub(t4, t4, p.X);
-  f25o::add(p.X, px, p.Z);
-  f25o::add(p.Y, q.X, q.Z);
-  f25o::mul(p.X, p.X, p.Y);
-  f25o::add(p.Y, t0, t2);
-  f25o::sub(p.Y, p.X, p.Y);
-  f25o::add(p.X, t0, t0);
-  f25o::add(t0, p.X, t0);
+  fgko::mul(t0, p.X, q.X);
+  fgko::mul(t1, p.Y, q.Y);
+  fgko::mul(t2, p.Z, q.Z);
+  fgko::add(t3, p.X, p.Y);
+  fgko::add(t4, q.X, q.Y);
+  fgko::mul(t3, t3, t4);
+  fgko::add(t4, t0, t1);
+  fgko::sub(t3, t3, t4);
+  fgko::add(t4, p.Y, p.Z);
+  fgko::add(p.X, q.Y, q.Z);
+  fgko::mul(t4, t4, p.X);
+  fgko::add(p.X, t1, t2);
+  fgko::sub(t4, t4, p.X);
+  fgko::add(p.X, px, p.Z);
+  fgko::add(p.Y, q.X, q.Z);
+  fgko::mul(p.X, p.X, p.Y);
+  fgko::add(p.Y, t0, t2);
+  fgko::sub(p.Y, p.X, p.Y);
+  fgko::add(p.X, t0, t0);
+  fgko::add(t0, p.X, t0);
   mul_by_3b(t2, t2);
-  f25o::add(p.Z, t1, t2);
-  f25o::sub(t1, t1, t2);
+  fgko::add(p.Z, t1, t2);
+  fgko::sub(t1, t1, t2);
   mul_by_3b(p.Y, p.Y);
-  f25o::mul(p.X, t4, p.Y);
-  f25o::mul(t2, t3, t1);
-  f25o::sub(p.X, t2, p.X);
-  f25o::mul(p.Y, p.Y, t0);
-  f25o::mul(t1, t1, p.Z);
-  f25o::add(p.Y, t1, p.Y);
-  f25o::mul(t0, t0, t3);
-  f25o::mul(p.Z, p.Z, t4);
-  f25o::add(p.Z, p.Z, t0);
+  fgko::mul(p.X, t4, p.Y);
+  fgko::mul(t2, t3, t1);
+  fgko::sub(p.X, t2, p.X);
+  fgko::mul(p.Y, p.Y, t0);
+  fgko::mul(t1, t1, p.Z);
+  fgko::add(p.Y, t1, p.Y);
+  fgko::mul(t0, t0, t3);
+  fgko::mul(p.Z, p.Z, t4);
+  fgko::add(p.Z, p.Z, t0);
 }
 
 //--------------------------------------------------------------------------------------------------

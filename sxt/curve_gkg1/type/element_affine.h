@@ -25,9 +25,9 @@
  */
 #pragma once
 
-#include "sxt/field25/constant/one.h"
-#include "sxt/field25/constant/zero.h"
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/constant/one.h"
+#include "sxt/fieldgk/constant/zero.h"
+#include "sxt/fieldgk/type/element.h"
 
 namespace sxt::ck1t {
 //--------------------------------------------------------------------------------------------------
@@ -40,12 +40,12 @@ namespace sxt::ck1t {
  * Values of `G1Affine` are guaranteed to be in the q-order subgroup.
  */
 struct element_affine {
-  f25t::element X;
-  f25t::element Y;
+  fgkt::element X;
+  fgkt::element Y;
   uint8_t infinity;
 
   static constexpr element_affine identity() noexcept {
-    return element_affine{f25cn::zero_v, f25cn::one_v, true};
+    return element_affine{fgkcn::zero_v, fgkcn::one_v, true};
   }
 
   bool operator==(const element_affine& rhs) const noexcept = default;

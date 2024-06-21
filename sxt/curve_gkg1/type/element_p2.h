@@ -19,10 +19,10 @@
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/curve_gkg1/type/compact_element.h"
 #include "sxt/curve_gkg1/type/operation_adl_stub.h"
-#include "sxt/field25/constant/one.h"
-#include "sxt/field25/constant/zero.h"
-#include "sxt/field25/operation/cmov.h"
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/constant/one.h"
+#include "sxt/fieldgk/constant/zero.h"
+#include "sxt/fieldgk/operation/cmov.h"
+#include "sxt/fieldgk/type/element.h"
 
 namespace sxt::ck1t {
 //--------------------------------------------------------------------------------------------------
@@ -35,25 +35,25 @@ namespace sxt::ck1t {
 struct element_p2 : ck1o::operation_adl_stub {
   element_p2() noexcept = default;
 
-  constexpr element_p2(const f25t::element& X, const f25t::element& Y,
-                       const f25t::element& Z) noexcept
+  constexpr element_p2(const fgkt::element& X, const fgkt::element& Y,
+                       const fgkt::element& Z) noexcept
       : X{X}, Y{Y}, Z{Z} {}
 
   CUDA_CALLABLE explicit element_p2(const compact_element& e) noexcept
-      : X{e.X}, Y{e.Y}, Z{f25cn::one_v} {
+      : X{e.X}, Y{e.Y}, Z{fgkcn::one_v} {
     auto is_identity = e.is_identity();
-    f25o::cmov(X, f25cn::zero_v, is_identity);
-    f25o::cmov(Z, f25cn::zero_v, is_identity);
+    fgko::cmov(X, fgkcn::zero_v, is_identity);
+    fgko::cmov(Z, fgkcn::zero_v, is_identity);
   }
 
   CUDA_CALLABLE explicit operator compact_element() const noexcept;
 
-  f25t::element X;
-  f25t::element Y;
-  f25t::element Z;
+  fgkt::element X;
+  fgkt::element Y;
+  fgkt::element Z;
 
   static constexpr element_p2 identity() noexcept {
-    return element_p2{f25cn::zero_v, f25cn::one_v, f25cn::zero_v};
+    return element_p2{fgkcn::zero_v, fgkcn::one_v, fgkcn::zero_v};
   }
 };
 

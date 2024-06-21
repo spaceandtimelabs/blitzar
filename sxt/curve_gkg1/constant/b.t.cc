@@ -17,8 +17,8 @@
 #include "sxt/curve_gkg1/constant/b.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field25/base/montgomery.h"
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/base/montgomery.h"
+#include "sxt/fieldgk/type/element.h"
 
 using namespace sxt;
 using namespace sxt::ck1cn;
@@ -26,9 +26,9 @@ using namespace sxt::ck1cn;
 TEST_CASE("b_v") {
   SECTION("is 3 in Montgomery form") {
     constexpr std::array<uint64_t, 4> a{3, 0, 0, 0};
-    f25t::element ret;
+    fgkt::element ret;
 
-    f25b::to_montgomery_form(ret.data(), a.data());
+    fgkb::to_montgomery_form(ret.data(), a.data());
 
     REQUIRE(b_v == ret);
   }

@@ -26,9 +26,9 @@
 #include "sxt/curve_gkg1/operation/neg.h"
 
 #include "sxt/curve_gkg1/type/element_p2.h"
-#include "sxt/field25/operation/cmov.h"
-#include "sxt/field25/operation/neg.h"
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/operation/cmov.h"
+#include "sxt/fieldgk/operation/neg.h"
+#include "sxt/fieldgk/type/element.h"
 
 namespace sxt::ck1o {
 //--------------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ namespace sxt::ck1o {
 CUDA_CALLABLE
 void neg(ck1t::element_p2& r, const ck1t::element_p2& p) noexcept {
   r.X = p.X;
-  f25o::neg(r.Y, p.Y);
+  fgko::neg(r.Y, p.Y);
   r.Z = p.Z;
 }
 
@@ -46,8 +46,8 @@ void neg(ck1t::element_p2& r, const ck1t::element_p2& p) noexcept {
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 void cneg(ck1t::element_p2& r, unsigned int b) noexcept {
-  f25t::element t;
-  f25o::neg(t, r.Y);
-  f25o::cmov(r.Y, t, b);
+  fgkt::element t;
+  fgko::neg(t, r.Y);
+  fgko::cmov(r.Y, t, b);
 }
 } // namespace sxt::ck1o

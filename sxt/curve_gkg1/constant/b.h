@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/type/element.h"
 
 namespace sxt::ck1cn {
 //--------------------------------------------------------------------------------------------------
@@ -26,6 +26,6 @@ namespace sxt::ck1cn {
  * b_v is 3 in Montgomery form.
  * Used in the bn254 curve equation: y^2 = x^3 + 3
  */
-static constexpr f25t::element b_v{0x7a17caa950ad28d7, 0x1f6ac17ae15521b9, 0x334bea4e696bd284,
+static constexpr fgkt::element b_v{0x7a17caa950ad28d7, 0x1f6ac17ae15521b9, 0x334bea4e696bd284,
                                    0x2a1f6744ce179d8e};
 } // namespace sxt::ck1cn

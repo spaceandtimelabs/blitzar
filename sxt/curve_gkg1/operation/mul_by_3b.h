@@ -17,8 +17,8 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/field25/operation/add.h"
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/operation/add.h"
+#include "sxt/fieldgk/type/element.h"
 
 namespace sxt::ck1o {
 //--------------------------------------------------------------------------------------------------
@@ -29,14 +29,14 @@ namespace sxt::ck1o {
  * See Algorithm 9 for details, https://eprint.iacr.org/2015/1060.pdf
  */
 CUDA_CALLABLE
-inline void mul_by_3b(f25t::element& h, const f25t::element& p) noexcept {
-  f25t::element p2;
-  f25t::element p4;
-  f25t::element p8;
+inline void mul_by_3b(fgkt::element& h, const fgkt::element& p) noexcept {
+  fgkt::element p2;
+  fgkt::element p4;
+  fgkt::element p8;
 
-  f25o::add(p2, p, p);
-  f25o::add(p4, p2, p2);
-  f25o::add(p8, p4, p4);
-  f25o::add(h, p8, p);
+  fgko::add(p2, p, p);
+  fgko::add(p4, p2, p2);
+  fgko::add(p8, p4, p4);
+  fgko::add(h, p8, p);
 }
 } // namespace sxt::ck1o

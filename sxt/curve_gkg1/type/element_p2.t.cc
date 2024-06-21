@@ -27,23 +27,23 @@
 
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field25/constant/one.h"
-#include "sxt/field25/constant/zero.h"
-#include "sxt/field25/operation/mul.h"
-#include "sxt/field25/random/element.h"
-#include "sxt/field25/type/element.h"
-#include "sxt/field25/type/literal.h"
+#include "sxt/fieldgk/constant/one.h"
+#include "sxt/fieldgk/constant/zero.h"
+#include "sxt/fieldgk/operation/mul.h"
+#include "sxt/fieldgk/random/element.h"
+#include "sxt/fieldgk/type/element.h"
+#include "sxt/fieldgk/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::ck1t;
-using f25t::operator""_f25;
+using fgkt::operator""_fgk;
 
 TEST_CASE("projective element equality") {
   SECTION("can distinguish the generator from the identity") {
     constexpr element_p2 a{
-        f25cn::one_v,
+        fgkcn::one_v,
         {0xa6ba871b8b1e1b3a, 0x14f1d651eb8e167b, 0xccdd46def0f28c58, 0x1c14ef83340fbe5e},
-        f25cn::one_v};
+        fgkcn::one_v};
     constexpr element_p2 b{element_p2::identity()};
 
     REQUIRE(a == a);
@@ -52,15 +52,15 @@ TEST_CASE("projective element equality") {
     REQUIRE(b != a);
 
     // Project the generator with a random field element.
-    f25t::element z;
+    fgkt::element z;
     basn::fast_random_number_generator rng{1, 2};
-    f25rn::generate_random_element(z, rng);
+    fgkrn::generate_random_element(z, rng);
 
-    f25t::element ax_z;
-    f25o::mul(ax_z, a.X, z);
+    fgkt::element ax_z;
+    fgko::mul(ax_z, a.X, z);
 
-    f25t::element ay_z;
-    f25o::mul(ay_z, a.Y, z);
+    fgkt::element ay_z;
+    fgko::mul(ay_z, a.Y, z);
 
     element_p2 c{ax_z, ay_z, z};
 
@@ -79,9 +79,9 @@ TEST_CASE("we can convert between elements") {
   }
 
   SECTION("we can covert an arbitrary element") {
-    element_p2 e{0x30644e72e131a029b85045b63db22989a0ca93286ebbf9d9bc5fd495e1a92d47_f25,
-                 0x30644e72e131a029b85045b668f629f0d4ae64afaa9d239050df4dd8b672b147_f25,
-                 0x307084c8417aab1f9ec8866edfd3f27acc230000_f25};
+    element_p2 e{0x30644e72e131a029b85045b63db22989a0ca93286ebbf9d9bc5fd495e1a92d47_fgk,
+                 0x30644e72e131a029b85045b668f629f0d4ae64afaa9d239050df4dd8b672b147_fgk,
+                 0x307084c8417aab1f9ec8866edfd3f27acc230000_fgk};
     auto ep = element_p2{static_cast<compact_element>(e)};
     REQUIRE(e == ep);
   }

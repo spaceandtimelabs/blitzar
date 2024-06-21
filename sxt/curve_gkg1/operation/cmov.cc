@@ -17,7 +17,7 @@
 #include "sxt/curve_gkg1/operation/cmov.h"
 
 #include "sxt/curve_gkg1/type/element_p2.h"
-#include "sxt/field25/operation/cmov.h"
+#include "sxt/fieldgk/operation/cmov.h"
 
 namespace sxt::ck1o {
 //--------------------------------------------------------------------------------------------------
@@ -25,8 +25,8 @@ namespace sxt::ck1o {
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 void cmov(ck1t::element_p2& f, const ck1t::element_p2& g, unsigned int b) noexcept {
-  f25o::cmov(f.X, g.X, b);
-  f25o::cmov(f.Y, g.Y, b);
-  f25o::cmov(f.Z, g.Z, b);
+  fgko::cmov(f.X, g.X, b);
+  fgko::cmov(f.Y, g.Y, b);
+  fgko::cmov(f.Z, g.Z, b);
 }
 } // namespace sxt::ck1o

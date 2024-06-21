@@ -29,19 +29,19 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve_gkg1/type/element_affine.h"
 #include "sxt/curve_gkg1/type/element_p2.h"
-#include "sxt/field25/constant/one.h"
-#include "sxt/field25/operation/mul.h"
-#include "sxt/field25/random/element.h"
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/constant/one.h"
+#include "sxt/fieldgk/operation/mul.h"
+#include "sxt/fieldgk/random/element.h"
+#include "sxt/fieldgk/type/element.h"
 
 using namespace sxt;
 using namespace sxt::ck1t;
 
-constexpr f25t::element generator_x{f25cn::one_v};
-constexpr f25t::element generator_y{0xa6ba871b8b1e1b3a, 0x14f1d651eb8e167b, 0xccdd46def0f28c58,
+constexpr fgkt::element generator_x{fgkcn::one_v};
+constexpr fgkt::element generator_y{0xa6ba871b8b1e1b3a, 0x14f1d651eb8e167b, 0xccdd46def0f28c58,
                                     0x1c14ef83340fbe5e};
 
-constexpr element_p2 generator_projective{generator_x, generator_y, f25cn::one_v};
+constexpr element_p2 generator_projective{generator_x, generator_y, fgkcn::one_v};
 constexpr element_p2 identity_projective{element_p2::identity()};
 
 constexpr element_affine generator_affine{generator_x, generator_y, false};
@@ -65,14 +65,14 @@ TEST_CASE("conversion from projective to affine elements") {
   }
 
   SECTION("does not change a projected generator coordinate") {
-    f25t::element z;
+    fgkt::element z;
     basn::fast_random_number_generator rng{1, 2};
-    f25rn::generate_random_element(z, rng);
+    fgkrn::generate_random_element(z, rng);
 
-    f25t::element gpx_z;
-    f25t::element gpy_z;
-    f25o::mul(gpx_z, generator_projective.X, z);
-    f25o::mul(gpy_z, generator_projective.Y, z);
+    fgkt::element gpx_z;
+    fgkt::element gpy_z;
+    fgko::mul(gpx_z, generator_projective.X, z);
+    fgko::mul(gpy_z, generator_projective.Y, z);
     element_p2 projective_pt{gpx_z, gpy_z, z};
 
     element_affine affine_pt;

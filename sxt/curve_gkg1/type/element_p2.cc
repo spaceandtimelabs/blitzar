@@ -25,10 +25,10 @@
  */
 #include "sxt/curve_gkg1/type/element_p2.h"
 
-#include "sxt/field25/operation/invert.h"
-#include "sxt/field25/operation/mul.h"
-#include "sxt/field25/property/zero.h"
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/operation/invert.h"
+#include "sxt/fieldgk/operation/mul.h"
+#include "sxt/fieldgk/property/zero.h"
+#include "sxt/fieldgk/type/element.h"
 
 namespace sxt::ck1t {
 //--------------------------------------------------------------------------------------------------
@@ -50,17 +50,17 @@ bool is_marked(const element_p2& e) noexcept { return e.Z[3] != unset_marker_v; 
 // operator compact_element
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE element_p2::operator compact_element() const noexcept {
-  f25t::element z_inv;
-  const bool is_zero{f25o::invert(z_inv, Z)};
-  f25o::cmov(z_inv, f25cn::zero_v, is_zero);
+  fgkt::element z_inv;
+  const bool is_zero{fgko::invert(z_inv, Z)};
+  fgko::cmov(z_inv, fgkcn::zero_v, is_zero);
 
-  f25t::element x;
-  f25t::element y;
-  f25o::mul(x, X, z_inv);
-  f25o::mul(y, Y, z_inv);
+  fgkt::element x;
+  fgkt::element y;
+  fgko::mul(x, X, z_inv);
+  fgko::mul(y, Y, z_inv);
 
-  f25o::cmov(x, compact_element::identity().X, is_zero);
-  f25o::cmov(y, compact_element::identity().Y, is_zero);
+  fgko::cmov(x, compact_element::identity().X, is_zero);
+  fgko::cmov(y, compact_element::identity().Y, is_zero);
 
   return {x, y};
 }
@@ -73,19 +73,19 @@ CUDA_CALLABLE element_p2::operator compact_element() const noexcept {
  * and the coordinates are the same.
  */
 bool operator==(const element_p2& lhs, const element_p2& rhs) noexcept {
-  f25t::element x1;
-  f25t::element x2;
-  f25t::element y1;
-  f25t::element y2;
+  fgkt::element x1;
+  fgkt::element x2;
+  fgkt::element y1;
+  fgkt::element y2;
 
-  f25o::mul(x1, lhs.X, rhs.Z);
-  f25o::mul(x2, rhs.X, lhs.Z);
+  fgko::mul(x1, lhs.X, rhs.Z);
+  fgko::mul(x2, rhs.X, lhs.Z);
 
-  f25o::mul(y1, lhs.Y, rhs.Z);
-  f25o::mul(y2, rhs.Y, lhs.Z);
+  fgko::mul(y1, lhs.Y, rhs.Z);
+  fgko::mul(y2, rhs.Y, lhs.Z);
 
-  const auto lhs_is_zero = f25p::is_zero(lhs.Z);
-  const auto rhs_is_zero = f25p::is_zero(rhs.Z);
+  const auto lhs_is_zero = fgkp::is_zero(lhs.Z);
+  const auto rhs_is_zero = fgkp::is_zero(rhs.Z);
 
   return (lhs_is_zero && rhs_is_zero) ||
          ((!lhs_is_zero) && (!rhs_is_zero) && (x1 == x2) && (y1 == y2));

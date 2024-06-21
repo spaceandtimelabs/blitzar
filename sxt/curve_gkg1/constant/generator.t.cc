@@ -17,8 +17,8 @@
 #include "sxt/curve_gkg1/constant/generator.h"
 
 #include "sxt/base/test/unit_test.h"
-#include "sxt/field25/base/montgomery.h"
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/base/montgomery.h"
+#include "sxt/fieldgk/type/element.h"
 
 using namespace sxt;
 using namespace sxt::ck1cn;
@@ -26,9 +26,9 @@ using namespace sxt::ck1cn;
 TEST_CASE("generator_y_v") {
   SECTION("is 2 in Montgomery form") {
     constexpr std::array<uint64_t, 4> a{2, 0, 0, 0};
-    f25t::element ret;
+    fgkt::element ret;
 
-    f25b::to_montgomery_form(ret.data(), a.data());
+    fgkb::to_montgomery_form(ret.data(), a.data());
 
     REQUIRE(generator_y_v == ret);
   }

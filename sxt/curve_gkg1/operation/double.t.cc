@@ -21,7 +21,7 @@
 #include "sxt/curve_gkg1/property/curve.h"
 #include "sxt/curve_gkg1/property/identity.h"
 #include "sxt/curve_gkg1/type/element_p2.h"
-#include "sxt/field25/constant/zero.h"
+#include "sxt/fieldgk/constant/zero.h"
 
 using namespace sxt;
 using namespace sxt::ck1o;
@@ -58,7 +58,7 @@ TEST_CASE("doubling a projective element") {
   }
 
   SECTION("produces the identity when Z is the zero element") {
-    constexpr ck1t::element_p2 p{ck1cn::generator_p2_v.X, ck1cn::generator_p2_v.Y, f25cn::zero_v};
+    constexpr ck1t::element_p2 p{ck1cn::generator_p2_v.X, ck1cn::generator_p2_v.Y, fgkcn::zero_v};
     ck1t::element_p2 expect_identity;
 
     double_element(expect_identity, p);

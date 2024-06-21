@@ -26,8 +26,8 @@
 
 #include "sxt/curve_gkg1/type/element_affine.h"
 #include "sxt/curve_gkg1/type/element_p2.h"
-#include "sxt/field25/constant/one.h"
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/constant/one.h"
+#include "sxt/fieldgk/type/element.h"
 
 namespace sxt::ck1cn {
 //--------------------------------------------------------------------------------------------------
@@ -41,12 +41,12 @@ namespace sxt::ck1cn {
  * Generator of G1 (x, y) = (1, 2).
  * Cofactor of G1 is 1.
  */
-static constexpr f25t::element generator_x_v{f25cn::one_v};
+static constexpr fgkt::element generator_x_v{fgkcn::one_v};
 
 //--------------------------------------------------------------------------------------------------
 // generator_y_v
 //--------------------------------------------------------------------------------------------------
-static constexpr f25t::element generator_y_v{0xa6ba871b8b1e1b3a, 0x14f1d651eb8e167b,
+static constexpr fgkt::element generator_y_v{0xa6ba871b8b1e1b3a, 0x14f1d651eb8e167b,
                                              0xccdd46def0f28c58, 0x1c14ef83340fbe5e};
 
 //--------------------------------------------------------------------------------------------------
@@ -57,5 +57,5 @@ static constexpr ck1t::element_affine generator_affine_v{generator_x_v, generato
 //--------------------------------------------------------------------------------------------------
 // generator_p2_v
 //--------------------------------------------------------------------------------------------------
-static constexpr ck1t::element_p2 generator_p2_v{generator_x_v, generator_y_v, f25cn::one_v};
+static constexpr ck1t::element_p2 generator_p2_v{generator_x_v, generator_y_v, fgkcn::one_v};
 } // namespace sxt::ck1cn

@@ -29,11 +29,11 @@
 #include "sxt/curve_gkg1/operation/mul_by_3b.h"
 #include "sxt/curve_gkg1/property/identity.h"
 #include "sxt/curve_gkg1/type/element_p2.h"
-#include "sxt/field25/operation/add.h"
-#include "sxt/field25/operation/mul.h"
-#include "sxt/field25/operation/square.h"
-#include "sxt/field25/operation/sub.h"
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/operation/add.h"
+#include "sxt/fieldgk/operation/mul.h"
+#include "sxt/fieldgk/operation/square.h"
+#include "sxt/fieldgk/operation/sub.h"
+#include "sxt/fieldgk/type/element.h"
 
 namespace sxt::ck1o {
 //--------------------------------------------------------------------------------------------------
@@ -41,27 +41,27 @@ namespace sxt::ck1o {
 //--------------------------------------------------------------------------------------------------
 CUDA_CALLABLE
 void double_element(ck1t::element_p2& h, const ck1t::element_p2& p) noexcept {
-  f25t::element t0, t1, t2;
-  f25t::element x3, y3, z3;
+  fgkt::element t0, t1, t2;
+  fgkt::element x3, y3, z3;
 
-  f25o::square(t0, p.Y);
-  f25o::add(z3, t0, t0);
-  f25o::add(z3, z3, z3);
-  f25o::add(z3, z3, z3);
-  f25o::mul(t1, p.Y, p.Z);
-  f25o::square(t2, p.Z);
+  fgko::square(t0, p.Y);
+  fgko::add(z3, t0, t0);
+  fgko::add(z3, z3, z3);
+  fgko::add(z3, z3, z3);
+  fgko::mul(t1, p.Y, p.Z);
+  fgko::square(t2, p.Z);
   mul_by_3b(t2, t2);
-  f25o::mul(x3, t2, z3);
-  f25o::add(y3, t0, t2);
-  f25o::mul(z3, t1, z3);
-  f25o::add(t1, t2, t2);
-  f25o::add(t2, t1, t2);
-  f25o::sub(t0, t0, t2);
-  f25o::mul(y3, t0, y3);
-  f25o::add(y3, x3, y3);
-  f25o::mul(t1, p.X, p.Y);
-  f25o::mul(x3, t0, t1);
-  f25o::add(x3, x3, x3);
+  fgko::mul(x3, t2, z3);
+  fgko::add(y3, t0, t2);
+  fgko::mul(z3, t1, z3);
+  fgko::add(t1, t2, t2);
+  fgko::add(t2, t1, t2);
+  fgko::sub(t0, t0, t2);
+  fgko::mul(y3, t0, y3);
+  fgko::add(y3, x3, y3);
+  fgko::mul(t1, p.X, p.Y);
+  fgko::mul(x3, t0, t1);
+  fgko::add(x3, x3, x3);
 
   h.X = x3;
   h.Y = y3;
