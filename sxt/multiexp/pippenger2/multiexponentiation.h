@@ -114,6 +114,29 @@ xena::future<> complete_multiexponentiation(basct::span<T> res, unsigned element
   co_await xendv::await_stream(stream);
 }
 
+template <bascrv::element T>
+xena::future<> complete_multiexponentiation2(basct::span<T> res, unsigned element_num_bytes,
+                                             basct::cspan<T> partial_products) noexcept {
+  auto num_outputs = res.size();
+  auto num_products = num_outputs * element_num_bytes * 8u;
+
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+
+  // combine the partial results
+  memmg::managed_array<T> products{num_products, &resource};
+  combine<T>(products, stream, partial_products);
+
+  // reduce the products
+  memmg::managed_array<T> res_dev{num_outputs, &resource};
+  reduce_products<T>(res_dev, stream, products);
+  products.reset();
+
+  // copy result
+  basdv::async_copy_device_to_host(res, res_dev, stream);
+  co_await xendv::await_stream(stream);
+}
+
 //--------------------------------------------------------------------------------------------------
 // multiexponentiate_impl
 //--------------------------------------------------------------------------------------------------
