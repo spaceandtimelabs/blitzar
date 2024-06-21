@@ -171,7 +171,7 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
         co_await xendv::await_stream(stream);
       });
 
-  // complete the multi-exponentiation by splitting the remaining work by output
+  // complete the multi-exponentiation
   basl::info("reducing products for {} outputs", num_outputs);
   co_await complete_multiexponentiation<T>(res, element_num_bytes, products);
   basl::info("completed {} reductions", num_outputs);
