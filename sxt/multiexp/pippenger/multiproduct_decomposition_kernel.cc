@@ -88,7 +88,7 @@ static __global__ void signed_count_kernel(unsigned* counters, const uint8_t* da
   unsigned count = 0;
   for (unsigned i = first; i < last; ++i) {
     // Note: we can assume the data pointer is properly aligned
-    auto element = basn::abs(*reinterpret_cast<const T*>(data));
+    auto element = basn::abs_to_unsigned(*reinterpret_cast<const T*>(data));
     auto byte = reinterpret_cast<uint8_t*>(&element)[byte_index];
     count += static_cast<unsigned>((byte & mask) != 0);
     data += element_num_bytes;
@@ -158,7 +158,7 @@ static __global__ void signed_decomposition_kernel(unsigned* out, const unsigned
   for (unsigned i = first; i < last; ++i) {
     // Note: we can assume the data pointer is properly aligned
     auto element = *reinterpret_cast<const T*>(data);
-    auto abs_element = basn::abs(element);
+    auto abs_element = basn::abs_to_unsigned(element);
     auto sign_bit = (1u << 31) * static_cast<unsigned>(element != abs_element);
 
     auto byte = reinterpret_cast<uint8_t*>(&abs_element)[byte_index];
