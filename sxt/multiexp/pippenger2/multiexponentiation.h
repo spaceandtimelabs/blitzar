@@ -93,29 +93,6 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<U
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 xena::future<> complete_multiexponentiation(basct::span<T> res, unsigned element_num_bytes,
-                                            basct::cspan<T> partial_products, unsigned num_products,
-                                            unsigned offset) noexcept {
-  auto num_outputs_slice = res.size();
-  auto num_products_slice = num_outputs_slice * element_num_bytes * 8u;
-
-  // combine the partial results
-  memmg::managed_array<T> products_slice{num_products_slice, memr::get_device_resource()};
-  co_await combine_partial<T>(products_slice, partial_products, num_products, offset);
-
-  // reduce the products
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<T> res_dev{num_outputs_slice, &resource};
-  reduce_products<T>(res_dev, stream, products_slice);
-  products_slice.reset();
-
-  // copy result
-  basdv::async_copy_device_to_host(res, res_dev, stream);
-  co_await xendv::await_stream(stream);
-}
-
-template <bascrv::element T>
-xena::future<> complete_multiexponentiation(basct::span<T> res, unsigned element_num_bytes,
                                             basct::cspan<T> partial_products) noexcept {
   auto num_outputs = res.size();
   auto num_products = num_outputs * element_num_bytes * 8u;
