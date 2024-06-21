@@ -23,9 +23,9 @@ namespace sxt::ck1cn {
 // b_v
 //--------------------------------------------------------------------------------------------------
 /**
- * b_v is 3 in Montgomery form.
- * Used in the bn254 curve equation: y^2 = x^3 + 3
+ * b_v is -17 in Montgomery form.
+ * Used in the Grumpkin curve equation: y^2 = x^3 - 17
  */
-static constexpr fgkt::element b_v{0x7a17caa950ad28d7, 0x1f6ac17ae15521b9, 0x334bea4e696bd284,
-                                   0x2a1f6744ce179d8e};
+static constexpr fgkt::element b_v{0xdd7056026000005a, 0x223fa97acb319311, 0xcc388229877910c0,
+                                   0x34394632b724eaa};
 } // namespace sxt::ck1cn

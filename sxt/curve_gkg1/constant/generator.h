@@ -34,28 +34,32 @@ namespace sxt::ck1cn {
 // generator_x_v
 //--------------------------------------------------------------------------------------------------
 /**
- * The generators of G1 is computed by finding the lexicographically smallest valid x coordinate,
- * and its lexicographically smallest y coordinate and multiplying it by the cofactor such that the
- * result is nonzero.
- *
- * Generator of G1 (x, y) = (1, 2).
- * Cofactor of G1 is 1.
+ * x = 1 in Montgomery form
  */
 static constexpr fgkt::element generator_x_v{fgkcn::one_v};
 
 //--------------------------------------------------------------------------------------------------
 // generator_y_v
 //--------------------------------------------------------------------------------------------------
-static constexpr fgkt::element generator_y_v{0xa6ba871b8b1e1b3a, 0x14f1d651eb8e167b,
-                                             0xccdd46def0f28c58, 0x1c14ef83340fbe5e};
+/**
+ * y = sqrt(-16) in Montgomery form
+ */
+static constexpr fgkt::element generator_y_v{0x11b2dff1448c41d8, 0x23d3446f21c77dc3,
+                                             0xaa7b8cf435dfafbb, 0x14b34cf69dc25d68};
 
 //--------------------------------------------------------------------------------------------------
 // generator_affine_v
 //--------------------------------------------------------------------------------------------------
+/**
+ * Generator of G1 (x, y) = (1, sqrt(-16))
+ */
 static constexpr ck1t::element_affine generator_affine_v{generator_x_v, generator_y_v, false};
 
 //--------------------------------------------------------------------------------------------------
 // generator_p2_v
 //--------------------------------------------------------------------------------------------------
+/**
+ * Generator of G1 (x, y, z) = (1, sqrt(-16), 1)
+ */
 static constexpr ck1t::element_p2 generator_p2_v{generator_x_v, generator_y_v, fgkcn::one_v};
 } // namespace sxt::ck1cn

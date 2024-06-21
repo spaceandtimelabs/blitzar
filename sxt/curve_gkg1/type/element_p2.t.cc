@@ -40,34 +40,32 @@ using fgkt::operator""_fgk;
 
 TEST_CASE("projective element equality") {
   SECTION("can distinguish the generator from the identity") {
-    constexpr element_p2 a{
-        fgkcn::one_v,
-        {0xa6ba871b8b1e1b3a, 0x14f1d651eb8e167b, 0xccdd46def0f28c58, 0x1c14ef83340fbe5e},
-        fgkcn::one_v};
-    constexpr element_p2 b{element_p2::identity()};
+    element_p2 generator{fgkcn::one_v,
+                         0x14b34cf69dc25d68aa7b8cf435dfafbb23d3446f21c77dc311b2dff1448c41d8_fgk,
+                         fgkcn::one_v};
 
-    REQUIRE(a == a);
-    REQUIRE(b == b);
-    REQUIRE(a != b);
-    REQUIRE(b != a);
+    REQUIRE(generator == generator);
+    REQUIRE(element_p2::identity() == element_p2::identity());
+    REQUIRE(generator != element_p2::identity());
+    REQUIRE(element_p2::identity() != generator);
 
     // Project the generator with a random field element.
     fgkt::element z;
     basn::fast_random_number_generator rng{1, 2};
     fgkrn::generate_random_element(z, rng);
 
-    fgkt::element ax_z;
-    fgko::mul(ax_z, a.X, z);
+    fgkt::element projx_z;
+    fgko::mul(projx_z, generator.X, z);
 
-    fgkt::element ay_z;
-    fgko::mul(ay_z, a.Y, z);
+    fgkt::element projy_z;
+    fgko::mul(projy_z, generator.Y, z);
 
-    element_p2 c{ax_z, ay_z, z};
+    element_p2 generator_projected{projx_z, projy_z, z};
 
-    REQUIRE(a == c);
-    REQUIRE(b != c);
-    REQUIRE(c == a);
-    REQUIRE(c != b);
+    REQUIRE(generator == generator_projected);
+    REQUIRE(element_p2::identity() != generator_projected);
+    REQUIRE(generator_projected == generator);
+    REQUIRE(generator_projected != element_p2::identity());
   }
 }
 
@@ -79,9 +77,9 @@ TEST_CASE("we can convert between elements") {
   }
 
   SECTION("we can covert an arbitrary element") {
-    element_p2 e{0x30644e72e131a029b85045b63db22989a0ca93286ebbf9d9bc5fd495e1a92d47_fgk,
-                 0x30644e72e131a029b85045b668f629f0d4ae64afaa9d239050df4dd8b672b147_fgk,
-                 0x307084c8417aab1f9ec8866edfd3f27acc230000_fgk};
+    element_p2 e{0x21c12e04bad4c2156ce3b4a8a3308c4fb4aacdadef62a450b495e0f6a86535ac_fgk,
+                 0x150b08bd8caf3a73f977c855a4550b9f0d2599a2a2c024609bbc45ffb56f854a_fgk,
+                 0x87110725e6d5daae7f0df824436892b177b7196fd22d9c2d59d6561cf0e2ada_fgk};
     auto ep = element_p2{static_cast<compact_element>(e)};
     REQUIRE(e == ep);
   }

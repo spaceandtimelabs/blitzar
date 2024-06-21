@@ -38,8 +38,8 @@ using namespace sxt;
 using namespace sxt::ck1t;
 
 constexpr fgkt::element generator_x{fgkcn::one_v};
-constexpr fgkt::element generator_y{0xa6ba871b8b1e1b3a, 0x14f1d651eb8e167b, 0xccdd46def0f28c58,
-                                    0x1c14ef83340fbe5e};
+constexpr fgkt::element generator_y{0x11b2dff1448c41d8, 0x23d3446f21c77dc3, 0xaa7b8cf435dfafbb,
+                                    0x14b34cf69dc25d68};
 
 constexpr element_p2 generator_projective{generator_x, generator_y, fgkcn::one_v};
 constexpr element_p2 identity_projective{element_p2::identity()};

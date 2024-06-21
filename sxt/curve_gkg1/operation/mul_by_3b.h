@@ -17,7 +17,7 @@
 #pragma once
 
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/fieldgk/operation/add.h"
+#include "sxt/fieldgk/operation/mul.h"
 #include "sxt/fieldgk/type/element.h"
 
 namespace sxt::ck1o {
@@ -25,18 +25,14 @@ namespace sxt::ck1o {
 // mul_by_3b
 //--------------------------------------------------------------------------------------------------
 /**
- * For the bn254 curve, since b = 3, 3b = 9.
+ * For the Grumpkin curve, since b = -17, 3b = -51.
+ * b3 is in Montgomery form.
  * See Algorithm 9 for details, https://eprint.iacr.org/2015/1060.pdf
  */
 CUDA_CALLABLE
 inline void mul_by_3b(fgkt::element& h, const fgkt::element& p) noexcept {
-  fgkt::element p2;
-  fgkt::element p4;
-  fgkt::element p8;
+  fgkt::element b3{0x985102072000010e, 0x66befc706194b935, 0x64a9867c966b3240, 0x9cabd298256ec00};
 
-  fgko::add(p2, p, p);
-  fgko::add(p4, p2, p2);
-  fgko::add(p8, p4, p4);
-  fgko::add(h, p8, p);
+  fgko::mul(h, p, b3);
 }
 } // namespace sxt::ck1o

@@ -23,9 +23,29 @@
 using namespace sxt;
 using namespace sxt::ck1cn;
 
+TEST_CASE("generator_x_v") {
+  SECTION("is 1 in Montgomery form") {
+    constexpr std::array<uint64_t, 4> a{1, 0, 0, 0};
+    fgkt::element ret;
+
+    fgkb::to_montgomery_form(ret.data(), a.data());
+
+    REQUIRE(generator_x_v == ret);
+  }
+}
+
 TEST_CASE("generator_y_v") {
-  SECTION("is 2 in Montgomery form") {
-    constexpr std::array<uint64_t, 4> a{2, 0, 0, 0};
+  SECTION("is -16 in Montgomery form") {
+    /**
+     * Generated using SAGE:
+     * p_v = 21888242871839275222246405745257275088548364400416034343698204186575808495617
+     * Fq = GF(p_v)
+     * hex(Fq(-16).sqrt())
+     * 0x2cf135e7506a45d632d270d45f1181294833fc48d823f272c
+     */
+    constexpr std::array<uint64_t, 4> a{0x833fc48d823f272c, 0x2d270d45f1181294, 0xcf135e7506a45d63,
+                                        0x2};
+
     fgkt::element ret;
 
     fgkb::to_montgomery_form(ret.data(), a.data());

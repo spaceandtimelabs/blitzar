@@ -28,22 +28,23 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/fieldgk/constant/one.h"
 #include "sxt/fieldgk/constant/zero.h"
+#include "sxt/fieldgk/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::ck1t;
+using fgkt::operator""_fgk;
 
 TEST_CASE("affine element equality") {
   SECTION("can distinguish the generator from the identity") {
-    constexpr element_affine a{
-        fgkcn::one_v,
-        {0xa6ba871b8b1e1b3a, 0x14f1d651eb8e167b, 0xccdd46def0f28c58, 0x1c14ef83340fbe5e},
-        false};
+    element_affine generator{fgkcn::one_v,
+                             0x14b34cf69dc25d68aa7b8cf435dfafbb23d3446f21c77dc311b2dff1448c41d8_fgk,
+                             false};
 
-    constexpr element_affine b{fgkcn::zero_v, fgkcn::one_v, true};
+    constexpr element_affine identity{fgkcn::zero_v, fgkcn::one_v, true};
 
-    REQUIRE(a == a);
-    REQUIRE(b == b);
-    REQUIRE(a != b);
-    REQUIRE(b != a);
+    REQUIRE(generator == generator);
+    REQUIRE(identity == identity);
+    REQUIRE(generator != identity);
+    REQUIRE(identity != generator);
   }
 }

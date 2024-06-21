@@ -48,7 +48,7 @@ TEST_CASE("a projective element") {
   SECTION("equal to the generator is on the curve") { REQUIRE(is_on_curve(ck1cn::generator_p2_v)); }
 
   SECTION("equal to the generator projected by z is on the curve") {
-    // z is arbitrarily chosen to be 3 in Montgomery form for this section of the test.
+    // z is arbitrarily chosen to be -17 in Montgomery form for this section of the test.
     constexpr fgkt::element z{ck1cn::b_v};
     fgkt::element x_projected;
     fgkt::element y_projected;
@@ -76,8 +76,8 @@ TEST_CASE("a projective element") {
   }
 
   SECTION("equal to (1,1,1) is not on the curve") {
-    constexpr ck1t::element_p2 one_one{fgkcn::one_v, fgkcn::one_v, fgkcn::one_v};
+    constexpr ck1t::element_p2 one_one_one{fgkcn::one_v, fgkcn::one_v, fgkcn::one_v};
 
-    REQUIRE(!is_on_curve(one_one));
+    REQUIRE(!is_on_curve(one_one_one));
   }
 }

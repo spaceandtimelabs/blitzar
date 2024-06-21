@@ -88,7 +88,7 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/macro:cuda_callable",
-        "//sxt/fieldgk/operation:add",
+        "//sxt/fieldgk/operation:mul",
         "//sxt/fieldgk/type:element",
     ],
 )

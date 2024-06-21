@@ -24,8 +24,16 @@ using namespace sxt;
 using namespace sxt::ck1cn;
 
 TEST_CASE("b_v") {
-  SECTION("is 3 in Montgomery form") {
-    constexpr std::array<uint64_t, 4> a{3, 0, 0, 0};
+  SECTION("is -17 in Montgomery form") {
+    /**
+     * Generated using SAGE:
+     * p_v = 21888242871839275222246405745257275088548364400416034343698204186575808495617
+     * Fq = GF(p_v)
+     * hex(Fq(-17))
+     * 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593effffff0
+     */
+    constexpr std::array<uint64_t, 4> a{0x43e1f593effffff0, 0x2833e84879b97091, 0xb85045b68181585d,
+                                        0x30644e72e131a029};
     fgkt::element ret;
 
     fgkb::to_montgomery_form(ret.data(), a.data());

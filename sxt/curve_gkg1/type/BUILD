@@ -48,6 +48,7 @@ sxt_cc_component(
     name = "element_affine",
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/fieldgk/type:literal",
     ],
     deps = [
         "//sxt/fieldgk/constant:one",

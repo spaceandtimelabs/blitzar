@@ -23,7 +23,7 @@
 
 using namespace sxt;
 using namespace sxt::ck1o;
-using namespace sxt::fgkt;
+using fgkt::operator""_fgk;
 
 TEST_CASE("multiply by 3b") {
   SECTION("returns nine if one in Montgomery form is the input") {
@@ -31,6 +31,6 @@ TEST_CASE("multiply by 3b") {
 
     mul_by_3b(ret, fgkcn::one_v);
 
-    REQUIRE(0x9_fgk == ret);
+    REQUIRE(0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593efffffce_fgk == ret);
   }
 }
