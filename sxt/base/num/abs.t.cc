@@ -16,8 +16,8 @@
  */
 #include "sxt/base/num/abs.h"
 
-#include <limits>
 #include <cstdint>
+#include <limits>
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/base/type/int.h"

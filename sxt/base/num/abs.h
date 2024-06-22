@@ -43,7 +43,7 @@ template <std::signed_integral T> CUDA_CALLABLE T abs(T x) noexcept {
 template <std::signed_integral T> CUDA_CALLABLE auto abs_to_unsigned(T x) noexcept {
   using Tp = std::make_unsigned_t<T>;
   // Use some arithmetic to make sure that conversion doesn't overflow
-  // for std::numeric_limits<T>::min() since 
+  // for std::numeric_limits<T>::min() since
   //      -std::numeric_limits<T>::min() == std::numeric_limits<T>::max() + 1
   auto m = static_cast<int>(x > 0) * 2 - 1;
   return static_cast<Tp>(m * (x - m)) + 1;

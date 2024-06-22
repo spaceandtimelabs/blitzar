@@ -270,8 +270,8 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
 
   SECTION("we handle the most extreme signed values") {
     std::vector<int64_t> exponents1 = {
-      std::numeric_limits<int64_t>::max(),
-      std::numeric_limits<int64_t>::min(),
+        std::numeric_limits<int64_t>::max(),
+        std::numeric_limits<int64_t>::min(),
     };
     std::vector<mtxb::exponent_sequence> sequences = {
         mtxb::to_exponent_sequence(exponents1),
