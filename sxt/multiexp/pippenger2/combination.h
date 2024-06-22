@@ -71,31 +71,4 @@ void combine(basct::span<T> res, bast::raw_stream_t stream, basct::cspan<T> elem
            };
   algi::launch_for_each_kernel(stream, f, n);
 }
-
-//--------------------------------------------------------------------------------------------------
-// combine_partial
-//--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
-xena::future<> combine_partial(basct::span<T> res, basct::cspan<T> elements, unsigned n,
-                               unsigned first) noexcept {
-  auto np = static_cast<unsigned>(res.size());
-  SXT_DEBUG_ASSERT(
-      // clang-format off
-      n >= first + np &&
-      elements.size() % n == 0 &&
-      basdv::is_active_device_pointer(res.data()) &&
-      basdv::is_host_pointer(elements.data())
-      // clang-format on
-  );
-  auto reduction_size = static_cast<unsigned>(elements.size() / n);
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<T> elements_p{np * reduction_size, &resource};
-  for (unsigned i = 0; i < reduction_size; ++i) {
-    basdv::async_copy_host_to_device(basct::subspan(elements_p, i * np, np),
-                                     elements.subspan(first + i * n, np), stream);
-  }
-  combine<T>(res, stream, elements_p);
-  co_await xendv::await_stream(stream);
-}
 } // namespace sxt::mtxpp2
