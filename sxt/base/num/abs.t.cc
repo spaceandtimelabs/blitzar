@@ -27,6 +27,7 @@ using namespace sxt::basn;
 
 TEST_CASE("we can compute the absolute value of numbers") {
   SECTION("we can compute the absolute value of numbers up to 8 bytes") {
+    REQUIRE(abs(0) == 0);
     REQUIRE(abs(1) == 1);
     REQUIRE(abs(-1) == 1);
     REQUIRE(abs(-1ll) == 1ll);
@@ -42,6 +43,7 @@ TEST_CASE("we can compute the absolute value of numbers") {
 
 TEST_CASE("we can take the absolute value of a number and convert to unsigned") {
   SECTION("we handle some basic examples") {
+    REQUIRE(abs_to_unsigned(0) == 0u);
     REQUIRE(abs_to_unsigned(1) == 1u);
     REQUIRE(abs_to_unsigned(-1) == 1u);
     REQUIRE(abs_to_unsigned(-1ll) == 1ull);
