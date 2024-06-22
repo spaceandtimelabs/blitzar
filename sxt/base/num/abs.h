@@ -49,6 +49,6 @@ template <std::signed_integral T> CUDA_CALLABLE auto abs_to_unsigned(T x) noexce
   // Note: This will also for the special case of zero since
   //     static_cast<Tp>(-1) + 1 == 0
   auto m = static_cast<int>(x > 0) * 2 - 1;
-  return static_cast<Tp>(m * (x - m)) + 1;
+  return static_cast<Tp>(m * (x - m)) + static_cast<Tp>(1);
 }
 } // namespace sxt::basn
