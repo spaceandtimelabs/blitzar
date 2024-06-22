@@ -65,7 +65,7 @@ static void aggregate_signed_terms(exponent_aggregates& aggregates, size_t outpu
     std::memcpy(reinterpret_cast<uint8_t*>(&x), sequence.data + term_index * NumBytes, NumBytes);
     auto abs_x = basn::abs_to_unsigned(x);
     basct::cspan<uint8_t> term{reinterpret_cast<uint8_t*>(&abs_x), NumBytes};
-    if (x == abs_x) {
+    if (x >= 0) {
       aggegate_term(aggregates, term, output_index, term_index);
     } else {
       aggegate_term(aggregates, term, output_index + 1, term_index);

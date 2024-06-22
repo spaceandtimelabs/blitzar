@@ -52,7 +52,7 @@ static void read_exponent(c21t::element_p3& e, basct::span<uint8_t>& exponent,
         bast::sized_int_t<NumBytes * 8> x{};
         std::copy_n(exponent.begin(), element_nbytes, reinterpret_cast<uint8_t*>(&x));
         auto abs_x = basn::abs_to_unsigned(x);
-        if (x == abs_x) {
+        if (x >= 0) {
           return;
         }
         c21o::neg(e, e);

@@ -159,7 +159,7 @@ static __global__ void signed_decomposition_kernel(unsigned* out, const unsigned
     // Note: we can assume the data pointer is properly aligned
     auto element = *reinterpret_cast<const T*>(data);
     auto abs_element = basn::abs_to_unsigned(element);
-    auto sign_bit = (1u << 31) * static_cast<unsigned>(element != abs_element);
+    auto sign_bit = (1u << 31) * static_cast<unsigned>(element < 0);
 
     auto byte = reinterpret_cast<uint8_t*>(&abs_element)[byte_index];
 

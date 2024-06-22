@@ -113,7 +113,7 @@ static uint64_t* init_signed_multiproduct_output_rows(basct::span<basct::span<ui
     std::copy(e.begin(), e.end(), reinterpret_cast<uint8_t*>(&x));
     auto abs_x = basn::abs_to_unsigned(x);
     e = {reinterpret_cast<uint8_t*>(&abs_x), NumBytes};
-    auto offset = static_cast<size_t>(abs_x != x) * radix_log2;
+    auto offset = static_cast<size_t>(x < 0) * radix_log2;
     auto digit_last = mtxb::get_last_digit(e, radix_log2);
     for (size_t digit_index = 0; digit_index < digit_last; ++digit_index) {
       mtxb::extract_digit(digit, e, radix_log2, digit_index);
@@ -191,7 +191,7 @@ static size_t fill_from_signed_sequence(
     e = {reinterpret_cast<uint8_t*>(&abs_x), NumBytes};
     auto digit_last = mtxb::get_last_digit(e, radix_log2);
     size_t input_offset = 0;
-    auto bit_index_offset = static_cast<size_t>(x != abs_x) * radix_log2;
+    auto bit_index_offset = static_cast<size_t>(x < 0) * radix_log2;
     for (size_t digit_index = 0; digit_index < digit_last; ++digit_index) {
       mtxb::extract_digit(digit, e, radix_log2, digit_index);
       basbt::for_each_bit(digit, [&](size_t bit_index) noexcept {
