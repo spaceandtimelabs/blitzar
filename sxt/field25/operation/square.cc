@@ -53,10 +53,6 @@ void square(f25t::element& h, const f25t::element& f) noexcept {
   t[6] = carry;
   carry = 0;
 
-  basfld::mac(t[7], carry, t[7], f[3], f[4]);
-  t[7] = carry;
-  carry = 0;
-
   t[7] = t[6] >> 63;
   t[6] = (t[6] << 1) | (t[5] >> 63);
   t[5] = (t[5] << 1) | (t[4] >> 63);
