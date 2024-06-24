@@ -268,6 +268,25 @@ void exercise_multiexponentiation_fn(std::mt19937& rng, multiexponentiation_fn f
     REQUIRE(res == expected);
   }
 
+  SECTION("we handle the most extreme signed values") {
+    std::vector<int64_t> exponents1 = {
+        std::numeric_limits<int64_t>::max(),
+        std::numeric_limits<int64_t>::min(),
+    };
+    std::vector<mtxb::exponent_sequence> sequences = {
+        mtxb::to_exponent_sequence(exponents1),
+    };
+    memmg::managed_array<c21t::element_p3> generators = {
+        0x123_rs,
+        0x456_rs,
+    };
+    auto res = f(generators, sequences);
+    memmg::managed_array<c21t::element_p3> expected = {
+        9'223'372'036'854'775'807ull * generators[0] - 9'223'372'036'854'775'808ull * generators[1],
+    };
+    REQUIRE(res == expected);
+  }
+
   // random test cases
   std::pmr::monotonic_buffer_resource resource;
   basct::span<mtxb::exponent_sequence> sequences;
