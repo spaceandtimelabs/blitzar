@@ -16,6 +16,9 @@
  */
 #include "sxt/base/num/abs.h"
 
+#include <cstdint>
+#include <limits>
+
 #include "sxt/base/test/unit_test.h"
 #include "sxt/base/type/int.h"
 
@@ -24,6 +27,7 @@ using namespace sxt::basn;
 
 TEST_CASE("we can compute the absolute value of numbers") {
   SECTION("we can compute the absolute value of numbers up to 8 bytes") {
+    REQUIRE(abs(0) == 0);
     REQUIRE(abs(1) == 1);
     REQUIRE(abs(-1) == 1);
     REQUIRE(abs(-1ll) == 1ll);
@@ -34,5 +38,26 @@ TEST_CASE("we can compute the absolute value of numbers") {
     REQUIRE(abs(int128_t{1}) == 1);
     REQUIRE(abs(int128_t{-2}) == 2);
     REQUIRE(abs(int128_t{2}) == 2);
+  }
+}
+
+TEST_CASE("we can take the absolute value of a number and convert to unsigned") {
+  SECTION("we handle some basic examples") {
+    REQUIRE(abs_to_unsigned(0) == 0u);
+    REQUIRE(abs_to_unsigned(1) == 1u);
+    REQUIRE(abs_to_unsigned(-1) == 1u);
+    REQUIRE(abs_to_unsigned(-1ll) == 1ull);
+  }
+
+  SECTION("we handle 128 bit numbers") {
+    REQUIRE(abs_to_unsigned(int128_t{-1}) == 1);
+    REQUIRE(abs_to_unsigned(int128_t{1}) == 1);
+    REQUIRE(abs_to_unsigned(int128_t{-2}) == 2);
+    REQUIRE(abs_to_unsigned(int128_t{2}) == 2);
+  }
+
+  SECTION("we handle extreme values") {
+    REQUIRE(abs_to_unsigned(std::numeric_limits<int64_t>::min()) == 9'223'372'036'854'775'808ull);
+    REQUIRE(abs_to_unsigned(std::numeric_limits<int64_t>::max()) == 9'223'372'036'854'775'807ull);
   }
 }
