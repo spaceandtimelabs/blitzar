@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <numeric>
+
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
@@ -23,6 +25,9 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/type/raw_stream.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/memory/resource/pinned_resource.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -66,6 +71,47 @@ void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
            __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
              reduce_output(reductions + output_index, products + output_index * reduction_size,
                            reduction_size);
+           };
+  algi::launch_for_each_kernel(stream, f, num_outputs);
+}
+
+template <bascrv::element T>
+void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
+                     basct::cspan<unsigned> output_bit_table, basct::cspan<T> products) noexcept {
+  auto num_outputs = reductions.size();
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      basdv::is_active_device_pointer(reductions.data()) &&
+      reductions.size() == num_outputs &&
+      output_bit_table.size() == num_outputs &&
+      basdv::is_active_device_pointer(products.data())
+      // clang-format on
+  );
+
+  memr::async_device_resource resource{stream};
+
+  // make partial bit table sums
+  memmg::managed_array<unsigned> bit_table_partial_sums{num_outputs, memr::get_pinned_resource()};
+  std::partial_sum(output_bit_table.begin(), output_bit_table.end(),
+                   bit_table_partial_sums.begin());
+  SXT_DEBUG_ASSERT(products.size() == bit_table_partial_sums[num_outputs - 1]);
+  memmg::managed_array<unsigned> bit_table_partial_sums_dev{num_outputs, &resource};
+  basdv::async_copy_host_to_device(bit_table_partial_sums_dev, bit_table_partial_sums, stream);
+
+  // reduce products
+  auto f = [
+               // clang-format off
+    reductions = reductions.data(),
+    bit_table_partial_sums = bit_table_partial_sums_dev.data(),
+    products = products.data()
+               // clang-format on
+  ] __device__
+           __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
+             auto lookup_index = max(0, static_cast<int>(output_index) - 1);
+             auto offset =
+                 bit_table_partial_sums[lookup_index] * static_cast<unsigned>(output_index != 0);
+             auto reduction_size = bit_table_partial_sums[output_index] - offset;
+             reduce_output(reductions + output_index, products + offset, reduction_size);
            };
   algi::launch_for_each_kernel(stream, f, num_outputs);
 }

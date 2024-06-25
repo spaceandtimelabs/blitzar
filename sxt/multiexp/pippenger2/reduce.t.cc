@@ -66,3 +66,66 @@ TEST_CASE("we can reduce products") {
     REQUIRE(outputs == expected);
   }
 }
+
+TEST_CASE("we can reduce products with a bit table") {
+  using E = bascrv::element97;
+
+  std::pmr::vector<E> outputs{memr::get_managed_device_resource()};
+  std::pmr::vector<E> products{memr::get_managed_device_resource()};
+  basdv::stream stream;
+
+  std::vector<unsigned> bit_table;
+
+  std::pmr::vector<E> expected;
+
+  SECTION("we can reduce a single output of one bit") {
+    outputs.resize(1);
+    products.resize(1);
+    bit_table = {1};
+    products[0] = 123u;
+    reduce_products<E>(outputs, stream, bit_table, products);
+    basdv::synchronize_stream(stream);
+    expected = {123u};
+    REQUIRE(outputs == expected);
+  }
+
+  SECTION("we can reduce a single output of two bits") {
+    outputs.resize(1);
+    bit_table = {2};
+    products = {123, 456};
+    reduce_products<E>(outputs, stream, bit_table, products);
+    basdv::synchronize_stream(stream);
+    expected = {123u + 2u * 456u};
+    REQUIRE(outputs == expected);
+  }
+
+  SECTION("we can reduce a single output of three bits") {
+    outputs.resize(1);
+    bit_table = {3};
+    products = {1, 3, 7};
+    reduce_products<E>(outputs, stream, bit_table, products);
+    basdv::synchronize_stream(stream);
+    expected = {1u + 2u * 3u + 4u * 7u};
+    REQUIRE(outputs == expected);
+  }
+
+  SECTION("we can reduce two outputs of 1 bit each") {
+    outputs.resize(2);
+    bit_table = {1, 1};
+    products = {123u, 456u};
+    reduce_products<E>(outputs, stream, bit_table, products);
+    basdv::synchronize_stream(stream);
+    expected = {123u, 456u};
+    REQUIRE(outputs == expected);
+  }
+
+  SECTION("we can reduce multiple outputs with varying numbers of bits") {
+    outputs.resize(3);
+    bit_table = {3, 1, 2};
+    products = {2u, 7u, 5u, 3u, 9u, 11u};
+    reduce_products<E>(outputs, stream, bit_table, products);
+    basdv::synchronize_stream(stream);
+    expected = {2u + 2u * 7u + 4u * 5u, 3u, 9u + 2u * 11u};
+    REQUIRE(outputs == expected);
+  }
+}

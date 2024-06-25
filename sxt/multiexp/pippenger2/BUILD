@@ -203,5 +203,8 @@ sxt_cc_component(
         "//sxt/base/device:memory_utility",
         "//sxt/base/macro:cuda_callable",
         "//sxt/base/type:raw_stream",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:pinned_resource",
     ],
 )
