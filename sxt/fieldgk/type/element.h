@@ -36,9 +36,7 @@ public:
 
   constexpr element(const uint64_t x[4]) noexcept : data_{x[0], x[1], x[2], x[3]} {}
 
-  constexpr const uint64_t& operator[](int index) const noexcept {
-    return data_[index];
-  }
+  constexpr const uint64_t& operator[](int index) const noexcept { return data_[index]; }
 
   constexpr uint64_t& operator[](int index) noexcept { return data_[index]; }
 
