@@ -78,7 +78,7 @@ TEST_CASE("we can reduce products with a bit table") {
 
   std::pmr::vector<E> expected;
 
-  SECTION("we can reduce a single product of one bit") {
+  SECTION("we can reduce a single output of one bit") {
     outputs.resize(1);
     products.resize(1);
     bit_table = {1};
@@ -89,7 +89,7 @@ TEST_CASE("we can reduce products with a bit table") {
     REQUIRE(outputs == expected);
   }
 
-  SECTION("we can reduce a single product of two bits") {
+  SECTION("we can reduce a single output of two bits") {
     outputs.resize(1);
     bit_table = {2};
     products = {123, 456};
@@ -99,7 +99,7 @@ TEST_CASE("we can reduce products with a bit table") {
     REQUIRE(outputs == expected);
   }
 
-  SECTION("we can reduce a single product of two bits") {
+  SECTION("we can reduce a single output of three bits") {
     outputs.resize(1);
     bit_table = {3};
     products = {1, 3, 7};
