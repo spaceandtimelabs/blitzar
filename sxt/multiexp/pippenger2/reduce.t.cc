@@ -115,7 +115,7 @@ TEST_CASE("we can reduce products with a bit table") {
     products = {123u, 456u};
     reduce_products<E>(outputs, stream, bit_table, products);
     basdv::synchronize_stream(stream);
-    expected = {123u, 456};
+    expected = {123u, 456u};
     REQUIRE(outputs == expected);
   }
 
