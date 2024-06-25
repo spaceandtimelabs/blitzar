@@ -77,6 +77,15 @@ template <bascrv::element T>
 void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
                      basct::cspan<unsigned> output_bit_table, basct::cspan<T> products) noexcept {
   auto num_outputs = reductions.size();
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      basdv::is_active_device_pointer(reductions.data()) &&
+      reductions.size() == num_outputs &&
+      output_bit_table.size() == num_outputs &&
+      basdv::is_active_device_pointer(products.data())
+      // clang-format on
+  );
+
   memr::async_device_resource resource{stream};
 
   // make partial bit table sums
@@ -86,17 +95,10 @@ void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
     sum += output_bit_table[output_index];
     bit_table_partial_sums[output_index] = sum;
   }
+  SXT_DEBUG_ASSERT(products.size() == sum);
   memmg::managed_array<unsigned> bit_table_partial_sums_dev{num_outputs, &resource};
   basdv::async_copy_host_to_device(bit_table_partial_sums_dev, bit_table_partial_sums, stream);
-#if 0
-  SXT_DEBUG_ASSERT(
-      // clang-format off
-      basdv::is_active_device_pointer(reductions.data()) &&
-      products.size() == reduction_size * num_outputs &&
-      basdv::is_active_device_pointer(products.data())
-      // clang-format on
-  );
-#endif
+
   // reduce products
   auto f = [
                // clang-format off
