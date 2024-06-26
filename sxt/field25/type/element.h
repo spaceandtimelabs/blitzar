@@ -60,11 +60,13 @@ inline constexpr bool operator==(const element& lhs, const element& rhs) noexcep
       return false;
     }
   }
-  return true;  
+  return true;
 }
 
 //--------------------------------------------------------------------------------------------------
 // operator!=
 //--------------------------------------------------------------------------------------------------
-inline constexpr bool operator!=(const element& lhs, const element& rhs) noexcept { return !(lhs == rhs); }
+inline constexpr bool operator!=(const element& lhs, const element& rhs) noexcept {
+  return !(lhs == rhs);
+}
 } // namespace sxt::f25t

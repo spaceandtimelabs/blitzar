@@ -67,5 +67,7 @@ inline constexpr bool operator==(const element& lhs, const element& rhs) noexcep
 //--------------------------------------------------------------------------------------------------
 // operator!=
 //--------------------------------------------------------------------------------------------------
-inline constexpr bool operator!=(const element& lhs, const element& rhs) noexcept { return !(lhs == rhs); }
+inline constexpr bool operator!=(const element& lhs, const element& rhs) noexcept {
+  return !(lhs == rhs);
+}
 } // namespace sxt::f12t
