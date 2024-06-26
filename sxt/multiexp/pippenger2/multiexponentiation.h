@@ -129,11 +129,11 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<U
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
-xena::future<> multiexponentiate_product_step(basct::span<T> products,
-                                              const partition_table_accessor<U>& accessor,
-                                              unsigned num_products, unsigned num_output_bytes,
-                                              basct::cspan<uint8_t> scalars,
-                                              const multiexponentiate_options& options) noexcept {
+xena::future<>
+multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction_stream,
+                               const partition_table_accessor<U>& accessor, unsigned num_products,
+                               unsigned num_output_bytes, basct::cspan<uint8_t> scalars,
+                               const multiexponentiate_options& options) noexcept {
   auto n = scalars.size() / num_output_bytes;
 
   // compute bitwise products
@@ -176,7 +176,15 @@ xena::future<> multiexponentiate_product_step(basct::span<T> products,
       });
 
   // combine the partial products
-
+  memr::async_device_resource resource{reduction_stream};
+  memmg::managed_array<T> partial_product_dev{partial_products.size(), &resource};
+  basdv::async_copy_host_to_device(partial_product_dev, partial_products, reduction_stream);
+  (void)reduction_stream;
+  /* memmg::managed_array<T> partial_products_dev{partial_products.size(), &resource}; */
+  /* basdv::async_copy_host_to_device(partial_products_dev, partial_products, stream); */
+  /* memmg::managed_array<T> products{num_products, &resource}; */
+  /* combine<T>(products, stream, partial_products_dev); */
+  /* partial_products_dev.reset(); */
 }
 
 //--------------------------------------------------------------------------------------------------
