@@ -16,10 +16,9 @@
  */
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <iosfwd>
-
-#include "sxt/base/macro/cuda_callable.h"
 
 namespace sxt::f25t {
 //--------------------------------------------------------------------------------------------------
@@ -31,20 +30,18 @@ public:
 
   element() noexcept = default;
 
-  CUDA_CALLABLE constexpr element(uint64_t x1, uint64_t x2, uint64_t x3, uint64_t x4) noexcept
+  constexpr element(uint64_t x1, uint64_t x2, uint64_t x3, uint64_t x4) noexcept
       : data_{x1, x2, x3, x4} {}
 
-  CUDA_CALLABLE constexpr element(const uint64_t x[4]) noexcept : data_{x[0], x[1], x[2], x[3]} {}
+  constexpr element(const uint64_t x[4]) noexcept : data_{x[0], x[1], x[2], x[3]} {}
 
-  CUDA_CALLABLE constexpr const uint64_t& operator[](int index) const noexcept {
-    return data_[index];
-  }
+  constexpr const uint64_t& operator[](int index) const noexcept { return data_[index]; }
 
-  CUDA_CALLABLE constexpr uint64_t& operator[](int index) noexcept { return data_[index]; }
+  constexpr uint64_t& operator[](int index) noexcept { return data_[index]; }
 
-  CUDA_CALLABLE constexpr const uint64_t* data() const noexcept { return data_; }
+  constexpr const uint64_t* data() const noexcept { return data_; }
 
-  CUDA_CALLABLE constexpr uint64_t* data() noexcept { return data_; }
+  constexpr uint64_t* data() noexcept { return data_; }
 
 private:
   uint64_t data_[num_limbs_v];
@@ -58,10 +55,14 @@ std::ostream& operator<<(std::ostream& out, const element& e) noexcept;
 //--------------------------------------------------------------------------------------------------
 // operator==
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE bool operator==(const element& lhs, const element& rhs) noexcept;
+inline constexpr bool operator==(const element& lhs, const element& rhs) noexcept {
+  return std::equal(lhs.data(), lhs.data() + element::num_limbs_v, rhs.data());
+}
 
 //--------------------------------------------------------------------------------------------------
 // operator!=
 //--------------------------------------------------------------------------------------------------
-inline bool operator!=(const element& lhs, const element& rhs) noexcept { return !(lhs == rhs); }
+inline constexpr bool operator!=(const element& lhs, const element& rhs) noexcept {
+  return !(lhs == rhs);
+}
 } // namespace sxt::f25t

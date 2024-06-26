@@ -9,9 +9,6 @@ sxt_cc_component(
         "//sxt/field51/base:byte_conversion",
         "//sxt/field51/base:reduce",
     ],
-    deps = [
-        "//sxt/base/macro:cuda_callable",
-    ],
 )
 
 sxt_cc_component(
