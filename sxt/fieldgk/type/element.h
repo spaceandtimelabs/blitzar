@@ -16,10 +16,9 @@
  */
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <iosfwd>
-
-#include "sxt/base/macro/cuda_callable.h"
 
 namespace sxt::fgkt {
 //--------------------------------------------------------------------------------------------------
@@ -56,10 +55,14 @@ std::ostream& operator<<(std::ostream& out, const element& e) noexcept;
 //--------------------------------------------------------------------------------------------------
 // operator==
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE bool operator==(const element& lhs, const element& rhs) noexcept;
+inline constexpr bool operator==(const element& lhs, const element& rhs) noexcept {
+  return std::equal(lhs.data(), lhs.data() + element::num_limbs_v, rhs.data());
+}
 
 //--------------------------------------------------------------------------------------------------
 // operator!=
 //--------------------------------------------------------------------------------------------------
-inline bool operator!=(const element& lhs, const element& rhs) noexcept { return !(lhs == rhs); }
+inline constexpr bool operator!=(const element& lhs, const element& rhs) noexcept {
+  return !(lhs == rhs);
+}
 } // namespace sxt::fgkt
