@@ -125,6 +125,45 @@ multiexponentiate_no_chunks(basct::span<T> res, const partition_table_accessor<U
 }
 
 //--------------------------------------------------------------------------------------------------
+// multiexponentiate_product_step 
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
+xena::future<memmg::managed_array<T>>
+multiexponentiate_product_step(const partition_table_accessor<U>& accessor, unsigned num_products,
+                               unsigned num_output_bytes, basct::cspan<uint8_t> scalars,
+                               const multiexponentiate_options& options) noexcept {
+  auto n = scalars.size() / num_output_bytes;
+
+  // compute bitwise products
+  //
+  // We split the work by groups of generators so that a single chunk will process
+  // all the outputs for those generators. This minimizes the amount of host->device
+  // copying we need to do for the table of precomputed sums.
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}
+                                                    .chunk_multiple(16)
+                                                    .min_chunk_size(options.min_chunk_size)
+                                                    .max_chunk_size(options.max_chunk_size),
+                                                options.split_factor);
+  auto num_chunks = std::distance(chunk_first, chunk_last);
+
+  // handle no chunk case
+  if (num_chunks == 1) {
+    basl::info("computing {} bitwise multiexponentiation products of length {}", num_products, n);
+    memmg::managed_array<T> products(num_products, memr::get_device_resource());
+    co_await async_partition_product<T>(products, accessor, scalars, 0);
+    co_return products;
+  }
+  (void)num_chunks;
+  (void)n;
+  (void)accessor;
+  (void)num_output_bytes;
+  (void)scalars;
+  (void)options;
+  co_return memmg::managed_array<T>{};
+}
+
+//--------------------------------------------------------------------------------------------------
 // complete_multiexponentiation
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
