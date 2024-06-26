@@ -146,21 +146,36 @@ multiexponentiate_product_step(const partition_table_accessor<U>& accessor, unsi
                                                     .max_chunk_size(options.max_chunk_size),
                                                 options.split_factor);
   auto num_chunks = std::distance(chunk_first, chunk_last);
+  basl::info("computing {} bitwise multiexponentiation products of length {} using {} chunks",
+             num_products, n, num_chunks);
 
   // handle no chunk case
   if (num_chunks == 1) {
-    basl::info("computing {} bitwise multiexponentiation products of length {}", num_products, n);
     memmg::managed_array<T> products(num_products, memr::get_device_resource());
     co_await async_partition_product<T>(products, accessor, scalars, 0);
     co_return products;
   }
-  (void)num_chunks;
-  (void)n;
-  (void)accessor;
-  (void)num_output_bytes;
-  (void)scalars;
-  (void)options;
-  co_return memmg::managed_array<T>{};
+
+  // handle multiple chunks
+  memmg::managed_array<T> products{num_products * num_chunks, memr::get_pinned_resource()};
+  size_t chunk_index = 0;
+  co_await xendv::concurrent_for_each(
+      chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+        basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
+                   rng.a(), rng.b(), basdv::get_device());
+        memmg::managed_array<T> products_dev{num_products, memr::get_device_resource()};
+        auto scalars_slice =
+            scalars.subspan(num_output_bytes * rng.a(), rng.size() * num_output_bytes);
+        co_await async_partition_product<T>(products_dev, accessor, scalars_slice, rng.a());
+        basdv::stream stream;
+        basdv::async_copy_device_to_host(
+            basct::subspan(products, num_products * chunk_index, num_products), products_dev,
+            stream);
+        ++chunk_index;
+        co_await xendv::await_stream(stream);
+      });
+
+  co_return products;
 }
 
 //--------------------------------------------------------------------------------------------------
