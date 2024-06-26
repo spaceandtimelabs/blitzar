@@ -19,8 +19,6 @@
 #include <cstdint>
 #include <iosfwd>
 
-#include "sxt/base/macro/cuda_callable.h"
-
 namespace sxt::f12t {
 //--------------------------------------------------------------------------------------------------
 // element
@@ -57,10 +55,17 @@ std::ostream& operator<<(std::ostream& out, const element& e) noexcept;
 //--------------------------------------------------------------------------------------------------
 // operator==
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE bool operator==(const element& lhs, const element& rhs) noexcept;
+inline constexpr bool operator==(const element& lhs, const element& rhs) noexcept {
+  for (size_t i = 0; i < element::num_limbs_v; ++i) {
+    if (lhs[i] != rhs[i]) {
+      return false;
+    }
+  }
+  return true;
+}
 
 //--------------------------------------------------------------------------------------------------
 // operator!=
 //--------------------------------------------------------------------------------------------------
-inline bool operator!=(const element& lhs, const element& rhs) noexcept { return !(lhs == rhs); }
+inline constexpr bool operator!=(const element& lhs, const element& rhs) noexcept { return !(lhs == rhs); }
 } // namespace sxt::f12t

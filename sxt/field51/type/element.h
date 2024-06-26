@@ -20,8 +20,6 @@
 #include <cstdint>
 #include <iosfwd>
 
-#include "sxt/base/macro/cuda_callable.h"
-
 namespace sxt::f51t {
 //--------------------------------------------------------------------------------------------------
 // element
