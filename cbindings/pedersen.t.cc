@@ -36,6 +36,12 @@
 #include "sxt/curve_g1/type/compressed_element.h"
 #include "sxt/curve_g1/type/conversion_utility.h"
 #include "sxt/curve_g1/type/element_affine.h"
+#include "sxt/curve_gk/constant/generator.h"
+#include "sxt/curve_gk/operation/add.h"
+#include "sxt/curve_gk/operation/scalar_multiply.h"
+#include "sxt/curve_gk/type/conversion_utility.h"
+#include "sxt/curve_gk/type/element_affine.h"
+#include "sxt/curve_gk/type/element_p2.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/ristretto/base/byte_conversion.h"
 #include "sxt/ristretto/operation/add.h"
@@ -101,6 +107,25 @@ static std::vector<cn1t::element_affine> get_bn254_g1_generators(uint64_t seq_le
 
   for (uint64_t i = 0; i < seq_length; ++i) {
     generators[i] = cn1cn::generator_affine_v;
+  }
+
+  return generators;
+}
+
+//--------------------------------------------------------------------------------------------------
+// get_grumpkin_generators
+//--------------------------------------------------------------------------------------------------
+/**
+ * This is a placeholder method. This method will be updated to behave like the
+ * compute_random_curve25519_generators method after random element generation is implemented inside
+ * the curve_gk package group.
+ */
+static std::vector<cgkt::element_affine> get_grumpkin_generators(uint64_t seq_length,
+                                                                 uint64_t offset) {
+  std::vector<cgkt::element_affine> generators(seq_length);
+
+  for (uint64_t i = 0; i < seq_length; ++i) {
+    generators[i] = cgkcn::generator_affine_v;
   }
 
   return generators;
@@ -191,6 +216,33 @@ compute_expected_bn254_g1_commitment(const std::vector<T>& data,
 
   cn1t::element_affine expected_commitment_affine;
   cn1t::to_element_affine(expected_commitment_affine, expected_commitment);
+
+  return expected_commitment_affine;
+}
+
+//--------------------------------------------------------------------------------------------------
+// compute_expected_grumpkin_commitment
+//--------------------------------------------------------------------------------------------------
+template <class T>
+static cgkt::element_affine
+compute_expected_grumpkin_commitment(const std::vector<T>& data,
+                                     const std::vector<cgkt::element_affine>& generators) {
+  SXT_DEBUG_ASSERT(data.size() == generators.size());
+
+  // Convert from affine to projective elements
+  memmg::managed_array<cgkt::element_p2> generators_p(generators.size());
+  cgkt::batch_to_element_p2(generators_p, generators);
+
+  cgkt::element_p2 expected_commitment{cgkt::element_p2::identity()};
+
+  for (uint64_t i = 0; i < data.size(); ++i) {
+    cgkt::element_p2 aux_h{generators_p[i]};
+    cgko::scalar_multiply255(aux_h, aux_h, data[i].data());
+    cgko::add(expected_commitment, expected_commitment, aux_h);
+  }
+
+  cgkt::element_affine expected_commitment_affine;
+  cgkt::to_element_affine(expected_commitment_affine, expected_commitment);
 
   return expected_commitment_affine;
 }
@@ -379,6 +431,38 @@ static void test_bn254_g1_pedersen_commitments_with_given_backend_and_generators
 }
 
 //--------------------------------------------------------------------------------------------------
+// test_grumpkin_pedersen_commitments_with_given_backend_and_generators
+//--------------------------------------------------------------------------------------------------
+static void test_grumpkin_pedersen_commitments_with_given_backend_and_generators(
+    int backend, uint64_t num_precomputed_generators) {
+  initialize_backend(backend, num_precomputed_generators);
+
+  SECTION("We verify that using the correct generators will produce correct results") {
+    constexpr std::array<uint8_t, 32> a{0x1b, 0xa7, 0x6d, 0xa5, 0x98, 0x82, 0x56, 0x2b,
+                                        0xd2, 0x19, 0xf5, 0xe,  0xc8, 0xfa, 0x5,  0x85,
+                                        0x91, 0xe7, 0x1d, 0x5e, 0xd2, 0x60, 0x22, 0x10,
+                                        0x6a, 0xdc, 0x18, 0xfd, 0xfc, 0xf8, 0x9a, 0xc};
+    constexpr std::array<uint8_t, 32> b{0x01, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+                                        0x0,  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+                                        0x0,  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+
+    const std::vector<std::array<uint8_t, 32>> data = {a, b};
+    const auto seq_descriptor = make_sequence_descriptor(data);
+    constexpr uint64_t num_sequences{1};
+    const auto generators = get_grumpkin_generators(data.size(), 10);
+    const auto expected_commitment = compute_expected_grumpkin_commitment(data, generators);
+
+    sxt_grumpkin commitments_data;
+    sxt_grumpkin_uncompressed_compute_pedersen_commitments_with_generators(
+        &commitments_data, num_sequences, &seq_descriptor,
+        reinterpret_cast<const sxt_grumpkin*>(generators.data()));
+    REQUIRE(*reinterpret_cast<cgkt::element_affine*>(&commitments_data) == expected_commitment);
+  }
+
+  cbn::reset_backend_for_testing();
+}
+
+//--------------------------------------------------------------------------------------------------
 // compute_ristretto255_commitments_with_specified_precomputed_elements
 //--------------------------------------------------------------------------------------------------
 static void
@@ -415,6 +499,18 @@ compute_bn254_g1_commitments_with_specified_precomputed_elements(int backend,
                                                                  uint64_t num_precomputed_els) {
   SECTION("We can compute commitments providing generators as input") {
     test_bn254_g1_pedersen_commitments_with_given_backend_and_generators(backend,
+                                                                         num_precomputed_els);
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+// compute_grumpkin_commitments_with_specified_precomputed_elements
+//--------------------------------------------------------------------------------------------------
+static void
+compute_grumpkin_commitments_with_specified_precomputed_elements(int backend,
+                                                                 uint64_t num_precomputed_els) {
+  SECTION("We can compute commitments providing generators as input") {
+    test_grumpkin_pedersen_commitments_with_given_backend_and_generators(backend,
                                                                          num_precomputed_els);
   }
 }
@@ -468,6 +564,21 @@ static void compute_bn254_g1_commitments_with_given_backend(int backend) {
   }
 }
 
+//--------------------------------------------------------------------------------------------------
+// compute_grumpkin_commitments_with_given_backend
+//--------------------------------------------------------------------------------------------------
+static void compute_grumpkin_commitments_with_given_backend(int backend) {
+  SECTION("We can compute commitments without precomputing elements") {
+    uint64_t num_precomputed_els{0};
+    compute_grumpkin_commitments_with_specified_precomputed_elements(backend, num_precomputed_els);
+  }
+
+  SECTION("We can compute commitments using non-zero precomputed elements") {
+    uint64_t num_precomputed_els{10};
+    compute_grumpkin_commitments_with_specified_precomputed_elements(backend, num_precomputed_els);
+  }
+}
+
 TEST_CASE(
     "We can compute pedersen commitments with ristretto255 elements using the naive gpu backend") {
   compute_ristretto255_commitments_with_given_backend(SXT_GPU_BACKEND);
@@ -496,4 +607,14 @@ TEST_CASE(
 TEST_CASE("We can compute pedersen commitments with bn254 G1 elements using the pippenger cpu "
           "backend") {
   compute_bn254_g1_commitments_with_given_backend(SXT_CPU_BACKEND);
+}
+
+TEST_CASE(
+    "We can compute pedersen commitments with Grumpkin elements using the naive gpu backend") {
+  compute_grumpkin_commitments_with_given_backend(SXT_GPU_BACKEND);
+}
+
+TEST_CASE("We can compute pedersen commitments with Grumpkin elements using the pippenger cpu "
+          "backend") {
+  compute_grumpkin_commitments_with_given_backend(SXT_CPU_BACKEND);
 }

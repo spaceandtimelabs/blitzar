@@ -28,6 +28,9 @@
 #include "sxt/curve_g1/type/conversion_utility.h"
 #include "sxt/curve_g1/type/element_affine.h"
 #include "sxt/curve_g1/type/element_p2.h"
+#include "sxt/curve_gk/type/conversion_utility.h"
+#include "sxt/curve_gk/type/element_affine.h"
+#include "sxt/curve_gk/type/element_p2.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
 #include "sxt/ristretto/type/compressed_element.h"
@@ -159,6 +162,37 @@ static void process_compute_pedersen_commitments(struct sxt_bn254_g1* commitment
       {reinterpret_cast<cn1t::element_affine*>(commitments), descriptors.size()}, sequences,
       generators_p);
 }
+
+//--------------------------------------------------------------------------------------------------
+// process_compute_pedersen_commitments
+//--------------------------------------------------------------------------------------------------
+static void process_compute_pedersen_commitments(struct sxt_grumpkin* commitments,
+                                                 basct::cspan<sxt_sequence_descriptor> descriptors,
+                                                 const cgkt::element_affine* generators,
+                                                 uint64_t offset_generators) {
+  if (descriptors.size() == 0)
+    return;
+
+  SXT_RELEASE_ASSERT(commitments != nullptr);
+  SXT_RELEASE_ASSERT(generators != nullptr);
+  SXT_RELEASE_ASSERT(sxt::cbn::is_backend_initialized());
+  static_assert(sizeof(cgkt::element_affine) == sizeof(sxt_grumpkin),
+                "types must be ABI compatible");
+
+  memmg::managed_array<mtxb::exponent_sequence> sequences(descriptors.size());
+  auto num_generators = populate_exponent_sequence(sequences, descriptors);
+
+  auto backend = cbn::get_backend();
+
+  // Convert from affine to projective elements
+  memmg::managed_array<cgkt::element_p2> generators_p(num_generators);
+  cgkt::batch_to_element_p2(generators_p,
+                            basct::cspan<cgkt::element_affine>{generators, num_generators});
+
+  backend->compute_commitments(
+      {reinterpret_cast<cgkt::element_affine*>(commitments), descriptors.size()}, sequences,
+      generators_p);
+}
 } // namespace sxt::cbn
 
 //--------------------------------------------------------------------------------------------------
@@ -192,6 +226,17 @@ void sxt_bn254_g1_uncompressed_compute_pedersen_commitments_with_generators(
   cbn::process_compute_pedersen_commitments(
       commitments, {descriptors, num_sequences},
       reinterpret_cast<const cn1t::element_affine*>(generators), 0);
+}
+
+//--------------------------------------------------------------------------------------------------
+// sxt_grumpkin_uncompressed_compute_pedersen_commitments_with_generators
+//--------------------------------------------------------------------------------------------------
+void sxt_grumpkin_uncompressed_compute_pedersen_commitments_with_generators(
+    struct sxt_grumpkin* commitments, uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors, const struct sxt_grumpkin* generators) {
+  cbn::process_compute_pedersen_commitments(
+      commitments, {descriptors, num_sequences},
+      reinterpret_cast<const cgkt::element_affine*>(generators), 0);
 }
 
 //--------------------------------------------------------------------------------------------------

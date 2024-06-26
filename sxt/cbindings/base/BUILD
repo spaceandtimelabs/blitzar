@@ -28,6 +28,10 @@ sxt_cc_component(
         "//sxt/curve_g1/operation:double",
         "//sxt/curve_g1/operation:neg",
         "//sxt/curve_g1/type:element_p2",
+        "//sxt/curve_gk/operation:add",
+        "//sxt/curve_gk/operation:double",
+        "//sxt/curve_gk/operation:neg",
+        "//sxt/curve_gk/type:element_p2",
     ],
 )
 

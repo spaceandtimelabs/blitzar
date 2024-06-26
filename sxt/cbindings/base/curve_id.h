@@ -29,5 +29,6 @@ enum class curve_id_t : unsigned {
   curve25519 = 0,
   bls12_381 = 1,
   bn254 = 2,
+  grumpkin = 3,
 };
 } // namespace sxt::cbnb
