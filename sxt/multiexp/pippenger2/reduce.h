@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <numeric>
+
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
@@ -90,12 +92,9 @@ void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
 
   // make partial bit table sums
   memmg::managed_array<unsigned> bit_table_partial_sums{num_outputs, memr::get_pinned_resource()};
-  unsigned sum = 0;
-  for (unsigned output_index = 0; output_index < num_outputs; ++output_index) {
-    sum += output_bit_table[output_index];
-    bit_table_partial_sums[output_index] = sum;
-  }
-  SXT_DEBUG_ASSERT(products.size() == sum);
+  std::partial_sum(output_bit_table.begin(), output_bit_table.end(),
+                   bit_table_partial_sums.begin());
+  SXT_DEBUG_ASSERT(products.size() == bit_table_partial_sums[num_outputs - 1]);
   memmg::managed_array<unsigned> bit_table_partial_sums_dev{num_outputs, &resource};
   basdv::async_copy_host_to_device(bit_table_partial_sums_dev, bit_table_partial_sums, stream);
 
