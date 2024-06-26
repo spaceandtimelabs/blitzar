@@ -177,14 +177,10 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
 
   // combine the partial products
   memr::async_device_resource resource{reduction_stream};
-  memmg::managed_array<T> partial_product_dev{partial_products.size(), &resource};
-  basdv::async_copy_host_to_device(partial_product_dev, partial_products, reduction_stream);
-  (void)reduction_stream;
-  /* memmg::managed_array<T> partial_products_dev{partial_products.size(), &resource}; */
-  /* basdv::async_copy_host_to_device(partial_products_dev, partial_products, stream); */
-  /* memmg::managed_array<T> products{num_products, &resource}; */
-  /* combine<T>(products, stream, partial_products_dev); */
-  /* partial_products_dev.reset(); */
+  memmg::managed_array<T> partial_products_dev{partial_products.size(), &resource};
+  basdv::async_copy_host_to_device(partial_products_dev, partial_products, reduction_stream);
+  combine<T>(products, reduction_stream, partial_products_dev);
+  co_await xendv::await_stream(reduction_stream);
 }
 
 //--------------------------------------------------------------------------------------------------
