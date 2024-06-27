@@ -18,7 +18,6 @@
 
 #include <concepts>
 #include <iterator>
-#include <numeric>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/container/span_utility.h"
@@ -123,7 +122,6 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
                                       unsigned element_num_bytes, basct::cspan<uint8_t> scalars,
                                       const multiexponentiate_options& options) noexcept {
   auto num_outputs = res.size();
-  auto n = scalars.size() / (num_outputs * element_num_bytes);
   auto num_products = num_outputs * element_num_bytes * 8u;
   SXT_DEBUG_ASSERT(
       // clang-format off
@@ -159,7 +157,6 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
   auto num_outputs = res.size();
   auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
   auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
-  auto n = scalars.size() / num_output_bytes;
   SXT_DEBUG_ASSERT(
       // clang-format off
       scalars.size() % num_output_bytes == 0
