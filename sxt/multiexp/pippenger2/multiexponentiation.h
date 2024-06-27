@@ -237,61 +237,22 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
       // clang-format on
   );
 #endif
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> products{num_products, &resource};
+  co_await multiexponentiate_product_step<T>(products, stream, accessor, num_products,
+                                             num_output_bytes, scalars, options);
 
-  // compute bitwise products
-  //
-  // We split the work by groups of generators so that a single chunk will process
-  // all the outputs for those generators. This minimizes the amount of host->device
-  // copying we need to do for the table of precomputed sums.
-  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}
-                                                    .chunk_multiple(16)
-                                                    .min_chunk_size(options.min_chunk_size)
-                                                    .max_chunk_size(options.max_chunk_size),
-                                                options.split_factor);
-  (void)chunk_first;
-  (void)chunk_last;
-  auto num_chunks = std::distance(chunk_first, chunk_last);
-  if (num_chunks == 1) {
-    multiexponentiate_no_chunks(res, accessor, output_bit_table, num_products, scalars);
-    co_return;
-  }
+  // reduce products
+  basl::info("reducing {} products to {} outputs", num_products, num_products);
+  memmg::managed_array<T> res_dev{num_outputs, &resource};
+  reduce_products<T>(res_dev, stream, output_bit_table, products);
+  products.reset();
+  basl::info("completed {} reductions", num_outputs);
 
-  baser::panic("not implemented yet");
-#if 0
-  memmg::managed_array<T> products{num_products * num_chunks, memr::get_pinned_resource()};
-  size_t chunk_index = 0;
-  basl::info("computing {} bitwise multiexponentiation products of length {} using {} chunks",
-             num_products, n, num_chunks);
-  co_await xendv::concurrent_for_each(
-      chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
-        basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
-                   rng.a(), rng.b(), basdv::get_device());
-        memmg::managed_array<T> products_dev{num_products, memr::get_device_resource()};
-        auto scalars_slice = scalars.subspan(num_outputs * element_num_bytes * rng.a(),
-                                             rng.size() * num_outputs * element_num_bytes);
-        co_await async_partition_product<T>(products_dev, accessor, scalars_slice, rng.a());
-        basdv::stream stream;
-        basdv::async_copy_device_to_host(
-            basct::subspan(products, num_products * chunk_index, num_products), products_dev,
-            stream);
-        ++chunk_index;
-        co_await xendv::await_stream(stream);
-      });
-
-  // complete the multi-exponentiation by splitting the remaining work by output
-  auto [output_first, output_last] =
-      basit::split(basit::index_range{0, num_outputs}, options.split_factor);
-  basl::info("reducing products for {} outputs using {} chunks", num_outputs,
-             std::distance(output_first, output_last));
-  co_await xendv::concurrent_for_each(
-      output_first, output_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
-        basl::info("reducing products for outputs [{}, {}] on device {}", rng.a(), rng.b(),
-                   basdv::get_device());
-        co_await complete_multiexponentiation<T>(res.subspan(rng.a(), rng.size()),
-                                                 element_num_bytes, products, num_products,
-                                                 rng.a() * element_num_bytes * 8u);
-      });
-#endif
+  // copy result
+  basdv::async_copy_device_to_host(res, res_dev, stream);
+  co_await xendv::await_stream(stream);
 }
 
 //--------------------------------------------------------------------------------------------------
