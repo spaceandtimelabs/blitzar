@@ -244,6 +244,15 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
     memmg::managed_array<T> products{num_products, &resource};
     co_await multiexponentiate_product_step<T>(products, stream, accessor, num_products,
                                                num_outputs * element_num_bytes, scalars, options);
+
+    // reduce the products
+    memmg::managed_array<T> res_dev{num_outputs, &resource};
+    reduce_products<T>(res_dev, stream, products);
+    products.reset();
+
+    // copy result
+    basdv::async_copy_device_to_host(res, res_dev, stream);
+    co_await xendv::await_stream(stream);
   }
 /* template <bascrv::element T, class U> */
 /*   requires std::constructible_from<T, U> */
