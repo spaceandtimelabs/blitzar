@@ -146,7 +146,7 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
                                                     .min_chunk_size(options.min_chunk_size)
                                                     .max_chunk_size(options.max_chunk_size),
                                                 options.split_factor);
-  auto num_chunks = std::distance(chunk_first, chunk_last);
+  auto num_chunks = static_cast<size_t>(std::distance(chunk_first, chunk_last));
   basl::info("computing {} bitwise multiexponentiation products of length {} using {} chunks",
              num_products, n, num_chunks);
 
@@ -237,6 +237,21 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
       scalars.size() % (num_outputs * element_num_bytes) == 0
       // clang-format on
   );
+
+  if (false) {
+    basdv::stream stream;
+    memr::async_device_resource resource{stream};
+    memmg::managed_array<T> products{num_products, &resource};
+    co_await multiexponentiate_product_step<T>(products, stream, accessor, num_products,
+                                               num_outputs * element_num_bytes, scalars, options);
+  }
+/* template <bascrv::element T, class U> */
+/*   requires std::constructible_from<T, U> */
+/* xena::future<> */
+/* multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction_stream, */
+/*                                const partition_table_accessor<U>& accessor, unsigned num_products, */
+/*                                unsigned num_output_bytes, basct::cspan<uint8_t> scalars, */
+/*                                const multiexponentiate_options& options) noexcept { */
 
   // compute bitwise products
   //
