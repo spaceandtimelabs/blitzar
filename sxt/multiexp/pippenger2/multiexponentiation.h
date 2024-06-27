@@ -238,70 +238,22 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
       // clang-format on
   );
 
-  if (false) {
-    basdv::stream stream;
-    memr::async_device_resource resource{stream};
-    memmg::managed_array<T> products{num_products, &resource};
-    co_await multiexponentiate_product_step<T>(products, stream, accessor, num_products,
-                                               num_outputs * element_num_bytes, scalars, options);
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> products{num_products, &resource};
+  co_await multiexponentiate_product_step<T>(products, stream, accessor, num_products,
+                                             num_outputs * element_num_bytes, scalars, options);
 
-    // reduce the products
-    memmg::managed_array<T> res_dev{num_outputs, &resource};
-    reduce_products<T>(res_dev, stream, products);
-    products.reset();
-
-    // copy result
-    basdv::async_copy_device_to_host(res, res_dev, stream);
-    co_await xendv::await_stream(stream);
-  }
-/* template <bascrv::element T, class U> */
-/*   requires std::constructible_from<T, U> */
-/* xena::future<> */
-/* multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction_stream, */
-/*                                const partition_table_accessor<U>& accessor, unsigned num_products, */
-/*                                unsigned num_output_bytes, basct::cspan<uint8_t> scalars, */
-/*                                const multiexponentiate_options& options) noexcept { */
-
-  // compute bitwise products
-  //
-  // We split the work by groups of generators so that a single chunk will process
-  // all the outputs for those generators. This minimizes the amount of host->device
-  // copying we need to do for the table of precomputed sums.
-  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}
-                                                    .chunk_multiple(16)
-                                                    .min_chunk_size(options.min_chunk_size)
-                                                    .max_chunk_size(options.max_chunk_size),
-                                                options.split_factor);
-  auto num_chunks = std::distance(chunk_first, chunk_last);
-  if (num_chunks == 1) {
-    multiexponentiate_no_chunks(res, accessor, element_num_bytes, scalars);
-    co_return;
-  }
-
-  memmg::managed_array<T> products{num_products * num_chunks, memr::get_pinned_resource()};
-  size_t chunk_index = 0;
-  basl::info("computing {} bitwise multiexponentiation products of length {} using {} chunks",
-             num_products, n, num_chunks);
-  co_await xendv::concurrent_for_each(
-      chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
-        basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
-                   rng.a(), rng.b(), basdv::get_device());
-        memmg::managed_array<T> products_dev{num_products, memr::get_device_resource()};
-        auto scalars_slice = scalars.subspan(num_outputs * element_num_bytes * rng.a(),
-                                             rng.size() * num_outputs * element_num_bytes);
-        co_await async_partition_product<T>(products_dev, accessor, scalars_slice, rng.a());
-        basdv::stream stream;
-        basdv::async_copy_device_to_host(
-            basct::subspan(products, num_products * chunk_index, num_products), products_dev,
-            stream);
-        ++chunk_index;
-        co_await xendv::await_stream(stream);
-      });
-
-  // complete the multi-exponentiation
+  // reduce the products
   basl::info("reducing products for {} outputs", num_outputs);
-  co_await complete_multiexponentiation<T>(res, element_num_bytes, products);
+  memmg::managed_array<T> res_dev{num_outputs, &resource};
+  reduce_products<T>(res_dev, stream, products);
+  products.reset();
   basl::info("completed {} reductions", num_outputs);
+
+  // copy result
+  basdv::async_copy_device_to_host(res, res_dev, stream);
+  co_await xendv::await_stream(stream);
 }
 
 template <bascrv::element T, class U>
