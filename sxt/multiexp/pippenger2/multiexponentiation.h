@@ -184,43 +184,6 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
 }
 
 //--------------------------------------------------------------------------------------------------
-// complete_multiexponentiation
-//--------------------------------------------------------------------------------------------------
-template <bascrv::element T>
-xena::future<> complete_multiexponentiation(basct::span<T> res, unsigned element_num_bytes,
-                                            basct::cspan<T> partial_products) noexcept {
-  auto num_outputs = res.size();
-  auto num_products = num_outputs * element_num_bytes * 8u;
-
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-#if 0
-  basl::info("reducing {} products to {} outputs", num_products, num_products);
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<T> res_dev{num_outputs, &resource};
-  reduce_products<T>(res_dev, stream, output_bit_table, products);
-  products.reset();
-#endif
-
-  // combine the partial results
-  memmg::managed_array<T> partial_products_dev{partial_products.size(), &resource};
-  basdv::async_copy_host_to_device(partial_products_dev, partial_products, stream);
-  memmg::managed_array<T> products{num_products, &resource};
-  combine<T>(products, stream, partial_products_dev);
-  partial_products_dev.reset();
-
-  // reduce the products
-  memmg::managed_array<T> res_dev{num_outputs, &resource};
-  reduce_products<T>(res_dev, stream, products);
-  products.reset();
-
-  // copy result
-  basdv::async_copy_device_to_host(res, res_dev, stream);
-  co_await xendv::await_stream(stream);
-}
-
-//--------------------------------------------------------------------------------------------------
 // multiexponentiate_impl
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, class U>
