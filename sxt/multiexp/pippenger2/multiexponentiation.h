@@ -54,7 +54,7 @@ struct multiexponentiate_options {
 };
 
 //--------------------------------------------------------------------------------------------------
-// multiexponentiate_product_step 
+// multiexponentiate_product_step
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
