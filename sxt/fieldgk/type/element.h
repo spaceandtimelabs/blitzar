@@ -16,22 +16,24 @@
  */
 #pragma once
 
-#include <array>
+#include <algorithm>
 #include <cstdint>
 #include <iosfwd>
 
-namespace sxt::f51t {
+namespace sxt::fgkt {
 //--------------------------------------------------------------------------------------------------
 // element
 //--------------------------------------------------------------------------------------------------
 class element {
 public:
-  static constexpr size_t num_limbs_v = 5;
+  static constexpr size_t num_limbs_v = 4;
 
   element() noexcept = default;
 
-  constexpr element(uint64_t x1, uint64_t x2, uint64_t x3, uint64_t x4, uint64_t x5) noexcept
-      : data_{x1, x2, x3, x4, x5} {}
+  constexpr element(uint64_t x1, uint64_t x2, uint64_t x3, uint64_t x4) noexcept
+      : data_{x1, x2, x3, x4} {}
+
+  constexpr element(const uint64_t x[4]) noexcept : data_{x[0], x[1], x[2], x[3]} {}
 
   constexpr const uint64_t& operator[](int index) const noexcept { return data_[index]; }
 
@@ -53,10 +55,14 @@ std::ostream& operator<<(std::ostream& out, const element& e) noexcept;
 //--------------------------------------------------------------------------------------------------
 // operator==
 //--------------------------------------------------------------------------------------------------
-bool operator==(const element& lhs, const element& rhs) noexcept;
+inline constexpr bool operator==(const element& lhs, const element& rhs) noexcept {
+  return std::equal(lhs.data(), lhs.data() + element::num_limbs_v, rhs.data());
+}
 
 //--------------------------------------------------------------------------------------------------
 // operator!=
 //--------------------------------------------------------------------------------------------------
-inline bool operator!=(const element& lhs, const element& rhs) noexcept { return !(lhs == rhs); }
-} // namespace sxt::f51t
+inline constexpr bool operator!=(const element& lhs, const element& rhs) noexcept {
+  return !(lhs == rhs);
+}
+} // namespace sxt::fgkt

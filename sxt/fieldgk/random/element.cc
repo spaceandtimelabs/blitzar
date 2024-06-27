@@ -14,45 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/random/element.h"
 
-#include <array>
-#include <iomanip>
+#include "sxt/base/macro/cuda_warning.h"
+#include "sxt/base/num/fast_random_number_generator.h"
+#include "sxt/fieldgk/base/byte_conversion.h"
+#include "sxt/fieldgk/type/element.h"
 
-#include "sxt/field25/base/byte_conversion.h"
-#include "sxt/field25/base/reduce.h"
-
-namespace sxt::f25t {
+namespace sxt::fgkrn {
 //--------------------------------------------------------------------------------------------------
-// print_impl
+// generate_random_element_impl
 //--------------------------------------------------------------------------------------------------
-static std::ostream& print_impl(std::ostream& out, const std::array<uint8_t, 32>& bytes,
-                                int start) noexcept {
-  out << std::hex << static_cast<int>(bytes[start]);
-  for (int i = start; i-- > 0;) {
-    out << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(bytes[i]);
+CUDA_DISABLE_HOSTDEV_WARNING
+template <class Rng>
+static CUDA_CALLABLE void generate_random_element_impl(fgkt::element& e, Rng& generator) noexcept {
+  uint64_t data[4];
+  for (int i = 0; i < 4; ++i) {
+    data[i] = generator();
   }
-  out << "_f25";
-  return out;
+
+  bool is_below_modulus{false};
+  fgkb::from_bytes(is_below_modulus, e.data(), reinterpret_cast<const uint8_t*>(data));
 }
 
 //--------------------------------------------------------------------------------------------------
-// operator<<
+// generate_random_element
 //--------------------------------------------------------------------------------------------------
-std::ostream& operator<<(std::ostream& out, const element& e) noexcept {
-  std::array<uint8_t, 32> bytes = {};
-  f25b::to_bytes_le(bytes.data(), e.data());
-  auto flags = out.flags();
-  out << "0x";
-  for (int i = 32; i-- > 0;) {
-    if (bytes[i] != 0) {
-      print_impl(out, bytes, i);
-      out.flags(flags);
-      return out;
-    }
-  }
-  out << "0_f25";
-  out.flags(flags);
-  return out;
+CUDA_CALLABLE
+void generate_random_element(fgkt::element& e, basn::fast_random_number_generator& rng) noexcept {
+  generate_random_element_impl(e, rng);
 }
-} // namespace sxt::f25t
+
+void generate_random_element(fgkt::element& e, std::mt19937& rng) noexcept {
+  generate_random_element_impl(e, rng);
+}
+} // namespace sxt::fgkrn

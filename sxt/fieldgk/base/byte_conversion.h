@@ -16,47 +16,41 @@
  */
 #pragma once
 
-#include <array>
 #include <cstdint>
-#include <iosfwd>
 
-namespace sxt::f51t {
+#include "sxt/base/macro/cuda_callable.h"
+
+namespace sxt::fgkb {
 //--------------------------------------------------------------------------------------------------
-// element
+// from_bytes
 //--------------------------------------------------------------------------------------------------
-class element {
-public:
-  static constexpr size_t num_limbs_v = 5;
-
-  element() noexcept = default;
-
-  constexpr element(uint64_t x1, uint64_t x2, uint64_t x3, uint64_t x4, uint64_t x5) noexcept
-      : data_{x1, x2, x3, x4, x5} {}
-
-  constexpr const uint64_t& operator[](int index) const noexcept { return data_[index]; }
-
-  constexpr uint64_t& operator[](int index) noexcept { return data_[index]; }
-
-  constexpr const uint64_t* data() const noexcept { return data_; }
-
-  constexpr uint64_t* data() noexcept { return data_; }
-
-private:
-  uint64_t data_[num_limbs_v];
-};
+/**
+ * h = s mod p
+ * If s represents a above the modulus, the from_bytes function will set the is_below_modulus flag
+ * to false and return a wrapped the value, h. In this case s != to_bytes(h). Otherwise the
+ * is_below_modulus flag will be set to true and s == to_bytes(h).
+ */
+CUDA_CALLABLE
+void from_bytes(bool& is_below_modulus, uint64_t h[4], const uint8_t s[32]) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// operator<<
+// from_bytes_le
 //--------------------------------------------------------------------------------------------------
-std::ostream& operator<<(std::ostream& out, const element& e) noexcept;
+/**
+ * The internal representation of fieldgk elements are in little-endian order.
+ */
+CUDA_CALLABLE
+void from_bytes_le(bool& is_below_modulus, uint64_t h[4], const uint8_t s[32]) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// operator==
+// to_bytes
 //--------------------------------------------------------------------------------------------------
-bool operator==(const element& lhs, const element& rhs) noexcept;
+CUDA_CALLABLE
+void to_bytes(uint8_t s[32], const uint64_t h[4]) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// operator!=
+// to_bytes_le
 //--------------------------------------------------------------------------------------------------
-inline bool operator!=(const element& lhs, const element& rhs) noexcept { return !(lhs == rhs); }
-} // namespace sxt::f51t
+CUDA_CALLABLE
+void to_bytes_le(uint8_t s[32], const uint64_t h[4]) noexcept;
+} // namespace sxt::fgkb

@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/field25/type/element.h"
+#include "sxt/fieldgk/type/element.h"
 
 #include <array>
 #include <iomanip>
 
-#include "sxt/field25/base/byte_conversion.h"
-#include "sxt/field25/base/reduce.h"
+#include "sxt/fieldgk/base/byte_conversion.h"
+#include "sxt/fieldgk/base/reduce.h"
 
-namespace sxt::f25t {
+namespace sxt::fgkt {
 //--------------------------------------------------------------------------------------------------
 // print_impl
 //--------------------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ static std::ostream& print_impl(std::ostream& out, const std::array<uint8_t, 32>
   for (int i = start; i-- > 0;) {
     out << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(bytes[i]);
   }
-  out << "_f25";
+  out << "_fgk";
   return out;
 }
 
@@ -41,7 +41,7 @@ static std::ostream& print_impl(std::ostream& out, const std::array<uint8_t, 32>
 //--------------------------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& out, const element& e) noexcept {
   std::array<uint8_t, 32> bytes = {};
-  f25b::to_bytes_le(bytes.data(), e.data());
+  fgkb::to_bytes_le(bytes.data(), e.data());
   auto flags = out.flags();
   out << "0x";
   for (int i = 32; i-- > 0;) {
@@ -51,8 +51,8 @@ std::ostream& operator<<(std::ostream& out, const element& e) noexcept {
       return out;
     }
   }
-  out << "0_f25";
+  out << "0_fgk";
   out.flags(flags);
   return out;
 }
-} // namespace sxt::f25t
+} // namespace sxt::fgkt
