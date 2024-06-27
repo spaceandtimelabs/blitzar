@@ -147,6 +147,7 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
   // copy result
   basdv::async_copy_device_to_host(res, res_dev, stream);
   co_await xendv::await_stream(stream);
+  basl::info("complete multiexponentiation");
 }
 
 template <bascrv::element T, class U>
@@ -159,13 +160,11 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
   auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
   auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
   auto n = scalars.size() / num_output_bytes;
-#if 0
   SXT_DEBUG_ASSERT(
       // clang-format off
-      scalars.size() % num_products == 0
+      scalars.size() % num_output_bytes == 0
       // clang-format on
   );
-#endif
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> products{num_products, &resource};
@@ -182,6 +181,7 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
   // copy result
   basdv::async_copy_device_to_host(res, res_dev, stream);
   co_await xendv::await_stream(stream);
+  basl::info("complete multiexponentiation");
 }
 
 //--------------------------------------------------------------------------------------------------
