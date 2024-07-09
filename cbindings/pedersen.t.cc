@@ -21,6 +21,7 @@
 
 #include "cbindings/backend.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/type/element_p3.h"
 #include "sxt/curve_bng1/constant/generator.h"
@@ -36,9 +37,9 @@
 #include "sxt/curve_g1/type/compressed_element.h"
 #include "sxt/curve_g1/type/conversion_utility.h"
 #include "sxt/curve_g1/type/element_affine.h"
-#include "sxt/curve_gk/constant/generator.h"
 #include "sxt/curve_gk/operation/add.h"
 #include "sxt/curve_gk/operation/scalar_multiply.h"
+#include "sxt/curve_gk/random/element_affine.h"
 #include "sxt/curve_gk/type/conversion_utility.h"
 #include "sxt/curve_gk/type/element_affine.h"
 #include "sxt/curve_gk/type/element_p2.h"
@@ -115,17 +116,14 @@ static std::vector<cn1t::element_affine> get_bn254_g1_generators(uint64_t seq_le
 //--------------------------------------------------------------------------------------------------
 // get_grumpkin_generators
 //--------------------------------------------------------------------------------------------------
-/**
- * This is a placeholder method. This method will be updated to behave like the
- * compute_random_curve25519_generators method after random element generation is implemented inside
- * the curve_gk package group.
- */
 static std::vector<cgkt::element_affine> get_grumpkin_generators(uint64_t seq_length,
                                                                  uint64_t offset) {
   std::vector<cgkt::element_affine> generators(seq_length);
 
   for (uint64_t i = 0; i < seq_length; ++i) {
-    generators[i] = cgkcn::generator_affine_v;
+    basn::fast_random_number_generator rng{static_cast<uint64_t>(i + 1),
+                                           static_cast<uint64_t>(i + 2)};
+    cgkrn::generate_random_element(generators[i], rng);
   }
 
   return generators;
