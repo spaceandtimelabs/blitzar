@@ -126,4 +126,22 @@ void reduce_products(basct::span<T> reductions, basct::cspan<T> products) noexce
                   reduction_size);
   }
 }
+
+template <bascrv::element T>
+void reduce_products(basct::span<T> reductions, basct::cspan<unsigned> output_bit_table,
+                     basct::cspan<T> products) noexcept {
+  auto num_outputs = reductions.size();
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      reductions.size() == num_outputs &&
+      output_bit_table.size() == num_outputs
+      // clang-format on
+  );
+  unsigned offset = 0;
+  for (unsigned output_index = 0; output_index < num_outputs; ++output_index) {
+    auto reduction_size = output_bit_table[output_index];
+    reduce_output(reductions.data() + output_index, products.data() + offset, reduction_size);
+    offset += reduction_size;
+  }
+}
 } // namespace sxt::mtxpp2

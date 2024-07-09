@@ -128,4 +128,13 @@ TEST_CASE("we can reduce products with a bit table") {
     expected = {2u + 2u * 7u + 4u * 5u, 3u, 9u + 2u * 11u};
     REQUIRE(outputs == expected);
   }
+
+  SECTION("we can reduce products on the host") {
+    outputs.resize(3);
+    bit_table = {3, 1, 2};
+    products = {2u, 7u, 5u, 3u, 9u, 11u};
+    reduce_products<E>(outputs, bit_table, products);
+    expected = {2u + 2u * 7u + 4u * 5u, 3u, 9u + 2u * 11u};
+    REQUIRE(outputs == expected);
+  }
 }
