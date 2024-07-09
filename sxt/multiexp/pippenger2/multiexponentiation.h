@@ -262,7 +262,7 @@ void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& ac
 
   // reduce products
   basl::info("reducing {} products to {} outputs", num_products, num_outputs);
-  /* reduce_products<T>(res, products); */
+  reduce_products<T>(res, output_bit_table, products);
   basl::info("completed {} reductions", num_outputs);
 }
 } // namespace sxt::mtxpp2
