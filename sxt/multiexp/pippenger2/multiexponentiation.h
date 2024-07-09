@@ -249,6 +249,7 @@ void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& ac
   auto num_outputs = res.size();
   auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
   auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
+  auto n = scalars.size() / num_output_bytes;
   SXT_DEBUG_ASSERT(
       // clang-format off
       scalars.size() % num_output_bytes == 0
@@ -256,7 +257,7 @@ void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& ac
   );
 
   // compute bitwise products
-  /* basl::info("computing {} bitwise multiexponentiation products of length {}", num_products, n); */
+  basl::info("computing {} bitwise multiexponentiation products of length {}", num_products, n);
   memmg::managed_array<T> products(num_products);
   partition_product<T>(products, accessor, scalars, 0);
 
