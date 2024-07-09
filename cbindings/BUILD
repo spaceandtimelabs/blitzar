@@ -122,7 +122,7 @@ sxt_cc_component(
     test_deps = [
         ":backend",
         "//sxt/base/error:assert",
-        "//sxt/base/num:fast_random_number_generator",        
+        "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
         "//sxt/curve21/type:element_p3",
         "//sxt/curve_bng1/constant:generator",
