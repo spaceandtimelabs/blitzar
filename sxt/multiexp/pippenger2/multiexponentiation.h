@@ -240,4 +240,29 @@ void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& ac
   reduce_products<T>(res, products);
   basl::info("completed {} reductions", num_outputs);
 }
+
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
+void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& accessor,
+                       basct::cspan<unsigned> output_bit_table,
+                       basct::cspan<uint8_t> scalars) noexcept {
+  auto num_outputs = res.size();
+  auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
+  auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      scalars.size() % num_output_bytes == 0
+      // clang-format on
+  );
+
+  // compute bitwise products
+  /* basl::info("computing {} bitwise multiexponentiation products of length {}", num_products, n); */
+  memmg::managed_array<T> products(num_products);
+  partition_product<T>(products, accessor, scalars, 0);
+
+  // reduce products
+  basl::info("reducing {} products to {} outputs", num_products, num_outputs);
+  /* reduce_products<T>(res, products); */
+  basl::info("completed {} reductions", num_outputs);
+}
 } // namespace sxt::mtxpp2
