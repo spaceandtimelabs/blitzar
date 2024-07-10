@@ -45,6 +45,13 @@
 #include "sxt/curve_g1/type/compressed_element.h"
 #include "sxt/curve_g1/type/conversion_utility.h"
 #include "sxt/curve_g1/type/element_p2.h"
+#include "sxt/curve_gk/operation/add.h"
+#include "sxt/curve_gk/operation/double.h"
+#include "sxt/curve_gk/operation/neg.h"
+#include "sxt/curve_gk/random/element_p2.h"
+#include "sxt/curve_gk/type/conversion_utility.h"
+#include "sxt/curve_gk/type/element_affine.h"
+#include "sxt/curve_gk/type/element_p2.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
@@ -89,6 +96,14 @@ static void bls12_381_generator(cg1t::element_p2& element, unsigned i) {
 static void bn254_generator(cn1t::element_p2& element, unsigned i) {
   basn::fast_random_number_generator rng{i + 1, i + 2};
   cn1rn::generate_random_element(element, rng);
+}
+
+//--------------------------------------------------------------------------------------------------
+// grumpkin_generator
+//--------------------------------------------------------------------------------------------------
+static void grumpkin_generator(cgkt::element_p2& element, unsigned i) {
+  basn::fast_random_number_generator rng{i + 1, i + 2};
+  cgkrn::generate_random_element(element, rng);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -141,6 +156,18 @@ static void print_elements(basct::cspan<cn1t::element_p2> elements) noexcept {
   for (auto& e : elements) {
     cn1t::element_affine e_affine;
     cn1t::to_element_affine(e_affine, e);
+    std::cout << index++ << ": {" << e_affine.X << ", " << e_affine.Y << "}" << "\n";
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+// print_elements
+//--------------------------------------------------------------------------------------------------
+static void print_elements(basct::cspan<cgkt::element_p2> elements) noexcept {
+  size_t index = 0;
+  for (auto& e : elements) {
+    cgkt::element_affine e_affine;
+    cgkt::to_element_affine(e_affine, e);
     std::cout << index++ << ": {" << e_affine.X << ", " << e_affine.Y << "}" << "\n";
   }
 }
@@ -245,6 +272,13 @@ int main(int argc, char* argv[]) {
     auto accessor =
         make_partition_table_accessor<cn1t::compact_element, cn1t::element_p2>(n, bn254_generator);
     const auto average_time = run_benchmark<cn1t::element_p2>(accessor, num_samples, num_outputs,
+                                                              element_num_bytes, n, verbose);
+    std::println("compute duration (s): {}", average_time);
+  } else if (curve_str == "grumpkin") {
+    std::println("running {} benchmark...", curve_str);
+    auto accessor = make_partition_table_accessor<cgkt::compact_element, cgkt::element_p2>(
+        n, grumpkin_generator);
+    const auto average_time = run_benchmark<cgkt::element_p2>(accessor, num_samples, num_outputs,
                                                               element_num_bytes, n, verbose);
     std::println("compute duration (s): {}", average_time);
   } else {
