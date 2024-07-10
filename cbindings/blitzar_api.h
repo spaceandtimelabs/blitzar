@@ -28,6 +28,7 @@ extern "C" {
 #define SXT_CURVE_RISTRETTO255 0
 #define SXT_CURVE_BLS_381 1
 #define SXT_CURVE_BN_254 2
+#define SXT_CURVE_GRUMPKIN 2
 
 /** config struct to hold the chosen backend */
 struct sxt_config {
@@ -88,6 +89,20 @@ struct sxt_bn254_g1 {
 
 /** encodes an affine element of the `bn254` `G1` group in projective form */
 struct sxt_bn254_g1_p2 {
+  uint64_t X[4];
+  uint64_t Y[4];
+  uint64_t Z[4];
+};
+
+/** encodes an affine element of the `grumpkin` group */
+struct sxt_grumpkin {
+  uint64_t X[4];
+  uint64_t Y[4];
+  uint8_t infinity;
+};
+
+/** encodes an affine element of the `grumpkin` group in projective form */
+struct sxt_grumpkin_p2 {
   uint64_t X[4];
   uint64_t Y[4];
   uint64_t Z[4];
@@ -296,6 +311,46 @@ void sxt_bls12_381_g1_compute_pedersen_commitments_with_generators(
 void sxt_bn254_g1_uncompressed_compute_pedersen_commitments_with_generators(
     struct sxt_bn254_g1* commitments, uint32_t num_sequences,
     const struct sxt_sequence_descriptor* descriptors, const struct sxt_bn254_g1* generators);
+
+/**
+ * Compute the Pedersen commitments for sequences of values using `grumpkin` group elements.
+ *
+ * Denote an element of a sequence by `a_ij` where `i` represents the sequence index
+ * and `j` represents the element index. Let `*` represent the operator for the
+ * `grumpkin` curve. Then `res[i]` encodes the `grumpkin` group value
+ *
+ * ```text
+ *     Prod_{j=1 to n_i} g_j ^ a_ij
+ * ```
+ *
+ * where `n_i` represents the number of elements in sequence `i` and `g_j` is a group
+ * element determined by the `generators[j]` user value given as input
+ *
+ * # Arguments:
+ *
+ * - `commitments` (out): an array of length num_sequences where the computed commitments
+ *                     of each sequence must be written into
+ *
+ * - `num_sequences` (in): specifies the number of sequences
+ * - `descriptors` (in): an array of length `num_sequences` that specifies each sequence
+ * - `generators` (in): an array of length `max_num_rows` equals the maximum between all `n_i`
+ *
+ * # Abnormal program termination in case of:
+ *
+ * - backend not initialized or incorrectly initialized
+ * - `descriptors == nullptr`
+ * - `commitments == nullptr`
+ * - `descriptor[i].element_nbytes == 0`
+ * - `descriptor[i].element_nbytes > 32`
+ * - `descriptor[i].n > 0 && descriptor[i].data == nullptr`
+ *
+ * # Considerations:
+ *
+ * - `num_sequences == 0` will skip the computation
+ */
+void sxt_grumpkin_uncompressed_compute_pedersen_commitments_with_generators(
+    struct sxt_grumpkin* commitments, uint32_t num_sequences,
+    const struct sxt_sequence_descriptor* descriptors, const struct sxt_grumpkin* generators);
 
 /**
  * Gets the pre-specified random generated elements used for the Pedersen commitments in the
@@ -518,6 +573,7 @@ int sxt_curve25519_verify_inner_product(struct sxt_transcript* transcript, uint6
  * SXT_CURVE_RISTRETTO255          struct sxt_ristretto255*
  * SXT_CURVE_BLS_381               struct sxt_bls12_381_g1_p2*
  * SXT_CURVE_BN_254                struct sxt_bn254_g1_p2*
+ * SXT_CURVE_GRUMPKIN              struct sxt_grumpkin_p2*
  */
 struct sxt_multiexp_handle* sxt_multiexp_handle_new(unsigned curve_id, const void* generators,
                                                     unsigned n);

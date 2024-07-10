@@ -42,6 +42,10 @@ public:
                            basct::cspan<mtxb::exponent_sequence> value_sequences,
                            basct::cspan<cn1t::element_p2> generators) const noexcept override;
 
+  void compute_commitments(basct::span<cgkt::element_affine> commitments,
+                           basct::cspan<mtxb::exponent_sequence> value_sequences,
+                           basct::cspan<cgkt::element_p2> generators) const noexcept override;
+
   basct::cspan<c21t::element_p3>
   get_precomputed_generators(std::vector<c21t::element_p3>& temp_generators, uint64_t n,
                              uint64_t offset_generators) const noexcept override;

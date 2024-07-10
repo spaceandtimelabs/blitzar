@@ -32,6 +32,10 @@
 #include "sxt/curve_g1/operation/double.h"
 #include "sxt/curve_g1/operation/neg.h"
 #include "sxt/curve_g1/type/element_p2.h"
+#include "sxt/curve_gk/operation/add.h"
+#include "sxt/curve_gk/operation/double.h"
+#include "sxt/curve_gk/operation/neg.h"
+#include "sxt/curve_gk/type/element_p2.h"
 
 namespace sxt::cbnb {
 //--------------------------------------------------------------------------------------------------
@@ -47,6 +51,9 @@ template <class F> void switch_curve_type(curve_id_t id, F f) {
     break;
   case curve_id_t::bn254:
     f(std::type_identity<cn1t::compact_element>{}, std::type_identity<cn1t::element_p2>{});
+    break;
+  case curve_id_t::grumpkin:
+    f(std::type_identity<cgkt::compact_element>{}, std::type_identity<cgkt::element_p2>{});
     break;
   default:
     baser::panic("unsupported curve id {}", static_cast<unsigned>(id));

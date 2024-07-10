@@ -39,6 +39,12 @@
 #include "sxt/curve_g1/operation/neg.h"
 #include "sxt/curve_g1/type/compressed_element.h"
 #include "sxt/curve_g1/type/element_p2.h"
+#include "sxt/curve_gk/operation/add.h"
+#include "sxt/curve_gk/operation/double.h"
+#include "sxt/curve_gk/operation/neg.h"
+#include "sxt/curve_gk/type/conversion_utility.h"
+#include "sxt/curve_gk/type/element_affine.h"
+#include "sxt/curve_gk/type/element_p2.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/multiexp/base/exponent_sequence.h"
@@ -83,6 +89,16 @@ void cpu_backend::compute_commitments(basct::span<cn1t::element_affine> commitme
                                       basct::cspan<cn1t::element_p2> generators) const noexcept {
   auto values = mtxcrv::compute_multiexponentiation<cn1t::element_p2>(generators, value_sequences);
   cn1t::batch_to_element_affine(commitments, values);
+}
+
+//--------------------------------------------------------------------------------------------------
+// compute_commitments
+//--------------------------------------------------------------------------------------------------
+void cpu_backend::compute_commitments(basct::span<cgkt::element_affine> commitments,
+                                      basct::cspan<mtxb::exponent_sequence> value_sequences,
+                                      basct::cspan<cgkt::element_p2> generators) const noexcept {
+  auto values = mtxcrv::compute_multiexponentiation<cgkt::element_p2>(generators, value_sequences);
+  cgkt::batch_to_element_affine(commitments, values);
 }
 
 //--------------------------------------------------------------------------------------------------

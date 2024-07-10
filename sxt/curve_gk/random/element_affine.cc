@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2023-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
-
-namespace sxt::cbnb {
-//--------------------------------------------------------------------------------------------------
-// curve_id_t
-//--------------------------------------------------------------------------------------------------
-/**
- * Ids for the various curves we support.
- *
- * Note: The values should match those in blitzar_api.h.
- */
-enum class curve_id_t : unsigned {
-  curve25519 = 0,
-  bls12_381 = 1,
-  bn254 = 2,
-  grumpkin = 3,
-};
-} // namespace sxt::cbnb
+#include "sxt/curve_gk/random/element_affine.h"
