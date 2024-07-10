@@ -17,8 +17,10 @@
 #include "sxt/cbindings/backend/gpu_backend.h"
 
 #include <vector>
+#include <numeric>
 
 #include "sxt/base/error/assert.h"
+#include "sxt/base/num/round_up.h"
 #include "sxt/cbindings/base/curve_id_utility.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
@@ -198,15 +200,23 @@ void gpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
 }
 
 void gpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id,
-                                 const mtxpp2::partition_table_accessor_base& accessor,
-                                 basct::cspan<unsigned> output_bit_table, unsigned n,
-                                 const uint8_t* scalars) const noexcept {
-  (void)res;
-  (void)curve_id;
-  (void)accessor;
-  (void)output_bit_table;
-  (void)n;
-  (void)scalars;
+                                            const mtxpp2::partition_table_accessor_base& accessor,
+                                            const unsigned* output_bit_table, unsigned num_outputs,
+                                            unsigned n, const uint8_t* scalars) const noexcept {
+#if 0
+  cbnb::switch_curve_type(
+      curve_id, [&]<class U, class T>(std::type_identity<U>, std::type_identity<T>) noexcept {
+        basct::span<T> res_span{static_cast<T*>(res), num_outputs};
+        auto output_num_bytes =
+            basn::round_up(std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0), 8);
+        (void)output_num_bytes;
+        /* basct::cspan<uint8_t> scalars_span{scalars, element_num_bytes * num_outputs * n}; */
+        /* auto fut = mtxpp2::async_multiexponentiate<T>( */
+        /*     res_span, static_cast<const mtxpp2::partition_table_accessor<U>&>(accessor), */
+        /*     output_bit_table, scalars_span); */
+        /* xens::get_scheduler().run(); */
+      });
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------
