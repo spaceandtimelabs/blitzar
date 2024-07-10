@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2023-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,23 @@
  */
 #pragma once
 
-namespace sxt::cbnb {
+#include <cstring>
+
+#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/curve_gk/random/element_p2.h"
+#include "sxt/curve_gk/type/conversion_utility.h"
+#include "sxt/curve_gk/type/element_affine.h"
+#include "sxt/curve_gk/type/element_p2.h"
+
+namespace sxt::cgkrn {
 //--------------------------------------------------------------------------------------------------
-// curve_id_t
+// generate_random_element
 //--------------------------------------------------------------------------------------------------
-/**
- * Ids for the various curves we support.
- *
- * Note: The values should match those in blitzar_api.h.
- */
-enum class curve_id_t : unsigned {
-  curve25519 = 0,
-  bls12_381 = 1,
-  bn254 = 2,
-  grumpkin = 3,
-};
-} // namespace sxt::cbnb
+CUDA_CALLABLE
+inline void generate_random_element(cgkt::element_affine& a,
+                                    basn::fast_random_number_generator& rng) noexcept {
+  cgkt::element_p2 p;
+  generate_random_element(p, rng);
+  cgkt::to_element_affine(a, p);
+}
+} // namespace sxt::cgkrn
