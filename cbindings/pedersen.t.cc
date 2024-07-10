@@ -24,16 +24,16 @@
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/type/element_p3.h"
-#include "sxt/curve_bng1/constant/generator.h"
 #include "sxt/curve_bng1/operation/add.h"
 #include "sxt/curve_bng1/operation/scalar_multiply.h"
+#include "sxt/curve_bng1/random/element_affine.h"
 #include "sxt/curve_bng1/type/conversion_utility.h"
 #include "sxt/curve_bng1/type/element_affine.h"
 #include "sxt/curve_bng1/type/element_p2.h"
-#include "sxt/curve_g1/constant/generator.h"
 #include "sxt/curve_g1/operation/add.h"
 #include "sxt/curve_g1/operation/compression.h"
 #include "sxt/curve_g1/operation/scalar_multiply.h"
+#include "sxt/curve_g1/random/element_affine.h"
 #include "sxt/curve_g1/type/compressed_element.h"
 #include "sxt/curve_g1/type/conversion_utility.h"
 #include "sxt/curve_g1/type/element_affine.h"
@@ -78,17 +78,14 @@ static std::vector<c21t::element_p3> compute_random_curve25519_generators(uint64
 //--------------------------------------------------------------------------------------------------
 // get_bls12_381_g1_generators
 //--------------------------------------------------------------------------------------------------
-/**
- * This is a placeholder method. This method will be updated to behave like the
- * compute_random_curve25519_generators method after random element generation is implemented inside
- * the curve_g1 package group.
- */
 static std::vector<cg1t::element_affine> get_bls12_381_g1_generators(uint64_t seq_length,
                                                                      uint64_t offset) {
   std::vector<cg1t::element_affine> generators(seq_length);
 
   for (uint64_t i = 0; i < seq_length; ++i) {
-    generators[i] = cg1cn::generator_affine_v;
+    basn::fast_random_number_generator rng{static_cast<uint64_t>(i + 1),
+                                           static_cast<uint64_t>(i + 2)};
+    cg1rn::generate_random_element(generators[i], rng);
   }
 
   return generators;
@@ -97,17 +94,14 @@ static std::vector<cg1t::element_affine> get_bls12_381_g1_generators(uint64_t se
 //--------------------------------------------------------------------------------------------------
 // get_bn254_g1_generators
 //--------------------------------------------------------------------------------------------------
-/**
- * This is a placeholder method. This method will be updated to behave like the
- * compute_random_curve25519_generators method after random element generation is implemented inside
- * the curve_bng1 package group.
- */
 static std::vector<cn1t::element_affine> get_bn254_g1_generators(uint64_t seq_length,
                                                                  uint64_t offset) {
   std::vector<cn1t::element_affine> generators(seq_length);
 
   for (uint64_t i = 0; i < seq_length; ++i) {
-    generators[i] = cn1cn::generator_affine_v;
+    basn::fast_random_number_generator rng{static_cast<uint64_t>(i + 1),
+                                           static_cast<uint64_t>(i + 2)};
+    cn1rn::generate_random_element(generators[i], rng);
   }
 
   return generators;
