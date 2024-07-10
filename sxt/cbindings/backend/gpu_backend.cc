@@ -16,8 +16,8 @@
  */
 #include "sxt/cbindings/backend/gpu_backend.h"
 
-#include <vector>
 #include <numeric>
+#include <vector>
 
 #include "sxt/base/error/assert.h"
 #include "sxt/base/num/round_up.h"

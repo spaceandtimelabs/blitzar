@@ -17,8 +17,8 @@
 #include "sxt/cbindings/backend/cpu_backend.h"
 
 #include <cstring>
-#include <vector>
 #include <numeric>
+#include <vector>
 
 #include "sxt/base/error/assert.h"
 #include "sxt/base/error/panic.h"

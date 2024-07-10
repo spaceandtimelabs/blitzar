@@ -616,16 +616,16 @@ void sxt_fixed_multiexponentiation(void* res, const struct sxt_multiexp_handle* 
                                    const uint8_t* scalars);
 
 /**
- * Compute a multiexponentiation of scalars in packed format using a handle to pre-specified 
+ * Compute a multiexponentiation of scalars in packed format using a handle to pre-specified
  * generators.
  *
  * On completion `res` contains an array of size `num_outputs` for the multiexponentiation
  * of the given `scalars` array.
  *
- * An entry output_bit_table[output_index] specifies the number of scalar bits used for 
+ * An entry output_bit_table[output_index] specifies the number of scalar bits used for
  * output_index.
  *
- * Put 
+ * Put
  *     bit_sum = sum_{output_index} output_bit_table[output_index]
  * and let num_bytes denote the smallest integer greater than or equal to bit_sum that is a
  * multiple of 8.
