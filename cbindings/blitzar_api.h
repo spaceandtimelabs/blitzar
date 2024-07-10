@@ -615,6 +615,33 @@ void sxt_fixed_multiexponentiation(void* res, const struct sxt_multiexp_handle* 
                                    unsigned element_num_bytes, unsigned num_outputs, unsigned n,
                                    const uint8_t* scalars);
 
+/**
+ * Compute a multiexponentiation of scalars in packed format using a handle to pre-specified 
+ * generators.
+ *
+ * On completion `res` contains an array of size `num_outputs` for the multiexponentiation
+ * of the given `scalars` array.
+ *
+ * An entry output_bit_table[output_index] specifies the number of scalar bits used for 
+ * output_index.
+ *
+ * Put 
+ *     bit_sum = sum_{output_index} output_bit_table[output_index]
+ * and let num_bytes denote the smallest integer greater than or equal to bit_sum that is a
+ * multiple of 8.
+ *
+ *
+ * `scalars` specifies a contiguous multi-dimension `num_bytes` by `n` array laid out in
+ * a packed column-major order as specified by output_bit_table. A given row determines the scalar
+ * exponents for generator g_i with the output scalars packed contiguously and padded with zeros.
+ *
+ * Note: `res` must match the generator type of the curve. See `sxt_multiexp_handle_new` for
+ * the types.
+ */
+void sxt_fixed_packed_multiexponentiation(void* res, const struct sxt_multiexp_handle* handle,
+                                          const unsigned* output_bit_table, unsigned num_outputs,
+                                          unsigned n, const uint8_t* scalars);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
