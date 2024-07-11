@@ -4,6 +4,21 @@ load(
 )
 
 sxt_cc_component(
+    name = "element_affine",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/curve_g1/property:curve",
+    ],
+    deps = [
+        ":element_p2",
+        "//sxt/base/macro:cuda_callable",
+        "//sxt/curve_g1/type:conversion_utility",
+        "//sxt/curve_g1/type:element_affine",
+        "//sxt/curve_g1/type:element_p2",
+    ],
+)
+
+sxt_cc_component(
     name = "element_p2",
     test_deps = [
         "//sxt/base/test:unit_test",
