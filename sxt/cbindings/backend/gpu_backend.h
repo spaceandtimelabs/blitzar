@@ -69,6 +69,11 @@ public:
                                  const mtxpp2::partition_table_accessor_base& accessor,
                                  unsigned element_num_bytes, unsigned num_outputs, unsigned n,
                                  const uint8_t* scalars) const noexcept override;
+
+  void fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id,
+                                 const mtxpp2::partition_table_accessor_base& accessor,
+                                 const unsigned* output_bit_table, unsigned num_outputs, unsigned n,
+                                 const uint8_t* scalars) const noexcept override;
 };
 
 //--------------------------------------------------------------------------------------------------
