@@ -20,6 +20,7 @@ sxt_cc_component(
     name = "gpu_backend",
     impl_deps = [
         "//sxt/base/error:assert",
+        "//sxt/base/num:round_up",
         "//sxt/proof/transcript:transcript",
         "//sxt/scalar25/type:element",
         "//sxt/cbindings/base:curve_id_utility",
@@ -71,6 +72,7 @@ sxt_cc_component(
     name = "cpu_backend",
     impl_deps = [
         "//sxt/base/error:panic",
+        "//sxt/base/num:round_up",
         "//sxt/cbindings/base:curve_id_utility",
         "//sxt/proof/transcript:transcript",
         "//sxt/scalar25/type:element",
