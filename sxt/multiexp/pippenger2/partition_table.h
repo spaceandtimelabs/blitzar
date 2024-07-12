@@ -93,6 +93,18 @@ void compute_partition_table(basct::span<U> sums, basct::cspan<T> generators) no
   }
 }
 
+template <class U, bascrv::element T>
+  requires requires(const U& u, const T& e) {
+    static_cast<U>(e);
+    T{u};
+  }
+void compute_partition_table(basct::span<U> sums, unsigned partition_window,
+                             basct::cspan<T> generators) noexcept {
+  (void)sums;
+  (void)partition_window;
+  (void)generators;
+}
+
 template <bascrv::element T>
 void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) noexcept {
   compute_partition_table<T, T>(sums, generators);
