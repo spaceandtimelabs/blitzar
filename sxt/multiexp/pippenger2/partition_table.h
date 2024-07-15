@@ -98,11 +98,15 @@ template <class U, bascrv::element T>
     static_cast<U>(e);
     T{u};
   }
-void compute_partition_table(basct::span<U> sums, unsigned partition_window,
+void compute_partition_table(basct::span<U> sums, unsigned window_width,
                              basct::cspan<T> generators) noexcept {
-  (void)sums;
-  (void)partition_window;
-  (void)generators;
+  auto table_size = 1u << window_width;
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+     sums.size() == partition_table_size_v * generators.size() / window_width &&
+     generators.size() % window_width == 0
+      // clang-format on
+  );
 }
 
 template <bascrv::element T>
