@@ -73,21 +73,19 @@ template <class U, bascrv::element T>
   }
 CUDA_CALLABLE void compute_partition_table_slice(U* __restrict__ sums, unsigned window_width,
                                                  const T* __restrict__ generators) noexcept {
-  (void)sums;
-  (void)window_width;
-  (void)generators;
-#if 0
+  assert(0u < window_width && window_width <= 32u);
+
   sums[0] = static_cast<U>(T::identity());
 
   // single entry sums
-  for (unsigned i = 0; i < 16; ++i) {
-    sums[1 << i] = static_cast<U>(generators[i]);
+  for (unsigned i = 0; i < window_width; ++i) {
+    sums[1u << i] = static_cast<U>(generators[i]);
   }
 
   // multi-entry sums
-  for (unsigned k = 2; k <= 16; ++k) {
-    unsigned partition = std::numeric_limits<uint16_t>::max() >> (16u - k);
-    auto partition_last = partition << (16u - k);
+  for (unsigned k = 2; k <= window_width; ++k) {
+    unsigned partition = std::numeric_limits<uint32_t>::max() >> (32u - k);
+    auto partition_last = partition << (window_width - k);
 
     // iterate over all possible permutations with k bits set to 1
     // until we reach partition_last
@@ -105,7 +103,6 @@ CUDA_CALLABLE void compute_partition_table_slice(U* __restrict__ sums, unsigned 
       partition = basbt::next_permutation(partition);
     }
   }
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -145,6 +142,7 @@ void compute_partition_table(basct::span<U> sums, unsigned window_width,
   auto table_size = 1u << window_width;
   SXT_DEBUG_ASSERT(
       // clang-format off
+     0u < window_width &&
      sums.size() == table_size * generators.size() / window_width &&
      generators.size() % window_width == 0
       // clang-format on
