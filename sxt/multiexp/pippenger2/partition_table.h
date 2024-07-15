@@ -34,43 +34,6 @@ template <class U, bascrv::element T>
     static_cast<U>(e);
     T{u};
   }
-CUDA_CALLABLE void compute_partition_table_slice(U* __restrict__ sums,
-                                                 const T* __restrict__ generators) noexcept {
-  sums[0] = static_cast<U>(T::identity());
-
-  // single entry sums
-  for (unsigned i = 0; i < 16; ++i) {
-    sums[1 << i] = static_cast<U>(generators[i]);
-  }
-
-  // multi-entry sums
-  for (unsigned k = 2; k <= 16; ++k) {
-    unsigned partition = std::numeric_limits<uint16_t>::max() >> (16u - k);
-    auto partition_last = partition << (16u - k);
-
-    // iterate over all possible permutations with k bits set to 1
-    // until we reach partition_last
-    while (true) {
-      // compute the k bit sum from a (k-1) bit sum and a 1 bit sum
-      auto rest = partition & (partition - 1u);
-      auto t = partition ^ rest;
-      T sum{sums[rest]};
-      T e{sums[t]};
-      add_inplace(sum, e);
-      sums[partition] = static_cast<U>(sum);
-      if (partition == partition_last) {
-        break;
-      }
-      partition = basbt::next_permutation(partition);
-    }
-  }
-}
-
-template <class U, bascrv::element T>
-  requires requires(const U& u, const T& e) {
-    static_cast<U>(e);
-    T{u};
-  }
 CUDA_CALLABLE void compute_partition_table_slice(U* __restrict__ sums, unsigned window_width,
                                                  const T* __restrict__ generators) noexcept {
   assert(0u < window_width && window_width <= 32u);
@@ -128,7 +91,7 @@ void compute_partition_table(basct::span<U> sums, basct::cspan<T> generators) no
   for (unsigned i = 0; i < n; ++i) {
     auto sums_slice = sums.subspan(i * partition_table_size_v, partition_table_size_v);
     auto generators_slice = generators.subspan(i * 16u, 16u);
-    compute_partition_table_slice(sums_slice.data(), generators_slice.data());
+    compute_partition_table_slice(sums_slice.data(), 16u, generators_slice.data());
   }
 }
 

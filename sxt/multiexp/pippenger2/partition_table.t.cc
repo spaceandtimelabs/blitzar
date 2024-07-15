@@ -31,7 +31,7 @@ TEST_CASE("we can compute a slice of the partition table") {
   std::vector<E> sums(1u << 16);
   std::vector<E> generators = {1u, 2u,  3u,  4u,  5u,  6u,  7u,  8u,
                                9u, 10u, 11u, 12u, 13u, 14u, 15u, 16u};
-  compute_partition_table_slice(sums.data(), generators.data());
+  compute_partition_table_slice(sums.data(), 16u, generators.data());
   for (unsigned i = 0; i < sums.size(); ++i) {
     auto expected = E::identity();
     basbt::for_each_bit(reinterpret_cast<uint8_t*>(&i), sizeof(i), [&](unsigned index) noexcept {
