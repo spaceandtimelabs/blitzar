@@ -51,7 +51,7 @@ make_in_memory_partition_table_accessor_impl(basct::cspan<T> generators,
     generators = generators_data;
   }
   memmg::managed_array<U> sums{partition_table_size_v * num_partitions, alloc};
-  compute_partition_table<U, T>(sums, generators);
+  compute_partition_table<U, T>(sums, 16, generators);
   return std::make_unique<in_memory_partition_table_accessor<U>>(std::move(sums));
 }
 

@@ -34,19 +34,21 @@ template <class U, bascrv::element T>
     static_cast<U>(e);
     T{u};
   }
-CUDA_CALLABLE void compute_partition_table_slice(U* __restrict__ sums,
+CUDA_CALLABLE void compute_partition_table_slice(U* __restrict__ sums, unsigned window_width,
                                                  const T* __restrict__ generators) noexcept {
+  assert(0u < window_width && window_width <= 32u);
+
   sums[0] = static_cast<U>(T::identity());
 
   // single entry sums
-  for (unsigned i = 0; i < 16; ++i) {
-    sums[1 << i] = static_cast<U>(generators[i]);
+  for (unsigned i = 0; i < window_width; ++i) {
+    sums[1u << i] = static_cast<U>(generators[i]);
   }
 
   // multi-entry sums
-  for (unsigned k = 2; k <= 16; ++k) {
-    unsigned partition = std::numeric_limits<uint16_t>::max() >> (16u - k);
-    auto partition_last = partition << (16u - k);
+  for (unsigned k = 2; k <= window_width; ++k) {
+    unsigned partition = std::numeric_limits<uint32_t>::max() >> (32u - k);
+    auto partition_last = partition << (window_width - k);
 
     // iterate over all possible permutations with k bits set to 1
     // until we reach partition_last
@@ -70,31 +72,40 @@ CUDA_CALLABLE void compute_partition_table_slice(U* __restrict__ sums,
 // compute_partition_table
 //--------------------------------------------------------------------------------------------------
 /**
- * Compute table of sums used for Pippenger's partition step with a width of 16. Each slice of the
- * table contains all possible sums of a group of 16 generators.
+ * Compute table of sums used for Pippenger's partition step with a given window width. Each
+ * slice of the table contains all possible sums of a group of `window_width` generators.
  */
 template <class U, bascrv::element T>
   requires requires(const U& u, const T& e) {
     static_cast<U>(e);
     T{u};
   }
-void compute_partition_table(basct::span<U> sums, basct::cspan<T> generators) noexcept {
+void compute_partition_table(basct::span<U> sums, unsigned window_width,
+                             basct::cspan<T> generators) noexcept {
+  auto table_size = 1u << window_width;
   SXT_DEBUG_ASSERT(
       // clang-format off
-     sums.size() == partition_table_size_v * generators.size() / 16u &&
-     generators.size() % 16 == 0
+     0u < window_width &&
+     sums.size() == table_size * generators.size() / window_width &&
+     generators.size() % window_width == 0
       // clang-format on
   );
-  auto n = generators.size() / 16u;
+  auto n = generators.size() / window_width;
   for (unsigned i = 0; i < n; ++i) {
-    auto sums_slice = sums.subspan(i * partition_table_size_v, partition_table_size_v);
-    auto generators_slice = generators.subspan(i * 16u, 16u);
-    compute_partition_table_slice(sums_slice.data(), generators_slice.data());
+    auto sums_slice = sums.subspan(i * table_size, table_size);
+    auto generators_slice = generators.subspan(i * window_width, window_width);
+    compute_partition_table_slice(sums_slice.data(), window_width, generators_slice.data());
   }
 }
 
 template <bascrv::element T>
 void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) noexcept {
-  compute_partition_table<T, T>(sums, generators);
+  compute_partition_table<T, T>(sums, 16u, generators);
+}
+
+template <bascrv::element T>
+void compute_partition_table(basct::span<T> sums, unsigned window_width,
+                             basct::cspan<T> generators) noexcept {
+  compute_partition_table<T, T>(sums, window_width, generators);
 }
 } // namespace sxt::mtxpp2
