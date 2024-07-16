@@ -120,6 +120,12 @@ void compute_partition_table(basct::span<U> sums, unsigned window_width,
 
 template <bascrv::element T>
 void compute_partition_table(basct::span<T> sums, basct::cspan<T> generators) noexcept {
-  compute_partition_table<T, T>(sums, generators);
+  compute_partition_table<T, T>(sums, 16u, generators);
+}
+
+template <bascrv::element T>
+void compute_partition_table(basct::span<T> sums, unsigned window_width,
+                             basct::cspan<T> generators) noexcept {
+  compute_partition_table<T, T>(sums, window_width, generators);
 }
 } // namespace sxt::mtxpp2

@@ -54,3 +54,15 @@ TEST_CASE("we can compute the full partition table") {
   REQUIRE(sums[1] == generators[0]);
   REQUIRE(sums[partition_table_size_v + 1] == generators[16]);
 }
+
+TEST_CASE("we can compute a slice of the partition table with a width of 1") {
+  using E = bascrv::element97;
+  std::vector<E> generators = {1u, 2u,  3u,  4u,  5u,  6u,  7u,  8u,
+                               9u, 10u, 11u, 12u, 13u, 14u, 15u, 16u};
+  std::vector<E> sums(2 * generators.size());
+  compute_partition_table<E>(sums, 1u, generators);
+  for (unsigned i=0; i<generators.size(); ++i) {
+    REQUIRE(sums[2 * i] == 0u);
+    REQUIRE(sums[2 * i + 1] == generators[i]);
+  }
+}
