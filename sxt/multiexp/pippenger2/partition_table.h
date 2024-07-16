@@ -72,29 +72,9 @@ CUDA_CALLABLE void compute_partition_table_slice(U* __restrict__ sums, unsigned 
 // compute_partition_table
 //--------------------------------------------------------------------------------------------------
 /**
- * Compute table of sums used for Pippenger's partition step with a width of 16. Each slice of the
- * table contains all possible sums of a group of 16 generators.
+ * Compute table of sums used for Pippenger's partition step with a given window width. Each
+ * slice of the table contains all possible sums of a group of `window_width` generators.
  */
-template <class U, bascrv::element T>
-  requires requires(const U& u, const T& e) {
-    static_cast<U>(e);
-    T{u};
-  }
-void compute_partition_table(basct::span<U> sums, basct::cspan<T> generators) noexcept {
-  SXT_DEBUG_ASSERT(
-      // clang-format off
-     sums.size() == partition_table_size_v * generators.size() / 16u &&
-     generators.size() % 16 == 0
-      // clang-format on
-  );
-  auto n = generators.size() / 16u;
-  for (unsigned i = 0; i < n; ++i) {
-    auto sums_slice = sums.subspan(i * partition_table_size_v, partition_table_size_v);
-    auto generators_slice = generators.subspan(i * 16u, 16u);
-    compute_partition_table_slice(sums_slice.data(), 16u, generators_slice.data());
-  }
-}
-
 template <class U, bascrv::element T>
   requires requires(const U& u, const T& e) {
     static_cast<U>(e);

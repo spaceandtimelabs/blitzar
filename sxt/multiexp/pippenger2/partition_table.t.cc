@@ -61,7 +61,7 @@ TEST_CASE("we can compute a slice of the partition table with a width of 1") {
                                9u, 10u, 11u, 12u, 13u, 14u, 15u, 16u};
   std::vector<E> sums(2 * generators.size());
   compute_partition_table<E>(sums, 1u, generators);
-  for (unsigned i=0; i<generators.size(); ++i) {
+  for (unsigned i = 0; i < generators.size(); ++i) {
     REQUIRE(sums[2 * i] == 0u);
     REQUIRE(sums[2 * i + 1] == generators[i]);
   }
@@ -69,12 +69,12 @@ TEST_CASE("we can compute a slice of the partition table with a width of 1") {
 
 TEST_CASE("we can compute a slice of the partition table with a width of 2") {
   using E = bascrv::element97;
-  std::vector<E> generators = {1u, 2u,  3u,  4u};
+  std::vector<E> generators = {1u, 2u, 3u, 4u};
   std::vector<E> sums(4 * generators.size() / 2);
   compute_partition_table<E>(sums, 2u, generators);
   std::vector<E> expected = {
-    0, generators[0], generators[1], generators[0].value + generators[1].value,
-    0, generators[2], generators[3], generators[2].value + generators[3].value,
+      0, generators[0], generators[1], generators[0].value + generators[1].value,
+      0, generators[2], generators[3], generators[2].value + generators[3].value,
   };
   REQUIRE(sums == expected);
 }
