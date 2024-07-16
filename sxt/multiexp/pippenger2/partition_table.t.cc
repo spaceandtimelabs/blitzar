@@ -66,3 +66,15 @@ TEST_CASE("we can compute a slice of the partition table with a width of 1") {
     REQUIRE(sums[2 * i + 1] == generators[i]);
   }
 }
+
+TEST_CASE("we can compute a slice of the partition table with a width of 2") {
+  using E = bascrv::element97;
+  std::vector<E> generators = {1u, 2u,  3u,  4u};
+  std::vector<E> sums(4 * generators.size() / 2);
+  compute_partition_table<E>(sums, 2u, generators);
+  std::vector<E> expected = {
+    0, generators[0], generators[1], generators[0].value + generators[1].value,
+    0, generators[2], generators[3], generators[2].value + generators[3].value,
+  };
+  REQUIRE(sums == expected);
+}
