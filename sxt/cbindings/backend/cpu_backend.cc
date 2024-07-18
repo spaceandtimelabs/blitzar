@@ -187,7 +187,7 @@ void cpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
     basct::cspan<unsigned> output_bit_table_span{output_bit_table, num_outputs};
     auto output_num_bytes =
         basn::round_up(std::accumulate(output_bit_table, output_bit_table + num_outputs, 0), 8);
-    basct::cspan<uint8_t> scalars_span{scalars, output_num_bytes * n};
+    basct::cspan<uint8_t> scalars_span{scalars, output_num_bytes * n / 8u};
     mtxpp2::multiexponentiate<T>(res_span,
                                  static_cast<const mtxpp2::partition_table_accessor<U>&>(accessor),
                                  output_bit_table_span, scalars_span);

@@ -44,6 +44,7 @@ TEST_CASE("we can compute multi-exponentiations with a fixed set of generators")
   std::vector<c21t::element_p3> generators = {
       0x123_c21,
       0x456_c21,
+      0x789_c21,
   };
 
   SECTION("we can compute a multiexponentiation with the gpu backend") {
@@ -88,6 +89,21 @@ TEST_CASE("we can compute multi-exponentiations with a fixed set of generators")
     sxt_fixed_packed_multiexponentiation(res, h.h, bit_table, 2, 2, scalars);
     REQUIRE(res[0] == 2 * generators[0] + 5 * generators[1]);
     REQUIRE(res[1] == generators[0]);
+  }
+
+  SECTION("we can compute a multiexponentiation in packed form with three generators") {
+    cbn::reset_backend_for_testing();
+    const sxt_config config = {SXT_GPU_BACKEND, 0};
+    REQUIRE(sxt_init(&config) == 0);
+
+    wrapped_handle h{generators.data(), 3};
+    REQUIRE(h.h != nullptr);
+
+    uint8_t scalars[] = {1, 1, 1};
+    unsigned bit_table[] = {8};
+    c21t::element_p3 res[1];
+    sxt_fixed_packed_multiexponentiation(res, h.h, bit_table, 1, 3, scalars);
+    REQUIRE(res[0] == generators[0] + generators[1] + generators[2]);
   }
 
   SECTION("we can compute a multiexponentiation in packed form with the cpu backend") {
