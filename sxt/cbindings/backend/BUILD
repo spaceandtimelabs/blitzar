@@ -20,7 +20,7 @@ sxt_cc_component(
     name = "gpu_backend",
     impl_deps = [
         "//sxt/base/error:assert",
-        "//sxt/base/num:round_up",
+        "//sxt/base/num:divide_up",
         "//sxt/proof/transcript:transcript",
         "//sxt/scalar25/type:element",
         "//sxt/cbindings/base:curve_id_utility",
