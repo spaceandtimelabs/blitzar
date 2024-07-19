@@ -69,8 +69,7 @@ partition_product_kernel(T* __restrict__ products, const U* __restrict__ partiti
                          const uint8_t* __restrict__ scalars, unsigned byte_index,
                          unsigned bit_offset, unsigned window_width, unsigned num_products,
                          unsigned n) noexcept {
-  (void)window_width;
-  constexpr unsigned num_partition_entries = 1u << 16u;
+  auto num_partition_entries = 1u << window_width;
 
   auto step = num_products / 8u;
 
@@ -82,10 +81,10 @@ partition_product_kernel(T* __restrict__ products, const U* __restrict__ partiti
   T res{partition_table[partition_index]};
 
   // sum remaining entries
-  while (n > 16u) {
-    n -= 16u;
+  while (n > window_width) {
+    n -= window_width;
     partition_table += num_partition_entries;
-    scalars += 16u * step;
+    scalars += window_width * step;
 
     partition_index = compute_partition_index(scalars, step, n, bit_offset);
     T e{partition_table[partition_index]};
