@@ -67,7 +67,9 @@ template <bascrv::element T, class U>
 CUDA_CALLABLE void
 partition_product_kernel(T* __restrict__ products, const U* __restrict__ partition_table,
                          const uint8_t* __restrict__ scalars, unsigned byte_index,
-                         unsigned bit_offset, unsigned num_products, unsigned n) noexcept {
+                         unsigned bit_offset, unsigned window_width, unsigned num_products,
+                         unsigned n) noexcept {
+  (void)window_width;
   constexpr unsigned num_partition_entries = 1u << 16u;
 
   auto step = num_products / 8u;
@@ -142,6 +144,7 @@ xena::future<> async_partition_product(basct::span<T> products,
     products = products.data(),
     scalars = scalars_dev.data(),
     partition_table = partition_table.data(),
+    window_width = window_width,
     n = n
                // clang-format on
   ] __device__
@@ -150,7 +153,7 @@ xena::future<> async_partition_product(basct::span<T> products,
              auto bit_offset = product_index % 8u;
              auto num_products_round_8 = basn::round_up(num_products, 8u);
              partition_product_kernel<T>(products, partition_table, scalars, byte_index, bit_offset,
-                                         num_products_round_8, n);
+                                         window_width, num_products_round_8, n);
            };
   algi::launch_for_each_kernel(stream, f, num_products);
   co_await xendv::await_stream(stream);
@@ -188,7 +191,7 @@ void partition_product(basct::span<T> products, const partition_table_accessor<U
     auto bit_offset = product_index % 8u;
     auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
     partition_product_kernel<T>(products.data(), partition_table.data(), scalars.data(), byte_index,
-                                bit_offset, num_products_round_8, n);
+                                bit_offset, window_width, num_products_round_8, n);
   }
 }
 } // namespace sxt::mtxpp2
