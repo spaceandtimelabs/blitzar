@@ -168,16 +168,18 @@ void partition_product(basct::span<T> products, const partition_table_accessor<U
   auto num_products = products.size();
   auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products_round_8);
+  auto window_width = accessor.window_width();
+  auto partition_table_size = 1u << window_width;
   SXT_DEBUG_ASSERT(
       // clang-format off
       scalars.size() * 8u % num_products_round_8 == 0 &&
-      offset % 16u == 0
+      offset % window_width == 0
       // clang-format on
   );
   std::pmr::monotonic_buffer_resource alloc;
 
   auto partition_table =
-      accessor.host_view(&alloc, offset, basn::divide_up(n, 16u) * partition_table_size_v);
+      accessor.host_view(&alloc, offset, basn::divide_up(n, window_width) * partition_table_size);
 
   for (unsigned product_index = 0; product_index < num_products; ++product_index) {
     auto byte_index = product_index / 8u;
