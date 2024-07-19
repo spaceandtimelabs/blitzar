@@ -46,8 +46,9 @@ namespace sxt::mtxpp2 {
  * Compute the index in the partition table of the product for a group of 16 scalars.
  */
 CUDA_CALLABLE inline uint16_t compute_partition_index(const uint8_t* __restrict__ scalars,
-                                                      unsigned step, unsigned n,
-                                                      unsigned bit_index) noexcept {
+                                                      unsigned step, unsigned window_width,
+                                                      unsigned n, unsigned bit_index) noexcept {
+  (void)window_width;
   uint16_t res = 0;
   unsigned num_elements = std::min(16u, n);
   auto mask = 1u << bit_index;
@@ -77,7 +78,7 @@ partition_product_kernel(T* __restrict__ products, const U* __restrict__ partiti
   products += byte_index * 8u + bit_offset;
 
   // lookup the first entry
-  auto partition_index = compute_partition_index(scalars, step, n, bit_offset);
+  auto partition_index = compute_partition_index(scalars, step, window_width, n, bit_offset);
   T res{partition_table[partition_index]};
 
   // sum remaining entries
@@ -86,7 +87,7 @@ partition_product_kernel(T* __restrict__ products, const U* __restrict__ partiti
     partition_table += num_partition_entries;
     scalars += window_width * step;
 
-    partition_index = compute_partition_index(scalars, step, n, bit_offset);
+    partition_index = compute_partition_index(scalars, step, window_width, n, bit_offset);
     T e{partition_table[partition_index]};
     add_inplace(res, e);
   }
