@@ -39,6 +39,8 @@ namespace sxt::mtxpp2 {
  */
 template <class T> class partition_table_accessor : public partition_table_accessor_base {
 public:
+  virtual unsigned window_width() const noexcept { return 16u; }
+
   /**
    * Asynchronously copy precomputed sums of partitions to device.
    *
