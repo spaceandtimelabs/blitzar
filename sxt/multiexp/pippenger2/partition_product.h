@@ -109,10 +109,12 @@ xena::future<> async_partition_product(basct::span<T> products,
   auto num_products = products.size();
   auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products_round_8);
-  auto num_partitions = basn::divide_up(n, 16u);
+  auto window_width = accessor.window_width();
+  auto num_partitions = basn::divide_up(n, window_width);
+  auto partition_table_size = 1u << window_width;
   SXT_DEBUG_ASSERT(
       // clang-format off
-      offset % 16u == 0 &&
+      offset % window_width == 0 &&
       scalars.size() * 8u % num_products_round_8 == 0 &&
       basdv::is_active_device_pointer(products.data()) &&
       basdv::is_host_pointer(scalars.data())
@@ -130,8 +132,8 @@ xena::future<> async_partition_product(basct::span<T> products,
   // partition_table
   basdv::stream stream;
   memr::async_device_resource resource{stream};
-  memmg::managed_array<U> partition_table{num_partitions * partition_table_size_v, &resource};
-  accessor.async_copy_to_device(partition_table, stream, offset / 16u);
+  memmg::managed_array<U> partition_table{num_partitions * partition_table_size, &resource};
+  accessor.async_copy_to_device(partition_table, stream, offset / window_width);
   co_await std::move(scalars_fut);
 
   // product
