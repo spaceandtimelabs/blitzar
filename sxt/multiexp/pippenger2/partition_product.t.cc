@@ -67,9 +67,16 @@ TEST_CASE("we can compute the index used to lookup the precomputed sum for a par
 
   SECTION("we handle a bit width of 1") {
     scalars[0] = 1;
-    scalars[2] = 1;
+    scalars[1] = 1;
     auto index = compute_partition_index(scalars, 1, 1, 16, 0);
     REQUIRE(index == 1);
+  }
+  
+  SECTION("we handle a bit width of 2") {
+    scalars[0] = 0;
+    scalars[1] = 1;
+    auto index = compute_partition_index(scalars, 1, 2, 16, 0);
+    REQUIRE(index == 2);
   }
 }
 
