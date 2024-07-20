@@ -53,8 +53,12 @@ public:
     in.read(reinterpret_cast<char*>(table_.data()), size);
   }
 
-  explicit in_memory_partition_table_accessor(memmg::managed_array<T>&& table) noexcept
-      : table_{std::move(table)} {}
+  explicit in_memory_partition_table_accessor(memmg::managed_array<T>&& table,
+                                              unsigned window_width = 16) noexcept
+      : window_width_{window_width}, table_{std::move(table)} {}
+
+  // partition_table_accessor
+  unsigned window_width() const noexcept { return window_width_; }
 
   void async_copy_to_device(basct::span<T> dest, bast::raw_stream_t stream,
                             unsigned first) const noexcept override {
@@ -79,6 +83,7 @@ public:
   }
 
 private:
+  unsigned window_width_ = 16;
   memmg::managed_array<T> table_;
 };
 } // namespace sxt::mtxpp2
