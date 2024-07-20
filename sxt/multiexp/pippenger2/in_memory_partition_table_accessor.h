@@ -58,7 +58,7 @@ public:
       : window_width_{window_width}, table_{std::move(table)} {}
 
   // partition_table_accessor
-  unsigned window_width() const noexcept { return window_width_; }
+  unsigned window_width() const noexcept override { return window_width_; }
 
   void async_copy_to_device(basct::span<T> dest, bast::raw_stream_t stream,
                             unsigned first) const noexcept override {
