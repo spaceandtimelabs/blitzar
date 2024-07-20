@@ -64,6 +64,13 @@ TEST_CASE("we can compute the index used to lookup the precomputed sum for a par
     auto index = compute_partition_index(scalars, 2, 16, 16, 0);
     REQUIRE(index == 1u << 8u);
   }
+
+  SECTION("we handle a bit width of 1") {
+    scalars[0] = 1;
+    scalars[2] = 1;
+    auto index = compute_partition_index(scalars, 1, 1, 16, 0);
+    REQUIRE(index == 1);
+  }
 }
 
 TEST_CASE("we can compute the product of partitions") {
