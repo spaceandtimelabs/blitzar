@@ -3,10 +3,10 @@ load(
     "sxt_cc_component",
 )
 
-sxt_cc_component(
-    name = "constants",
-    with_test = False,
-)
+# sxt_cc_component(
+#     name = "constants",
+#     with_test = False,
+# )
 
 sxt_cc_component(
     name = "combination",
@@ -75,7 +75,6 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
-        ":constants",
         "//sxt/algorithm/iteration:for_each",
         "//sxt/base/bit:iteration",
         "//sxt/base/bit:permutation",
