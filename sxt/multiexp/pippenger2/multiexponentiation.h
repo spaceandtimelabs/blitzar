@@ -63,6 +63,7 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
                                unsigned num_output_bytes, basct::cspan<uint8_t> scalars,
                                const multiexponentiate_options& options) noexcept {
   auto n = scalars.size() / num_output_bytes;
+  auto window_width = accessor.window_width();
 
   // compute bitwise products
   //
@@ -70,7 +71,7 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   // all the outputs for those generators. This minimizes the amount of host->device
   // copying we need to do for the table of precomputed sums.
   auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}
-                                                    .chunk_multiple(16)
+                                                    .chunk_multiple(window_width)
                                                     .min_chunk_size(options.min_chunk_size)
                                                     .max_chunk_size(options.max_chunk_size),
                                                 options.split_factor);
