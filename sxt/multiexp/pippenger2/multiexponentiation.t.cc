@@ -45,10 +45,6 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
   }
 
   auto accessor = make_in_memory_partition_table_accessor<E>(generators);
-  auto accessor1 = make_in_memory_partition_table_accessor<E>(generators, {}, 1);
-  auto accessor10 = make_in_memory_partition_table_accessor<E>(generators, {}, 10);
-  (void)accessor1;
-  (void)accessor10;
 
   std::vector<uint8_t> scalars(1);
   std::vector<E> res(1);
@@ -104,11 +100,24 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     REQUIRE(res[0] == generators[0].value + generators[16].value);
   }
 
-  SECTION("we can compute a multiexponentiation with different window widths") {
+  SECTION("we can compute a multiexponentiation with a window width of 1") {
     scalars.resize(17);
     scalars[0] = 1;
     scalars[16] = 1;
-    auto fut = async_multiexponentiate<E>(res, *accessor1, 1, scalars);
+    accessor = make_in_memory_partition_table_accessor<E>(generators, {}, 1);
+    auto fut = async_multiexponentiate<E>(res, *accessor, 1, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    E expected = generators[0].value + generators[16].value;
+    REQUIRE(res[0] == expected);
+  }
+
+  SECTION("we can compute a multiexponentiation with a window width of 10") {
+    scalars.resize(17);
+    scalars[0] = 1;
+    scalars[16] = 1;
+    accessor = make_in_memory_partition_table_accessor<E>(generators, {}, 10);
+    auto fut = async_multiexponentiate<E>(res, *accessor, 1, scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     E expected = generators[0].value + generators[16].value;
