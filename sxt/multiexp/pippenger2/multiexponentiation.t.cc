@@ -45,6 +45,10 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
   }
 
   auto accessor = make_in_memory_partition_table_accessor<E>(generators);
+  auto accessor1 = make_in_memory_partition_table_accessor<E>(generators, {}, 1);
+  auto accessor10 = make_in_memory_partition_table_accessor<E>(generators, {}, 10);
+  (void)accessor1;
+  (void)accessor10;
 
   std::vector<uint8_t> scalars(1);
   std::vector<E> res(1);
@@ -98,6 +102,17 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == generators[0].value + generators[16].value);
+  }
+
+  SECTION("we can compute a multiexponentiation with different window widths") {
+    scalars.resize(17);
+    scalars[0] = 1;
+    scalars[16] = 1;
+    auto fut = async_multiexponentiate<E>(res, *accessor1, 1, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    E expected = generators[0].value + generators[16].value;
+    REQUIRE(res[0] == expected);
   }
 
   SECTION("we can compute a multiexponentiation with more than one output") {

@@ -53,7 +53,7 @@ make_in_memory_partition_table_accessor_impl(basct::cspan<T> generators, basm::a
   }
   memmg::managed_array<U> sums{partition_table_size * num_partitions, alloc};
   compute_partition_table<U, T>(sums, window_width, generators);
-  return std::make_unique<in_memory_partition_table_accessor<U>>(std::move(sums));
+  return std::make_unique<in_memory_partition_table_accessor<U>>(std::move(sums), window_width);
 }
 
 //--------------------------------------------------------------------------------------------------
