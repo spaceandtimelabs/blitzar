@@ -35,7 +35,6 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
-#include "sxt/multiexp/pippenger2/constants.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 
 namespace sxt::mtxpp2 {

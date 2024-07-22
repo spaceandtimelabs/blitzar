@@ -61,14 +61,18 @@ make_in_memory_partition_table_accessor_impl(basct::cspan<T> generators, basm::a
 //--------------------------------------------------------------------------------------------------
 template <class U, class T>
   requires(!std::same_as<U, T>)
-std::unique_ptr<partition_table_accessor<U>> make_in_memory_partition_table_accessor(
-    basct::cspan<T> generators, basm::alloc_t alloc = memr::get_pinned_resource()) noexcept {
-  return make_in_memory_partition_table_accessor_impl<U, T>(generators, alloc);
+std::unique_ptr<partition_table_accessor<U>>
+make_in_memory_partition_table_accessor(basct::cspan<T> generators,
+                                        basm::alloc_t alloc = memr::get_pinned_resource(),
+                                        unsigned window_width = 16) noexcept {
+  return make_in_memory_partition_table_accessor_impl<U, T>(generators, alloc, window_width);
 }
 
 template <class T>
-std::unique_ptr<partition_table_accessor<T>> make_in_memory_partition_table_accessor(
-    basct::cspan<T> generators, basm::alloc_t alloc = memr::get_pinned_resource()) noexcept {
-  return make_in_memory_partition_table_accessor_impl<T, T>(generators, alloc);
+std::unique_ptr<partition_table_accessor<T>>
+make_in_memory_partition_table_accessor(basct::cspan<T> generators,
+                                        basm::alloc_t alloc = memr::get_pinned_resource(),
+                                        unsigned window_width = 16) noexcept {
+  return make_in_memory_partition_table_accessor_impl<T, T>(generators, alloc, window_width);
 }
 } // namespace sxt::mtxpp2

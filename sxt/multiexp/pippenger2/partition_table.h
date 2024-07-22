@@ -23,7 +23,6 @@
 #include "sxt/base/curve/element.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
-#include "sxt/multiexp/pippenger2/constants.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
