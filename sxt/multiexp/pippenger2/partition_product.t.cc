@@ -25,7 +25,6 @@
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
-#include "sxt/multiexp/pippenger2/constants.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor.h"
 
 using namespace sxt;

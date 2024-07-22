@@ -46,7 +46,6 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
-        ":constants",
         "//sxt/algorithm/iteration:for_each",
         "//sxt/base/bit:iteration",
         "//sxt/base/bit:permutation",
