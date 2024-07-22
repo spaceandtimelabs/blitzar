@@ -115,7 +115,6 @@ sxt_cc_component(
         "//sxt/memory/resource:device_resource",
     ],
     deps = [
-        ":constants",
         ":partition_table_accessor",
         "//sxt/base/container:span_utility",
         "//sxt/base/device:memory_utility",

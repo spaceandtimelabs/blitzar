@@ -27,7 +27,6 @@
 #include "sxt/base/error/panic.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/pinned_resource.h"
-#include "sxt/multiexp/pippenger2/constants.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 
 namespace sxt::mtxpp2 {
@@ -73,7 +72,7 @@ public:
 
   basct::cspan<T> host_view(std::pmr::polymorphic_allocator<> /*alloc*/, unsigned first,
                             unsigned size) const noexcept override {
-    SXT_RELEASE_ASSERT(table_.size() >= size + first * partition_table_size_v);
+    SXT_RELEASE_ASSERT(table_.size() >= size + first * partition_table_size_);
     return basct::subspan(table_, first * partition_table_size_, size);
   }
 
