@@ -89,7 +89,8 @@ TEST_CASE("we can compute the product of partitions") {
     e = 0u;
   }
 
-  memmg::managed_array<E> partition_table((1u << 16) * 10);
+  auto partition_table_size = 1u << 16;
+  memmg::managed_array<E> partition_table(partition_table_size * 10);
   std::mt19937 rng{0};
   for (unsigned i = 0; i < partition_table.size(); ++i) {
     if (i % (1u << 16u) == 0) {
@@ -130,7 +131,7 @@ TEST_CASE("we can compute the product of partitions") {
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
-    expected[0] = partition_table[partition_table_size_v + 1];
+    expected[0] = partition_table[partition_table_size + 1];
     REQUIRE(products == expected);
   }
 
@@ -165,7 +166,7 @@ TEST_CASE("we can compute the product of partitions") {
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
-    expected[0] = partition_table[1].value + partition_table[partition_table_size_v + 1].value;
+    expected[0] = partition_table[1].value + partition_table[partition_table_size + 1].value;
     REQUIRE(products == expected);
   }
 
@@ -174,7 +175,7 @@ TEST_CASE("we can compute the product of partitions") {
     scalars[0] = 1u;
     scalars[16] = 1u;
     partition_product<E>(products, accessor, scalars, 0);
-    expected[0] = partition_table[1].value + partition_table[partition_table_size_v + 1].value;
+    expected[0] = partition_table[1].value + partition_table[partition_table_size + 1].value;
     REQUIRE(products == expected);
   }
 }
