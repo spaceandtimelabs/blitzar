@@ -3,11 +3,6 @@ load(
     "sxt_cc_component",
 )
 
-# sxt_cc_component(
-#     name = "constants",
-#     with_test = False,
-# )
-
 sxt_cc_component(
     name = "combination",
     test_deps = [
