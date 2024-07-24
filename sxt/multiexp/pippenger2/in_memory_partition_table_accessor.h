@@ -56,7 +56,7 @@ public:
   }
 
   explicit in_memory_partition_table_accessor(memmg::managed_array<T>&& table,
-                                              unsigned window_width = 16) noexcept
+                                              unsigned window_width) noexcept
       : window_width_{window_width}, partition_table_size_{1u << window_width},
         table_{std::move(table)} {}
 

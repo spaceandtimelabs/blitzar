@@ -91,7 +91,7 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
     for (auto& val : data) {
       val = cnt++;
     }
-    in_memory_partition_table_accessor<E> accessor{memmg::managed_array<E>{data}};
+    in_memory_partition_table_accessor<E> accessor{memmg::managed_array<E>{data}, 16};
     temp_file.stream().close();
     accessor.write_to_file(temp_file.name());
     in_memory_partition_table_accessor<E> accessor_p{temp_file.name()};
