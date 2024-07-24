@@ -35,7 +35,6 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
-#include "sxt/multiexp/pippenger2/constants.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 
 namespace sxt::mtxpp2 {
@@ -45,16 +44,16 @@ namespace sxt::mtxpp2 {
 /**
  * Compute the index in the partition table of the product for a group of 16 scalars.
  */
-CUDA_CALLABLE inline uint16_t compute_partition_index(const uint8_t* __restrict__ scalars,
-                                                      unsigned step, unsigned n,
-                                                      unsigned bit_index) noexcept {
-  uint16_t res = 0;
-  unsigned num_elements = std::min(16u, n);
+CUDA_CALLABLE inline unsigned compute_partition_index(const uint8_t* __restrict__ scalars,
+                                                      unsigned step, unsigned window_width,
+                                                      unsigned n, unsigned bit_index) noexcept {
+  unsigned res = 0;
+  unsigned num_elements = std::min(window_width, n);
   auto mask = 1u << bit_index;
   for (unsigned i = 0; i < num_elements; ++i) {
     auto byte = scalars[i * step];
-    auto bit_value = static_cast<uint16_t>((byte & mask) != 0);
-    res |= static_cast<uint16_t>(bit_value << i);
+    auto bit_value = static_cast<unsigned>((byte & mask) != 0);
+    res |= static_cast<unsigned>(bit_value << i);
   }
   return res;
 }
@@ -67,8 +66,9 @@ template <bascrv::element T, class U>
 CUDA_CALLABLE void
 partition_product_kernel(T* __restrict__ products, const U* __restrict__ partition_table,
                          const uint8_t* __restrict__ scalars, unsigned byte_index,
-                         unsigned bit_offset, unsigned num_products, unsigned n) noexcept {
-  constexpr unsigned num_partition_entries = 1u << 16u;
+                         unsigned bit_offset, unsigned window_width, unsigned num_products,
+                         unsigned n) noexcept {
+  auto num_partition_entries = 1u << window_width;
 
   auto step = num_products / 8u;
 
@@ -76,16 +76,16 @@ partition_product_kernel(T* __restrict__ products, const U* __restrict__ partiti
   products += byte_index * 8u + bit_offset;
 
   // lookup the first entry
-  auto partition_index = compute_partition_index(scalars, step, n, bit_offset);
+  auto partition_index = compute_partition_index(scalars, step, window_width, n, bit_offset);
   T res{partition_table[partition_index]};
 
   // sum remaining entries
-  while (n > 16u) {
-    n -= 16u;
+  while (n > window_width) {
+    n -= window_width;
     partition_table += num_partition_entries;
-    scalars += 16u * step;
+    scalars += window_width * step;
 
-    partition_index = compute_partition_index(scalars, step, n, bit_offset);
+    partition_index = compute_partition_index(scalars, step, window_width, n, bit_offset);
     T e{partition_table[partition_index]};
     add_inplace(res, e);
   }
@@ -109,10 +109,12 @@ xena::future<> async_partition_product(basct::span<T> products,
   auto num_products = products.size();
   auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products_round_8);
-  auto num_partitions = basn::divide_up(n, 16u);
+  auto window_width = accessor.window_width();
+  auto num_partitions = basn::divide_up(n, window_width);
+  auto partition_table_size = 1u << window_width;
   SXT_DEBUG_ASSERT(
       // clang-format off
-      offset % 16u == 0 &&
+      offset % window_width == 0 &&
       scalars.size() * 8u % num_products_round_8 == 0 &&
       basdv::is_active_device_pointer(products.data()) &&
       basdv::is_host_pointer(scalars.data())
@@ -130,8 +132,8 @@ xena::future<> async_partition_product(basct::span<T> products,
   // partition_table
   basdv::stream stream;
   memr::async_device_resource resource{stream};
-  memmg::managed_array<U> partition_table{num_partitions * partition_table_size_v, &resource};
-  accessor.async_copy_to_device(partition_table, stream, offset / 16u);
+  memmg::managed_array<U> partition_table{num_partitions * partition_table_size, &resource};
+  accessor.async_copy_to_device(partition_table, stream, offset / window_width);
   co_await std::move(scalars_fut);
 
   // product
@@ -140,6 +142,7 @@ xena::future<> async_partition_product(basct::span<T> products,
     products = products.data(),
     scalars = scalars_dev.data(),
     partition_table = partition_table.data(),
+    window_width = window_width,
     n = n
                // clang-format on
   ] __device__
@@ -148,7 +151,7 @@ xena::future<> async_partition_product(basct::span<T> products,
              auto bit_offset = product_index % 8u;
              auto num_products_round_8 = basn::round_up(num_products, 8u);
              partition_product_kernel<T>(products, partition_table, scalars, byte_index, bit_offset,
-                                         num_products_round_8, n);
+                                         window_width, num_products_round_8, n);
            };
   algi::launch_for_each_kernel(stream, f, num_products);
   co_await xendv::await_stream(stream);
@@ -168,23 +171,25 @@ void partition_product(basct::span<T> products, const partition_table_accessor<U
   auto num_products = products.size();
   auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products_round_8);
+  auto window_width = accessor.window_width();
+  auto partition_table_size = 1u << window_width;
   SXT_DEBUG_ASSERT(
       // clang-format off
       scalars.size() * 8u % num_products_round_8 == 0 &&
-      offset % 16u == 0
+      offset % window_width == 0
       // clang-format on
   );
   std::pmr::monotonic_buffer_resource alloc;
 
   auto partition_table =
-      accessor.host_view(&alloc, offset, basn::divide_up(n, 16u) * partition_table_size_v);
+      accessor.host_view(&alloc, offset, basn::divide_up(n, window_width) * partition_table_size);
 
   for (unsigned product_index = 0; product_index < num_products; ++product_index) {
     auto byte_index = product_index / 8u;
     auto bit_offset = product_index % 8u;
     auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
     partition_product_kernel<T>(products.data(), partition_table.data(), scalars.data(), byte_index,
-                                bit_offset, num_products_round_8, n);
+                                bit_offset, window_width, num_products_round_8, n);
   }
 }
 } // namespace sxt::mtxpp2
