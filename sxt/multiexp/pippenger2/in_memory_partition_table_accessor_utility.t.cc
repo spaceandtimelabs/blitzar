@@ -38,12 +38,14 @@ TEST_CASE("we can create a partition table accessor from given generators") {
     g = std::uniform_int_distribution<unsigned>{0, 96}(rng);
   }
 
+  unsigned window_width = 16;
   basdv::stream stream;
-  memmg::managed_array<E> table_dev{1u << 16u, memr::get_device_resource()};
+  memmg::managed_array<E> table_dev{1u << window_width, memr::get_device_resource()};
   memmg::managed_array<E> table(table_dev.size());
 
   SECTION("we can create an accessor from a single generators") {
-    auto accessor = make_in_memory_partition_table_accessor<E>(basct::subspan(generators, 0, 1));
+    auto accessor = make_in_memory_partition_table_accessor<E>(basct::subspan(generators, 0, 1), {},
+                                                               window_width);
     accessor->async_copy_to_device(table_dev, stream, 0);
     basdv::async_copy_device_to_host(table, table_dev, stream);
     basdv::synchronize_stream(stream);
@@ -52,7 +54,7 @@ TEST_CASE("we can create a partition table accessor from given generators") {
   }
 
   SECTION("we can create an accessor from multiple generators") {
-    auto accessor = make_in_memory_partition_table_accessor<E>(generators);
+    auto accessor = make_in_memory_partition_table_accessor<E>(generators, {}, window_width);
     accessor->async_copy_to_device(table_dev, stream, 0);
     basdv::async_copy_device_to_host(table, table_dev, stream);
     basdv::synchronize_stream(stream);
