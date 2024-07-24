@@ -40,6 +40,8 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
 
   SECTION("we can access a single element") {
     E e{11};
+    unsigned window_width = 16;
+    temp_file.stream().write(reinterpret_cast<const char*>(&window_width), sizeof(unsigned));
     temp_file.stream().write(reinterpret_cast<const char*>(&e), sizeof(e));
     temp_file.stream().close();
     in_memory_partition_table_accessor<E> accessor{temp_file.name()};
@@ -53,8 +55,10 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
   }
 
   SECTION("we can access a elements with offset") {
+    unsigned window_width = 16;
     std::vector<E> data(partition_table_size * 2);
-    data[1u << 16u] = 12u;
+    data[1u << window_width] = 12u;
+    temp_file.stream().write(reinterpret_cast<const char*>(&window_width), sizeof(unsigned));
     temp_file.stream().write(reinterpret_cast<const char*>(data.data()), sizeof(E) * data.size());
     temp_file.stream().close();
     in_memory_partition_table_accessor<E> accessor{temp_file.name()};
@@ -70,6 +74,8 @@ TEST_CASE("we can provide access to precomputed partition sums stored on disk") 
   SECTION("we can access elements from the host") {
     std::vector<E> data(partition_table_size * 2);
     data[partition_table_size] = 12;
+    unsigned window_width = 16;
+    temp_file.stream().write(reinterpret_cast<const char*>(&window_width), sizeof(unsigned));
     temp_file.stream().write(reinterpret_cast<const char*>(data.data()), sizeof(E) * data.size());
     temp_file.stream().close();
     in_memory_partition_table_accessor<E> accessor{temp_file.name()};

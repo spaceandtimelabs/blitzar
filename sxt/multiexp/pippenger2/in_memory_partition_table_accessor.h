@@ -47,10 +47,11 @@ public:
     in.seekg(0, std::ios::end);
     auto size = in.tellg() - pos;
     in.seekg(pos);
+    in.read(reinterpret_cast<char*>(&window_width_), sizeof(unsigned));
+    size -= sizeof(unsigned);
     SXT_RELEASE_ASSERT(size % sizeof(T) == 0);
     table_.resize(size / sizeof(T));
     in.read(reinterpret_cast<char*>(table_.data()), size);
-    window_width_ = 16;
     partition_table_size_ = 1u << window_width_;
   }
 
@@ -81,6 +82,7 @@ public:
     if (!out.good()) {
       baser::panic("failed to open {}: {}", filename, std::strerror(errno));
     }
+    out.write(reinterpret_cast<const char*>(&window_width_), sizeof(unsigned));
     out.write(reinterpret_cast<const char*>(table_.data()), table_.size() * sizeof(T));
   }
 
