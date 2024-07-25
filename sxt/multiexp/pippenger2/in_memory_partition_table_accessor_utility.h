@@ -39,7 +39,7 @@ template <class U, bascrv::element T>
   }
 std::unique_ptr<partition_table_accessor<U>>
 make_in_memory_partition_table_accessor_impl(basct::cspan<T> generators, basm::alloc_t alloc,
-                                             unsigned window_width = 13) noexcept {
+                                             unsigned window_width = 15) noexcept {
   auto n = generators.size();
   auto partition_table_size = 1u << window_width;
   std::vector<T> generators_data;
@@ -64,7 +64,7 @@ template <class U, class T>
 std::unique_ptr<partition_table_accessor<U>>
 make_in_memory_partition_table_accessor(basct::cspan<T> generators,
                                         basm::alloc_t alloc = memr::get_pinned_resource(),
-                                        unsigned window_width = 13) noexcept {
+                                        unsigned window_width = 15) noexcept {
   return make_in_memory_partition_table_accessor_impl<U, T>(generators, alloc, window_width);
 }
 
@@ -72,7 +72,7 @@ template <class T>
 std::unique_ptr<partition_table_accessor<T>>
 make_in_memory_partition_table_accessor(basct::cspan<T> generators,
                                         basm::alloc_t alloc = memr::get_pinned_resource(),
-                                        unsigned window_width = 13) noexcept {
+                                        unsigned window_width = 15) noexcept {
   return make_in_memory_partition_table_accessor_impl<T, T>(generators, alloc, window_width);
 }
 } // namespace sxt::mtxpp2
