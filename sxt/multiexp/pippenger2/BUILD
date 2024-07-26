@@ -202,6 +202,15 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "variable_length_computation",
+    deps = [
+    ],
+    test_deps = [
+      "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "variable_length_partition_product",
     test_deps = [
         # ":in_memory_partition_table_accessor",
