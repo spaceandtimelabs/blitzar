@@ -204,6 +204,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "variable_length_computation",
     deps = [
+      "//sxt/base/container:span",
     ],
     test_deps = [
       "//sxt/base/test:unit_test",
