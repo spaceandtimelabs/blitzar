@@ -4,6 +4,17 @@ load(
 )
 
 sxt_cc_component(
+    name = "window_width",
+    impl_deps = [
+        "//sxt/base/error:panic",
+        "//sxt/base/log:log",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "combination",
     test_deps = [
         "//sxt/base/curve:example_element",
@@ -131,6 +142,7 @@ sxt_cc_component(
     deps = [
         ":in_memory_partition_table_accessor",
         ":partition_table",
+        ":window_width",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
         "//sxt/base/memory:alloc",
