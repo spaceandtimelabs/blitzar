@@ -4,6 +4,13 @@ load(
 )
 
 sxt_cc_component(
+    name = "window_width",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "combination",
     test_deps = [
         "//sxt/base/curve:example_element",
