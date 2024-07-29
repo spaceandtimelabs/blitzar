@@ -5,6 +5,7 @@
 #include <charconv>
 
 #include "sxt/base/error/panic.h"
+#include "sxt/base/log/log.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -31,7 +32,9 @@ static unsigned get_default_window_width_impl() noexcept {
 //--------------------------------------------------------------------------------------------------
 unsigned get_default_window_width() noexcept {
   static auto res = []() noexcept {
-    return get_default_window_width_impl();
+    auto res = get_default_window_width_impl();
+    basl::info("using a default partition window width of {}", res);
+    return res;
   }();
   return res;
 }
