@@ -142,6 +142,7 @@ sxt_cc_component(
     deps = [
         ":in_memory_partition_table_accessor",
         ":partition_table",
+        ":window_width",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
         "//sxt/base/memory:alloc",
