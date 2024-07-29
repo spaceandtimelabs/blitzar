@@ -6,8 +6,8 @@ load(
 sxt_cc_component(
     name = "window_width",
     impl_deps = [
-      "//sxt/base/error:panic",
-      "//sxt/base/log:log",
+        "//sxt/base/error:panic",
+        "//sxt/base/log:log",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
