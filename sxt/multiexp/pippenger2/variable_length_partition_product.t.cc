@@ -46,6 +46,16 @@ TEST_CASE("we can compute partition products of variable length") {
     REQUIRE(products == expected);
   }
 
+  SECTION("we handle a product with different lengths") {
+    scalars[0] = 1;
+    lengths[0] = 0;
+    auto fut = async_partition_product<E>(products, accessor, scalars, lengths, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    REQUIRE(products == expected);
+  }
+
 #if 0
   SECTION("we can compute a multiproduct where the number of products is not a multiple of 8") {
     scalars = {1u, 3u};
