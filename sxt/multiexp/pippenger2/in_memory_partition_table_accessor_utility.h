@@ -27,6 +27,7 @@
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor.h"
 #include "sxt/multiexp/pippenger2/partition_table.h"
+#include "sxt/multiexp/pippenger2/window_width.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -37,9 +38,9 @@ template <class U, bascrv::element T>
     static_cast<U>(e);
     T{u};
   }
-std::unique_ptr<partition_table_accessor<U>>
-make_in_memory_partition_table_accessor_impl(basct::cspan<T> generators, basm::alloc_t alloc,
-                                             unsigned window_width = 13) noexcept {
+std::unique_ptr<partition_table_accessor<U>> make_in_memory_partition_table_accessor_impl(
+    basct::cspan<T> generators, basm::alloc_t alloc,
+    unsigned window_width = get_default_window_width()) noexcept {
   auto n = generators.size();
   auto partition_table_size = 1u << window_width;
   std::vector<T> generators_data;
@@ -61,18 +62,16 @@ make_in_memory_partition_table_accessor_impl(basct::cspan<T> generators, basm::a
 //--------------------------------------------------------------------------------------------------
 template <class U, class T>
   requires(!std::same_as<U, T>)
-std::unique_ptr<partition_table_accessor<U>>
-make_in_memory_partition_table_accessor(basct::cspan<T> generators,
-                                        basm::alloc_t alloc = memr::get_pinned_resource(),
-                                        unsigned window_width = 13) noexcept {
+std::unique_ptr<partition_table_accessor<U>> make_in_memory_partition_table_accessor(
+    basct::cspan<T> generators, basm::alloc_t alloc = memr::get_pinned_resource(),
+    unsigned window_width = get_default_window_width()) noexcept {
   return make_in_memory_partition_table_accessor_impl<U, T>(generators, alloc, window_width);
 }
 
 template <class T>
-std::unique_ptr<partition_table_accessor<T>>
-make_in_memory_partition_table_accessor(basct::cspan<T> generators,
-                                        basm::alloc_t alloc = memr::get_pinned_resource(),
-                                        unsigned window_width = 13) noexcept {
+std::unique_ptr<partition_table_accessor<T>> make_in_memory_partition_table_accessor(
+    basct::cspan<T> generators, basm::alloc_t alloc = memr::get_pinned_resource(),
+    unsigned window_width = get_default_window_width()) noexcept {
   return make_in_memory_partition_table_accessor_impl<T, T>(generators, alloc, window_width);
 }
 } // namespace sxt::mtxpp2
