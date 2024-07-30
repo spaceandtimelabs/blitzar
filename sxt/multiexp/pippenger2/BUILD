@@ -226,13 +226,14 @@ sxt_cc_component(
 sxt_cc_component(
     name = "variable_length_partition_product",
     test_deps = [
-        # ":in_memory_partition_table_accessor",
-        # "//sxt/base/curve:example_element",
-        # "//sxt/base/device:stream",
+        ":in_memory_partition_table_accessor",
+        "//sxt/base/curve:example_element",
+        "//sxt/base/device:stream",
         # "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
         # "//sxt/execution/schedule:scheduler",
-        # "//sxt/memory/resource:managed_device_resource",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
         ":partition_table_accessor",
