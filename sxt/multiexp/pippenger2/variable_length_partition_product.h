@@ -104,11 +104,20 @@ xena::future<> async_partition_product(basct::span<T> products,
     co_await xendv::await_stream(stream);
   }();
 
+  // lengths_dev
+  memmg::managed_array<unsigned> lengths_dev{lengths.size(), memr::get_device_resource()};
+  auto lengths_fut = [&]() noexcept -> xena::future<> {
+    basdv::stream stream;
+    basdv::async_copy_host_to_device(lengths_dev, lengths, stream);
+    co_await xendv::await_stream(stream);
+  };
+
   // partition_table
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<U> partition_table{num_partitions * partition_table_size, &resource};
   accessor.async_copy_to_device(partition_table, stream, offset / window_width);
+  co_await std::move(lengths_fut);
   co_await std::move(scalars_fut);
 
 #if 0
