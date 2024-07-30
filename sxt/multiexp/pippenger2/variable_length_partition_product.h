@@ -77,12 +77,6 @@ xena::future<> async_partition_product(basct::span<T> products,
                                        basct::cspan<uint8_t> scalars, 
                                        basct::cspan<unsigned> lengths,
                                        unsigned offset) noexcept {
-  (void)products;
-  (void)accessor;
-  (void)scalars;
-  (void)lengths;
-  (void)offset;
-  co_return;
   auto num_products = products.size();
   auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products_round_8);
