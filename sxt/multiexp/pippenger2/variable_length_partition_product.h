@@ -2,6 +2,7 @@
 
 #include <concepts>
 
+#include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/memory_utility.h"
@@ -14,6 +15,7 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
+#include "sxt/multiexp/pippenger2/partition_product.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -120,7 +122,6 @@ xena::future<> async_partition_product(basct::span<T> products,
   co_await std::move(lengths_fut);
   co_await std::move(scalars_fut);
 
-#if 0
   // product
   auto f = [
                // clang-format off
@@ -128,18 +129,18 @@ xena::future<> async_partition_product(basct::span<T> products,
     scalars = scalars_dev.data(),
     partition_table = partition_table.data(),
     window_width = window_width,
-    n = n
+    lengths = lengths_dev.data()
                // clang-format on
   ] __device__
            __host__(unsigned num_products, unsigned product_index) noexcept {
              auto byte_index = product_index / 8u;
              auto bit_offset = product_index % 8u;
              auto num_products_round_8 = basn::round_up(num_products, 8u);
+             auto n = lengths[product_index];
              partition_product_kernel<T>(products, partition_table, scalars, byte_index, bit_offset,
                                          window_width, num_products_round_8, n);
            };
   algi::launch_for_each_kernel(stream, f, num_products);
   co_await xendv::await_stream(stream);
-#endif
 }
 } // namespace sxt::mtxpp2

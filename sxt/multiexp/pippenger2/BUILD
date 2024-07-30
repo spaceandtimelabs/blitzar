@@ -236,7 +236,8 @@ sxt_cc_component(
     ],
     deps = [
         ":partition_table_accessor",
-        # "//sxt/algorithm/iteration:for_each",
+        ":partition_product",
+        "//sxt/algorithm/iteration:for_each",
         # "//sxt/base/bit:iteration",
         # "//sxt/base/bit:permutation",
         "//sxt/base/container:span",
