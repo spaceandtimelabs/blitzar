@@ -106,7 +106,7 @@ xena::future<> async_partition_product(basct::span<T> products,
     basdv::stream stream;
     basdv::async_copy_host_to_device(lengths_dev, lengths, stream);
     co_await xendv::await_stream(stream);
-  };
+  }();
 
   // partition_table
   basdv::stream stream;

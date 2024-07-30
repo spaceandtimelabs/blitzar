@@ -3,7 +3,9 @@
 #include <random>
 
 #include "sxt/base/curve/example_element.h"
+#include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor.h"
@@ -13,7 +15,9 @@ using namespace sxt::mtxpp2;
 
 TEST_CASE("we can compute partition products of variable length") {
   using E = bascrv::element97;
+
   memmg::managed_array<E> products{8, memr::get_managed_device_resource()};
+  std::vector<unsigned> lengths(8, 1);
   std::vector<uint8_t> scalars(1);
   memmg::managed_array<E> expected(8);
   for (auto& e : expected) {
@@ -32,10 +36,9 @@ TEST_CASE("we can compute partition products of variable length") {
   }
   in_memory_partition_table_accessor accessor{memmg::managed_array<E>{partition_table}, 16};
 
-#if 0
   SECTION("we handle a product with a single scalar") {
     scalars[0] = 1;
-    auto fut = async_partition_product<E>(products, accessor, scalars, 0);
+    auto fut = async_partition_product<E>(products, accessor, scalars, lengths, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -43,6 +46,7 @@ TEST_CASE("we can compute partition products of variable length") {
     REQUIRE(products == expected);
   }
 
+#if 0
   SECTION("we can compute a multiproduct where the number of products is not a multiple of 8") {
     scalars = {1u, 3u};
     products.resize(2);
