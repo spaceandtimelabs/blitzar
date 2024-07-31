@@ -4,8 +4,9 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
-// compute_offset_table 
+// compute_product_length_table 
 //--------------------------------------------------------------------------------------------------
-void compute_offset_table(basct::span<unsigned> offset_table, basct::cspan<unsigned> bit_table,
-                          basct::cspan<unsigned> length_table) noexcept;
+void compute_product_length_table(basct::span<unsigned>& lengths, basct::cspan<unsigned> bit_widths,
+                                  basct::cspan<unsigned> output_lengths, unsigned first,
+                                  unsigned length) noexcept;
 } // namespace sxt::mtxpp2
