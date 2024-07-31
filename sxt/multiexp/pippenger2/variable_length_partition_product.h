@@ -19,51 +19,6 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
-// variable_length_partition_product_kernel
-//--------------------------------------------------------------------------------------------------
-template <bascrv::element T, class U>
-  requires std::constructible_from<T, U>
-CUDA_CALLABLE void variable_length_partition_product_kernel(
-    T* __restrict__ products, const U* __restrict__ partition_table,
-    const uint8_t* __restrict__ scalars, unsigned byte_index, unsigned bit_offset,
-    unsigned window_width, unsigned num_products, const unsigned* lengths) noexcept {
-  (void)products;
-  (void)partition_table;
-  (void)scalars;
-  (void)byte_index;
-  (void)bit_offset;
-  (void)window_width;
-  (void)num_products;
-  (void)lengths;
-#if 0
-  auto num_partition_entries = 1u << window_width;
-
-  auto step = num_products / 8u;
-
-  scalars += byte_index;
-  products += byte_index * 8u + bit_offset;
-
-  // lookup the first entry
-  auto partition_index = compute_partition_index(scalars, step, window_width, n, bit_offset);
-  T res{partition_table[partition_index]};
-
-  // sum remaining entries
-  while (n > window_width) {
-    n -= window_width;
-    partition_table += num_partition_entries;
-    scalars += window_width * step;
-
-    partition_index = compute_partition_index(scalars, step, window_width, n, bit_offset);
-    T e{partition_table[partition_index]};
-    add_inplace(res, e);
-  }
-
-  // write result
-  *products = res;
-#endif
-}
-
-//--------------------------------------------------------------------------------------------------
 // async_partition_product
 //--------------------------------------------------------------------------------------------------
 /**
