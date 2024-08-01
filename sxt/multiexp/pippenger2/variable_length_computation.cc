@@ -25,11 +25,19 @@ void compute_product_length_table(basct::span<unsigned>& product_lengths, basct:
   // find first output with longer than <length>
   auto output_first =
       std::count_if(output_lengths.begin(), output_lengths.end(),
-                    [&](double output_length) noexcept { return output_length <= length; });
-  (void)output_first;
-  (void)bit_widths;
-  (void)output_lengths;
-  (void)first;
-  (void)length;
+                    [&](double output_length) noexcept { return output_length <= first; });
+
+  // fill in product lengths
+  unsigned product_index = 0;
+  for (auto output_index = output_first; output_index < num_outputs; ++output_index) {
+    auto output_length = output_lengths[output_index];
+    SXT_DEBUG_ASSERT(output_length > first);
+    auto product_length = std::min(output_length - first, length);
+    auto bit_width = bit_widths[output_index];
+    for (unsigned bit_index=0; bit_index<bit_width; ++bit_index) {
+      product_lengths[product_index++] = product_length;
+    }
+  }
+  product_lengths = product_lengths.subspan(0, product_index);
 }
 } // namespace sxt::mtxpp2
