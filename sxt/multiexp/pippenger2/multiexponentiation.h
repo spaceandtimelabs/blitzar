@@ -41,6 +41,7 @@
 #include "sxt/multiexp/pippenger2/partition_product.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 #include "sxt/multiexp/pippenger2/reduce.h"
+#include "sxt/multiexp/pippenger2/variable_length_computation.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -61,14 +62,24 @@ xena::future<>
 async_partition_product_chunk(basct::span<T> products, const partition_table_accessor<U>& accessor,
                               basct::cspan<unsigned> output_bit_table,
                               basct::cspan<unsigned> output_lengths, basct::cspan<uint8_t> scalars,
-                              unsigned first, unsigned size) noexcept {
+                              unsigned first, unsigned length) noexcept {
+  auto num_products = products.size();
+
+  memmg::managed_array<unsigned> product_lengths_data{num_products, memr::get_pinned_resource()};
+  basct::span<unsigned> product_lengths{product_lengths_data};
+  compute_product_length_table(product_lengths, output_bit_table, output_lengths, first, length);
+  (void)product_lengths_data;
+  /* void compute_product_length_table(basct::span<unsigned>& product_lengths,
+   * basct::cspan<unsigned> bit_widths, */
+  /*                                   basct::cspan<unsigned> output_lengths, unsigned first, */
+  /*                                   unsigned length) noexcept; */
   (void)products;
   (void)accessor;
   (void)output_bit_table;
   (void)output_lengths;
   (void)scalars;
   (void)first;
-  (void)size;
+  (void)length;
   return {};
 }
 /* xena::future<> async_partition_product(basct::span<T> products, */

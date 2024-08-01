@@ -171,6 +171,7 @@ sxt_cc_component(
         ":partition_product",
         ":partition_table_accessor",
         ":reduce",
+        ":variable_length_computation",
         "//sxt/base/container:span",
         "//sxt/base/container:span_utility",
         "//sxt/base/curve:element",
