@@ -65,9 +65,17 @@ async_partition_product_chunk(basct::span<T> products, const partition_table_acc
                               unsigned first, unsigned length) noexcept {
   auto num_products = products.size();
 
+  // product lengths
   memmg::managed_array<unsigned> product_lengths_data{num_products, memr::get_pinned_resource()};
   basct::span<unsigned> product_lengths{product_lengths_data};
   compute_product_length_table(product_lengths, output_bit_table, output_lengths, first, length);
+
+  // launch kernel
+  auto num_products_p = product_lengths.size();
+  auto product_fut = async_partition_product(products.subspan(num_products - num_products_p),
+                                             accessor, scalars, product_lengths, first);
+
+  // fill in zero section
   (void)product_lengths_data;
   /* void compute_product_length_table(basct::span<unsigned>& product_lengths,
    * basct::cspan<unsigned> bit_widths, */
