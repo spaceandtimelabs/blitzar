@@ -8,7 +8,8 @@ namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 // compute_product_length_table 
 //--------------------------------------------------------------------------------------------------
-void compute_product_length_table(basct::span<unsigned>& product_lengths, basct::cspan<unsigned> bit_widths,
+void compute_product_length_table(basct::span<unsigned>& product_lengths,
+                                  basct::cspan<unsigned> bit_widths,
                                   basct::cspan<unsigned> output_lengths, unsigned first,
                                   unsigned length) noexcept {
   auto num_products = product_lengths.size();
@@ -39,5 +40,6 @@ void compute_product_length_table(basct::span<unsigned>& product_lengths, basct:
     }
   }
   product_lengths = product_lengths.subspan(0, product_index);
+  SXT_DEBUG_ASSERT(product_index == num_products);
 }
 } // namespace sxt::mtxpp2
