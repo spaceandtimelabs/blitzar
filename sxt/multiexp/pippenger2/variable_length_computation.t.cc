@@ -20,7 +20,12 @@ TEST_CASE("we can fill in the table of product lengths") {
     REQUIRE(product_lengths.size() == 1);
     REQUIRE(product_lengths[0] == 5);
   }
-/* void compute_product_length_table(basct::span<unsigned>& product_lengths, basct::cspan<unsigned> bit_widths, */
-/*                                   basct::cspan<unsigned> output_lengths, unsigned first, */
-/*                                   unsigned length) noexcept; */
+
+  SECTION("we handle the case when output_length is less than length") {
+    bit_widths = {1};
+    output_lengths = {10};
+    compute_product_length_table(product_lengths, bit_widths, output_lengths, 0, 20);
+    REQUIRE(product_lengths.size() == 1);
+    REQUIRE(product_lengths[0] == 10);
+  }
 }
