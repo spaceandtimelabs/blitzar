@@ -42,6 +42,7 @@
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 #include "sxt/multiexp/pippenger2/reduce.h"
 #include "sxt/multiexp/pippenger2/variable_length_computation.h"
+#include "sxt/multiexp/pippenger2/variable_length_partition_product.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
@@ -86,7 +87,7 @@ async_partition_product_chunk(basct::span<T> products, const partition_table_acc
 
   // await futures
   co_await xendv::await_stream(stream);
-  co_await products_fut;
+  co_await std::move(products_fut);
 }
 
 //--------------------------------------------------------------------------------------------------
