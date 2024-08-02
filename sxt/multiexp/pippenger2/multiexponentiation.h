@@ -72,10 +72,17 @@ async_partition_product_chunk(basct::span<T> products, const partition_table_acc
 
   // launch kernel
   auto num_products_p = product_lengths.size();
+  SXT_DEBUG_ASSERT(num_products_p <= num_products);
   auto product_fut = async_partition_product(products.subspan(num_products - num_products_p),
                                              accessor, scalars, product_lengths, first);
 
   // fill in zero section
+  memmg::managed_array<T> identities_host{num_products - num_products_p,
+                                          memr::get_pinned_resource()};
+  std::fill(identities_host.begin(), identities_host.end(), T::identity());
+  basdv::stream stream;
+  basdv::async_copy_host_to_device(products.subspan(0, num_products - num_products_p),
+                                   identities_host, stream);
   (void)product_lengths_data;
   /* void compute_product_length_table(basct::span<unsigned>& product_lengths,
    * basct::cspan<unsigned> bit_widths, */
