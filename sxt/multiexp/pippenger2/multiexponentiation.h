@@ -83,8 +83,10 @@ async_partition_product_chunk(basct::span<T> products, const partition_table_acc
   basdv::stream stream;
   basdv::async_copy_host_to_device(products.subspan(0, num_products - num_products_p),
                                    identities_host, stream);
+
+  // await futures
   co_await xendv::await_stream(stream);
-  co_await xendv::await_stream(products_fut);
+  co_await products_fut;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -157,15 +159,6 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
                                unsigned num_output_bytes, basct::cspan<unsigned> output_bit_table,
                                basct::cspan<unsigned> output_lengths, basct::cspan<uint8_t> scalars,
                                const multiexponentiate_options& options) noexcept {
-  (void)products;
-  (void)reduction_stream;
-  (void)accessor;
-  (void)num_output_bytes;
-  (void)output_bit_table;
-  (void)output_lengths;
-  (void)scalars;
-  (void)options;
-  return {};
   auto num_products = products.size();
   auto n = scalars.size() / num_output_bytes;
   auto window_width = accessor.window_width();
@@ -184,18 +177,15 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   basl::info("computing {} bitwise multiexponentiation products of length {} using {} chunks",
              num_products, n, num_chunks);
 
-/* xena::future<> async_partition_product(basct::span<T> products, */
-/*                                        const partition_table_accessor<U>& accessor, */
-/*                                        basct::cspan<uint8_t> scalars,  */
-/*                                        basct::cspan<unsigned> lengths, */
-/*                                        unsigned offset) noexcept { */
-#if 0
   // handle no chunk case
   if (num_chunks == 1) {
-    co_await async_partition_product<T>(products, accessor, scalars, 0);
+    co_await async_partition_product_chunk(products, accessor, output_bit_table, output_lengths,
+                                           scalars, 0, n);
     co_return;
   }
 
+  baser::panic("not implemented yet");
+#if 0
   // handle multiple chunks
   memmg::managed_array<T> partial_products{num_products * num_chunks, memr::get_pinned_resource()};
   size_t chunk_index = 0;
