@@ -40,6 +40,5 @@ void compute_product_length_table(basct::span<unsigned>& product_lengths,
     }
   }
   product_lengths = product_lengths.subspan(0, product_index);
-  SXT_DEBUG_ASSERT(product_index == num_products);
 }
 } // namespace sxt::mtxpp2

@@ -263,6 +263,17 @@ TEST_CASE("we can compute multiexponentiations with varying lengths") {
   std::vector<unsigned> output_bit_table(1);
   std::vector<unsigned> output_lengths(1);
 
+  SECTION("we can compute a multiexponentiation of length zero") {
+    output_bit_table[0] = 1;
+    output_lengths[0] = 0;
+    scalars[0] = 1;
+    auto fut =
+        async_multiexponentiate<E>(res, *accessor, output_bit_table, output_lengths, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == E::identity());
+  }
+
   SECTION("we can compute a multiexponentiation for a single bit scalar") {
     output_bit_table[0] = 1;
     output_lengths[0] = 1;
