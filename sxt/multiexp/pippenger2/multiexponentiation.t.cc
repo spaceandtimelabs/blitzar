@@ -272,6 +272,17 @@ TEST_CASE("we can compute multiexponentiations with varying lengths") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == E::identity());
   }
+
+  SECTION("we can compute a multiexponentiation of length two") {
+    output_bit_table[0] = 1;
+    output_lengths[0] = 2;
+    scalars = {0, 1};
+    auto fut =
+        async_multiexponentiate<E>(res, *accessor, output_bit_table, output_lengths, scalars);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == generators[1]);
+  }
 }
 
 TEST_CASE("we can compute multiexponentiations with curve-21") {
