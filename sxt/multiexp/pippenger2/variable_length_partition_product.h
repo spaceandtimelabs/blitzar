@@ -97,7 +97,7 @@ template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
 xena::future<> async_partition_product(basct::span<T> products_slice, unsigned num_products,
                                        const partition_table_accessor<U>& accessor,
-                                       basct::cspan<uint8_t> scalars, unsigned scalars_stride,
+                                       basct::cspan<uint8_t> scalars,
                                        basct::cspan<unsigned> lengths, unsigned offset) noexcept {
   auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products_round_8);

@@ -38,7 +38,7 @@ TEST_CASE("we can compute partition products of variable length") {
 
   SECTION("we handle a product with a single scalar") {
     scalars[0] = 1;
-    auto fut = async_partition_product<E>(products, accessor, scalars, lengths, 0);
+    auto fut = async_partition_product<E>(products, 8, accessor, scalars, lengths, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -49,7 +49,7 @@ TEST_CASE("we can compute partition products of variable length") {
   SECTION("we handle a product with different lengths") {
     scalars[0] = 1;
     lengths[0] = 0;
-    auto fut = async_partition_product<E>(products, accessor, scalars, lengths, 0);
+    auto fut = async_partition_product<E>(products, 8, accessor, scalars, lengths, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -61,7 +61,7 @@ TEST_CASE("we can compute partition products of variable length") {
     products.resize(2);
     lengths[0] = 2;
     lengths[1] = 1;
-    auto fut = async_partition_product<E>(products, accessor, scalars, lengths, 0);
+    auto fut = async_partition_product<E>(products, 2, accessor, scalars, lengths, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
