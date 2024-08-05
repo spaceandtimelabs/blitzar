@@ -92,4 +92,73 @@ xena::future<> async_partition_product(basct::span<T> products,
   algi::launch_for_each_kernel(stream, f, num_products);
   co_await xendv::await_stream(stream);
 }
+
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
+xena::future<> async_partition_product(basct::span<T> products_slice, unsigned num_products,
+                                       const partition_table_accessor<U>& accessor,
+                                       basct::cspan<uint8_t> scalars, unsigned scalars_stride,
+                                       basct::cspan<unsigned> lengths, unsigned offset) noexcept {
+  auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
+  auto n = static_cast<unsigned>(scalars.size() * 8u / num_products_round_8);
+  auto window_width = accessor.window_width();
+  auto num_partitions = basn::divide_up(n, window_width);
+  auto partition_table_size = 1u << window_width;
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      products_slice.size() <= num_products &&
+      offset % window_width == 0 &&
+      scalars.size() * 8u % num_products_round_8 == 0 &&
+      basdv::is_active_device_pointer(products_slice.data()) &&
+      basdv::is_host_pointer(scalars.data())
+      // clang-format on
+  );
+
+  // scalars_dev
+  memmg::managed_array<uint8_t> scalars_dev{scalars.size(), memr::get_device_resource()};
+  auto scalars_fut = [&]() noexcept -> xena::future<> {
+    basdv::stream stream;
+    basdv::async_copy_host_to_device(scalars_dev, scalars, stream);
+    co_await xendv::await_stream(stream);
+  }();
+
+  // lengths_dev
+  memmg::managed_array<unsigned> lengths_dev{lengths.size(), memr::get_device_resource()};
+  auto lengths_fut = [&]() noexcept -> xena::future<> {
+    basdv::stream stream;
+    basdv::async_copy_host_to_device(lengths_dev, lengths, stream);
+    co_await xendv::await_stream(stream);
+  }();
+
+  // partition_table
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<U> partition_table{num_partitions * partition_table_size, &resource};
+  accessor.async_copy_to_device(partition_table, stream, offset / window_width);
+  co_await std::move(lengths_fut);
+  co_await std::move(scalars_fut);
+
+  // product
+  auto f = [
+               // clang-format off
+    products = products_slice.data(),
+    scalars = scalars_dev.data(),
+    partition_table = partition_table.data(),
+    window_width = window_width,
+    num_products = num_products,
+    lengths = lengths_dev.data()
+               // clang-format on
+  ] __device__
+           __host__(unsigned num_slice_products, unsigned product_index) noexcept {
+             product_index += num_products - num_slice_products;
+             auto byte_index = product_index / 8u;
+             auto bit_offset = product_index % 8u;
+             auto num_products_round_8 = basn::round_up(num_products, 8u);
+             auto n = lengths[product_index];
+             partition_product_kernel<T>(products, partition_table, scalars, byte_index, bit_offset,
+                                         window_width, num_products_round_8, n);
+           };
+  algi::launch_for_each_kernel(stream, f, products_slice.size());
+  co_await xendv::await_stream(stream);
+}
 } // namespace sxt::mtxpp2
