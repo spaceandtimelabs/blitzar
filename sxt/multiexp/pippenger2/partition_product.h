@@ -94,6 +94,38 @@ partition_product_kernel(T* __restrict__ products, const U* __restrict__ partiti
   *products = res;
 }
 
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
+CUDA_CALLABLE void partition_product_kernel(T& product, const U* __restrict__ partition_table,
+                                            const uint8_t* __restrict__ scalars,
+                                            unsigned byte_index, unsigned bit_offset,
+                                            unsigned window_width, unsigned num_products,
+                                            unsigned n) noexcept {
+  auto num_partition_entries = 1u << window_width;
+
+  auto step = num_products / 8u;
+
+  scalars += byte_index;
+
+  // lookup the first entry
+  auto partition_index = compute_partition_index(scalars, step, window_width, n, bit_offset);
+  T res{partition_table[partition_index]};
+
+  // sum remaining entries
+  while (n > window_width) {
+    n -= window_width;
+    partition_table += num_partition_entries;
+    scalars += window_width * step;
+
+    partition_index = compute_partition_index(scalars, step, window_width, n, bit_offset);
+    T e{partition_table[partition_index]};
+    add_inplace(res, e);
+  }
+
+  // write result
+  product = res;
+}
+
 //--------------------------------------------------------------------------------------------------
 // async_partition_product
 //--------------------------------------------------------------------------------------------------

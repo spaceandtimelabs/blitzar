@@ -56,9 +56,21 @@ TEST_CASE("we can compute partition products of variable length") {
     REQUIRE(products == expected);
   }
 
+  SECTION("we handle a product slice") {
+    scalars[0] = 2;
+    auto fut = async_partition_product<E>(basct::span<E>{products}.subspan(1), 8, accessor, scalars,
+                                          basct::span<unsigned>{lengths}.subspan(1), 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected[1] = partition_table[1];
+    REQUIRE(products == expected);
+  }
+
   SECTION("we handle products with length greater than 1") {
     scalars = {1u, 3u};
     products.resize(2);
+    lengths.resize(2);
     lengths[0] = 2;
     lengths[1] = 1;
     auto fut = async_partition_product<E>(products, 2, accessor, scalars, lengths, 0);

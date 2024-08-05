@@ -107,6 +107,7 @@ xena::future<> async_partition_product(basct::span<T> products_slice, unsigned n
   SXT_DEBUG_ASSERT(
       // clang-format off
       products_slice.size() <= num_products &&
+      products_slice.size() == lengths.size() &&
       offset % window_width == 0 &&
       scalars.size() * 8u % num_products_round_8 == 0 &&
       basdv::is_active_device_pointer(products_slice.data()) &&
@@ -150,12 +151,13 @@ xena::future<> async_partition_product(basct::span<T> products_slice, unsigned n
                // clang-format on
   ] __device__
            __host__(unsigned num_slice_products, unsigned product_index) noexcept {
+             auto n = lengths[product_index];
+             auto& product = products[product_index];
              product_index += num_products - num_slice_products;
              auto byte_index = product_index / 8u;
              auto bit_offset = product_index % 8u;
              auto num_products_round_8 = basn::round_up(num_products, 8u);
-             auto n = lengths[product_index];
-             partition_product_kernel<T>(products, partition_table, scalars, byte_index, bit_offset,
+             partition_product_kernel<T>(product, partition_table, scalars, byte_index, bit_offset,
                                          window_width, num_products_round_8, n);
            };
   algi::launch_for_each_kernel(stream, f, products_slice.size());
