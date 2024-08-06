@@ -307,6 +307,23 @@ TEST_CASE("we can compute multiexponentiations with varying lengths") {
     REQUIRE(res[0] == generators[0]);
     REQUIRE(res[1] == generators[0].value + generators[1].value);
   }
+
+  SECTION("we can split a multiexponentiation") {
+    multiexponentiate_options options{
+        .split_factor = 2,
+        .min_chunk_size = 16u,
+    };
+    output_bit_table[0] = 8;
+    output_lengths[0] = 17;
+    scalars.resize(32);
+    scalars[0] = 1;
+    scalars[16] = 1;
+    auto fut = multiexponentiate_impl<E>(res, *accessor, output_bit_table, output_lengths, scalars,
+                                         options);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == generators[0].value + generators[16].value);
+  }
 }
 
 TEST_CASE("we can compute multiexponentiations with curve-21") {

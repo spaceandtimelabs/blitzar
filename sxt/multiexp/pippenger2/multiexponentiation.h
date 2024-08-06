@@ -193,7 +193,6 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
 
   // handle multiple chunks
   memmg::managed_array<T> partial_products{num_products * num_chunks, memr::get_pinned_resource()};
-  baser::panic("not implemented yet");
   size_t chunk_index = 0;
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
