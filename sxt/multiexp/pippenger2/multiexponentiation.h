@@ -76,8 +76,8 @@ async_partition_product_chunk(basct::span<T> products, const partition_table_acc
   SXT_DEBUG_ASSERT(num_products_p <= num_products);
   auto products_fut = [&]() noexcept -> xena::future<> {
     if (num_products_p > 0) {
-      return async_partition_product(products.subspan(num_products - num_products_p), accessor,
-                                     scalars, product_lengths, first);
+      return async_partition_product(products.subspan(num_products - num_products_p), num_products,
+                                     accessor, scalars, product_lengths, first);
     } else {
       return xena::make_ready_future();
     }
