@@ -212,25 +212,6 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
         ++chunk_index;
         co_await xendv::await_stream(stream);
       });
-#if 0
-  memmg::managed_array<T> partial_products{num_products * num_chunks, memr::get_pinned_resource()};
-  size_t chunk_index = 0;
-  co_await xendv::concurrent_for_each(
-      chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
-        basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
-                   rng.a(), rng.b(), basdv::get_device());
-        memmg::managed_array<T> partial_products_dev{num_products, memr::get_device_resource()};
-        auto scalars_slice =
-            scalars.subspan(num_output_bytes * rng.a(), rng.size() * num_output_bytes);
-        co_await async_partition_product<T>(partial_products_dev, accessor, scalars_slice, rng.a());
-        basdv::stream stream;
-        basdv::async_copy_device_to_host(
-            basct::subspan(partial_products, num_products * chunk_index, num_products),
-            partial_products_dev, stream);
-        ++chunk_index;
-        co_await xendv::await_stream(stream);
-      });
-#endif
 
   // combine the partial products
   basl::info("combining {} partial product chunks", num_chunks);
