@@ -185,9 +185,20 @@ double run_benchmark(std::unique_ptr<mtxpp2::partition_table_accessor<U>>& acces
 
   memmg::managed_array<T> res{num_outputs, memr::get_pinned_resource()};
 
+  memmg::managed_array<unsigned> output_bit_widths(num_outputs);
+  for (unsigned i=0; i<num_outputs; ++i) {
+    output_bit_widths[i] = element_num_bytes * 8;
+  }
+
+  memmg::managed_array<unsigned> output_lengths(num_outputs);
+  for (unsigned i=0; i<num_outputs; ++i) {
+    output_lengths[i] = std::max(i+1, n - num_outputs + i);
+  }
+
   // discard initial run
   {
-    auto fut = mtxpp2::async_multiexponentiate<T>(res, *accessor, element_num_bytes, exponents);
+    auto fut = mtxpp2::async_multiexponentiate<T>(res, *accessor, output_bit_widths, output_lengths,
+                                                  exponents);
     xens::get_scheduler().run();
   }
 
@@ -195,7 +206,8 @@ double run_benchmark(std::unique_ptr<mtxpp2::partition_table_accessor<U>>& acces
   double times = 0.0;
   for (unsigned i = 0; i < num_samples; ++i) {
     auto t1 = std::chrono::steady_clock::now();
-    auto fut = mtxpp2::async_multiexponentiate<T>(res, *accessor, element_num_bytes, exponents);
+    auto fut = mtxpp2::async_multiexponentiate<T>(res, *accessor, output_bit_widths, output_lengths,
+                                                  exponents);
     xens::get_scheduler().run();
     auto t2 = std::chrono::steady_clock::now();
     auto elapse = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
