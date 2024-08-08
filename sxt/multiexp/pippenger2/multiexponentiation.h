@@ -55,7 +55,7 @@ struct multiexponentiate_options {
 };
 
 //--------------------------------------------------------------------------------------------------
-// async_partition_product_chunk 
+// async_partition_product_chunk
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
@@ -84,8 +84,8 @@ async_partition_product_chunk(basct::span<T> products, const partition_table_acc
   }();
 
   // fill in zero section
-  memmg::managed_array<T>
-      identities_host{num_products - num_products_p, memr::get_pinned_resource()};
+  memmg::managed_array<T> identities_host{num_products - num_products_p,
+                                          memr::get_pinned_resource()};
   std::fill(identities_host.begin(), identities_host.end(), T::identity());
   basdv::stream stream;
   basdv::async_copy_host_to_device(products.subspan(0, num_products - num_products_p),

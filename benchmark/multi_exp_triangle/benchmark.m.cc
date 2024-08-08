@@ -186,13 +186,13 @@ double run_benchmark(std::unique_ptr<mtxpp2::partition_table_accessor<U>>& acces
   memmg::managed_array<T> res{num_outputs, memr::get_pinned_resource()};
 
   memmg::managed_array<unsigned> output_bit_widths(num_outputs);
-  for (unsigned i=0; i<num_outputs; ++i) {
+  for (unsigned i = 0; i < num_outputs; ++i) {
     output_bit_widths[i] = element_num_bytes * 8;
   }
 
   memmg::managed_array<unsigned> output_lengths(num_outputs);
-  for (unsigned i=0; i<num_outputs; ++i) {
-    output_lengths[i] = std::max(i+1, n - num_outputs + i);
+  for (unsigned i = 0; i < num_outputs; ++i) {
+    output_lengths[i] = std::max(i + 1, n - num_outputs + i);
   }
 
   // discard initial run
