@@ -46,6 +46,16 @@ TEST_CASE("we can compute partition products of variable length") {
     REQUIRE(products == expected);
   }
 
+  SECTION("we handle a product with an offset") {
+    scalars[0] = 1;
+    auto fut = async_partition_product<E>(products, 8, accessor, scalars, lengths, 16);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    expected[0] = partition_table[partition_table_size + 1];
+    REQUIRE(products == expected);
+  }
+
   SECTION("we handle a product with different lengths") {
     scalars[0] = 1;
     lengths[0] = 0;
