@@ -61,6 +61,7 @@ CUDA_CALLABLE inline unsigned compute_partition_index(const uint8_t* __restrict_
 //--------------------------------------------------------------------------------------------------
 // partition_product_kernel
 //--------------------------------------------------------------------------------------------------
+#if 0
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
 CUDA_CALLABLE void
@@ -93,6 +94,7 @@ partition_product_kernel(T* __restrict__ products, const U* __restrict__ partiti
   // write result
   *products = res;
 }
+#endif
 
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
@@ -182,8 +184,9 @@ xena::future<> async_partition_product(basct::span<T> products,
              auto byte_index = product_index / 8u;
              auto bit_offset = product_index % 8u;
              auto num_products_round_8 = basn::round_up(num_products, 8u);
-             partition_product_kernel<T>(products, partition_table, scalars, byte_index, bit_offset,
-                                         window_width, num_products_round_8, n);
+             partition_product_kernel<T>(products[product_index], partition_table, scalars,
+                                         byte_index, bit_offset, window_width, num_products_round_8,
+                                         n);
            };
   algi::launch_for_each_kernel(stream, f, num_products);
   co_await xendv::await_stream(stream);
@@ -220,8 +223,8 @@ void partition_product(basct::span<T> products, const partition_table_accessor<U
     auto byte_index = product_index / 8u;
     auto bit_offset = product_index % 8u;
     auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
-    partition_product_kernel<T>(products.data(), partition_table.data(), scalars.data(), byte_index,
-                                bit_offset, window_width, num_products_round_8, n);
+    partition_product_kernel<T>(products[product_index], partition_table.data(), scalars.data(),
+                                byte_index, bit_offset, window_width, num_products_round_8, n);
   }
 }
 } // namespace sxt::mtxpp2
