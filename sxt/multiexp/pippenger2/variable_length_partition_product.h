@@ -108,6 +108,7 @@ template <bascrv::element T, class U>
 void partition_product(basct::span<T> products_slice, unsigned num_products,
                        const partition_table_accessor<U>& accessor, basct::cspan<uint8_t> scalars,
                        basct::cspan<unsigned> lengths, unsigned offset) noexcept {
+  auto num_slice_products = products_slice.size();
   auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
   auto n = static_cast<unsigned>(scalars.size() * 8u / num_products_round_8);
   auto window_width = accessor.window_width();
@@ -115,22 +116,10 @@ void partition_product(basct::span<T> products_slice, unsigned num_products,
   auto partition_table_size = 1u << window_width;
   SXT_DEBUG_ASSERT(
       // clang-format off
-      products_slice.size() <= num_products &&
-      products_slice.size() == lengths.size() &&
+      num_slice_products <= num_products &&
+      num_slice_products == lengths.size() &&
       offset % window_width == 0 &&
       scalars.size() * 8u % num_products_round_8 == 0
-      // clang-format on
-  );
-#if 0
-  auto num_products = products.size();
-  auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
-  auto n = static_cast<unsigned>(scalars.size() * 8u / num_products_round_8);
-  auto window_width = accessor.window_width();
-  auto partition_table_size = 1u << window_width;
-  SXT_DEBUG_ASSERT(
-      // clang-format off
-      scalars.size() * 8u % num_products_round_8 == 0 &&
-      offset % window_width == 0
       // clang-format on
   );
   std::pmr::monotonic_buffer_resource alloc;
@@ -138,13 +127,15 @@ void partition_product(basct::span<T> products_slice, unsigned num_products,
   auto partition_table =
       accessor.host_view(&alloc, offset, basn::divide_up(n, window_width) * partition_table_size);
 
-  for (unsigned product_index = 0; product_index < num_products; ++product_index) {
+  for (unsigned product_index = 0; product_index < num_slice_products; ++product_index) {
+    auto len = lengths[product_index];
+    auto& product = products_slice[product_index];
+    product_index += num_products - num_slice_products;
     auto byte_index = product_index / 8u;
     auto bit_offset = product_index % 8u;
-    auto num_products_round_8 = basn::round_up<size_t>(num_products, 8u);
-    partition_product_kernel<T>(products[product_index], partition_table.data(), scalars.data(),
-                                byte_index, bit_offset, window_width, num_products_round_8, n);
+    auto num_products_round_8 = basn::round_up(num_products, 8u);
+    partition_product_kernel<T>(product, partition_table, scalars, byte_index, bit_offset,
+                                window_width, num_products_round_8, n);
   }
-#endif
 }
 } // namespace sxt::mtxpp2
