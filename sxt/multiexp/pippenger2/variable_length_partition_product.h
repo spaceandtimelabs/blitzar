@@ -124,8 +124,7 @@ void partition_product(basct::span<T> products_slice, unsigned num_products,
   );
   std::pmr::monotonic_buffer_resource alloc;
 
-  auto partition_table =
-      accessor.host_view(&alloc, offset, basn::divide_up(n, window_width) * partition_table_size);
+  auto partition_table = accessor.host_view(&alloc, offset, num_partitions * partition_table_size);
 
   for (unsigned product_index = 0; product_index < num_slice_products; ++product_index) {
     auto len = lengths[product_index];
@@ -134,8 +133,8 @@ void partition_product(basct::span<T> products_slice, unsigned num_products,
     auto byte_index = product_index / 8u;
     auto bit_offset = product_index % 8u;
     auto num_products_round_8 = basn::round_up(num_products, 8u);
-    partition_product_kernel<T>(product, partition_table, scalars, byte_index, bit_offset,
-                                window_width, num_products_round_8, n);
+    partition_product_kernel<T>(product, partition_table.data(), scalars.data(), byte_index,
+                                bit_offset, window_width, num_products_round_8, len);
   }
 }
 } // namespace sxt::mtxpp2

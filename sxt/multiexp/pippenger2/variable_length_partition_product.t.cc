@@ -67,6 +67,14 @@ TEST_CASE("we can compute partition products of variable length") {
     REQUIRE(products == expected);
   }
 
+  SECTION("we handle a product on the host") {
+    scalars[0] = 2;
+    partition_product<E>(basct::span<E>{products}.subspan(1), 8, accessor, scalars,
+                         basct::span<unsigned>{lengths}.subspan(1), 0);
+    expected[1] = partition_table[1];
+    REQUIRE(products == expected);
+  }
+
   SECTION("we handle products with length greater than 1") {
     scalars = {1u, 3u};
     products.resize(2);
