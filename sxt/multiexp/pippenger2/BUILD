@@ -84,8 +84,8 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
-        ":partition_table_accessor",
         ":partition_product",
+        ":partition_table_accessor",
         "//sxt/algorithm/iteration:for_each",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
