@@ -241,3 +241,13 @@ sxt_cc_component(
         "//sxt/memory/resource:pinned_resource",
     ],
 )
+
+sxt_cc_component(
+    name = "variable_length_computation",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
