@@ -223,6 +223,13 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+  name = "variable_length_multiexponentiation",
+  test_deps = [
+        "//sxt/base/test:unit_test",
+  ],
+)
+
+sxt_cc_component(
     name = "reduce",
     test_deps = [
         "//sxt/base/curve:example_element",
