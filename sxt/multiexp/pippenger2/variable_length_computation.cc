@@ -39,10 +39,12 @@ void compute_product_length_table(basct::span<unsigned>& product_lengths,
       // clang-format on
   );
 
-  // find first output with longer than <length>
-  auto output_first =
-      std::count_if(output_lengths.begin(), output_lengths.end(),
-                    [&](double output_length) noexcept { return output_length <= first; });
+  // find the index of the first output longer than <first>
+  auto output_first = [&] noexcept {
+    auto iter = std::find_if(output_lengths.begin(), output_lengths.end(),
+                             [&](double output_length) noexcept { return output_length > first; });
+    return static_cast<unsigned>(std::distance(output_lengths.begin(), iter));
+  }();
 
   // fill in product lengths
   unsigned product_index = 0;
