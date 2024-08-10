@@ -38,7 +38,7 @@ sxt_cc_benchmark(
         "//sxt/execution/schedule:scheduler",
         "//sxt/memory/resource:pinned_resource",
         "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
-        "//sxt/multiexp/pippenger2:multiexponentiation",
+        "//sxt/multiexp/pippenger2:variable_length_multiexponentiation",
         "//sxt/ristretto/operation:compression",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/seqcommit/generator:base_element",

@@ -55,7 +55,7 @@
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
-#include "sxt/multiexp/pippenger2/multiexponentiation.h"
+#include "sxt/multiexp/pippenger2/variable_length_multiexponentiation.h"
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/seqcommit/generator/base_element.h"
