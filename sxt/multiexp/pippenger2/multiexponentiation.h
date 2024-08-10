@@ -55,48 +55,6 @@ struct multiexponentiate_options {
 };
 
 //--------------------------------------------------------------------------------------------------
-// async_partition_product_chunk
-//--------------------------------------------------------------------------------------------------
-template <bascrv::element T, class U>
-  requires std::constructible_from<T, U>
-xena::future<>
-async_partition_product_chunk(basct::span<T> products, const partition_table_accessor<U>& accessor,
-                              basct::cspan<unsigned> output_bit_table,
-                              basct::cspan<unsigned> output_lengths, basct::cspan<uint8_t> scalars,
-                              unsigned first, unsigned length) noexcept {
-  auto num_products = products.size();
-
-  // product lengths
-  memmg::managed_array<unsigned> product_lengths_data{num_products, memr::get_pinned_resource()};
-  basct::span<unsigned> product_lengths{product_lengths_data};
-  compute_product_length_table(product_lengths, output_bit_table, output_lengths, first, length);
-
-  // launch kernel
-  auto num_products_p = product_lengths.size();
-  SXT_DEBUG_ASSERT(num_products_p <= num_products);
-  auto products_fut = [&]() noexcept -> xena::future<> {
-    if (num_products_p > 0) {
-      return async_partition_product(products.subspan(num_products - num_products_p), num_products,
-                                     accessor, scalars, product_lengths, first);
-    } else {
-      return xena::make_ready_future();
-    }
-  }();
-
-  // fill in zero section
-  memmg::managed_array<T> identities_host{num_products - num_products_p,
-                                          memr::get_pinned_resource()};
-  std::fill(identities_host.begin(), identities_host.end(), T::identity());
-  basdv::stream stream;
-  basdv::async_copy_host_to_device(products.subspan(0, num_products - num_products_p),
-                                   identities_host, stream);
-
-  // await futures
-  co_await xendv::await_stream(stream);
-  co_await std::move(products_fut);
-}
-
-//--------------------------------------------------------------------------------------------------
 // multiexponentiate_product_step
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, class U>
