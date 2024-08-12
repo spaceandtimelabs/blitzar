@@ -223,17 +223,17 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-  name = "variable_length_multiexponentiation",
-  deps = [
-    ":multiexponentiation",
-  ],
-  test_deps = [
+    name = "variable_length_multiexponentiation",
+    test_deps = [
         ":in_memory_partition_table_accessor_utility",
         "//sxt/base/curve:example_element",
         "//sxt/base/test:unit_test",
         "//sxt/execution/schedule:scheduler",
         "//sxt/ristretto/random:element",
-  ],
+    ],
+    deps = [
+        ":multiexponentiation",
+    ],
 )
 
 sxt_cc_component(
