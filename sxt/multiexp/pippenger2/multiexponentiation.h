@@ -185,40 +185,6 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
   basl::info("complete multiexponentiation");
 }
 
-template <bascrv::element T, class U>
-  requires std::constructible_from<T, U>
-xena::future<>
-multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& accessor,
-                       basct::cspan<unsigned> output_bit_table,
-                       basct::cspan<unsigned> output_lengths, basct::cspan<uint8_t> scalars,
-                       const multiexponentiate_options& options) noexcept {
-  auto num_outputs = res.size();
-  auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
-  auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
-  SXT_DEBUG_ASSERT(
-      // clang-format off
-      scalars.size() % num_output_bytes == 0
-      // clang-format on
-  );
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<T> products{num_products, &resource};
-  co_await multiexponentiate_product_step<T>(products, stream, accessor, num_output_bytes,
-                                             output_bit_table, output_lengths, scalars, options);
-
-  // reduce products
-  basl::info("reducing {} products to {} outputs", num_products, num_products);
-  memmg::managed_array<T> res_dev{num_outputs, &resource};
-  reduce_products<T>(res_dev, stream, output_bit_table, products);
-  products.reset();
-  basl::info("completed {} reductions", num_outputs);
-
-  // copy result
-  basdv::async_copy_device_to_host(res, res_dev, stream);
-  co_await xendv::await_stream(stream);
-  basl::info("complete multiexponentiation");
-}
-
 //--------------------------------------------------------------------------------------------------
 // async_multiexponentiate
 //--------------------------------------------------------------------------------------------------
