@@ -17,6 +17,8 @@
 #pragma once
 
 #include "sxt/multiexp/pippenger2/multiexponentiation.h"
+#include "sxt/multiexp/pippenger2/variable_length_computation.h"
+#include "sxt/multiexp/pippenger2/variable_length_partition_product.h"
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
