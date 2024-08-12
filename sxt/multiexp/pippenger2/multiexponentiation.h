@@ -59,9 +59,10 @@ template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
 xena::future<>
 multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction_stream,
-                               const partition_table_accessor<U>& accessor, unsigned num_products,
+                               const partition_table_accessor<U>& accessor,
                                unsigned num_output_bytes, basct::cspan<uint8_t> scalars,
                                const multiexponentiate_options& options) noexcept {
+  auto num_products = products.size();
   auto n = scalars.size() / num_output_bytes;
   auto window_width = accessor.window_width();
 
@@ -133,7 +134,7 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> products{num_products, &resource};
-  co_await multiexponentiate_product_step<T>(products, stream, accessor, num_products,
+  co_await multiexponentiate_product_step<T>(products, stream, accessor,
                                              num_outputs * element_num_bytes, scalars, options);
 
   // reduce the products
@@ -166,8 +167,8 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> products{num_products, &resource};
-  co_await multiexponentiate_product_step<T>(products, stream, accessor, num_products,
-                                             num_output_bytes, scalars, options);
+  co_await multiexponentiate_product_step<T>(products, stream, accessor, num_output_bytes, scalars,
+                                             options);
 
   // reduce products
   basl::info("reducing {} products to {} outputs", num_products, num_products);
