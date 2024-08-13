@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <numeric>
+
 #include "sxt/base/container/span.h"
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/curve/element.h"
@@ -28,7 +30,11 @@
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/pinned_resource.h"
-#include "sxt/multiexp/pippenger2/multiexponentiation.h"
+#include "sxt/multiexp/pippenger2/combination.h"
+#include "sxt/multiexp/pippenger2/multiexponentiation_options.h"
+#include "sxt/multiexp/pippenger2/partition_product.h"
+#include "sxt/multiexp/pippenger2/partition_table_accessor.h"
+#include "sxt/multiexp/pippenger2/reduce.h"
 #include "sxt/multiexp/pippenger2/variable_length_computation.h"
 #include "sxt/multiexp/pippenger2/variable_length_partition_product.h"
 

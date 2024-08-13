@@ -38,20 +38,12 @@
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/combination.h"
+#include "sxt/multiexp/pippenger2/multiexponentiation_options.h"
 #include "sxt/multiexp/pippenger2/partition_product.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 #include "sxt/multiexp/pippenger2/reduce.h"
 
 namespace sxt::mtxpp2 {
-//--------------------------------------------------------------------------------------------------
-// multiexponentiate_options
-//--------------------------------------------------------------------------------------------------
-struct multiexponentiate_options {
-  unsigned split_factor = 1;
-  unsigned min_chunk_size = 64;
-  unsigned max_chunk_size = 1024;
-};
-
 //--------------------------------------------------------------------------------------------------
 // multiexponentiate_product_step
 //--------------------------------------------------------------------------------------------------
