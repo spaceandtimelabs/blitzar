@@ -16,7 +16,18 @@
  */
 #pragma once
 
+#include "sxt/base/container/span.h"
 #include "sxt/base/container/span_utility.h"
+#include "sxt/base/curve/element.h"
+#include "sxt/base/device/stream.h"
+#include "sxt/base/iterator/index_range_iterator.h"
+#include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/log/log.h"
+#include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/for_each.h"
+#include "sxt/execution/device/synchronization.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/multiexponentiation.h"
 #include "sxt/multiexp/pippenger2/variable_length_computation.h"
 #include "sxt/multiexp/pippenger2/variable_length_partition_product.h"
