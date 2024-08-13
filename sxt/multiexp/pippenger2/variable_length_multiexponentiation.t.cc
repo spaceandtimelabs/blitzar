@@ -76,6 +76,14 @@ TEST_CASE("we can compute multiexponentiations with varying lengths") {
     REQUIRE(res[0] == generators[1]);
   }
 
+  SECTION("we can compute a multiexponentiation on the host") {
+    output_bit_table[0] = 1;
+    output_lengths[0] = 2;
+    scalars = {0, 1};
+    multiexponentiate<E>(res, *accessor, output_bit_table, output_lengths, scalars);
+    REQUIRE(res[0] == generators[1]);
+  }
+
   SECTION("we can compute a multiexponentiation with two products of different lengths") {
     output_bit_table = {1, 1};
     output_lengths = {1, 2};

@@ -233,6 +233,7 @@ sxt_cc_component(
     ],
     deps = [
         ":multiexponentiation",
+        "//sxt/base/container:span_utility",
     ],
 )
 

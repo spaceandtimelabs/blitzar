@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "sxt/base/container/span_utility.h"
 #include "sxt/multiexp/pippenger2/multiexponentiation.h"
 #include "sxt/multiexp/pippenger2/variable_length_computation.h"
 #include "sxt/multiexp/pippenger2/variable_length_partition_product.h"
@@ -210,8 +211,8 @@ void multiexponentiate(basct::span<T> res,
   auto num_products_p = product_lengths.size();
   memmg::managed_array<T> products(num_products);
   if (num_products_p > 0) {
-    partition_product(products.subspan(num_products - num_products_p), num_products, accessor,
-                      scalars, product_lengths, 0);
+    partition_product(basct::subspan(products, num_products - num_products_p), num_products,
+                      accessor, scalars, product_lengths, 0);
   }
   std::fill_n(products.begin(), num_products - num_products_p, T::identity());
 
