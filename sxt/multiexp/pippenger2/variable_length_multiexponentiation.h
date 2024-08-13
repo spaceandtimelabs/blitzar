@@ -213,6 +213,11 @@ void multiexponentiate(basct::span<T> res,
     partition_product(products.subspan(num_products - num_products_p), num_products, accessor,
                       scalars, product_lengths, 0);
   }
+  std::fill_n(products.begin(), num_products - num_products_p, T::identity());
+  /* std::fill(identities_host.begin(), identities_host.end(), T::identity()); */
+  /* basdv::stream stream; */
+  /* basdv::async_copy_host_to_device(products.subspan(0, num_products - num_products_p), */
+  /*                                  identities_host, stream); */
   (void)products;
 /* void partition_product(basct::span<T> products_slice, unsigned num_products, */
 /*                        const partition_table_accessor<U>& accessor, basct::cspan<uint8_t> scalars, */
