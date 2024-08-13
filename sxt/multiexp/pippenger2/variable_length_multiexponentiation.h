@@ -180,4 +180,56 @@ xena::future<> async_multiexponentiate(basct::span<T> res,
   options.split_factor = static_cast<unsigned>(basdv::get_num_devices());
   return multiexponentiate_impl(res, accessor, output_bit_table, output_lengths, scalars, options);
 }
+
+//--------------------------------------------------------------------------------------------------
+// multiexponentiate
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
+void multiexponentiate(basct::span<T> res,
+                                       const partition_table_accessor<U>& accessor,
+                                       basct::cspan<unsigned> output_bit_table,
+                                       basct::cspan<unsigned> output_lengths,
+                                       basct::cspan<uint8_t> scalars) noexcept {
+  auto num_outputs = res.size();
+  auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
+  auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
+  auto n = scalars.size() / num_output_bytes;
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      scalars.size() % num_output_bytes == 0
+      // clang-format on
+  );
+
+// product lengths
+  memmg::managed_array<unsigned> product_lengths_data(num_products);
+  basct::span<unsigned> product_lengths{product_lengths_data};
+  compute_product_length_table(product_lengths, output_bit_table, output_lengths, 0, n);
+
+  (void)product_lengths;
+  (void)res;
+  (void)accessor;
+  (void)output_bit_table;
+  (void)output_lengths;
+  (void)scalars;
+#if 0
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> products{num_products, &resource};
+  co_await multiexponentiate_product_step<T>(products, stream, accessor, num_output_bytes,
+                                             output_bit_table, output_lengths, scalars, options);
+
+  // reduce products
+  basl::info("reducing {} products to {} outputs", num_products, num_products);
+  memmg::managed_array<T> res_dev{num_outputs, &resource};
+  reduce_products<T>(res_dev, stream, output_bit_table, products);
+  products.reset();
+  basl::info("completed {} reductions", num_outputs);
+
+  // copy result
+  basdv::async_copy_device_to_host(res, res_dev, stream);
+  co_await xendv::await_stream(stream);
+  basl::info("complete multiexponentiation");
+#endif
+}
 } // namespace sxt::mtxpp2
