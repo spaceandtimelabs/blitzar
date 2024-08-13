@@ -187,6 +187,13 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
 //--------------------------------------------------------------------------------------------------
 // async_multiexponentiate
 //--------------------------------------------------------------------------------------------------
+/**
+ * Compute a varying length multi-exponentiation using an accessor to precompute sums of partition
+ * groups.
+ *
+ * This implements the partition part of Pipenger's algorithm. See Algorithm 7 of
+ * https://cacr.uwaterloo.ca/techreports/2010/cacr2010-26.pdf
+ */
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
 xena::future<> async_multiexponentiate(basct::span<T> res,
@@ -202,6 +209,9 @@ xena::future<> async_multiexponentiate(basct::span<T> res,
 //--------------------------------------------------------------------------------------------------
 // multiexponentiate
 //--------------------------------------------------------------------------------------------------
+/**
+ * Host version of async_multiexponentiate.
+ */
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
 void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& accessor,
