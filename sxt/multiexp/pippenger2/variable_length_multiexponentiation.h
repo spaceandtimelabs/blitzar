@@ -214,40 +214,10 @@ void multiexponentiate(basct::span<T> res,
                       scalars, product_lengths, 0);
   }
   std::fill_n(products.begin(), num_products - num_products_p, T::identity());
-  /* std::fill(identities_host.begin(), identities_host.end(), T::identity()); */
-  /* basdv::stream stream; */
-  /* basdv::async_copy_host_to_device(products.subspan(0, num_products - num_products_p), */
-  /*                                  identities_host, stream); */
-  (void)products;
-/* void partition_product(basct::span<T> products_slice, unsigned num_products, */
-/*                        const partition_table_accessor<U>& accessor, basct::cspan<uint8_t> scalars, */
-/*                        basct::cspan<unsigned> lengths, unsigned offset) noexcept { */
-      /* return async_partition_product(products.subspan(num_products - num_products_p), num_products, */
-      /*                                accessor, scalars, product_lengths, first); */
-  (void)product_lengths;
-  (void)res;
-  (void)accessor;
-  (void)output_bit_table;
-  (void)output_lengths;
-  (void)scalars;
-#if 0
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<T> products{num_products, &resource};
-  co_await multiexponentiate_product_step<T>(products, stream, accessor, num_output_bytes,
-                                             output_bit_table, output_lengths, scalars, options);
 
   // reduce products
   basl::info("reducing {} products to {} outputs", num_products, num_products);
-  memmg::managed_array<T> res_dev{num_outputs, &resource};
-  reduce_products<T>(res_dev, stream, output_bit_table, products);
-  products.reset();
+  reduce_products<T>(res, output_bit_table, products);
   basl::info("completed {} reductions", num_outputs);
-
-  // copy result
-  basdv::async_copy_device_to_host(res, res_dev, stream);
-  co_await xendv::await_stream(stream);
-  basl::info("complete multiexponentiation");
-#endif
 }
 } // namespace sxt::mtxpp2
