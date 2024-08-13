@@ -55,6 +55,14 @@ TEST_CASE("we can compute multiexponentiations with varying lengths") {
     REQUIRE(res[0] == E::identity());
   }
 
+  SECTION("we can compute a host multiexponentiation of length zero") {
+    output_bit_table[0] = 1;
+    output_lengths[0] = 0;
+    scalars[0] = 1;
+    multiexponentiate<E>(res, *accessor, output_bit_table, output_lengths, scalars);
+    REQUIRE(res[0] == E::identity());
+  }
+
   SECTION("we can compute a multiexponentiation for a single bit scalar") {
     output_bit_table[0] = 1;
     output_lengths[0] = 1;
