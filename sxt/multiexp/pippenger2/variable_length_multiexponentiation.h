@@ -201,11 +201,24 @@ void multiexponentiate(basct::span<T> res,
       // clang-format on
   );
 
-// product lengths
+  // product lengths
   memmg::managed_array<unsigned> product_lengths_data(num_products);
   basct::span<unsigned> product_lengths{product_lengths_data};
   compute_product_length_table(product_lengths, output_bit_table, output_lengths, 0, n);
 
+  // partition products
+  auto num_products_p = product_lengths.size();
+  memmg::managed_array<T> products(num_products);
+  if (num_products_p > 0) {
+    partition_product(products.subspan(num_products - num_products_p), num_products, accessor,
+                      scalars, product_lengths, 0);
+  }
+  (void)products;
+/* void partition_product(basct::span<T> products_slice, unsigned num_products, */
+/*                        const partition_table_accessor<U>& accessor, basct::cspan<uint8_t> scalars, */
+/*                        basct::cspan<unsigned> lengths, unsigned offset) noexcept { */
+      /* return async_partition_product(products.subspan(num_products - num_products_p), num_products, */
+      /*                                accessor, scalars, product_lengths, first); */
   (void)product_lengths;
   (void)res;
   (void)accessor;
