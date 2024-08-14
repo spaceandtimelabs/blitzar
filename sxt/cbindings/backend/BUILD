@@ -17,6 +17,20 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "computational_backend_utility",
+    deps = [
+        "//sxt/base/container:span",
+    ],
+    impl_deps = [
+      "//sxt/base/error:assert",
+      "//sxt/base/num:divide_up",
+    ],
+    test_deps = [
+      "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "gpu_backend",
     impl_deps = [
         "//sxt/base/error:assert",
@@ -56,6 +70,7 @@ sxt_cc_component(
         "//sxt/multiexp/curve:multiexponentiation",
         "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
         "//sxt/multiexp/pippenger2:multiexponentiation",
+        "//sxt/multiexp/pippenger2:variable_length_multiexponentiation",
         "//sxt/seqcommit/generator:precomputed_generators",
         "//sxt/proof/inner_product:proof_descriptor",
         "//sxt/proof/inner_product:proof_computation",
