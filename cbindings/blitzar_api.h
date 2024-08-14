@@ -642,6 +642,14 @@ void sxt_fixed_packed_multiexponentiation(void* res, const struct sxt_multiexp_h
                                           const unsigned* output_bit_table, unsigned num_outputs,
                                           unsigned n, const uint8_t* scalars);
 
+
+/**
+ * TODO(rnburn): fill me in
+ */
+void sxt_fixed_vlen_multiexponentiation(void* res, const struct sxt_multiexp_handle* handle,
+                                        const unsigned* output_bit_table,
+                                        const unsigned* output_lengths, unsigned num_outputs,
+                                        const uint8_t* scalars);
 #ifdef __cplusplus
 } // extern "C"
 #endif
