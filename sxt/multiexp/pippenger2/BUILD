@@ -181,9 +181,15 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "multiexponentiation_options",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "multiexponentiation",
     test_deps = [
         ":in_memory_partition_table_accessor_utility",
+        ":multiexponentiation_options",
         "//sxt/base/curve:example_element",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
@@ -200,6 +206,42 @@ sxt_cc_component(
         ":partition_product",
         ":partition_table_accessor",
         ":reduce",
+        ":variable_length_computation",
+        "//sxt/base/container:span",
+        "//sxt/base/container:span_utility",
+        "//sxt/base/curve:element",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:property",
+        "//sxt/base/device:state",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/iterator:index_range_iterator",
+        "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/log",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:for_each",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:pinned_resource",
+    ],
+)
+
+sxt_cc_component(
+    name = "variable_length_multiexponentiation",
+    test_deps = [
+        ":in_memory_partition_table_accessor_utility",
+        "//sxt/base/curve:example_element",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/ristretto/random:element",
+    ],
+    deps = [
+        ":combination",
+        ":partition_table_accessor",
+        ":reduce",
+        ":variable_length_computation",
+        ":variable_length_partition_product",
         "//sxt/base/container:span",
         "//sxt/base/container:span_utility",
         "//sxt/base/curve:element",
