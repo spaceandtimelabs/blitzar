@@ -18,15 +18,15 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "computational_backend_utility",
-    deps = [
-        "//sxt/base/container:span",
-    ],
     impl_deps = [
-      "//sxt/base/error:assert",
-      "//sxt/base/num:divide_up",
+        "//sxt/base/error:assert",
+        "//sxt/base/num:divide_up",
     ],
     test_deps = [
-      "//sxt/base/test:unit_test",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
     ],
 )
 

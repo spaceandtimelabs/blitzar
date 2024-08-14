@@ -241,37 +241,38 @@ void gpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
                                             const unsigned* output_bit_table,
                                             const unsigned* output_lengths, unsigned num_outputs,
                                             const uint8_t* scalars) const noexcept {
-  if (num_outputs == 0)  {
+  if (num_outputs == 0) {
     return;
   }
-  cbnb::switch_curve_type(curve_id, [&]<class U, class T>(std::type_identity<U>,
-                                                          std::type_identity<T>) noexcept {
-    basct::span<T> res_span{static_cast<T*>(res), num_outputs};
-    basct::cspan<unsigned> output_bit_table_span{output_bit_table, num_outputs};
-    basct::cspan<unsigned> output_lengths_span{output_lengths, num_outputs};
-    /* auto output_num_bytes = */
-    /*     basn::divide_up(std::accumulate(output_bit_table, output_bit_table + num_outputs, 0), 8); */
-    /* unsigned n = output_lengths[0]; */
-    /* for (unsigned output_index=1; output_index<num_outputs; ++output_index) { */
-    /*   auto len = output_lengths[output_index]; */
-    /*   SXT_RELEASE_ASSERT( */
-    /* } */
-    (void)res_span;
-    (void)output_bit_table;
-    (void)output_lengths;
-    /* basct::cspan<uint8_t> scalars_span{scalars, output_num_bytes * n}; */
-    /* auto fut = mtxpp2::async_multiexponentiate<T>( */
-    /*     res_span, static_cast<const mtxpp2::partition_table_accessor<U>&>(accessor), */
-    /*     output_bit_table_span, scalars_span); */
-    /* xens::get_scheduler().run(); */
-  });
-/* template <bascrv::element T, class U> */
-/*   requires std::constructible_from<T, U> */
-/* xena::future<> async_multiexponentiate(basct::span<T> res, */
-/*                                        const partition_table_accessor<U>& accessor, */
-/*                                        basct::cspan<unsigned> output_bit_table, */
-/*                                        basct::cspan<unsigned> output_lengths, */
-/*                                        basct::cspan<uint8_t> scalars) noexcept { */
+  cbnb::switch_curve_type(
+      curve_id, [&]<class U, class T>(std::type_identity<U>, std::type_identity<T>) noexcept {
+        basct::span<T> res_span{static_cast<T*>(res), num_outputs};
+        basct::cspan<unsigned> output_bit_table_span{output_bit_table, num_outputs};
+        basct::cspan<unsigned> output_lengths_span{output_lengths, num_outputs};
+        /* auto output_num_bytes = */
+        /*     basn::divide_up(std::accumulate(output_bit_table, output_bit_table + num_outputs, 0),
+         * 8); */
+        /* unsigned n = output_lengths[0]; */
+        /* for (unsigned output_index=1; output_index<num_outputs; ++output_index) { */
+        /*   auto len = output_lengths[output_index]; */
+        /*   SXT_RELEASE_ASSERT( */
+        /* } */
+        (void)res_span;
+        (void)output_bit_table;
+        (void)output_lengths;
+        /* basct::cspan<uint8_t> scalars_span{scalars, output_num_bytes * n}; */
+        /* auto fut = mtxpp2::async_multiexponentiate<T>( */
+        /*     res_span, static_cast<const mtxpp2::partition_table_accessor<U>&>(accessor), */
+        /*     output_bit_table_span, scalars_span); */
+        /* xens::get_scheduler().run(); */
+      });
+  /* template <bascrv::element T, class U> */
+  /*   requires std::constructible_from<T, U> */
+  /* xena::future<> async_multiexponentiate(basct::span<T> res, */
+  /*                                        const partition_table_accessor<U>& accessor, */
+  /*                                        basct::cspan<unsigned> output_bit_table, */
+  /*                                        basct::cspan<unsigned> output_lengths, */
+  /*                                        basct::cspan<uint8_t> scalars) noexcept { */
   (void)res;
   (void)curve_id;
   (void)accessor;
