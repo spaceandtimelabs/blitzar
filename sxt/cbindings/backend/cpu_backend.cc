@@ -194,6 +194,20 @@ void cpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
   });
 }
 
+void cpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id,
+                                            const mtxpp2::partition_table_accessor_base& accessor,
+                                            const unsigned* output_bit_table,
+                                            const unsigned* output_lengths, unsigned num_outputs,
+                                            const uint8_t* scalars) const noexcept {
+  (void)res;
+  (void)curve_id;
+  (void)accessor;
+  (void)output_bit_table;
+  (void)output_lengths;
+  (void)num_outputs;
+  (void)scalars;
+}
+
 //--------------------------------------------------------------------------------------------------
 // get_cpu_backend
 //--------------------------------------------------------------------------------------------------
