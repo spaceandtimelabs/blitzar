@@ -87,6 +87,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "cpu_backend",
     impl_deps = [
+        ":computational_backend_utility",
         "//sxt/base/error:panic",
         "//sxt/base/num:round_up",
         "//sxt/cbindings/base:curve_id_utility",
@@ -119,6 +120,7 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
         "//sxt/multiexp/pippenger2:multiexponentiation",
+        "//sxt/multiexp/pippenger2:variable_length_multiexponentiation",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/ristretto/operation:compression",
         "//sxt/multiexp/base:exponent_sequence",
