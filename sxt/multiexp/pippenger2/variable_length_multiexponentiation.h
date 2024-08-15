@@ -165,6 +165,12 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
       scalars.size() % num_output_bytes == 0
       // clang-format on
   );
+
+  if (num_outputs == 0) {
+    co_return;
+  }
+
+  // compute products
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> products{num_products, &resource};
@@ -227,6 +233,10 @@ void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& ac
       scalars.size() % num_output_bytes == 0
       // clang-format on
   );
+
+  if (num_outputs == 0) {
+    return;
+  }
 
   // product lengths
   memmg::managed_array<unsigned> product_lengths_data(num_products);

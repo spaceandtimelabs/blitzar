@@ -242,9 +242,6 @@ void gpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
                                             const unsigned* output_bit_table,
                                             const unsigned* output_lengths, unsigned num_outputs,
                                             const uint8_t* scalars) const noexcept {
-  if (num_outputs == 0) {
-    return;
-  }
   cbnb::switch_curve_type(
       curve_id, [&]<class U, class T>(std::type_identity<U>, std::type_identity<T>) noexcept {
         basct::span<T> res_span{static_cast<T*>(res), num_outputs};
