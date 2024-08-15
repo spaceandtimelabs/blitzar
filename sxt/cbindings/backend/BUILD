@@ -33,6 +33,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "gpu_backend",
     impl_deps = [
+        ":computational_backend_utility",
         "//sxt/base/error:assert",
         "//sxt/base/num:divide_up",
         "//sxt/proof/transcript:transcript",
