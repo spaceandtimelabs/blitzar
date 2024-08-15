@@ -39,10 +39,10 @@ basct::cspan<uint8_t> make_scalars_span(const uint8_t* data,
     SXT_RELEASE_ASSERT(width > 0, "output bit width must be positive");
     auto len = output_lengths[output_index];
     SXT_RELEASE_ASSERT(len >= prev_len, "output lengths must be sorted in ascending order");
-    prev_len = len;
 
     output_bit_sum += width;
     n = std::max(n, len);
+    prev_len = len;
   }
 
   auto output_num_bytes = basn::divide_up(output_bit_sum, 8u);

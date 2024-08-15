@@ -16,9 +16,31 @@
  */
 #include "sxt/cbindings/backend/computational_backend_utility.h"
 
+#include <vector>
+
 #include "sxt/base/test/unit_test.h"
 
 using namespace sxt;
 using namespace sxt::cbnbck;
 
-TEST_CASE("t") {}
+TEST_CASE("we can make a span for the referenced scalars") {
+  uint8_t data[16];
+
+  std::vector<unsigned> output_bit_table, output_lengths;
+
+  SECTION("we handle an output of length 1") {
+    output_bit_table = {1};
+    output_lengths = {1};
+    auto span = make_scalars_span(data, output_bit_table, output_lengths);
+    REQUIRE(span.size() == 1);
+    REQUIRE(span.data() == data);
+  }
+
+  SECTION("we handle multiple outputs") {
+    output_bit_table = {1, 8};
+    output_lengths = {1, 2};
+    auto span = make_scalars_span(data, output_bit_table, output_lengths);
+    REQUIRE(span.size() == 4);
+    REQUIRE(span.data() == data);
+  }
+}
