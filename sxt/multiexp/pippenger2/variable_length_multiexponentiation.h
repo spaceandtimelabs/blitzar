@@ -160,15 +160,14 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
   auto num_outputs = res.size();
   auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
   auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
+  if (num_outputs == 0) {
+    co_return;
+  }
   SXT_DEBUG_ASSERT(
       // clang-format off
       scalars.size() % num_output_bytes == 0
       // clang-format on
   );
-
-  if (num_outputs == 0) {
-    co_return;
-  }
 
   // compute products
   basdv::stream stream;
@@ -227,16 +226,15 @@ void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& ac
   auto num_outputs = res.size();
   auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
   auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
+  if (num_outputs == 0) {
+    return;
+  }
   auto n = scalars.size() / num_output_bytes;
   SXT_DEBUG_ASSERT(
       // clang-format off
       scalars.size() % num_output_bytes == 0
       // clang-format on
   );
-
-  if (num_outputs == 0) {
-    return;
-  }
 
   // product lengths
   memmg::managed_array<unsigned> product_lengths_data(num_products);

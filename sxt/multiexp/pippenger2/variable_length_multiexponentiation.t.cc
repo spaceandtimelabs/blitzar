@@ -44,6 +44,24 @@ TEST_CASE("we can compute multiexponentiations with varying lengths") {
   std::vector<unsigned> output_bit_table(1);
   std::vector<unsigned> output_lengths(1);
 
+  SECTION("we handle no outputs") {
+    res.clear();
+    output_bit_table.clear();
+    output_lengths.clear();
+    scalars.clear();
+    auto fut =
+        async_multiexponentiate<E>(res, *accessor, output_bit_table, output_lengths, scalars);
+    REQUIRE(fut.ready());
+  }
+
+  SECTION("we handle no outputs on the host") {
+    res.clear();
+    output_bit_table.clear();
+    output_lengths.clear();
+    scalars.clear();
+    multiexponentiate<E>(res, *accessor, output_bit_table, output_lengths, scalars);
+  }
+
   SECTION("we can compute a multiexponentiation of length zero") {
     output_bit_table[0] = 1;
     output_lengths[0] = 0;
