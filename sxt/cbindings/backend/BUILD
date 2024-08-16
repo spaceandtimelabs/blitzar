@@ -17,8 +17,23 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "computational_backend_utility",
+    impl_deps = [
+        "//sxt/base/error:assert",
+        "//sxt/base/num:divide_up",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "gpu_backend",
     impl_deps = [
+        ":computational_backend_utility",
         "//sxt/base/error:assert",
         "//sxt/base/num:divide_up",
         "//sxt/proof/transcript:transcript",
@@ -56,6 +71,7 @@ sxt_cc_component(
         "//sxt/multiexp/curve:multiexponentiation",
         "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
         "//sxt/multiexp/pippenger2:multiexponentiation",
+        "//sxt/multiexp/pippenger2:variable_length_multiexponentiation",
         "//sxt/seqcommit/generator:precomputed_generators",
         "//sxt/proof/inner_product:proof_descriptor",
         "//sxt/proof/inner_product:proof_computation",
@@ -71,6 +87,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "cpu_backend",
     impl_deps = [
+        ":computational_backend_utility",
         "//sxt/base/error:panic",
         "//sxt/base/num:round_up",
         "//sxt/cbindings/base:curve_id_utility",
@@ -103,6 +120,7 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
         "//sxt/multiexp/pippenger2:multiexponentiation",
+        "//sxt/multiexp/pippenger2:variable_length_multiexponentiation",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/ristretto/operation:compression",
         "//sxt/multiexp/base:exponent_sequence",

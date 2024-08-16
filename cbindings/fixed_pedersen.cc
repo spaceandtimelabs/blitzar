@@ -66,3 +66,16 @@ void sxt_fixed_packed_multiexponentiation(void* res, const struct sxt_multiexp_h
   backend->fixed_multiexponentiation(res, h->curve_id, *h->partition_table_accessor,
                                      output_bit_table, num_outputs, n, scalars);
 }
+
+//--------------------------------------------------------------------------------------------------
+// sxt_fixed_vlen_multiexponentiation
+//--------------------------------------------------------------------------------------------------
+void sxt_fixed_vlen_multiexponentiation(void* res, const struct sxt_multiexp_handle* handle,
+                                        const unsigned* output_bit_table,
+                                        const unsigned* output_lengths, unsigned num_outputs,
+                                        const uint8_t* scalars) {
+  auto backend = cbn::get_backend();
+  auto h = reinterpret_cast<const cbnb::multiexp_handle*>(handle);
+  backend->fixed_multiexponentiation(res, h->curve_id, *h->partition_table_accessor,
+                                     output_bit_table, output_lengths, num_outputs, scalars);
+}

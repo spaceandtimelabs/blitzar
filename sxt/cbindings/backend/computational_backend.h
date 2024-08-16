@@ -117,5 +117,11 @@ public:
                                          const mtxpp2::partition_table_accessor_base& accessor,
                                          const unsigned* output_bit_table, unsigned num_outputs,
                                          unsigned n, const uint8_t* scalars) const noexcept = 0;
+
+  virtual void fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id,
+                                         const mtxpp2::partition_table_accessor_base& accessor,
+                                         const unsigned* output_bit_table,
+                                         const unsigned* output_lengths, unsigned num_outputs,
+                                         const uint8_t* scalars) const noexcept = 0;
 };
 } // namespace sxt::cbnbck
