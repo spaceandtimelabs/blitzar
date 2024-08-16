@@ -191,8 +191,15 @@ double run_benchmark(std::unique_ptr<mtxpp2::partition_table_accessor<U>>& acces
   }
 
   memmg::managed_array<unsigned> output_lengths(num_outputs);
+  auto length_counter = [&]() noexcept {
+    if (n > num_outputs) {
+      return n - num_outputs;
+    } else {
+      return 0u;
+    }
+  }();
   for (unsigned i = 0; i < num_outputs; ++i) {
-    output_lengths[i] = std::max(i + 1, n - num_outputs + i);
+    output_lengths[i] = std::min(++length_counter, n);
   }
 
   // discard initial run
