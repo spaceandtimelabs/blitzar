@@ -99,13 +99,13 @@ TEST_CASE("we can compute multi-exponentiations with a fixed set of generators")
     wrapped_handle h{generators.data(), 2};
     REQUIRE(h.h != nullptr);
 
-    uint8_t scalars[] = {0b1010, 0b0101};
+    uint8_t scalars[] = {0b1011, 0b1101};
     unsigned bit_table[] = {3, 1};
-    unsigned lengths[] = {2, 2};
+    unsigned lengths[] = {1, 2};
     c21t::element_p3 res[2];
     sxt_fixed_vlen_multiexponentiation(res, h.h, bit_table, lengths, 2, scalars);
-    REQUIRE(res[0] == 2 * generators[0] + 5 * generators[1]);
-    REQUIRE(res[1] == generators[0]);
+    REQUIRE(res[0] == 3 * generators[0]);
+    REQUIRE(res[1] == generators[0] + generators[1]);
   }
 
   SECTION("we can compute a multiexponentiation of varying length on the host") {
@@ -116,13 +116,13 @@ TEST_CASE("we can compute multi-exponentiations with a fixed set of generators")
     wrapped_handle h{generators.data(), 2};
     REQUIRE(h.h != nullptr);
 
-    uint8_t scalars[] = {0b1010, 0b0101};
+    uint8_t scalars[] = {0b1011, 0b1101};
     unsigned bit_table[] = {3, 1};
-    unsigned lengths[] = {2, 2};
+    unsigned lengths[] = {1, 2};
     c21t::element_p3 res[2];
     sxt_fixed_vlen_multiexponentiation(res, h.h, bit_table, lengths, 2, scalars);
-    REQUIRE(res[0] == 2 * generators[0] + 5 * generators[1]);
-    REQUIRE(res[1] == generators[0]);
+    REQUIRE(res[0] == 3 * generators[0]);
+    REQUIRE(res[1] == generators[0] + generators[1]);
   }
 
   SECTION("we can compute a multiexponentiation in packed form with three generators") {
