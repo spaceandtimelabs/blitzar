@@ -1,5 +1,6 @@
 # multi_exp_pip
-Benchmarking for a multi-exponentiation using an accessor to precomputed sums of partition groups. Runs benchmarks on the following curve elements:
+Benchmarking for a multi-exponentiation of varying lengths in a triangular structure using an 
+accessor to precomputed sums of partition groups. Runs benchmarks on the following curve elements:
 - `curve25519`
 - `bls12-381 G1`
 - `bn254 G1`
@@ -7,7 +8,7 @@ Benchmarking for a multi-exponentiation using an accessor to precomputed sums of
 
 ## Usage
 ```sh
-bazel run -c opt //benchmark/multi_exp_pip:benchmark <curve> <n> <num_samples> <num_outputs> <element_num_bytes> <verbose>
+bazel run -c opt //benchmark/multi_exp_triangle:benchmark <curve> <n> <num_samples> <num_outputs> <element_num_bytes> <verbose>
 ```
 - `curve` - the curve to benchmark. Current support: `curve25519`, `bls12-381`, `bn254`, `grumpkin`
 - `n` - the number of generators
@@ -18,5 +19,5 @@ bazel run -c opt //benchmark/multi_exp_pip:benchmark <curve> <n> <num_samples> <
 
 ### Example
 ```sh
-bazel run -c opt //benchmark/multi_exp_pip:benchmark curve25519 1024 30 1024 32 0
+bazel run -c opt //benchmark/multi_exp_triangle:benchmark curve25519 1024 30 1024 32 0
 ```
