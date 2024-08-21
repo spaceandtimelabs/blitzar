@@ -39,7 +39,7 @@ stdenvNoCC.mkDerivation {
     "mkdir build; cd build;"
     "cmake"
     "-G \"Unix Makefiles\""
-    "-DGCC_INSTALL_PREFIX=${gccForLibs}"
+    # "-DGCC_INSTALL_PREFIX=${gccForLibs}"
     "-DC_INCLUDE_DIRS=${gcc.libc.dev}/include"
     "-DLLVM_TARGETS_TO_BUILD=\"host;NVPTX\""
     "-DLLVM_BUILTIN_TARGETS=\"x86_64-unknown-linux-gnu\""
@@ -64,6 +64,7 @@ stdenvNoCC.mkDerivation {
 
     # libunwind
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ENABLE_STATIC=ON"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ENABLE_SHARED=OFF"
 
     # compiler-rt
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_CXX_LIBRARY=libcxx"
