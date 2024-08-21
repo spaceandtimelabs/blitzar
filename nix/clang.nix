@@ -38,7 +38,7 @@ stdenvNoCC.mkDerivation {
   configurePhase = pkgs.lib.strings.concatStringsSep " " [
     "mkdir build; cd build;"
     "cmake"
-    "-G \"Unix Makefiles\""
+    "-G \"Ninja\""
     # "-DGCC_INSTALL_PREFIX=${gccForLibs}"
     "-DC_INCLUDE_DIRS=${gcc.libc.dev}/include"
     "-DLLVM_TARGETS_TO_BUILD=\"host;NVPTX\""
@@ -46,18 +46,23 @@ stdenvNoCC.mkDerivation {
     "-DLLVM_RUNTIME_TARGETS=\"x86_64-unknown-linux-gnu\""
     "-DLLVM_ENABLE_PROJECTS=\"clang;clang-tools-extra\""
 
-    "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
+    # clang
+    "-DCLANG_DEFAULT_CXX_STDLIB=libc++"
+
+    # "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
+    "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind\""
     "-DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_CMAKE_BUILD_TYPE=Release"
 
     # libcxx
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_SHARED=ON"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_SHARED=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_STATIC=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_STATICALLY_LINK_ABI_IN_STATIC_LIBRARY=ON"
 
     # libcxxabi
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_USE_LLVM_UNWINDER=ON"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_SHARED=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_STATIC=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_STATIC_UNWINDER=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_STATICALLY_LINK_UNWINDER_IN_STATIC_LIBRARY=ON"
@@ -75,6 +80,6 @@ stdenvNoCC.mkDerivation {
     "-DCMAKE_INSTALL_PREFIX=\"$out\""
     "../llvm"
   ];
-  buildPhase = "make";
-  installPhase = "make install";
+  buildPhase = "ninja -j4";
+  installPhase = "ninja install";
 }
