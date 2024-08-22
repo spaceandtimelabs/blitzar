@@ -24,30 +24,6 @@ load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_depende
 rules_foreign_cc_dependencies()
 
 # libbacktrace
-# git_repository(
-#     name = "com_github_ianlancetaylor_libbacktrace",
-#     build_file_content = """
-# load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make")
-# 
-# package(default_visibility = ["//visibility:public"])
-# 
-# filegroup(
-#   name = "all_srcs",
-#   srcs = glob(
-#       include = ["**"],
-#       exclude = ["*.bazel"],
-#   ),
-# )
-# 
-# configure_make(
-#   name = "libbacktrace",
-#   lib_source = ":all_srcs",
-# )
-#   """,
-#     commit = "14818b7",
-#     remote = "https://github.com/ianlancetaylor/libbacktrace",
-# )
-
 git_repository(
     name = "com_github_ianlancetaylor_libbacktrace",
     build_file = "//bazel/libbacktrace:libbacktrace.BUILD",
