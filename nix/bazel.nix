@@ -14,7 +14,7 @@ let
     "${pkgs.bash}/bin"
     "${cuda}/bin"
   ];
-  bazel = "${pkgs.bazel_6}/bin/bazel";
+  bazel = "${pkgs.bazel_7}/bin/bazel";
 in
 pkgs.writeShellScriptBin "bazel" ''
   if [[
