@@ -6,5 +6,6 @@ cc_library(
         "include/**/*.h",
     ]),
     includes = ["include"],
+    linkstatic = 1,
     visibility = ["//visibility:public"],
 )
