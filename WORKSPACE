@@ -26,25 +26,8 @@ rules_foreign_cc_dependencies()
 # libbacktrace
 git_repository(
     name = "com_github_ianlancetaylor_libbacktrace",
-    build_file_content = """
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make")
-
-package(default_visibility = ["//visibility:public"])
-
-filegroup(
-  name = "all_srcs",
-  srcs = glob(
-      include = ["**"],
-      exclude = ["*.bazel"],
-  ),
-)
-
-configure_make(
-  name = "libbacktrace",
-  lib_source = ":all_srcs",
-)
-  """,
-    commit = "14818b7",
+    build_file = "//bazel/libbacktrace:libbacktrace.BUILD",
+    commit = "86885d1",
     remote = "https://github.com/ianlancetaylor/libbacktrace",
 )
 
@@ -103,7 +86,7 @@ boost_deps()
 # rules_cuda
 git_repository(
     name = "rules_cuda",
-    commit = "7a29239",
+    commit = "775ba0c",
     remote = "https://github.com/bazel-contrib/rules_cuda",
 )
 

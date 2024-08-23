@@ -30,7 +30,7 @@ SUBDIR_SET = set(common.include_dir_order())
 
 SUFFIXES = ("BUILD", "WORKSPACE", ".bzl", ".cc", ".h")
 
-EXCLUDED_PREFIXES = ("./third_party/", "./.git/", "./bazel-", "./.cache", "./ci", "./rust")
+EXCLUDED_PREFIXES = ("./third_party/", "./bazel", "./.git/", "./bazel-", "./.cache", "./ci", "./rust")
 
 class FormatChecker:
     def __init__(self, args):
