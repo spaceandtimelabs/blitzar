@@ -4,6 +4,8 @@ build --copt -fPIC
 build --cxxopt -std=c++2b
 build --linkopt=-lm
 
+build --linkopt=-fuse-ld=/nix/store/p792j5f44l3f0xi7ai5jllwnxqwnka88-binutils-2.31.1/bin/ld.gold
+
 build --flag_alias=enable_cuda=@rules_cuda//cuda:enable
 build --flag_alias=cuda_archs=@rules_cuda//cuda:archs
 build --flag_alias=cuda_compiler=@rules_cuda//cuda:compiler
