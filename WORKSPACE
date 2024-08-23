@@ -12,17 +12,6 @@ http_archive(
     ],
 )
 
-# rules_foreign_cc
-git_repository(
-    name = "rules_foreign_cc",
-    commit = "a87e754",
-    remote = "https://github.com/bazelbuild/rules_foreign_cc",
-)
-
-load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
-
-rules_foreign_cc_dependencies()
-
 # libbacktrace
 git_repository(
     name = "com_github_ianlancetaylor_libbacktrace",
