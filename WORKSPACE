@@ -51,7 +51,7 @@ rules_foreign_cc_dependencies()
 git_repository(
     name = "com_github_ianlancetaylor_libbacktrace",
     build_file = "//bazel/libbacktrace:libbacktrace.BUILD",
-    commit = "14818b7",
+    commit = "86885d1",
     remote = "https://github.com/ianlancetaylor/libbacktrace",
 )
 
