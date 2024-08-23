@@ -39,6 +39,7 @@ stdenvNoCC.mkDerivation {
     "mkdir build; cd build;"
     "cmake"
     "-G \"Ninja\""
+    "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
     # "-DGCC_INSTALL_PREFIX=${gccForLibs}"
     "-DC_INCLUDE_DIRS=${gcc.libc.dev}/include"
     "-DLLVM_TARGETS_TO_BUILD=\"host;NVPTX\""

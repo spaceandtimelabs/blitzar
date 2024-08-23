@@ -104,5 +104,6 @@ def sxt_cc_binary(
         deps = [
             ":" + libname,
         ] + deps,
+        linkstatic = 1,
         **kwargs
     )

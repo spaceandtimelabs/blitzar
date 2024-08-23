@@ -5,6 +5,7 @@ cc_library(
     hdrs = glob([
         "include/**/*.h",
     ]),
+    linkstatic = 1,
     includes = ["include"],
     visibility = ["//visibility:public"],
 )
