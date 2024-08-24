@@ -1,5 +1,6 @@
 cc_library(
     name = "libbacktrace",
+    linkstatic = 1,
     srcs = [
         "atomic.c",
         "backtrace.c",
