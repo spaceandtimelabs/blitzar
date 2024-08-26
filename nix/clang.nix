@@ -56,6 +56,7 @@ stdenvNoCC.mkDerivation {
     "-DRUNTIMES_x86_64-unknown-linux-gnu_CMAKE_BUILD_TYPE=Release"
 
     # libcxx
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_CMAKE_POSITION_INDEPENDENT_CODE=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ADDITIONAL_COMPILER_FLAGS=-fPIC"
     #"-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_SHARED=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_SHARED=ON"
@@ -64,8 +65,10 @@ stdenvNoCC.mkDerivation {
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_STATICALLY_LINK_ABI_IN_STATIC_LIBRARY=ON"
 
     # libcxxabi
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_CMAKE_POSITION_INDEPENDENT_CODE=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ADDITIONAL_COMPILER_FLAGS=-fPIC"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_USE_LLVM_UNWINDER=ON"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_EXCEPTIONS=ON"
     #"-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_SHARED=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_STATIC=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_STATIC_UNWINDER=ON"
@@ -74,7 +77,7 @@ stdenvNoCC.mkDerivation {
     # libunwind
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ADDITIONAL_COMPILER_FLAGS=-fPIC"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ENABLE_STATIC=ON"
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ENABLE_SHARED=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ENABLE_SHARED=OFF"
 
     # compiler-rt
     #"-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_CXX_LIBRARY=libcxx"
