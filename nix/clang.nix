@@ -56,7 +56,7 @@ stdenvNoCC.mkDerivation {
     "-DRUNTIMES_x86_64-unknown-linux-gnu_CMAKE_BUILD_TYPE=Release"
 
     # libcxx
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_SHARED=ON"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_SHARED=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ADDITIONAL_COMPILER_FLAGS=-fPIC"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_SHARED=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_STATIC=ON"
