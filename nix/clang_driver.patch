@@ -19,7 +19,7 @@ index 0601016c3b14..53aa54f73b79 100644
  
  // Gcc adds libgcc arguments in various ways:
 diff --git a/clang/lib/Driver/ToolChains/Gnu.cpp b/clang/lib/Driver/ToolChains/Gnu.cpp
-index 52c2ee90b1b2..2b092156fbf4 100644
+index 52c2ee90b1b2..12892b4fb4b8 100644
 --- a/clang/lib/Driver/ToolChains/Gnu.cpp
 +++ b/clang/lib/Driver/ToolChains/Gnu.cpp
 @@ -451,8 +451,7 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
@@ -52,11 +52,17 @@ index 52c2ee90b1b2..2b092156fbf4 100644
          else
            crtbegin = isAndroid ? "crtbegin_dynamic.o" : "crtbegin.o";
 -        P = ToolChain.GetFilePath(crtbegin);
-+        P = std::string("GCCLIB_PATH_ABC123/") + crtend;
++        P = std::string("GCCLIB_PATH_ABC123/") + crtbegin;
        }
        CmdArgs.push_back(Args.MakeArgString(P));
      }
-@@ -668,7 +669,7 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
+@@ -663,12 +664,12 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
+             crtend = isAndroid ? "crtend_android.o" : "crtendS.o";
+           else
+             crtend = isAndroid ? "crtend_android.o" : "crtend.o";
+-          P = ToolChain.GetFilePath(crtend);
++          P = std::string("GCCLIB_PATH_ABC123/") + crtend;
+         }
          CmdArgs.push_back(Args.MakeArgString(P));
        }
        if (!isAndroid)
