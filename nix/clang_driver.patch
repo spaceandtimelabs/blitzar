@@ -1,8 +1,8 @@
 diff --git a/clang/lib/Driver/ToolChains/CommonArgs.cpp b/clang/lib/Driver/ToolChains/CommonArgs.cpp
-index 7b2966f70bf6..e31145124c2d 100644
+index 0601016c3b14..53aa54f73b79 100644
 --- a/clang/lib/Driver/ToolChains/CommonArgs.cpp
 +++ b/clang/lib/Driver/ToolChains/CommonArgs.cpp
-@@ -1802,14 +1802,7 @@ enum class LibGccType { UnspecifiedLibGcc, StaticLibGcc, SharedLibGcc };
+@@ -2151,14 +2151,7 @@ enum class LibGccType { UnspecifiedLibGcc, StaticLibGcc, SharedLibGcc };
  
  static LibGccType getLibGccType(const ToolChain &TC, const Driver &D,
                                  const ArgList &Args) {
@@ -19,12 +19,12 @@ index 7b2966f70bf6..e31145124c2d 100644
  
  // Gcc adds libgcc arguments in various ways:
 diff --git a/clang/lib/Driver/ToolChains/Gnu.cpp b/clang/lib/Driver/ToolChains/Gnu.cpp
-index cdd911af9a73..d629ff8abb27 100644
+index 52c2ee90b1b2..2b092156fbf4 100644
 --- a/clang/lib/Driver/ToolChains/Gnu.cpp
 +++ b/clang/lib/Driver/ToolChains/Gnu.cpp
-@@ -467,8 +467,7 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
-     if (!Args.hasArg(options::OPT_shared) && !IsStaticPIE &&
-         !Args.hasArg(options::OPT_r)) {
+@@ -451,8 +451,7 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
+       if (IsPIE)
+         CmdArgs.push_back("-pie");
        CmdArgs.push_back("-dynamic-linker");
 -      CmdArgs.push_back(Args.MakeArgString(Twine(D.DyldPrefix) +
 -                                           ToolChain.getDynamicLinker(Args)));
@@ -32,7 +32,7 @@ index cdd911af9a73..d629ff8abb27 100644
      }
    }
  
-@@ -490,10 +489,12 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
+@@ -474,10 +473,12 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
            crt1 = "crt1.o";
        }
        if (crt1)
@@ -47,7 +47,16 @@ index cdd911af9a73..d629ff8abb27 100644
  
      if (IsVE) {
        CmdArgs.push_back("-z");
-@@ -671,7 +672,7 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
+@@ -505,7 +506,7 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
+           crtbegin = isAndroid ? "crtbegin_dynamic.o" : "crtbeginS.o";
+         else
+           crtbegin = isAndroid ? "crtbegin_dynamic.o" : "crtbegin.o";
+-        P = ToolChain.GetFilePath(crtbegin);
++        P = std::string("GCCLIB_PATH_ABC123/") + crtend;
+       }
+       CmdArgs.push_back(Args.MakeArgString(P));
+     }
+@@ -668,7 +669,7 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
          CmdArgs.push_back(Args.MakeArgString(P));
        }
        if (!isAndroid)
