@@ -34,6 +34,8 @@ stdenvNoCC.mkDerivation {
   postPatch = ''
     substituteInPlace clang/lib/Driver/ToolChains/Gnu.cpp \
       --replace 'GLIBC_PATH_ABC123' '${gcc.libc}/lib'
+    substituteInPlace clang/lib/Driver/ToolChains/Gnu.cpp \
+      --replace 'GCCLIB_PATH_ABC123' '${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version}'
   '';
   configurePhase = pkgs.lib.strings.concatStringsSep " " [
     "mkdir build; cd build;"

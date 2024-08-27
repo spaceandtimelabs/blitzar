@@ -52,7 +52,7 @@ index 52c2ee90b1b2..12892b4fb4b8 100644
          else
            crtbegin = isAndroid ? "crtbegin_dynamic.o" : "crtbegin.o";
 -        P = ToolChain.GetFilePath(crtbegin);
-+        P = std::string("GLIBC_PATH_ABC123/") + crtbegin;
++        P = std::string("GCCLIB_PATH_ABC123/") + crtbegin;
        }
        CmdArgs.push_back(Args.MakeArgString(P));
      }
@@ -61,7 +61,7 @@ index 52c2ee90b1b2..12892b4fb4b8 100644
            else
              crtend = isAndroid ? "crtend_android.o" : "crtend.o";
 -          P = ToolChain.GetFilePath(crtend);
-+          P = std::string("GLIBC_PATH_ABC123/") + crtend;
++          P = std::string("GCCLIB_PATH_ABC123/") + crtend;
          }
          CmdArgs.push_back(Args.MakeArgString(P));
        }
