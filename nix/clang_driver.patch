@@ -44,6 +44,8 @@ index 52c2ee90b1b2..12892b4fb4b8 100644
      }
 +    CmdArgs.push_back("-L");
 +    CmdArgs.push_back("GLIBC_PATH_ABC123");
++    CmdArgs.push_back("-L");
++    CmdArgs.push_back("GCCLIB_PATH_ABC123");
  
      if (IsVE) {
        CmdArgs.push_back("-z");
