@@ -52,8 +52,8 @@ stdenvNoCC.mkDerivation {
     # clang
     "-DCLANG_DEFAULT_CXX_STDLIB=libc++"
 
-    # "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
-    "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind\""
+    "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
+    #"-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind\""
     "-DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_CMAKE_BUILD_TYPE=Release"
 
@@ -83,9 +83,9 @@ stdenvNoCC.mkDerivation {
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ENABLE_SHARED=OFF"
 
     # compiler-rt
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_CXX_LIBRARY=libcxx"
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_USE_LLVM_UNWINDER=ON"
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_CXX_LIBRARY=libcxx"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_USE_LLVM_UNWINDER=ON"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED=OFF"
 
     "-DCMAKE_BUILD_TYPE=Release"
     "-DCMAKE_INSTALL_PREFIX=\"$out\""
