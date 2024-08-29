@@ -9,8 +9,8 @@ stdenvNoCC.mkDerivation {
   src = pkgs.fetchFromGitHub {
     owner = "llvm";
     repo = "llvm-project";
-    rev = "2405253";
-    hash = "sha256-DG69bHVWqCn09CUcx3uglRp7H0LrBED36NY2TNc0yzM=";
+    rev = "aa91d90";
+    hash = "sha256-+UGCC3OEwGpAz1/ZPKaemZvP4Do7+POqZfduP78WtRc=";
   };
   nativeBuildInputs = [
     cmake
