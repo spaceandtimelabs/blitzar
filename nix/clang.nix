@@ -41,7 +41,6 @@ stdenvNoCC.mkDerivation {
     "mkdir build; cd build;"
     "cmake"
     "-G \"Ninja\""
-    "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
     "-DC_INCLUDE_DIRS=${gcc.libc.dev}/include"
     "-DLLVM_TARGETS_TO_BUILD=\"host;NVPTX\""
     "-DLLVM_BUILTIN_TARGETS=\"x86_64-unknown-linux-gnu\""
@@ -51,33 +50,25 @@ stdenvNoCC.mkDerivation {
     # clang
     "-DCLANG_DEFAULT_CXX_STDLIB=libc++"
 
-    #"-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
-    "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind\""
+    "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
+    #"-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind\""
     "-DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_CMAKE_BUILD_TYPE=Release"
 
     # libcxx
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_CMAKE_POSITION_INDEPENDENT_CODE=ON"
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ADDITIONAL_COMPILER_FLAGS=-fPIC"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_SHARED=OFF"
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_SHARED=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_STATIC=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_STATICALLY_LINK_ABI_IN_STATIC_LIBRARY=ON"
 
     # libcxxabi
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_CMAKE_POSITION_INDEPENDENT_CODE=ON"
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ADDITIONAL_COMPILER_FLAGS=-fPIC"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_USE_LLVM_UNWINDER=ON"
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_EXCEPTIONS=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_SHARED=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_STATIC=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_STATIC_UNWINDER=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_STATICALLY_LINK_UNWINDER_IN_STATIC_LIBRARY=ON"
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_HERMETIC_STATIC_LIBRARY=OFF"
 
     # libunwind
-    #"-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ADDITIONAL_COMPILER_FLAGS=-fPIC"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ENABLE_STATIC=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ENABLE_SHARED=OFF"
 
