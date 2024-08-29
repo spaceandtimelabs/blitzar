@@ -39,7 +39,7 @@ class abc {
 Template parameters use [camel case](https://en.wikipedia.org/wiki/Camel_case) with the
 first letter capitalized:
 ```
-templae <class MyType>
+template <class MyType>
 void f(MyType t) {
     // ...
 }

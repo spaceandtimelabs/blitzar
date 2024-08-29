@@ -5,11 +5,7 @@ cc_library(
     hdrs = glob([
         "include/**/*.h",
     ]),
-    copts = [
-        "-stdlib=libc++",
-        "-std=c++20",
-    ],
-    linkstatic = 1,
     includes = ["include"],
+    linkstatic = 1,
     visibility = ["//visibility:public"],
 )
