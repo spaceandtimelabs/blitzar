@@ -39,7 +39,7 @@ class in_memory_partition_table_accessor final : public partition_table_accessor
 public:
   explicit in_memory_partition_table_accessor(std::string_view filename) noexcept
       : table_{memr::get_pinned_resource()} {
-    std::ifstream in{filename, std::ios::binary};
+    std::ifstream in{std::string{filename}, std::ios::binary};
     if (!in.good()) {
       baser::panic("failed to open {}: {}", filename, std::strerror(errno));
     }
@@ -78,7 +78,7 @@ public:
   }
 
   void write_to_file(std::string_view filename) const noexcept override {
-    std::ofstream out{filename, std::ios::binary};
+    std::ofstream out{std::string{filename}, std::ios::binary};
     if (!out.good()) {
       baser::panic("failed to open {}: {}", filename, std::strerror(errno));
     }
