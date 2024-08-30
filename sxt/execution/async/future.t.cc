@@ -95,7 +95,9 @@ TEST_CASE("future manages an asynchronously computed result") {
 
   SECTION("a future can be destroyed before the promise is complete") {
     promise<int> pr;
-    { future<int> fut{pr}; }
+    {
+      future<int> fut{pr};
+    }
     pr.set_value(123);
   }
 

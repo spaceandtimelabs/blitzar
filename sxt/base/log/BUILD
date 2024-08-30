@@ -15,10 +15,10 @@ cc_library(
         "-stdlib=libc++",
         "-std=c++20",
     ],
-    linkstatic = 1,
     implementation_deps = [
         "@com_github_gabime_spdlog//:libspdlog",
     ],
+    linkstatic = 1,
 )
 
 cc_library(
@@ -33,11 +33,11 @@ cc_library(
         "-stdlib=libc++",
         "-std=c++20",
     ],
-    linkstatic = 1,
     implementation_deps = [
         ":setup",
         "@com_github_gabime_spdlog//:libspdlog",
     ],
+    linkstatic = 1,
 )
 
 sxt_cc_component(
