@@ -58,7 +58,6 @@ def sxt_cc_component(
         native.cc_test(
             name = name + ".t",
             copts = sxt_copts() + copts,
-            linkstatic = 1,
             deps = [
                        ":" + test_lib,
                    ] + test_deps +
@@ -104,6 +103,5 @@ def sxt_cc_binary(
         deps = [
             ":" + libname,
         ] + deps,
-        linkstatic = 1,
         **kwargs
     )
