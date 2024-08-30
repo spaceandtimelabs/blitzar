@@ -36,7 +36,7 @@ def extract_copyright_year(block_comment):
         # Extract the current year from the existing block comment
         block_comment = "\n".join(block_comment)
         copyright_match = re.search(
-            (SXT_COPYRIGHT_KEY + "\s*\d+(\s*-\s*\d+|(\s*,\s*\d+)*)"), block_comment
+            (SXT_COPYRIGHT_KEY + r'\s*\d+(\s*-\s*\d+|(\s*,\s*\d+)*)'), block_comment
         ).group(0)
         copyright_year = str(copyright_match).replace(SXT_COPYRIGHT_KEY, "").strip()
 
