@@ -23,12 +23,6 @@ pkgs.writeShellScriptBin "bazel" ''
     "$1" == "run"
   ]]; then
     exec ${bazel} $1 \
-     --copt=-stdlib=libc++ \
-     --cxxopt=-stdlib=libc++ \
-     --linkopt=-stdlib=libc++ \
-     --linkopt=-static-libstdc++ \
-     --@rules_cuda//cuda:copts=-stdlib=libc++ \
-     --@rules_cuda//cuda:host_copts=-stdlib=libc++ \
      --action_env CC=${clang}/bin/clang \
      --action_env CXX=${clang}/bin/clang++ \
      --action_env PATH="${path}" \
