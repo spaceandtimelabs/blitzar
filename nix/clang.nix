@@ -51,7 +51,6 @@ stdenvNoCC.mkDerivation {
     "-DCLANG_DEFAULT_CXX_STDLIB=libc++"
 
     "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
-    #"-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind\""
     "-DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_CMAKE_BUILD_TYPE=Release"
 
