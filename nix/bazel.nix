@@ -2,10 +2,9 @@
 let
   # Set PATH so that it only includes things bazel needs.
   path = pkgs.lib.strings.concatStringsSep ":" [
-    "${clang}/bin"
     "${pkgs.git}/bin"
-    "${pkgs.portableGcc}/bin"
-    "${pkgs.portableGcc.libc.bin}/bin"
+    "${pkgs.gcc}/bin"
+    "${pkgs.gcc.libc.bin}/bin"
     "${pkgs.binutils}/bin"
     "${pkgs.coreutils}/bin"
     "${pkgs.findutils}/bin"
@@ -22,13 +21,10 @@ pkgs.writeShellScriptBin "bazel" ''
     "$1" == "test" ||
     "$1" == "run"
   ]]; then
+    unset TMPDIR TMP
     exec ${bazel} $1 \
-     --action_env CC=${clang}/bin/clang \
-     --action_env CXX=${clang}/bin/clang++ \
      --action_env PATH="${path}" \
      --action_env CUDA_PATH="${cuda}" \
-     --action_env=BAZEL_LINKLIBS='-l%:libc++.a -static-libgcc' \
-     --action_env=BAZEL_LINKOPTS='-L${clang}/lib' \
      ''${@:2}
   else
     exec ${bazel} $@

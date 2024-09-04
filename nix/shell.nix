@@ -15,7 +15,7 @@ mkShell {
     nodejs
     # custom packages
     bazel
-    clang
+    gcc
     cuda
   ];
   LD_LIBRARY_PATH = lib.makeLibraryPath [
