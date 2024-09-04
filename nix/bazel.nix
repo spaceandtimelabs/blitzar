@@ -21,7 +21,7 @@ pkgs.writeShellScriptBin "bazel" ''
     "$1" == "test" ||
     "$1" == "run"
   ]]; then
-    unset TMPDIR TMP
+    # unset TMPDIR TMP
     exec ${bazel} $1 \
      --action_env PATH="${path}" \
      --action_env CUDA_PATH="${cuda}" \
