@@ -14,6 +14,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "temp_file",
     impl_deps = [
+      "//sxt/base/io:print",
     ],
     with_test = False,
 )

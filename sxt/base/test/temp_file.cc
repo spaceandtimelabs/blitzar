@@ -20,7 +20,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <print>
+
+#include "sxt/base/io/print.h"
 
 namespace sxt::bastst {
 //--------------------------------------------------------------------------------------------------
@@ -36,7 +37,7 @@ temp_file::~temp_file() noexcept {
   out_.close();
   auto rcode = std::remove(name_.c_str());
   if (rcode != 0) {
-    std::println(stderr, "failed to close file {}: {}", name_, std::strerror(errno));
+    basio::println(stderr, "failed to close file {}: {}", name_, std::strerror(errno));
     std::abort();
   }
 }

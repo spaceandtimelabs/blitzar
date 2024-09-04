@@ -1,15 +1,12 @@
 licenses(["notice"])  # Apache 2
 
 cc_library(
-    name = "libspdlog",
+    name = "fmtlib",
     hdrs = glob([
-        "include/**/*.h",
+        "include/fmt/*.h",
     ]),
-    defines = ["SPDLOG_FMT_EXTERNAL"],
+    defines = ["FMT_HEADER_ONLY"],
     includes = ["include"],
     linkstatic = 1,
     visibility = ["//visibility:public"],
-    deps = [
-      "@com_github_fmtlib_fmt//:fmtlib",
-    ],
 )

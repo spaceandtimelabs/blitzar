@@ -17,7 +17,8 @@
 #include "sxt/base/error/panic.h"
 
 #include <cstdlib>
-#include <print>
+
+#include "sxt/base/io/print.h"
 
 namespace sxt::baser {
 //--------------------------------------------------------------------------------------------------
@@ -25,7 +26,7 @@ namespace sxt::baser {
 //--------------------------------------------------------------------------------------------------
 [[noreturn]] void panic_with_message(std::string_view file, int line, std::string_view msg,
                                      const std::string& trace) noexcept {
-  std::print(stderr, "{}:{} panic: {}\n{}\n", file, line, msg, trace);
+  basio::print(stderr, "{}:{} panic: {}\n{}\n", file, line, msg, trace);
   std::abort();
 }
 } // namespace sxt::baser

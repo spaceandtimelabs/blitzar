@@ -15,6 +15,9 @@ sxt_cc_component(
 sxt_cc_component(
     name = "panic",
     with_test = False,
+    impl_deps = [
+      "//sxt/base/io:print",
+    ],
     deps = [
         ":stacktrace",
     ],
@@ -27,5 +30,6 @@ sxt_cc_component(
     ],
     deps = [
         ":stacktrace",
+        "//sxt/base/io:print",
     ],
 )
