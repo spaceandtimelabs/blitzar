@@ -21,6 +21,7 @@
 #include <type_traits>
 
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/base/type/int.h"
 
 namespace sxt::basn {
 //--------------------------------------------------------------------------------------------------
@@ -29,7 +30,9 @@ namespace sxt::basn {
 /**
  * Support abs for integral types larger than 128 bits.
  */
-template <std::signed_integral T> CUDA_CALLABLE T abs(T x) noexcept {
+template <class T> 
+  requires (std::signed_integral<T> || std::is_same_v<T, int128_t>)
+CUDA_CALLABLE T abs(T x) noexcept {
   if constexpr (sizeof(T) <= 8) {
     return std::abs(x);
   }
@@ -40,15 +43,29 @@ template <std::signed_integral T> CUDA_CALLABLE T abs(T x) noexcept {
 //--------------------------------------------------------------------------------------------------
 // abs_to_unsigned
 //--------------------------------------------------------------------------------------------------
-template <std::signed_integral T> CUDA_CALLABLE auto abs_to_unsigned(T x) noexcept {
-  using Tp = std::make_unsigned_t<T>;
-  // Use some arithmetic to make sure that conversion doesn't overflow
-  // for std::numeric_limits<T>::min() since
-  //      -std::numeric_limits<T>::min() == std::numeric_limits<T>::max() + 1
-  //
-  // Note: This will also for the special case of zero since
-  //     static_cast<Tp>(-1) + 1 == 0
-  auto m = static_cast<int>(x > 0) * 2 - 1;
-  return static_cast<Tp>(m * (x - m)) + static_cast<Tp>(1);
+template <class T> 
+  requires (std::signed_integral<T> || std::is_same_v<T, int128_t>)
+CUDA_CALLABLE auto abs_to_unsigned(T x) noexcept {
+  if constexpr (std::is_same_v<T, int128_t>) {
+    using Tp = uint128_t;
+    // Use some arithmetic to make sure that conversion doesn't overflow
+    // for std::numeric_limits<T>::min() since
+    //      -std::numeric_limits<T>::min() == std::numeric_limits<T>::max() + 1
+    //
+    // Note: This will also for the special case of zero since
+    //     static_cast<Tp>(-1) + 1 == 0
+    auto m = static_cast<int>(x > 0) * 2 - 1;
+    return static_cast<Tp>(m * (x - m)) + static_cast<Tp>(1);
+  } else {
+    using Tp = std::make_unsigned_t<T>;
+    // Use some arithmetic to make sure that conversion doesn't overflow
+    // for std::numeric_limits<T>::min() since
+    //      -std::numeric_limits<T>::min() == std::numeric_limits<T>::max() + 1
+    //
+    // Note: This will also for the special case of zero since
+    //     static_cast<Tp>(-1) + 1 == 0
+    auto m = static_cast<int>(x > 0) * 2 - 1;
+    return static_cast<Tp>(m * (x - m)) + static_cast<Tp>(1);
+  }
 }
 } // namespace sxt::basn
