@@ -51,7 +51,7 @@
 #define _ASSERT_IMPL(CONDITION, CONDITION_STR, MESSAGE)                                            \
   do {                                                                                             \
     if (!(CONDITION)) {                                                                            \
-      basio::print(stderr, "{}:{} failed assert: [{}]. {}\n{}\n", __builtin_FILE(),                  \
+      sxt::basio::print(stderr, "{}:{} failed assert: [{}]. {}\n{}\n", __builtin_FILE(),                  \
                  __builtin_LINE(), CONDITION_STR, MESSAGE, sxt::baser::stacktrace());              \
       std::abort();                                                                                \
     }                                                                                              \
