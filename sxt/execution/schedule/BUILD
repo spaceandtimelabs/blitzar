@@ -29,19 +29,33 @@ sxt_cc_component(
     ],
 )
 
-sxt_cc_component(
-    name = "active_scheduler",
-    impl_deps = [
+cc_library(
+  name = "active_scheduler",
+  hdrs = [
+    "active_scheduler.h",
+  ],
+  srcs = [
+    "active_scheduler.cc",
+  ],
+  deps = [
         ":pollable_event",
-    ],
-    test_deps = [
-        ":test_pollable_event",
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
         "//sxt/base/functional:function_ref",
-    ],
+  ],
 )
+
+# sxt_cc_component(
+#     name = "active_scheduler",
+#     impl_deps = [
+#         ":pollable_event",
+#     ],
+#     test_deps = [
+#         ":test_pollable_event",
+#         "//sxt/base/test:unit_test",
+#     ],
+#     deps = [
+#         "//sxt/base/functional:function_ref",
+#     ],
+# )
 
 sxt_cc_component(
     name = "scheduler",
