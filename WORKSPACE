@@ -14,7 +14,7 @@ git_repository(
 git_repository(
     name = "com_github_fmtlib_fmt",
     build_file = "//bazel:fmtlib.BUILD",
-    commit = "5f438c9",
+    commit = "0c9fce2",
     remote = "https://github.com/fmtlib/fmt",
 )
 
@@ -22,7 +22,7 @@ git_repository(
 git_repository(
     name = "com_github_gabime_spdlog",
     build_file = "//bazel:spdlog.BUILD",
-    commit = "5ebfc92",
+    commit = "a3a0c9d",
     remote = "https://github.com/gabime/spdlog",
 )
 
