@@ -45,7 +45,7 @@ public:
    * pointer to a table of the items' run lengths.
    */
   template <unsigned ItemsPerThread>
-  CUDA_CALLABLE CounterT* count(T (&items)[ItemsPerThread]) noexcept {
+  __device__ CounterT* count(T (&items)[ItemsPerThread]) noexcept {
     auto thread_id = threadIdx.x;
     for (unsigned i = thread_id; i < NumBins; i += NumThreads) {
       storage_.run_begin[i] = NumThreads * ItemsPerThread;
