@@ -110,19 +110,23 @@ xena::future<> sum_buckets(basct::span<T> sums, basct::cspan<T> generators,
   memmg::managed_array<T> sums_dev{num_buckets_total, &resource};
   co_await std::move(fut);
   basl::info("summing {} buckets", num_buckets_total);
+  auto sums_data = sums.data();
+  auto generators_data = generators_dev.data();
+  auto bucket_prefix_counts_data = bucket_prefix_counts.data();
+  auto indexes_data = indexes.data();
   auto f = [
                // clang-format off
-    sums = sums.data(),
-    generators = generators_dev.data(),
-    bucket_prefix_counts = bucket_prefix_counts.data(),
-    indexes = indexes.data(),
-    num_buckets_per_digit = num_buckets_per_digit,
-    n = n
+    sums_data,
+    generators_data,
+    bucket_prefix_counts_data,
+    indexes_data,
+    num_buckets_per_digit,
+    n
                // clang-format on
   ] __device__
            __host__(unsigned /*num_buckets_total*/, unsigned index) noexcept {
-             sum_bucket<T>(sums, generators, bucket_prefix_counts, indexes, num_buckets_per_digit,
-                           n, index);
+             sum_bucket<T>(sums_data, generators_data, bucket_prefix_counts_data, indexes_data, 
+                           num_buckets_per_digit, n, index);
            };
   algi::launch_for_each_kernel(stream, f, num_buckets_total);
   co_await xendv::await_stream(stream);

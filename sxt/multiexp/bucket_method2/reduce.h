@@ -108,16 +108,18 @@ xena::future<> reduce_buckets(basct::span<T> res, basct::cspan<T> bucket_sums,
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> res_dev{num_outputs, &resource};
+  auto res_data = res_dev.data();
+  auto sums_data = bucket_sums.data();
   auto f = [
                // clang-format off
-    res = res_dev.data(),
-    sums = bucket_sums.data(),
-    num_digits = num_digits,
-    bit_width = bit_width
+    res_data,
+    sums_data,
+    num_digits,
+    bit_width
                // clang-format on
   ] __host__
            __device__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
-             reduction_kernel(res, sums, num_digits, bit_width, output_index);
+             reduction_kernel(res_data, sums_data, num_digits, bit_width, output_index);
            };
   algi::launch_for_each_kernel(stream, f, num_outputs);
   basdv::async_copy_device_to_host(res, res_dev, stream);

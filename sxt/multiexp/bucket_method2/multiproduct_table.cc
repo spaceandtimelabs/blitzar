@@ -71,10 +71,10 @@ xena::future<> make_multiproduct_table(basct::span<uint16_t> bucket_prefix_count
       n);
 
   // prefix sum
-  auto f = [bucket_prefix_counts = bucket_prefix_counts.data(),
-            num_buckets_per_digit = num_buckets_per_digit] __host__
+  auto bucket_prefix_counts_data = bucket_prefix_counts.data();
+  auto f = [bucket_prefix_counts_data, num_buckets_per_digit] __host__
            __device__(unsigned /*num_digits_total*/, unsigned index) noexcept {
-             auto counts = bucket_prefix_counts + index * num_buckets_per_digit;
+             auto counts = bucket_prefix_counts_data + index * num_buckets_per_digit;
              for (unsigned i = 1; i < num_buckets_per_digit; ++i) {
                counts[i] += counts[i - 1u];
              }

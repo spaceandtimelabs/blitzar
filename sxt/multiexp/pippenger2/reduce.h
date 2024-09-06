@@ -61,15 +61,17 @@ void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
       basdv::is_active_device_pointer(products.data())
       // clang-format on
   );
+  auto reductions_data = reductions.data();
+  auto products_data = products.data();
   auto f = [
                // clang-format off
-    reductions = reductions.data(),
-    products = products.data(),
-    reduction_size = reduction_size
+    reductions_data,
+    products_data,
+    reduction_size
                // clang-format on
   ] __device__
            __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
-             reduce_output(reductions + output_index, products + output_index * reduction_size,
+             reduce_output(reductions_data + output_index, products_data + output_index * reduction_size,
                            reduction_size);
            };
   algi::launch_for_each_kernel(stream, f, num_outputs);
@@ -99,19 +101,22 @@ void reduce_products(basct::span<T> reductions, bast::raw_stream_t stream,
   basdv::async_copy_host_to_device(bit_table_partial_sums_dev, bit_table_partial_sums, stream);
 
   // reduce products
+  auto reductions_data = reductions.data();
+  auto bit_table_partial_sums_data = bit_table_partial_sums.data();
+  auto products_data = products.data();
   auto f = [
                // clang-format off
-    reductions = reductions.data(),
-    bit_table_partial_sums = bit_table_partial_sums_dev.data(),
-    products = products.data()
+    reductions_data,
+    bit_table_partial_sums_data,
+    products_data
                // clang-format on
   ] __device__
            __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
              auto lookup_index = max(0, static_cast<int>(output_index) - 1);
              auto offset =
-                 bit_table_partial_sums[lookup_index] * static_cast<unsigned>(output_index != 0);
-             auto reduction_size = bit_table_partial_sums[output_index] - offset;
-             reduce_output(reductions + output_index, products + offset, reduction_size);
+                 bit_table_partial_sums_data[lookup_index] * static_cast<unsigned>(output_index != 0);
+             auto reduction_size = bit_table_partial_sums_data[output_index] - offset;
+             reduce_output(reductions_data + output_index, products_data + offset, reduction_size);
            };
   algi::launch_for_each_kernel(stream, f, num_outputs);
 }

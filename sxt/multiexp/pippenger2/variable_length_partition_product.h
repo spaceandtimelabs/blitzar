@@ -88,24 +88,28 @@ xena::future<> async_partition_product(basct::span<T> products_slice, unsigned n
   co_await std::move(scalars_fut);
 
   // product
+  auto products_data = products_slice.data();
+  auto scalars_data = scalars_dev.data();
+  auto partition_table_data = partition_table.data();
+  auto lengths_data = lengths_dev.data();
   auto f = [
                // clang-format off
-    products = products_slice.data(),
-    scalars = scalars_dev.data(),
-    partition_table = partition_table.data(),
-    window_width = window_width,
-    num_products = num_products,
-    lengths = lengths_dev.data()
+    products_data,
+    scalars_data,
+    partition_table_data,
+    window_width,
+    num_products,
+    lengths_data
                // clang-format on
   ] __device__
            __host__(unsigned num_slice_products, unsigned product_index) noexcept {
-             auto n = lengths[product_index];
-             auto& product = products[product_index];
+             auto n = lengths_data[product_index];
+             auto& product = products_data[product_index];
              product_index += num_products - num_slice_products;
              auto byte_index = product_index / 8u;
              auto bit_offset = product_index % 8u;
              auto num_products_round_8 = basn::round_up(num_products, 8u);
-             partition_product_kernel<T>(product, partition_table, scalars, byte_index, bit_offset,
+             partition_product_kernel<T>(product, partition_table_data, scalars_data, byte_index, bit_offset,
                                          window_width, num_products_round_8, n);
            };
   algi::launch_for_each_kernel(stream, f, products_slice.size());

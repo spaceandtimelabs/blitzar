@@ -59,15 +59,17 @@ void combine(basct::span<T> res, bast::raw_stream_t stream, basct::cspan<T> elem
       // clang-format on
   );
   auto reduction_size = static_cast<unsigned>(elements.size() / n);
+  auto reductions_data = res.data();
+  auto elements_data = elements.data();
   auto f = [
                // clang-format off
-    reductions = res.data(),
-    elements = elements.data(),
-    reduction_size = reduction_size
+    reductions_data,
+    elements_data,
+    reduction_size
                // clang-format on
   ] __device__
            __host__(unsigned n, unsigned index) noexcept {
-             combine_impl(reductions + index, elements + index, n, reduction_size);
+             combine_impl(reductions_data + index, elements_data + index, n, reduction_size);
            };
   algi::launch_for_each_kernel(stream, f, n);
 }

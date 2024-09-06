@@ -56,7 +56,7 @@ public:
    * to make the view available, it will be allocated using alloc. Make sure that alloc uses
    * a resource that frees memory upon destruction (e.g. std::pmr::monotonic_buffer_resource).
    */
-  virtual basct::cspan<T> host_view(std::pmr::polymorphic_allocator<> alloc, unsigned first,
+  virtual basct::cspan<T> host_view(std::pmr::polymorphic_allocator<std::byte> alloc, unsigned first,
                                     unsigned size) const noexcept = 0;
 
   virtual void write_to_file(std::string_view filename) const noexcept = 0;

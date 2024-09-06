@@ -46,7 +46,7 @@ template <unsigned NumBytes> struct scalar_blob {
 template <unsigned NumBytes>
 static __global__ void transpose_kernel(uint8_t* __restrict__ dst,
                                         const scalar_blob<NumBytes>* __restrict__ src,
-                                        unsigned n) noexcept {
+                                        unsigned n) {
   using Scalar = scalar_blob<NumBytes>;
 
   auto byte_index = threadIdx.x;

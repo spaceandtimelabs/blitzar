@@ -136,20 +136,23 @@ xena::future<> async_partition_product(basct::span<T> products,
   co_await std::move(scalars_fut);
 
   // product
+  auto products_data = products.data();
+  auto scalars_data = scalars_dev.data();
+  auto partition_table_data = partition_table.data();
   auto f = [
                // clang-format off
-    products = products.data(),
-    scalars = scalars_dev.data(),
-    partition_table = partition_table.data(),
-    window_width = window_width,
-    n = n
+    products_data,
+    scalars_data,
+    partition_table_data,
+    window_width,
+    n
                // clang-format on
   ] __device__
            __host__(unsigned num_products, unsigned product_index) noexcept {
              auto byte_index = product_index / 8u;
              auto bit_offset = product_index % 8u;
              auto num_products_round_8 = basn::round_up(num_products, 8u);
-             partition_product_kernel<T>(products[product_index], partition_table, scalars,
+             partition_product_kernel<T>(products_data[product_index], partition_table_data, scalars_data,
                                          byte_index, bit_offset, window_width, num_products_round_8,
                                          n);
            };
