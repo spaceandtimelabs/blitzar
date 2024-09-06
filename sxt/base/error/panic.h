@@ -69,11 +69,21 @@ template <class... Args> struct panic_format {
   panic_with_message(msg.loc.file_name(), msg.loc.line(), msg.s);
 }
 
+#if 0
 template <class... Args>
 [[noreturn]] void panic(panic_format<std::type_identity_t<Args>...> fmt, Args&&... args) noexcept
   requires(sizeof...(Args) > 0)
 {
   panic_with_message(fmt.loc.file_name(), fmt.loc.line(),
                      std::format(fmt.fmt, std::forward<Args>(args)...));
+}
+#endif
+
+template <class... Args>
+[[noreturn]] void panic(panic_message fmt, Args&&... args) noexcept
+  requires(sizeof...(Args) > 0)
+{
+  panic_with_message(fmt.loc.file_name(), fmt.loc.line(),
+                     std::vformat(fmt.s, std::make_format_args(args...)));
 }
 } // namespace sxt::baser
