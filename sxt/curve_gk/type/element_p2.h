@@ -42,8 +42,8 @@ struct element_p2 : cgko::operation_adl_stub {
   CUDA_CALLABLE explicit element_p2(const compact_element& e) noexcept
       : X{e.X}, Y{e.Y}, Z{fgkcn::one_v} {
     auto is_identity = e.is_identity();
-    fgko::cmov(X, fgkcn::zero_v, is_identity);
-    fgko::cmov(Z, fgkcn::zero_v, is_identity);
+    fgko::cmov(X, fgkt::element{fgkcn::zero_v}, is_identity);
+    fgko::cmov(Z, fgkt::element{fgkcn::zero_v}, is_identity);
   }
 
   CUDA_CALLABLE explicit operator compact_element() const noexcept;

@@ -42,8 +42,8 @@ struct element_p2 : cn1o::operation_adl_stub {
   CUDA_CALLABLE explicit element_p2(const compact_element& e) noexcept
       : X{e.X}, Y{e.Y}, Z{f25cn::one_v} {
     auto is_identity = e.is_identity();
-    f25o::cmov(X, f25cn::zero_v, is_identity);
-    f25o::cmov(Z, f25cn::zero_v, is_identity);
+    f25o::cmov(X, f25t::element{f25cn::zero_v}, is_identity);
+    f25o::cmov(Z, f25t::element{f25cn::zero_v}, is_identity);
   }
 
   CUDA_CALLABLE explicit operator compact_element() const noexcept;
@@ -53,7 +53,7 @@ struct element_p2 : cn1o::operation_adl_stub {
   f25t::element Z;
 
   static constexpr element_p2 identity() noexcept {
-    return element_p2{f25cn::zero_v, f25cn::one_v, f25cn::zero_v};
+    return element_p2{f25t::element{f25cn::zero_v}, f25t::element{f25cn::one_v}, f25t::element{f25cn::zero_v}};
   }
 };
 

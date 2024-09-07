@@ -52,7 +52,7 @@ bool is_marked(const element_p2& e) noexcept { return e.Z[3] != unset_marker_v; 
 CUDA_CALLABLE element_p2::operator compact_element() const noexcept {
   f25t::element z_inv;
   const bool is_zero{f25o::invert(z_inv, Z)};
-  f25o::cmov(z_inv, f25cn::zero_v, is_zero);
+  f25o::cmov(z_inv, f25t::element{f25cn::zero_v}, is_zero);
 
   f25t::element x;
   f25t::element y;

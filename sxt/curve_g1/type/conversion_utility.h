@@ -45,7 +45,7 @@ CUDA_CALLABLE
 inline void to_element_affine(element_affine& a, const element_p2& p) noexcept {
   f12t::element z_inv;
   const bool is_zero{f12o::invert(z_inv, p.Z)};
-  f12o::cmov(z_inv, f12cn::zero_v, is_zero);
+  f12o::cmov(z_inv, f12t::element{f12cn::zero_v}, is_zero);
 
   f12t::element x;
   f12t::element y;

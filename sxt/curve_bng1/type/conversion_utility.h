@@ -45,7 +45,7 @@ CUDA_CALLABLE
 inline void to_element_affine(element_affine& a, const element_p2& p) noexcept {
   f25t::element z_inv;
   const bool is_zero{f25o::invert(z_inv, p.Z)};
-  f25o::cmov(z_inv, f25cn::zero_v, is_zero);
+  f25o::cmov(z_inv, f25t::element{f25cn::zero_v}, is_zero);
 
   f25t::element x;
   f25t::element y;
@@ -72,7 +72,7 @@ inline void to_element_p2(element_p2& p, const element_affine& a) noexcept {
   p.X = a.X;
   p.Y = a.Y;
   p.Z = f25cn::one_v;
-  f25o::cmov(p.Z, f25cn::zero_v, a.infinity);
+  f25o::cmov(p.Z, f25t::element{f25cn::zero_v}, a.infinity);
 }
 
 //--------------------------------------------------------------------------------------------------

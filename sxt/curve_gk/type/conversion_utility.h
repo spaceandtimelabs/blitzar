@@ -45,7 +45,7 @@ CUDA_CALLABLE
 inline void to_element_affine(element_affine& a, const element_p2& p) noexcept {
   fgkt::element z_inv;
   const bool is_zero{fgko::invert(z_inv, p.Z)};
-  fgko::cmov(z_inv, fgkcn::zero_v, is_zero);
+  fgko::cmov(z_inv, fgkt::element{fgkcn::zero_v}, is_zero);
 
   fgkt::element x;
   fgkt::element y;
@@ -72,7 +72,7 @@ inline void to_element_p2(element_p2& p, const element_affine& a) noexcept {
   p.X = a.X;
   p.Y = a.Y;
   p.Z = fgkcn::one_v;
-  fgko::cmov(p.Z, fgkcn::zero_v, a.infinity);
+  fgko::cmov(p.Z, fgkt::element{fgkcn::zero_v}, a.infinity);
 }
 
 //--------------------------------------------------------------------------------------------------

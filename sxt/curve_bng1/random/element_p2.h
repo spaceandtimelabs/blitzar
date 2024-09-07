@@ -45,6 +45,6 @@ inline void generate_random_element(cn1t::element_p2& a,
   }
 
   // Generate random point by multiplying the generator by the scalar
-  cn1o::scalar_multiply255(a, cn1cn::generator_p2_v, data);
+  cn1o::scalar_multiply255(a, cn1t::element_p2{cn1cn::generator_p2_v}, data);
 }
 } // namespace sxt::cn1rn

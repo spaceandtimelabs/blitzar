@@ -45,6 +45,6 @@ inline void generate_random_element(cgkt::element_p2& a,
   }
 
   // Generate random point by multiplying the generator by the scalar
-  cgko::scalar_multiply255(a, cgkcn::generator_p2_v, data);
+  cgko::scalar_multiply255(a, cgkt::element_p2{cgkcn::generator_p2_v}, data);
 }
 } // namespace sxt::cgkrn

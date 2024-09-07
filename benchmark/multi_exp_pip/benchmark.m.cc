@@ -19,11 +19,11 @@
 #include <iostream>
 #include <limits>
 #include <memory>
-#include <print>
 #include <random>
 #include <string_view>
 #include <type_traits>
 
+#include "sxt/base/io/print.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/curve21/operation/add.h"
@@ -214,7 +214,7 @@ double run_benchmark(std::unique_ptr<mtxpp2::partition_table_accessor<U>>& acces
 //--------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
   if (argc != 7) {
-    std::println(
+    basio::println(
         "Usage: benchmark <curve> <n> <num_samples> <num_outputs> <element_nbytes> <verbose>");
     return -1;
   }
@@ -228,61 +228,61 @@ int main(int argc, char* argv[]) {
   bool verbose = std::string_view{argv[6]} != "0";
   unsigned n, num_samples, num_outputs, element_num_bytes;
   if (std::from_chars(n_str.begin(), n_str.end(), n).ec != std::errc{}) {
-    std::println("invalid argument: {}\n", n_str);
+    basio::println("invalid argument: {}\n", n_str);
     return -1;
   }
   if (std::from_chars(num_samples_str.begin(), num_samples_str.end(), num_samples).ec !=
       std::errc{}) {
-    std::println("invalid argument: {}\n", num_samples_str);
+    basio::println("invalid argument: {}\n", num_samples_str);
     return -1;
   }
   if (std::from_chars(num_outputs_str.begin(), num_outputs_str.end(), num_outputs).ec !=
       std::errc{}) {
-    std::println("invalid argument: {}\n", num_outputs_str);
+    basio::println("invalid argument: {}\n", num_outputs_str);
     return -1;
   }
   if (std::from_chars(element_num_bytes_str.begin(), element_num_bytes_str.end(), element_num_bytes)
           .ec != std::errc{}) {
-    std::println("invalid argument: {}\n", element_num_bytes_str);
+    basio::println("invalid argument: {}\n", element_num_bytes_str);
     return -1;
   }
 
   // set up data
-  std::println("n = {}", n);
-  std::println("num_samples = {}", num_samples);
-  std::println("num_outputs = {}", num_outputs);
-  std::println("element_num_bytes = {}", element_num_bytes);
+  basio::println("n = {}", n);
+  basio::println("num_samples = {}", num_samples);
+  basio::println("num_outputs = {}", num_outputs);
+  basio::println("element_num_bytes = {}", element_num_bytes);
 
   if (curve_str == "curve25519") {
-    std::println("running {} benchmark...", curve_str);
+    basio::println("running {} benchmark...", curve_str);
     auto accessor = make_partition_table_accessor<c21t::compact_element, c21t::element_p3>(
         n, curve25519_generator);
     const auto average_time = run_benchmark<c21t::element_p3>(accessor, num_samples, num_outputs,
                                                               element_num_bytes, n, verbose);
-    std::println("compute duration (s): {}", average_time);
+    basio::println("compute duration (s): {}", average_time);
   } else if (curve_str == "bls12_381" || curve_str == "bls12-381") {
-    std::println("running {} benchmark...", curve_str);
+    basio::println("running {} benchmark...", curve_str);
     auto accessor = make_partition_table_accessor<cg1t::compact_element, cg1t::element_p2>(
         n, bls12_381_generator);
     const auto average_time = run_benchmark<cg1t::element_p2>(accessor, num_samples, num_outputs,
                                                               element_num_bytes, n, verbose);
-    std::println("compute duration (s): {}", average_time);
+    basio::println("compute duration (s): {}", average_time);
   } else if (curve_str == "bn254") {
-    std::println("running {} benchmark...", curve_str);
+    basio::println("running {} benchmark...", curve_str);
     auto accessor =
         make_partition_table_accessor<cn1t::compact_element, cn1t::element_p2>(n, bn254_generator);
     const auto average_time = run_benchmark<cn1t::element_p2>(accessor, num_samples, num_outputs,
                                                               element_num_bytes, n, verbose);
-    std::println("compute duration (s): {}", average_time);
+    basio::println("compute duration (s): {}", average_time);
   } else if (curve_str == "grumpkin") {
-    std::println("running {} benchmark...", curve_str);
+    basio::println("running {} benchmark...", curve_str);
     auto accessor = make_partition_table_accessor<cgkt::compact_element, cgkt::element_p2>(
         n, grumpkin_generator);
     const auto average_time = run_benchmark<cgkt::element_p2>(accessor, num_samples, num_outputs,
                                                               element_num_bytes, n, verbose);
-    std::println("compute duration (s): {}", average_time);
+    basio::println("compute duration (s): {}", average_time);
   } else {
-    std::println("curve not supported");
+    basio::println("curve not supported");
   }
 
   return 0;

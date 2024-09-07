@@ -8,6 +8,7 @@ sxt_cc_benchmark(
     visibility = ["//visibility:public"],
     deps = [
         "//sxt/base/curve:element",
+        "//sxt/base/io:print",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
