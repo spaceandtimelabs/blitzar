@@ -36,12 +36,27 @@ int get_num_devices() noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
-// get_driver_version 
+// get_latest_cuda_version_supported_by_driver
 //--------------------------------------------------------------------------------------------------
-int get_driver_version() noexcept {
+int get_latest_cuda_version_supported_by_driver() noexcept {
   static int version = []() noexcept {
     int res;
     auto rcode = cudaDriverGetVersion(&res);
+    if (rcode != cudaSuccess) {
+      return 0;
+    }
+    return res;
+  }();
+  return version;
+}
+
+//--------------------------------------------------------------------------------------------------
+// get_cuda_version 
+//--------------------------------------------------------------------------------------------------
+int get_cuda_version() noexcept {
+  static int version = []() noexcept {
+    int res;
+    auto rcode = cudaRuntimeGetVersion(&res);
     if (rcode != cudaSuccess) {
       return 0;
     }

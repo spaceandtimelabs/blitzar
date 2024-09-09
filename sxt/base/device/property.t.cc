@@ -28,5 +28,6 @@ TEST_CASE("We can fetch a positive number of gpu devices without crashing the ex
 }
 
 TEST_CASE("we can get the version of the driver running") {
-  std::cout << get_driver_version() << "\n";
+  std::cout << sxt::basdv::get_latest_cuda_version_supported_by_driver() << "\n";
+  std::cout << sxt::basdv::get_cuda_version() << "\n";
 }
