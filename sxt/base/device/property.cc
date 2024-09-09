@@ -34,4 +34,19 @@ int get_num_devices() noexcept {
   }();
   return num_devices;
 }
+
+//--------------------------------------------------------------------------------------------------
+// get_driver_version 
+//--------------------------------------------------------------------------------------------------
+int get_driver_version() noexcept {
+  static int version = []() noexcept {
+    int res;
+    auto rcode = cudaDriverGetVersion(&res);
+    if (rcode != cudaSuccess) {
+      return 0;
+    }
+    return res;
+  }();
+  return version;
+}
 } // namespace sxt::basdv

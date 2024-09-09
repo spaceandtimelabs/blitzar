@@ -16,6 +16,8 @@
  */
 #include "sxt/base/device/property.h"
 
+#include <iostream>
+
 #include "sxt/base/test/unit_test.h"
 
 using namespace sxt;
@@ -23,4 +25,8 @@ using namespace sxt::basdv;
 
 TEST_CASE("We can fetch a positive number of gpu devices without crashing the execution") {
   REQUIRE(get_num_devices() >= 0);
+}
+
+TEST_CASE("we can get the version of the driver running") {
+  std::cout << get_driver_version() << "\n";
 }
