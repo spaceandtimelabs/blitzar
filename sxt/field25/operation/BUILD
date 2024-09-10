@@ -60,12 +60,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "mul",
-    impl_deps = [
-        "//sxt/base/field:arithmetic_utility",
-        "//sxt/field25/base:reduce",
-        "//sxt/field25/type:element",
-    ],
-    is_cuda = True,
     test_deps = [
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
@@ -73,10 +67,12 @@ sxt_cc_component(
         "//sxt/field25/base:montgomery",
         "//sxt/field25/constant:zero",
         "//sxt/field25/random:element",
-        "//sxt/field25/type:element",
     ],
     deps = [
+        "//sxt/base/field:arithmetic_utility",
         "//sxt/base/macro:cuda_callable",
+        "//sxt/field25/base:reduce",
+        "//sxt/field25/type:element",
     ],
 )
 
