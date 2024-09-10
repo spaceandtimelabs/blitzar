@@ -30,7 +30,7 @@ int get_num_devices() noexcept;
 int get_latest_cuda_version_supported_by_driver() noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// get_cuda_version 
+// get_cuda_version
 //--------------------------------------------------------------------------------------------------
 int get_cuda_version() noexcept;
 } // namespace sxt::basdv

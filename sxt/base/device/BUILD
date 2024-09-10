@@ -66,11 +66,11 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "property",
+    impl_deps = [
+        "//sxt/base/error:panic",
+    ],
     test_deps = [
         "//sxt/base/test:unit_test",
-    ],
-    impl_deps = [
-      "//sxt/base/error:panic",
     ],
     deps = [
         "//sxt/base/type:raw_stream",

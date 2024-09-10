@@ -53,7 +53,7 @@ int get_latest_cuda_version_supported_by_driver() noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
-// get_cuda_version 
+// get_cuda_version
 //--------------------------------------------------------------------------------------------------
 int get_cuda_version() noexcept {
   static int version = []() noexcept {
