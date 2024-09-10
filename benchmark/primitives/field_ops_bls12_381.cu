@@ -18,9 +18,9 @@
 
 #include <chrono>
 #include <format>
-#include <print>
 
 #include "stats.h"
+#include "sxt/base/io/print.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/field12/operation/add.h"
@@ -116,7 +116,7 @@ void init_random_array(f12t::element* rand, unsigned n_elements, unsigned n_thre
 // field_ops_bls12_381
 //--------------------------------------------------------------------------------------------------
 void field_ops_bls12_381(std::string op, unsigned n_elements, unsigned repetitions, unsigned n_threads, unsigned n_executions) noexcept {
-  std::println("field_ops_bls12_381 for {}", op);
+  basio::println("field_ops_bls12_381 for {}", op);
 
   // Allocate memory for the input and output vectors
   memmg::managed_array<f12t::element> a(n_elements, memr::get_device_resource());
@@ -136,7 +136,7 @@ void field_ops_bls12_381(std::string op, unsigned n_elements, unsigned repetitio
   // Report any errors from the warm up loop
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess) {
-    std::println("CUDA error: {}", cudaGetErrorString(err));
+    basio::println("CUDA error: {}", cudaGetErrorString(err));
   }
 
   // Benchmarking loop
@@ -156,18 +156,18 @@ void field_ops_bls12_381(std::string op, unsigned n_elements, unsigned repetitio
     // Report any errors from the benchmark loop
     err = cudaGetLastError();
     if (err != cudaSuccess) {
-      std::println("CUDA error: {}", cudaGetErrorString(err));
+      basio::println("CUDA error: {}", cudaGetErrorString(err));
     }
   }
 
   // Report data
-  std::println("Final benchmarks over {} executions", n_executions);
-  std::println("...Median : {} ms", sxt::median(elapsed_times));
-  std::println("...Min    : {} ms", sxt::min(elapsed_times));
-  std::println("...Max    : {} ms", sxt::max(elapsed_times));
-  std::println("...Mean   : {} ms", sxt::mean(elapsed_times));
-  std::println("...STD    : {} ms", sxt::std_dev(elapsed_times));
-  std::println("...Performance : {} Giga Field {} Per Second", sxt::gmps(elapsed_times, repetitions, n_elements), op);
-  std::println("");
+  basio::println("Final benchmarks over {} executions", n_executions);
+  basio::println("...Median : {} ms", sxt::median(elapsed_times));
+  basio::println("...Min    : {} ms", sxt::min(elapsed_times));
+  basio::println("...Max    : {} ms", sxt::max(elapsed_times));
+  basio::println("...Mean   : {} ms", sxt::mean(elapsed_times));
+  basio::println("...STD    : {} ms", sxt::std_dev(elapsed_times));
+  basio::println("...Performance : {} Giga Field {} Per Second", sxt::gmps(elapsed_times, repetitions, n_elements), op);
+  basio::println("");
 }
 }

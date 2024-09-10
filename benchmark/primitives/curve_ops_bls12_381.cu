@@ -17,9 +17,9 @@
 #include "curve_ops_bls12_381.h"
 
 #include <chrono>
-#include <print>
 
 #include "stats.h"
+#include "sxt/base/io/print.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/curve_g1/operation/add.h"
@@ -85,7 +85,7 @@ void init_random_array(cg1t::element_p2* rand, unsigned n_elements, unsigned n_t
 // curve_ops_bls12_381
 //--------------------------------------------------------------------------------------------------
 void curve_ops_bls12_381(unsigned n_elements, unsigned repetitions, unsigned n_threads, unsigned n_executions) noexcept {
-  std::println("curve_ops_bls12_381 add");
+  basio::println("curve_ops_bls12_381 add");
 
   // Allocate memory for the input and output vectors
   memmg::managed_array<cg1t::element_p2> a(n_elements, memr::get_device_resource());
@@ -101,7 +101,7 @@ void curve_ops_bls12_381(unsigned n_elements, unsigned repetitions, unsigned n_t
   // Report any errors from the warmup loop
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess) {
-    std::println("CUDA error: {}", cudaGetErrorString(err));
+    basio::println("CUDA error: {}", cudaGetErrorString(err));
   }
 
   // Benchmarking loop
@@ -117,18 +117,18 @@ void curve_ops_bls12_381(unsigned n_elements, unsigned repetitions, unsigned n_t
     // Report any errors from the benchmark loop
     err = cudaGetLastError();
     if (err != cudaSuccess) {
-      std::println("CUDA error: {}", cudaGetErrorString(err));
+      basio::println("CUDA error: {}", cudaGetErrorString(err));
     }
   }
 
   // Report data
-  std::println("Final benchmarks over {} executions", n_executions);
-  std::println("...Median : {} ms", sxt::median(elapsed_times));
-  std::println("...Min    : {} ms", sxt::min(elapsed_times));
-  std::println("...Max    : {} ms", sxt::max(elapsed_times));
-  std::println("...Mean   : {} ms", sxt::mean(elapsed_times));
-  std::println("...STD    : {} ms", sxt::std_dev(elapsed_times));
-  std::println("...Performance : {} Giga Curve Additions Per Second", sxt::gmps(elapsed_times, repetitions, n_elements));
-  std::println("");
+  basio::println("Final benchmarks over {} executions", n_executions);
+  basio::println("...Median : {} ms", sxt::median(elapsed_times));
+  basio::println("...Min    : {} ms", sxt::min(elapsed_times));
+  basio::println("...Max    : {} ms", sxt::max(elapsed_times));
+  basio::println("...Mean   : {} ms", sxt::mean(elapsed_times));
+  basio::println("...STD    : {} ms", sxt::std_dev(elapsed_times));
+  basio::println("...Performance : {} Giga Curve Additions Per Second", sxt::gmps(elapsed_times, repetitions, n_elements));
+  basio::println("");
 }
 }

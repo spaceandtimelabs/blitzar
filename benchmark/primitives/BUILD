@@ -12,6 +12,7 @@ sxt_cc_benchmark(
         ":curve_ops_bn254",
         ":field_ops_bls12_381",
         ":field_ops_bn254",
+        "//sxt/base/io:print",
     ],
 )
 
@@ -24,6 +25,7 @@ sxt_cc_library(
         "curve_ops_bls12_381.h",
     ],
     deps = [
+        "//sxt/base/io:print",
         "//sxt/base/num:divide_up",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/curve_g1/operation:add",
@@ -43,6 +45,7 @@ sxt_cc_library(
         "curve_ops_bn254.h",
     ],
     deps = [
+        "//sxt/base/io:print",
         "//sxt/base/num:divide_up",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/curve_bng1/operation:add",
@@ -63,6 +66,7 @@ sxt_cc_library(
     ],
     deps = [
         ":stats",
+        "//sxt/base/io:print",
         "//sxt/base/num:divide_up",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/field12/operation:add",
@@ -84,6 +88,7 @@ sxt_cc_library(
     ],
     deps = [
         ":stats",
+        "//sxt/base/io:print",
         "//sxt/base/num:divide_up",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/field25/operation:add",

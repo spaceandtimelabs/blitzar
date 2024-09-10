@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <print>
 
 #include "benchmark/primitives/curve_ops_bls12_381.h"
 #include "benchmark/primitives/curve_ops_bn254.h"
 #include "benchmark/primitives/field_ops_bls12_381.h"
 #include "benchmark/primitives/field_ops_bn254.h"
+#include "sxt/base/io/print.h"
 
 using namespace sxt;
 
 int main(int argc, char* argv[]) {
   if (argc < 5) {
-    std::print("Usage: benchmark <curve> <op> <n_elements> <repetitions> <optional - n_threads> "
+    basio::print("Usage: benchmark <curve> <op> <n_elements> <repetitions> <optional - n_threads> "
                "<optional - n_executions>\n");
     return -1;
   }
@@ -37,15 +37,15 @@ int main(int argc, char* argv[]) {
   auto n_threads = (argc > 5) ? std::atoi(argv[5]) : 256;
   auto n_executions = (argc > 6) ? std::atoi(argv[6]) : 10;
 
-  std::println("===== benchmark results =====");
-  std::println("backend : GPU");
-  std::println("curve : {}", curve);
-  std::println("operation : {}", op);
-  std::println("Number of elements : {}", n_elements);
-  std::println("Repetitions : {}", repetitions);
-  std::println("Max threads per block : {}", n_threads);
-  std::println("Number of executions : {}", n_executions);
-  std::println("*****************************");
+  basio::println("===== benchmark results =====");
+  basio::println("backend : GPU");
+  basio::println("curve : {}", curve);
+  basio::println("operation : {}", op);
+  basio::println("Number of elements : {}", n_elements);
+  basio::println("Repetitions : {}", repetitions);
+  basio::println("Max threads per block : {}", n_threads);
+  basio::println("Number of executions : {}", n_executions);
+  basio::println("*****************************");
 
   if (curve == "bls12_381") {
     if (op == "curve") {
@@ -62,12 +62,12 @@ int main(int argc, char* argv[]) {
       field_ops_bn254("mul", n_elements, repetitions, n_threads, n_executions);
     }
   } else {
-    std::println("curve not supported");
+    basio::println("curve not supported");
   }
 
-  std::println("******************************");
-  std::println("===== benchmark complete =====");
-  std::println("******************************");
+  basio::println("******************************");
+  basio::println("===== benchmark complete =====");
+  basio::println("******************************");
 
   return 0;
 }
