@@ -19,6 +19,8 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
+#include "sxt/base/error/panic.h"
+
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // get_num_devices
@@ -33,5 +35,35 @@ int get_num_devices() noexcept {
     return res;
   }();
   return num_devices;
+}
+
+//--------------------------------------------------------------------------------------------------
+// get_latest_cuda_version_supported_by_driver
+//--------------------------------------------------------------------------------------------------
+int get_latest_cuda_version_supported_by_driver() noexcept {
+  static int version = []() noexcept {
+    int res;
+    auto rcode = cudaDriverGetVersion(&res);
+    if (rcode != cudaSuccess) {
+      baser::panic("cudaDriverGetVersion failed: {}", cudaGetErrorString(rcode));
+    }
+    return res;
+  }();
+  return version;
+}
+
+//--------------------------------------------------------------------------------------------------
+// get_cuda_version
+//--------------------------------------------------------------------------------------------------
+int get_cuda_version() noexcept {
+  static int version = []() noexcept {
+    int res;
+    auto rcode = cudaRuntimeGetVersion(&res);
+    if (rcode != cudaSuccess) {
+      baser::panic("cudaRuntimeGetVersion failed: {}", cudaGetErrorString(rcode));
+    }
+    return res;
+  }();
+  return version;
 }
 } // namespace sxt::basdv

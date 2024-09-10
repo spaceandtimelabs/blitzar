@@ -20,6 +20,7 @@
 
 #include "sxt/base/device/property.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/error/panic.h"
 #include "sxt/cbindings/backend/computational_backend.h"
 #include "sxt/cbindings/backend/cpu_backend.h"
 #include "sxt/cbindings/backend/gpu_backend.h"
@@ -45,6 +46,14 @@ static void initialize_cpu_backend(const sxt_config* config) noexcept {
 // initialize_gpu_backend
 //--------------------------------------------------------------------------------------------------
 static void initialize_gpu_backend(const sxt_config* config) noexcept {
+  // check that driver supports version
+  auto max_supported_version = basdv::get_latest_cuda_version_supported_by_driver();
+  auto version = basdv::get_cuda_version();
+  if (max_supported_version < version) {
+    baser::panic("Update GPU drivers. The maximum supported version is {} but blitzar requires {}",
+                 max_supported_version, version);
+  }
+
   int num_devices = basdv::get_num_devices();
 
   if (num_devices == 0) {

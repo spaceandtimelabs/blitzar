@@ -45,6 +45,7 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/base/device:property",
         "//sxt/base/error:assert",
+        "//sxt/base/error:panic",
         "//sxt/cbindings/backend:gpu_backend",
         "//sxt/cbindings/backend:cpu_backend",
         "//sxt/seqcommit/generator:precomputed_initializer",
