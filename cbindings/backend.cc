@@ -16,8 +16,8 @@
  */
 #include "cbindings/backend.h"
 
-#include <cstdlib>
 #include <cctype>
+#include <cstdlib>
 
 #include "sxt/base/device/property.h"
 #include "sxt/base/error/assert.h"
@@ -66,7 +66,7 @@ static void initialize_gpu_backend(const sxt_config* config) noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
-// try_get_environ_backend 
+// try_get_environ_backend
 //--------------------------------------------------------------------------------------------------
 static void try_get_environ_backend(int& backend) noexcept {
   auto val = std::getenv("BLITZAR_BACKEND");
