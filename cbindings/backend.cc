@@ -16,7 +16,8 @@
  */
 #include "cbindings/backend.h"
 
-#include <iostream>
+#include <cstdlib>
+#include <cctype>
 
 #include "sxt/base/device/property.h"
 #include "sxt/base/error/assert.h"
@@ -57,16 +58,32 @@ static void initialize_gpu_backend(const sxt_config* config) noexcept {
   int num_devices = basdv::get_num_devices();
 
   if (num_devices == 0) {
-    initialize_cpu_backend(config);
-
-    // this message is used only to warn the user that gpu will not be used
-    std::cout << "WARN: Using pippenger cpu instead of naive gpu backend." << std::endl;
-
-    return;
+    baser::panic("no supported GPUs found");
   }
 
   backend = cbnbck::get_gpu_backend();
   sqcgn::init_precomputed_components(config->num_precomputed_generators, true);
+}
+
+//--------------------------------------------------------------------------------------------------
+// try_get_environ_backend 
+//--------------------------------------------------------------------------------------------------
+static void try_get_environ_backend(int& backend) noexcept {
+  auto val = std::getenv("BLITZAR_BACKEND");
+  if (val == nullptr) {
+    return;
+  }
+  std::string s{val};
+  for (auto& c : s) {
+    c = std::tolower(c);
+  }
+  if (s == "cpu") {
+    backend = SXT_CPU_BACKEND;
+  } else if (s == "gpu") {
+    backend = SXT_GPU_BACKEND;
+  } else {
+    baser::panic("invalid BLITZAR_BACKEND value {}", s);
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -97,11 +114,13 @@ int sxt_init(const sxt_config* config) {
   SXT_RELEASE_ASSERT(cbn::backend == nullptr,
                      "trying to reinitialize the backend in the `sxt_init` c binding function");
 
-  if (config->backend == SXT_GPU_BACKEND) {
+  auto backend = config->backend;
+  sxt::cbn::try_get_environ_backend(backend);
+  if (backend == SXT_GPU_BACKEND) {
     cbn::initialize_gpu_backend(config);
 
     return 0;
-  } else if (config->backend == SXT_CPU_BACKEND) {
+  } else if (backend == SXT_CPU_BACKEND) {
     cbn::initialize_cpu_backend(config);
 
     return 0;
