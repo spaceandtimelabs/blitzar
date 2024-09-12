@@ -92,6 +92,7 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
                                unsigned num_output_bytes, basct::cspan<unsigned> output_bit_table,
                                basct::cspan<unsigned> output_lengths, basct::cspan<uint8_t> scalars,
                                const multiexponentiate_options& options) noexcept {
+  basl::info("variable_length_mutiexponentiation");
   auto num_products = products.size();
   auto n = scalars.size() / num_output_bytes;
   auto window_width = accessor.window_width();

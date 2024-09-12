@@ -54,6 +54,7 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
                                const partition_table_accessor<U>& accessor,
                                unsigned num_output_bytes, basct::cspan<uint8_t> scalars,
                                const multiexponentiate_options& options) noexcept {
+  basl::info("multiexponentiation");
   auto num_products = products.size();
   auto n = scalars.size() / num_output_bytes;
   auto window_width = accessor.window_width();
@@ -115,6 +116,7 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
                                       const partition_table_accessor<U>& accessor,
                                       unsigned element_num_bytes, basct::cspan<uint8_t> scalars,
                                       const multiexponentiate_options& options) noexcept {
+  basl::info("multiexponentiate_impl with element_num_bytes");
   auto num_outputs = res.size();
   auto num_products = num_outputs * element_num_bytes * 8u;
   SXT_DEBUG_ASSERT(
@@ -148,6 +150,7 @@ xena::future<>
 multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& accessor,
                        basct::cspan<unsigned> output_bit_table, basct::cspan<uint8_t> scalars,
                        const multiexponentiate_options& options) noexcept {
+  basl::info("multiexponentiate_impl with output_bit_table");
   auto num_outputs = res.size();
   auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
   auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
