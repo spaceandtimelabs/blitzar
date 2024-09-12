@@ -22,6 +22,7 @@
 #include "sxt/base/device/property.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/error/panic.h"
+#include "sxt/base/log/log.h"
 #include "sxt/cbindings/backend/computational_backend.h"
 #include "sxt/cbindings/backend/cpu_backend.h"
 #include "sxt/cbindings/backend/gpu_backend.h"
@@ -74,6 +75,7 @@ static void try_get_environ_backend(int& backend) noexcept {
     return;
   }
   std::string s{val};
+  basl::info("override default backend with environmental varaible BLITZAR_BACKEND={}", s);
   for (auto& c : s) {
     c = std::tolower(c);
   }
@@ -117,10 +119,12 @@ int sxt_init(const sxt_config* config) {
   auto backend = config->backend;
   sxt::cbn::try_get_environ_backend(backend);
   if (backend == SXT_GPU_BACKEND) {
+    basl::info("initializing GPU backend");
     cbn::initialize_gpu_backend(config);
 
     return 0;
   } else if (backend == SXT_CPU_BACKEND) {
+    basl::info("initializing CPU backend");
     cbn::initialize_cpu_backend(config);
 
     return 0;
