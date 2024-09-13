@@ -18,11 +18,12 @@ jobs:
     timeout-minutes: 600
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3      
   
       - name: Run check
-        run: >
-          /usr/bin/nix develop --command ./tools/code_format/check_format.py check
+        run: |
+          source ~/.nix-profile/etc/profile.d/nix.sh
+          nix develop --command ./tools/code_format/check_format.py check
   
   test-cpp:
     name: C++ code
@@ -31,10 +32,11 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-  
+      
       - name: Run cpp tests
-        run: >
-          TEST_TMPDIR=$HOME/.bazel_test /usr/bin/nix develop --command bazel test //...
+        run: |
+          source ~/.nix-profile/etc/profile.d/nix.sh
+          TEST_TMPDIR=$HOME/.bazel_test nix develop --command bazel test //...
   
           # Note: There are some steps we need to our
           # to our custom nix derivation from https://github.com/spaceandtimelabs/blitzar/pull/96
@@ -69,11 +71,12 @@ jobs:
     timeout-minutes: 600
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3        
   
       - name: Run cpp tests with optimization flags on
-        run: >
-          TEST_TMPDIR=$HOME/.bazel_test_opt /usr/bin/nix develop --command bazel test --jobs=1 -c opt //...
+        run: |
+          source ~/.nix-profile/etc/profile.d/nix.sh
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command bazel test --jobs=1 -c opt //...
   
   test-cpp-asan:
     name: C++ code with address sanitizer
@@ -84,8 +87,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run cpp-asan tests
-        run: >
-          TEST_TMPDIR=$HOME/.bazel_test_asan /usr/bin/nix develop --command bazel test --config=asan //...
+        run: |
+          source ~/.nix-profile/etc/profile.d/nix.sh
+          TEST_TMPDIR=$HOME/.bazel_test_asan nix develop --command bazel test --config=asan //...
 
   test-rust:
     name: Rust Sys Crate
@@ -97,5 +101,6 @@ jobs:
 
       - name: Run rust tests
         run: |
-          TEST_TMPDIR=$HOME/.bazel_test_opt /usr/bin/nix develop --command cargo test --manifest-path rust/blitzar-sys/Cargo.toml
-          TEST_TMPDIR=$HOME/.bazel_test_opt /usr/bin/nix develop --command cargo test --manifest-path rust/tests/Cargo.toml
+          source ~/.nix-profile/etc/profile.d/nix.sh
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command cargo test --manifest-path rust/blitzar-sys/Cargo.toml
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command cargo test --manifest-path rust/tests/Cargo.toml
