@@ -188,12 +188,7 @@ int main(int argc, char* argv[]) {
     basct::span<c21t::element_p3> span_generators(generators.data(), p.commitment_length);
 
     p.trigger_timer();
-    auto fut = mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(basct::cspan<c21t::element_p3>{span_generators}, value_sequences);
-/* template <bascrv::element Element> */
-/* xena::future<memmg::managed_array<Element>> */
-/* async_compute_multiexponentiation(basct::cspan<Element> generators, */
-/*                                   basct::cspan<mtxb::exponent_sequence> exponents) noexcept { */
-    /* p.backend->compute_commitments(commitments, value_sequences, span_generators); */
+    auto fut = mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(span_generators, value_sequences);
     xens::get_scheduler().run();
     p.stop_timer();
 
