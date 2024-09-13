@@ -12,7 +12,6 @@ cc_library(
         "setup.h",
     ],
     copts = [
-        "-stdlib=libc++",
         "-std=c++20",
     ],
     implementation_deps = [
@@ -30,7 +29,6 @@ cc_library(
         "log_impl.h",
     ],
     copts = [
-        "-stdlib=libc++",
         "-std=c++20",
     ],
     implementation_deps = [
