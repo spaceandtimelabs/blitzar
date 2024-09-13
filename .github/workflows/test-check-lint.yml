@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 600
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3      
+        uses: actions/checkout@v3
   
       - name: Run check
         run: |
@@ -71,7 +71,7 @@ jobs:
     timeout-minutes: 600
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3        
+        uses: actions/checkout@v3
   
       - name: Run cpp tests with optimization flags on
         run: |
