@@ -105,6 +105,7 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   //memr::async_device_resource resource{reduction_stream};
   memmg::managed_array<T> partial_products_dev{partial_products.size(), &resource};
   basdv::async_copy_device_to_device(partial_products_dev, partial_products, reduction_stream);
+  co_await xendv::await_stream(reduction_stream);
   combine<T>(products, reduction_stream, partial_products_dev);
   co_await xendv::await_stream(reduction_stream);
 }
