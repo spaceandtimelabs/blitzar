@@ -46,6 +46,7 @@ sxt_cc_component(
         "//sxt/base/device:property",
         "//sxt/base/error:assert",
         "//sxt/base/error:panic",
+        "//sxt/base/log:log",
         "//sxt/cbindings/backend:gpu_backend",
         "//sxt/cbindings/backend:cpu_backend",
         "//sxt/seqcommit/generator:precomputed_initializer",
