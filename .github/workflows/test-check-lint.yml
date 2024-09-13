@@ -22,7 +22,7 @@ jobs:
   
       - name: Run check
         run: >
-          nix develop --command ./tools/code_format/check_format.py check
+          /usr/bin/nix develop --command ./tools/code_format/check_format.py check
   
   test-cpp:
     name: C++ code
@@ -34,7 +34,7 @@ jobs:
   
       - name: Run cpp tests
         run: >
-          TEST_TMPDIR=$HOME/.bazel_test nix develop --command bazel test //...
+          TEST_TMPDIR=$HOME/.bazel_test /usr/bin/nix develop --command bazel test //...
   
           # Note: There are some steps we need to our
           # to our custom nix derivation from https://github.com/spaceandtimelabs/blitzar/pull/96
@@ -73,7 +73,7 @@ jobs:
   
       - name: Run cpp tests with optimization flags on
         run: >
-          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command bazel test --jobs=1 -c opt //...
+          TEST_TMPDIR=$HOME/.bazel_test_opt /usr/bin/nix develop --command bazel test --jobs=1 -c opt //...
   
   test-cpp-asan:
     name: C++ code with address sanitizer
@@ -85,7 +85,7 @@ jobs:
 
       - name: Run cpp-asan tests
         run: >
-          TEST_TMPDIR=$HOME/.bazel_test_asan nix develop --command bazel test --config=asan //...
+          TEST_TMPDIR=$HOME/.bazel_test_asan /usr/bin/nix develop --command bazel test --config=asan //...
 
   test-rust:
     name: Rust Sys Crate
@@ -97,5 +97,5 @@ jobs:
 
       - name: Run rust tests
         run: |
-          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command cargo test --manifest-path rust/blitzar-sys/Cargo.toml
-          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command cargo test --manifest-path rust/tests/Cargo.toml
+          TEST_TMPDIR=$HOME/.bazel_test_opt /usr/bin/nix develop --command cargo test --manifest-path rust/blitzar-sys/Cargo.toml
+          TEST_TMPDIR=$HOME/.bazel_test_opt /usr/bin/nix develop --command cargo test --manifest-path rust/tests/Cargo.toml
