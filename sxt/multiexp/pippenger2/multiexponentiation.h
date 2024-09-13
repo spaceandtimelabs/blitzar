@@ -80,9 +80,7 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   }
 
   // handle multiple chunks
-  memr::async_device_resource resource{reduction_stream};
-  memmg::managed_array<T> partial_products{num_products * num_chunks, &resource};
-  //memmg::managed_array<T> partial_products{num_products * num_chunks, memr::get_pinned_resource()};
+  memmg::managed_array<T> partial_products{num_products * num_chunks, memr::get_pinned_resource()};
   size_t chunk_index = 0;
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
@@ -93,7 +91,7 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
             scalars.subspan(num_output_bytes * rng.a(), rng.size() * num_output_bytes);
         co_await async_partition_product<T>(partial_products_dev, accessor, scalars_slice, rng.a());
         basdv::stream stream;
-        basdv::async_copy_device_to_device(
+        basdv::async_copy_device_to_host(
             basct::subspan(partial_products, num_products * chunk_index, num_products),
             partial_products_dev, stream);
         ++chunk_index;
@@ -102,10 +100,9 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
 
   // combine the partial products
   basl::info("combining {} partial product chunks", num_chunks);
-  //memr::async_device_resource resource{reduction_stream};
+  memr::async_device_resource resource{reduction_stream};
   memmg::managed_array<T> partial_products_dev{partial_products.size(), &resource};
-  basdv::async_copy_device_to_device(partial_products_dev, partial_products, reduction_stream);
-  co_await xendv::await_stream(reduction_stream);
+  basdv::async_copy_host_to_device(partial_products_dev, partial_products, reduction_stream);
   combine<T>(products, reduction_stream, partial_products_dev);
   co_await xendv::await_stream(reduction_stream);
 }
