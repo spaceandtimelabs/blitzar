@@ -94,16 +94,31 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
         basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
                    rng.a(), rng.b(), basdv::get_device());
+        
+        auto ppd1 = std::chrono::steady_clock::now();
         memmg::managed_array<T> partial_products_dev{num_products, memr::get_device_resource()};
+        auto ppd2 = std::chrono::steady_clock::now();
+        basl::info("partial_products_dev time: {} ns on device {}",
+                   std::chrono::duration_cast<std::chrono::nanoseconds>(ppd2 - ppd1).count(),
+                   basdv::get_device());
+
+        auto sss1 = std::chrono::steady_clock::now();
         auto scalars_slice =
             scalars.subspan(num_output_bytes * rng.a(), rng.size() * num_output_bytes);
+        auto sss2 = std::chrono::steady_clock::now();
+        basl::info("scalars.subspan time: {} ns on device {}",
+                   std::chrono::duration_cast<std::chrono::nanoseconds>(sss2 - sss1).count(),
+                   basdv::get_device());
+
         auto a1 = std::chrono::steady_clock::now();
         co_await async_partition_product<T>(partial_products_dev, accessor, scalars_slice, rng.a());
         auto a2 = std::chrono::steady_clock::now();
         basl::info("async_partition_product time: {} ns on device {}",
                    std::chrono::duration_cast<std::chrono::nanoseconds>(a2 - a1).count(),
                    basdv::get_device());
+
         basdv::stream stream;
+
         auto copy1 = std::chrono::steady_clock::now();
         basdv::async_copy_device_to_host(
             basct::subspan(partial_products, num_products * chunk_index, num_products),
@@ -112,8 +127,15 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
         basl::info("basdv::async_copy_device_to_host time: {} ns on device {}",
                    std::chrono::duration_cast<std::chrono::nanoseconds>(copy2 - copy1).count(),
                    basdv::get_device());
+        
         ++chunk_index;
+
+        auto as1 = std::chrono::steady_clock::now();
         co_await xendv::await_stream(stream);
+        auto as2 = std::chrono::steady_clock::now();
+        basl::info("xendv::await_stream time: {} ns on device {}",
+                   std::chrono::duration_cast<std::chrono::nanoseconds>(as2 - as1).count(),
+                   basdv::get_device());
       });
     auto t2 = std::chrono::steady_clock::now();
     basl::info("xendv::concurrent_for_each: {} ns",
