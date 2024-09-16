@@ -145,14 +145,29 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   // combine the partial products
   basl::info("combining {} partial product chunks", num_chunks);
   memr::async_device_resource resource{reduction_stream};
+
+  auto ppd1 = std::chrono::steady_clock::now();
   memmg::managed_array<T> partial_products_dev{partial_products.size(), &resource};
+  auto ppd2 = std::chrono::steady_clock::now();
+  basl::info("partial_products_dev: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(ppd2 - ppd1).count());
+
+  auto achtd1 = std::chrono::steady_clock::now();
   basdv::async_copy_host_to_device(partial_products_dev, partial_products, reduction_stream);
+  auto achtd2 = std::chrono::steady_clock::now();
+  basl::info("async_copy_host_to_device: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(achtd2 - achtd1).count());
+
+  auto combine1 = std::chrono::steady_clock::now();
   combine<T>(products, reduction_stream, partial_products_dev);
+  auto combine2 = std::chrono::steady_clock::now();
+  basl::info("combine: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(combine2 - combine1).count());
+
+  auto xendv1 = std::chrono::steady_clock::now();
   co_await xendv::await_stream(reduction_stream);
+  auto xendv2 = std::chrono::steady_clock::now();
+  basl::info("xendv::await_stream: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(xendv2 - xendv1).count());
+
   auto o2 = std::chrono::steady_clock::now();
-  basl::info("{} chunks: {} ns", num_chunks,
-                   std::chrono::duration_cast<std::chrono::nanoseconds>(o2 - o1).count(),
-                   basdv::get_device());
+  basl::info("{} chunks: {} ns", num_chunks, std::chrono::duration_cast<std::chrono::nanoseconds>(o2 - o1).count());
 }
 
 //--------------------------------------------------------------------------------------------------
