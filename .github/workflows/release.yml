@@ -25,8 +25,8 @@ jobs:
 
       - name: Semantic release
         run: |
-          /usr/bin/nix develop --command npm install semantic-release
-          TEST_TMPDIR=$HOME/.bazel_test_opt /usr/bin/nix develop --command npx semantic-release
+          nix develop --command npm install semantic-release
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command npx semantic-release
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
