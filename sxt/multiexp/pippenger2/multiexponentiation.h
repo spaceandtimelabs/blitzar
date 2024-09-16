@@ -79,7 +79,7 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
     auto t1 = std::chrono::steady_clock::now();
     co_await async_partition_product<T>(products, accessor, scalars, 0);
     auto t2 = std::chrono::steady_clock::now();
-    basl::info("one chunk: {} ns",
+    basl::info("1 chunk async_partition_product: {} ns",
                 std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count(),
                 basdv::get_device());
     co_return;
@@ -97,7 +97,12 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
         memmg::managed_array<T> partial_products_dev{num_products, memr::get_device_resource()};
         auto scalars_slice =
             scalars.subspan(num_output_bytes * rng.a(), rng.size() * num_output_bytes);
+        auto a1 = std::chrono::steady_clock::now();
         co_await async_partition_product<T>(partial_products_dev, accessor, scalars_slice, rng.a());
+        auto a2 = std::chrono::steady_clock::now();
+        basl::info("async_partition_product time: {} ns on device {}",
+                   std::chrono::duration_cast<std::chrono::nanoseconds>(a2 - a1).count(),
+                   basdv::get_device());
         basdv::stream stream;
         auto copy1 = std::chrono::steady_clock::now();
         basdv::async_copy_device_to_host(
