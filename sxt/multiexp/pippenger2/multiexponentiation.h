@@ -87,7 +87,12 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
 
   // handle multiple chunks
   auto o1 = std::chrono::steady_clock::now();
+
+  auto pr1 = std::chrono::steady_clock::now();
   memmg::managed_array<T> partial_products{num_products * num_chunks, memr::get_pinned_resource()};
+  auto pr2 = std::chrono::steady_clock::now();
+  basl::info("partial_products time: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(pr2 - pr1).count());
+  
   size_t chunk_index = 0;
   auto t1 = std::chrono::steady_clock::now();
   co_await xendv::concurrent_for_each(
