@@ -91,9 +91,14 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
             scalars.subspan(num_output_bytes * rng.a(), rng.size() * num_output_bytes);
         co_await async_partition_product<T>(partial_products_dev, accessor, scalars_slice, rng.a());
         basdv::stream stream;
+        auto copy1 = std::chrono::steady_clock::now();
         basdv::async_copy_device_to_host(
             basct::subspan(partial_products, num_products * chunk_index, num_products),
             partial_products_dev, stream);
+        auto copy2 = std::chrono::steady_clock::now();
+        basl::info("basdv::async_copy_device_to_host time: {} ms on device {}",
+                   std::chrono::duration_cast<std::chrono::milliseconds>(copy2 - copy1).count(),
+                   basdv::get_device());
         ++chunk_index;
         co_await xendv::await_stream(stream);
       });
