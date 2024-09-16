@@ -25,7 +25,6 @@ jobs:
 
       - name: Semantic release
         run: |
-          source ~/.nix-profile/etc/profile.d/nix.sh
           nix develop --command npm install semantic-release
           TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command npx semantic-release
         env:
