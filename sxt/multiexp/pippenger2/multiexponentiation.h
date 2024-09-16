@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <chrono>
 #include <concepts>
 #include <iterator>
 
@@ -75,13 +76,20 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
 
   // handle no chunk case
   if (num_chunks == 1) {
+    auto t1 = std::chrono::steady_clock::now();
     co_await async_partition_product<T>(products, accessor, scalars, 0);
+    auto t2 = std::chrono::steady_clock::now();
+    basl::info("one chunk: {} ns",
+                std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count(),
+                basdv::get_device());
     co_return;
   }
 
   // handle multiple chunks
+  auto o1 = std::chrono::steady_clock::now();
   memmg::managed_array<T> partial_products{num_products * num_chunks, memr::get_pinned_resource()};
   size_t chunk_index = 0;
+  auto t1 = std::chrono::steady_clock::now();
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
         basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
@@ -96,12 +104,16 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
             basct::subspan(partial_products, num_products * chunk_index, num_products),
             partial_products_dev, stream);
         auto copy2 = std::chrono::steady_clock::now();
-        basl::info("basdv::async_copy_device_to_host time: {} ms on device {}",
-                   std::chrono::duration_cast<std::chrono::milliseconds>(copy2 - copy1).count(),
+        basl::info("basdv::async_copy_device_to_host time: {} ns on device {}",
+                   std::chrono::duration_cast<std::chrono::nanoseconds>(copy2 - copy1).count(),
                    basdv::get_device());
         ++chunk_index;
         co_await xendv::await_stream(stream);
       });
+    auto t2 = std::chrono::steady_clock::now();
+    basl::info("xendv::concurrent_for_each: {} ns",
+                   std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count(),
+                   basdv::get_device());
 
   // combine the partial products
   basl::info("combining {} partial product chunks", num_chunks);
@@ -110,6 +122,10 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   basdv::async_copy_host_to_device(partial_products_dev, partial_products, reduction_stream);
   combine<T>(products, reduction_stream, partial_products_dev);
   co_await xendv::await_stream(reduction_stream);
+  auto o2 = std::chrono::steady_clock::now();
+  basl::info("{} chunks: {} ns", num_chunks,
+                   std::chrono::duration_cast<std::chrono::nanoseconds>(o2 - o1).count(),
+                   basdv::get_device());
 }
 
 //--------------------------------------------------------------------------------------------------
