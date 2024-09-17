@@ -55,7 +55,9 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
                                const partition_table_accessor<U>& accessor,
                                unsigned num_output_bytes, basct::cspan<uint8_t> scalars,
                                const multiexponentiate_options& options) noexcept {
-  basl::info("multiexponentiation");
+  basl::info("multiexponentiate_product_step");
+
+  auto in1 = std::chrono::steady_clock::now();
   auto num_products = products.size();
   auto n = scalars.size() / num_output_bytes;
   auto window_width = accessor.window_width();
@@ -71,6 +73,10 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
                                                     .max_chunk_size(options.max_chunk_size),
                                                 options.split_factor);
   auto num_chunks = static_cast<size_t>(std::distance(chunk_first, chunk_last));
+  auto in2 = std::chrono::steady_clock::now();
+  basl::info("initialization took: {} ns",
+             std::chrono::duration_cast<std::chrono::nanoseconds>(in2 - in1).count());
+
   basl::info("computing {} bitwise multiexponentiation products of length {} using {} chunks",
              num_products, n, num_chunks);
 
@@ -87,6 +93,12 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
 
   // handle multiple chunks
   auto o1 = std::chrono::steady_clock::now();
+
+  auto cmh1 = std::chrono::steady_clock::now();
+  void* res;
+  cudaMallocHost(&res, num_products * num_chunks);
+  auto cmh2 = std::chrono::steady_clock::now();
+  basl::info("cudaMallocHost: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(cmh2 - cmh1).count());
 
   auto pr1 = std::chrono::steady_clock::now();
   memmg::managed_array<T> partial_products{num_products * num_chunks, memr::get_pinned_resource()};
@@ -149,7 +161,11 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
 
   // combine the partial products
   basl::info("combining {} partial product chunks", num_chunks);
+
+  auto asdr1 = std::chrono::steady_clock::now();
   memr::async_device_resource resource{reduction_stream};
+  auto asdr2 = std::chrono::steady_clock::now();
+  basl::info("memr::async_device_resource time: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(asdr2 - asdr1).count());
 
   auto ppd1 = std::chrono::steady_clock::now();
   memmg::managed_array<T> partial_products_dev{partial_products.size(), &resource};
