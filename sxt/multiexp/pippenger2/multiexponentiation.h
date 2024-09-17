@@ -101,6 +101,12 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   auto cmh2 = std::chrono::steady_clock::now();
   basl::info("cudaMallocHost: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(cmh2 - cmh1).count());
 
+  cmh1 = std::chrono::steady_clock::now();
+  void* res2;
+  cudaMalloc(&res2, num_products * num_chunks);
+  cmh2 = std::chrono::steady_clock::now();
+  basl::info("cudaMalloc: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(cmh2 - cmh1).count());  
+
 
   // {
   //   auto mem1 = std::chrono::steady_clock::now();
