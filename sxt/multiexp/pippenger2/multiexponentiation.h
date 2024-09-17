@@ -107,9 +107,10 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
 
   pa1 = std::chrono::steady_clock::now();
   void* res;
-  cudaMallocHost(&res, num_products * num_chunks * sizeof(T));
+  auto byte_size = num_products * num_chunks * sizeof(T);
+  cudaMallocHost(&res, byte_size);
   pa2 = std::chrono::steady_clock::now();
-  basl::info("cudaMallocHost: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(pa2 - pa1).count());
+  basl::info("cudaMallocHost: {} ns on {} bytes", std::chrono::duration_cast<std::chrono::nanoseconds>(pa2 - pa1).count(), byte_size);
 
   auto mac1 = std::chrono::steady_clock::now();
   memmg::managed_array<void> data{static_cast<void*>(res), num_products * num_chunks, num_products * num_chunks * sizeof(T), pinned};
