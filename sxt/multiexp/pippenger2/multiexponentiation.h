@@ -37,6 +37,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
+#include "sxt/memory/resource/managed_device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/combination.h"
 #include "sxt/multiexp/pippenger2/multiexponentiation_options.h"
@@ -99,6 +100,23 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   cudaMallocHost(&res, num_products * num_chunks);
   auto cmh2 = std::chrono::steady_clock::now();
   basl::info("cudaMallocHost: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(cmh2 - cmh1).count());
+
+
+  // {
+  //   auto mem1 = std::chrono::steady_clock::now();
+  //   auto mem = memr::get_managed_device_resource();
+  //   mem->allocate(num_products * num_chunks * sizeof(T));
+  //   auto mem2 = std::chrono::steady_clock::now();
+  //   basl::info("allocating managed_device_resource: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(mem2 - mem1).count());
+  // }
+  
+  {
+    auto mem3 = std::chrono::steady_clock::now();
+    auto dmem = memr::get_device_resource();
+    dmem->allocate(num_products * num_chunks * sizeof(T));
+    auto mem4 = std::chrono::steady_clock::now();
+    basl::info("allocating device_resource: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(mem4 - mem3).count());
+  }
 
   auto pr1 = std::chrono::steady_clock::now();
   auto pinned = memr::get_pinned_resource();
