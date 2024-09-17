@@ -61,7 +61,7 @@ pinned_resource* get_pinned_resource() noexcept {
   //
   // See https://google.github.io/styleguide/cppguide.html#Static_and_Global_Variables for
   // details on this use case.
-  static pinned_resource* resource = new pinned_resource{};
+  pinned_resource* resource = new pinned_resource{};
 
   return resource;
 }
