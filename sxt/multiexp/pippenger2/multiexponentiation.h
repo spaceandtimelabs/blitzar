@@ -95,35 +95,6 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   // handle multiple chunks
   auto o1 = std::chrono::steady_clock::now();
 
-  auto cmh1 = std::chrono::steady_clock::now();
-  void* res;
-  cudaMallocHost(&res, num_products * num_chunks);
-  auto cmh2 = std::chrono::steady_clock::now();
-  basl::info("cudaMallocHost: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(cmh2 - cmh1).count());
-
-  cmh1 = std::chrono::steady_clock::now();
-  void* res2;
-  cudaMalloc(&res2, num_products * num_chunks);
-  cmh2 = std::chrono::steady_clock::now();
-  basl::info("cudaMalloc: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(cmh2 - cmh1).count());  
-
-
-  // {
-  //   auto mem1 = std::chrono::steady_clock::now();
-  //   auto mem = memr::get_managed_device_resource();
-  //   mem->allocate(num_products * num_chunks * sizeof(T));
-  //   auto mem2 = std::chrono::steady_clock::now();
-  //   basl::info("allocating managed_device_resource: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(mem2 - mem1).count());
-  // }
-  
-  {
-    auto mem3 = std::chrono::steady_clock::now();
-    auto dmem = memr::get_device_resource();
-    dmem->allocate(num_products * num_chunks * sizeof(T));
-    auto mem4 = std::chrono::steady_clock::now();
-    basl::info("allocating device_resource: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(mem4 - mem3).count());
-  }
-
   auto pr1 = std::chrono::steady_clock::now();
   auto pinned = memr::get_pinned_resource();
   auto pr2 = std::chrono::steady_clock::now();
@@ -134,8 +105,14 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   auto pa2 = std::chrono::steady_clock::now();
   basl::info("pinned.allocate: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(pa2 - pa1).count());
 
+  pa1 = std::chrono::steady_clock::now();
+  void* res;
+  cudaMallocHost(&res, num_products * num_chunks * sizeof(T));
+  pa2 = std::chrono::steady_clock::now();
+  basl::info("cudaMallocHost: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(pa2 - pa1).count());
+
   auto mac1 = std::chrono::steady_clock::now();
-  memmg::managed_array<void> data{static_cast<void*>(pinned_al), num_products * num_chunks, num_products * num_chunks * sizeof(T), pinned};
+  memmg::managed_array<void> data{static_cast<void*>(res), num_products * num_chunks, num_products * num_chunks * sizeof(T), pinned};
   auto mac2 = std::chrono::steady_clock::now();
   basl::info("managed_array constructor: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(mac2 - mac1).count());
 
