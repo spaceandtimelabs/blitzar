@@ -35,5 +35,5 @@ private:
 //--------------------------------------------------------------------------------------------------
 // get_pinned_resource
 //--------------------------------------------------------------------------------------------------
-pinned_resource* get_pinned_resource() noexcept;
+std::pmr::memory_resource* get_pinned_resource() noexcept;
 } // namespace sxt::memr

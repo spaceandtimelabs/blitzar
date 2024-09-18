@@ -55,13 +55,15 @@ bool pinned_resource::do_is_equal(const std::pmr::memory_resource& other) const 
 //--------------------------------------------------------------------------------------------------
 // get_pinned_resource
 //--------------------------------------------------------------------------------------------------
-pinned_resource* get_pinned_resource() noexcept {
+std::pmr::memory_resource* get_pinned_resource() noexcept {
   // Use a heap allocated object that never gets deleted since we want this
   // to be available for the program duration.
   //
   // See https://google.github.io/styleguide/cppguide.html#Static_and_Global_Variables for
   // details on this use case.
-  static pinned_resource* resource = new pinned_resource{};
+  static pinned_resource* resource_p = new pinned_resource{};
+  static std::pmr::unsynchronized_pool_resource* resource =
+      new std::pmr::unsynchronized_pool_resource{resource_p};
 
   return resource;
 }
