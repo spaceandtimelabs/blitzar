@@ -91,30 +91,7 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
                 basdv::get_device());
     co_return;
   }
-
-  basl::info("Steps inside of memmg::managed_array<T> constructor");
-  auto pr1 = std::chrono::steady_clock::now();
-  auto pinned = memr::get_pinned_resource();
-  auto pr2 = std::chrono::steady_clock::now();
-  basl::info("   memr::get_pinned_resource(): {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(pr2 - pr1).count());
-
-  auto pa1 = std::chrono::steady_clock::now();
-  auto pinned_al = pinned->allocate(num_products * num_chunks * sizeof(T));
-  auto pa2 = std::chrono::steady_clock::now();
-  basl::info("   pinned->allocate (calls cudaMallocHost): {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(pa2 - pa1).count());
-
-  pa1 = std::chrono::steady_clock::now();
-  void* res;
-  auto byte_size = num_products * num_chunks * sizeof(T);
-  cudaMallocHost(&res, byte_size);
-  pa2 = std::chrono::steady_clock::now();
-  basl::info("   cudaMallocHost: {} ns on {} bytes", std::chrono::duration_cast<std::chrono::nanoseconds>(pa2 - pa1).count(), byte_size);
-
-  auto mac1 = std::chrono::steady_clock::now();
-  memmg::managed_array<void> data{static_cast<void*>(res), num_products * num_chunks, num_products * num_chunks * sizeof(T), pinned};
-  auto mac2 = std::chrono::steady_clock::now();
-  basl::info("   memmg::managed_array constructor: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(mac2 - mac1).count());
-  
+ 
   // handle multiple chunks
   auto o1 = std::chrono::steady_clock::now();
 
