@@ -105,6 +105,13 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   auto pp2 = std::chrono::steady_clock::now();
   basl::info("partial_products time: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(pp2 - pp1).count());
 
+  auto ppas1 = std::chrono::steady_clock::now();
+  co_await xendv::await_stream(pp_stream);
+  auto ppas2 = std::chrono::steady_clock::now();
+  basl::info("xendv::await_stream(pp_stream) time: {} ns on device {}",
+              std::chrono::duration_cast<std::chrono::nanoseconds>(ppas2 - ppas1).count(),
+              basdv::get_device());
+
   size_t chunk_index = 0;
   auto t1 = std::chrono::steady_clock::now();
   co_await xendv::concurrent_for_each(
@@ -132,13 +139,6 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
         auto a2 = std::chrono::steady_clock::now();
         basl::info("async_partition_product time: {} ns on device {}",
                    std::chrono::duration_cast<std::chrono::nanoseconds>(a2 - a1).count(),
-                   basdv::get_device());
-
-        auto ppas1 = std::chrono::steady_clock::now();
-        co_await xendv::await_stream(pp_stream);
-        auto ppas2 = std::chrono::steady_clock::now();
-        basl::info("xendv::await_stream(pp_stream) time: {} ns on device {}",
-                   std::chrono::duration_cast<std::chrono::nanoseconds>(ppas2 - ppas1).count(),
                    basdv::get_device());
 
         basdv::stream stream;
@@ -180,7 +180,7 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   basl::info("partial_products_dev: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(ppd2 - ppd1).count());
 
   auto achtd1 = std::chrono::steady_clock::now();
-  basdv::async_copy_host_to_device(partial_products_dev, partial_products, reduction_stream);
+  basdv::async_copy_device_to_device(partial_products_dev, partial_products, reduction_stream);
   auto achtd2 = std::chrono::steady_clock::now();
   basl::info("async_copy_host_to_device: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(achtd2 - achtd1).count());
 
