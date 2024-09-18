@@ -53,8 +53,9 @@ static xena::future<void> commit_to_fold_partial(rstt::compressed_element& commi
                                                  const c21t::element_p3& q_value,
                                                  basct::cspan<s25t::element> u_vector,
                                                  basct::cspan<s25t::element> v_vector) noexcept {
+  auto u_exponents = mtxb::to_exponent_sequence(u_vector);
   auto u_commit_fut = mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(
-      g_vector.subspan(0, u_vector.size()), mtxb::to_exponent_sequence(u_vector));
+      g_vector.subspan(0, u_vector.size()), u_exponents);
   auto product_fut = s25o::async_inner_product(u_vector, v_vector);
   c21t::element_p3 commit_p;
   c21o::scalar_multiply(commit_p, co_await std::move(product_fut), q_value);
@@ -214,8 +215,9 @@ xena::future<void> gpu_driver::compute_expected_commitment(
 
   // commitment
   co_await std::move(fut);
+  auto exponent_sequence = mtxb::to_exponent_sequence(exponents);
   auto commit_p = co_await mtxcrv::async_compute_multiexponentiation<c21t::element_p3>(
-      generators, mtxb::to_exponent_sequence(exponents));
+      generators, exponent_sequence);
   rsto::compress(commit, commit_p);
 }
 } // namespace sxt::prfip
