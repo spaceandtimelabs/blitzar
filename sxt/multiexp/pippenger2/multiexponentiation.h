@@ -96,7 +96,12 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   auto o1 = std::chrono::steady_clock::now();
 
   auto pp1 = std::chrono::steady_clock::now();
-  memmg::managed_array<T> partial_products{num_products * num_chunks, memr::get_pinned_resource()};
+  //memmg::managed_array<T> partial_products{num_products * num_chunks, memr::get_pinned_resource()};
+  
+  basdv::stream pp_stream;
+  memr::async_device_resource pp_resource{pp_stream};
+  memmg::managed_array<T> partial_products{num_products * num_chunks, &pp_resource};
+
   auto pp2 = std::chrono::steady_clock::now();
   basl::info("partial_products time: {} ns", std::chrono::duration_cast<std::chrono::nanoseconds>(pp2 - pp1).count());
 
@@ -129,10 +134,17 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
                    std::chrono::duration_cast<std::chrono::nanoseconds>(a2 - a1).count(),
                    basdv::get_device());
 
+        auto ppas1 = std::chrono::steady_clock::now();
+        co_await xendv::await_stream(pp_stream);
+        auto ppas2 = std::chrono::steady_clock::now();
+        basl::info("xendv::await_stream(pp_stream) time: {} ns on device {}",
+                   std::chrono::duration_cast<std::chrono::nanoseconds>(ppas2 - ppas1).count(),
+                   basdv::get_device());
+
         basdv::stream stream;
 
         auto copy1 = std::chrono::steady_clock::now();
-        basdv::async_copy_device_to_host(
+        basdv::async_copy_device_to_device(
             basct::subspan(partial_products, num_products * chunk_index, num_products),
             partial_products_dev, stream);
         auto copy2 = std::chrono::steady_clock::now();
