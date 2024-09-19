@@ -80,6 +80,6 @@ stdenvNoCC.mkDerivation {
     "-DCMAKE_INSTALL_PREFIX=\"$out\""
     "../llvm"
   ];
-  buildPhase = "ninja -j4";
+  buildPhase = "ninja";
   installPhase = "ninja install";
 }
