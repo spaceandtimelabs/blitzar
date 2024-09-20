@@ -29,6 +29,7 @@ pkgs.writeShellScriptBin "bazel" ''
      --action_env CUDA_PATH="${cuda}" \
      --action_env=BAZEL_LINKLIBS='-l%:libc++.a' \
      --action_env=BAZEL_LINKOPTS='-L${clang}/lib' \
+     --action_env=LD_LIBRARY_PATH=${clang}/lib \
      ''${@:2}
   else
     exec ${bazel} $@
