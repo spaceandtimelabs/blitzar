@@ -17,6 +17,7 @@ mkShell {
     bazel
     clang
     cuda
+    lzma
   ];
   LD_LIBRARY_PATH = lib.makeLibraryPath [
     "/usr/lib/wsl"

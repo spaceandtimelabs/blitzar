@@ -20,6 +20,7 @@ stdenvNoCC.mkDerivation {
   ];
   buildInputs = [
     gcc
+    lzma
   ];
   NIX_LDFLAGS = "-L${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -L${gcc.libc}/lib";
   CFLAGS = "-B${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -B${gcc.libc}/lib";
