@@ -45,7 +45,7 @@ stdenvNoCC.mkDerivation {
     "-DLLVM_TARGETS_TO_BUILD=\"host;NVPTX\""
     "-DLLVM_BUILTIN_TARGETS=\"x86_64-unknown-linux-gnu\""
     "-DLLVM_RUNTIME_TARGETS=\"x86_64-unknown-linux-gnu\""
-    "-DLLVM_ENABLE_PROJECTS=\"clang;clang-tools-extra\""
+    "-DLLVM_ENABLE_PROJECTS=\"clang;lld;clang-tools-extra\""
 
     # clang
     "-DCLANG_DEFAULT_CXX_STDLIB=libc++"
