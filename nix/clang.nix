@@ -21,6 +21,7 @@ stdenvNoCC.mkDerivation {
   ];
   buildInputs = [
     gcc
+    zlib
   ];
   NIX_LDFLAGS = "-L${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -L${gcc.libc}/lib";
   CFLAGS = "-B${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -B${gcc.libc}/lib";
@@ -46,6 +47,7 @@ stdenvNoCC.mkDerivation {
     "-DLLVM_BUILTIN_TARGETS=\"x86_64-unknown-linux-gnu\""
     "-DLLVM_RUNTIME_TARGETS=\"x86_64-unknown-linux-gnu\""
     "-DLLVM_ENABLE_PROJECTS=\"clang;lld;clang-tools-extra\""
+    "-DLLVM_ENABLE_ZLIB=ON"
 
     # clang
     "-DCLANG_DEFAULT_CXX_STDLIB=libc++"
