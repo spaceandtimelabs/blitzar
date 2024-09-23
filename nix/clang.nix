@@ -80,6 +80,7 @@ stdenvNoCC.mkDerivation {
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_USE_LIBCXX=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_SANITIZERS_TO_BUILD=\"asan;msan\""
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_BUILTINS=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_LIBFUZZER=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_XRAY=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_XRAY_NO_PREINIT=OFF"
