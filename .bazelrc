@@ -30,8 +30,6 @@ build --config=clang
 #   https://stackoverflow.com/a/57733619
 build:asan --strip=never
 build:asan --copt -DADDRESS_SANITIZER
-#build:asan --copt -O1
-#build:asan --copt -g
 build:asan --copt -fno-omit-frame-pointer
 build:asan --copt -fsanitize=address
 
