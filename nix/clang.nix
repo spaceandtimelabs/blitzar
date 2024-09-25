@@ -9,8 +9,8 @@ stdenvNoCC.mkDerivation {
   src = pkgs.fetchFromGitHub {
     owner = "llvm";
     repo = "llvm-project";
-    rev = "aa91d90";
-    hash = "sha256-+UGCC3OEwGpAz1/ZPKaemZvP4Do7+POqZfduP78WtRc=";
+    rev = "bde2357";
+    hash = "sha256-eWqHYSEHl+YAx3qeabsCY0OKHySEsjNqvbEcYrMucKU=";
   };
   nativeBuildInputs = [
     cmake
@@ -21,6 +21,7 @@ stdenvNoCC.mkDerivation {
   ];
   buildInputs = [
     gcc
+    zlib
   ];
   NIX_LDFLAGS = "-L${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -L${gcc.libc}/lib";
   CFLAGS = "-B${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -B${gcc.libc}/lib";
@@ -45,7 +46,8 @@ stdenvNoCC.mkDerivation {
     "-DLLVM_TARGETS_TO_BUILD=\"host;NVPTX\""
     "-DLLVM_BUILTIN_TARGETS=\"x86_64-unknown-linux-gnu\""
     "-DLLVM_RUNTIME_TARGETS=\"x86_64-unknown-linux-gnu\""
-    "-DLLVM_ENABLE_PROJECTS=\"clang;clang-tools-extra\""
+    "-DLLVM_ENABLE_PROJECTS=\"clang;lld;clang-tools-extra\""
+    "-DLLVM_ENABLE_ZLIB=ON"
 
     # clang
     "-DCLANG_DEFAULT_CXX_STDLIB=libc++"
@@ -73,8 +75,24 @@ stdenvNoCC.mkDerivation {
 
     # compiler-rt
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_CXX_LIBRARY=libcxx"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_USE_LIBCXX=ON"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_STATIC_CXX_LIBRARY=ON"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_SANITIZER_USE_STATIC_CXX_ABI=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_USE_LLVM_UNWINDER=ON"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_SANITIZER_USE_STATIC_LLVM_UNWINDER=ON"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_BUILTINS=ON"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_SANITIZERS_TO_BUILD=\"asan;msan\""
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_LIBFUZZER=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_XRAY=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_XRAY_NO_PREINIT=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_PROFILE=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_CTX_PROFILE=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_MEMPROF=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_ORC=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_GWP_ASAN=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_TEST_STANDALONE_BUILD_LIBS=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_INCLUDE_TESTS=OFF"
 
     "-DCMAKE_BUILD_TYPE=Release"
     "-DCMAKE_INSTALL_PREFIX=\"$out\""

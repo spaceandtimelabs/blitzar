@@ -30,19 +30,29 @@ build --config=clang
 #   https://stackoverflow.com/a/57733619
 build:asan --strip=never
 build:asan --copt -DADDRESS_SANITIZER
-build:asan --copt -O1
-build:asan --copt -g
 build:asan --copt -fno-omit-frame-pointer
 build:asan --copt -fsanitize=address
+
+build:asan --@rules_cuda//cuda:host_copts=-DADDRESS_SANITIZER
+build:asan --@rules_cuda//cuda:host_copts=-D_LIBCPP_HAS_NO_ASAN
+build:asan --@rules_cuda//cuda:host_copts=-fno-omit-frame-pointer
+build:asan --@rules_cuda//cuda:host_copts=-fsanitize=address
+build:asan --@rules_cuda//cuda:copts=-DADDRESS_SANITIZER
+build:asan --@rules_cuda//cuda:copts=-D_LIBCPP_HAS_NO_ASAN
+build:asan --@rules_cuda//cuda:copts=-fno-omit-frame-pointer
+build:asan --@rules_cuda//cuda:copts=-fsanitize=address
+
 build:asan --linkopt -fsanitize=address
+build:asan --linkopt -fuse-ld=lld
+build:asan --linkopt -rtlib=compiler-rt
 
 # work around for https://github.com/google/sanitizers/issues/856
 build:asan --linkopt -no-pie
 
 # For asan to work with cuda, we need to add this option
 # See https://github.com/google/sanitizers/issues/629#issuecomment-161357276
-test:asan --action_env=ASAN_OPTIONS=protect_shadow_gap=0
-run:asan --action_env=ASAN_OPTIONS=protect_shadow_gap=0
+run:asan --action_env=ASAN_OPTIONS=protect_shadow_gap=0:detect_container_overflow=0
+test:asan --action_env=ASAN_OPTIONS=protect_shadow_gap=0:detect_container_overflow=0
 
 # Hack to add suppressions for libcuda
 # See https://github.com/bazelbuild/bazel/issues/3216

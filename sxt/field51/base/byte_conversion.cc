@@ -37,7 +37,7 @@ void from_bytes(uint64_t h[5], const uint8_t s[32]) noexcept {
   const uint64_t mask = 0x7ffffffffffffULL;
   uint64_t h0, h1, h2, h3, h4;
 
-  h0 = (basbt::load64_le(s))&mask;
+  h0 = (basbt::load64_le(s)) & mask;
   h1 = (basbt::load64_le(s + 6) >> 3) & mask;
   h2 = (basbt::load64_le(s + 12) >> 6) & mask;
   h3 = (basbt::load64_le(s + 19) >> 1) & mask;

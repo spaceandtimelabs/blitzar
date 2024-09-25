@@ -1,8 +1,8 @@
 diff --git a/compiler-rt/lib/asan/CMakeLists.txt b/compiler-rt/lib/asan/CMakeLists.txt
-index 463ea233b37a..98293e1f66c9 100644
+index fb3d74283a61..13534ddd8547 100644
 --- a/compiler-rt/lib/asan/CMakeLists.txt
 +++ b/compiler-rt/lib/asan/CMakeLists.txt
-@@ -185,22 +185,22 @@ if(APPLE)
+@@ -209,22 +209,22 @@ if(APPLE)
    add_weak_symbols("sanitizer_common" WEAK_SYMBOL_LINK_FLAGS)
    add_weak_symbols("xray" WEAK_SYMBOL_LINK_FLAGS)
  
@@ -41,10 +41,10 @@ index 463ea233b37a..98293e1f66c9 100644
  
    add_compiler_rt_runtime(clang_rt.asan_static
      STATIC
-@@ -293,25 +293,25 @@ else()
-           SanitizerCommonWeakInterception)
+@@ -308,25 +308,25 @@ else()
      endif()
  
+     set(ASAN_DYNAMIC_WEAK_INTERCEPTION)
 -    add_compiler_rt_runtime(clang_rt.asan
 -      SHARED
 -      ARCHS ${arch}
@@ -187,7 +187,7 @@ index dc700cec9bec..112d8d77c3ed 100644
  if(COMPILER_RT_INCLUDE_TESTS)
    add_subdirectory(tests)
 diff --git a/compiler-rt/lib/ubsan/CMakeLists.txt b/compiler-rt/lib/ubsan/CMakeLists.txt
-index db0b33f1276e..1b7d8324b205 100644
+index 5d45a53d02db..3de1500dcf77 100644
 --- a/compiler-rt/lib/ubsan/CMakeLists.txt
 +++ b/compiler-rt/lib/ubsan/CMakeLists.txt
 @@ -104,19 +104,19 @@ if(APPLE)
@@ -223,7 +223,7 @@ index db0b33f1276e..1b7d8324b205 100644
  
      if (NOT APPLE)
        add_compiler_rt_runtime(clang_rt.ubsan
-@@ -246,23 +246,23 @@ else()
+@@ -225,23 +225,23 @@ else()
            APPEND PROPERTY
            OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/clang_rt.ubsan_standalone-dynamic-${arch}.vers)
  
