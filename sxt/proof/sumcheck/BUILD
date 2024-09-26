@@ -12,6 +12,10 @@ sxt_cc_component(
 
 sxt_cc_component(
   name = "proof_computation",
+  deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
+  ],
   test_deps = [
     "//sxt/base/test:unit_test",
   ],
