@@ -1,8 +1,8 @@
 diff --git a/compiler-rt/lib/asan/CMakeLists.txt b/compiler-rt/lib/asan/CMakeLists.txt
-index fb3d74283a61..13534ddd8547 100644
+index 48d0e91052d7..323e0441daea 100644
 --- a/compiler-rt/lib/asan/CMakeLists.txt
 +++ b/compiler-rt/lib/asan/CMakeLists.txt
-@@ -209,22 +209,22 @@ if(APPLE)
+@@ -183,22 +183,22 @@ if(APPLE)
    add_weak_symbols("sanitizer_common" WEAK_SYMBOL_LINK_FLAGS)
    add_weak_symbols("xray" WEAK_SYMBOL_LINK_FLAGS)
  
@@ -41,10 +41,10 @@ index fb3d74283a61..13534ddd8547 100644
  
    add_compiler_rt_runtime(clang_rt.asan_static
      STATIC
-@@ -308,25 +308,25 @@ else()
+@@ -291,25 +291,25 @@ else()
+           SanitizerCommonWeakInterception)
      endif()
  
-     set(ASAN_DYNAMIC_WEAK_INTERCEPTION)
 -    add_compiler_rt_runtime(clang_rt.asan
 -      SHARED
 -      ARCHS ${arch}
@@ -87,10 +87,10 @@ index fb3d74283a61..13534ddd8547 100644
      if (SANITIZER_USE_SYMBOLS AND NOT ${arch} STREQUAL "i386")
        add_sanitizer_rt_symbols(clang_rt.asan_cxx
 diff --git a/compiler-rt/lib/hwasan/CMakeLists.txt b/compiler-rt/lib/hwasan/CMakeLists.txt
-index 086079c7536e..f029acf4bb24 100644
+index 6f75baa7e354..dbe1e69487b1 100644
 --- a/compiler-rt/lib/hwasan/CMakeLists.txt
 +++ b/compiler-rt/lib/hwasan/CMakeLists.txt
-@@ -204,32 +204,32 @@ function(add_hwasan_runtimes arch use_aliases)
+@@ -192,32 +192,32 @@ function(add_hwasan_runtimes arch use_aliases)
    endif()
  
  
@@ -150,47 +150,47 @@ index 086079c7536e..f029acf4bb24 100644
    if(SANITIZER_USE_SYMBOLS)
      add_sanitizer_rt_symbols(${hwasan_runtime}
 diff --git a/compiler-rt/lib/scudo/standalone/CMakeLists.txt b/compiler-rt/lib/scudo/standalone/CMakeLists.txt
-index dc700cec9bec..112d8d77c3ed 100644
+index 60092005cc33..72c2b83a2dad 100644
 --- a/compiler-rt/lib/scudo/standalone/CMakeLists.txt
 +++ b/compiler-rt/lib/scudo/standalone/CMakeLists.txt
-@@ -232,19 +232,19 @@ add_compiler_rt_runtime(clang_rt.scudo_standalone_cxx
-   DEPS ${SCUDO_DEPS}
-   PARENT_TARGET scudo_standalone)
+@@ -232,19 +232,19 @@ if(COMPILER_RT_HAS_SCUDO_STANDALONE)
+     DEPS ${SCUDO_DEPS}
+     PARENT_TARGET scudo_standalone)
  
--if(COMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED)
--  add_compiler_rt_runtime(clang_rt.scudo_standalone
--    SHARED
--    ARCHS ${SCUDO_STANDALONE_SUPPORTED_ARCH}
--    SOURCES ${SCUDO_SOURCES} ${SCUDO_SOURCES_C_WRAPPERS} ${SCUDO_SOURCES_CXX_WRAPPERS}
--    ADDITIONAL_HEADERS ${SCUDO_HEADERS}
--    CFLAGS ${SCUDO_CFLAGS}
--    DEPS ${SCUDO_DEPS}
--    OBJECT_LIBS ${SCUDO_OBJECT_LIBS}
--    LINK_FLAGS ${SCUDO_LINK_FLAGS}
--    LINK_LIBS ${SCUDO_LINK_LIBS}
--    PARENT_TARGET scudo_standalone)
--endif()
-+# if(COMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED)
-+#   add_compiler_rt_runtime(clang_rt.scudo_standalone
-+#     SHARED
-+#     ARCHS ${SCUDO_STANDALONE_SUPPORTED_ARCH}
-+#     SOURCES ${SCUDO_SOURCES} ${SCUDO_SOURCES_C_WRAPPERS} ${SCUDO_SOURCES_CXX_WRAPPERS}
-+#     ADDITIONAL_HEADERS ${SCUDO_HEADERS}
-+#     CFLAGS ${SCUDO_CFLAGS}
-+#     DEPS ${SCUDO_DEPS}
-+#     OBJECT_LIBS ${SCUDO_OBJECT_LIBS}
-+#     LINK_FLAGS ${SCUDO_LINK_FLAGS}
-+#     LINK_LIBS ${SCUDO_LINK_LIBS}
-+#     PARENT_TARGET scudo_standalone)
-+# endif()
+-  if(COMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED)
+-    add_compiler_rt_runtime(clang_rt.scudo_standalone
+-      SHARED
+-      ARCHS ${SCUDO_STANDALONE_SUPPORTED_ARCH}
+-      SOURCES ${SCUDO_SOURCES} ${SCUDO_SOURCES_C_WRAPPERS} ${SCUDO_SOURCES_CXX_WRAPPERS}
+-      ADDITIONAL_HEADERS ${SCUDO_HEADERS}
+-      CFLAGS ${SCUDO_CFLAGS}
+-      DEPS ${SCUDO_DEPS}
+-      OBJECT_LIBS ${SCUDO_OBJECT_LIBS}
+-      LINK_FLAGS ${SCUDO_LINK_FLAGS}
+-      LINK_LIBS ${SCUDO_LINK_LIBS}
+-      PARENT_TARGET scudo_standalone)
+-  endif()
++  # if(COMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED)
++  #   add_compiler_rt_runtime(clang_rt.scudo_standalone
++  #     SHARED
++  #     ARCHS ${SCUDO_STANDALONE_SUPPORTED_ARCH}
++  #     SOURCES ${SCUDO_SOURCES} ${SCUDO_SOURCES_C_WRAPPERS} ${SCUDO_SOURCES_CXX_WRAPPERS}
++  #     ADDITIONAL_HEADERS ${SCUDO_HEADERS}
++  #     CFLAGS ${SCUDO_CFLAGS}
++  #     DEPS ${SCUDO_DEPS}
++  #     OBJECT_LIBS ${SCUDO_OBJECT_LIBS}
++  #     LINK_FLAGS ${SCUDO_LINK_FLAGS}
++  #     LINK_LIBS ${SCUDO_LINK_LIBS}
++  #     PARENT_TARGET scudo_standalone)
++  # endif()
  
- if(COMPILER_RT_INCLUDE_TESTS)
-   add_subdirectory(tests)
+   add_subdirectory(benchmarks)
+   if(COMPILER_RT_INCLUDE_TESTS)
 diff --git a/compiler-rt/lib/ubsan/CMakeLists.txt b/compiler-rt/lib/ubsan/CMakeLists.txt
-index 5d45a53d02db..3de1500dcf77 100644
+index 3f1e12ed9ac6..33c371c5131b 100644
 --- a/compiler-rt/lib/ubsan/CMakeLists.txt
 +++ b/compiler-rt/lib/ubsan/CMakeLists.txt
-@@ -104,19 +104,19 @@ if(APPLE)
+@@ -103,19 +103,19 @@ if(APPLE)
      add_weak_symbols("ubsan" WEAK_SYMBOL_LINK_FLAGS)
      add_weak_symbols("sanitizer_common" WEAK_SYMBOL_LINK_FLAGS)
  
@@ -223,7 +223,7 @@ index 5d45a53d02db..3de1500dcf77 100644
  
      if (NOT APPLE)
        add_compiler_rt_runtime(clang_rt.ubsan
-@@ -225,23 +225,23 @@ else()
+@@ -245,23 +245,23 @@ else()
            APPEND PROPERTY
            OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/clang_rt.ubsan_standalone-dynamic-${arch}.vers)
  

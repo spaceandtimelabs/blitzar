@@ -9,8 +9,8 @@ stdenvNoCC.mkDerivation {
   src = pkgs.fetchFromGitHub {
     owner = "llvm";
     repo = "llvm-project";
-    rev = "bde2357";
-    hash = "sha256-eWqHYSEHl+YAx3qeabsCY0OKHySEsjNqvbEcYrMucKU=";
+    rev = "fdbff88";
+    hash = "sha256-kipkrgqzSgdsHwYz5P2NpUo6miulE/Nd9zRgeKAHeHM=";
   };
   nativeBuildInputs = [
     cmake
@@ -21,7 +21,6 @@ stdenvNoCC.mkDerivation {
   ];
   buildInputs = [
     gcc
-    zlib
   ];
   NIX_LDFLAGS = "-L${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -L${gcc.libc}/lib";
   CFLAGS = "-B${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version} -B${gcc.libc}/lib";
@@ -35,69 +34,46 @@ stdenvNoCC.mkDerivation {
   postPatch = ''
     substituteInPlace clang/lib/Driver/ToolChains/Gnu.cpp \
       --replace 'GLIBC_PATH_ABC123' '${gcc.libc}/lib'
-    substituteInPlace clang/lib/Driver/ToolChains/Gnu.cpp \
-      --replace 'GCCLIB_PATH_ABC123' '${gccForLibs}/lib/gcc/${targetPlatform.config}/${gccForLibs.version}'
   '';
   configurePhase = pkgs.lib.strings.concatStringsSep " " [
     "mkdir build; cd build;"
     "cmake"
-    "-G \"Ninja\""
+    "-G \"Unix Makefiles\""
+    "-DGCC_INSTALL_PREFIX=${gccForLibs}"
     "-DC_INCLUDE_DIRS=${gcc.libc.dev}/include"
     "-DLLVM_TARGETS_TO_BUILD=\"host;NVPTX\""
     "-DLLVM_BUILTIN_TARGETS=\"x86_64-unknown-linux-gnu\""
     "-DLLVM_RUNTIME_TARGETS=\"x86_64-unknown-linux-gnu\""
-    "-DLLVM_ENABLE_PROJECTS=\"clang;lld;clang-tools-extra\""
-    "-DLLVM_ENABLE_ZLIB=ON"
-
-    # clang
-    "-DCLANG_DEFAULT_CXX_STDLIB=libc++"
+    "-DLLVM_ENABLE_PROJECTS=\"clang;clang-tools-extra\""
 
     "-DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\""
     "-DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_CMAKE_BUILD_TYPE=Release"
 
     # libcxx
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_SHARED=OFF"
+    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_SHARED=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_STATIC=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXX_STATICALLY_LINK_ABI_IN_STATIC_LIBRARY=ON"
 
     # libcxxabi
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_USE_LLVM_UNWINDER=ON"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_SHARED=OFF"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_STATIC=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_ENABLE_STATIC_UNWINDER=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBCXXABI_STATICALLY_LINK_UNWINDER_IN_STATIC_LIBRARY=ON"
 
     # libunwind
     "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ENABLE_STATIC=ON"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_LIBUNWIND_ENABLE_SHARED=OFF"
 
     # compiler-rt
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_CXX_LIBRARY=libcxx"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_USE_LIBCXX=ON"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_STATIC_CXX_LIBRARY=ON"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_SANITIZER_USE_STATIC_CXX_ABI=ON"
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_USE_LLVM_UNWINDER=ON"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_SANITIZER_USE_STATIC_LLVM_UNWINDER=ON"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_BUILTINS=ON"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_SANITIZERS_TO_BUILD=\"asan;msan\""
     "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED=OFF"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_LIBFUZZER=OFF"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_XRAY=OFF"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_XRAY_NO_PREINIT=OFF"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_PROFILE=OFF"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_CTX_PROFILE=OFF"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_MEMPROF=OFF"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_ORC=OFF"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_GWP_ASAN=OFF"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_TEST_STANDALONE_BUILD_LIBS=OFF"
-    "-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_INCLUDE_TESTS=OFF"
 
     "-DCMAKE_BUILD_TYPE=Release"
     "-DCMAKE_INSTALL_PREFIX=\"$out\""
     "../llvm"
   ];
-  buildPhase = "ninja -j4";
-  installPhase = "ninja install";
+  buildPhase = "make";
+  installPhase = "make install";
 }
