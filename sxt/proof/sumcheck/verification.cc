@@ -11,7 +11,7 @@ namespace sxt::prfsk {
 bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
                                    basct::span<s25t::element> evaluation_point,
                                    prft::transcript& transcript, 
-                                   basct::span<s25t::element> round_polynomials,
+                                   basct::cspan<s25t::element> round_polynomials,
                                    unsigned round_degree) noexcept {
   auto num_variables = evaluation_point.size();
   basl::info("verifying sumcheck of {} variables and round degree {}", num_variables, round_degree);
