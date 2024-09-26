@@ -11,5 +11,7 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
                                    basct::span<s25t::element> evaluation_point,
-                                   prft::transcript& transcript, unsigned round_degree) noexcept;
+                                   prft::transcript& transcript, 
+                                   basct::span<s25t::element> round_polynomials,
+                                   unsigned round_degree) noexcept;
 } // namespace sxt::prfsk
