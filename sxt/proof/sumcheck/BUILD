@@ -42,6 +42,7 @@ sxt_cc_component(
         "//sxt/base/container:span",
   ],
   impl_deps = [
+    ":polynomial_utility",
     "//sxt/base/log:log",
     "//sxt/scalar25/type:element",
   ],

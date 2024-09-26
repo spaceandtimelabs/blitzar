@@ -1,8 +1,8 @@
 #include "sxt/proof/sumcheck/verification.h"
 
 #include "sxt/base/log/log.h"
+#include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/scalar25/type/element.h"
-#include "verification.h"
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
@@ -24,19 +24,26 @@ bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
     return false;
   }
 
+  // go through sumcheck rounds
   for (unsigned round_index=0; round_index<num_variables; ++round_index) {
     auto round_polynomial =
         round_polynomials.subspan((round_degree + 1u) * round_index, round_degree + 1u);
 
-    // TODO: check sum
-    // TODO: evaluate at random point
-    (void)round_polynomial;
+    // TODO: commit to round polynomial
+    // TODO: draw evaluation point
+
+    // check sum
+    s25t::element round_sum;
+    sum_polynomial_01(round_sum, round_polynomial);
+    if (expected_sum != round_sum) {
+      basl::info("sumcheck verification failed on round {}", round_index + 1);
+      return false;
+    }
+
+    // evaluate at random point
+    /* evaluate_polynomial(expected_sum, round_polynomial, evaluation_point[round_index]); */
   }
-  (void)expected_sum;
-  (void)evaluation_point;
-  (void)transcript;
-  (void)round_polynomials;
-  (void)round_degree;
+
   return true;
 }
 } // namespace sxt::prfsk
