@@ -20,3 +20,13 @@ sxt_cc_component(
     "//sxt/base/test:unit_test",
   ],
 )
+
+sxt_cc_component(
+  name = "verification",
+  deps = [
+        "//sxt/base/container:span",
+  ],
+  test_deps = [
+    "//sxt/base/test:unit_test",
+  ],
+)
