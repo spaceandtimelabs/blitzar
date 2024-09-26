@@ -11,6 +11,20 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+  name = "polynomial_utility",
+  deps = [
+        "//sxt/base/container:span",
+  ],
+  impl_deps = [
+    "//sxt/scalar25/operation:add",
+    "//sxt/scalar25/type:element",
+  ],
+  test_deps = [
+    "//sxt/base/test:unit_test",
+  ],
+)
+
+sxt_cc_component(
   name = "proof_computation",
   deps = [
         "//sxt/base/container:span",
@@ -27,6 +41,7 @@ sxt_cc_component(
         "//sxt/base/container:span",
   ],
   impl_deps = [
+    "//sxt/base/log:log",
     "//sxt/scalar25/type:element",
   ],
   test_deps = [

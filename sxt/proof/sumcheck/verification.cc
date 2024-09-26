@@ -1,5 +1,6 @@
 #include "sxt/proof/sumcheck/verification.h"
 
+#include "sxt/base/log/log.h"
 #include "sxt/scalar25/type/element.h"
 #include "verification.h"
 
@@ -12,6 +13,25 @@ bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
                                    prft::transcript& transcript, 
                                    basct::span<s25t::element> round_polynomials,
                                    unsigned round_degree) noexcept {
+  auto num_variables = evaluation_point.size();
+  basl::info("verifying sumcheck of {} variables and round degree {}", num_variables, round_degree);
+
+  // check dimensions
+  if (auto expected_count = (round_degree + 1u) * num_variables;
+      round_polynomials.size() != expected_count) {
+    basl::info("sumcheck verification failed: expected {} scalars for round_polynomials but got {}",
+               expected_count, round_polynomials.size());
+    return false;
+  }
+
+  for (unsigned round_index=0; round_index<num_variables; ++round_index) {
+    auto round_polynomial =
+        round_polynomials.subspan((round_degree + 1u) * round_index, round_degree + 1u);
+
+    // TODO: check sum
+    // TODO: evaluate at random point
+    (void)round_polynomial;
+  }
   (void)expected_sum;
   (void)evaluation_point;
   (void)transcript;

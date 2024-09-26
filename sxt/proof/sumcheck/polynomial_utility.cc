@@ -1,0 +1,19 @@
+#include "sxt/proof/sumcheck/polynomial_utility.h"
+
+#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/operation/add.h"
+
+namespace sxt::prfsk {
+//--------------------------------------------------------------------------------------------------
+// sum_polynomial_01 
+//--------------------------------------------------------------------------------------------------
+void sum_polynomial_01(s25t::element& e, basct::cspan<s25t::element> polynomial) noexcept {
+  if (polynomial.empty()) {
+    e = s25t::element{};
+  }
+  e = polynomial[0];
+  for (unsigned i=1; i<polynomial.size(); ++i) {
+    s25o::add(e, e, polynomial[i]);
+  }
+}
+} // namespace sxt::prfsk
