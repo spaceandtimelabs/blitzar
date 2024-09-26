@@ -26,6 +26,9 @@ sxt_cc_component(
   deps = [
         "//sxt/base/container:span",
   ],
+  impl_deps = [
+    "//sxt/scalar25/type:element",
+  ],
   test_deps = [
     "//sxt/base/test:unit_test",
   ],
