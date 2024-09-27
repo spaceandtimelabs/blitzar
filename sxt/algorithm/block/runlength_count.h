@@ -20,81 +20,83 @@
  * This is a workaround to define _VSTD before including cub/cub.cuh.
  * It should be removed when we can upgrade to a newer version of CUDA.
  *
- * We need to define _VSTD in order to use the clang version defined in 
+ * We need to define _VSTD in order to use the clang version defined in
  * clang.nix and the CUDA toolkit version defined in cuda.nix.
- * 
+ *
  * _VSTD was deprecated and removed from the LLVM truck.
  * NVIDIA: https://github.com/NVIDIA/cccl/pull/1331
  * LLVM: https://github.com/llvm/llvm-project/commit/683bc94e1637bd9bacc978f5dc3c79cfc8ff94b9
- * 
- * We cannot currently use any CUDA toolkit above 12.4.1 because the Kubernetes 
- * cluster currently cannot install a driver above 550. 
- * 
- * See CUDA toolkit and driver support: https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html
+ *
+ * We cannot currently use any CUDA toolkit above 12.4.1 because the Kubernetes
+ * cluster currently cannot install a driver above 550.
+ *
+ * See CUDA toolkit and driver support:
+ * https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html
  */
 #include <__config>
+
 #define _VSTD std::_LIBCPP_ABI_NAMESPACE
 _LIBCPP_BEGIN_NAMESPACE_STD _LIBCPP_END_NAMESPACE_STD
 
 #include "cub/cub.cuh"
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::algbk {
-//--------------------------------------------------------------------------------------------------
-// runlength_count
-//--------------------------------------------------------------------------------------------------
-/**
- * This is adapted from block_histogram_sort in CUB. See
- *   https://github.com/NVIDIA/cccl/blob/a51b1f8c75f8e577eeccc74b45f1ff16a2727265/cub/cub/block/specializations/block_histogram_sort.cuh
- */
-template <class T, class CounterT, unsigned NumThreads, unsigned NumBins> class runlength_count {
-  using Discontinuity = cub::BlockDiscontinuity<T, NumThreads>;
-
-public:
-  struct temp_storage {
-    typename Discontinuity::TempStorage discontinuity;
-    CounterT run_begin[NumBins];
-    CounterT run_end[NumBins];
-  };
-
-  CUDA_CALLABLE explicit runlength_count(temp_storage& storage) noexcept
-      : storage_{storage}, discontinuity_{storage.discontinuity} {}
-
+    namespace sxt::algbk {
+  //--------------------------------------------------------------------------------------------------
+  // runlength_count
+  //--------------------------------------------------------------------------------------------------
   /**
-   * If items holds sorted items across threads in a block, count and return a
-   * pointer to a table of the items' run lengths.
+   * This is adapted from block_histogram_sort in CUB. See
+   *   https://github.com/NVIDIA/cccl/blob/a51b1f8c75f8e577eeccc74b45f1ff16a2727265/cub/cub/block/specializations/block_histogram_sort.cuh
    */
-  template <unsigned ItemsPerThread>
-  CUDA_CALLABLE CounterT* count(T (&items)[ItemsPerThread]) noexcept {
-    auto thread_id = threadIdx.x;
-    for (unsigned i = thread_id; i < NumBins; i += NumThreads) {
-      storage_.run_begin[i] = NumThreads * ItemsPerThread;
-      storage_.run_end[i] = NumThreads * ItemsPerThread;
-    }
-    int flags[ItemsPerThread];
-    auto flag_op = [&storage = storage_](T a, T b, int b_index) noexcept {
-      if (a != b) {
-        storage.run_begin[b] = static_cast<CounterT>(b_index);
-        storage.run_end[a] = static_cast<CounterT>(b_index);
-        return true;
-      } else {
-        return false;
-      }
-    };
-    __syncthreads();
-    discontinuity_.FlagHeads(flags, items, flag_op);
-    if (thread_id == 0) {
-      storage_.run_begin[items[0]] = 0;
-    }
-    __syncthreads();
-    for (unsigned i = thread_id; i < NumBins; i += NumThreads) {
-      storage_.run_end[i] -= storage_.run_begin[i];
-    }
-    return storage_.run_end;
-  }
+  template <class T, class CounterT, unsigned NumThreads, unsigned NumBins> class runlength_count {
+    using Discontinuity = cub::BlockDiscontinuity<T, NumThreads>;
 
-private:
-  temp_storage& storage_;
-  Discontinuity discontinuity_;
-};
+  public:
+    struct temp_storage {
+      typename Discontinuity::TempStorage discontinuity;
+      CounterT run_begin[NumBins];
+      CounterT run_end[NumBins];
+    };
+
+    CUDA_CALLABLE explicit runlength_count(temp_storage& storage) noexcept
+        : storage_{storage}, discontinuity_{storage.discontinuity} {}
+
+    /**
+     * If items holds sorted items across threads in a block, count and return a
+     * pointer to a table of the items' run lengths.
+     */
+    template <unsigned ItemsPerThread>
+    CUDA_CALLABLE CounterT* count(T (&items)[ItemsPerThread]) noexcept {
+      auto thread_id = threadIdx.x;
+      for (unsigned i = thread_id; i < NumBins; i += NumThreads) {
+        storage_.run_begin[i] = NumThreads * ItemsPerThread;
+        storage_.run_end[i] = NumThreads * ItemsPerThread;
+      }
+      int flags[ItemsPerThread];
+      auto flag_op = [&storage = storage_](T a, T b, int b_index) noexcept {
+        if (a != b) {
+          storage.run_begin[b] = static_cast<CounterT>(b_index);
+          storage.run_end[a] = static_cast<CounterT>(b_index);
+          return true;
+        } else {
+          return false;
+        }
+      };
+      __syncthreads();
+      discontinuity_.FlagHeads(flags, items, flag_op);
+      if (thread_id == 0) {
+        storage_.run_begin[items[0]] = 0;
+      }
+      __syncthreads();
+      for (unsigned i = thread_id; i < NumBins; i += NumThreads) {
+        storage_.run_end[i] -= storage_.run_begin[i];
+      }
+      return storage_.run_end;
+    }
+
+  private:
+    temp_storage& storage_;
+    Discontinuity discontinuity_;
+  };
 } // namespace sxt::algbk
