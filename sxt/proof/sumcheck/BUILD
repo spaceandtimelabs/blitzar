@@ -45,6 +45,7 @@ sxt_cc_component(
     ":polynomial_utility",
     "//sxt/base/log:log",
     "//sxt/scalar25/type:element",
+    "//sxt/proof/transcript:transcript_utility",
   ],
   test_deps = [
     "//sxt/base/test:unit_test",

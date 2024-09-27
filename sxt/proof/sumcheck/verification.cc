@@ -2,6 +2,7 @@
 
 #include "sxt/base/log/log.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
+#include "sxt/proof/transcript/transcript_utility.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {
@@ -26,22 +27,28 @@ bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
 
   // go through sumcheck rounds
   for (unsigned round_index=0; round_index<num_variables; ++round_index) {
-    auto round_polynomial =
+    auto polynomial =
         round_polynomials.subspan((round_degree + 1u) * round_index, round_degree + 1u);
 
-    // TODO: commit to round polynomial
-    // TODO: draw evaluation point
-
     // check sum
-    s25t::element round_sum;
-    sum_polynomial_01(round_sum, round_polynomial);
-    if (expected_sum != round_sum) {
+    s25t::element sum;
+    sum_polynomial_01(sum, polynomial);
+    if (expected_sum != sum) {
       basl::info("sumcheck verification failed on round {}", round_index + 1);
       return false;
     }
 
+    // commit to polynomial
+    prft::append_values(transcript, "P", polynomial);
+
+    // draw a random scalar
+    s25t::element r;
+    prft::challenge_value(r, transcript, "R");
+    evaluation_point[round_index] = r;
+
+
     // evaluate at random point
-    /* evaluate_polynomial(expected_sum, round_polynomial, evaluation_point[round_index]); */
+    evaluate_polynomial(expected_sum, polynomial, r);
   }
 
   return true;
