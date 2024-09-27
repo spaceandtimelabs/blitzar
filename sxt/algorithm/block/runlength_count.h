@@ -34,9 +34,7 @@
  * https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html
  */
 #include <__config>
-
 #define _VSTD std::_LIBCPP_ABI_NAMESPACE
-_LIBCPP_BEGIN_NAMESPACE_STD _LIBCPP_END_NAMESPACE_STD
 
 #include "cub/cub.cuh"
 #include "sxt/base/macro/cuda_callable.h"

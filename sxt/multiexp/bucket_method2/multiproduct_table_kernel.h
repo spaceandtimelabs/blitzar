@@ -37,7 +37,6 @@
  */
 #include <__config>
 #define _VSTD std::_LIBCPP_ABI_NAMESPACE
-_LIBCPP_BEGIN_NAMESPACE_STD _LIBCPP_END_NAMESPACE_STD
 
 #include "cub/cub.cuh"
 #include "sxt/algorithm/block/runlength_count.h"
