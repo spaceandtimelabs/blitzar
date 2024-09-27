@@ -3,6 +3,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/log/log.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
+#include "sxt/proof/sumcheck/transcript_utility.h"
 #include "sxt/proof/transcript/transcript_utility.h"
 #include "sxt/scalar25/type/element.h"
 
@@ -31,6 +32,8 @@ bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
                expected_count, round_polynomials.size());
     return false;
   }
+
+  init_transcript(transcript, num_variables, round_degree);
 
   // go through sumcheck rounds
   for (unsigned round_index=0; round_index<num_variables; ++round_index) {
