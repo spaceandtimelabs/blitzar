@@ -94,7 +94,7 @@ sxt_cc_component(
         ":constants",
         "//sxt/algorithm/block:runlength_count",
         "//sxt/base/device:stream",
-        "@local_cuda//:cub"
+        "@local_cuda//:cub",
     ],
 )
 
