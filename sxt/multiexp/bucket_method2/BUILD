@@ -93,8 +93,8 @@ sxt_cc_component(
     deps = [
         ":constants",
         "//sxt/algorithm/block:runlength_count",
+        "//sxt/base/device:cub",
         "//sxt/base/device:stream",
-        "@local_cuda//:cub",
     ],
 )
 

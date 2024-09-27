@@ -16,28 +16,8 @@
  */
 #include "sxt/multiexp/bucket_method2/multiproduct_table.h"
 
-/*
- * This is a workaround to define _VSTD before including cub/cub.cuh.
- * It should be removed when we can upgrade to a newer version of CUDA.
- *
- * We need to define _VSTD in order to use the clang version defined in
- * clang.nix and the CUDA toolkit version defined in cuda.nix.
- *
- * _VSTD was deprecated and removed from the LLVM truck.
- * NVIDIA: https://github.com/NVIDIA/cccl/pull/1331
- * LLVM: https://github.com/llvm/llvm-project/commit/683bc94e1637bd9bacc978f5dc3c79cfc8ff94b9
- *
- * We cannot currently use any CUDA toolkit above 12.4.1 because the Kubernetes
- * cluster currently cannot install a driver above 550.
- *
- * See CUDA toolkit and driver support:
- * https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html
- */
-#include <__config>
-#define _VSTD std::_LIBCPP_ABI_NAMESPACE
-
-#include "cub/cub.cuh"
 #include "sxt/algorithm/iteration/for_each.h"
+#include "sxt/base/device/cub.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/log/log.h"
