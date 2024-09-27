@@ -4,6 +4,13 @@ load(
 )
 
 sxt_cc_component(
+  name = "transcript_utility",
+  test_deps = [
+    "//sxt/base/test:unit_test",
+  ],
+)
+
+sxt_cc_component(
   name = "round_sum",
   test_deps = [
     "//sxt/base/test:unit_test",
