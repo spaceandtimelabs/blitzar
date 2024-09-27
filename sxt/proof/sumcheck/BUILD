@@ -5,6 +5,9 @@ load(
 
 sxt_cc_component(
   name = "transcript_utility",
+  impl_deps = [
+    "//sxt/proof/transcript:transcript_utility",
+  ],
   test_deps = [
     "//sxt/base/test:unit_test",
   ],
