@@ -43,6 +43,7 @@ sxt_cc_component(
   ],
   impl_deps = [
     ":polynomial_utility",
+    "//sxt/base/error:assert",
     "//sxt/base/log:log",
     "//sxt/scalar25/type:element",
     "//sxt/proof/transcript:transcript_utility",

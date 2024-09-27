@@ -1,5 +1,6 @@
 #include "sxt/proof/sumcheck/verification.h"
 
+#include "sxt/base/error/assert.h"
 #include "sxt/base/log/log.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/proof/transcript/transcript_utility.h"
@@ -15,6 +16,12 @@ bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
                                    basct::cspan<s25t::element> round_polynomials,
                                    unsigned round_degree) noexcept {
   auto num_variables = evaluation_point.size();
+  SXT_RELEASE_ASSERT(
+      // clang-format off
+      num_variables > 0 && round_degree > 0
+      // clang-format on
+  );
+
   basl::info("verifying sumcheck of {} variables and round degree {}", num_variables, round_degree);
 
   // check dimensions
