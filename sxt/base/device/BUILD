@@ -15,6 +15,14 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "cub",
+    with_test = False,
+    deps = [
+        "@local_cuda//:cub",
+    ],
+)
+
+sxt_cc_component(
     name = "pointer_attributes",
     with_test = False,
     deps = [

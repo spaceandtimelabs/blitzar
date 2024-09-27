@@ -18,8 +18,8 @@
 
 #include <utility>
 
-#include "cub/cub.cuh"
 #include "sxt/algorithm/block/runlength_count.h"
+#include "sxt/base/device/cub.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/num/constexpr_switch.h"
 #include "sxt/base/num/divide_up.h"

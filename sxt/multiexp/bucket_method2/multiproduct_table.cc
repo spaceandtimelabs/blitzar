@@ -16,8 +16,8 @@
  */
 #include "sxt/multiexp/bucket_method2/multiproduct_table.h"
 
-#include "cub/cub.cuh"
 #include "sxt/algorithm/iteration/for_each.h"
+#include "sxt/base/device/cub.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/log/log.h"

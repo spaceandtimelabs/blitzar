@@ -18,8 +18,8 @@
 
 #include <vector>
 
-#include "cub/cub.cuh"
 #include "sxt/base/container/span_utility.h"
+#include "sxt/base/device/cub.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/num/ceil_log2.h"
