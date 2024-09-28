@@ -48,12 +48,9 @@ bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
       return false;
     }
 
-    // commit to polynomial
-    prft::append_values(transcript, "P", polynomial);
-
     // draw a random scalar
     s25t::element r;
-    prft::challenge_value(r, transcript, "R");
+    round_challenge(r, transcript, polynomial);
     evaluation_point[round_index] = r;
 
 
