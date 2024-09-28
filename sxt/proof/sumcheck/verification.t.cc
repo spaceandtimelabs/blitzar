@@ -28,4 +28,11 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
     REQUIRE(res);
     REQUIRE(evaluation_point[0] != 0x0_s25);
   }
+
+  SECTION("verification fails if the round polynomial doesn't match the sum") {
+    round_polynomials[1] = 0x1_s25;
+    auto res = sxt::prfsk::verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
+                                                         round_polynomials, 1);
+    REQUIRE(!res);
+  }
 }
