@@ -6,7 +6,11 @@ load(
 sxt_cc_component(
   name = "transcript_utility",
   impl_deps = [
+    "//sxt/scalar25/type:element",
     "//sxt/proof/transcript:transcript_utility",
+  ],
+  deps = [
+        "//sxt/base/container:span",
   ],
   test_deps = [
     "//sxt/base/test:unit_test",
