@@ -13,6 +13,7 @@ namespace sxt::prfsk {
 // prove_sum 
 //--------------------------------------------------------------------------------------------------
 xena::future<> prove_sum(basct::span<s25t::element> polynomials, prft::transcript& transcript,
-                         basct::cspan<s25t::element> mles, basct::cspan<unsigned> product_terms,
-                         basct::cspan<std::pair<s25t::element, unsigned>> product_table) noexcept;
+                         basct::cspan<s25t::element> mles,
+                         basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+                         basct::cspan<unsigned> product_terms, unsigned n) noexcept;
 } // namespace sxt::prfsk

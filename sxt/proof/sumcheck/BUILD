@@ -46,6 +46,8 @@ sxt_cc_component(
         "//sxt/execution/async:future_fwd",
   ],
   impl_deps = [
+    ":transcript_utility",
+    "//sxt/base/error:assert",
     "//sxt/scalar25/type:element",
   ],
   test_deps = [
