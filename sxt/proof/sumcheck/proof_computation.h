@@ -1,24 +1,18 @@
 #pragma once
 
+#include <utility>
+
 #include "sxt/base/container/span.h"
 #include "sxt/execution/async/future.h"
-/* #include "sxt/proof/transcript/transcript_utility.h" */
 
 namespace sxt::prft { class transcript; }
+namespace sxt::s25t { class element; }
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // prove_sum 
 //--------------------------------------------------------------------------------------------------
-template <class Scalar>
-xena::future<> prove_sum(basct::span<Scalar> polynomials, prft::transcript& transcript,
-                         basct::cspan<Scalar> mles, basct::cspan<unsigned> product_table,
-                         basct::cspan<unsigned> product_lengths) noexcept {
-  (void)polynomials;
-  (void)transcript;
-  (void)mles;
-  (void)product_table;
-  (void)product_lengths;
-  return {};
-}
+xena::future<> prove_sum(basct::span<s25t::element> polynomials, prft::transcript& transcript,
+                         basct::cspan<s25t::element> mles, basct::cspan<unsigned> product_terms,
+                         basct::cspan<std::pair<s25t::element, unsigned>> product_table) noexcept;
 } // namespace sxt::prfsk
