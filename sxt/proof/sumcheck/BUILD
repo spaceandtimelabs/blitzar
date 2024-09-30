@@ -45,6 +45,9 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
   ],
+  impl_deps = [
+    "//sxt/scalar25/type:element",
+  ],
   test_deps = [
     "//sxt/base/test:unit_test",
   ],
