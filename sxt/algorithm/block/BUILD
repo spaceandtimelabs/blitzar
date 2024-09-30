@@ -10,8 +10,8 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
-        "//sxt/base/device:cub",
         "//sxt/base/device:synchronization",
         "//sxt/base/macro:cuda_callable",
+        "@local_cuda//:cub",
     ],
 )

@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include "sxt/base/device/cub.h"
+#include "cub/cub.cuh"
 #include "sxt/base/macro/cuda_callable.h"
 
 namespace sxt::algbk {
