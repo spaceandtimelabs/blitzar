@@ -48,6 +48,7 @@ sxt_cc_component(
   impl_deps = [
     ":transcript_utility",
     "//sxt/base/error:assert",
+    "//sxt/base/num:ceil_log2",
     "//sxt/scalar25/type:element",
   ],
   test_deps = [

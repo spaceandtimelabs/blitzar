@@ -1,6 +1,7 @@
 #include "sxt/proof/sumcheck/proof_computation.h"
 
 #include "sxt/base/error/assert.h"
+#include "sxt/base/num/ceil_log2.h"
 #include "sxt/proof/sumcheck/transcript_utility.h"
 #include "sxt/scalar25/type/element.h"
 
@@ -12,6 +13,26 @@ xena::future<> prove_sum(basct::span<s25t::element> polynomials, prft::transcrip
                          basct::cspan<s25t::element> mles,
                          basct::cspan<std::pair<s25t::element, unsigned>> product_table,
                          basct::cspan<unsigned> product_terms, unsigned n) noexcept {
+  SXT_RELEASE_ASSERT(0 < n);
+  auto num_variables = basn::ceil_log2(n);
+  auto polynomial_length = polynomials.size() / num_variables;
+  auto num_mles = mles.size() / n;
+  SXT_RELEASE_ASSERT(
+      // clang-format off
+      polynomials.size() == num_variables * polynomial_length &&
+      mles.size() == n * num_mles
+      // clang-format on
+  );
+
+  for (unsigned round_index = 0; round_index < num_variables; ++round_index) {
+    auto polynomial = polynomials.subspan(round_index * polynomial_length, polynomial_length);
+    (void)polynomial;
+    // compute the round polynomial
+    // draw the next scalar
+    // fold the polynomial
+  }
+  (void)polynomial_length;
+  (void)num_variables;
 /* void init_transcript(prft::transcript& transcript, unsigned num_variables, */
 /*                      unsigned round_degree) noexcept; */
 /*  */
