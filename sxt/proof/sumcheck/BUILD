@@ -18,6 +18,16 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+  name = "driver",
+  with_test = False,
+)
+
+sxt_cc_component(
+  name = "workspace",
+  with_test = False,
+)
+
+sxt_cc_component(
   name = "round_sum",
   test_deps = [
     "//sxt/base/test:unit_test",

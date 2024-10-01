@@ -10,7 +10,7 @@ namespace sxt::prfsk {
 // prove_sum 
 //--------------------------------------------------------------------------------------------------
 xena::future<> prove_sum(basct::span<s25t::element> polynomials, prft::transcript& transcript,
-                         basct::cspan<s25t::element> mles,
+                         const driver& drv, basct::cspan<s25t::element> mles,
                          basct::cspan<std::pair<s25t::element, unsigned>> product_table,
                          basct::cspan<unsigned> product_terms, unsigned n) noexcept {
   SXT_RELEASE_ASSERT(0 < n);
@@ -27,6 +27,7 @@ xena::future<> prove_sum(basct::span<s25t::element> polynomials, prft::transcrip
   for (unsigned round_index = 0; round_index < num_variables; ++round_index) {
     auto polynomial = polynomials.subspan(round_index * polynomial_length, polynomial_length);
     (void)polynomial;
+    (void)drv;
     // compute the round polynomial
     // draw the next scalar
     // fold the polynomial
