@@ -20,6 +20,10 @@ sxt_cc_component(
 sxt_cc_component(
   name = "driver",
   with_test = False,
+  deps = [
+    ":workspace",
+    "//sxt/base/container:span",
+  ],
 )
 
 sxt_cc_component(
@@ -56,6 +60,7 @@ sxt_cc_component(
         "//sxt/execution/async:future_fwd",
   ],
   impl_deps = [
+    ":driver",
     ":transcript_utility",
     "//sxt/base/error:assert",
     "//sxt/base/num:ceil_log2",

@@ -2,6 +2,7 @@
 
 #include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
+#include "sxt/proof/sumcheck/driver.h"
 #include "sxt/proof/sumcheck/transcript_utility.h"
 #include "sxt/scalar25/type/element.h"
 
@@ -24,10 +25,13 @@ xena::future<> prove_sum(basct::span<s25t::element> polynomials, prft::transcrip
       // clang-format on
   );
 
+  auto ws = drv.make_workspace(mles, product_table, product_terms);
+
   for (unsigned round_index = 0; round_index < num_variables; ++round_index) {
     auto polynomial = polynomials.subspan(round_index * polynomial_length, polynomial_length);
     (void)polynomial;
     (void)drv;
+    (void)ws;
     // compute the round polynomial
     // draw the next scalar
     // fold the polynomial
