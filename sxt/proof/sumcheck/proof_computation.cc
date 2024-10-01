@@ -33,24 +33,15 @@ xena::future<> prove_sum(basct::span<s25t::element> polynomials, prft::transcrip
 
   for (unsigned round_index = 0; round_index < num_variables; ++round_index) {
     auto polynomial = polynomials.subspan(round_index * polynomial_length, polynomial_length);
-    co_await drv.sum(polynomial, *ws);
-    (void)polynomial;
-    (void)drv;
-    (void)ws;
     // compute the round polynomial
+    co_await drv.sum(polynomial, *ws);
+
     // draw the next scalar
+    s25t::element r;
+    round_challenge(r, transcript, polynomial);
+
     // fold the polynomial
+    co_await drv.fold(*ws, r);
   }
-  (void)polynomial_length;
-  (void)num_variables;
-/* void init_transcript(prft::transcript& transcript, unsigned num_variables, */
-/*                      unsigned round_degree) noexcept; */
-/*  */
-  (void)n;
-  (void)polynomials;
-  (void)transcript;
-  (void)mles;
-  (void)product_terms;
-  (void)product_table;
 }
 } // namespace sxt::prfsk

@@ -23,5 +23,7 @@ class driver {
 
     virtual xena::future<> sum(basct::span<s25t::element> polynomial,
                                workspace& ws) const noexcept = 0;
+
+    virtual xena::future<> fold(workspace& ws, const s25t::element& r) const noexcept = 0;
 };
 } // namespace sxt::prfsk
