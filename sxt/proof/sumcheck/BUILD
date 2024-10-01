@@ -23,6 +23,7 @@ sxt_cc_component(
   deps = [
     ":workspace",
     "//sxt/base/container:span",
+    "//sxt/execution/async:future_fwd",
   ],
 )
 
@@ -64,6 +65,7 @@ sxt_cc_component(
     ":transcript_utility",
     "//sxt/base/error:assert",
     "//sxt/base/num:ceil_log2",
+    "//sxt/execution/async:coroutine",
     "//sxt/scalar25/type:element",
   ],
   test_deps = [
