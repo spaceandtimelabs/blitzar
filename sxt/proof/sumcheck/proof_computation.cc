@@ -34,10 +34,11 @@ xena::future<> prove_sum(basct::span<s25t::element> polynomials,
 
   for (unsigned round_index = 0; round_index < num_variables; ++round_index) {
     auto polynomial = polynomials.subspan(round_index * polynomial_length, polynomial_length);
+
     // compute the round polynomial
     co_await drv.sum(polynomial, *ws);
 
-    // draw the next scalar
+    // draw the next random challenge
     s25t::element r;
     round_challenge(r, transcript, polynomial);
     evaluation_point[round_index] = r;
