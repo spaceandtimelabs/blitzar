@@ -15,4 +15,10 @@ void sum_polynomial_01(s25t::element& e, basct::cspan<s25t::element> polynomial)
 //--------------------------------------------------------------------------------------------------
 void evaluate_polynomial(s25t::element& e, basct::cspan<s25t::element> polynomial,
                          const s25t::element& x) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// expand_products 
+//--------------------------------------------------------------------------------------------------
+void expand_products(basct::span<s25t::element> p, const s25t::element* mles, unsigned n,
+                     unsigned step, basct::cspan<unsigned> terms) noexcept;
 } // namespace sxt::prfsk
