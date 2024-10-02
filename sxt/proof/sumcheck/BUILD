@@ -28,6 +28,16 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+  name = "cpu_driver",
+  deps = [
+    ":driver",
+  ],
+  impl_deps = [
+    "//sxt/execution/async:future",
+  ],
+)
+
+sxt_cc_component(
   name = "workspace",
   with_test = False,
 )
