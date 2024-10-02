@@ -11,7 +11,8 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // prove_sum 
 //--------------------------------------------------------------------------------------------------
-xena::future<> prove_sum(basct::span<s25t::element> polynomials, prft::transcript& transcript,
+xena::future<> prove_sum(basct::span<s25t::element> polynomials,
+                         basct::span<s25t::element> evaluation_point, prft::transcript& transcript,
                          const driver& drv, basct::cspan<s25t::element> mles,
                          basct::cspan<std::pair<s25t::element, unsigned>> product_table,
                          basct::cspan<unsigned> product_terms, unsigned n) noexcept {
@@ -39,6 +40,7 @@ xena::future<> prove_sum(basct::span<s25t::element> polynomials, prft::transcrip
     // draw the next scalar
     s25t::element r;
     round_challenge(r, transcript, polynomial);
+    evaluation_point[round_index] = r;
 
     // fold the polynomial
     co_await drv.fold(*ws, r);
