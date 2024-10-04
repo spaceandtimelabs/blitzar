@@ -6,6 +6,8 @@
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/proof/sumcheck/polynomial_utility.h"
+#include "sxt/scalar25/operation/muladd.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {
@@ -44,10 +46,11 @@ cpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
                              workspace& ws) const noexcept {
   auto& work = static_cast<cpu_workspace&>(ws);
+  auto n = work.n;
   auto mid = 1u << (work.num_variables - 1u);
   SXT_RELEASE_ASSERT(work.n > mid);
 
-  auto mles = work.mles;
+  auto mles = work.mles.data();
   auto product_table = work.product_table;
   auto product_terms = work.product_terms;
 
@@ -57,20 +60,19 @@ xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
 
   auto n1 = work.n - mid;
   for (unsigned i = 0; i < n1; ++i) {
-    auto term_iter = product_terms.data();
+    unsigned term_first = 0;
     for (auto [mult, num_terms] : product_table) {
       SXT_STACK_ARRAY(p, num_terms, s25t::element);
       for (auto& coef : p) {
         coef = {};
       }
-      (void)mles;
-      (void)product_table;
-      (void)product_terms;
-      (void)mult;
-      (void)num_terms;
+      auto terms = product_terms.subspan(term_first, num_terms);
+      expand_products(p, mles + i, n, mid, terms);
+      for (unsigned term_index=0; term_index<num_terms; ++term_index) {
+        s25o::muladd(polynomial[term_index], mult, p[term_index], polynomial[term_index]);
+      }
+      term_first += num_terms;
     }
-    /* void expand_products(basct::span<s25t::element> p, const s25t::element* mles, unsigned n, */
-    /*                      unsigned step, basct::cspan<unsigned> terms) noexcept; */
   }
 
   auto n2 = mid - n1;
