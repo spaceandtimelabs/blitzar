@@ -62,11 +62,8 @@ xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
   for (unsigned i = 0; i < n1; ++i) {
     unsigned term_first = 0;
     for (auto [mult, num_terms] : product_table) {
-      SXT_STACK_ARRAY(p, num_terms, s25t::element);
-      for (auto& coef : p) {
-        coef = {};
-      }
       auto terms = product_terms.subspan(term_first, num_terms);
+      SXT_STACK_ARRAY(p, num_terms, s25t::element);
       expand_products(p, mles + i, n, mid, terms);
       for (unsigned term_index=0; term_index<num_terms; ++term_index) {
         s25o::muladd(polynomial[term_index], mult, p[term_index], polynomial[term_index]);
