@@ -1,5 +1,7 @@
 #include "sxt/proof/sumcheck/cpu_driver.h"
 
+#include <algorithm>
+
 #include "sxt/base/container/stack_array.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/future.h"
@@ -42,10 +44,37 @@ cpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
                              workspace& ws) const noexcept {
   auto& work = static_cast<cpu_workspace&>(ws);
-  SXT_STACK_ARRAY(p, polynomial.size(), s25t::element);
   auto mid = 1u << (work.num_variables - 1u);
-  for (unsigned i=0; i<mid; ++i) {
+  SXT_RELEASE_ASSERT(work.n > mid);
+
+  auto mles = work.mles;
+  auto product_table = work.product_table;
+  auto product_terms = work.product_terms;
+
+  for (auto& val : polynomial) {
+    val = {};
   }
+
+  auto n1 = work.n - mid;
+  for (unsigned i = 0; i < n1; ++i) {
+    auto term_iter = product_terms.data();
+    for (auto [mult, num_terms] : product_table) {
+      SXT_STACK_ARRAY(p, num_terms, s25t::element);
+      for (auto& coef : p) {
+        coef = {};
+      }
+      (void)mles;
+      (void)product_table;
+      (void)product_terms;
+      (void)mult;
+      (void)num_terms;
+    }
+    /* void expand_products(basct::span<s25t::element> p, const s25t::element* mles, unsigned n, */
+    /*                      unsigned step, basct::cspan<unsigned> terms) noexcept; */
+  }
+
+  auto n2 = mid - n1;
+  (void)n2;
   (void)mid;
   (void)polynomial;
   (void)ws;
