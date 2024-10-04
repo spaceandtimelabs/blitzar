@@ -1,5 +1,6 @@
 #include "sxt/proof/sumcheck/cpu_driver.h"
 
+#include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/scalar25/type/element.h"
@@ -14,6 +15,7 @@ struct cpu_workspace final : public workspace {
   basct::cspan<std::pair<s25t::element, unsigned>> product_table;
   basct::cspan<unsigned> product_terms;
   unsigned n;
+  unsigned num_variables;
 };
 } // namespace
 
@@ -29,6 +31,7 @@ cpu_driver::make_workspace(basct::cspan<s25t::element> mles,
   res->product_table = product_table;
   res->product_terms = product_terms;
   res->n = n;
+  res->num_variables = basn::ceil_log2(n);
   return res;
 }
 

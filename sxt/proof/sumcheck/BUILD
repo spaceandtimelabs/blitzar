@@ -33,6 +33,7 @@ sxt_cc_component(
     ":driver",
   ],
   impl_deps = [
+    "//sxt/base/num:ceil_log2",
     "//sxt/execution/async:future",
     "//sxt/memory/management:managed_array",
     "//sxt/scalar25/type:element",
