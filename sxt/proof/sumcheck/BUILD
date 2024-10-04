@@ -34,6 +34,8 @@ sxt_cc_component(
   ],
   impl_deps = [
     "//sxt/execution/async:future",
+    "//sxt/memory/management:managed_array",
+    "//sxt/scalar25/type:element",
   ],
 )
 
