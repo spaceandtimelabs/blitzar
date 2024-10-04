@@ -19,7 +19,7 @@ class driver {
     virtual std::unique_ptr<workspace>
     make_workspace(basct::cspan<s25t::element> mles,
                    basct::cspan<std::pair<s25t::element, unsigned>> product_table,
-                   basct::cspan<unsigned> product_terms) const noexcept = 0;
+                   basct::cspan<unsigned> product_terms, unsigned n) const noexcept = 0;
 
     virtual xena::future<> sum(basct::span<s25t::element> polynomial,
                                workspace& ws) const noexcept = 0;
