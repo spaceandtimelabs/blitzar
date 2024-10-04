@@ -1,5 +1,6 @@
 #include "sxt/proof/sumcheck/cpu_driver.h"
 
+#include "sxt/base/container/stack_array.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
@@ -40,6 +41,12 @@ cpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 //--------------------------------------------------------------------------------------------------
 xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
                              workspace& ws) const noexcept {
+  auto& work = static_cast<cpu_workspace&>(ws);
+  SXT_STACK_ARRAY(p, polynomial.size(), s25t::element);
+  auto mid = 1u << (work.num_variables - 1u);
+  for (unsigned i=0; i<mid; ++i) {
+  }
+  (void)mid;
   (void)polynomial;
   (void)ws;
   return {};
