@@ -40,4 +40,17 @@ TEST_CASE("we can create a sumcheck proof") {
     }
     REQUIRE(fut.ready());
   }
+
+  SECTION("we can prove a sum where the term multiplier is different from one") {
+    product_table[0].first = 0x2_s25;
+    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                         product_terms, 2);
+    REQUIRE(polynomials[0] == 0x2_s25 * mles[0]);
+    REQUIRE(polynomials[1] == 0x2_s25 * (mles[1] - mles[0]));
+    std::cout << "*********\n";
+    for (auto& r : evaluation_point) {
+      std::cout << r << "\n";
+    }
+    REQUIRE(fut.ready());
+  }
 }
