@@ -34,6 +34,10 @@ TEST_CASE("we can create a sumcheck proof") {
     for (auto& s : polynomials) {
       std::cout << s << "\n";
     }
+    std::cout << "*********\n";
+    for (auto& r : evaluation_point) {
+      std::cout << r << "\n";
+    }
     REQUIRE(fut.ready());
   }
 }

@@ -47,17 +47,17 @@ void expand_products(basct::span<s25t::element> p, const s25t::element* mles, un
   auto num_terms = terms.size();
   assert(num_terms > 0 && p.size() == num_terms + 1u);
   s25t::element a, b;
-  auto index = terms[0];
-  a = *(mles + index * n);
-  b = *(mles + index * n + step);
+  auto mle_index = terms[0];
+  a = *(mles + mle_index * n);
+  b = *(mles + mle_index * n + step);
   s25o::sub(b, b, a);
   p[0] = a;
   p[1] = b;
 
   for (unsigned i=1; i<num_terms; ++i) {
-    auto index = terms[i];
-    a = *(mles + index * n);
-    b = *(mles + index * n + step);
+    auto mle_index = terms[i];
+    a = *(mles + mle_index * n);
+    b = *(mles + mle_index * n + step);
     s25o::sub(b, b, a);
 
     auto c_prev = p[0];
