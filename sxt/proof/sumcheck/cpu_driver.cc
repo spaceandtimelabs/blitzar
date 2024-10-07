@@ -83,6 +83,6 @@ xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
 xena::future<> cpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
   (void)ws;
   (void)r;
-  return {};
+  return xena::make_ready_future();
 }
 } // namespace prfsk

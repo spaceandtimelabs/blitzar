@@ -82,13 +82,18 @@ sxt_cc_component(
   impl_deps = [
     ":driver",
     ":transcript_utility",
+    "//sxt/execution/async:future",
     "//sxt/base/error:assert",
     "//sxt/base/num:ceil_log2",
     "//sxt/execution/async:coroutine",
     "//sxt/scalar25/type:element",
   ],
   test_deps = [
+    ":cpu_driver",
+    "//sxt/execution/async:future",
     "//sxt/base/test:unit_test",
+    "//sxt/proof/transcript:transcript",
+    "//sxt/scalar25/type:element",
   ],
 )
 

@@ -1,5 +1,6 @@
 #include "sxt/proof/sumcheck/proof_computation.h"
 
+#include "sxt/execution/async/future.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/coroutine.h"

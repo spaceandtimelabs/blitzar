@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "sxt/base/container/span.h"
-#include "sxt/execution/async/future.h"
+#include "sxt/execution/async/future_fwd.h"
 
 namespace sxt::prft { class transcript; }
 namespace sxt::s25t { class element; }
