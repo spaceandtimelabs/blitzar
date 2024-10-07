@@ -8,8 +8,10 @@
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
+#include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
 #include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/type/literal.h"
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
@@ -81,8 +83,36 @@ xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
 // fold
 //--------------------------------------------------------------------------------------------------
 xena::future<> cpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
-  (void)ws;
-  (void)r;
+  using s25t::operator""_s25;
+
+  auto& work = static_cast<cpu_workspace&>(ws);
+  auto n = work.n;
+  auto mid = 1u << (work.num_variables - 1u);
+  auto num_mles = work.mles.size() / n;
+  SXT_RELEASE_ASSERT(
+      // clang-format off
+      work.n > mid && work.mles.size() % n == 0
+      // clang-format on
+  );
+
+  auto mles = work.mles.data();
+  s25t::element one_m_r = 0x1_s25;
+  s25o::mul(one_m_r, one_m_r, r);
+  auto n1 = work.n - mid;
+  for (auto mle_index = 0; mle_index < num_mles; ++mle_index) {
+    auto data = mles + n * mle_index;
+    for (unsigned i = 0; i < n1; ++i) {
+      auto val = data[i];
+      s25o::mul(val, val, one_m_r);
+      s25o::muladd(val, r, data[mid + i], val);
+      data[i] = val;
+    }
+  }
+
+  auto n2 = mid - n1;
+  SXT_RELEASE_ASSERT(n2 == 0, "not implemented yet");
+  work.n = mid;
+  --work.num_variables;
   return xena::make_ready_future();
 }
 } // namespace prfsk

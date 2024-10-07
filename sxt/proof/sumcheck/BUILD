@@ -39,8 +39,10 @@ sxt_cc_component(
     "//sxt/base/num:ceil_log2",
     "//sxt/execution/async:future",
     "//sxt/memory/management:managed_array",
+    "//sxt/scalar25/operation:mul",
     "//sxt/scalar25/operation:muladd",
     "//sxt/scalar25/type:element",
+    "//sxt/scalar25/type:literal",
   ],
 )
 

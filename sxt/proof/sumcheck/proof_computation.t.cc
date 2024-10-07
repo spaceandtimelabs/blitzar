@@ -1,6 +1,7 @@
 #include "sxt/proof/sumcheck/proof_computation.h"
 
 #include <utility>
+#include <iostream>
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
@@ -30,6 +31,9 @@ TEST_CASE("we can create a sumcheck proof") {
   SECTION("we can prove a sum with a single term") {
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
                          product_terms, 2);
+    for (auto& s : polynomials) {
+      std::cout << s << "\n";
+    }
     REQUIRE(fut.ready());
   }
 }
