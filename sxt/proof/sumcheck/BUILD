@@ -35,6 +35,7 @@ sxt_cc_component(
   impl_deps = [
     ":polynomial_utility",
     "//sxt/base/container:stack_array",
+    "//sxt/base/error:panic",
     "//sxt/base/num:ceil_log2",
     "//sxt/execution/async:future",
     "//sxt/memory/management:managed_array",

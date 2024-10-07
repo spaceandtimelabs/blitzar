@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "sxt/base/container/stack_array.h"
+#include "sxt/base/error/panic.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
@@ -63,7 +64,7 @@ xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
     unsigned term_first = 0;
     for (auto [mult, num_terms] : product_table) {
       auto terms = product_terms.subspan(term_first, num_terms);
-      SXT_STACK_ARRAY(p, num_terms, s25t::element);
+      SXT_STACK_ARRAY(p, num_terms + 1u, s25t::element);
       expand_products(p, mles + i, n, mid, terms);
       for (unsigned term_index=0; term_index<num_terms; ++term_index) {
         s25o::muladd(polynomial[term_index], mult, p[term_index], polynomial[term_index]);
@@ -71,13 +72,9 @@ xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
       term_first += num_terms;
     }
   }
-
   auto n2 = mid - n1;
-  (void)n2;
-  (void)mid;
-  (void)polynomial;
-  (void)ws;
-  return {};
+  SXT_RELEASE_ASSERT(n2 == 0, "not implemented yet");
+  return xena::make_ready_future();
 }
 
 //--------------------------------------------------------------------------------------------------
