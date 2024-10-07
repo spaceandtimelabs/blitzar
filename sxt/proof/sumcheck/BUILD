@@ -95,6 +95,7 @@ sxt_cc_component(
     "//sxt/execution/async:future",
     "//sxt/base/test:unit_test",
     "//sxt/proof/transcript:transcript",
+    "//sxt/scalar25/operation:overload",
     "//sxt/scalar25/type:element",
   ],
 )
