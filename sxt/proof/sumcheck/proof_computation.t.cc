@@ -29,28 +29,43 @@ TEST_CASE("we can create a sumcheck proof") {
   };
   std::vector<unsigned> product_terms = {0};
    
-  SECTION("we can prove a sum with a single term") {
+  SECTION("we can prove a sum with a single variable") {
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
                          product_terms, 2);
+    REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == mles[0]);
     REQUIRE(polynomials[1] == mles[1] - mles[0]);
-    std::cout << "*********\n";
-    for (auto& r : evaluation_point) {
-      std::cout << r << "\n";
-    }
-    REQUIRE(fut.ready());
   }
 
   SECTION("we can prove a sum where the term multiplier is different from one") {
     product_table[0].first = 0x2_s25;
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
                          product_terms, 2);
+    REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == 0x2_s25 * mles[0]);
     REQUIRE(polynomials[1] == 0x2_s25 * (mles[1] - mles[0]));
+  }
+
+  SECTION("we can prove a sum with two variables") {
+    mles.push_back(0x4_s25);
+    mles.push_back(0x7_s25);
+    polynomials.resize(4);
+    evaluation_point.resize(2);
+    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                         product_terms, 4);
+    REQUIRE(fut.ready());
+    REQUIRE(polynomials[0] == mles[0] + mles[1]);
+    REQUIRE(polynomials[1] == (mles[2] - mles[0]) + (mles[3] - mles[1]));
+
+    auto r = evaluation_point[0];
+    mles[0] = mles[0] * (0x1_s25 - r) + mles[2] * r;
+    mles[1] = mles[1] * (0x1_s25 - r) + mles[3] * r;
+
+    REQUIRE(polynomials[2] == mles[0]);
+    REQUIRE(polynomials[3] == mles[1] - mles[0]);
     std::cout << "*********\n";
     for (auto& r : evaluation_point) {
       std::cout << r << "\n";
     }
-    REQUIRE(fut.ready());
   }
 }

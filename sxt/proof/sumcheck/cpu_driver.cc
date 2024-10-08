@@ -10,6 +10,7 @@
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
+#include "sxt/scalar25/operation/sub.h"
 #include "sxt/scalar25/type/element.h"
 #include "sxt/scalar25/type/literal.h"
 
@@ -97,7 +98,7 @@ xena::future<> cpu_driver::fold(workspace& ws, const s25t::element& r) const noe
 
   auto mles = work.mles.data();
   s25t::element one_m_r = 0x1_s25;
-  s25o::mul(one_m_r, one_m_r, r);
+  s25o::sub(one_m_r, one_m_r, r);
   auto n1 = work.n - mid;
   for (auto mle_index = 0; mle_index < num_mles; ++mle_index) {
     auto data = mles + n * mle_index;
