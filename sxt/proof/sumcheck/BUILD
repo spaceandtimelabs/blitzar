@@ -55,10 +55,13 @@ sxt_cc_component(
   impl_deps = [
     ":polynomial_utility",
     "//sxt/base/container:stack_array",
+    "//sxt/base/device:stream",
+    "//sxt/base/device:memory_utility",
     "//sxt/base/error:panic",
     "//sxt/base/num:ceil_log2",
     "//sxt/execution/async:future",
     "//sxt/memory/management:managed_array",
+    "//sxt/memory/resource:async_device_resource",
     "//sxt/scalar25/operation:mul",
     "//sxt/scalar25/operation:sub",
     "//sxt/scalar25/operation:muladd",

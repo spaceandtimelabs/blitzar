@@ -3,10 +3,13 @@
 #include <algorithm>
 
 #include "sxt/base/container/stack_array.h"
+#include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/error/panic.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
@@ -20,6 +23,23 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 namespace {
 struct gpu_workspace final : public workspace {
+  basdv::stream stream;
+
+  gpu_workspace(basct::cspan<s25t::element> mles,
+                basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+                basct::cspan<unsigned> product_terms, unsigned n) noexcept {
+    (void)mles;
+    (void)product_table;
+    (void)product_terms;
+    (void)n;
+#if 0
+  res->mles = memmg::managed_array<s25t::element>{mles.begin(), mles.end()};
+  res->product_table = product_table;
+  res->product_terms = product_terms;
+  res->n = n;
+  res->num_variables = basn::ceil_log2(n);
+#endif
+  }
 #if 0
   memmg::managed_array<s25t::element> mles;
   basct::cspan<std::pair<s25t::element, unsigned>> product_table;
@@ -37,19 +57,7 @@ std::unique_ptr<workspace>
 gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
                            basct::cspan<std::pair<s25t::element, unsigned>> product_table,
                            basct::cspan<unsigned> product_terms, unsigned n) const noexcept {
-  auto res = std::make_unique<gpu_workspace>();
-  (void)mles;
-  (void)product_table;
-  (void)product_terms;
-  (void)n;
-#if 0
-  res->mles = memmg::managed_array<s25t::element>{mles.begin(), mles.end()};
-  res->product_table = product_table;
-  res->product_terms = product_terms;
-  res->n = n;
-  res->num_variables = basn::ceil_log2(n);
-#endif
-  return res;
+  return std::make_unique<gpu_workspace>(mles, product_table, product_terms, n);
 }
 
 //--------------------------------------------------------------------------------------------------
