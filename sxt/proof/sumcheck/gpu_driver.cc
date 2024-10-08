@@ -24,29 +24,20 @@ namespace sxt::prfsk {
 namespace {
 struct gpu_workspace final : public workspace {
   basdv::stream stream;
-
-  gpu_workspace(basct::cspan<s25t::element> mles,
-                basct::cspan<std::pair<s25t::element, unsigned>> product_table,
-                basct::cspan<unsigned> product_terms, unsigned n) noexcept {
-    (void)mles;
-    (void)product_table;
-    (void)product_terms;
-    (void)n;
-#if 0
-  res->mles = memmg::managed_array<s25t::element>{mles.begin(), mles.end()};
-  res->product_table = product_table;
-  res->product_terms = product_terms;
-  res->n = n;
-  res->num_variables = basn::ceil_log2(n);
-#endif
-  }
-#if 0
+  memr::async_device_resource resource;
   memmg::managed_array<s25t::element> mles;
-  basct::cspan<std::pair<s25t::element, unsigned>> product_table;
-  basct::cspan<unsigned> product_terms;
+  memmg::managed_array<std::pair<s25t::element, unsigned>> product_table;
+  memmg::managed_array<unsigned> product_terms;
   unsigned n;
   unsigned num_variables;
-#endif
+
+  gpu_workspace(basct::cspan<s25t::element> mles_p,
+                basct::cspan<std::pair<s25t::element, unsigned>> product_table_p,
+                basct::cspan<unsigned> product_terms_p, unsigned np) noexcept
+      : resource{stream}, mles{mles_p.size(), &resource},
+        product_table{product_table_p.size(), &resource},
+        product_terms{product_terms.size(), &resource}, n{np},
+        num_variables{static_cast<unsigned>(basn::ceil_log2(np))} {}
 };
 } // namespace
 
