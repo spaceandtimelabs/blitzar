@@ -37,7 +37,11 @@ struct gpu_workspace final : public workspace {
       : resource{stream}, mles{mles_p.size(), &resource},
         product_table{product_table_p.size(), &resource},
         product_terms{product_terms.size(), &resource}, n{np},
-        num_variables{static_cast<unsigned>(basn::ceil_log2(np))} {}
+        num_variables{static_cast<unsigned>(basn::ceil_log2(np))} {
+    basdv::async_copy_host_to_device(mles, mles_p, stream);
+    basdv::async_copy_host_to_device(product_table, product_table_p, stream);
+    basdv::async_copy_host_to_device(product_terms, product_terms_p, stream);
+  }
 };
 } // namespace
 
