@@ -12,6 +12,7 @@
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/memory/resource/device_resource.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
@@ -62,14 +63,14 @@ gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 //--------------------------------------------------------------------------------------------------
 xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
                              workspace& ws) const noexcept {
-  (void)polynomial;
-  (void)ws;
-#if 0
   auto& work = static_cast<gpu_workspace&>(ws);
   auto n = work.n;
   auto mid = 1u << (work.num_variables - 1u);
   SXT_RELEASE_ASSERT(work.n > mid);
 
+  (void)polynomial;
+  (void)ws;
+#if 0
   auto mles = work.mles.data();
   auto product_table = work.product_table;
   auto product_terms = work.product_terms;
