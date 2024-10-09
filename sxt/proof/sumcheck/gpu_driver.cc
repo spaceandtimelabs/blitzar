@@ -2,12 +2,14 @@
 
 #include <algorithm>
 
+#include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/stack_array.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/panic.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
@@ -36,7 +38,7 @@ struct gpu_workspace final : public workspace {
                 basct::cspan<unsigned> product_terms_p, unsigned np) noexcept
       : resource{stream}, mles{mles_p.size(), &resource},
         product_table{product_table_p.size(), &resource},
-        product_terms{product_terms.size(), &resource}, n{np},
+        product_terms{product_terms_p.size(), &resource}, n{np},
         num_variables{static_cast<unsigned>(basn::ceil_log2(np))} {
     basdv::async_copy_host_to_device(mles, mles_p, stream);
     basdv::async_copy_host_to_device(product_table, product_table_p, stream);
@@ -99,11 +101,7 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
 // fold
 //--------------------------------------------------------------------------------------------------
 xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
-  (void)ws;
-  (void)r;
-#if 0
   using s25t::operator""_s25;
-
   auto& work = static_cast<gpu_workspace&>(ws);
   auto n = work.n;
   auto mid = 1u << (work.num_variables - 1u);
@@ -113,6 +111,44 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
       work.n > mid && work.mles.size() % n == 0
       // clang-format on
   );
+
+  auto n1 = work.n - mid;
+  s25t::element one_m_r = 0x1_s25;
+  s25o::sub(one_m_r, one_m_r, r);
+
+  // f1
+  auto f1 = [
+    // clang-format off
+    mles = work.mles.data(),
+    n = n,
+    num_mles = num_mles,
+    mid = mid,
+    r = r,
+    one_m_r = one_m_r
+    // clang-format on
+  ] __device__ __host__ (unsigned /*n1*/, unsigned i) noexcept {
+    for (unsigned mle_index=0; mle_index<num_mles; ++mle_index) {
+      auto data = mles + n * mle_index;
+      auto val = data[i];
+      s25o::mul(val, val, one_m_r);
+      s25o::muladd(val, r, data[mid + i], val);
+      data[i] = val;
+    }
+  };
+  algi::for_each(f1, n1);
+
+  SXT_RELEASE_ASSERT(n1 == mid, "not implemented yet");
+
+  work.n = mid;
+  --work.num_variables;
+  return xendv::await_stream(work.stream);
+  (void)f1;
+/* template <algb::index_functor F> __global__ void for_each_kernel(F f, unsigned n) { */
+  (void)ws;
+  (void)r;
+#if 0
+  using s25t::operator""_s25;
+
 
   auto mles = work.mles.data();
   s25t::element one_m_r = 0x1_s25;
