@@ -171,3 +171,15 @@ sxt_cc_component(
     "//sxt/base/test:unit_test",
   ],
 )
+
+sxt_cc_component(
+  name = "polynomial_mapper",
+  deps = [
+    "//sxt/base/macro:cuda_callable",
+    "//sxt/scalar25/operation:add",
+    "//sxt/scalar25/type:element",
+  ],
+  test_deps = [
+    "//sxt/base/test:unit_test",
+  ],
+)
