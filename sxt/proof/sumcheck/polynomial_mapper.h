@@ -23,6 +23,16 @@ template <unsigned MaxDegree> struct polynomial_mapper {
     }
 
     // expand products
+    auto mle_data = mles + index;
+    auto terms_data = product_terms;
+    s25t::element prod[MaxDegree + 1u];
+    for (unsigned product_index = 0; product_index < num_products; ++product_index) {
+      auto [mult, num_terms] = product_table[product_index];
+
+      expand_products({prod, num_terms + 1u}, mle_data, n, mid, {terms_data, num_terms});
+      terms_data += num_terms;
+      (void)mult;
+    }
 /* void expand_products(basct::span<s25t::element> p, const s25t::element* mles, unsigned n, */
 /*                      unsigned step, basct::cspan<unsigned> terms) noexcept; */
     (void)p;
