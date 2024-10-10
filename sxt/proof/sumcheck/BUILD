@@ -175,6 +175,7 @@ sxt_cc_component(
 sxt_cc_component(
   name = "polynomial_mapper",
   deps = [
+    ":polynomial_utility",
     "//sxt/base/macro:cuda_callable",
     "//sxt/scalar25/operation:add",
     "//sxt/scalar25/type:element",
