@@ -146,3 +146,28 @@ sxt_cc_component(
     "//sxt/scalar25/type:literal",
   ],
 )
+
+sxt_cc_component(
+  name = "sum_gpu",
+  deps = [
+        "//sxt/base/container:span",
+  ],
+  impl_deps = [
+    "//sxt/scalar25/type:element",
+  ],
+  test_deps = [
+    "//sxt/base/test:unit_test",
+  ],
+)
+
+sxt_cc_component(
+  name = "polynomial_reducer",
+  deps = [
+    "//sxt/base/macro:cuda_callable",
+    "//sxt/scalar25/operation:add",
+    "//sxt/scalar25/type:element",
+  ],
+  test_deps = [
+    "//sxt/base/test:unit_test",
+  ],
+)
