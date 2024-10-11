@@ -41,6 +41,21 @@ TEST_CASE("we can create a sumcheck proof") {
     REQUIRE(polynomials[1] == mles[1] - mles[0]);
   }
 
+  SECTION("we can prove a sum degree greater than 1") {
+    product_table = {
+        {0x1_s25, 2},
+    };
+    product_terms = {0, 0};
+    polynomials.resize(3);
+    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                         product_terms, 2);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(polynomials[0] == mles[0] * mles[0]);
+    REQUIRE(polynomials[1] == 0x2_s25 * (mles[1] - mles[0]) * mles[0]);
+    REQUIRE(polynomials[2] == (mles[1] - mles[0]) * (mles[1] - mles[0]));
+  }
+
   SECTION("we can prove a sum where the term multiplier is different from one") {
     product_table[0].first = 0x2_s25;
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,

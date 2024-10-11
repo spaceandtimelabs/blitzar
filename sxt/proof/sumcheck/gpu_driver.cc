@@ -125,7 +125,7 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
         .mles = work.mles.data(),
         .product_table = work.product_table.data(),
         .product_terms = work.product_terms.data(),
-        .num_products = static_cast<unsigned>(work.product_terms.size()),
+        .num_products = static_cast<unsigned>(work.product_table.size()),
         .mid = mid,
         .n = n,
     };
