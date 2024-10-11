@@ -6,6 +6,7 @@
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/scalar25/operation/add.h"
+#include "sxt/scalar25/operation/muladd.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {
@@ -31,12 +32,11 @@ template <unsigned MaxDegree> struct polynomial_mapper {
 
       expand_products({prod, num_terms + 1u}, mle_data, n, mid, {terms_data, num_terms});
       terms_data += num_terms;
-      (void)mult;
+
+      for (unsigned i=0; i<num_terms+1; ++i) {
+        s25o::muladd(p, mult, prod[i], p);
+      }
     }
-/* void expand_products(basct::span<s25t::element> p, const s25t::element* mles, unsigned n, */
-/*                      unsigned step, basct::cspan<unsigned> terms) noexcept; */
-    (void)p;
-    (void)index;
   }
 
   const s25t::element* __restrict__ mles;
