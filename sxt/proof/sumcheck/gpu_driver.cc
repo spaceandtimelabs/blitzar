@@ -144,10 +144,6 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
 // fold
 //--------------------------------------------------------------------------------------------------
 xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
-  (void)ws;
-  (void)r;
-  return xena::make_ready_future();
-#if 0
   using s25t::operator""_s25;
   auto& work = static_cast<gpu_workspace&>(ws);
   auto n = work.n;
@@ -182,18 +178,12 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
       data[i] = val;
     }
   };
-  algi::for_each(f1, n1);
+  co_await algi::for_each(f1, n1);
 
   SXT_RELEASE_ASSERT(n1 == mid, "not implemented yet");
 
   work.n = mid;
   --work.num_variables;
-  return xendv::await_stream(work.stream);
-  (void)f1;
-/* template <algb::index_functor F> __global__ void for_each_kernel(F f, unsigned n) { */
-  (void)ws;
-  (void)r;
-#endif
 }
 } // namespace prfsk
 

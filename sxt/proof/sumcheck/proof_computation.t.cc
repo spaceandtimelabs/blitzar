@@ -41,11 +41,11 @@ TEST_CASE("we can create a sumcheck proof") {
     REQUIRE(polynomials[1] == mles[1] - mles[0]);
   }
 
-#if 0
   SECTION("we can prove a sum where the term multiplier is different from one") {
     product_table[0].first = 0x2_s25;
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
                          product_terms, 2);
+    xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == 0x2_s25 * mles[0]);
     REQUIRE(polynomials[1] == 0x2_s25 * (mles[1] - mles[0]));
@@ -58,6 +58,7 @@ TEST_CASE("we can create a sumcheck proof") {
     evaluation_point.resize(2);
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
                          product_terms, 4);
+    xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == mles[0] + mles[1]);
     REQUIRE(polynomials[1] == (mles[2] - mles[0]) + (mles[3] - mles[1]));
@@ -73,5 +74,4 @@ TEST_CASE("we can create a sumcheck proof") {
       std::cout << r << "\n";
     }
   }
-#endif
 }
