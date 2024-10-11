@@ -17,6 +17,13 @@ template <unsigned MaxDegree> struct polynomial_mapper {
   using value_type = std::array<s25t::element, MaxDegree + 1u>;
 
   CUDA_CALLABLE
+  value_type map_index(unsigned index) const noexcept {
+    value_type res;
+    this->map_index(res, index);
+    return res;
+  }
+
+  CUDA_CALLABLE
   void map_index(value_type& p, unsigned index) const noexcept {
     // zero
     for (auto& pi : p) { 
@@ -34,7 +41,7 @@ template <unsigned MaxDegree> struct polynomial_mapper {
       terms_data += num_terms;
 
       for (unsigned i=0; i<num_terms+1; ++i) {
-        s25o::muladd(p, mult, prod[i], p);
+        s25o::muladd(p[i], mult, prod[i], p[i]);
       }
     }
   }

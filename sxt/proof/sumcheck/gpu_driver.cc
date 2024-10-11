@@ -80,7 +80,6 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
 
   xena::future<> res;
   auto f = [&]<unsigned MaxDegree>(std::integral_constant<unsigned, MaxDegree>) noexcept {
-    polynomial_reducer<MaxDegree> reducer;
     polynomial_mapper<MaxDegree> mapper{
         .mles = work.mles.data(),
         .product_table = work.product_table.data(),
@@ -89,44 +88,15 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
         .mid = mid,
         .n = n,
     };
-    (void)res;
-    (void)reducer;
-    (void)mapper;
-    /* template <algb::reducer Reducer, class Mapper> */
-    /* xena::future<typename Reducer::value_type> reduce(basdv::stream&& stream, Mapper mapper, */
-    /*                                                   unsigned n) noexcept { */
+    auto fut = algr::reduce<polynomial_reducer<MaxDegree>>(basdv::stream{}, mapper, mid);
+    res = fut.then([&](std::array<s25t::element, MaxDegree + 1u> p) noexcept {
+      for (unsigned i = 0; i < p.size(); ++i) {
+        polynomial[i] = p[i];
+      }
+    });
   };
   basn::constexpr_switch<1u, max_degree_v + 1u>(polynomial.size() - 1u, f);
   return res;
-  (void)f;
-  (void)polynomial;
-  (void)ws;
-#if 0
-  auto mles = work.mles.data();
-  auto product_table = work.product_table;
-  auto product_terms = work.product_terms;
-
-  for (auto& val : polynomial) {
-    val = {};
-  }
-
-  auto n1 = work.n - mid;
-  for (unsigned i = 0; i < n1; ++i) {
-    unsigned term_first = 0;
-    for (auto [mult, num_terms] : product_table) {
-      auto terms = product_terms.subspan(term_first, num_terms);
-      SXT_STACK_ARRAY(p, num_terms + 1u, s25t::element);
-      expand_products(p, mles + i, n, mid, terms);
-      for (unsigned term_index = 0; term_index < p.size(); ++term_index) {
-        s25o::muladd(polynomial[term_index], mult, p[term_index], polynomial[term_index]);
-      }
-      term_first += num_terms;
-    }
-  }
-  auto n2 = mid - n1;
-  SXT_RELEASE_ASSERT(n2 == 0, "not implemented yet");
-#endif
-  return xena::make_ready_future();
 }
 
 //--------------------------------------------------------------------------------------------------
