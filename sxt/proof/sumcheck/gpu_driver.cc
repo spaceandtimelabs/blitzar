@@ -10,6 +10,7 @@
 #include "sxt/base/error/panic.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/constexpr_switch.h"
+#include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
@@ -30,14 +31,15 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 namespace {
 struct gpu_workspace final : public workspace {
-  basdv::stream stream;
-  memr::async_device_resource resource;
+  /* basdv::stream stream; */
+  /* memr::async_device_resource resource; */
   memmg::managed_array<s25t::element> mles;
   memmg::managed_array<std::pair<s25t::element, unsigned>> product_table;
   memmg::managed_array<unsigned> product_terms;
   unsigned n;
   unsigned num_variables;
 
+#if 0
   gpu_workspace(basct::cspan<s25t::element> mles_p,
                 basct::cspan<std::pair<s25t::element, unsigned>> product_table_p,
                 basct::cspan<unsigned> product_terms_p, unsigned np) noexcept
@@ -49,6 +51,11 @@ struct gpu_workspace final : public workspace {
     basdv::async_copy_host_to_device(product_table, product_table_p, stream);
     basdv::async_copy_host_to_device(product_terms, product_terms_p, stream);
   }
+#endif
+
+  gpu_workspace() noexcept
+      : mles{memr::get_device_resource()}, product_table{memr::get_device_resource()},
+        product_terms{memr::get_device_resource()} {}
 };
 } // namespace
 
@@ -59,8 +66,26 @@ xena::future<std::unique_ptr<workspace>>
 gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
                            basct::cspan<std::pair<s25t::element, unsigned>> product_table,
                            basct::cspan<unsigned> product_terms, unsigned n) const noexcept {
-  return xena::make_ready_future<std::unique_ptr<workspace>>(
-      std::make_unique<gpu_workspace>(mles, product_table, product_terms, n));
+  auto ws = std::make_unique<gpu_workspace>();
+
+  // dimensions
+  ws->n = n;
+  ws->num_variables = basn::ceil_log2(n);
+
+  // mles
+  ws->mles = memmg::managed_array<s25t::element>{
+      mles.size(),
+      memr::get_device_resource(),
+  };
+  basdv::stream mle_stream;
+  basdv::async_copy_host_to_device(ws->mles, mles, mle_stream);
+
+  // await
+  co_await xendv::await_stream(mle_stream);
+  co_return ws;
+  /* return xena::make_ready_future<std::unique_ptr<workspace>>(std::move(ws)); */
+  /* return xena::make_ready_future<std::unique_ptr<workspace>>( */
+  /*     std::make_unique<gpu_workspace>(mles, product_table, product_terms, n)); */
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -68,6 +93,10 @@ gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 //--------------------------------------------------------------------------------------------------
 xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
                              workspace& ws) const noexcept {
+  (void)polynomial;
+  (void)ws;
+  return xena::make_ready_future();
+#if 0
   static constexpr unsigned max_degree_v = 5u;
   auto& work = static_cast<gpu_workspace&>(ws);
   auto n = work.n;
@@ -100,12 +129,17 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
   };
   basn::constexpr_switch<1u, max_degree_v + 1u>(polynomial.size() - 1u, f);
   return res;
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------
 // fold
 //--------------------------------------------------------------------------------------------------
 xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
+  (void)ws;
+  (void)r;
+  return xena::make_ready_future();
+#if 0
   using s25t::operator""_s25;
   auto& work = static_cast<gpu_workspace&>(ws);
   auto n = work.n;
@@ -151,30 +185,7 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
 /* template <algb::index_functor F> __global__ void for_each_kernel(F f, unsigned n) { */
   (void)ws;
   (void)r;
-#if 0
-  using s25t::operator""_s25;
-
-
-  auto mles = work.mles.data();
-  s25t::element one_m_r = 0x1_s25;
-  s25o::sub(one_m_r, one_m_r, r);
-  auto n1 = work.n - mid;
-  for (auto mle_index = 0; mle_index < num_mles; ++mle_index) {
-    auto data = mles + n * mle_index;
-    for (unsigned i = 0; i < n1; ++i) {
-      auto val = data[i];
-      s25o::mul(val, val, one_m_r);
-      s25o::muladd(val, r, data[mid + i], val);
-      data[i] = val;
-    }
-  }
-
-  auto n2 = mid - n1;
-  SXT_RELEASE_ASSERT(n2 == 0, "not implemented yet");
-  work.n = mid;
-  --work.num_variables;
 #endif
-  return xena::make_ready_future();
 }
 } // namespace prfsk
 
