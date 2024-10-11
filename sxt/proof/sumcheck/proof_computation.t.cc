@@ -37,8 +37,8 @@ TEST_CASE("we can create a sumcheck proof") {
                          product_terms, 2);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
-    /* REQUIRE(polynomials[0] == mles[0]); */
-    /* REQUIRE(polynomials[1] == mles[1] - mles[0]); */
+    REQUIRE(polynomials[0] == mles[0]);
+    REQUIRE(polynomials[1] == mles[1] - mles[0]);
   }
 
 #if 0

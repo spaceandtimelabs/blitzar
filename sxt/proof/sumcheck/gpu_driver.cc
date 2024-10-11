@@ -108,10 +108,6 @@ gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 //--------------------------------------------------------------------------------------------------
 xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
                              workspace& ws) const noexcept {
-  (void)polynomial;
-  (void)ws;
-  return xena::make_ready_future();
-#if 0
   static constexpr unsigned max_degree_v = 5u;
   auto& work = static_cast<gpu_workspace&>(ws);
   auto n = work.n;
@@ -133,9 +129,7 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
         .mid = mid,
         .n = n,
     };
-    auto fut = algr::reduce<polynomial_reducer<MaxDegree>>(
-        basdv::stream{}
-        , mapper, mid);
+    auto fut = algr::reduce<polynomial_reducer<MaxDegree>>(basdv::stream{}, mapper, mid);
     res = fut.then([&](std::array<s25t::element, MaxDegree + 1u> p) noexcept {
       for (unsigned i = 0; i < p.size(); ++i) {
         polynomial[i] = p[i];
@@ -143,8 +137,7 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
     });
   };
   basn::constexpr_switch<1u, max_degree_v + 1u>(polynomial.size() - 1u, f);
-  return res;
-#endif
+  co_await std::move(res);
 }
 
 //--------------------------------------------------------------------------------------------------
