@@ -81,8 +81,17 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
   xena::future<> res;
   auto f = [&]<unsigned MaxDegree>(std::integral_constant<unsigned, MaxDegree>) noexcept {
     polynomial_reducer<MaxDegree> reducer;
+    polynomial_mapper<MaxDegree> mapper{
+        .mles = work.mles.data(),
+        .product_table = work.product_table.data(),
+        .product_terms = work.product_terms.data(),
+        .num_products = static_cast<unsigned>(work.product_terms.size()),
+        .mid = mid,
+        .n = n,
+    };
     (void)res;
     (void)reducer;
+    (void)mapper;
     /* template <algb::reducer Reducer, class Mapper> */
     /* xena::future<typename Reducer::value_type> reduce(basdv::stream&& stream, Mapper mapper, */
     /*                                                   unsigned n) noexcept { */
