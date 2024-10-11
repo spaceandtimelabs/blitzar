@@ -3,16 +3,20 @@
 #include <algorithm>
 
 #include "sxt/algorithm/iteration/for_each.h"
+#include "sxt/algorithm/reduction/reduction.h"
 #include "sxt/base/container/stack_array.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/panic.h"
 #include "sxt/base/num/ceil_log2.h"
+#include "sxt/base/num/constexpr_switch.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
+#include "sxt/proof/sumcheck/polynomial_mapper.h"
+#include "sxt/proof/sumcheck/polynomial_reducer.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
@@ -63,11 +67,29 @@ gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 //--------------------------------------------------------------------------------------------------
 xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
                              workspace& ws) const noexcept {
+  static constexpr unsigned max_degree_v = 5u;
   auto& work = static_cast<gpu_workspace&>(ws);
   auto n = work.n;
   auto mid = 1u << (work.num_variables - 1u);
-  SXT_RELEASE_ASSERT(work.n > mid);
+  SXT_RELEASE_ASSERT(
+      // clang-format off
+      work.n > mid &&
+      polynomial.size() - 1u <= max_degree_v
+      // clang-format on
+  );
 
+  xena::future<> res;
+  auto f = [&]<unsigned MaxDegree>(std::integral_constant<unsigned, MaxDegree>) noexcept {
+    polynomial_reducer<MaxDegree> reducer;
+    (void)res;
+    (void)reducer;
+    /* template <algb::reducer Reducer, class Mapper> */
+    /* xena::future<typename Reducer::value_type> reduce(basdv::stream&& stream, Mapper mapper, */
+    /*                                                   unsigned n) noexcept { */
+  };
+  basn::constexpr_switch<1u, max_degree_v + 1u>(polynomial.size() - 1u, f);
+  return res;
+  (void)f;
   (void)polynomial;
   (void)ws;
 #if 0
