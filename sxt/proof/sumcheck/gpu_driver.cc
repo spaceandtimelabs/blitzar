@@ -80,12 +80,27 @@ gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
   basdv::stream mle_stream;
   basdv::async_copy_host_to_device(ws->mles, mles, mle_stream);
 
+  // product_table
+  ws->product_table = memmg::managed_array<std::pair<s25t::element, unsigned>>{
+      product_table.size(),
+      memr::get_device_resource(),
+  };
+  basdv::stream product_table_stream;
+  basdv::async_copy_host_to_device(ws->product_table, product_table, product_table_stream);
+
+  // product_terms
+  ws->product_terms = memmg::managed_array<unsigned>{
+      product_terms.size(),
+      memr::get_device_resource(),
+  };
+  basdv::stream product_terms_stream;
+  basdv::async_copy_host_to_device(ws->product_terms, product_terms, product_terms_stream);
+
   // await
   co_await xendv::await_stream(mle_stream);
+  co_await xendv::await_stream(product_table_stream);
+  co_await xendv::await_stream(product_terms_stream);
   co_return ws;
-  /* return xena::make_ready_future<std::unique_ptr<workspace>>(std::move(ws)); */
-  /* return xena::make_ready_future<std::unique_ptr<workspace>>( */
-  /*     std::make_unique<gpu_workspace>(mles, product_table, product_terms, n)); */
 }
 
 //--------------------------------------------------------------------------------------------------
