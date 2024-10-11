@@ -55,11 +55,12 @@ struct gpu_workspace final : public workspace {
 //--------------------------------------------------------------------------------------------------
 // make_workspace
 //--------------------------------------------------------------------------------------------------
-std::unique_ptr<workspace>
+xena::future<std::unique_ptr<workspace>>
 gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
                            basct::cspan<std::pair<s25t::element, unsigned>> product_table,
                            basct::cspan<unsigned> product_terms, unsigned n) const noexcept {
-  return std::make_unique<gpu_workspace>(mles, product_table, product_terms, n);
+  return xena::make_ready_future<std::unique_ptr<workspace>>(
+      std::make_unique<gpu_workspace>(mles, product_table, product_terms, n));
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -88,7 +89,9 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
         .mid = mid,
         .n = n,
     };
-    auto fut = algr::reduce<polynomial_reducer<MaxDegree>>(basdv::stream{}, mapper, mid);
+    auto fut = algr::reduce<polynomial_reducer<MaxDegree>>(
+        basdv::stream{}
+        , mapper, mid);
     res = fut.then([&](std::array<s25t::element, MaxDegree + 1u> p) noexcept {
       for (unsigned i = 0; i < p.size(); ++i) {
         polynomial[i] = p[i];

@@ -123,7 +123,9 @@ sxt_cc_component(
   ],
   test_deps = [
     ":cpu_driver",
+    ":gpu_driver",
     "//sxt/execution/async:future",
+    "//sxt/execution/schedule:scheduler",
     "//sxt/base/test:unit_test",
     "//sxt/proof/transcript:transcript",
     "//sxt/scalar25/operation:overload",

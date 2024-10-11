@@ -31,7 +31,7 @@ struct cpu_workspace final : public workspace {
 //--------------------------------------------------------------------------------------------------
 // make_workspace
 //--------------------------------------------------------------------------------------------------
-std::unique_ptr<workspace>
+xena::future<std::unique_ptr<workspace>>
 cpu_driver::make_workspace(basct::cspan<s25t::element> mles,
                            basct::cspan<std::pair<s25t::element, unsigned>> product_table,
                            basct::cspan<unsigned> product_terms, unsigned n) const noexcept {
@@ -41,7 +41,7 @@ cpu_driver::make_workspace(basct::cspan<s25t::element> mles,
   res->product_terms = product_terms;
   res->n = n;
   res->num_variables = basn::ceil_log2(n);
-  return res;
+  return xena::make_ready_future<std::unique_ptr<workspace>>(std::move(res));
 }
 
 //--------------------------------------------------------------------------------------------------

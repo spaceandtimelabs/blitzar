@@ -31,7 +31,7 @@ xena::future<> prove_sum(basct::span<s25t::element> polynomials,
 
   init_transcript(transcript, num_variables, polynomial_length - 1);
 
-  auto ws = drv.make_workspace(mles, product_table, product_terms, n);
+  auto ws = co_await drv.make_workspace(mles, product_table, product_terms, n);
 
   for (unsigned round_index = 0; round_index < num_variables; ++round_index) {
     auto polynomial = polynomials.subspan(round_index * polynomial_length, polynomial_length);

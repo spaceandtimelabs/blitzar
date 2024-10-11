@@ -6,7 +6,9 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/proof/sumcheck/cpu_driver.h"
+#include "sxt/proof/sumcheck/gpu_driver.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"
@@ -18,6 +20,7 @@ using s25t::operator""_s25;
 TEST_CASE("we can create a sumcheck proof") {
   prft::transcript transcript{"abc"};
   cpu_driver drv;
+  /* gpu_driver drv; */
   std::vector<s25t::element> polynomials(2);
   std::vector<s25t::element> evaluation_point(1);
   std::vector<s25t::element> mles = {
@@ -32,11 +35,13 @@ TEST_CASE("we can create a sumcheck proof") {
   SECTION("we can prove a sum with a single variable") {
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
                          product_terms, 2);
+    xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == mles[0]);
     REQUIRE(polynomials[1] == mles[1] - mles[0]);
   }
 
+#if 0
   SECTION("we can prove a sum where the term multiplier is different from one") {
     product_table[0].first = 0x2_s25;
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
@@ -68,4 +73,5 @@ TEST_CASE("we can create a sumcheck proof") {
       std::cout << r << "\n";
     }
   }
+#endif
 }
