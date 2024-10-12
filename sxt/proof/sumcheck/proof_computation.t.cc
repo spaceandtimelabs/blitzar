@@ -56,6 +56,23 @@ TEST_CASE("we can create a sumcheck proof") {
     REQUIRE(polynomials[2] == (mles[1] - mles[0]) * (mles[1] - mles[0]));
   }
 
+  SECTION("we can prove a sum with multiple MLEs") {
+    product_table = {
+        {0x1_s25, 2},
+    };
+    product_terms = {0, 1};
+    polynomials.resize(3);
+    mles.push_back(0x7_s25);
+    mles.push_back(0x10_s25);
+    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                         product_terms, 2);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(polynomials[0] == mles[0] * mles[2]);
+    REQUIRE(polynomials[1] == (mles[1] - mles[0]) * mles[2] + (mles[3] - mles[2]) * mles[0]);
+    REQUIRE(polynomials[2] == (mles[1] - mles[0]) * (mles[3] - mles[2]));
+  }
+
   SECTION("we can prove a sum where the term multiplier is different from one") {
     product_table[0].first = 0x2_s25;
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
