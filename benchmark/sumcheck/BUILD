@@ -8,7 +8,7 @@ sxt_cc_benchmark(
     visibility = ["//visibility:public"],
     deps = [
         "//sxt/base/error:panic",
-        # "//sxt/base/container:span",
+        "//sxt/base/container:span",
         # "//sxt/cbindings/backend:cpu_backend",
         # "//sxt/cbindings/backend:gpu_backend",
         # "//sxt/curve21/type:element_p3",

@@ -2,6 +2,7 @@
 #include <print>
 #include <string_view>
 
+#include "sxt/base/container/span.h"
 #include "sxt/base/error/panic.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/scalar25/type/element.h"
@@ -46,13 +47,17 @@ static void read_params(params& p, int argc, char* argv[]) noexcept {
   }
 }
 
+void fill_mles(basct::span<s25t::element> mles) noexcept {
+  (void)mles;
+}
+
 int main(int argc, char* argv[]) {
   params p;
   read_params(p, argc, argv);
 
   // mles
-  memmg::managed_array<s25t::element> mles;
-  (void)argc;
-  (void)argv;
+  memmg::managed_array<s25t::element> mles(p.n * p.degree * p.num_products);
+  fill_mles(mles);
+
   return 0;
 }
