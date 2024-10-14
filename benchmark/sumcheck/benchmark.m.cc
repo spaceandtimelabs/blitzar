@@ -18,12 +18,32 @@ static void read_params(params& p, int argc, char* argv[]) noexcept {
   if (argc != 5) {
     baser::panic("Usage: benchmark <n> <degree> <num_products> <num_samples>");
   }
-  std::string_view s{argv[1]};
+
+  std::string_view s;
+
+  // n
+  s = {argv[1]};
   if (std::from_chars(s.begin(), s.end(), p.n).ec != std::errc{}) {
     baser::panic("invalid argument for n: {}\n", s);
   }
-  (void)p;
-  (void)argv;
+
+  // degree
+  s = {argv[2]};
+  if (std::from_chars(s.begin(), s.end(), p.degree).ec != std::errc{}) {
+    baser::panic("invalid argument for degree: {}\n", s);
+  }
+
+  // num_products
+  s = {argv[3]};
+  if (std::from_chars(s.begin(), s.end(), p.num_products).ec != std::errc{}) {
+    baser::panic("invalid argument for num_products: {}\n", s);
+  }
+
+  // num_samples
+  s = {argv[4]};
+  if (std::from_chars(s.begin(), s.end(), p.num_samples).ec != std::errc{}) {
+    baser::panic("invalid argument for num_samples: {}\n", s);
+  }
 }
 
 int main(int argc, char* argv[]) {
