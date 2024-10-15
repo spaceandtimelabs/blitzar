@@ -13,6 +13,7 @@ sxt_cc_benchmark(
         # "//sxt/cbindings/backend:cpu_backend",
         # "//sxt/cbindings/backend:gpu_backend",
         # "//sxt/curve21/type:element_p3",
+        "//sxt/proof/sumcheck:proof_computation",
         "//sxt/memory/management:managed_array",
         "//sxt/scalar25/random:element",
         "//sxt/scalar25/type:element",

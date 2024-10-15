@@ -6,6 +6,7 @@
 #include "sxt/base/error/panic.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/proof/sumcheck/proof_computation.h"
 #include "sxt/scalar25/random/element.h"
 #include "sxt/scalar25/type/element.h"
 using namespace sxt;
@@ -59,5 +60,18 @@ int main(int argc, char* argv[]) {
   memmg::managed_array<s25t::element> mles(p.n * p.degree * p.num_products);
   s25rn::generate_random_elements(mles, rng);
 
+  // product_table
+  memmg::managed_array<std::pair<s25t::element, unsigned>> product_table(p.num_products);
+  for (unsigned product_index = 0; product_index < p.num_products; ++product_index) {
+    s25rn::generate_random_element(product_table[product_index].first, rng);
+    product_table[product_index].second = p.degree;
+  }
+  (void)product_table;
+
+/* xena::future<> prove_sum(basct::span<s25t::element> polynomials, */
+/*                          basct::span<s25t::element> evaluation_point, prft::transcript& transcript, */
+/*                          const driver& drv, basct::cspan<s25t::element> mles, */
+/*                          basct::cspan<std::pair<s25t::element, unsigned>> product_table, */
+/*                          basct::cspan<unsigned> product_terms, unsigned n) noexcept; */
   return 0;
 }
