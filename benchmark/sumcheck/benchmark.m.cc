@@ -1,13 +1,19 @@
 #include <charconv>
+#include <chrono>
 #include <numeric>
 #include <print>
 #include <string_view>
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/error/panic.h"
+#include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/fast_random_number_generator.h"
+#include "sxt/execution/async/future.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/proof/sumcheck/gpu_driver.h"
 #include "sxt/proof/sumcheck/proof_computation.h"
+#include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/random/element.h"
 #include "sxt/scalar25/type/element.h"
 using namespace sxt;
@@ -71,6 +77,21 @@ int main(int argc, char* argv[]) {
   // product_terms
   memmg::managed_array<unsigned> product_terms(p.num_products * p.degree);
   std::iota(product_terms.begin(), product_terms.end(), 0);
+
+  // benchmark
+  auto num_rounds = basn::ceil_log2(p.n);
+  memmg::managed_array<s25t::element> polynomials(p.degree * num_rounds);
+  memmg::managed_array<s25t::element> evaluation_point(num_rounds);
+  prft::transcript transcript{"abc123"};
+  prfsk::gpu_driver drv;
+  auto t1 = std::chrono::steady_clock::now();
+  auto fut = prfsk::prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                              product_terms, p.n);
+  xens::get_scheduler().run();
+  auto t2 = std::chrono::steady_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
+  std::println("{} seconds", static_cast<double>(duration.count()) / 1.0e6);
+
   (void)product_table;
 
 /* xena::future<> prove_sum(basct::span<s25t::element> polynomials, */
