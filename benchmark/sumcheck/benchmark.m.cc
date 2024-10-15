@@ -80,6 +80,7 @@ int main(int argc, char* argv[]) {
 
   // benchmark
   auto num_rounds = basn::ceil_log2(p.n);
+  std::println("num_rounds = {}", num_rounds);
   memmg::managed_array<s25t::element> polynomials(p.degree * num_rounds);
   memmg::managed_array<s25t::element> evaluation_point(num_rounds);
   prft::transcript transcript{"abc123"};

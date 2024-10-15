@@ -1,6 +1,8 @@
 #include "sxt/proof/sumcheck/gpu_driver.h"
 
 #include <algorithm>
+#include <chrono>
+#include <print>
 
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/algorithm/reduction/reduction.h"
@@ -136,8 +138,13 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
       }
     });
   };
+  std::println("summing {}", n);
+  auto t1 = std::chrono::steady_clock::now();
   basn::constexpr_switch<1u, max_degree_v + 1u>(polynomial.size() - 1u, f);
   co_await std::move(res);
+  auto t2 = std::chrono::steady_clock::now();
+  auto elapse = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
+  std::println("done summing {}: {}", n, elapse.count() / 1.0e6);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -178,12 +185,18 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
       data[i] = val;
     }
   };
+  std::println("folding {}", n);
+  auto t1 = std::chrono::steady_clock::now();
   co_await algi::for_each(f1, n1);
+  auto t2 = std::chrono::steady_clock::now();
+  auto elapse = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
+  std::println("done folding {}: {}", n, elapse.count() / 1.0e6);
 
   SXT_RELEASE_ASSERT(n1 == mid, "not implemented yet");
 
   work.n = mid;
   --work.num_variables;
+  work.mles.shrink(num_mles * mid);
 }
 } // namespace prfsk
 
