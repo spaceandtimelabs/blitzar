@@ -1,4 +1,5 @@
 #include <charconv>
+#include <numeric>
 #include <print>
 #include <string_view>
 
@@ -66,6 +67,10 @@ int main(int argc, char* argv[]) {
     s25rn::generate_random_element(product_table[product_index].first, rng);
     product_table[product_index].second = p.degree;
   }
+
+  // product_terms
+  memmg::managed_array<unsigned> product_terms(p.num_products * p.degree);
+  std::iota(product_terms.begin(), product_terms.end(), 0);
   (void)product_table;
 
 /* xena::future<> prove_sum(basct::span<s25t::element> polynomials, */
