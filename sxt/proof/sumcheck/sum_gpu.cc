@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/proof/sumcheck/sum_gpu.h"
 
-#include <concepts>
+#include "sxt/scalar25/type/element.h"
 
-namespace sxt::algb {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
-// mapper
+// sum
 //--------------------------------------------------------------------------------------------------
-/**
- * Describe a generic map function that can be used within CUDA kernels.
- *
- * Mapper turns an index into a value.
- */
-template <class M>
-concept mapper = requires(M m, typename M::value_type& x, unsigned int i) {
-  { m.map_index(i) } noexcept -> std::convertible_to<typename M::value_type>;
-  { m.map_index(x, i) } noexcept;
-};
-} // namespace sxt::algb
+void sum(basct::span<s25t::element> polynomial, basdv::stream& stream,
+         basct::cspan<s25t::element> mles,
+         basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+         basct::cspan<unsigned> product_terms, unsigned mid, unsigned n) noexcept {
+  (void)polynomial;
+  (void)stream;
+  (void)mles;
+  (void)product_table;
+  (void)product_terms;
+  (void)mid;
+  (void)n;
+}
+} // namespace sxt::prfsk

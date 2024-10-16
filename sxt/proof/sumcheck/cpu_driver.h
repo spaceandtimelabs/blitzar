@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,22 @@
  */
 #pragma once
 
-#include <concepts>
+#include "sxt/proof/sumcheck/driver.h"
 
-namespace sxt::algb {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
-// mapper
+// cpu_driver
 //--------------------------------------------------------------------------------------------------
-/**
- * Describe a generic map function that can be used within CUDA kernels.
- *
- * Mapper turns an index into a value.
- */
-template <class M>
-concept mapper = requires(M m, typename M::value_type& x, unsigned int i) {
-  { m.map_index(i) } noexcept -> std::convertible_to<typename M::value_type>;
-  { m.map_index(x, i) } noexcept;
+class cpu_driver final : public driver {
+
+  // driver
+  xena::future<std::unique_ptr<workspace>>
+  make_workspace(basct::cspan<s25t::element> mles,
+                 basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+                 basct::cspan<unsigned> product_terms, unsigned n) const noexcept override;
+
+  xena::future<> sum(basct::span<s25t::element> polynomial, workspace& ws) const noexcept override;
+
+  xena::future<> fold(workspace& ws, const s25t::element& r) const noexcept override;
 };
-} // namespace sxt::algb
+} // namespace sxt::prfsk

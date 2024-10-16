@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,22 @@
  */
 #pragma once
 
-#include <concepts>
+#include "sxt/base/container/span.h"
 
-namespace sxt::algb {
+namespace sxt::prft {
+class transcript;
+}
+namespace sxt::s25t {
+class element;
+}
+
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
-// mapper
+// verify_sumcheck_no_evaluation
 //--------------------------------------------------------------------------------------------------
-/**
- * Describe a generic map function that can be used within CUDA kernels.
- *
- * Mapper turns an index into a value.
- */
-template <class M>
-concept mapper = requires(M m, typename M::value_type& x, unsigned int i) {
-  { m.map_index(i) } noexcept -> std::convertible_to<typename M::value_type>;
-  { m.map_index(x, i) } noexcept;
-};
-} // namespace sxt::algb
+bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
+                                   basct::span<s25t::element> evaluation_point,
+                                   prft::transcript& transcript,
+                                   basct::cspan<s25t::element> round_polynomials,
+                                   unsigned round_degree) noexcept;
+} // namespace sxt::prfsk

@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,23 @@
  */
 #pragma once
 
-#include <concepts>
+#include <array>
 
-namespace sxt::algb {
+#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/scalar25/operation/add.h"
+#include "sxt/scalar25/type/element.h"
+
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
-// mapper
+// polynomial_reducer
 //--------------------------------------------------------------------------------------------------
-/**
- * Describe a generic map function that can be used within CUDA kernels.
- *
- * Mapper turns an index into a value.
- */
-template <class M>
-concept mapper = requires(M m, typename M::value_type& x, unsigned int i) {
-  { m.map_index(i) } noexcept -> std::convertible_to<typename M::value_type>;
-  { m.map_index(x, i) } noexcept;
+template <unsigned MaxDegree> struct polynomial_reducer {
+  using value_type = std::array<s25t::element, MaxDegree + 1u>;
+
+  CUDA_CALLABLE static void accumulate_inplace(value_type& res, const value_type& e) noexcept {
+    for (unsigned i = 0; i < res.size(); ++i) {
+      s25o::add(res[i], res[i], e[i]);
+    }
+  }
 };
-} // namespace sxt::algb
+} // namespace sxt::prfsk

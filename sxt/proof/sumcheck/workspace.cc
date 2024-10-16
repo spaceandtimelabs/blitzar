@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
-
-namespace sxt::algb {
-//--------------------------------------------------------------------------------------------------
-// reducer
-//--------------------------------------------------------------------------------------------------
-/**
- * Describe a generic reduction function that can be used in CUDA kernels.
- * See https://developer.download.nvidia.com/assets/cuda/files/reduction.pdf
- */
-template <class R>
-concept reducer = requires(typename R::value_type& x) {
-  { R::accumulate_inplace(x, x) } noexcept;
-};
-} // namespace sxt::algb
+#include "sxt/proof/sumcheck/workspace.h"

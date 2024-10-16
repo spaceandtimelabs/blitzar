@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,18 @@
  */
 #pragma once
 
-#include <concepts>
-
-namespace sxt::algb {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
-// mapper
+// sum_round
 //--------------------------------------------------------------------------------------------------
-/**
- * Describe a generic map function that can be used within CUDA kernels.
- *
- * Mapper turns an index into a value.
- */
-template <class M>
-concept mapper = requires(M m, typename M::value_type& x, unsigned int i) {
-  { m.map_index(i) } noexcept -> std::convertible_to<typename M::value_type>;
-  { m.map_index(x, i) } noexcept;
-};
-} // namespace sxt::algb
+template <size_t MaxDegree, class Scalar>
+void sum_round(Scalar* __restrict__ polynomial, const Scalar* __restrict__ mles,
+               const unsigned* __restrict__ product_table,
+               const unsigned* __restrict__ product_lengths, unsigned num_products) noexcept {
+  (void)polynomial;
+  (void)mles;
+  (void)product_table;
+  (void)product_lengths;
+  (void)num_products;
+}
+} // namespace sxt::prfsk
