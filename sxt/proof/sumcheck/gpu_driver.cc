@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2024-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include "sxt/proof/sumcheck/gpu_driver.h"
 
 #include <algorithm>
@@ -109,7 +125,7 @@ gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 // sum
 //--------------------------------------------------------------------------------------------------
 xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
-                             workspace& ws) const noexcept {
+                               workspace& ws) const noexcept {
   static constexpr unsigned max_degree_v = 5u;
   auto& work = static_cast<gpu_workspace&>(ws);
   auto n = work.n;
@@ -168,23 +184,24 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
 
   // f1
   auto f1 = [
-    // clang-format off
+                // clang-format off
     mles = work.mles.data(),
     n = n,
     num_mles = num_mles,
     mid = mid,
     r = r,
     one_m_r = one_m_r
-    // clang-format on
-  ] __device__ __host__ (unsigned /*n1*/, unsigned i) noexcept {
-    for (unsigned mle_index=0; mle_index<num_mles; ++mle_index) {
-      auto data = mles + n * mle_index;
-      auto val = data[i];
-      s25o::mul(val, val, one_m_r);
-      s25o::muladd(val, r, data[mid + i], val);
-      data[i] = val;
-    }
-  };
+                // clang-format on
+  ] __device__
+            __host__(unsigned /*n1*/, unsigned i) noexcept {
+              for (unsigned mle_index = 0; mle_index < num_mles; ++mle_index) {
+                auto data = mles + n * mle_index;
+                auto val = data[i];
+                s25o::mul(val, val, one_m_r);
+                s25o::muladd(val, r, data[mid + i], val);
+                data[i] = val;
+              }
+            };
   std::println("folding {}", n);
   auto t1 = std::chrono::steady_clock::now();
   co_await algi::for_each(f1, n1);
@@ -198,5 +215,4 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
   --work.num_variables;
   work.mles.shrink(num_mles * mid);
 }
-} // namespace prfsk
-
+} // namespace sxt::prfsk

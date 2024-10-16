@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2024-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <array>
@@ -26,7 +42,7 @@ template <unsigned MaxDegree> struct polynomial_mapper {
   CUDA_CALLABLE
   void map_index(value_type& p, unsigned index) const noexcept {
     // zero
-    for (auto& pi : p) { 
+    for (auto& pi : p) {
       pi = {};
     }
 
@@ -40,7 +56,7 @@ template <unsigned MaxDegree> struct polynomial_mapper {
       expand_products({prod, num_terms + 1u}, mle_data, n, mid, {terms_data, num_terms});
       terms_data += num_terms;
 
-      for (unsigned i=0; i<num_terms+1; ++i) {
+      for (unsigned i = 0; i < num_terms + 1; ++i) {
         s25o::muladd(p[i], mult, prod[i], p[i]);
       }
     }
