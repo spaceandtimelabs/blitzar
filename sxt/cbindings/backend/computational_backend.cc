@@ -15,3 +15,25 @@
  * limitations under the License.
  */
 #include "sxt/cbindings/backend/computational_backend.h"
+#include "sxt/cbindings/base/curve_id_utility.h"
+
+namespace sxt::cbnbck {
+//--------------------------------------------------------------------------------------------------
+// read_partition_table_accessor
+//--------------------------------------------------------------------------------------------------
+std::unique_ptr<mtxpp2::partition_table_accessor_base>
+computational_backend::read_partition_table_accessor(cbnb::curve_id_t curve_id,
+                                                     const char* filename) const noexcept {
+  (void)curve_id;
+  (void)filename;
+}
+
+//--------------------------------------------------------------------------------------------------
+// write_partition_table_accessor
+//--------------------------------------------------------------------------------------------------
+void computational_backend::write_partition_table_accessor(cbnb::curve_id_t curve_id,
+                                                           const char* filename) const noexcept {
+  (void)curve_id;
+  (void)filename;
+}
+} // namespace sxt::cbnbck

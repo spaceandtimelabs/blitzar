@@ -7,6 +7,7 @@ sxt_cc_component(
     name = "computational_backend",
     with_test = False,
     deps = [
+        ":computational_backend_utility",
         "//sxt/base/container:span",
         "//sxt/cbindings/base:curve_id",
         "//sxt/curve21/type:element_p3",
