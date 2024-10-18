@@ -586,6 +586,12 @@ struct sxt_multiexp_handle* sxt_multiexp_handle_new_from_file(unsigned curve_id,
                                                               const char* filename);
 
 /**
+ * Write to file
+ */
+void sxt_multiexp_handle_write_to_file(const struct sxt_multiexp_handle* handle,
+                                       const char* filename);
+
+/**
  * Free resources for a multiexponentiation handle
  */
 void sxt_multiexp_handle_free(struct sxt_multiexp_handle* handle);

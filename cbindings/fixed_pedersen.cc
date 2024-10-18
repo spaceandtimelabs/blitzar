@@ -49,6 +49,16 @@ struct sxt_multiexp_handle* sxt_multiexp_handle_new_from_file(unsigned curve_id,
 }
 
 //--------------------------------------------------------------------------------------------------
+// sxt_multiexp_handle_write_to_file
+//--------------------------------------------------------------------------------------------------
+void sxt_multiexp_handle_write_to_file(const struct sxt_multiexp_handle* handle,
+                                       const char* filename) {
+  auto backend = cbn::get_backend();
+  auto h = reinterpret_cast<const cbnb::multiexp_handle*>(handle);
+  backend->write_partition_table_accessor(h->curve_id, *h->partition_table_accessor, filename);
+}
+
+//--------------------------------------------------------------------------------------------------
 // sxt_multiexp_handle_free
 //--------------------------------------------------------------------------------------------------
 void sxt_multiexp_handle_free(struct sxt_multiexp_handle* handle) {
