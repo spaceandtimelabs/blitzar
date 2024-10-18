@@ -37,6 +37,18 @@ struct sxt_multiexp_handle* sxt_multiexp_handle_new(unsigned curve_id, const voi
 }
 
 //--------------------------------------------------------------------------------------------------
+// sxt_multiexp_handle_new_from_file
+//--------------------------------------------------------------------------------------------------
+struct sxt_multiexp_handle* sxt_multiexp_handle_new_from_file(unsigned curve_id,
+                                                              const char* filename) {
+  auto res = std::make_unique<cbnb::multiexp_handle>();
+  res->curve_id = static_cast<cbnb::curve_id_t>(curve_id);
+  auto backend = cbn::get_backend();
+  res->partition_table_accessor = backend->read_partition_table_accessor(res->curve_id, filename);
+  return reinterpret_cast<sxt_multiexp_handle*>(res.release());
+}
+
+//--------------------------------------------------------------------------------------------------
 // sxt_multiexp_handle_free
 //--------------------------------------------------------------------------------------------------
 void sxt_multiexp_handle_free(struct sxt_multiexp_handle* handle) {

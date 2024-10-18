@@ -579,6 +579,13 @@ struct sxt_multiexp_handle* sxt_multiexp_handle_new(unsigned curve_id, const voi
                                                     unsigned n);
 
 /**
+ * Use a serialized file to create a handle for computing multiexponentiations using a fixed 
+ * sequence of generators.
+ */
+struct sxt_multiexp_handle* sxt_multiexp_handle_new_from_file(unsigned curve_id,
+                                                              const char* filename);
+
+/**
  * Free resources for a multiexponentiation handle
  */
 void sxt_multiexp_handle_free(struct sxt_multiexp_handle* handle);
