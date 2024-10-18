@@ -16,6 +16,7 @@
  */
 
 #include "sxt/cbindings/backend/computational_backend.h"
+#include "computational_backend.h"
 #include "sxt/cbindings/base/curve_id_utility.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor.h"
 
@@ -37,9 +38,12 @@ computational_backend::read_partition_table_accessor(cbnb::curve_id_t curve_id,
 //--------------------------------------------------------------------------------------------------
 // write_partition_table_accessor
 //--------------------------------------------------------------------------------------------------
-void computational_backend::write_partition_table_accessor(cbnb::curve_id_t curve_id,
-                                                           const char* filename) const noexcept {
-  (void)curve_id;
-  (void)filename;
+void computational_backend::write_partition_table_accessor(
+    cbnb::curve_id_t curve_id, const mtxpp2::partition_table_accessor_base& accessor,
+    const char* filename) const noexcept {
+  cbnb::switch_curve_type(
+      curve_id, [&]<class U, class T>(std::type_identity<U>, std::type_identity<T>) noexcept {
+        static_cast<const mtxpp2::partition_table_accessor<U>&>(accessor).write_to_file(filename);
+      });
 }
 } // namespace sxt::cbnbck

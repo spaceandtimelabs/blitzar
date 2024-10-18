@@ -129,6 +129,7 @@ public:
   read_partition_table_accessor(cbnb::curve_id_t curve_id, const char* filename) const noexcept;
 
   void write_partition_table_accessor(cbnb::curve_id_t curve_id,
+                                      const mtxpp2::partition_table_accessor_base& accessor,
                                       const char* filename) const noexcept;
 };
 } // namespace sxt::cbnbck
