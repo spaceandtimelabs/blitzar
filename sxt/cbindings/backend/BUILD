@@ -15,6 +15,9 @@ sxt_cc_component(
         "//sxt/multiexp/pippenger2:partition_table_accessor_base",
         "//sxt/ristretto/type:compressed_element",
     ],
+    impl_deps = [
+        "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor",
+    ],
 )
 
 sxt_cc_component(
