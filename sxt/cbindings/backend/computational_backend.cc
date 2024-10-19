@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#include "computational_backend.h"
 #include "sxt/cbindings/backend/computational_backend.h"
 
 #include "sxt/cbindings/base/curve_id_utility.h"
