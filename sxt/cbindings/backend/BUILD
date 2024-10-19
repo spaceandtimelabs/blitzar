@@ -5,6 +5,9 @@ load(
 
 sxt_cc_component(
     name = "computational_backend",
+    impl_deps = [
+        "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor",
+    ],
     with_test = False,
     deps = [
         ":computational_backend_utility",
@@ -14,9 +17,6 @@ sxt_cc_component(
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/pippenger2:partition_table_accessor_base",
         "//sxt/ristretto/type:compressed_element",
-    ],
-    impl_deps = [
-        "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor",
     ],
 )
 

@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-#include "sxt/cbindings/backend/computational_backend.h"
 #include "computational_backend.h"
+#include "sxt/cbindings/backend/computational_backend.h"
+
 #include "sxt/cbindings/base/curve_id_utility.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor.h"
 
