@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "cbindings/backend.h"
+#include "sxt/base/test/temp_file.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
@@ -73,6 +74,25 @@ TEST_CASE("we can compute multi-exponentiations with a fixed set of generators")
     c21t::element_p3 res;
     sxt_fixed_multiexponentiation(&res, h.h, 2, 1, 2, scalars);
     REQUIRE(res == generators[0] + 2 * 256 * generators[1]);
+  }
+
+  SECTION("we can read and write a handle to a file") {
+    bastst::temp_file temp_file{std::ios::binary};
+    temp_file.stream().close();
+
+    wrapped_handle h{generators.data(), 2};
+    REQUIRE(h.h != nullptr);
+
+    sxt_multiexp_handle_write_to_file(h.h, temp_file.name().c_str());
+
+    auto hp = sxt_multiexp_handle_new_from_file(SXT_CURVE_RISTRETTO255, temp_file.name().c_str());
+
+    uint8_t scalars[] = {1, 0, 0, 2};
+    c21t::element_p3 res;
+    sxt_fixed_multiexponentiation(&res, hp, 2, 1, 2, scalars);
+    REQUIRE(res == generators[0] + 2 * 256 * generators[1]);
+
+    sxt_multiexp_handle_free(hp);
   }
 
   SECTION("we can compute a multiexponentiation in packed form") {
