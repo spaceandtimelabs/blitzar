@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"
 #include "sxt/scalar25/type/literal.h"
 
@@ -40,5 +41,11 @@ TEST_CASE("we perform basic operations on polynomials") {
     p = {0x123_s25};
     sum_polynomial_01(e, p);
     REQUIRE(e == 0x123_s25);
+  }
+
+  SECTION("we can compute the 0-1 sum of a 1 degree polynomial") {
+    p = {0x123_s25, 0x456_s25};
+    sum_polynomial_01(e, p);
+    REQUIRE(e == 0x123_s25 + 0x456_s25);
   }
 }
