@@ -168,6 +168,7 @@ sxt_cc_component(
     ],
     test_deps = [
         ":backend",
+        "//sxt/base/test:temp_file",
         "//sxt/base/test:unit_test",
         "//sxt/curve21/operation:add",
         "//sxt/curve21/operation:double",
