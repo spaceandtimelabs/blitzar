@@ -46,6 +46,7 @@ void evaluate_polynomial(s25t::element& e, basct::cspan<s25t::element> polynomia
                          const s25t::element& x) noexcept {
   if (polynomial.empty()) {
     e = s25t::element{};
+    return;
   }
   auto i = polynomial.size();
   --i;

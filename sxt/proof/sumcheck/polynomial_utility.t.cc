@@ -48,4 +48,9 @@ TEST_CASE("we perform basic operations on polynomials") {
     sum_polynomial_01(e, p);
     REQUIRE(e == 0x123_s25 + 0x456_s25);
   }
+
+  SECTION("we can evaluate the zero polynomial") {
+    evaluate_polynomial(e, p, 0x123_s25);
+    REQUIRE(e == 0x0_s25);
+  }
 }
