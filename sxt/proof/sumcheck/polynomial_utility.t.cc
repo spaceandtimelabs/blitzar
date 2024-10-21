@@ -16,6 +16,29 @@
  */
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 
-#include "sxt/base/test/unit_test.h"
+#include <vector>
 
-TEST_CASE("todo") {}
+#include "sxt/base/test/unit_test.h"
+#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/type/literal.h"
+
+using namespace sxt;
+using namespace sxt::prfsk;
+using s25t::operator""_s25;
+
+TEST_CASE("we perform basic operations on polynomials") {
+  s25t::element e;
+
+  std::vector<s25t::element> p;
+
+  SECTION("we can compute the 0-1 sum of a zero polynomials") {
+    sum_polynomial_01(e, p);
+    REQUIRE(e == 0x0_s25);
+  }
+
+  SECTION("we can compute the 0-1 sum of a constant polynomial") {
+    p = {0x123_s25};
+    sum_polynomial_01(e, p);
+    REQUIRE(e == 0x123_s25);
+  }
+}

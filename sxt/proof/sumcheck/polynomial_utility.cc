@@ -31,6 +31,7 @@ namespace sxt::prfsk {
 void sum_polynomial_01(s25t::element& e, basct::cspan<s25t::element> polynomial) noexcept {
   if (polynomial.empty()) {
     e = s25t::element{};
+    return;
   }
   e = polynomial[0];
   for (unsigned i = 1; i < polynomial.size(); ++i) {
