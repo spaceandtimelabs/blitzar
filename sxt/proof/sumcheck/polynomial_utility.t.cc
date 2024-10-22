@@ -86,4 +86,18 @@ TEST_CASE("we can expand a product of MLEs") {
     REQUIRE(p[0] == mles[0]);
     REQUIRE(p[1] == mles[1] - mles[0]);
   }
+
+  SECTION("we can expand two MLEs") {
+    p.resize(3);
+    mles = {0x123_s25, 0x456_s25, 0x1122_s25, 0x4455_s25};
+    terms = {0, 1};
+    expand_products(p, mles.data(), 2, 1, terms);
+    auto a1 = mles[0];
+    auto a2 = mles[1] - mles[0];
+    auto b1 = mles[2];
+    auto b2 = mles[3] - mles[2];
+    REQUIRE(p[0] == a1 * b1);
+    REQUIRE(p[1] == a1 * b2 + a2 * b1);
+    REQUIRE(p[2] == a2 * b2);
+  }
 }
