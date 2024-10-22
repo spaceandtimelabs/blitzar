@@ -72,3 +72,18 @@ TEST_CASE("we perform basic operations on polynomials") {
     REQUIRE(e == 0x123_s25 + 0x456_s25 * 0x321_s25 + 0x789_s25 * 0x321_s25 * 0x321_s25);
   }
 }
+
+TEST_CASE("we can expand a product of MLEs") {
+  std::vector<s25t::element> p;
+  std::vector<s25t::element> mles;
+  std::vector<unsigned> terms;
+
+  SECTION("we can expand a single MLE") {
+    p.resize(2);
+    mles = {0x123_s25, 0x456_s25};
+    terms = {0};
+    expand_products(p, mles.data(), 2, 1, terms);
+    REQUIRE(p[0] == mles[0]);
+    REQUIRE(p[1] == mles[1] - mles[0]);
+  }
+}
