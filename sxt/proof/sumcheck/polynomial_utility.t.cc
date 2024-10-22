@@ -53,4 +53,22 @@ TEST_CASE("we perform basic operations on polynomials") {
     evaluate_polynomial(e, p, 0x123_s25);
     REQUIRE(e == 0x0_s25);
   }
+
+  SECTION("we can evaluate a constant polynomial") {
+    p = {0x123_s25};
+    evaluate_polynomial(e, p, 0x321_s25);
+    REQUIRE(e == 0x123_s25);
+  }
+
+  SECTION("we can evaluate a polynomial of degree 1") {
+    p = {0x123_s25, 0x456_s25};
+    evaluate_polynomial(e, p, 0x321_s25);
+    REQUIRE(e == 0x123_s25 + 0x456_s25 * 0x321_s25);
+  }
+
+  SECTION("we can evaluate a polynomial of degree 2") {
+    p = {0x123_s25, 0x456_s25, 0x789_s25};
+    evaluate_polynomial(e, p, 0x321_s25);
+    REQUIRE(e == 0x123_s25 + 0x456_s25 * 0x321_s25 + 0x789_s25 * 0x321_s25 * 0x321_s25);
+  }
 }
