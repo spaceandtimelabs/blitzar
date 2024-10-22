@@ -64,7 +64,13 @@ CUDA_CALLABLE
 void expand_products(basct::span<s25t::element> p, const s25t::element* mles, unsigned n,
                      unsigned step, basct::cspan<unsigned> terms) noexcept {
   auto num_terms = terms.size();
-  assert(num_terms > 0 && p.size() == num_terms + 1u);
+  assert(
+      // clang-format off
+      num_terms > 0 && 
+      n > step &&
+      p.size() == num_terms + 1u
+      // clang-format on
+  );
   s25t::element a, b;
   auto mle_index = terms[0];
   a = *(mles + mle_index * n);
