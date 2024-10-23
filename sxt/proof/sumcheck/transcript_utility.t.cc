@@ -16,6 +16,29 @@
  */
 #include "sxt/proof/sumcheck/transcript_utility.h"
 
-#include "sxt/base/test/unit_test.h"
+#include <vector>
 
-TEST_CASE("todo") {}
+#include "sxt/base/test/unit_test.h"
+#include "sxt/proof/transcript/transcript.h"
+#include "sxt/scalar25/type/literal.h"
+
+using namespace sxt;
+using namespace sxt::prfsk;
+using s25t::operator""_s25;
+
+TEST_CASE("we can perform basic operations on a transcript") {
+  prft::transcript transcript{"abc"};
+  std::vector<s25t::element> p = {0x123_s25};
+  s25t::element r, rp;
+
+  SECTION("we don't draw the same challenge from a transcript") {
+    round_challenge(r, transcript, p);
+    round_challenge(rp, transcript, p);
+    REQUIRE(r != rp);
+
+    prft::transcript transcript_p{"abc"};
+    p[0] = 0x456_s25;
+    round_challenge(rp, transcript_p, p);
+    REQUIRE(r != rp);
+  }
+}
