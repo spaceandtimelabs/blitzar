@@ -17,3 +17,23 @@ sxt_cc_component(
         "//sxt/base/container:span",
     ],
 )
+
+sxt_cc_component(
+    name = "polynomial_utility",
+    impl_deps = [
+        "//sxt/scalar25/operation:add",
+        "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/operation:sub",
+        "//sxt/scalar25/operation:muladd",
+        "//sxt/scalar25/type:element",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
