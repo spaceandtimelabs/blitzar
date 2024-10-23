@@ -23,6 +23,37 @@ jobs:
 
       - run: git config --global --add safe.directory $(realpath .)
 
+      - name: Log Environment Variables (Redacted)
+        run: |
+          printenv | grep -v -e 'SECRET' -e 'TOKEN' -e 'PASSWORD' -e 'KEY'        
+
+      - name: Check nix Installation
+        run: |
+          if command -v nix; then
+            echo "nix is installed"
+            nix --version
+          else
+            echo "nix is NOT installed"
+          fi
+
+      - name: Check nix Directory Structure
+        run: |
+          if [ -d "$HOME/.nix-profile/bin" ]; then
+            echo "nix directory exists"
+            ls -la $HOME/.nix-profile/bin
+          else
+            echo "nix directory does NOT exist"
+          fi
+
+      - name: Check TEST_TMPDIR Permissions
+        run: |
+          if [ -d "$HOME/.bazel_test_opt" ]; then
+            echo "Checking permissions for TEST_TMPDIR"
+            ls -ld $HOME/.bazel_test_opt
+          else
+            echo "TEST_TMPDIR directory does NOT exist"
+          fi
+
       - name: Semantic release
         run: |
           nix develop --command npm install semantic-release
