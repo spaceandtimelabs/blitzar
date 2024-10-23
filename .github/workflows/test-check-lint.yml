@@ -23,6 +23,10 @@ jobs:
       - name: Log PATH
         run: echo $PATH
 
+      - name: Log Environment Variables (Redacted)
+        run: |
+          printenv | grep -v -e 'SECRET' -e 'TOKEN' -e 'PASSWORD' -e 'KEY'
+
       - name: Check nix Installation
         run: |
           if command -v nix; then
@@ -39,7 +43,7 @@ jobs:
             ls -la $HOME/.nix-profile/bin
           else
             echo "nix directory does NOT exist"
-          fi        
+          fi
   
       - name: Run check
         run: nix develop --command ./tools/code_format/check_format.py check
@@ -55,6 +59,10 @@ jobs:
       - name: Log PATH
         run: echo $PATH
 
+      - name: Log Environment Variables (Redacted)
+        run: |
+          printenv | grep -v -e 'SECRET' -e 'TOKEN' -e 'PASSWORD' -e 'KEY'       
+
       - name: Check nix Installation
         run: |
           if command -v nix; then
@@ -71,7 +79,16 @@ jobs:
             ls -la $HOME/.nix-profile/bin
           else
             echo "nix directory does NOT exist"
-          fi        
+          fi          
+
+      - name: Check TEST_TMPDIR Permissions
+        run: |
+          if [ -d "$HOME/.bazel_test" ]; then
+            echo "Checking permissions for TEST_TMPDIR"
+            ls -ld $HOME/.bazel_test
+          else
+            echo "TEST_TMPDIR directory does NOT exist"
+          fi
 
       - name: Run cpp tests
         run: TEST_TMPDIR=$HOME/.bazel_test nix develop --command bazel test //...
@@ -114,6 +131,10 @@ jobs:
       - name: Log PATH
         run: echo $PATH
 
+      - name: Log Environment Variables (Redacted)
+        run: |
+          printenv | grep -v -e 'SECRET' -e 'TOKEN' -e 'PASSWORD' -e 'KEY'       
+
       - name: Check nix Installation
         run: |
           if command -v nix; then
@@ -130,7 +151,16 @@ jobs:
             ls -la $HOME/.nix-profile/bin
           else
             echo "nix directory does NOT exist"
-          fi        
+          fi
+
+      - name: Check TEST_TMPDIR Permissions
+        run: |
+          if [ -d "$HOME/.bazel_test_opt" ]; then
+            echo "Checking permissions for TEST_TMPDIR"
+            ls -ld $HOME/.bazel_test_opt
+          else
+            echo "TEST_TMPDIR directory does NOT exist"
+          fi
   
       - name: Run cpp tests with optimization flags on
         run: TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command bazel test --jobs=1 -c opt //...
@@ -146,6 +176,10 @@ jobs:
       - name: Log PATH
         run: echo $PATH
 
+      - name: Log Environment Variables (Redacted)
+        run: |
+          printenv | grep -v -e 'SECRET' -e 'TOKEN' -e 'PASSWORD' -e 'KEY'
+
       - name: Check nix Installation
         run: |
           if command -v nix; then
@@ -162,7 +196,16 @@ jobs:
             ls -la $HOME/.nix-profile/bin
           else
             echo "nix directory does NOT exist"
-          fi        
+          fi
+
+      - name: Check TEST_TMPDIR Permissions
+        run: |
+          if [ -d "$HOME/.bazel_test_asan" ]; then
+            echo "Checking permissions for TEST_TMPDIR"
+            ls -ld $HOME/.bazel_test_asan
+          else
+            echo "TEST_TMPDIR directory does NOT exist"
+          fi
 
       - name: Run cpp-asan tests
         run: TEST_TMPDIR=$HOME/.bazel_test_asan nix develop --command bazel test --config=asan //sxt/...
@@ -178,6 +221,10 @@ jobs:
       - name: Log PATH
         run: echo $PATH
 
+      - name: Log Environment Variables (Redacted)
+        run: |
+          printenv | grep -v -e 'SECRET' -e 'TOKEN' -e 'PASSWORD' -e 'KEY'        
+
       - name: Check nix Installation
         run: |
           if command -v nix; then
@@ -194,7 +241,16 @@ jobs:
             ls -la $HOME/.nix-profile/bin
           else
             echo "nix directory does NOT exist"
-          fi        
+          fi
+
+      - name: Check TEST_TMPDIR Permissions
+        run: |
+          if [ -d "$HOME/.bazel_test_opt" ]; then
+            echo "Checking permissions for TEST_TMPDIR"
+            ls -ld $HOME/.bazel_test_opt
+          else
+            echo "TEST_TMPDIR directory does NOT exist"
+          fi
 
       - name: Run rust tests
         run: |
