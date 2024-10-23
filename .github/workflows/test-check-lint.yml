@@ -19,6 +19,27 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Log PATH
+        run: echo $PATH
+
+      - name: Check nix Installation
+        run: |
+          if command -v nix; then
+            echo "nix is installed"
+            nix --version
+          else
+            echo "nix is NOT installed"
+          fi
+
+      - name: Check nix Directory Structure
+        run: |
+          if [ -d "$HOME/.nix-profile/bin" ]; then
+            echo "nix directory exists"
+            ls -la $HOME/.nix-profile/bin
+          else
+            echo "nix directory does NOT exist"
+          fi        
   
       - name: Run check
         run: nix develop --command ./tools/code_format/check_format.py check
@@ -30,6 +51,27 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Log PATH
+        run: echo $PATH
+
+      - name: Check nix Installation
+        run: |
+          if command -v nix; then
+            echo "nix is installed"
+            nix --version
+          else
+            echo "nix is NOT installed"
+          fi
+
+      - name: Check nix Directory Structure
+        run: |
+          if [ -d "$HOME/.nix-profile/bin" ]; then
+            echo "nix directory exists"
+            ls -la $HOME/.nix-profile/bin
+          else
+            echo "nix directory does NOT exist"
+          fi        
 
       - name: Run cpp tests
         run: TEST_TMPDIR=$HOME/.bazel_test nix develop --command bazel test //...
@@ -68,6 +110,27 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Log PATH
+        run: echo $PATH
+
+      - name: Check nix Installation
+        run: |
+          if command -v nix; then
+            echo "nix is installed"
+            nix --version
+          else
+            echo "nix is NOT installed"
+          fi
+
+      - name: Check nix Directory Structure
+        run: |
+          if [ -d "$HOME/.nix-profile/bin" ]; then
+            echo "nix directory exists"
+            ls -la $HOME/.nix-profile/bin
+          else
+            echo "nix directory does NOT exist"
+          fi        
   
       - name: Run cpp tests with optimization flags on
         run: TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command bazel test --jobs=1 -c opt //...
@@ -80,6 +143,27 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Log PATH
+        run: echo $PATH
+
+      - name: Check nix Installation
+        run: |
+          if command -v nix; then
+            echo "nix is installed"
+            nix --version
+          else
+            echo "nix is NOT installed"
+          fi
+
+      - name: Check nix Directory Structure
+        run: |
+          if [ -d "$HOME/.nix-profile/bin" ]; then
+            echo "nix directory exists"
+            ls -la $HOME/.nix-profile/bin
+          else
+            echo "nix directory does NOT exist"
+          fi        
+
       - name: Run cpp-asan tests
         run: TEST_TMPDIR=$HOME/.bazel_test_asan nix develop --command bazel test --config=asan //sxt/...
 
@@ -90,6 +174,27 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Log PATH
+        run: echo $PATH
+
+      - name: Check nix Installation
+        run: |
+          if command -v nix; then
+            echo "nix is installed"
+            nix --version
+          else
+            echo "nix is NOT installed"
+          fi
+
+      - name: Check nix Directory Structure
+        run: |
+          if [ -d "$HOME/.nix-profile/bin" ]; then
+            echo "nix directory exists"
+            ls -la $HOME/.nix-profile/bin
+          else
+            echo "nix directory does NOT exist"
+          fi        
 
       - name: Run rust tests
         run: |
