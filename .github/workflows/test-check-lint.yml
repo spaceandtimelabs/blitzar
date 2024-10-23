@@ -20,9 +20,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Log PATH
-        run: echo $PATH
-
       - name: Log Environment Variables (Redacted)
         run: |
           printenv | grep -v -e 'SECRET' -e 'TOKEN' -e 'PASSWORD' -e 'KEY'
@@ -55,9 +52,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
-      - name: Log PATH
-        run: echo $PATH
 
       - name: Log Environment Variables (Redacted)
         run: |
@@ -128,9 +122,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Log PATH
-        run: echo $PATH
-
       - name: Log Environment Variables (Redacted)
         run: |
           printenv | grep -v -e 'SECRET' -e 'TOKEN' -e 'PASSWORD' -e 'KEY'       
@@ -173,9 +164,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Log PATH
-        run: echo $PATH
-
       - name: Log Environment Variables (Redacted)
         run: |
           printenv | grep -v -e 'SECRET' -e 'TOKEN' -e 'PASSWORD' -e 'KEY'
@@ -217,9 +205,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
-      - name: Log PATH
-        run: echo $PATH
 
       - name: Log Environment Variables (Redacted)
         run: |
