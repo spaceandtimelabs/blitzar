@@ -20,6 +20,7 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/proof/transcript/transcript.h"
+#include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"
 #include "sxt/scalar25/type/literal.h"
 
@@ -52,4 +53,24 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
                                                          round_polynomials, 1);
     REQUIRE(!res);
   }
+
+  SECTION("we can verify a sum with two rounds") {
+    // Use the MLE:
+    //    3(1-x1)(1-x2) + 3(1-x1)x2 -7x1(1-x2) -1x1x2
+    round_polynomials.resize(4);
+
+    // round 1
+    round_polynomials[0] = 0x3_s25 + 0x5_s25;
+    round_polynomials[1] = -0x3_s25 - 0x5_s25 - 0x7_s25 - 0x1_s25;
+
+    // round 2
+    // draw r
+
+    evaluation_point.resize(2);
+    // TODO
+  }
+
+  SECTION("we can verify a polynomial of degree 2 with one round") {}
+
+  SECTION("we can verify a polynomial of degree 2 with two rounds") {}
 }

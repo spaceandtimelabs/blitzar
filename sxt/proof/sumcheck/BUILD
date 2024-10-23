@@ -145,6 +145,7 @@ sxt_cc_component(
         ":transcript_utility",
         "//sxt/base/error:assert",
         "//sxt/base/log:log",
+        "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:element",
         "//sxt/proof/transcript:transcript_utility",
     ],
