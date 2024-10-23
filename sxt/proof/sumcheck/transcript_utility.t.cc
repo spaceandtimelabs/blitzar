@@ -41,4 +41,15 @@ TEST_CASE("we can perform basic operations on a transcript") {
     round_challenge(rp, transcript_p, p);
     REQUIRE(r != rp);
   }
+
+  SECTION("init_transcript produces different results based on parameters") {
+    init_transcript(transcript, 1, 2);
+    round_challenge(r, transcript, p);
+
+    prft::transcript transcript_p{"abc"};
+    init_transcript(transcript_p, 2, 1);
+    round_challenge(rp, transcript_p, p);
+
+    REQUIRE(r != rp);
+  }
 }
