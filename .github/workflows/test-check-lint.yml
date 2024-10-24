@@ -14,7 +14,7 @@ concurrency:
 jobs:
   format-code:
     name: Check code
-    runs-on: self-hosted
+    runs-on: public-blitzar-T4-gpu-vm
     timeout-minutes: 600
     steps:
       - name: Checkout code
@@ -25,7 +25,7 @@ jobs:
   
   test-cpp:
     name: C++ code
-    runs-on: self-hosted
+    runs-on: public-blitzar-T4-gpu-vm
     timeout-minutes: 600
     steps:
       - name: Checkout Code
@@ -42,7 +42,7 @@ jobs:
           #
           # test-cpp-compute-sanitizer:
           #   name: C++ code with compute sanitizer
-          #   runs-on: self-hosted
+          #   runs-on: public-blitzar-T4-gpu-vm
           #   timeout-minutes: 600
           #   steps:
           #     - name: Checkout Code
@@ -63,7 +63,7 @@ jobs:
          
   test-cpp-opt:
     name: C++ code with optimizations
-    runs-on: self-hosted
+    runs-on: public-blitzar-T4-gpu-vm
     timeout-minutes: 600
     steps:
       - name: Checkout Code
@@ -74,7 +74,7 @@ jobs:
   
   test-cpp-asan:
     name: C++ code with address sanitizer
-    runs-on: self-hosted
+    runs-on: public-blitzar-T4-gpu-vm
     timeout-minutes: 600
     steps:
       - name: Checkout Code
@@ -85,7 +85,7 @@ jobs:
 
   test-rust:
     name: Rust Sys Crate
-    runs-on: self-hosted
+    runs-on: public-blitzar-T4-gpu-vm
     timeout-minutes: 600
     steps:
       - name: Checkout Code
