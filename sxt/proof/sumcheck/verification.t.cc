@@ -62,14 +62,14 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
 
     // round 1
     round_polynomials[0] = 0x3_s25 + 0x5_s25;
-    round_polynomials[1] = -0x3_s25 - 0x5_s25 - 0x7_s25 - 0x1_s25;
+    round_polynomials[1] = -0x3_s25 - 0x7_s25 - 0x5_s25 - 0x1_s25;
 
     // draw scalar
     s25t::element r;
     {
-      prft::transcript transcript{"abc"};
-      init_transcript(transcript, 2, 1);
-      round_challenge(r, transcript, basct::span<s25t::element>{round_polynomials}.subspan(0, 2));
+      prft::transcript transcript_p{"abc"};
+      init_transcript(transcript_p, 2, 1);
+      round_challenge(r, transcript_p, basct::span<s25t::element>{round_polynomials}.subspan(0, 2));
     }
 
     // round 2
@@ -81,7 +81,8 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
     evaluation_point.resize(2);
     auto res = sxt::prfsk::verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
                                                          round_polynomials, 1);
-    /* REQUIRE(res); */
+    REQUIRE(evaluation_point[0] == r);
+    REQUIRE(res);
   }
 
   SECTION("we can verify a polynomial of degree 2 with one round") {}

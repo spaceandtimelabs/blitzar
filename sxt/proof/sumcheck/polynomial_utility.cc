@@ -34,7 +34,7 @@ void sum_polynomial_01(s25t::element& e, basct::cspan<s25t::element> polynomial)
     return;
   }
   e = polynomial[0];
-  for (unsigned i = 1; i < polynomial.size(); ++i) {
+  for (unsigned i = 0; i < polynomial.size(); ++i) {
     s25o::add(e, e, polynomial[i]);
   }
 }
