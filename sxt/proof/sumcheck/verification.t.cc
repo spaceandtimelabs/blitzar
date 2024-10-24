@@ -109,7 +109,19 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
     REQUIRE(!res);
   }
 
-  SECTION("we can verify a polynomial of degree 2 with one round") {}
-
-  SECTION("we can verify a polynomial of degree 2 with two rounds") {}
+  SECTION("we can verify a polynomial of degree 2 with one round") {
+    // Use the MLEs:
+    //    f(x1) = 3(1-x1) -7x1
+    //    g(x1) = -2 (1 - x1) + 4 x1
+    round_polynomials = {
+        0x3_s25 * -0x2_s25,
+        (-0x3_s25 - 0x7_s25) * -0x2_s25 + 0x3_s25 * (0x2_s25 + 0x4_s25),
+        (-0x3_s25 - 0x7_s25) * (0x2_s25 + 0x4_s25),
+    };
+    expected_sum = 0x3_s25 * -0x2_s25 - 0x7_s25 * 0x4_s25;
+    auto res = sxt::prfsk::verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
+                                                         round_polynomials, 2);
+    REQUIRE(res);
+    REQUIRE(evaluation_point[0] != 0x0_s25);
+  }
 }
