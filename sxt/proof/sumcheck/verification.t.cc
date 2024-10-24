@@ -85,6 +85,30 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
     REQUIRE(res);
   }
 
+  SECTION("sumcheck verification fails if the random scalar used is wrong") {
+    // Use the MLE:
+    //    3(1-x1)(1-x2) + 5(1-x1)x2 -7x1(1-x2) -1x1x2
+    round_polynomials.resize(4);
+
+    // round 1
+    round_polynomials[0] = 0x3_s25 + 0x5_s25;
+    round_polynomials[1] = -0x3_s25 - 0x7_s25 - 0x5_s25 - 0x1_s25;
+
+    // draw scalar
+    s25t::element r = 0x112233_s25;
+
+    // round 2
+    round_polynomials[2] = 0x3_s25 * (0x1_s25 - r) - 0x7_s25 * r;
+    round_polynomials[3] =
+        -0x3_s25 * (0x1_s25 - r) + 0x5_s25 * (0x1_s25 - r) + 0x7_s25 * r - 0x1_s25 * r;
+
+    // prove
+    evaluation_point.resize(2);
+    auto res = sxt::prfsk::verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
+                                                         round_polynomials, 1);
+    REQUIRE(!res);
+  }
+
   SECTION("we can verify a polynomial of degree 2 with one round") {}
 
   SECTION("we can verify a polynomial of degree 2 with two rounds") {}
