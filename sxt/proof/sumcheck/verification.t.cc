@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/proof/sumcheck/transcript_utility.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"
@@ -56,18 +57,31 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
 
   SECTION("we can verify a sum with two rounds") {
     // Use the MLE:
-    //    3(1-x1)(1-x2) + 3(1-x1)x2 -7x1(1-x2) -1x1x2
+    //    3(1-x1)(1-x2) + 5(1-x1)x2 -7x1(1-x2) -1x1x2
     round_polynomials.resize(4);
 
     // round 1
     round_polynomials[0] = 0x3_s25 + 0x5_s25;
     round_polynomials[1] = -0x3_s25 - 0x5_s25 - 0x7_s25 - 0x1_s25;
 
-    // round 2
-    // draw r
+    // draw scalar
+    s25t::element r;
+    {
+      prft::transcript transcript{"abc"};
+      init_transcript(transcript, 2, 1);
+      round_challenge(r, transcript, basct::span<s25t::element>{round_polynomials}.subspan(0, 2));
+    }
 
+    // round 2
+    round_polynomials[2] = 0x3_s25 * (0x1_s25 - r) - 0x7_s25 * r;
+    round_polynomials[3] =
+        -0x3_s25 * (0x1_s25 - r) + 0x5_s25 * (0x1_s25 - r) + 0x7_s25 * r - 0x1_s25 * r;
+
+    // prove
     evaluation_point.resize(2);
-    // TODO
+    auto res = sxt::prfsk::verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
+                                                         round_polynomials, 1);
+    /* REQUIRE(res); */
   }
 
   SECTION("we can verify a polynomial of degree 2 with one round") {}
