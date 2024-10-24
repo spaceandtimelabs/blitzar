@@ -37,3 +37,25 @@ sxt_cc_component(
         "//sxt/base/container:span",
     ],
 )
+
+sxt_cc_component(
+    name = "verification",
+    impl_deps = [
+        ":polynomial_utility",
+        ":transcript_utility",
+        "//sxt/base/error:assert",
+        "//sxt/base/log:log",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+        "//sxt/proof/transcript:transcript_utility",
+    ],
+    test_deps = [
+        ":transcript_utility",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
