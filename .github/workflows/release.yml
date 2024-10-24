@@ -11,7 +11,7 @@ jobs:
 
   release:
     name: Build Publish Library - Linux-x86_64
-    runs-on: self-hosted
+    runs-on: public-blitzar-T4-gpu-vm
     timeout-minutes: 600
     needs: [test-check-lint]
     environment: deploy #!! DO NOT CHANGE THIS LINE !! #
