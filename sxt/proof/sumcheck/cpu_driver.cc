@@ -17,6 +17,7 @@
 #include "sxt/proof/sumcheck/cpu_driver.h"
 
 #include <algorithm>
+#include <iostream>
 
 #include "sxt/base/container/stack_array.h"
 #include "sxt/base/error/panic.h"
@@ -151,6 +152,7 @@ xena::future<> cpu_driver::fold(workspace& ws, const s25t::element& r) const noe
 
   work.n = mid;
   --work.num_variables;
+  work.mles.shrink(num_mles * mid);
   return xena::make_ready_future();
 }
 } // namespace sxt::prfsk

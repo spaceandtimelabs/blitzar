@@ -36,8 +36,8 @@ using s25t::operator""_s25;
 
 TEST_CASE("we can create a sumcheck proof") {
   prft::transcript transcript{"abc"};
-  /* cpu_driver drv; */
-  gpu_driver drv;
+  cpu_driver drv;
+  /* gpu_driver drv; */
   std::vector<s25t::element> polynomials(2);
   std::vector<s25t::element> evaluation_point(1);
   std::vector<s25t::element> mles = {
@@ -48,6 +48,17 @@ TEST_CASE("we can create a sumcheck proof") {
       {0x1_s25, 1},
   };
   std::vector<unsigned> product_terms = {0};
+
+#if 0
+  SECTION("we can prove a sum with n=1") {
+    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                         product_terms, 1);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(polynomials[0] == mles[0]);
+    REQUIRE(polynomials[1] == mles[1] - mles[0]);
+  }
+#endif
 
   SECTION("we can prove a sum with a single variable") {
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
@@ -118,9 +129,24 @@ TEST_CASE("we can create a sumcheck proof") {
 
     REQUIRE(polynomials[2] == mles[0]);
     REQUIRE(polynomials[3] == mles[1] - mles[0]);
-    std::cout << "*********\n";
-    for (auto& r : evaluation_point) {
-      std::cout << r << "\n";
-    }
+  }
+
+  SECTION("we can prove a sum with n=3") {
+    mles.push_back(0x4_s25);
+    polynomials.resize(4);
+    evaluation_point.resize(2);
+    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                         product_terms, 3);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(polynomials[0] == mles[0] + mles[1]);
+    REQUIRE(polynomials[1] == (mles[2] - mles[0]) - mles[1]);
+
+    auto r = evaluation_point[0];
+    mles[0] = mles[0] * (0x1_s25 - r) + mles[2] * r;
+    mles[1] = mles[1] * (0x1_s25 - r);
+
+    REQUIRE(polynomials[2] == mles[0]);
+    REQUIRE(polynomials[3] == mles[1] - mles[0]);
   }
 }
