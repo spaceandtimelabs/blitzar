@@ -98,6 +98,7 @@ sxt_cc_component(
         "//sxt/scalar25/operation:mul",
         "//sxt/scalar25/operation:sub",
         "//sxt/scalar25/operation:muladd",
+        "//sxt/scalar25/operation:neg",
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
