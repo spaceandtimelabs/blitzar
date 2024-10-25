@@ -78,6 +78,7 @@ xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
     val = {};
   }
 
+  // expand paired terms
   auto n1 = work.n - mid;
   for (unsigned i = 0; i < n1; ++i) {
     unsigned term_first = 0;
@@ -91,8 +92,21 @@ xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
       term_first += num_terms;
     }
   }
-  auto n2 = mid - n1;
-  SXT_RELEASE_ASSERT(n2 == 0, "not implemented yet");
+
+  // expand terms where the corresponding pair is zero (i.e. n is not a power of 2)
+  for (unsigned i = n1; i < n; ++i) {
+    unsigned term_first = 0;
+    for (auto [mult, num_terms] : product_table) {
+      auto terms = product_terms.subspan(term_first, num_terms);
+      SXT_STACK_ARRAY(p, num_terms + 1u, s25t::element);
+      partial_expand_products(p, mles + i, n, terms);
+      for (unsigned term_index = 0; term_index < p.size(); ++term_index) {
+        s25o::muladd(polynomial[term_index], mult, p[term_index], polynomial[term_index]);
+      }
+      term_first += num_terms;
+    }
+  }
+
   return xena::make_ready_future();
 }
 
