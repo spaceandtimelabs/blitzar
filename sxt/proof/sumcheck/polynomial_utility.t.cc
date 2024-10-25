@@ -87,6 +87,17 @@ TEST_CASE("we can expand a product of MLEs") {
     REQUIRE(p[1] == mles[1] - mles[0]);
   }
 
+  SECTION("we can partially expand MLEs (where some terms are assumed to be zero)") {
+    mles = {0x123_s25, 0x0_s25};
+    p.resize(2);
+    terms = {0};
+    partial_expand_products(p, mles.data(), 1, terms);
+
+    std::vector<s25t::element> expected(2);
+    expand_products(expected, mles.data(), 2, 1, terms);
+    REQUIRE(p == expected);
+  }
+
   SECTION("we can expand two MLEs") {
     p.resize(3);
     mles = {0x123_s25, 0x456_s25, 0x1122_s25, 0x4455_s25};
