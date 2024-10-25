@@ -45,9 +45,9 @@ sxt_cc_component(
         ":transcript_utility",
         "//sxt/base/error:assert",
         "//sxt/base/log:log",
+        "//sxt/proof/transcript:transcript_utility",
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:element",
-        "//sxt/proof/transcript:transcript_utility",
     ],
     test_deps = [
         ":transcript_utility",
