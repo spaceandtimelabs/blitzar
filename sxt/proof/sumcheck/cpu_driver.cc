@@ -94,7 +94,7 @@ xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
   }
 
   // expand terms where the corresponding pair is zero (i.e. n is not a power of 2)
-  for (unsigned i = n1; i < n; ++i) {
+  for (unsigned i = n1; i < mid; ++i) {
     unsigned term_first = 0;
     for (auto [mult, num_terms] : product_table) {
       auto terms = product_terms.subspan(term_first, num_terms);
@@ -132,16 +132,23 @@ xena::future<> cpu_driver::fold(workspace& ws, const s25t::element& r) const noe
   auto n1 = work.n - mid;
   for (auto mle_index = 0; mle_index < num_mles; ++mle_index) {
     auto data = mles + n * mle_index;
+
+    // fold paired terms
     for (unsigned i = 0; i < n1; ++i) {
       auto val = data[i];
       s25o::mul(val, val, one_m_r);
       s25o::muladd(val, r, data[mid + i], val);
       data[i] = val;
     }
+
+    // fold terms paired with zero
+    for (unsigned i = n1; i < mid; ++i) {
+      auto val = data[i];
+      s25o::mul(val, val, one_m_r);
+      data[i] = val;
+    }
   }
 
-  auto n2 = mid - n1;
-  SXT_RELEASE_ASSERT(n2 == 0, "not implemented yet");
   work.n = mid;
   --work.num_variables;
   return xena::make_ready_future();
