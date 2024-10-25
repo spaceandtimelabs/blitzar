@@ -27,6 +27,10 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // sum_polynomial_01
 //--------------------------------------------------------------------------------------------------
+// Given a polynomial
+//    f_a(X) = a[0] + a[1] * X + a[2] * X^2 + ...
+// compute the sum
+//    f_a(0) + f_a(1)
 void sum_polynomial_01(s25t::element& e, basct::cspan<s25t::element> polynomial) noexcept;
 
 //--------------------------------------------------------------------------------------------------
@@ -41,4 +45,11 @@ void evaluate_polynomial(s25t::element& e, basct::cspan<s25t::element> polynomia
 CUDA_CALLABLE
 void expand_products(basct::span<s25t::element> p, const s25t::element* mles, unsigned n,
                      unsigned step, basct::cspan<unsigned> terms) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// partial_expand_products
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+void partial_expand_products(basct::span<s25t::element> p, const s25t::element* mles, unsigned n,
+                             basct::cspan<unsigned> terms) noexcept;
 } // namespace sxt::prfsk
