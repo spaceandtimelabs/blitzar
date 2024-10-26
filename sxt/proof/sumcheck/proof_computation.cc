@@ -34,7 +34,7 @@ xena::future<> prove_sum(basct::span<s25t::element> polynomials,
                          basct::cspan<std::pair<s25t::element, unsigned>> product_table,
                          basct::cspan<unsigned> product_terms, unsigned n) noexcept {
   SXT_RELEASE_ASSERT(0 < n);
-  auto num_variables = basn::ceil_log2(n);
+  auto num_variables = std::max(basn::ceil_log2(n), 1);
   auto polynomial_length = polynomials.size() / num_variables;
   auto num_mles = mles.size() / n;
   SXT_RELEASE_ASSERT(

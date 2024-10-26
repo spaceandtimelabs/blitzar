@@ -57,7 +57,7 @@ cpu_driver::make_workspace(basct::cspan<s25t::element> mles,
   res->product_table = product_table;
   res->product_terms = product_terms;
   res->n = n;
-  res->num_variables = basn::ceil_log2(n);
+  res->num_variables = std::max(basn::ceil_log2(n), 1);
   return xena::make_ready_future<std::unique_ptr<workspace>>(std::move(res));
 }
 
@@ -69,7 +69,7 @@ xena::future<> cpu_driver::sum(basct::span<s25t::element> polynomial,
   auto& work = static_cast<cpu_workspace&>(ws);
   auto n = work.n;
   auto mid = 1u << (work.num_variables - 1u);
-  SXT_RELEASE_ASSERT(work.n > mid);
+  SXT_RELEASE_ASSERT(work.n >= mid);
 
   auto mles = work.mles.data();
   auto product_table = work.product_table;
@@ -123,7 +123,7 @@ xena::future<> cpu_driver::fold(workspace& ws, const s25t::element& r) const noe
   auto num_mles = work.mles.size() / n;
   SXT_RELEASE_ASSERT(
       // clang-format off
-      work.n > mid && work.mles.size() % n == 0
+      work.n >= mid && work.mles.size() % n == 0
       // clang-format on
   );
 

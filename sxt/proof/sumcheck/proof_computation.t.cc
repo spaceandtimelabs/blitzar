@@ -49,16 +49,14 @@ TEST_CASE("we can create a sumcheck proof") {
   };
   std::vector<unsigned> product_terms = {0};
 
-#if 0
   SECTION("we can prove a sum with n=1") {
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
                          product_terms, 1);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == mles[0]);
-    REQUIRE(polynomials[1] == mles[1] - mles[0]);
+    REQUIRE(polynomials[1] == -mles[0]);
   }
-#endif
 
   SECTION("we can prove a sum with a single variable") {
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
