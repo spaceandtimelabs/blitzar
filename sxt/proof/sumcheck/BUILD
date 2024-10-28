@@ -44,9 +44,10 @@ sxt_cc_component(
         "//sxt/scalar25/type:literal",
     ],
     test_deps = [
+        "//sxt/execution/async:future",
+        "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
-        "//sxt/execution/async:future",
     ],
     deps = [
         ":driver",
