@@ -46,9 +46,11 @@ sxt_cc_component(
     test_deps = [
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
+        "//sxt/execution/async:future",
     ],
     deps = [
         ":driver",
+        ":workspace",
     ],
 )
 
