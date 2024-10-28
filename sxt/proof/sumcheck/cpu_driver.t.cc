@@ -56,4 +56,20 @@ TEST_CASE("we can perform the primitive operations for sumcheck proofs") {
     REQUIRE(p[0] == mles[0]);
     REQUIRE(p[1] == mles[1] - mles[0]);
   }
+
+  SECTION("we can fold mles") {
+    std::vector<s25t::element> mles = {0x123_s25, 0x456_s25, 0x789_s25};
+    auto ws = drv.make_workspace(mles, product_table, product_terms, 3).value();
+    auto r = 0xabc123_s25;
+    auto fut = drv.fold(*ws, r);
+    REQUIRE(fut.ready());
+    fut = drv.sum(p, *ws);
+    REQUIRE(fut.ready());
+
+    mles[0] = (0x1_s25 - r) * mles[0] + r * mles[2];
+    mles[1] = (0x1_s25 - r) * mles[1];
+
+    REQUIRE(p[0] == mles[0]);
+    REQUIRE(p[1] == mles[1] - mles[0]);
+  }
 }
