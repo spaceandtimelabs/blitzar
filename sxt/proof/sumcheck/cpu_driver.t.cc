@@ -16,6 +16,25 @@
  */
 #include "sxt/proof/sumcheck/cpu_driver.h"
 
-#include "sxt/base/test/unit_test.h"
+#include <vector>
 
-TEST_CASE("todo") {}
+#include "sxt/base/test/unit_test.h"
+#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/type/literal.h"
+
+using namespace sxt;
+using namespace sxt::prfsk;
+using s25t::operator""_s25;
+
+TEST_CASE("we can perform the primitive operations for sumcheck proofs") {
+#if 0
+  xena::future<std::unique_ptr<workspace>>
+  make_workspace(basct::cspan<s25t::element> mles,
+                 basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+                 basct::cspan<unsigned> product_terms, unsigned n) const noexcept override;
+
+  xena::future<> sum(basct::span<s25t::element> polynomial, workspace& ws) const noexcept override;
+
+  xena::future<> fold(workspace& ws, const s25t::element& r) const noexcept override;
+#endif
+}
