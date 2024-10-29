@@ -28,7 +28,7 @@ extern "C" {
 #define SXT_CURVE_RISTRETTO255 0
 #define SXT_CURVE_BLS_381 1
 #define SXT_CURVE_BN_254 2
-#define SXT_CURVE_GRUMPKIN 2
+#define SXT_CURVE_GRUMPKIN 3
 
 /** config struct to hold the chosen backend */
 struct sxt_config {
