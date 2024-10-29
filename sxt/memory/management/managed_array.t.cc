@@ -16,6 +16,8 @@
  */
 #include "sxt/memory/management/managed_array.h"
 
+#include <vector>
+
 #include "sxt/base/test/allocator_aware.h"
 #include "sxt/base/test/unit_test.h"
 
@@ -30,6 +32,12 @@ TEST_CASE("managed_array is an allocator-aware container manages an array of "
     REQUIRE(arr[0] == 1);
     REQUIRE(arr[1] == 2);
     REQUIRE(arr[2] == 3);
+  }
+
+  SECTION("we can construct a managed array from iterators") {
+    std::vector<int> v = {1, 2, 3};
+    memmg::managed_array<double> arr{v.begin(), v.end()};
+    REQUIRE(arr == memmg::managed_array<double>{1, 2, 3});
   }
 
   SECTION("we can move-assign a managed array to a void array") {
