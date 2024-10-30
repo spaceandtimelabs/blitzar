@@ -214,6 +214,21 @@ void cpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
 }
 
 //--------------------------------------------------------------------------------------------------
+// read_partition_table_accessor
+//--------------------------------------------------------------------------------------------------
+std::unique_ptr<mtxpp2::partition_table_accessor_base>
+cpu_backend::read_partition_table_accessor(cbnb::curve_id_t curve_id,
+                                           const char* filename) const noexcept {
+  std::unique_ptr<mtxpp2::partition_table_accessor_base> res;
+  cbnb::switch_curve_type(curve_id, [&]<class U, class T>(std::type_identity<U>,
+                                                          std::type_identity<T>) noexcept {
+    res =
+        std::make_unique<mtxpp2::in_memory_partition_table_accessor<U>>(filename, basm::alloc_t{});
+  });
+  return res;
+}
+
+//--------------------------------------------------------------------------------------------------
 // get_cpu_backend
 //--------------------------------------------------------------------------------------------------
 cpu_backend* get_cpu_backend() {
