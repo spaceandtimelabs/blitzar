@@ -95,6 +95,29 @@ TEST_CASE("we can compute multi-exponentiations with a fixed set of generators")
     sxt_multiexp_handle_free(hp);
   }
 
+  SECTION("we can read and write a handle to a file with cpu backend") {
+    cbn::reset_backend_for_testing();
+    const sxt_config config = {SXT_CPU_BACKEND, 0};
+
+    REQUIRE(sxt_init(&config) == 0);
+    bastst::temp_file temp_file{std::ios::binary};
+    temp_file.stream().close();
+
+    wrapped_handle h{generators.data(), 2};
+    REQUIRE(h.h != nullptr);
+
+    sxt_multiexp_handle_write_to_file(h.h, temp_file.name().c_str());
+
+    auto hp = sxt_multiexp_handle_new_from_file(SXT_CURVE_RISTRETTO255, temp_file.name().c_str());
+
+    uint8_t scalars[] = {1, 0, 0, 2};
+    c21t::element_p3 res;
+    sxt_fixed_multiexponentiation(&res, hp, 2, 1, 2, scalars);
+    REQUIRE(res == generators[0] + 2 * 256 * generators[1]);
+
+    sxt_multiexp_handle_free(hp);
+  }
+
   SECTION("we can compute a multiexponentiation in packed form") {
     cbn::reset_backend_for_testing();
     const sxt_config config = {SXT_GPU_BACKEND, 0};
