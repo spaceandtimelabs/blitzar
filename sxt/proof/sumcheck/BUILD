@@ -92,13 +92,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "round_sum",
-    test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-)
-
-sxt_cc_component(
     name = "polynomial_utility",
     impl_deps = [
         "//sxt/scalar25/operation:add",
@@ -162,19 +155,6 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
-    name = "sum_gpu",
-    impl_deps = [
-        "//sxt/scalar25/type:element",
-    ],
-    test_deps = [
-        "//sxt/base/test:unit_test",
     ],
     deps = [
         "//sxt/base/container:span",
