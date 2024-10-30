@@ -153,6 +153,7 @@ sxt_cc_component(
         "//sxt/base/device:memory_utility",
         "//sxt/base/error:assert",
         "//sxt/base/error:panic",
+        "//sxt/base/memory:alloc",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:pinned_resource",
     ],

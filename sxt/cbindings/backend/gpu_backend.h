@@ -80,6 +80,10 @@ public:
                                  const unsigned* output_bit_table, const unsigned* output_lengths,
                                  unsigned num_outputs,
                                  const uint8_t* scalars) const noexcept override;
+
+  std::unique_ptr<mtxpp2::partition_table_accessor_base>
+  read_partition_table_accessor(cbnb::curve_id_t curve_id,
+                                const char* filename) const noexcept override;
 };
 
 //--------------------------------------------------------------------------------------------------
