@@ -21,6 +21,7 @@
 #include "sxt/scalar25/operation/add.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
+#include "sxt/scalar25/operation/neg.h"
 #include "sxt/scalar25/operation/sub.h"
 #include "sxt/scalar25/type/element.h"
 
@@ -84,6 +85,43 @@ void expand_products(basct::span<s25t::element> p, const s25t::element* mles, un
     a = *(mles + mle_index * n);
     b = *(mles + mle_index * n + step);
     s25o::sub(b, b, a);
+
+    auto c_prev = p[0];
+    s25o::mul(p[0], c_prev, a);
+    for (unsigned pow = 1u; pow < i + 1u; ++pow) {
+      auto c = p[pow];
+      s25o::mul(p[pow], c, a);
+      s25o::muladd(p[pow], c_prev, b, p[pow]);
+      c_prev = c;
+    }
+    s25o::mul(p[i + 1u], c_prev, b);
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+// partial_expand_products
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+void partial_expand_products(basct::span<s25t::element> p, const s25t::element* mles, unsigned n,
+                             basct::cspan<unsigned> terms) noexcept {
+  auto num_terms = terms.size();
+  assert(
+      // clang-format off
+      num_terms > 0 && 
+      p.size() == num_terms + 1u
+      // clang-format on
+  );
+  s25t::element a, b;
+  auto mle_index = terms[0];
+  a = *(mles + mle_index * n);
+  s25o::neg(b, a);
+  p[0] = a;
+  p[1] = b;
+
+  for (unsigned i = 1; i < num_terms; ++i) {
+    auto mle_index = terms[i];
+    a = *(mles + mle_index * n);
+    s25o::neg(b, a);
 
     auto c_prev = p[0];
     s25o::mul(p[0], c_prev, a);

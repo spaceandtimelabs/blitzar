@@ -45,4 +45,11 @@ void evaluate_polynomial(s25t::element& e, basct::cspan<s25t::element> polynomia
 CUDA_CALLABLE
 void expand_products(basct::span<s25t::element> p, const s25t::element* mles, unsigned n,
                      unsigned step, basct::cspan<unsigned> terms) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// partial_expand_products
+//--------------------------------------------------------------------------------------------------
+CUDA_CALLABLE
+void partial_expand_products(basct::span<s25t::element> p, const s25t::element* mles, unsigned n,
+                             basct::cspan<unsigned> terms) noexcept;
 } // namespace sxt::prfsk
