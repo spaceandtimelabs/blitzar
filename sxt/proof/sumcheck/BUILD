@@ -81,6 +81,32 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "proof_computation",
+    impl_deps = [
+        ":driver",
+        ":transcript_utility",
+        "//sxt/execution/async:future",
+        "//sxt/base/error:assert",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/execution/async:coroutine",
+        "//sxt/scalar25/type:element",
+    ],
+    test_deps = [
+        ":cpu_driver",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/proof/transcript",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
+    ],
+)
+
+sxt_cc_component(
     name = "verification",
     impl_deps = [
         ":polynomial_utility",
