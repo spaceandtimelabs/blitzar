@@ -16,7 +16,6 @@
  */
 #include "sxt/proof/sumcheck/proof_computation.h"
 
-#include <iostream>
 #include <utility>
 #include <vector>
 
