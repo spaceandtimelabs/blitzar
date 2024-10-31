@@ -16,6 +16,14 @@
  */
 #include "sxt/proof/sumcheck/polynomial_mapper.h"
 
+#include <vector>
+
+#include "sxt/algorithm/base/mapper.h"
 #include "sxt/base/test/unit_test.h"
 
-TEST_CASE("todo") {}
+using namespace sxt;
+using namespace sxt::prfsk;
+
+TEST_CASE("we can map an index to expanded MLE products") {
+  REQUIRE(algb::mapper<polynomial_mapper<2>>);
+}

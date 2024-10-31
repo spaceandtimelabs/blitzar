@@ -176,6 +176,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "polynomial_mapper",
     test_deps = [
+        "//sxt/algorithm/base:mapper",
         "//sxt/base/test:unit_test",
     ],
     deps = [
