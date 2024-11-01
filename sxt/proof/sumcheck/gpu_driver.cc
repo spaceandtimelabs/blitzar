@@ -36,7 +36,6 @@
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/proof/sumcheck/partial_polynomial_mapper.h"
 #include "sxt/proof/sumcheck/polynomial_mapper.h"
-#include "sxt/proof/sumcheck/polynomial_reducer.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
@@ -45,6 +44,21 @@
 #include "sxt/scalar25/type/literal.h"
 
 namespace sxt::prfsk {
+//--------------------------------------------------------------------------------------------------
+// polynomial_reducer
+//--------------------------------------------------------------------------------------------------
+namespace {
+template <unsigned MaxDegree> struct polynomial_reducer {
+  using value_type = std::array<s25t::element, MaxDegree + 1u>;
+
+  CUDA_CALLABLE static void accumulate_inplace(value_type& res, const value_type& e) noexcept {
+    for (unsigned i = 0; i < res.size(); ++i) {
+      s25o::add(res[i], res[i], e[i]);
+    }
+  }
+};
+} // namespace
+
 //--------------------------------------------------------------------------------------------------
 // gpu_workspace
 //--------------------------------------------------------------------------------------------------

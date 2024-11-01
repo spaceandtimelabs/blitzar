@@ -65,7 +65,6 @@ sxt_cc_component(
     impl_deps = [
         ":partial_polynomial_mapper",
         ":polynomial_mapper",
-        ":polynomial_reducer",
         ":polynomial_utility",
         "//sxt/algorithm/iteration:for_each",
         "//sxt/algorithm/reduction:reduction",
@@ -159,18 +158,6 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
-    name = "polynomial_reducer",
-    test_deps = [
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        "//sxt/base/macro:cuda_callable",
-        "//sxt/scalar25/operation:add",
-        "//sxt/scalar25/type:element",
     ],
 )
 
