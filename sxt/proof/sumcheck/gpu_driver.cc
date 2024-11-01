@@ -198,7 +198,7 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
   s25t::element one_m_r = 0x1_s25;
   s25o::sub(one_m_r, one_m_r, r);
 
-  // f1
+  // fold full terms
   auto f1 = [
                 // clang-format off
     mles = work.mles.data(),
@@ -218,9 +218,9 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
                 data[i] = val;
               }
             };
-  co_await algi::for_each(f1, n1);
+  auto fut1 = algi::for_each(f1, n1);
 
-  // f2
+  // fold partial terms
   auto f2 = [
                 // clang-format off
     mles = work.mles.data() + n1,
@@ -237,10 +237,11 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
                 data[i] = val;
               }
             };
-  if (n1 != mid) {
-    co_await algi::for_each(f2, mid - n1);
-  }
+  auto fut2 = algi::for_each(f2, mid - n1);
 
+  // complete
+  co_await std::move(fut1);
+  co_await std::move(fut2);
   work.n = mid;
   --work.num_variables;
   work.mles.shrink(num_mles * mid);
