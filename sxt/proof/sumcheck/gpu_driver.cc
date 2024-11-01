@@ -88,7 +88,7 @@ gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 
   // dimensions
   ws->n = n;
-  ws->num_variables = basn::ceil_log2(n);
+  ws->num_variables = std::max(basn::ceil_log2(n), 1);
 
   // mles
   ws->mles = memmg::managed_array<s25t::element>{
@@ -132,7 +132,7 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
   auto mid = 1u << (work.num_variables - 1u);
   SXT_RELEASE_ASSERT(
       // clang-format off
-      work.n > mid &&
+      work.n >= mid &&
       polynomial.size() - 1u <= max_degree_v
       // clang-format on
   );
