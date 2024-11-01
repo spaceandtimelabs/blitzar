@@ -174,6 +174,24 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "partial_polynomial_mapper",
+    test_deps = [
+        "//sxt/algorithm/base:mapper",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/operation:overload",
+    ],
+    deps = [
+        ":polynomial_utility",
+        "//sxt/base/macro:cuda_callable",
+        "//sxt/scalar25/operation:add",
+        "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/operation:muladd",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+)
+
+sxt_cc_component(
     name = "polynomial_mapper",
     test_deps = [
         "//sxt/algorithm/base:mapper",

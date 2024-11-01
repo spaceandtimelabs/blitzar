@@ -29,9 +29,9 @@
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
-// polynomial_mapper
+// partial_polynomial_mapper
 //--------------------------------------------------------------------------------------------------
-template <unsigned MaxDegree> struct polynomial_mapper {
+template <unsigned MaxDegree> struct partial_polynomial_mapper {
   using value_type = std::array<s25t::element, MaxDegree + 1u>;
 
   CUDA_CALLABLE
@@ -50,7 +50,7 @@ template <unsigned MaxDegree> struct polynomial_mapper {
     // first iteration
     assert(num_products > 0);
     auto [mult, num_terms] = product_table[0];
-    expand_products({prod, num_terms + 1u}, mle_data, n, mid, {terms_data, num_terms});
+    partial_expand_products({prod, num_terms + 1u}, mle_data, n, {terms_data, num_terms});
     terms_data += num_terms;
     for (unsigned i = 0; i < num_terms + 1; ++i) {
       s25o::mul(p[i], mult, prod[i]);
@@ -59,7 +59,7 @@ template <unsigned MaxDegree> struct polynomial_mapper {
     // remaining iterations
     for (unsigned product_index = 1; product_index < num_products; ++product_index) {
       auto [mult, num_terms] = product_table[product_index];
-      expand_products({prod, num_terms + 1u}, mle_data, n, mid, {terms_data, num_terms});
+      partial_expand_products({prod, num_terms + 1u}, mle_data, n, {terms_data, num_terms});
       terms_data += num_terms;
       for (unsigned i = 0; i < num_terms + 1; ++i) {
         s25o::muladd(p[i], mult, prod[i], p[i]);
@@ -71,7 +71,6 @@ template <unsigned MaxDegree> struct polynomial_mapper {
   const std::pair<s25t::element, unsigned>* __restrict__ product_table;
   const unsigned* __restrict__ product_terms;
   unsigned num_products;
-  unsigned mid;
   unsigned n;
 };
 } // namespace sxt::prfsk
