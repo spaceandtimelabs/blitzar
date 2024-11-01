@@ -178,6 +178,7 @@ sxt_cc_component(
     test_deps = [
         "//sxt/algorithm/base:mapper",
         "//sxt/base/test:unit_test",
+        "//sxt/scalar25/operation:overload",
     ],
     deps = [
         ":polynomial_utility",
@@ -185,5 +186,6 @@ sxt_cc_component(
         "//sxt/scalar25/operation:add",
         "//sxt/scalar25/operation:muladd",
         "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
     ],
 )

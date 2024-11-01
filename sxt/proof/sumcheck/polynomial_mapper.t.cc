@@ -20,10 +20,33 @@
 
 #include "sxt/algorithm/base/mapper.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/scalar25/operation/overload.h"
+#include "sxt/scalar25/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::prfsk;
+using s25t::operator""_s25;
 
 TEST_CASE("we can map an index to expanded MLE products") {
   REQUIRE(algb::mapper<polynomial_mapper<2>>);
+
+  std::vector<s25t::element> mles = {0x123_s25, 0x456_s25};
+  std::vector<std::pair<s25t::element, unsigned>> product_table = {
+      {0x1_s25, 1},
+  };
+  std::vector<unsigned> product_terms = {0};
+
+  SECTION("we can map an index to an expanded polynomial") {
+    polynomial_mapper<1> mapper{
+        .mles = mles.data(),
+        .product_table = product_table.data(),
+        .product_terms = product_terms.data(),
+        .num_products = 1,
+        .mid = 1,
+        .n = 2,
+    };
+    auto p = mapper.map_index(0);
+    REQUIRE(p[0] == mles[0]);
+    REQUIRE(p[1] == mles[1] - mles[0]);
+  }
 }
