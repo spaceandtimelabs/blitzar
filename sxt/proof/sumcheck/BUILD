@@ -63,6 +63,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "gpu_driver",
     impl_deps = [
+        ":partial_polynomial_mapper",
         ":polynomial_mapper",
         ":polynomial_reducer",
         ":polynomial_utility",

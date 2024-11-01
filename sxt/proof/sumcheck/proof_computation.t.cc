@@ -35,8 +35,8 @@ using s25t::operator""_s25;
 
 TEST_CASE("we can create a sumcheck proof") {
   prft::transcript transcript{"abc"};
-  cpu_driver drv;
-  /* gpu_driver drv; */
+  /* cpu_driver drv; */
+  gpu_driver drv;
   std::vector<s25t::element> polynomials(2);
   std::vector<s25t::element> evaluation_point(1);
   std::vector<s25t::element> mles = {
