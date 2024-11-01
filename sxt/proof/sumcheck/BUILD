@@ -70,7 +70,6 @@ sxt_cc_component(
     deps = [
         ":polynomial_utility",
         "//sxt/base/macro:cuda_callable",
-        "//sxt/scalar25/operation:add",
         "//sxt/scalar25/operation:mul",
         "//sxt/scalar25/operation:muladd",
         "//sxt/scalar25/type:element",
@@ -88,7 +87,6 @@ sxt_cc_component(
     deps = [
         ":polynomial_utility",
         "//sxt/base/macro:cuda_callable",
-        "//sxt/scalar25/operation:add",
         "//sxt/scalar25/operation:mul",
         "//sxt/scalar25/operation:muladd",
         "//sxt/scalar25/type:element",
