@@ -44,8 +44,10 @@ void exercise_driver(const driver& drv) {
 
   SECTION("we can sum a polynomial with n = 1") {
     std::vector<s25t::element> mles = {0x123_s25};
-    auto ws = drv.make_workspace(mles, product_table, product_terms, 1).value();
-    auto fut = drv.sum(p, *ws);
+    auto ws = drv.make_workspace(mles, product_table, product_terms, 1);
+    xens::get_scheduler().run();
+    auto fut = drv.sum(p, *ws.value());
+    xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(p[0] == mles[0]);
     REQUIRE(p[1] == -mles[0]);
@@ -54,8 +56,9 @@ void exercise_driver(const driver& drv) {
   SECTION("we can sum a polynomial with a non-unity multiplier") {
     std::vector<s25t::element> mles = {0x123_s25};
     product_table[0].first = 0x2_s25;
-    auto ws = drv.make_workspace(mles, product_table, product_terms, 1).value();
-    auto fut = drv.sum(p, *ws);
+    auto ws = drv.make_workspace(mles, product_table, product_terms, 1);
+    xens::get_scheduler().run();
+    auto fut = drv.sum(p, *ws.value());
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(p[0] == 0x2_s25 * mles[0]);
@@ -64,8 +67,9 @@ void exercise_driver(const driver& drv) {
 
   SECTION("we can sum a polynomial with n = 2") {
     std::vector<s25t::element> mles = {0x123_s25, 0x456_s25};
-    auto ws = drv.make_workspace(mles, product_table, product_terms, 2).value();
-    auto fut = drv.sum(p, *ws);
+    auto ws = drv.make_workspace(mles, product_table, product_terms, 2);
+    xens::get_scheduler().run();
+    auto fut = drv.sum(p, *ws.value());
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(p[0] == mles[0]);
@@ -80,8 +84,9 @@ void exercise_driver(const driver& drv) {
     };
     std::vector<unsigned> product_terms = {0, 1};
 
-    auto ws = drv.make_workspace(mles, product_table, product_terms, 1).value();
-    auto fut = drv.sum(p, *ws);
+    auto ws = drv.make_workspace(mles, product_table, product_terms, 1);
+    xens::get_scheduler().run();
+    auto fut = drv.sum(p, *ws.value());
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(p[0] == mles[0] + mles[1]);
@@ -96,8 +101,9 @@ void exercise_driver(const driver& drv) {
     std::vector<unsigned> product_terms = {0, 1};
     p.resize(3);
 
-    auto ws = drv.make_workspace(mles, product_table, product_terms, 1).value();
-    auto fut = drv.sum(p, *ws);
+    auto ws = drv.make_workspace(mles, product_table, product_terms, 1);
+    xens::get_scheduler().run();
+    auto fut = drv.sum(p, *ws.value());
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(p[0] == mles[0] * mles[1]);
@@ -107,12 +113,13 @@ void exercise_driver(const driver& drv) {
 
   SECTION("we can fold mles") {
     std::vector<s25t::element> mles = {0x123_s25, 0x456_s25, 0x789_s25};
-    auto ws = drv.make_workspace(mles, product_table, product_terms, 3).value();
+    auto ws = drv.make_workspace(mles, product_table, product_terms, 3);
+    xens::get_scheduler().run();
     auto r = 0xabc123_s25;
-    auto fut = drv.fold(*ws, r);
+    auto fut = drv.fold(*ws.value(), r);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
-    fut = drv.sum(p, *ws);
+    fut = drv.sum(p, *ws.value());
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
 

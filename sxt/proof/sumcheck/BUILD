@@ -99,6 +99,10 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
     ],
+    test_deps = [
+        ":driver_test",
+        "//sxt/base/test:unit_test",
+    ],
     deps = [
         ":driver",
     ],
