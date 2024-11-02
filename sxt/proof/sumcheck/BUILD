@@ -9,6 +9,31 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "driver",
+    with_test = False,
+    deps = [
+        ":workspace",
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
+    ],
+)
+
+sxt_cc_component(
+    name = "driver_test",
+    with_test = False,
+    impl_deps = [
+        ":driver",
+        ":workspace",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+)
+
+sxt_cc_component(
     name = "cpu_driver",
     impl_deps = [
         ":polynomial_utility",
@@ -47,16 +72,6 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
-    name = "driver",
-    with_test = False,
-    deps = [
-        ":workspace",
-        "//sxt/base/container:span",
-        "//sxt/execution/async:future_fwd",
     ],
 )
 
