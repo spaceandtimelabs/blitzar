@@ -20,7 +20,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "driver_test",
-    with_test = False,
     impl_deps = [
         ":driver",
         ":workspace",
@@ -31,6 +30,7 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
     ],
+    with_test = False,
 )
 
 sxt_cc_component(
@@ -49,10 +49,8 @@ sxt_cc_component(
         "//sxt/scalar25/type:literal",
     ],
     test_deps = [
-        "//sxt/execution/async:future",
-        "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
+        ":driver_test",
+        "//sxt/base/test:unit_test",
     ],
     deps = [
         ":driver",
