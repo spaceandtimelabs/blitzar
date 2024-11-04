@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/proof/sumcheck/cpu_driver.h"
-
-#include <vector>
+#include "sxt/proof/sumcheck/gpu_driver.h"
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/proof/sumcheck/driver_test.h"
@@ -25,6 +23,6 @@ using namespace sxt;
 using namespace sxt::prfsk;
 
 TEST_CASE("we can perform the primitive operations for sumcheck proofs") {
-  cpu_driver drv;
+  gpu_driver drv;
   exercise_driver(drv);
 }
