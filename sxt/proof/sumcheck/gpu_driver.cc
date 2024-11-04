@@ -34,6 +34,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
+#include "sxt/proof/sumcheck/constant.h"
 #include "sxt/proof/sumcheck/partial_polynomial_mapper.h"
 #include "sxt/proof/sumcheck/polynomial_mapper.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
@@ -125,7 +126,6 @@ gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 //--------------------------------------------------------------------------------------------------
 xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
                                workspace& ws) const noexcept {
-  static constexpr unsigned max_degree_v = 5u;
   auto& work = static_cast<gpu_workspace&>(ws);
   auto n = work.n;
   auto mid = 1u << (work.num_variables - 1u);

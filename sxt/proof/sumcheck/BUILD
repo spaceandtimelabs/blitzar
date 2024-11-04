@@ -4,6 +4,11 @@ load(
 )
 
 sxt_cc_component(
+    name = "constant",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "workspace",
     with_test = False,
 )
@@ -76,6 +81,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "gpu_driver",
     impl_deps = [
+        ":constant",
         ":partial_polynomial_mapper",
         ":polynomial_mapper",
         ":polynomial_utility",
