@@ -31,7 +31,7 @@ basct::cspan<uint8_t> make_scalars_span(const uint8_t* data,
   auto num_outputs = output_bit_table.size();
   SXT_DEBUG_ASSERT(output_lengths.size() == num_outputs);
 
-  unsigned output_bit_sum = 0;
+  size_t output_bit_sum = 0;
   unsigned n = 0;
   unsigned prev_len = 0;
   for (unsigned output_index = 0; output_index < num_outputs; ++output_index) {
@@ -45,7 +45,7 @@ basct::cspan<uint8_t> make_scalars_span(const uint8_t* data,
     prev_len = len;
   }
 
-  auto output_num_bytes = basn::divide_up(output_bit_sum, 8u);
+  auto output_num_bytes = basn::divide_up<size_t>(output_bit_sum, 8u);
   return basct::cspan<uint8_t>{data, output_num_bytes * n};
 }
 } // namespace sxt::cbnbck
