@@ -26,4 +26,9 @@ void compute_product_length_table(basct::span<unsigned>& product_lengths,
                                   basct::cspan<unsigned> bit_widths,
                                   basct::cspan<unsigned> output_lengths, unsigned first,
                                   unsigned length) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// count_products
+//--------------------------------------------------------------------------------------------------
+size_t count_products(basct::cspan<unsigned> output_bit_table) noexcept;
 } // namespace sxt::mtxpp2
