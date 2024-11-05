@@ -67,9 +67,9 @@ TEST_CASE("we can count the number of products") {
 
   SECTION("we can count entries that would overflow a 32-bit integer") {
     output_bit_table = {
-        4'294'967'295,
-        4'294'967'295,
+        4'294'967'295u,
+        4'294'967'295u,
     };
-    REQUIRE(count_products(output_bit_table) == 8'589'934'590);
+    REQUIRE(count_products(output_bit_table) == 8'589'934'590ul);
   }
 }
