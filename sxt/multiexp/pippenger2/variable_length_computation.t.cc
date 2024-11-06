@@ -56,3 +56,20 @@ TEST_CASE("we can fill in the table of product lengths") {
     REQUIRE(product_lengths[1] == 5);
   }
 }
+
+TEST_CASE("we can count the number of products") {
+  std::vector<unsigned> output_bit_table;
+
+  SECTION("we can count a single output") {
+    output_bit_table = {123};
+    REQUIRE(count_products(output_bit_table) == 123);
+  }
+
+  SECTION("we can count entries that would overflow a 32-bit integer") {
+    output_bit_table = {
+        4'294'967'295u,
+        4'294'967'295u,
+    };
+    REQUIRE(count_products(output_bit_table) == 8'589'934'590ul);
+  }
+}

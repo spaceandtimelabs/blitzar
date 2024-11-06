@@ -158,7 +158,7 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
                        basct::cspan<unsigned> output_lengths, basct::cspan<uint8_t> scalars,
                        const multiexponentiate_options& options) noexcept {
   auto num_outputs = res.size();
-  auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
+  auto num_products = count_products(output_bit_table);
   auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
   if (num_outputs == 0) {
     co_return;
@@ -224,7 +224,7 @@ void multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& ac
                        basct::cspan<unsigned> output_lengths,
                        basct::cspan<uint8_t> scalars) noexcept {
   auto num_outputs = res.size();
-  auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
+  auto num_products = count_products(output_bit_table);
   auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
   if (num_outputs == 0) {
     return;
