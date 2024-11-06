@@ -17,6 +17,7 @@
 #include "sxt/multiexp/pippenger2/variable_length_computation.h"
 
 #include <algorithm>
+#include <numeric>
 
 #include "sxt/base/error/assert.h"
 
@@ -58,5 +59,12 @@ void compute_product_length_table(basct::span<unsigned>& product_lengths,
     }
   }
   product_lengths = product_lengths.subspan(0, product_index);
+}
+
+//--------------------------------------------------------------------------------------------------
+// count_products
+//--------------------------------------------------------------------------------------------------
+size_t count_products(basct::cspan<unsigned> output_bit_table) noexcept {
+  return std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0ull);
 }
 } // namespace sxt::mtxpp2

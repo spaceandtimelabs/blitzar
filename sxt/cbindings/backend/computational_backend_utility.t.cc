@@ -43,4 +43,15 @@ TEST_CASE("we can make a span for the referenced scalars") {
     REQUIRE(span.size() == 4);
     REQUIRE(span.data() == data);
   }
+
+  SECTION("we handle values that would overflow a 32-bit integer") {
+    output_bit_table = {1, 1};
+    output_lengths = {
+        4'294'967'295u,
+        4'294'967'295u,
+    };
+    auto span = make_scalars_span(data, output_bit_table, output_lengths);
+    REQUIRE(span.size() == 4'294'967'295ul);
+    REQUIRE(span.data() == data);
+  }
 }
