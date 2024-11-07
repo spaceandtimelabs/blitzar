@@ -14,17 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/proof/sumcheck/cpu_driver.h"
+#pragma once
 
-#include <vector>
+namespace sxt::prfsk {
+class driver;
 
-#include "sxt/base/test/unit_test.h"
-#include "sxt/proof/sumcheck/driver_test.h"
-
-using namespace sxt;
-using namespace sxt::prfsk;
-
-TEST_CASE("we can perform the primitive operations for sumcheck proofs") {
-  cpu_driver drv;
-  exercise_driver(drv);
-}
+//--------------------------------------------------------------------------------------------------
+// exercise_driver
+//--------------------------------------------------------------------------------------------------
+void exercise_driver(const driver& drv);
+} // namespace sxt::prfsk

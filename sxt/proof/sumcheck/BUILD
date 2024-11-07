@@ -4,6 +4,11 @@ load(
 )
 
 sxt_cc_component(
+    name = "constant",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "workspace",
     with_test = False,
 )
@@ -16,6 +21,21 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
     ],
+)
+
+sxt_cc_component(
+    name = "driver_test",
+    impl_deps = [
+        ":driver",
+        ":workspace",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+    with_test = False,
 )
 
 sxt_cc_component(
@@ -34,10 +54,8 @@ sxt_cc_component(
         "//sxt/scalar25/type:literal",
     ],
     test_deps = [
-        "//sxt/execution/async:future",
-        "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
+        ":driver_test",
+        "//sxt/base/test:unit_test",
     ],
     deps = [
         ":driver",
@@ -61,36 +79,38 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "partial_polynomial_mapper",
-    test_deps = [
-        "//sxt/algorithm/base:mapper",
-        "//sxt/base/test:unit_test",
-        "//sxt/scalar25/operation:overload",
-    ],
-    deps = [
+    name = "gpu_driver",
+    impl_deps = [
+        ":constant",
+        ":partial_polynomial_mapper",
+        ":polynomial_mapper",
         ":polynomial_utility",
-        "//sxt/base/macro:cuda_callable",
+        "//sxt/algorithm/iteration:for_each",
+        "//sxt/algorithm/reduction:reduction",
+        "//sxt/base/container:stack_array",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/error:panic",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/base/num:constexpr_switch",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/execution/device:synchronization",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:device_resource",
         "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/operation:sub",
         "//sxt/scalar25/operation:muladd",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
     ],
-)
-
-sxt_cc_component(
-    name = "polynomial_mapper",
     test_deps = [
-        "//sxt/algorithm/base:mapper",
+        ":driver_test",
         "//sxt/base/test:unit_test",
-        "//sxt/scalar25/operation:overload",
     ],
     deps = [
-        ":polynomial_utility",
-        "//sxt/base/macro:cuda_callable",
-        "//sxt/scalar25/operation:mul",
-        "//sxt/scalar25/operation:muladd",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
+        ":driver",
     ],
 )
 
@@ -101,6 +121,7 @@ sxt_cc_component(
         "//sxt/scalar25/operation:mul",
         "//sxt/scalar25/operation:sub",
         "//sxt/scalar25/operation:muladd",
+        "//sxt/scalar25/operation:neg",
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
@@ -127,6 +148,7 @@ sxt_cc_component(
     ],
     test_deps = [
         ":cpu_driver",
+        ":gpu_driver",
         "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
         "//sxt/execution/schedule:scheduler",
@@ -147,9 +169,9 @@ sxt_cc_component(
         ":transcript_utility",
         "//sxt/base/error:assert",
         "//sxt/base/log:log",
-        "//sxt/proof/transcript:transcript_utility",
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:element",
+        "//sxt/proof/transcript:transcript_utility",
     ],
     test_deps = [
         ":transcript_utility",
@@ -159,5 +181,41 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
+    name = "partial_polynomial_mapper",
+    test_deps = [
+        "//sxt/algorithm/base:mapper",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/operation:overload",
+    ],
+    deps = [
+        ":polynomial_utility",
+        "//sxt/base/macro:cuda_callable",
+        "//sxt/scalar25/operation:add",
+        "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/operation:muladd",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+)
+
+sxt_cc_component(
+    name = "polynomial_mapper",
+    test_deps = [
+        "//sxt/algorithm/base:mapper",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/operation:overload",
+    ],
+    deps = [
+        ":polynomial_utility",
+        "//sxt/base/macro:cuda_callable",
+        "//sxt/scalar25/operation:add",
+        "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/operation:muladd",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
     ],
 )
