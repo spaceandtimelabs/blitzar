@@ -119,6 +119,7 @@ int main(int argc, char* argv[]) {
     xens::get_scheduler().run();
   }
 
+  // sample
   double elapse = 0;
   for (unsigned i = 0; i < (p.num_samples + 1u); ++i) {
     auto t1 = std::chrono::steady_clock::now();
