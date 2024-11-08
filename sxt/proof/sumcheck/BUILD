@@ -173,6 +173,7 @@ sxt_cc_component(
         "//sxt/scalar25/type:literal",
     ],
     deps = [
+        "//sxt/base/container:span",
     ],
 )
 
