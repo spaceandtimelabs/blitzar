@@ -163,6 +163,20 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "reduction_gpu",
+    impl_deps = [
+    ],
+    test_deps = [
+        ":transcript_utility",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+    ],
+)
+
+sxt_cc_component(
     name = "verification",
     impl_deps = [
         ":polynomial_utility",
