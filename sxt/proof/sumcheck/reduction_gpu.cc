@@ -1,8 +1,11 @@
 #include "sxt/proof/sumcheck/reduction_gpu.h"
 
+#include "sxt/algorithm/reduction/kernel_fit.h"
+#include "sxt/algorithm/reduction/thread_reduction.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/kernel/kernel_dims.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {
@@ -25,6 +28,7 @@ xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
       basdv::is_active_device_pointer(partial_terms.data())
       // clang-format on
   );
+  auto dims = algr::fit_reduction_kernel(n);
   return {};
 }
 #pragma clang diagnostic pop
