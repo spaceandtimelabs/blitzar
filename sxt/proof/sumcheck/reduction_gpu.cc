@@ -7,6 +7,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/kernel/kernel_dims.h"
+#include "sxt/execution/kernel/launch.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/scalar25/type/element.h"
@@ -19,6 +20,7 @@ namespace sxt::prfsk {
 #pragma clang diagnostic ignored "-Wunused-function"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #pragma clang diagnostic ignored "-Wunused-parameter"
+template <unsigned BlockSize>
 static void reduction_kernel(s25t::element* __restrict__ out,
                              const s25t::element* __restrict__ partials, unsigned n) noexcept {}
 #pragma clang diagnostic pop
@@ -49,7 +51,12 @@ xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
   memmg::managed_array<s25t::element> p_dev{num_coefficients * dims.num_blocks, &resource};
 
   // launch kernel
-  (void)reduction_kernel;
+  (void)reduction_kernel<1>;
+  /* xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>( */
+  /*                                          std::integral_constant<unsigned, BlockSize>) noexcept { */
+  /*   reduction_kernel<Reducer, BlockSize> */
+  /*       <<<dims.num_blocks, BlockSize, 0, stream>>>(out_array.data(), mapper, n); */
+  /* }); */
 
   // complete reduction on host if necessary
   return {};

@@ -172,6 +172,7 @@ sxt_cc_component(
         "//sxt/base/error:assert",
         "//sxt/execution/async:future",
         "//sxt/execution/kernel:kernel_dims",
+        "//sxt/execution/kernel:launch",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/scalar25/type:element",
