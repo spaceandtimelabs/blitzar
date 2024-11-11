@@ -3,12 +3,26 @@
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/kernel/kernel_dims.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {
+//--------------------------------------------------------------------------------------------------
+// reduction_kernel 
+//--------------------------------------------------------------------------------------------------
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+static void reduction_kernel(s25t::element* __restrict__ out,
+                             const s25t::element* __restrict__ partials, unsigned n) noexcept {}
+#pragma clang diagnostic pop
+
 //--------------------------------------------------------------------------------------------------
 // reduce_sums 
 //--------------------------------------------------------------------------------------------------
@@ -29,6 +43,9 @@ xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
       // clang-format on
   );
   auto dims = algr::fit_reduction_kernel(n);
+
+  memr::async_device_resource resource{stream};
+  (void)reduction_kernel;
   return {};
 }
 #pragma clang diagnostic pop

@@ -168,9 +168,12 @@ sxt_cc_component(
       "//sxt/algorithm/reduction:kernel_fit",
       "//sxt/algorithm/reduction:thread_reduction",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
         "//sxt/base/error:assert",
         "//sxt/execution/async:future",
         "//sxt/execution/kernel:kernel_dims",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
