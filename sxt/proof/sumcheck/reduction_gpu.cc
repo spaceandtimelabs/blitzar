@@ -44,8 +44,14 @@ xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
   );
   auto dims = algr::fit_reduction_kernel(n);
 
+  // p_dev
   memr::async_device_resource resource{stream};
+  memmg::managed_array<s25t::element> p_dev{num_coefficients * dims.num_blocks, &resource};
+
+  // launch kernel
   (void)reduction_kernel;
+
+  // complete reduction on host if necessary
   return {};
 }
 #pragma clang diagnostic pop
