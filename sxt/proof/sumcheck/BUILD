@@ -165,6 +165,10 @@ sxt_cc_component(
 sxt_cc_component(
     name = "reduction_gpu",
     impl_deps = [
+        "//sxt/execution/async:future",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/error:assert",
+        "//sxt/scalar25/type:element",
     ],
     test_deps = [
         ":transcript_utility",
@@ -174,6 +178,7 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
     ],
 )
 
