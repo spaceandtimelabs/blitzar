@@ -12,6 +12,7 @@
 #include "sxt/execution/kernel/launch.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/scalar25/operation/add.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {
@@ -72,6 +73,16 @@ xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
   co_await xendv::await_stream(stream);
 
   // complete reduction on host if necessary
+  if (dims.num_blocks == 1) {
+    co_return;
+  }
+  for (unsigned coefficient_index = 0; coefficient_index < num_coefficients; ++coefficient_index) {
+    p[coefficient_index] = p_host[coefficient_index * dims.num_blocks];
+    for (unsigned block_index = 1; block_index < dims.num_blocks; ++block_index) {
+      s25o::add(p[coefficient_index], p[coefficient_index],
+                p_host[coefficient_index * dims.num_blocks + block_index]);
+    }
+  }
 }
 #pragma clang diagnostic pop
 } // namespace sxt::prfsk
