@@ -21,8 +21,9 @@ namespace sxt::prfsk {
 #pragma clang diagnostic ignored "-Wunused-variable"
 #pragma clang diagnostic ignored "-Wunused-parameter"
 template <unsigned BlockSize>
-static void reduction_kernel(s25t::element* __restrict__ out,
-                             const s25t::element* __restrict__ partials, unsigned n) noexcept {}
+__global__ static void reduction_kernel(s25t::element* __restrict__ out,
+                                        const s25t::element* __restrict__ partials,
+                                        unsigned n) noexcept {}
 #pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
@@ -51,12 +52,12 @@ xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
   memmg::managed_array<s25t::element> p_dev{num_coefficients * dims.num_blocks, &resource};
 
   // launch kernel
-  (void)reduction_kernel<1>;
-  /* xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>( */
-  /*                                          std::integral_constant<unsigned, BlockSize>) noexcept { */
-  /*   reduction_kernel<Reducer, BlockSize> */
-  /*       <<<dims.num_blocks, BlockSize, 0, stream>>>(out_array.data(), mapper, n); */
-  /* }); */
+  xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
+                                           std::integral_constant<unsigned, BlockSize>) noexcept {
+    reduction_kernel<BlockSize>
+        <<<dim3(dims.num_blocks, num_coefficients, 1), BlockSize, 0, stream>>>(
+            p_dev.data(), partial_terms.data(), n);
+  });
 
   // complete reduction on host if necessary
   return {};
