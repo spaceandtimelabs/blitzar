@@ -5,7 +5,9 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/execution/kernel/kernel_dims.h"
 #include "sxt/execution/kernel/launch.h"
 #include "sxt/memory/management/managed_array.h"
@@ -59,8 +61,17 @@ xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
             p_dev.data(), partial_terms.data(), n);
   });
 
+  // copy polynomial to host
+  memmg::managed_array<s25t::element> p_host_data;
+  basct::span<s25t::element> p_host = p_dev;
+  if (dims.num_blocks > 1) {
+    p_host_data.resize(p_dev.size());
+    p_host = p_host_data;
+  }
+  basdv::async_copy_device_to_host(p_host, p_dev, stream);
+  co_await xendv::await_stream(stream);
+
   // complete reduction on host if necessary
-  return {};
 }
 #pragma clang diagnostic pop
 } // namespace sxt::prfsk
