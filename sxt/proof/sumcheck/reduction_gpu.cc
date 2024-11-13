@@ -1,5 +1,6 @@
 #include "sxt/proof/sumcheck/reduction_gpu.h"
 
+#include "sxt/algorithm/base/identity_mapper.h"
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
 #include "sxt/base/device/memory_utility.h"
@@ -12,6 +13,7 @@
 #include "sxt/execution/kernel/launch.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/scalar25/operation/accumulator.h"
 #include "sxt/scalar25/operation/add.h"
 #include "sxt/scalar25/type/element.h"
 
@@ -26,16 +28,23 @@ namespace sxt::prfsk {
 template <unsigned BlockSize>
 __global__ static void reduction_kernel(s25t::element* __restrict__ out,
                                         const s25t::element* __restrict__ partials,
-                                        unsigned n) noexcept {}
+                                        unsigned n) noexcept {
+  auto thread_index = threadIdx.x;
+  auto block_index = blockIdx.x;
+  auto index = block_index * (BlockSize * 2) + thread_index;
+  auto step = BlockSize * 2 * gridDim.x;
+  __shared__ s25t::element shared_data[2 * BlockSize];
+#if 0
+  using T = typename Reducer::value_type;
+  thread_reduce<Reducer, BlockSize>(out + block_index, shared_data, mapper, n, step, thread_index,
+                                    index);
+#endif
+}
 #pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // reduce_sums 
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
                            basct::cspan<s25t::element> partial_terms) noexcept {
   auto num_coefficients = p.size();
@@ -84,5 +93,4 @@ xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
     }
   }
 }
-#pragma clang diagnostic pop
 } // namespace sxt::prfsk

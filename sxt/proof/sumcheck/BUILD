@@ -165,6 +165,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "reduction_gpu",
     impl_deps = [
+      "//sxt/algorithm/base:identity_mapper",
       "//sxt/algorithm/reduction:kernel_fit",
       "//sxt/algorithm/reduction:thread_reduction",
         "//sxt/base/device:memory_utility",
@@ -178,6 +179,7 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/scalar25/operation:add",
+        "//sxt/scalar25/operation:accumulator",
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
