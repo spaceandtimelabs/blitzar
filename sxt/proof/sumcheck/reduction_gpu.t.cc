@@ -38,4 +38,14 @@ TEST_CASE("we can reduce sumcheck polynomials") {
     REQUIRE(fut.ready());
     REQUIRE(p[0] == 0x123_s25 + 0x456_s25);
   }
+
+  SECTION("we can reduce multiple coefficients") {
+    p.resize(2);
+    partial_terms = {0x123_s25, 0x456_s25};
+    auto fut = reduce_sums(p, stream, partial_terms);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(p[0] == 0x123_s25);
+    REQUIRE(p[1] == 0x456_s25);
+  }
 }
