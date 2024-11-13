@@ -21,7 +21,7 @@ TEST_CASE("we can reduce sumcheck polynomials") {
 
   basdv::stream stream;
 
-  SECTION("we can reduce a sime with a single term") {
+  SECTION("we can reduce a sum with a single term") {
     p.resize(1);
     partial_terms = {0x123_s25};
     auto fut = reduce_sums(p, stream, partial_terms);
