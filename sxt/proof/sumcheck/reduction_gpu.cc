@@ -21,26 +21,28 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // reduction_kernel 
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 template <unsigned BlockSize>
 __global__ static void reduction_kernel(s25t::element* __restrict__ out,
                                         const s25t::element* __restrict__ partials,
                                         unsigned n) noexcept {
   auto thread_index = threadIdx.x;
   auto block_index = blockIdx.x;
+  auto coefficient_index = blockIdx.y;
   auto index = block_index * (BlockSize * 2) + thread_index;
   auto step = BlockSize * 2 * gridDim.x;
   __shared__ s25t::element shared_data[2 * BlockSize];
-#if 0
-  using T = typename Reducer::value_type;
-  thread_reduce<Reducer, BlockSize>(out + block_index, shared_data, mapper, n, step, thread_index,
-                                    index);
-#endif
+
+  // coefficient adjustment
+  out += coefficient_index;
+  partials += coefficient_index * n;
+
+  // mapper
+  algb::identity_mapper<s25t::element> mapper{partials};
+
+  // reduce
+  algr::thread_reduce<s25o::accumulator, BlockSize>(out + block_index, shared_data, mapper, n, step,
+                                                    thread_index, index);
 }
-#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // reduce_sums 

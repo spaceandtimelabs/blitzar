@@ -29,7 +29,7 @@ namespace sxt::algb {
  */
 template <class M>
 concept mapper = requires(M m, typename M::value_type& x, unsigned int i) {
-  { m.map_index(i) } noexcept -> std::convertible_to<typename M::value_type>;
+  /* { m.map_index(i) } noexcept -> std::convertible_to<typename M::value_type>; */
   { m.map_index(x, i) } noexcept;
 };
 } // namespace sxt::algb
