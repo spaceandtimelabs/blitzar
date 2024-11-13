@@ -1,5 +1,6 @@
 #include "sxt/proof/sumcheck/sum_gpu.h"
 
+#include "sxt/execution/kernel/launch.h"
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/execution/async/coroutine.h"
@@ -14,6 +15,7 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // partial_sum_kernel 
 //--------------------------------------------------------------------------------------------------
+template <unsigned BlockSize>
 __global__ static void
 partial_sum_kernel(s25t::element* __restrict__ out,
                    const std::pair<s25t::element, unsigned>* __restrict__ product_table,
@@ -35,6 +37,12 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
 
   // partials
   memmg::managed_array<s25t::element> partials{num_coefficients * dims.num_blocks, &resource};
+  xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
+                                           std::integral_constant<unsigned, BlockSize>) noexcept {
+    partial_sum_kernel<BlockSize>
+        <<<dim3(dims.num_blocks, num_coefficients, 1), BlockSize, 0, stream>>>(
+            partials.data(), product_table.data(), product_terms.data(), n);
+  });
 
   // reduce partials
   co_await reduce_sums(p, stream, partials);
