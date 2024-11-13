@@ -11,5 +11,5 @@ namespace sxt::prfsk {
 // reduce_sums 
 //--------------------------------------------------------------------------------------------------
 xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
-                 basct::cspan<s25t::element> partial_terms) noexcept;
+                           basct::cspan<s25t::element> partial_terms) noexcept;
 } // namespace sxt::prfsk

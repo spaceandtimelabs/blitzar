@@ -185,6 +185,7 @@ sxt_cc_component(
     test_deps = [
         ":transcript_utility",
         "//sxt/base/test:unit_test",
+        "//sxt/memory/resource:managed_device_resource",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
     ],
