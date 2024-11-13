@@ -7,6 +7,7 @@
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/resource/managed_device_resource.h"
+#include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"
 #include "sxt/scalar25/type/literal.h"
 
@@ -27,5 +28,14 @@ TEST_CASE("we can reduce sumcheck polynomials") {
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(p[0] == 0x123_s25);
+  }
+
+  SECTION("we can reduce two terms") {
+    p.resize(1);
+    partial_terms = {0x123_s25, 0x456_s25};
+    auto fut = reduce_sums(p, stream, partial_terms);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(p[0] == 0x123_s25 + 0x456_s25);
   }
 }
