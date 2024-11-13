@@ -75,7 +75,7 @@ xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
 
   // copy polynomial to host
   memmg::managed_array<s25t::element> p_host_data;
-  basct::span<s25t::element> p_host = p_dev;
+  basct::span<s25t::element> p_host = p;
   if (dims.num_blocks > 1) {
     p_host_data.resize(p_dev.size());
     p_host = p_host_data;

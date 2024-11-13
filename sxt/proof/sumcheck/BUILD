@@ -184,7 +184,10 @@ sxt_cc_component(
     ],
     test_deps = [
         ":transcript_utility",
+        "//sxt/base/device:stream",
         "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
         "//sxt/memory/resource:managed_device_resource",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
