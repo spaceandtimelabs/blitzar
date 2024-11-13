@@ -163,6 +163,43 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "sum_gpu",
+    impl_deps = [
+      # "//sxt/algorithm/base:identity_mapper",
+      # "//sxt/algorithm/reduction:kernel_fit",
+      # "//sxt/algorithm/reduction:thread_reduction",
+      #   "//sxt/base/device:memory_utility",
+      #   "//sxt/base/device:stream",
+      #   "//sxt/base/error:assert",
+      #   "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+      #   "//sxt/execution/device:synchronization",
+      #   "//sxt/execution/kernel:kernel_dims",
+      #   "//sxt/execution/kernel:launch",
+      #   "//sxt/memory/management:managed_array",
+      #   "//sxt/memory/resource:async_device_resource",
+      #   "//sxt/scalar25/operation:add",
+      #   "//sxt/scalar25/operation:accumulator",
+        "//sxt/scalar25/type:element",
+    ],
+    test_deps = [
+        # ":transcript_utility",
+        # "//sxt/base/device:stream",
+        "//sxt/base/test:unit_test",
+        # "//sxt/execution/async:future",
+        # "//sxt/execution/schedule:scheduler",
+        # "//sxt/memory/resource:managed_device_resource",
+        # "//sxt/scalar25/operation:overload",
+        # "//sxt/scalar25/type:element",
+        # "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
+    ],
+)
+
+sxt_cc_component(
     name = "reduction_gpu",
     impl_deps = [
       "//sxt/algorithm/base:identity_mapper",
