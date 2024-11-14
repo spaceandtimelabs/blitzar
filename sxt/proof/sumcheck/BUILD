@@ -9,6 +9,17 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "device_cache",
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/device:device_map",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "workspace",
     with_test = False,
 )
