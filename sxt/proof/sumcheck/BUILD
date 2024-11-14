@@ -176,6 +176,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "sum_gpu",
     impl_deps = [
+      ":device_cache",
       ":reduction_gpu",
       # "//sxt/algorithm/base:identity_mapper",
       "//sxt/algorithm/reduction:kernel_fit",

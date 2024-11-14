@@ -11,6 +11,8 @@ class element;
 }
 
 namespace sxt::prfsk {
+class device_cache;
+
 //--------------------------------------------------------------------------------------------------
 // sum_options
 //--------------------------------------------------------------------------------------------------
@@ -23,7 +25,6 @@ struct sum_options {
 //--------------------------------------------------------------------------------------------------
 // sum_gpu
 //--------------------------------------------------------------------------------------------------
-xena::future<> sum_gpu(basct::span<s25t::element> p, basct::cspan<s25t::element> mles,
-                       basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        basct::cspan<unsigned> product_terms, unsigned n) noexcept;
 } // namespace sxt::prfsk

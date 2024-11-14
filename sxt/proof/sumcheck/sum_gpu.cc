@@ -11,6 +11,7 @@
 #include "sxt/execution/kernel/launch.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/proof/sumcheck/device_cache.h"
 #include "sxt/proof/sumcheck/reduction_gpu.h"
 #include "sxt/scalar25/type/element.h"
 
@@ -54,8 +55,7 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
 #pragma clang diagnostic ignored "-Wunused-function"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #pragma clang diagnostic ignored "-Wunused-parameter"
-xena::future<> sum_gpu(basct::span<s25t::element> p, basct::cspan<s25t::element> mles,
-                       basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        basct::cspan<unsigned> product_terms, unsigned n) noexcept {
   unsigned num_mles = product_terms.size();
 
@@ -71,6 +71,18 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, basct::cspan<s25t::element>
   size_t chunk_index = 0;
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+      basdv::stream stream;
+      memr::async_device_resource resource{stream};
+
+      // partial_mles
+      memmg::managed_array<s25t::element> partial_mles{num_mles * rng.size(), &resource};
+
+      // lookup problem descriptor
+      basct::cspan<std::pair<s25t::element, unsigned>> product_table;
+      basct::cspan<unsigned> product_terms;
+      cache.lookup(product_table, product_terms, stream);
+
+      // compute
 #if 0
         basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
                    rng.a(), rng.b(), basdv::get_device());
