@@ -13,6 +13,7 @@ sxt_cc_component(
     impl_deps = [
       "//sxt/base/device:memory_utility",
       "//sxt/base/device:state",
+      "//sxt/base/device:stream",
       "//sxt/memory/resource:device_resource",
     ],
     deps = [

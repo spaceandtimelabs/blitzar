@@ -2,22 +2,24 @@
 
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/state.h"
+#include "sxt/base/device/stream.h"
 #include "sxt/memory/resource/device_resource.h"
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // make_device_copy 
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 static std::unique_ptr<device_cache_data>
 make_device_copy(basct::cspan<std::pair<s25t::element, unsigned>> product_table,
                  basct::cspan<unsigned> product_terms, basdv::stream& stream) noexcept {
-  return nullptr;
+  device_cache_data res{
+      .product_table{product_table.size(), memr::get_device_resource()},
+      .product_terms{product_terms.size(), memr::get_device_resource()},
+  };
+  basdv::async_copy_host_to_device(res.product_table, product_table, stream);
+  basdv::async_copy_host_to_device(res.product_terms, product_terms, stream);
+  return std::make_unique<device_cache_data>(std::move(res));
 }
-#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // lookup
