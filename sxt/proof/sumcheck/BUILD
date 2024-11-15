@@ -28,6 +28,13 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "mle_utility",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "workspace",
     with_test = False,
 )
