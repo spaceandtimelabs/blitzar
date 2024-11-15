@@ -12,6 +12,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/proof/sumcheck/device_cache.h"
+#include "sxt/proof/sumcheck/mle_utility.h"
 #include "sxt/proof/sumcheck/reduction_gpu.h"
 #include "sxt/scalar25/type/element.h"
 
@@ -56,13 +57,13 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
 #pragma clang diagnostic ignored "-Wunused-variable"
 #pragma clang diagnostic ignored "-Wunused-parameter"
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
-                       basct::cspan<unsigned> product_terms, unsigned n) noexcept {
-  unsigned num_mles = product_terms.size();
+                       basct::cspan<s25t::element> mles, unsigned n) noexcept {
+  auto mid = n / 2u;
 
   (void)partial_sum;
   // split
   sum_options options;
-  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, mid}
                                                     .min_chunk_size(options.min_chunk_size)
                                                     .max_chunk_size(options.max_chunk_size),
                                                 options.split_factor);
@@ -74,8 +75,9 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
       basdv::stream stream;
       memr::async_device_resource resource{stream};
 
-      // partial_mles
-      memmg::managed_array<s25t::element> partial_mles{num_mles * rng.size(), &resource};
+      // copy partial mles to device
+      memmg::managed_array<s25t::element> partial_mles{&resource};
+      copy_partial_mles(partial_mles, stream, mles, n, rng.a(), rng.b());
 
       // lookup problem descriptor
       basct::cspan<std::pair<s25t::element, unsigned>> product_table;

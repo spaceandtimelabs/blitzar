@@ -14,6 +14,8 @@ namespace sxt::prfsk {
 #pragma clang diagnostic ignored "-Wunused-parameter"
 void copy_partial_mles(memmg::managed_array<s25t::element> partial_mles, basdv::stream& stream,
                        basct::cspan<s25t::element> mles, unsigned n, unsigned a,
-                       unsigned b) noexcept {}
+                       unsigned b) noexcept {
+  auto mid = n / 2u;
+}
 #pragma clang diagnostic pop
 } // namespace sxt::prfsk
