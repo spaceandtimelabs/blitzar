@@ -29,6 +29,14 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "mle_utility",
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/memory/management:managed_array_fwd",
+    ],
+    impl_deps = [
+        "//sxt/memory/management:managed_array",
+        "//sxt/scalar25/type:element",
+    ],
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
