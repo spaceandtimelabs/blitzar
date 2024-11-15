@@ -5,15 +5,18 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/device/device_map.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/scalar25/type/element.h"
 
 namespace sxt::basdv { class stream; }
-namespace sxt::s25t { class element; }
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // device_cache_data
 //--------------------------------------------------------------------------------------------------
 struct device_cache_data {
+  memmg::managed_array<std::pair<s25t::element, unsigned>> product_table;
+  memmg::managed_array<unsigned> product_terms;
 };
 
 //--------------------------------------------------------------------------------------------------

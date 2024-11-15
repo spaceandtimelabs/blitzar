@@ -10,9 +10,16 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "device_cache",
+    impl_deps = [
+      "//sxt/base/device:memory_utility",
+      "//sxt/base/device:state",
+      "//sxt/memory/resource:device_resource",
+    ],
     deps = [
         "//sxt/base/container:span",
         "//sxt/base/device:device_map",
+        "//sxt/memory/management:managed_array",
+        "//sxt/scalar25/type:element",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
