@@ -30,8 +30,10 @@ partial_sum_kernel(s25t::element* __restrict__ out,
 // partial_sum 
 //--------------------------------------------------------------------------------------------------
 static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& stream,
+                                  basct::cspan<s25t::element> mles,
                                   basct::cspan<std::pair<s25t::element, unsigned>> product_table,
-                                  basct::cspan<unsigned> product_terms, unsigned n) noexcept {
+                                  basct::cspan<unsigned> product_terms, unsigned split,
+                                  unsigned n) noexcept {
   auto num_coefficients = p.size();
   auto dims = algr::fit_reduction_kernel(n);
   memr::async_device_resource resource{stream};
@@ -40,9 +42,11 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
   memmg::managed_array<s25t::element> partials{num_coefficients * dims.num_blocks, &resource};
   xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
                                            std::integral_constant<unsigned, BlockSize>) noexcept {
+#if 0
     partial_sum_kernel<BlockSize>
         <<<dim3(dims.num_blocks, num_coefficients, 1), BlockSize, 0, stream>>>(
             partials.data(), product_table.data(), product_terms.data(), n);
+#endif
   });
 
   // reduce partials
@@ -59,6 +63,8 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        basct::cspan<s25t::element> mles, unsigned n) noexcept {
   auto mid = n / 2u;
+  auto num_mles = mles.size() / n;
+  auto num_coefficients = p.size();
 
   (void)partial_sum;
   // split
@@ -78,6 +84,8 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
       // copy partial mles to device
       memmg::managed_array<s25t::element> partial_mles{&resource};
       copy_partial_mles(partial_mles, stream, mles, n, rng.a(), rng.b());
+      auto split = rng.b() - rng.a();
+      auto np = partial_mles.size() / num_mles;
 
       // lookup problem descriptor
       basct::cspan<std::pair<s25t::element, unsigned>> product_table;
@@ -85,6 +93,9 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
       cache.lookup(product_table, product_terms, stream);
 
       // compute
+      memmg::managed_array<s25t::element> partial_p(num_coefficients);
+      co_await partial_sum(partial_p, stream, partial_mles, product_table, product_terms, split,
+                           np);
 #if 0
         basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
                    rng.a(), rng.b(), basdv::get_device());
