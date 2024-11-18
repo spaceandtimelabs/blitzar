@@ -39,7 +39,7 @@ class in_memory_partition_table_accessor final : public partition_table_accessor
 
 public:
   explicit in_memory_partition_table_accessor(
-      std::string_view filename, basm::alloc_t alloc = memr::get_pinned_resource()) noexcept
+      std::string_view filename, basm::alloc_t alloc = {}) noexcept
       : table_{alloc} {
     std::ifstream in{std::string{filename}, std::ios::binary};
     if (!in.good()) {
