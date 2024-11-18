@@ -68,7 +68,6 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
   auto num_mles = mles.size() / n;
   auto num_coefficients = p.size();
 
-  (void)partial_sum;
   // split
   sum_options options;
   auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, mid}
