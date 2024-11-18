@@ -14,7 +14,9 @@
 #include "sxt/proof/sumcheck/device_cache.h"
 #include "sxt/proof/sumcheck/mle_utility.h"
 #include "sxt/proof/sumcheck/reduction_gpu.h"
+#include "sxt/scalar25/operation/add.h"
 #include "sxt/scalar25/type/element.h"
+#include <locale>
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
@@ -75,43 +77,39 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                                                 options.split_factor);
 
   // sum
-  size_t chunk_index = 0;
+  size_t counter = 0;
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
-      basdv::stream stream;
-      memr::async_device_resource resource{stream};
-
-      // copy partial mles to device
-      memmg::managed_array<s25t::element> partial_mles{&resource};
-      copy_partial_mles(partial_mles, stream, mles, n, rng.a(), rng.b());
-      auto split = rng.b() - rng.a();
-      auto np = partial_mles.size() / num_mles;
-
-      // lookup problem descriptor
-      basct::cspan<std::pair<s25t::element, unsigned>> product_table;
-      basct::cspan<unsigned> product_terms;
-      cache.lookup(product_table, product_terms, stream);
-
-      // compute
-      memmg::managed_array<s25t::element> partial_p(num_coefficients);
-      co_await partial_sum(partial_p, stream, partial_mles, product_table, product_terms, split,
-                           np);
-#if 0
-        basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
-                   rng.a(), rng.b(), basdv::get_device());
-#endif
-        /* memmg::managed_array<T> partial_products_dev{num_products, memr::get_device_resource()}; */
-#if 0   
-        auto scalars_slice =
-            scalars.subspan(num_output_bytes * rng.a(), rng.size() * num_output_bytes);
-        co_await async_partition_product<T>(partial_products_dev, accessor, scalars_slice, rng.a());
         basdv::stream stream;
-        basdv::async_copy_device_to_host(
-            basct::subspan(partial_products, num_products * chunk_index, num_products),
-            partial_products_dev, stream);
-        ++chunk_index;
-        co_await xendv::await_stream(stream);
-#endif
+        memr::async_device_resource resource{stream};
+
+        // copy partial mles to device
+        memmg::managed_array<s25t::element> partial_mles{&resource};
+        copy_partial_mles(partial_mles, stream, mles, n, rng.a(), rng.b());
+        auto split = rng.b() - rng.a();
+        auto np = partial_mles.size() / num_mles;
+
+        // lookup problem descriptor
+        basct::cspan<std::pair<s25t::element, unsigned>> product_table;
+        basct::cspan<unsigned> product_terms;
+        cache.lookup(product_table, product_terms, stream);
+
+        // compute
+        memmg::managed_array<s25t::element> partial_p(num_coefficients);
+        co_await partial_sum(partial_p, stream, partial_mles, product_table, product_terms, split,
+                             np);
+
+        // fill in the result
+        if (counter == 0) {
+          for (unsigned i = 0; i < num_coefficients; ++i) {
+            p[i] = partial_p[i];
+          }
+        } else {
+          for (unsigned i = 0; i < num_coefficients; ++i) {
+            s25o::add(p[i], p[i], partial_p[i]);
+          }
+        }
+        ++counter;
       });
 }
 #pragma clang diagnostic pop
