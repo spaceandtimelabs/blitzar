@@ -22,6 +22,13 @@ make_device_copy(basct::cspan<std::pair<s25t::element, unsigned>> product_table,
 }
 
 //--------------------------------------------------------------------------------------------------
+// constructor
+//--------------------------------------------------------------------------------------------------
+device_cache::device_cache(basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+                           basct::cspan<unsigned> product_terms) noexcept
+    : product_table_{product_table}, product_terms_{product_terms} {}
+
+//--------------------------------------------------------------------------------------------------
 // lookup
 //--------------------------------------------------------------------------------------------------
 void device_cache::lookup(basct::cspan<std::pair<s25t::element, unsigned>>& product_table,
