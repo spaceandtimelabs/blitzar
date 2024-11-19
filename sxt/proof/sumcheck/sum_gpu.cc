@@ -22,11 +22,33 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // partial_sum_kernel 
 //--------------------------------------------------------------------------------------------------
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
 template <unsigned BlockSize>
 __global__ static void
-partial_sum_kernel(s25t::element* __restrict__ out,
+partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restrict__ mles,
                    const std::pair<s25t::element, unsigned>* __restrict__ product_table,
-                   const unsigned* __restrict__ product_terms, unsigned n) noexcept {}
+                   const unsigned* __restrict__ product_terms, unsigned num_coefficients,
+                   unsigned n) noexcept {
+  auto term_index = blockIdx.y;
+
+  out += num_coefficients * term_index;
+  for (unsigned i=0; i<term_index; ++i) {
+    product_terms += product_table[i].second;
+  }
+
+  (void)product_terms;
+  (void)out;
+/* template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Mapper> */
+/*   requires std::same_as<typename Reducer::value_type, typename Mapper::value_type> */
+/* __device__ void thread_reduce(typename Reducer::value_type* out, */
+/*                               typename Reducer::value_type* shared_data, Mapper mapper, */
+/*                               unsigned int n, unsigned int step, unsigned int thread_index, */
+/*                               unsigned int index) { */
+}
+#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // partial_sum 
@@ -44,11 +66,10 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
   memmg::managed_array<s25t::element> partials{num_coefficients * dims.num_blocks, &resource};
   xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
                                            std::integral_constant<unsigned, BlockSize>) noexcept {
-#if 0
     partial_sum_kernel<BlockSize>
         <<<dim3(dims.num_blocks, num_coefficients, 1), BlockSize, 0, stream>>>(
-            partials.data(), product_table.data(), product_terms.data(), n);
-#endif
+            partials.data(), mles.data(), product_table.data(), product_terms.data(),
+            num_coefficients, n);
   });
 
   // reduce partials
@@ -58,10 +79,6 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
 //--------------------------------------------------------------------------------------------------
 // sum_gpu 
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        basct::cspan<s25t::element> mles, unsigned n) noexcept {
   auto mid = n / 2u;
@@ -111,5 +128,4 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
         ++counter;
       });
 }
-#pragma clang diagnostic pop
 } // namespace sxt::prfsk
