@@ -1,5 +1,7 @@
 #include "sxt/proof/sumcheck/sum_gpu.h"
 
+#include <cstddef>
+
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/iterator/index_range_iterator.h"
@@ -11,14 +13,24 @@
 #include "sxt/execution/kernel/launch.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/proof/sumcheck/constant.h"
 #include "sxt/proof/sumcheck/device_cache.h"
 #include "sxt/proof/sumcheck/mle_utility.h"
 #include "sxt/proof/sumcheck/reduction_gpu.h"
 #include "sxt/scalar25/operation/add.h"
 #include "sxt/scalar25/type/element.h"
-#include <locale>
 
 namespace sxt::prfsk {
+//--------------------------------------------------------------------------------------------------
+// partial_sum_kernel_impl 
+//--------------------------------------------------------------------------------------------------
+template <unsigned BlockSize, unsigned TermDegree>
+__device__ static void
+partial_sum_kernel_impl(s25t::element* __restrict__ out, const s25t::element* __restrict__ mles,
+                        const unsigned* __restrict__ product_terms, unsigned n) noexcept {
+  extern __shared__ std::byte shared_data;
+}
+
 //--------------------------------------------------------------------------------------------------
 // partial_sum_kernel 
 //--------------------------------------------------------------------------------------------------
@@ -28,16 +40,24 @@ namespace sxt::prfsk {
 #pragma clang diagnostic ignored "-Wunused-parameter"
 template <unsigned BlockSize>
 __global__ static void
-partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restrict__ mles,
+partial_sum_kernel(
+    s25t::element* __restrict__ out, const s25t::element* __restrict__ mles,
                    const std::pair<s25t::element, unsigned>* __restrict__ product_table,
                    const unsigned* __restrict__ product_terms, unsigned num_coefficients,
-                   unsigned n) noexcept {
+                   unsigned n
+                   ) noexcept {
   auto term_index = blockIdx.y;
+  auto term_degree = product_table[term_index].second;
 
+  // adjust pointers
   out += num_coefficients * term_index;
   for (unsigned i=0; i<term_index; ++i) {
     product_terms += product_table[i].second;
   }
+
+  // sum
+  // write out result
+/* constexpr unsigned max_degree_v = 5u; */
 
   (void)product_terms;
   (void)out;

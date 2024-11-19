@@ -201,6 +201,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "sum_gpu",
     impl_deps = [
+      ":constant",
       ":device_cache",
       ":mle_utility",
       ":reduction_gpu",
