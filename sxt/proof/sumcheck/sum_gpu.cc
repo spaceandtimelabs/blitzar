@@ -40,12 +40,10 @@ partial_sum_kernel_impl(s25t::element* __restrict__ out, const s25t::element* __
 #pragma clang diagnostic ignored "-Wunused-parameter"
 template <unsigned BlockSize>
 __global__ static void
-partial_sum_kernel(
-    s25t::element* __restrict__ out, const s25t::element* __restrict__ mles,
+partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restrict__ mles,
                    const std::pair<s25t::element, unsigned>* __restrict__ product_table,
                    const unsigned* __restrict__ product_terms, unsigned num_coefficients,
-                   unsigned n
-                   ) noexcept {
+                   unsigned split, unsigned n) noexcept {
   auto term_index = blockIdx.y;
   auto term_degree = product_table[term_index].second;
 
@@ -79,7 +77,7 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
                                   basct::cspan<unsigned> product_terms, unsigned split,
                                   unsigned n) noexcept {
   auto num_coefficients = p.size();
-  auto dims = algr::fit_reduction_kernel(n);
+  auto dims = algr::fit_reduction_kernel(split);
   memr::async_device_resource resource{stream};
 
   // partials
@@ -89,7 +87,7 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
     partial_sum_kernel<BlockSize>
         <<<dim3(dims.num_blocks, num_coefficients, 1), BlockSize, 0, stream>>>(
             partials.data(), mles.data(), product_table.data(), product_terms.data(),
-            num_coefficients, n);
+            num_coefficients, split, n);
   });
 
   // reduce partials
