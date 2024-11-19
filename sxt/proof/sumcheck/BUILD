@@ -223,6 +223,7 @@ sxt_cc_component(
       #   "//sxt/memory/management:managed_array",
       #   "//sxt/memory/resource:async_device_resource",
         "//sxt/scalar25/operation:add",
+        "//sxt/scalar25/operation:mul",
       #   "//sxt/scalar25/operation:accumulator",
         "//sxt/scalar25/type:element",
     ],

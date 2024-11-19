@@ -19,6 +19,7 @@
 #include "sxt/proof/sumcheck/mle_utility.h"
 #include "sxt/proof/sumcheck/reduction_gpu.h"
 #include "sxt/scalar25/operation/add.h"
+#include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {
@@ -31,15 +32,17 @@ __device__ static void partial_sum_kernel_impl(s25t::element* __restrict__ out,
                                                const s25t::element* __restrict__ mles,
                                                const unsigned* __restrict__ product_terms,
                                                unsigned split, unsigned n) noexcept {
+/* template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Mapper> */
+/*   requires std::same_as<typename Reducer::value_type, typename Mapper::value_type> */
+/* __device__ void thread_reduce(typename Reducer::value_type* out, */
+/*                               typename Reducer::value_type* shared_data, Mapper mapper, */
+/*                               unsigned int n, unsigned int step, unsigned int thread_index, */
+/*                               unsigned int index) { */
 }
 
 //--------------------------------------------------------------------------------------------------
 // partial_sum_kernel 
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 template <unsigned BlockSize>
 __global__ static void
 partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restrict__ mles,
@@ -48,6 +51,7 @@ partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restr
                    unsigned split, unsigned n) noexcept {
   auto term_index = blockIdx.y;
   auto num_terms = product_table[term_index].second;
+  auto thread_index = threadIdx.x;
 
   // shared data for reduction
   __shared__ s25t::element shared_data[BlockSize * (max_degree_v + 1u)];
@@ -66,18 +70,18 @@ partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restr
       });
 
   // write out result
-/* constexpr unsigned max_degree_v = 5u; */
-
-  (void)product_terms;
-  (void)out;
-/* template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Mapper> */
-/*   requires std::same_as<typename Reducer::value_type, typename Mapper::value_type> */
-/* __device__ void thread_reduce(typename Reducer::value_type* out, */
-/*                               typename Reducer::value_type* shared_data, Mapper mapper, */
-/*                               unsigned int n, unsigned int step, unsigned int thread_index, */
-/*                               unsigned int index) { */
+  if (blockIdx.x != 0) {
+    return;
+  }
+  auto mult = product_table[term_index].first;
+  for (unsigned i = thread_index; i < num_coefficients; i += BlockSize) {
+    if (i < num_terms + 1u) {
+      s25o::mul(out[i], mult, out[i]);
+    } else {
+      out[i] = s25t::element{};
+    }
+  }
 }
-#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // partial_sum 
