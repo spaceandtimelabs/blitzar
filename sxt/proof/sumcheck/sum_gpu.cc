@@ -1,6 +1,7 @@
 #include "sxt/proof/sumcheck/sum_gpu.h"
 
 #include <cstddef>
+#include <iostream>
 
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
@@ -63,12 +64,6 @@ __device__ static void partial_sum_kernel_impl(s25t::element* __restrict__ out,
   algr::thread_reduce<Reducer, BlockSize>(reinterpret_cast<T*>(out),
                                           reinterpret_cast<T*>(shared_data), mapper, split, step,
                                           threadIdx.x, index);
-  /* template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Mapper> */
-  /*   requires std::same_as<typename Reducer::value_type, typename Mapper::value_type> */
-  /* __device__ void thread_reduce(typename Reducer::value_type* out, */
-  /*                               typename Reducer::value_type* shared_data, Mapper mapper, */
-  /*                               unsigned int n, unsigned int step, unsigned int thread_index, */
-  /*                               unsigned int index) { */
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -125,13 +120,14 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
   auto num_coefficients = p.size();
   auto dims = algr::fit_reduction_kernel(split);
   memr::async_device_resource resource{stream};
+  std::cout << "split = " << split << std::endl;
 
   // partials
   memmg::managed_array<s25t::element> partials{num_coefficients * dims.num_blocks, &resource};
   xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
                                            std::integral_constant<unsigned, BlockSize>) noexcept {
     partial_sum_kernel<BlockSize>
-        <<<dim3(dims.num_blocks, num_coefficients, 1), BlockSize, 0, stream>>>(
+        <<<dim3(dims.num_blocks, product_table.size(), 1), BlockSize, 0, stream>>>(
             partials.data(), mles.data(), product_table.data(), product_terms.data(),
             num_coefficients, split, n);
   });
@@ -145,7 +141,7 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
 //--------------------------------------------------------------------------------------------------
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        basct::cspan<s25t::element> mles, unsigned n) noexcept {
-  auto mid = n / 2u;
+  auto mid = std::max(n / 2u, 1u);
   auto num_mles = mles.size() / n;
   auto num_coefficients = p.size();
 

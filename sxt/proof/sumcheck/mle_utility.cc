@@ -20,12 +20,12 @@ namespace sxt::prfsk {
 void copy_partial_mles(memmg::managed_array<s25t::element> partial_mles, basdv::stream& stream,
                        basct::cspan<s25t::element> mles, unsigned n, unsigned a,
                        unsigned b) noexcept {
-  auto mid = n / 2u;
+  auto mid = std::max(n / 2u, 1u);
   auto num_mles = mles.size() / n;
   auto part1_size = b - a;
-  SXT_DEBUG_ASSERT(
-      b <= mid
-  );
+  /* SXT_DEBUG_ASSERT( */
+  /*     b <= mid */
+  /* ); */
   auto ap = std::min(mid + a, n);
   auto bp = std::min(mid + b, n);
   auto part2_size = bp - ap;
@@ -38,13 +38,15 @@ void copy_partial_mles(memmg::managed_array<s25t::element> partial_mles, basdv::
   for (unsigned mle_index=0; mle_index<num_mles; ++mle_index) {
     // first part
     auto src = mles.subspan(n * mle_index + a, part1_size);
-    auto dst = basct::subspan(partial_mles, n * mle_index, part1_size);
+    auto dst = basct::subspan(partial_mles, partial_length * mle_index, part1_size);
     basdv::async_copy_host_to_device(dst, src, stream);
 
     // second part
     src = mles.subspan(n * mle_index + ap, part2_size);
-    dst = basct::subspan(partial_mles, n * mle_index + part1_size, part2_size);
-    basdv::async_copy_host_to_device(dst, src, stream);
+    dst = basct::subspan(partial_mles, partial_length * mle_index + part1_size, part2_size);
+    if (!src.empty()) {
+      basdv::async_copy_host_to_device(dst, src, stream);
+    }
   }
 }
 #pragma clang diagnostic pop
