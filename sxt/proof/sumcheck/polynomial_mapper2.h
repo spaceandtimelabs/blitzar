@@ -23,7 +23,7 @@ template <unsigned Degree> struct polynomial_mapper2 {
     if (index + split < n) {
       expand_products(p, mles, n, split, {product_terms, Degree});
     } else {
-      partially_expand_products(p, mles, n, {product_terms, Degree});
+      partial_expand_products(p, mles, n, {product_terms, Degree});
     }
   }
 

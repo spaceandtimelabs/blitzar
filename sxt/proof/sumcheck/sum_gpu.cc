@@ -3,6 +3,7 @@
 #include <cstddef>
 
 #include "sxt/algorithm/reduction/kernel_fit.h"
+#include "sxt/algorithm/reduction/thread_reduction.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/iterator/index_range_utility.h"
@@ -17,12 +18,28 @@
 #include "sxt/proof/sumcheck/constant.h"
 #include "sxt/proof/sumcheck/device_cache.h"
 #include "sxt/proof/sumcheck/mle_utility.h"
+#include "sxt/proof/sumcheck/polynomial_mapper2.h"
 #include "sxt/proof/sumcheck/reduction_gpu.h"
 #include "sxt/scalar25/operation/add.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {
+//--------------------------------------------------------------------------------------------------
+// polynomial_reducer
+//--------------------------------------------------------------------------------------------------
+namespace {
+template <unsigned Degree> struct polynomial_reducer {
+  using value_type = std::array<s25t::element, Degree + 1u>;
+
+  CUDA_CALLABLE static void accumulate_inplace(value_type& res, const value_type& e) noexcept {
+    for (unsigned i = 0; i < res.size(); ++i) {
+      s25o::add(res[i], res[i], e[i]);
+    }
+  }
+};
+} // namespace
+
 //--------------------------------------------------------------------------------------------------
 // partial_sum_kernel_impl 
 //--------------------------------------------------------------------------------------------------
@@ -32,12 +49,26 @@ __device__ static void partial_sum_kernel_impl(s25t::element* __restrict__ out,
                                                const s25t::element* __restrict__ mles,
                                                const unsigned* __restrict__ product_terms,
                                                unsigned split, unsigned n) noexcept {
-/* template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Mapper> */
-/*   requires std::same_as<typename Reducer::value_type, typename Mapper::value_type> */
-/* __device__ void thread_reduce(typename Reducer::value_type* out, */
-/*                               typename Reducer::value_type* shared_data, Mapper mapper, */
-/*                               unsigned int n, unsigned int step, unsigned int thread_index, */
-/*                               unsigned int index) { */
+  using Mapper = polynomial_mapper2<NumTerms>;
+  using Reducer = polynomial_reducer<NumTerms>;
+  using T = Mapper::value_type;
+  Mapper mapper{
+      .mles = mles,
+      .product_terms = product_terms,
+      .split = split,
+      .n = n,
+  };
+  auto index = blockIdx.x * (BlockSize * 2) + threadIdx.x;
+  auto step = BlockSize * 2 * gridDim.x;
+  algr::thread_reduce<Reducer, BlockSize>(reinterpret_cast<T*>(out),
+                                          reinterpret_cast<T*>(shared_data), mapper, split, step,
+                                          threadIdx.x, index);
+  /* template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Mapper> */
+  /*   requires std::same_as<typename Reducer::value_type, typename Mapper::value_type> */
+  /* __device__ void thread_reduce(typename Reducer::value_type* out, */
+  /*                               typename Reducer::value_type* shared_data, Mapper mapper, */
+  /*                               unsigned int n, unsigned int step, unsigned int thread_index, */
+  /*                               unsigned int index) { */
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -54,7 +85,7 @@ partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restr
   auto thread_index = threadIdx.x;
 
   // shared data for reduction
-  __shared__ s25t::element shared_data[BlockSize * (max_degree_v + 1u)];
+  __shared__ s25t::element shared_data[2 * BlockSize * (max_degree_v + 1u)];
 
   // adjust pointers
   out += num_coefficients * term_index;
