@@ -212,6 +212,7 @@ sxt_cc_component(
         "//sxt/base/device:stream",
         "//sxt/base/iterator:index_range_iterator",
         "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/num:constexpr_switch",
       #   "//sxt/base/error:assert",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",

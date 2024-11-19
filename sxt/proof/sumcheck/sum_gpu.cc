@@ -6,6 +6,7 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/num/constexpr_switch.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/for_each.h"
@@ -24,11 +25,12 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // partial_sum_kernel_impl 
 //--------------------------------------------------------------------------------------------------
-template <unsigned BlockSize, unsigned TermDegree>
-__device__ static void
-partial_sum_kernel_impl(s25t::element* __restrict__ out, const s25t::element* __restrict__ mles,
-                        const unsigned* __restrict__ product_terms, unsigned n) noexcept {
-  extern __shared__ std::byte shared_data;
+template <unsigned BlockSize, unsigned NumTerms>
+__device__ static void partial_sum_kernel_impl(s25t::element* __restrict__ out,
+                                               s25t::element* __restrict__ shared_data,
+                                               const s25t::element* __restrict__ mles,
+                                               const unsigned* __restrict__ product_terms,
+                                               unsigned split, unsigned n) noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -45,7 +47,10 @@ partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restr
                    const unsigned* __restrict__ product_terms, unsigned num_coefficients,
                    unsigned split, unsigned n) noexcept {
   auto term_index = blockIdx.y;
-  auto term_degree = product_table[term_index].second;
+  auto num_terms = product_table[term_index].second;
+
+  // shared data for reduction
+  __shared__ s25t::element shared_data[BlockSize * (max_degree_v + 1u)];
 
   // adjust pointers
   out += num_coefficients * term_index;
@@ -54,6 +59,12 @@ partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restr
   }
 
   // sum
+  basn::constexpr_switch<1, max_degree_v>(
+      num_terms, [&]<unsigned NumTerms>(std::integral_constant<unsigned, NumTerms>) noexcept {
+        partial_sum_kernel_impl<BlockSize, NumTerms>(out, shared_data, mles, product_terms, split,
+                                                     n);
+      });
+
   // write out result
 /* constexpr unsigned max_degree_v = 5u; */
 
