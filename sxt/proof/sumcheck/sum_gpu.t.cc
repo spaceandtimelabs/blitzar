@@ -27,6 +27,7 @@ TEST_CASE("we can sum MLEs") {
     auto fut = sum_gpu(p, cache, mles, 1);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
-    /* REQUIRE(p[0] == 0x456_s25); */
+    REQUIRE(p[0] == mles[0]);
+    REQUIRE(p[1] == -mles[0]);
   }
 }

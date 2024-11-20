@@ -169,6 +169,7 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
         basct::cspan<std::pair<s25t::element, unsigned>> product_table;
         basct::cspan<unsigned> product_terms;
         cache.lookup(product_table, product_terms, stream);
+        std::cout << "partial_mles.size() = " << partial_mles.size() << std::endl;
 
         // compute
         memmg::managed_array<s25t::element> partial_p(num_coefficients);

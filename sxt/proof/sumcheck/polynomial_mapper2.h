@@ -20,7 +20,6 @@ template <unsigned Degree> struct polynomial_mapper2 {
 
   CUDA_CALLABLE
   void map_index(value_type& p, unsigned index) const noexcept {
-    return;
     if (index + split < n) {
       expand_products(p, mles, n, split, {product_terms, Degree});
     } else {

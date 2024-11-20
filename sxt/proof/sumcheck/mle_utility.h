@@ -10,7 +10,7 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // copy_partial_mles 
 //--------------------------------------------------------------------------------------------------
-void copy_partial_mles(memmg::managed_array<s25t::element> partial_mles, basdv::stream& stream,
+void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv::stream& stream,
                        basct::cspan<s25t::element> mles, unsigned n, unsigned a,
                        unsigned b) noexcept;
 } // namespace sxt::prfsk

@@ -17,7 +17,7 @@ namespace sxt::prfsk {
 #pragma clang diagnostic ignored "-Wunused-function"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #pragma clang diagnostic ignored "-Wunused-parameter"
-void copy_partial_mles(memmg::managed_array<s25t::element> partial_mles, basdv::stream& stream,
+void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv::stream& stream,
                        basct::cspan<s25t::element> mles, unsigned n, unsigned a,
                        unsigned b) noexcept {
   auto mid = std::max(n / 2u, 1u);
