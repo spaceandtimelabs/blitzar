@@ -31,6 +31,18 @@ TEST_CASE("we can sum MLEs") {
     REQUIRE(p[1] == -mles[0]);
   }
 
+  SECTION("we can sum an MLE with a single term, n=1, and a non-unity multiplier") {
+    product_table = {{0x2_s25, 1}};
+    product_terms = {0};
+    device_cache cache{product_table, product_terms};
+    mles = {0x123_s25};
+    auto fut = sum_gpu(p, cache, mles, 1);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(p[0] == product_table[0].first * mles[0]);
+    REQUIRE(p[1] == -product_table[0].first * mles[0]);
+  }
+
   SECTION("we can sum an MLE with a single term and n=2") {
     product_table = {{0x1_s25, 1}};
     product_terms = {0};
