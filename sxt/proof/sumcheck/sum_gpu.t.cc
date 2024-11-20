@@ -30,4 +30,16 @@ TEST_CASE("we can sum MLEs") {
     REQUIRE(p[0] == mles[0]);
     REQUIRE(p[1] == -mles[0]);
   }
+
+  SECTION("we can sum an MLE with a single term and n=2") {
+    product_table = {{0x1_s25, 1}};
+    product_terms = {0};
+    device_cache cache{product_table, product_terms};
+    mles = {0x123_s25, 0x456_s25};
+    auto fut = sum_gpu(p, cache, mles, 2);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(p[0] == mles[0]);
+    REQUIRE(p[1] == mles[1] - mles[0]);
+  }
 }
