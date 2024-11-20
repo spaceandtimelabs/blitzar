@@ -26,5 +26,9 @@ struct sum_options {
 // sum_gpu
 //--------------------------------------------------------------------------------------------------
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
+                       const sum_options& options, basct::cspan<s25t::element> mles,
+                       unsigned n) noexcept;
+
+xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        basct::cspan<s25t::element> mles, unsigned n) noexcept;
 } // namespace sxt::prfsk

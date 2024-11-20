@@ -140,13 +140,13 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
 // sum_gpu 
 //--------------------------------------------------------------------------------------------------
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
-                       basct::cspan<s25t::element> mles, unsigned n) noexcept {
+                       const sum_options& options, basct::cspan<s25t::element> mles,
+                       unsigned n) noexcept {
   auto mid = std::max(n / 2u, 1u);
   auto num_mles = mles.size() / n;
   auto num_coefficients = p.size();
 
   // split
-  sum_options options;
   auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, mid}
                                                     .min_chunk_size(options.min_chunk_size)
                                                     .max_chunk_size(options.max_chunk_size),
@@ -188,5 +188,11 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
         }
         ++counter;
       });
+}
+
+xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
+                       basct::cspan<s25t::element> mles, unsigned n) noexcept {
+  sum_options options;
+  co_await sum_gpu(p, cache, options, mles, n);
 }
 } // namespace sxt::prfsk
