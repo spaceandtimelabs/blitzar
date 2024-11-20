@@ -54,4 +54,21 @@ TEST_CASE("we can sum MLEs") {
     REQUIRE(p[0] == mles[0]);
     REQUIRE(p[1] == mles[1] - mles[0]);
   }
+
+  SECTION("we can chunk sums with n=4") {
+    product_table = {{0x1_s25, 1}};
+    product_terms = {0};
+    device_cache cache{product_table, product_terms};
+    mles = {0x123_s25, 0x456_s25, 0x789_s25, 0x91011_s25};
+    sum_options options{
+        .min_chunk_size = 1,
+        .max_chunk_size = 1,
+        .split_factor = 2,
+    };
+    auto fut = sum_gpu(p, cache, options, mles, 4);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(p[0] == mles[0] + mles[2]);
+    REQUIRE(p[1] == mles[1] - mles[0] + mles[3] - mles[2]);
+  }
 }
