@@ -117,6 +117,8 @@ sxt_cc_component(
 sxt_cc_component(
     name = "chunked_gpu_driver",
     impl_deps = [
+      ":device_cache",
+      ":sum_gpu",
         # ":constant",
         # ":partial_polynomial_mapper",
         # ":polynomial_mapper",
