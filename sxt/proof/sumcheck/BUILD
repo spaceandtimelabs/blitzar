@@ -127,7 +127,7 @@ sxt_cc_component(
         # "//sxt/base/device:stream",
         # "//sxt/base/device:memory_utility",
         # "//sxt/base/error:panic",
-        # "//sxt/base/num:ceil_log2",
+        "//sxt/base/num:ceil_log2",
         # "//sxt/base/num:constexpr_switch",
         # "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
