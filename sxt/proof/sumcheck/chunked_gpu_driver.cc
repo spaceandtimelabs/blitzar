@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "sxt/base/num/ceil_log2.h"
+#include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/proof/sumcheck/device_cache.h"
@@ -45,17 +46,12 @@ chunked_gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 //--------------------------------------------------------------------------------------------------
 // sum
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 xena::future<> chunked_gpu_driver::sum(basct::span<s25t::element> polynomial,
                                        workspace& ws) const noexcept {
-/* xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache, */
-/*                        basct::cspan<s25t::element> mles, unsigned n) noexcept; */
-  return {};
+  auto& work = static_cast<chunked_gpu_workspace&>(ws);
+  basct::cspan<s25t::element> mles = work.mles.empty() ? work.mles0 : work.mles;
+  co_await sum_gpu(polynomial, work.cache, mles, work.n);
 }
-#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // fold

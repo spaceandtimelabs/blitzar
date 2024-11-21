@@ -131,7 +131,7 @@ sxt_cc_component(
         # "//sxt/base/error:panic",
         "//sxt/base/num:ceil_log2",
         # "//sxt/base/num:constexpr_switch",
-        # "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
         # "//sxt/execution/device:synchronization",
         "//sxt/memory/management:managed_array",
