@@ -240,6 +240,13 @@ sxt_cc_component(
 sxt_cc_component(
     name = "fold_gpu",
     impl_deps = [
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+        "//sxt/execution/async:future",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
     ],
     test_deps = [
       "//sxt/base/test:unit_test",
