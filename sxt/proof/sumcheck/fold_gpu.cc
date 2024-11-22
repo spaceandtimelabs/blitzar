@@ -13,12 +13,21 @@
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
-// fold_gpu 
+// fold_impl 
 //--------------------------------------------------------------------------------------------------
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-function"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #pragma clang diagnostic ignored "-Wunused-parameter"
+static xena::future<> fold_impl(basct::span<s25t::element> mles, unsigned n, unsigned a, unsigned b,
+                                const s25t::element& r, const s25t::element one_m_r) noexcept {
+  return {};
+}
+#pragma clang diagnostic pop
+
+//--------------------------------------------------------------------------------------------------
+// fold_gpu 
+//--------------------------------------------------------------------------------------------------
 xena::future<> fold_gpu(basct::span<s25t::element> mles, unsigned n, const s25t::element& r) noexcept {
   using s25t::operator""_s25;
   auto num_mles = mles.size() / n;
@@ -35,7 +44,9 @@ xena::future<> fold_gpu(basct::span<s25t::element> mles, unsigned n, const s25t:
       basdv::get_num_devices());
 
   // fold
-  return {};
+  co_await xendv::concurrent_for_each(chunk_first, chunk_last,
+                                      [&](basit::index_range rng) noexcept -> xena::future<> {
+                                        co_await fold_impl(mles, n, rng.a(), rng.b(), r, one_m_r);
+                                      });
 }
-#pragma clang diagnostic pop
 } // namespace sxt::prfsk
