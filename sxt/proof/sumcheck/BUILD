@@ -129,7 +129,7 @@ sxt_cc_component(
         # "//sxt/base/container:stack_array",
         # "//sxt/base/device:stream",
         # "//sxt/base/device:memory_utility",
-        # "//sxt/base/error:panic",
+        "//sxt/base/error:assert",
         "//sxt/base/num:ceil_log2",
         # "//sxt/base/num:constexpr_switch",
         "//sxt/execution/async:coroutine",
@@ -142,7 +142,7 @@ sxt_cc_component(
         # "//sxt/scalar25/operation:sub",
         # "//sxt/scalar25/operation:muladd",
         "//sxt/scalar25/type:element",
-        # "//sxt/scalar25/type:literal",
+        "//sxt/scalar25/type:literal",
     ],
     test_deps = [
         ":driver_test",

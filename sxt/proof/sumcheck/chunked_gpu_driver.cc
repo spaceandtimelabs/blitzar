@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "sxt/algorithm/iteration/transform.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
@@ -10,6 +11,7 @@
 #include "sxt/proof/sumcheck/device_cache.h"
 #include "sxt/proof/sumcheck/sum_gpu.h"
 #include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/type/literal.h"
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
@@ -62,6 +64,16 @@ xena::future<> chunked_gpu_driver::sum(basct::span<s25t::element> polynomial,
 #pragma clang diagnostic ignored "-Wunused-variable"
 #pragma clang diagnostic ignored "-Wunused-parameter"
 xena::future<> chunked_gpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
+  using s25t::operator""_s25;
+  auto& work = static_cast<chunked_gpu_workspace&>(ws);
+  auto n = work.n;
+  auto mid = 1u << (work.num_variables - 1u);
+  auto num_mles = work.mles.size() / n;
+  SXT_RELEASE_ASSERT(
+      // clang-format off
+      work.n >= mid && work.mles.size() % n == 0
+      // clang-format on
+  );
   return {};
 #if 0
 template <class F, class Arg1, class... ArgsRest>
