@@ -13,10 +13,6 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // copy_partial_mles 
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv::stream& stream,
                        basct::cspan<s25t::element> mles, unsigned n, unsigned a,
                        unsigned b) noexcept {
@@ -48,6 +44,31 @@ void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv:
       basdv::async_copy_host_to_device(dst, src, stream);
     }
   }
+}
+
+//--------------------------------------------------------------------------------------------------
+// copy_folded_mles 
+//--------------------------------------------------------------------------------------------------
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+void copy_folded_mles(basct::span<s25t::element> host_mles, basdv::stream& stream,
+                      basct::cspan<s25t::element> device_mles, unsigned n, unsigned a,
+                      unsigned b) noexcept {
+  auto num_mles = host_mles.size() / n;
+  auto slice_size = device_mles.size() / num_mles;
+  auto np = n / 2u;
+  SXT_DEBUG_ASSERT(
+      host_mles.size() == num_mles * n &&
+      device_mles.size() == num_mles * slice_size &&
+      b <= np
+  );
+#if 0
+  for (index_t mle_index=0; mle_index<num_mles; ++mle_index) {
+    /* auto src = device_mles.subspan(mle_index */
+  }
+#endif
 }
 #pragma clang diagnostic pop
 } // namespace sxt::prfsk

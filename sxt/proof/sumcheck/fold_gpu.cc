@@ -59,8 +59,9 @@ static __global__ void fold_kernel(s25t::element* __restrict__ mles, unsigned np
 #pragma clang diagnostic ignored "-Wunused-function"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #pragma clang diagnostic ignored "-Wunused-parameter"
-static xena::future<> fold_impl(basct::span<s25t::element> mles, unsigned n, unsigned a, unsigned b,
-                                const s25t::element& r, const s25t::element one_m_r) noexcept {
+static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<s25t::element> mles,
+                                unsigned n, unsigned a, unsigned b, const s25t::element& r,
+                                const s25t::element one_m_r) noexcept {
   auto num_mles = mles.size() / n;
   auto split = b - a;
 
@@ -84,7 +85,8 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles, unsigned n, uns
 //--------------------------------------------------------------------------------------------------
 // fold_gpu 
 //--------------------------------------------------------------------------------------------------
-xena::future<> fold_gpu(basct::span<s25t::element> mles, unsigned n, const s25t::element& r) noexcept {
+xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::element> mles,
+                        unsigned n, const s25t::element& r) noexcept {
   using s25t::operator""_s25;
   auto num_mles = mles.size() / n;
   auto mid = n / 2;
@@ -100,9 +102,9 @@ xena::future<> fold_gpu(basct::span<s25t::element> mles, unsigned n, const s25t:
       basdv::get_num_devices());
 
   // fold
-  co_await xendv::concurrent_for_each(chunk_first, chunk_last,
-                                      [&](basit::index_range rng) noexcept -> xena::future<> {
-                                        co_await fold_impl(mles, n, rng.a(), rng.b(), r, one_m_r);
-                                      });
+  co_await xendv::concurrent_for_each(
+      chunk_first, chunk_last, [&](basit::index_range rng) noexcept -> xena::future<> {
+        co_await fold_impl(mles_p, mles, n, rng.a(), rng.b(), r, one_m_r);
+      });
 }
 } // namespace sxt::prfsk

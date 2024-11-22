@@ -13,4 +13,11 @@ namespace sxt::prfsk {
 void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv::stream& stream,
                        basct::cspan<s25t::element> mles, unsigned n, unsigned a,
                        unsigned b) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// copy_folded_mles 
+//--------------------------------------------------------------------------------------------------
+void copy_folded_mles(basct::span<s25t::element> host_mles, basdv::stream& stream,
+                      basct::cspan<s25t::element> device_mles, unsigned n, unsigned a,
+                      unsigned b) noexcept;
 } // namespace sxt::prfsk

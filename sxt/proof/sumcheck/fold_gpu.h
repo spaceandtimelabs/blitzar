@@ -9,5 +9,7 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // fold_gpu 
 //--------------------------------------------------------------------------------------------------
-xena::future<> fold_gpu(basct::span<s25t::element> mles, unsigned n, const s25t::element& r) noexcept;
+xena::future<> fold_gpu(
+    basct::span<s25t::element> mles_p,
+    basct::cspan<s25t::element> mles, unsigned n, const s25t::element& r) noexcept;
 } // namespace sxt::prfsk
