@@ -139,7 +139,7 @@ sxt_cc_component(
         # "//sxt/memory/resource:async_device_resource",
         # "//sxt/memory/resource:device_resource",
         # "//sxt/scalar25/operation:mul",
-        # "//sxt/scalar25/operation:sub",
+        "//sxt/scalar25/operation:sub",
         # "//sxt/scalar25/operation:muladd",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
@@ -238,6 +238,15 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "fold_gpu",
+    impl_deps = [
+    ],
+    test_deps = [
+      "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "sum_gpu",
     impl_deps = [
       ":constant",
@@ -245,15 +254,12 @@ sxt_cc_component(
       ":mle_utility",
       ":polynomial_mapper2",
       ":reduction_gpu",
-      # "//sxt/algorithm/base:identity_mapper",
       "//sxt/algorithm/reduction:kernel_fit",
       "//sxt/algorithm/reduction:thread_reduction",
-      #   "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/iterator:index_range_iterator",
         "//sxt/base/iterator:index_range_utility",
         "//sxt/base/num:constexpr_switch",
-      #   "//sxt/base/error:assert",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
         "//sxt/execution/device:for_each",

@@ -12,6 +12,7 @@
 #include "sxt/proof/sumcheck/sum_gpu.h"
 #include "sxt/scalar25/type/element.h"
 #include "sxt/scalar25/type/literal.h"
+#include "sxt/scalar25/operation/sub.h"
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
@@ -73,6 +74,11 @@ xena::future<> chunked_gpu_driver::fold(workspace& ws, const s25t::element& r) c
       work.n >= mid && work.mles.size() % n == 0
       // clang-format on
   );
+
+  s25t::element one_m_r = 0x1_s25;
+  s25o::sub(one_m_r, one_m_r, r);
+
+  // f
   return {};
 #if 0
 template <class F, class Arg1, class... ArgsRest>
