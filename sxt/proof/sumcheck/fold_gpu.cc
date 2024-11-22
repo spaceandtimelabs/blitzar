@@ -1,5 +1,6 @@
 #include "sxt/proof/sumcheck/fold_gpu.h"
 
+#include "sxt/proof/sumcheck/mle_utility.h"
 #include "sxt/algorithm/iteration/kernel_fit.h"
 #include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
@@ -25,9 +26,14 @@ namespace sxt::prfsk {
 #pragma clang diagnostic ignored "-Wunused-parameter"
 static xena::future<> fold_impl(basct::span<s25t::element> mles, unsigned n, unsigned a, unsigned b,
                                 const s25t::element& r, const s25t::element one_m_r) noexcept {
-/* void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv::stream& stream, */
-/*                        basct::cspan<s25t::element> mles, unsigned n, unsigned a, */
-/*                        unsigned b) noexcept; */
+  // copy MLEs to device
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<s25t::element> mles_dev{&resource};
+  copy_partial_mles(mles_dev, stream, mles, n, a, b);
+   
+  // fold
+  // copy results back
   return {};
 }
 #pragma clang diagnostic pop

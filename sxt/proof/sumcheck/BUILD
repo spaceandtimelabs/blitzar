@@ -240,6 +240,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "fold_gpu",
     impl_deps = [
+      ":mle_utility",
       "//sxt/algorithm/iteration:kernel_fit",
         "//sxt/base/error:assert",
         "//sxt/base/device:property",
