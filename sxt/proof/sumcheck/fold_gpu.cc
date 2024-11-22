@@ -1,6 +1,7 @@
 #include "sxt/proof/sumcheck/fold_gpu.h"
 
-#include "sxt/proof/sumcheck/mle_utility.h"
+#include <cassert>
+
 #include "sxt/algorithm/iteration/kernel_fit.h"
 #include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
@@ -10,13 +11,35 @@
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/for_each.h"
+#include "sxt/execution/kernel/kernel_dims.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/proof/sumcheck/mle_utility.h"
 #include "sxt/scalar25/operation/sub.h"
 #include "sxt/scalar25/type/element.h"
 #include "sxt/scalar25/type/literal.h"
 
 namespace sxt::prfsk {
+//--------------------------------------------------------------------------------------------------
+// fold_kernel 
+//--------------------------------------------------------------------------------------------------
+static __global__ void fold_kernel(s25t::element* __restrict__ mles, unsigned np, unsigned split,
+                                  s25t::element r, s25t::element one_m_r) noexcept {
+#if 0
+  auto thread_index = threadIdx.x;
+  auto block_index = blockIdx.x;
+  auto block_size = blockDim.x;
+  auto k = basn::divide_up(n, gridDim.x * block_size) * block_size;
+  auto block_first = block_index * k;
+  assert(block_first < n && "every block should be active");
+  auto m = umin(block_first + k, n);
+  auto index = block_first + thread_index;
+  for (; index < m; index += block_size) {
+    f(n, index);
+  }
+#endif
+}
+
 //--------------------------------------------------------------------------------------------------
 // fold_impl 
 //--------------------------------------------------------------------------------------------------
@@ -26,6 +49,9 @@ namespace sxt::prfsk {
 #pragma clang diagnostic ignored "-Wunused-parameter"
 static xena::future<> fold_impl(basct::span<s25t::element> mles, unsigned n, unsigned a, unsigned b,
                                 const s25t::element& r, const s25t::element one_m_r) noexcept {
+  auto num_mles = mles.size() / n;
+  auto split = b - a;
+
   // copy MLEs to device
   basdv::stream stream;
   memr::async_device_resource resource{stream};
@@ -33,6 +59,11 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles, unsigned n, uns
   copy_partial_mles(mles_dev, stream, mles, n, a, b);
    
   // fold
+  auto np = mles_dev.size() / num_mles;
+  auto dims = algi::fit_iteration_kernel(split);
+  fold_kernel<<<dim3(dims.num_blocks, num_mles, 1), static_cast<unsigned>(dims.block_size), 0,
+                stream>>>(mles_dev.data(), np, split, r, one_m_r);
+
   // copy results back
   return {};
 }
