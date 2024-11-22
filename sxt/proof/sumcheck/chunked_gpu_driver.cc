@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "sxt/algorithm/iteration/transform.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
@@ -62,6 +63,13 @@ xena::future<> chunked_gpu_driver::sum(basct::span<s25t::element> polynomial,
 #pragma clang diagnostic ignored "-Wunused-parameter"
 xena::future<> chunked_gpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
   return {};
+#if 0
+template <class F, class Arg1, class... ArgsRest>
+  requires algb::transform_functor<F, bast::value_type_t<Arg1>, bast::value_type_t<ArgsRest>...>
+xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res,
+                         basit::chunk_options chunk_options, F f, const Arg1& x1,
+                         const ArgsRest&... xrest) noexcept {
+#endif
 }
 #pragma clang diagnostic pop
 } // namespace sxt::prfsk

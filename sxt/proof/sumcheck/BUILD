@@ -119,6 +119,7 @@ sxt_cc_component(
     impl_deps = [
       ":device_cache",
       ":sum_gpu",
+      "//sxt/algorithm/iteration:transform",
         # ":constant",
         # ":partial_polynomial_mapper",
         # ":polynomial_mapper",
