@@ -8,6 +8,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/for_each.h"
@@ -15,6 +16,8 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/proof/sumcheck/mle_utility.h"
+#include "sxt/scalar25/operation/mul.h"
+#include "sxt/scalar25/operation/muladd.h"
 #include "sxt/scalar25/operation/sub.h"
 #include "sxt/scalar25/type/element.h"
 #include "sxt/scalar25/type/literal.h"
@@ -25,19 +28,28 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 static __global__ void fold_kernel(s25t::element* __restrict__ mles, unsigned np, unsigned split,
                                   s25t::element r, s25t::element one_m_r) noexcept {
-#if 0
   auto thread_index = threadIdx.x;
   auto block_index = blockIdx.x;
   auto block_size = blockDim.x;
-  auto k = basn::divide_up(n, gridDim.x * block_size) * block_size;
+  auto k = basn::divide_up(split, gridDim.x * block_size) * block_size;
   auto block_first = block_index * k;
-  assert(block_first < n && "every block should be active");
-  auto m = umin(block_first + k, n);
+  assert(block_first < split && "every block should be active");
+  auto m = umin(block_first + k, split);
+
+  // adjust mles
+  mles += np * blockIdx.y;
+
+  // fold
   auto index = block_first + thread_index;
   for (; index < m; index += block_size) {
-    f(n, index);
+    auto x = mles[index];
+    s25o::mul(x, x, one_m_r);
+    auto index_p = split + index;
+    if (index_p < np) {
+      s25o::muladd(x, mles[index_p], r, x);
+    }
+    mles[index] = x;
   }
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------
