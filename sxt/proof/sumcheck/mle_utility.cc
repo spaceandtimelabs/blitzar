@@ -49,10 +49,6 @@ void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv:
 //--------------------------------------------------------------------------------------------------
 // copy_folded_mles 
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 void copy_folded_mles(basct::span<s25t::element> host_mles, basdv::stream& stream,
                       basct::cspan<s25t::element> device_mles, unsigned np, unsigned a,
                       unsigned b) noexcept {
@@ -67,7 +63,7 @@ void copy_folded_mles(basct::span<s25t::element> host_mles, basdv::stream& strea
   for (unsigned mle_index=0; mle_index<num_mles; ++mle_index) {
     auto src = device_mles.subspan(mle_index * slice_np, slice_np);
     auto dst = host_mles.subspan(mle_index * np + a, slice_np);
+    basdv::async_copy_device_to_host(dst, src, stream);
   }
 }
-#pragma clang diagnostic pop
 } // namespace sxt::prfsk
