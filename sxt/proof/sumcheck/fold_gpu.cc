@@ -12,6 +12,7 @@
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/for_each.h"
+#include "sxt/execution/device/synchronization.h"
 #include "sxt/execution/kernel/kernel_dims.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
@@ -55,10 +56,6 @@ static __global__ void fold_kernel(s25t::element* __restrict__ mles, unsigned np
 //--------------------------------------------------------------------------------------------------
 // fold_impl 
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<s25t::element> mles,
                                 unsigned n, unsigned a, unsigned b, const s25t::element& r,
                                 const s25t::element one_m_r) noexcept {
@@ -78,9 +75,10 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<
                 stream>>>(mles_dev.data(), np, split, r, one_m_r);
 
   // copy results back
-  return {};
+  copy_folded_mles(mles_p, stream, mles_dev, n / 2u, a, b);
+
+  xendv::await_stream(stream);
 }
-#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // fold_gpu 

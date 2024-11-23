@@ -254,6 +254,7 @@ sxt_cc_component(
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
         "//sxt/execution/device:for_each",
+        "//sxt/execution/device:synchronization",
         "//sxt/execution/kernel:kernel_dims",
         "//sxt/base/iterator:index_range_iterator",
         "//sxt/base/iterator:index_range_utility",
