@@ -118,6 +118,7 @@ sxt_cc_component(
     name = "chunked_gpu_driver",
     impl_deps = [
       ":device_cache",
+      ":fold_gpu",
       ":sum_gpu",
       "//sxt/algorithm/iteration:transform",
         # ":constant",

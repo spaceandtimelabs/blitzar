@@ -9,10 +9,11 @@
 #include "sxt/execution/async/future.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/proof/sumcheck/device_cache.h"
+#include "sxt/proof/sumcheck/fold_gpu.h"
 #include "sxt/proof/sumcheck/sum_gpu.h"
+#include "sxt/scalar25/operation/sub.h"
 #include "sxt/scalar25/type/element.h"
 #include "sxt/scalar25/type/literal.h"
-#include "sxt/scalar25/operation/sub.h"
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
@@ -59,10 +60,6 @@ xena::future<> chunked_gpu_driver::sum(basct::span<s25t::element> polynomial,
 //--------------------------------------------------------------------------------------------------
 // fold
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 xena::future<> chunked_gpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
   using s25t::operator""_s25;
   auto& work = static_cast<chunked_gpu_workspace&>(ws);
@@ -78,15 +75,13 @@ xena::future<> chunked_gpu_driver::fold(workspace& ws, const s25t::element& r) c
   s25t::element one_m_r = 0x1_s25;
   s25o::sub(one_m_r, one_m_r, r);
 
-  // f
-  return {};
-#if 0
-template <class F, class Arg1, class... ArgsRest>
-  requires algb::transform_functor<F, bast::value_type_t<Arg1>, bast::value_type_t<ArgsRest>...>
-xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res,
-                         basit::chunk_options chunk_options, F f, const Arg1& x1,
-                         const ArgsRest&... xrest) noexcept {
-#endif
+  // fold
+  memmg::managed_array<s25t::element> mles_p(num_mles * mid);
+  co_await fold_gpu(mles_p, work.mles, n, r);
+
+  // update
+  work.n = mid;
+  --work.num_variables;
+  work.mles = std::move(mles_p);
 }
-#pragma clang diagnostic pop
 } // namespace sxt::prfsk
