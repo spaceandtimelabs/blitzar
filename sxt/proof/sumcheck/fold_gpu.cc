@@ -77,7 +77,7 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<
   // copy results back
   copy_folded_mles(mles_p, stream, mles_dev, n / 2u, a, b);
 
-  xendv::await_stream(stream);
+  co_await xendv::await_stream(stream);
 }
 
 //--------------------------------------------------------------------------------------------------

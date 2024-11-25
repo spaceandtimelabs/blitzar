@@ -61,7 +61,7 @@ void copy_folded_mles(basct::span<s25t::element> host_mles, basdv::stream& strea
       b <= np
   );
   for (unsigned mle_index=0; mle_index<num_mles; ++mle_index) {
-    auto src = device_mles.subspan(mle_index * slice_np, slice_np);
+    auto src = device_mles.subspan(mle_index * slice_n, slice_np);
     auto dst = host_mles.subspan(mle_index * np + a, slice_np);
     basdv::async_copy_device_to_host(dst, src, stream);
   }
