@@ -75,16 +75,19 @@ partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restr
                    const std::pair<s25t::element, unsigned>* __restrict__ product_table,
                    const unsigned* __restrict__ product_terms, unsigned num_coefficients,
                    unsigned split, unsigned n) noexcept {
-  auto term_index = blockIdx.y;
-  auto num_terms = product_table[term_index].second;
+  auto product_index = blockIdx.y;
+  auto num_terms = product_table[product_index].second;
   auto thread_index = threadIdx.x;
+  printf("num_terms = %d\n", num_terms);
+  printf("num_coefficients = %d\n", num_coefficients);
 
   // shared data for reduction
   __shared__ s25t::element shared_data[2 * BlockSize * (max_degree_v + 1u)];
 
   // adjust pointers
-  out += num_coefficients * term_index;
-  for (unsigned i=0; i<term_index; ++i) {
+  out += num_coefficients * blockIdx.x;
+  out += num_coefficients * gridDim.x * product_index;
+  for (unsigned i = 0; i < product_index; ++i) {
     product_terms += product_table[i].second;
   }
 
@@ -96,14 +99,14 @@ partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restr
       });
 
   // write out result
-  if (blockIdx.x != 0) {
-    return;
-  }
-  auto mult = product_table[term_index].first;
+  auto mult = product_table[product_index].first;
   for (unsigned i = thread_index; i < num_coefficients; i += BlockSize) {
     if (i < num_terms + 1u) {
       s25o::mul(out[i], mult, out[i]);
     } else {
+      out[i] = s25t::element{};
+    }
+    if (product_index == 1) { 
       out[i] = s25t::element{};
     }
   }
@@ -118,18 +121,18 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
                                   basct::cspan<unsigned> product_terms, unsigned split,
                                   unsigned n) noexcept {
   auto num_coefficients = p.size();
+  auto num_products = product_table.size();
   auto dims = algr::fit_reduction_kernel(split);
   memr::async_device_resource resource{stream};
-  std::cout << "split = " << split << std::endl;
 
   // partials
-  memmg::managed_array<s25t::element> partials{num_coefficients * dims.num_blocks, &resource};
+  memmg::managed_array<s25t::element> partials{num_coefficients * dims.num_blocks * num_products,
+                                               &resource};
   xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
                                            std::integral_constant<unsigned, BlockSize>) noexcept {
-    partial_sum_kernel<BlockSize>
-        <<<dim3(dims.num_blocks, product_table.size(), 1), BlockSize, 0, stream>>>(
-            partials.data(), mles.data(), product_table.data(), product_terms.data(),
-            num_coefficients, split, n);
+    partial_sum_kernel<BlockSize><<<dim3(dims.num_blocks, num_products, 1), BlockSize, 0, stream>>>(
+        partials.data(), mles.data(), product_table.data(), product_terms.data(), num_coefficients,
+        split, n);
   });
 
   // reduce partials
@@ -144,6 +147,7 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        unsigned n) noexcept {
   auto mid = std::max(n / 2u, 1u);
   auto num_mles = mles.size() / n;
+  std::cout << "num_mles = " << num_mles << "\n";
   auto num_coefficients = p.size();
 
   // split
@@ -169,7 +173,6 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
         basct::cspan<std::pair<s25t::element, unsigned>> product_table;
         basct::cspan<unsigned> product_terms;
         cache.lookup(product_table, product_terms, stream);
-        std::cout << "partial_mles.size() = " << partial_mles.size() << std::endl;
 
         // compute
         memmg::managed_array<s25t::element> partial_p(num_coefficients);
