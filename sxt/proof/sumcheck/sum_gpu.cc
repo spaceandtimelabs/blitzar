@@ -1,7 +1,6 @@
 #include "sxt/proof/sumcheck/sum_gpu.h"
 
 #include <cstddef>
-#include <iostream>
 
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
@@ -45,8 +44,7 @@ template <unsigned Degree> struct polynomial_reducer {
 // partial_sum_kernel_impl 
 //--------------------------------------------------------------------------------------------------
 template <unsigned BlockSize, unsigned NumTerms>
-__device__ static void partial_sum_kernel_impl(s25t::element* __restrict__ out,
-                                               s25t::element* __restrict__ shared_data,
+__device__ static void partial_sum_kernel_impl(s25t::element* __restrict__ shared_data,
                                                const s25t::element* __restrict__ mles,
                                                const unsigned* __restrict__ product_terms,
                                                unsigned split, unsigned n) noexcept {
@@ -61,8 +59,7 @@ __device__ static void partial_sum_kernel_impl(s25t::element* __restrict__ out,
   };
   auto index = blockIdx.x * (BlockSize * 2) + threadIdx.x;
   auto step = BlockSize * 2 * gridDim.x;
-  algr::thread_reduce<Reducer, BlockSize>(reinterpret_cast<T*>(out),
-                                          reinterpret_cast<T*>(shared_data), mapper, split, step,
+  algr::thread_reduce<Reducer, BlockSize>(reinterpret_cast<T*>(shared_data), mapper, split, step,
                                           threadIdx.x, index);
 }
 
@@ -78,15 +75,14 @@ partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restr
   auto product_index = blockIdx.y;
   auto num_terms = product_table[product_index].second;
   auto thread_index = threadIdx.x;
-  printf("num_terms = %d\n", num_terms);
-  printf("num_coefficients = %d\n", num_coefficients);
+  auto output_step = gridDim.x * gridDim.y;
 
   // shared data for reduction
   __shared__ s25t::element shared_data[2 * BlockSize * (max_degree_v + 1u)];
 
   // adjust pointers
-  out += num_coefficients * blockIdx.x;
-  out += num_coefficients * gridDim.x * product_index;
+  out += blockIdx.x;
+  out += gridDim.x * product_index;
   for (unsigned i = 0; i < product_index; ++i) {
     product_terms += product_table[i].second;
   }
@@ -94,20 +90,17 @@ partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restr
   // sum
   basn::constexpr_switch<1, max_degree_v>(
       num_terms, [&]<unsigned NumTerms>(std::integral_constant<unsigned, NumTerms>) noexcept {
-        partial_sum_kernel_impl<BlockSize, NumTerms>(out, shared_data, mles, product_terms, split,
-                                                     n);
+        partial_sum_kernel_impl<BlockSize, NumTerms>(shared_data, mles, product_terms, split, n);
       });
 
   // write out result
   auto mult = product_table[product_index].first;
   for (unsigned i = thread_index; i < num_coefficients; i += BlockSize) {
+    auto output_index = output_step * i;
     if (i < num_terms + 1u) {
-      s25o::mul(out[i], mult, out[i]);
+      s25o::mul(out[output_index], mult, shared_data[i]);
     } else {
-      out[i] = s25t::element{};
-    }
-    if (product_index == 1) { 
-      out[i] = s25t::element{};
+      out[output_index] = s25t::element{};
     }
   }
 }
@@ -147,7 +140,6 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        unsigned n) noexcept {
   auto mid = std::max(n / 2u, 1u);
   auto num_mles = mles.size() / n;
-  std::cout << "num_mles = " << num_mles << "\n";
   auto num_coefficients = p.size();
 
   // split
