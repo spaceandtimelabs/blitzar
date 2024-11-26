@@ -17,8 +17,8 @@ class device_cache;
 // sum_options
 //--------------------------------------------------------------------------------------------------
 struct sum_options {
-  unsigned min_chunk_size = 1'000'000u;
-  unsigned max_chunk_size = 4'000'0000;
+  unsigned min_chunk_size = 100'000u;
+  unsigned max_chunk_size = 1'000'000u;
   unsigned split_factor = unsigned(basdv::get_num_devices());
 };
 

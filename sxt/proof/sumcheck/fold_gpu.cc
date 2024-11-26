@@ -16,6 +16,7 @@
 #include "sxt/execution/kernel/kernel_dims.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
+#include "sxt/memory/resource/device_resource.h"
 #include "sxt/proof/sumcheck/mle_utility.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
@@ -64,8 +65,9 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<
 
   // copy MLEs to device
   basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<s25t::element> mles_dev{&resource};
+  /* memr::async_device_resource resource{stream}; */
+  /* memmg::managed_array<s25t::element> mles_dev{&resource}; */
+  memmg::managed_array<s25t::element> mles_dev{memr::get_device_resource()};
   copy_partial_mles(mles_dev, stream, mles, n, a, b);
    
   // fold
@@ -96,7 +98,7 @@ xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::el
 
   // split
   auto [chunk_first, chunk_last] = basit::split(
-      basit::index_range{0, mid}.min_chunk_size(1024 * 512).max_chunk_size(1024 * 1024 * 5),
+      basit::index_range{0, mid}.min_chunk_size(1024 * 512).max_chunk_size(1024 * 1024),
       basdv::get_num_devices());
 
   // fold

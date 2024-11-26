@@ -262,6 +262,7 @@ sxt_cc_component(
         "//sxt/base/iterator:index_range_utility",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:device_resource",
     ],
     deps = [
         "//sxt/base/container:span",
@@ -297,7 +298,8 @@ sxt_cc_component(
         "//sxt/execution/kernel:kernel_dims",
       #   "//sxt/execution/kernel:launch",
       #   "//sxt/memory/management:managed_array",
-      #   "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:async_device_resource",
         "//sxt/scalar25/operation:add",
         "//sxt/scalar25/operation:mul",
       #   "//sxt/scalar25/operation:accumulator",

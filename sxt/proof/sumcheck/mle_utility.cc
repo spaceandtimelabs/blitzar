@@ -1,6 +1,7 @@
 #include "sxt/proof/sumcheck/mle_utility.h"
  
 #include <algorithm>
+#include <iostream>
 
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
@@ -29,6 +30,10 @@ void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv:
    
   // resize array
   auto partial_length = part1_size + part2_size;
+  std::cerr << "n = " << n << std::endl;
+  std::cerr << "num_mles = " << num_mles << std::endl;
+  std::cerr << "part1 = " << part1_size << std::endl;
+  std::cerr << "part2 = " << part2_size << std::endl;
   partial_mles.resize(partial_length * num_mles);
    
   // copy data

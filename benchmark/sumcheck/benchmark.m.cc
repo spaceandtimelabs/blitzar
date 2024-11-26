@@ -28,6 +28,7 @@
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/proof/sumcheck/gpu_driver.h"
+#include "sxt/proof/sumcheck/chunked_gpu_driver.h"
 #include "sxt/proof/sumcheck/proof_computation.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/random/element.h"
@@ -110,7 +111,11 @@ int main(int argc, char* argv[]) {
   memmg::managed_array<s25t::element> polynomials((p.degree + 1u) * num_rounds);
   memmg::managed_array<s25t::element> evaluation_point(num_rounds);
   prft::transcript transcript{"abc123"};
+#if 0
   prfsk::gpu_driver drv;
+#else
+  prfsk::chunked_gpu_driver drv;
+#endif
 
   // initial run
   {
