@@ -6,6 +6,6 @@ using namespace sxt;
 using namespace sxt::prfsk;
 
 TEST_CASE("we can perform the primitive operations for sumcheck proofs") {
-  /* chunked_gpu_driver drv; */
+  chunked_gpu_driver drv;
   /* exercise_driver(drv); */
 }

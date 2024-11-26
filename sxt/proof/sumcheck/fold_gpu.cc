@@ -75,7 +75,7 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<
                 stream>>>(mles_dev.data(), np, split, r, one_m_r);
 
   // copy results back
-  copy_folded_mles(mles_p, stream, mles_dev, n / 2u, a, b);
+  copy_folded_mles(mles_p, stream, mles_dev, basn::divide_up(n, 2u), a, b);
 
   co_await xendv::await_stream(stream);
 }
@@ -87,7 +87,7 @@ xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::el
                         unsigned n, const s25t::element& r) noexcept {
   using s25t::operator""_s25;
   auto num_mles = mles.size() / n;
-  auto mid = n / 2;
+  auto mid = basn::divide_up(n, 2u);
   SXT_DEBUG_ASSERT(
       n > 1 && mles.size() == num_mles * n
   );

@@ -6,6 +6,7 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/num/divide_up.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/scalar25/type/element.h"
 
@@ -16,7 +17,7 @@ namespace sxt::prfsk {
 void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv::stream& stream,
                        basct::cspan<s25t::element> mles, unsigned n, unsigned a,
                        unsigned b) noexcept {
-  auto mid = std::max(n / 2u, 1u);
+  auto mid = std::max(basn::divide_up(n, 2u), 1u);
   auto num_mles = mles.size() / n;
   auto part1_size = b - a;
   /* SXT_DEBUG_ASSERT( */
