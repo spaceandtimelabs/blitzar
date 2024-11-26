@@ -61,6 +61,13 @@ void copy_folded_mles(basct::span<s25t::element> host_mles, basdv::stream& strea
   auto num_mles = host_mles.size() / np;
   auto slice_n = device_mles.size() / num_mles;
   auto slice_np = b - a;
+  std::cout << "copy_folded_mles: np = " << np << std::endl;
+  std::cout << "copy_folded_mles: a, b = " << a << " " << b << std::endl;
+  std::cout << "copy_folded_mles: num_mles = " << num_mles << std::endl;
+  std::cout << "copy_folded_mles: slice_n = " << slice_n << std::endl;
+  std::cout << "copy_folded_mles: slice_np = " << slice_np << std::endl;
+  std::cout << "copy_folded_mles: host_mles.size() = " << host_mles.size() << std::endl;
+  std::cout << "copy_folded_mles: device_mles.size() = " << device_mles.size() << std::endl;
   SXT_DEBUG_ASSERT(
       host_mles.size() == num_mles * np &&
       device_mles.size() == num_mles * slice_n &&

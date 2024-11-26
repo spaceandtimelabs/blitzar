@@ -98,7 +98,8 @@ xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::el
 
   // split
   auto [chunk_first, chunk_last] = basit::split(
-      basit::index_range{0, mid}.min_chunk_size(1024 * 512).max_chunk_size(1024 * 1024),
+      basit::index_range{0, mid}.min_chunk_size(1024 * 128).max_chunk_size(1024 * 256),
+      /* basit::index_range{0, mid}.min_chunk_size(1024 * 512).max_chunk_size(1024 * 1024), */
       basdv::get_num_devices());
 
   // fold
