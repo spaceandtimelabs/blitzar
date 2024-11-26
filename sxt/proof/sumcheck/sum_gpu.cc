@@ -9,6 +9,7 @@
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/iterator/index_range_utility.h"
 #include "sxt/base/num/constexpr_switch.h"
+#include "sxt/base/device/state.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/for_each.h"
@@ -185,7 +186,7 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
           }
         }
         ++counter;
-        std::cout << "************************* sum done" << std::endl;
+        std::cout << "************************* sum done: " << basdv::get_device() << std::endl;
       });
 }
 

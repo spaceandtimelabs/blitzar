@@ -288,6 +288,7 @@ sxt_cc_component(
       "//sxt/algorithm/reduction:kernel_fit",
       "//sxt/algorithm/reduction:thread_reduction",
         "//sxt/base/device:stream",
+        "//sxt/base/device:state",
         "//sxt/base/iterator:index_range_iterator",
         "//sxt/base/iterator:index_range_utility",
         "//sxt/base/num:constexpr_switch",
