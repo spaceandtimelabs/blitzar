@@ -82,6 +82,7 @@ xena::future<> chunked_gpu_driver::fold(workspace& ws, const s25t::element& r) c
   // update
   work.n = mid;
   --work.num_variables;
-  work.mles = std::move(mles_p);
+  work.mles_data = std::move(mles_p);
+  work.mles = work.mles_data;
 }
 } // namespace sxt::prfsk
