@@ -8,7 +8,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/iterator/index_range_utility.h"
-#include "sxt/base/num/divide_up.h"
+#include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/for_each.h"
@@ -58,8 +58,8 @@ static __global__ void fold_kernel(s25t::element* __restrict__ mles, unsigned np
 // fold_impl 
 //--------------------------------------------------------------------------------------------------
 static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<s25t::element> mles,
-                                unsigned n, unsigned a, unsigned b, const s25t::element& r,
-                                const s25t::element one_m_r) noexcept {
+                                unsigned n, unsigned mid, unsigned a, unsigned b,
+                                const s25t::element& r, const s25t::element one_m_r) noexcept {
   auto num_mles = mles.size() / n;
   auto split = b - a;
 
@@ -77,7 +77,7 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<
                 stream>>>(mles_dev.data(), np, split, r, one_m_r);
 
   // copy results back
-  copy_folded_mles(mles_p, stream, mles_dev, basn::divide_up(n, 2u), a, b);
+  copy_folded_mles(mles_p, stream, mles_dev, mid, a, b);
 
   co_await xendv::await_stream(stream);
 }
@@ -89,7 +89,8 @@ xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::el
                         unsigned n, const s25t::element& r) noexcept {
   using s25t::operator""_s25;
   auto num_mles = mles.size() / n;
-  auto mid = basn::divide_up(n, 2u);
+  auto num_variables = std::max(basn::ceil_log2(n), 1);
+  auto mid = 1u << (num_variables - 1u);
   SXT_DEBUG_ASSERT(
       n > 1 && mles.size() == num_mles * n
   );
@@ -105,7 +106,7 @@ xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::el
   // fold
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](basit::index_range rng) noexcept -> xena::future<> {
-        co_await fold_impl(mles_p, mles, n, rng.a(), rng.b(), r, one_m_r);
+        co_await fold_impl(mles_p, mles, n, mid, rng.a(), rng.b(), r, one_m_r);
       });
 }
 } // namespace sxt::prfsk

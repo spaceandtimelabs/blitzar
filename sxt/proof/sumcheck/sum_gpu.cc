@@ -5,11 +5,12 @@
 
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
+#include "sxt/base/device/state.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/constexpr_switch.h"
-#include "sxt/base/device/state.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/for_each.h"
@@ -141,7 +142,8 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        const sum_options& options, basct::cspan<s25t::element> mles,
                        unsigned n) noexcept {
-  auto mid = std::max(n / 2u, 1u);
+  auto num_variables = std::max(basn::ceil_log2(n), 1);
+  auto mid = 1u << (num_variables - 1u);
   auto num_mles = mles.size() / n;
   auto num_coefficients = p.size();
 
