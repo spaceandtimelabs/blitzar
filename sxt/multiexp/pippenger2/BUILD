@@ -27,7 +27,7 @@ sxt_cc_component(
     deps = [
         # "//sxt/algorithm/iteration:for_each",
         "//sxt/base/container:span",
-        # "//sxt/base/container:span_utility",
+        "//sxt/base/container:span_utility",
         "//sxt/base/curve:element",
         "//sxt/base/device:property",
         # "//sxt/base/device:memory_utility",

@@ -3,6 +3,7 @@
 #include <numeric>
 
 #include "sxt/base/container/span.h"
+#include "sxt/base/container/span_utility.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/property.h"
 #include "sxt/base/iterator/index_range_iterator.h"
@@ -36,7 +37,17 @@ xena::future<> combine_reduce(basct::span<T> res, basct::cspan<unsigned> output_
       basit::split(basit::index_range{0, num_outputs}, basdv::get_num_devices());
 
   // combine reduce
+  co_await xendv::concurrent_for_each(
+      chunk_first, chunk_last, [&](basit::index_range rng) noexcept -> xena::future<> {
+        auto output_first = rng.a();
+        auto output_last = rng.b();
 
+        auto res_chunk = res.subspan(output_first, rng.size());
+        auto bit_table_partial_sumss_chunk =
+            basct::subspan(bit_table_partial_sums, output_first, rng.size());
+
+        return {};
+      });
 }
 #pragma clang diagnostic pop
 } // namespace sxt::mtxpp2
