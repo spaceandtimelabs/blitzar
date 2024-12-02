@@ -15,6 +15,21 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
+// combine_reduce_cunk
+//--------------------------------------------------------------------------------------------------
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+template <bascrv::element T>
+xena::future<>
+combine_reduce_chunk(basct::span<T> res, basct::cspan<unsigned> output_bit_table_partial_sums,
+                     basct::cspan<T> partial_products, unsigned partials_offset) noexcept {
+  return {};
+}
+#pragma clang diagnostic pop
+
+//--------------------------------------------------------------------------------------------------
 // combine_reduce 
 //--------------------------------------------------------------------------------------------------
 #pragma clang diagnostic push
@@ -43,10 +58,12 @@ xena::future<> combine_reduce(basct::span<T> res, basct::cspan<unsigned> output_
         auto output_last = rng.b();
 
         auto res_chunk = res.subspan(output_first, rng.size());
-        auto bit_table_partial_sumss_chunk =
+        auto bit_table_partial_sums_chunk =
             basct::subspan(bit_table_partial_sums, output_first, rng.size());
+        auto partials_offset = output_first > 0 ? bit_table_partial_sums[output_first - 1] : 0u;
 
-        return {};
+        co_await combine_reduce_chunk(res_chunk, bit_table_partial_sums_chunk, partial_products,
+                                      partials_offset);
       });
 }
 #pragma clang diagnostic pop
