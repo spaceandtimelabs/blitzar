@@ -27,4 +27,12 @@ class pinned_memory_pool {
 private:
   pinned_memory_handle* head_ = nullptr;
 };
+
+//--------------------------------------------------------------------------------------------------
+// get_pinned_memory_pool
+//--------------------------------------------------------------------------------------------------
+/**
+ * Access the thread_local pinned pool.
+ */
+pinned_memory_pool* get_pinned_memory_pool(size_t initial_size = 32) noexcept;
 } // namespace sxt::basdv

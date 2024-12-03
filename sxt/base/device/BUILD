@@ -15,6 +15,16 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "pinned_memory",
+    with_test = False,
+    deps = [
+    ],
+    test_deps = [
+      "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "pinned_memory_handle",
     with_test = False,
     deps = [
@@ -28,6 +38,9 @@ sxt_cc_component(
     impl_deps = [
       ":pinned_memory_handle",
       "//sxt/base/error:panic",
+    ],
+    test_deps = [
+      "//sxt/base/test:unit_test",
     ],
 )
 

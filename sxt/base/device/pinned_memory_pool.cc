@@ -66,4 +66,16 @@ void pinned_memory_pool::release_handle(pinned_memory_handle* handle) noexcept {
   handle->next = head_;
   head_ = handle;
 }
+
+//--------------------------------------------------------------------------------------------------
+// get_pinned_memory_pool
+//--------------------------------------------------------------------------------------------------
+/**
+ * Access the thread_local pinned pool.
+ */
+pinned_memory_pool* get_pinned_memory_pool(size_t initial_size) noexcept {
+  // Allocate a thread local pool that's available for the duration of the process.
+  static thread_local auto pool = new pinned_memory_pool{initial_size};
+  return pool;
+}
 } // namespace sxt::basdv
