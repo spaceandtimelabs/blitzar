@@ -15,9 +15,11 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "pinned_memory",
-    with_test = False,
+    name = "pinned_memory_ptr",
     deps = [
+    ],
+    impl_deps = [
+      ":pinned_memory_pool",
     ],
     test_deps = [
       "//sxt/base/test:unit_test",

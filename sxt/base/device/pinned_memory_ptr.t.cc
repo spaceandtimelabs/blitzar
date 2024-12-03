@@ -1,4 +1,4 @@
-#include "sxt/base/device/pinned_memory.h"
+#include "sxt/base/device/pinned_memory_ptr.h"
 
 #include "sxt/base/test/unit_test.h"
 using namespace sxt;
