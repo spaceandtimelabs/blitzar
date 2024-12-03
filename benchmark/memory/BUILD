@@ -20,6 +20,7 @@ sxt_cc_binary(
       "//sxt/execution/schedule:scheduler",
       "//sxt/memory/management:managed_array",
       "//sxt/memory/resource:async_device_resource",
+      "//sxt/memory/resource:pinned_resource",
     ],
     visibility = ["//visibility:public"],
 )
