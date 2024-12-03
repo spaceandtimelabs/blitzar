@@ -15,6 +15,19 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "pinned_memory_handle",
+    with_test = False,
+    deps = [
+    ],
+)
+
+sxt_cc_component(
+    name = "pinned_memory_pool",
+    deps = [
+    ],
+)
+
+sxt_cc_component(
     name = "pointer_attributes",
     with_test = False,
     deps = [
