@@ -1,22 +1,33 @@
 #include "sxt/base/device/pinned_memory_pool.h"
 
+#include <cuda_runtime.h>
+
 #include <cassert>
 
 #include "sxt/base/device/pinned_memory_handle.h"
+#include "sxt/base/error/panic.h"
 
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // new_handle 
 //--------------------------------------------------------------------------------------------------
 static pinned_memory_handle* new_handle() noexcept {
-  return nullptr;
+  auto res = new pinned_memory_handle{};
+  auto rcode = cudaMallocHost(&res->ptr, pinned_memory_size);
+  if (rcode != cudaSuccess) {
+    baser::panic("cudaMallocHost failed: {}", cudaGetErrorString(rcode));
+  }
+  return res;
 }
 
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
 pinned_memory_pool::pinned_memory_pool(size_t initial_size) noexcept {
-  (void)initial_size;
+  for (size_t i=0; i<initial_size; ++i) {
+    auto h = new_handle();
+    this->release_handle(h);
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -24,7 +35,13 @@ pinned_memory_pool::pinned_memory_pool(size_t initial_size) noexcept {
 //--------------------------------------------------------------------------------------------------
 pinned_memory_pool::~pinned_memory_pool() noexcept {
   while (head_ != nullptr) {
-    this->release_handle(head_);
+    auto rcode = cudaFreeHost(head_->ptr);
+    if (rcode != cudaSuccess) {
+      baser::panic("cudaFreeHost failed: {}", cudaGetErrorString(rcode));
+    }
+    auto next = head_->next;
+    delete head_;
+    head_ = next;
   }
 }
 

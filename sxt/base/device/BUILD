@@ -27,6 +27,7 @@ sxt_cc_component(
     ],
     impl_deps = [
       ":pinned_memory_handle",
+      "//sxt/base/error:panic",
     ],
 )
 
