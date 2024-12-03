@@ -6,6 +6,11 @@ sxt_cc_binary(
         "copy.m.cc",
     ],
     deps = [
+      "//sxt/base/iterator:index_range",
+      "//sxt/base/iterator:index_range_utility",
+      "//sxt/execution/async:coroutine",
+      "//sxt/execution/async:future",
+      "//sxt/execution/device:for_each",
       "//sxt/memory/management:managed_array",
     ],
     visibility = ["//visibility:public"],
