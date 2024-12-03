@@ -6,6 +6,6 @@ namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 struct pinned_memory_handle {
   void* ptr = nullptr;
-  void* next = nullptr;
+  pinned_memory_handle* next = nullptr;
 };
 } // namespace sxt::basdv

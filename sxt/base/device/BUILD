@@ -25,6 +25,9 @@ sxt_cc_component(
     name = "pinned_memory_pool",
     deps = [
     ],
+    impl_deps = [
+      ":pinned_memory_handle",
+    ],
 )
 
 sxt_cc_component(
