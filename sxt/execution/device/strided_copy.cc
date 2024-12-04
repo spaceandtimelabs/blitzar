@@ -1,7 +1,13 @@
 #include "sxt/execution/device/strided_copy.h"
 
+#include <cassert>
+#include <cstring>
+
+#include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/pinned_buffer.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/synchronization.h"
 
 namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
@@ -11,9 +17,19 @@ namespace sxt::xendv {
 #pragma clang diagnostic ignored "-Wunused-function"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #pragma clang diagnostic ignored "-Wunused-parameter"
-xena::future<> strided_copy(void* dst, const basdv::stream& stream, const void* src,
-                            size_t num_bytes, size_t stride, size_t offset) noexcept {
-  return {};
+xena::future<> strided_copy(std::byte* dst, const basdv::stream& stream, const std::byte* src,
+                            size_t n, size_t count, size_t stride) noexcept {
+  auto num_bytes = n * count;
+  basdv::pinned_buffer buffer;
+  assert(num_bytes <= buffer.size() && "todo");
+  auto data = static_cast<std::byte*>(buffer.data());
+  for (size_t i=0; i<count; ++i) {
+    std::memcpy(data, src, n);
+    data += n;
+    src += stride;
+  }
+  basdv::async_memcpy_host_to_device(static_cast<void*>(dst), buffer.data(), num_bytes, stream);
+  co_await await_stream(stream);
 }
 #pragma clang diagnostic pop
 } // namespace sxt::xendv

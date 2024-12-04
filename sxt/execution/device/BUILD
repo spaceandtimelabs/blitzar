@@ -185,6 +185,9 @@ sxt_cc_component(
         "//sxt/execution/async:future_fwd",
     ],
     impl_deps = [
+      ":synchronization",
+        "//sxt/base/device:pinned_buffer",
+        "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/execution/async:coroutine",
     ],
