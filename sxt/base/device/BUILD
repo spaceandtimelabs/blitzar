@@ -15,7 +15,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "pinned_buffer_ptr",
+    name = "pinned_buffer",
     deps = [
     ],
     impl_deps = [

@@ -4,18 +4,18 @@
 
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
-// pinned_buffer_ptr
+// pinned_buffer
 //--------------------------------------------------------------------------------------------------
-class pinned_buffer_ptr {
+class pinned_buffer {
  public:
-   pinned_buffer_ptr() noexcept;
-   pinned_buffer_ptr(pinned_buffer_ptr&& ptr) noexcept;
-   pinned_buffer_ptr(const pinned_buffer_ptr&) noexcept = delete;
+   pinned_buffer() noexcept;
+   pinned_buffer(pinned_buffer&& ptr) noexcept;
+   pinned_buffer(const pinned_buffer&) noexcept = delete;
 
-   ~pinned_buffer_ptr() noexcept;
+   ~pinned_buffer() noexcept;
 
-   pinned_buffer_ptr& operator=(pinned_buffer_ptr&& ptr) noexcept;
-   pinned_buffer_ptr& operator=(const pinned_buffer_ptr& ptr) noexcept = delete;
+   pinned_buffer& operator=(pinned_buffer&& ptr) noexcept;
+   pinned_buffer& operator=(const pinned_buffer& ptr) noexcept = delete;
 
    operator void*() noexcept {
      return handle_->ptr;
