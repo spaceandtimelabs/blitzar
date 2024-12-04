@@ -22,6 +22,6 @@ xena::future<> strided_copy_host_to_device(basct::span<T> dst, const basdv::stre
   auto count = dst.size() / slice_size;
   return strided_copy_host_to_device(reinterpret_cast<std::byte*>(dst.data()), stream,
                                      reinterpret_cast<const std::byte*>(src.data() + offset),
-                                     slice_size * sizeof(T), count, stride);
+                                     slice_size * sizeof(T), count, stride * sizeof(T));
 }
 } // namespace sxt::xendv

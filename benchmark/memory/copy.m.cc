@@ -8,12 +8,14 @@
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/device/pinned_buffer_pool.h"
 #include "sxt/base/iterator/index_range.h"
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/iterator/index_range_utility.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/for_each.h"
+#include "sxt/execution/device/strided_copy.h"
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
@@ -62,7 +64,6 @@ static xena::future<> sum2(basct::span<double> res, basct::cspan<double> data, u
   memr::async_device_resource resource{stream};
   
   // copy
-  /* memmg::managed_array<double> data_p{res.size() * m, memr::get_pinned_resource()}; */
   memmg::managed_array<double> data_p(res.size() * m);
   memmg::managed_array<double> data_dev{res.size() * m, &resource};
   for (unsigned i = 0; i < m; ++i) {
@@ -86,10 +87,40 @@ static xena::future<> sum2(basct::span<double> res, basct::cspan<double> data, u
   co_await xendv::await_stream(stream);
 }
 
+// sum3
+static xena::future<> sum3(basct::span<double> res, basct::cspan<double> data, unsigned n,
+                           unsigned a) noexcept {
+  auto chunk_size = res.size();
+  auto m = data.size() / n;
+
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  
+  // copy
+  memmg::managed_array<double> data_dev{res.size() * m, &resource};
+  co_await xendv::strided_copy_host_to_device<double>(data_dev, stream, data, n, chunk_size, a);
+
+  // sum
+  memmg::managed_array<double> res_dev{chunk_size, &resource};
+  auto f = [res = res_dev.data(), data = data_dev.data(), m = m] __device__ __host__(
+               unsigned chunk_size, unsigned i) noexcept {
+    double sum = 0;
+    for (unsigned j = 0; j < m; ++j) {
+      sum += data[i + chunk_size * j];
+    }
+    res[i] = sum;
+  };
+  algi::launch_for_each_kernel(stream, f, chunk_size);
+  basdv::async_copy_device_to_host(res, res_dev, stream);
+  co_await xendv::await_stream(stream);
+}
+
 int main() {
   const unsigned n = 1'000'00;
   const unsigned m = 32;
   const unsigned split_factor = 16;
+
+  basdv::get_pinned_buffer_pool();
 
   // fill data
   memmg::managed_array<double> data(n * m);
@@ -110,7 +141,8 @@ int main() {
 #if 0
         co_await sum1(basct::subspan(sum, rng.a(), rng.size()), data, n, rng.a());
 #else
-        co_await sum2(basct::subspan(sum, rng.a(), rng.size()), data, n, rng.a());
+        /* co_await sum2(basct::subspan(sum, rng.a(), rng.size()), data, n, rng.a()); */
+        co_await sum3(basct::subspan(sum, rng.a(), rng.size()), data, n, rng.a());
 #endif
       });
   xens::get_scheduler().run();

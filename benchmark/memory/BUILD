@@ -16,6 +16,7 @@ sxt_cc_binary(
       "//sxt/execution/async:coroutine",
       "//sxt/execution/async:future",
       "//sxt/execution/device:for_each",
+      "//sxt/execution/device:strided_copy",
       "//sxt/execution/device:synchronization",
       "//sxt/execution/schedule:scheduler",
       "//sxt/memory/management:managed_array",
