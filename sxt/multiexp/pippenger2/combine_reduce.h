@@ -20,6 +20,20 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
+// combine_reduce_chunk_kernel 
+//--------------------------------------------------------------------------------------------------
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+template <bascrv::element T>
+void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __restrict__ partials,
+                                 const unsigned* __restrict__ bit_table_partial_sums,
+                                 unsigned num_partials, unsigned reduction_size,
+                                 unsigned partials_offset, unsigned output_index) noexcept {}
+#pragma clang diagnostic pop
+
+//--------------------------------------------------------------------------------------------------
 // combine_reduce_chunk
 //--------------------------------------------------------------------------------------------------
 #pragma clang diagnostic push
@@ -47,15 +61,19 @@ xena::future<> combine_reduce_chunk(basct::span<T> res,
   // combine reduce chunk
   memmg::managed_array<T> res_dev{num_outputs, &resource};
   auto f = [
-    // clang-format off
-    partials_offset = partials_offset,
-    reduction_size = reduction_size,
+               // clang-format off
     num_partials = slice_num_partials,
+    reduction_size = reduction_size,
+    partials_offset = partials_offset,
+    res = res_dev.data(),
     partials = partials_dev.data(),
     bit_table_partial_sums = bit_table_partial_sums_dev.data()
-    // clang-format on
-  ] __device__ __host__ (unsigned /*num_outputs*/, unsigned output_index) noexcept {
-  };
+               // clang-format on
+  ] __device__
+           __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
+             combine_reduce_chunk_kernel(res, partials, bit_table_partial_sums, num_partials,
+                                         reduction_size, partials_offset, output_index);
+           };
   algi::launch_for_each_kernel(stream, f, num_outputs);
   basdv::async_copy_device_to_host(res, res_dev, stream);
   co_await xendv::await_stream(stream);
