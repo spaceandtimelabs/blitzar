@@ -2,10 +2,10 @@
 
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
-// pinned_memory_handle 
+// pinned_buffer_handle 
 //--------------------------------------------------------------------------------------------------
-struct pinned_memory_handle {
+struct pinned_buffer_handle {
   void* ptr = nullptr;
-  pinned_memory_handle* next = nullptr;
+  pinned_buffer_handle* next = nullptr;
 };
 } // namespace sxt::basdv
