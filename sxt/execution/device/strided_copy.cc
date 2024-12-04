@@ -11,10 +11,11 @@
 
 namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
-// strided_copy 
+// strided_copy_host_to_device 
 //--------------------------------------------------------------------------------------------------
-xena::future<> strided_copy(std::byte* dst, const basdv::stream& stream, const std::byte* src,
-                            size_t n, size_t count, size_t stride) noexcept {
+xena::future<> strided_copy_host_to_device(std::byte* dst, const basdv::stream& stream,
+                                           const std::byte* src, size_t n, size_t count,
+                                           size_t stride) noexcept {
   auto num_bytes = n * count;
   basdv::pinned_buffer buffer;
   assert(num_bytes <= buffer.size() && "todo");
