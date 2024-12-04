@@ -115,13 +115,12 @@ static xena::future<> sum3(basct::span<double> res, basct::cspan<double> data, u
   co_await xendv::await_stream(stream);
 }
 
-int main() {
-  const unsigned n = 1'000'00;
-  const unsigned m = 32;
-  const unsigned split_factor = 16;
+using benchmark_fn = 
+xena::future<>(*)(basct::span<double>, basct::cspan<double>, unsigned, unsigned);
 
-  basdv::get_pinned_buffer_pool();
-
+// run_benchmark
+static double run_benchmark(benchmark_fn f, unsigned n, unsigned m,
+                            unsigned split_factor) noexcept {
   // fill data
   memmg::managed_array<double> data(n * m);
   std::mt19937 rng{0};
@@ -129,29 +128,45 @@ int main() {
   for (auto& x : data) {
     x = dist(rng);
   }
-  (void)data;
 
-  memmg::managed_array<double> sum(n);
+  // chunk
   auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}, split_factor);
 
-  // 1 call repeat copies from ordinary memory to device
-  auto t1 = std::chrono::steady_clock::now();
-  auto fut = xendv::concurrent_for_each(
-      chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
-#if 0
-        co_await sum1(basct::subspan(sum, rng.a(), rng.size()), data, n, rng.a());
-#else
-        /* co_await sum2(basct::subspan(sum, rng.a(), rng.size()), data, n, rng.a()); */
-        co_await sum3(basct::subspan(sum, rng.a(), rng.size()), data, n, rng.a());
-#endif
-      });
-  xens::get_scheduler().run();
-  auto t2 = std::chrono::steady_clock::now();
-  auto elapse = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() / 1.0e3;
-  std::println("duration: {}", elapse);
-  std::println("sums {} ... {}", sum[0], sum[n-1]);
+  // invoker
+  auto invoker = [&] {
+    memmg::managed_array<double> sum(n);
+    auto fut = xendv::concurrent_for_each(
+        chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+          co_await f(basct::subspan(sum, rng.a(), rng.size()), data, n, rng.a());
+        });
+    xens::get_scheduler().run();
+  };
 
-  // 2 copy to contiguous paged memory, copy from paged memory to device
-  // 3 like 2, but use chunks
+  // initial run
+  invoker();
+
+  // average
+  auto avg = 0.0;
+  unsigned num_iterations = 10;
+  for (unsigned i = 0; i < num_iterations; ++i) {
+    auto t1 = std::chrono::steady_clock::now();
+    invoker();
+    auto t2 = std::chrono::steady_clock::now();
+    auto elapse = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() / 1.0e3;
+    avg += elapse;
+  }
+  return avg / num_iterations;
+}
+
+int main() {
+  const unsigned n = 1'000'00;
+  const unsigned m = 32;
+  const unsigned split_factor = 16;
+
+  basdv::get_pinned_buffer_pool();
+
+  auto avg_elapse = run_benchmark(sum2, n, m, split_factor);
+  std::println("average elapse: {}", avg_elapse);
+
   return 0;
 }
