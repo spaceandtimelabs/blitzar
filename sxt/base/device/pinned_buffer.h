@@ -17,7 +17,7 @@ class pinned_buffer {
    pinned_buffer& operator=(pinned_buffer&& ptr) noexcept;
    pinned_buffer& operator=(const pinned_buffer& ptr) noexcept = delete;
 
-   size_t size() const noexcept;
+   static size_t size() noexcept;
 
    void* data() noexcept {
      return handle_->ptr;

@@ -37,7 +37,7 @@ pinned_buffer& pinned_buffer::operator=(pinned_buffer&& ptr) noexcept {
 //--------------------------------------------------------------------------------------------------
 // size
 //--------------------------------------------------------------------------------------------------
-size_t pinned_buffer::size() const noexcept {
+size_t pinned_buffer::size() noexcept {
   return pinned_buffer_size;
 }
 } // namespace sxt::basdv
