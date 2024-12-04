@@ -13,10 +13,6 @@ namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 // strided_copy 
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 xena::future<> strided_copy(std::byte* dst, const basdv::stream& stream, const std::byte* src,
                             size_t n, size_t count, size_t stride) noexcept {
   auto num_bytes = n * count;
@@ -31,5 +27,4 @@ xena::future<> strided_copy(std::byte* dst, const basdv::stream& stream, const s
   basdv::async_memcpy_host_to_device(static_cast<void*>(dst), buffer.data(), num_bytes, stream);
   co_await await_stream(stream);
 }
-#pragma clang diagnostic pop
 } // namespace sxt::xendv

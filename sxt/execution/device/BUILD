@@ -182,7 +182,8 @@ sxt_cc_component(
 sxt_cc_component(
     name = "strided_copy",
     deps = [
-        "//sxt/execution/async:future_fwd",
+      "//sxt/base/container:span",
+        "//sxt/execution/async:future",
     ],
     impl_deps = [
       ":synchronization",
