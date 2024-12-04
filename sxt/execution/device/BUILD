@@ -180,6 +180,20 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "strided_copy",
+    deps = [
+        "//sxt/execution/async:future_fwd",
+    ],
+    impl_deps = [
+        "//sxt/base/device:stream",
+        "//sxt/execution/async:coroutine",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "synchronization",
     test_deps = [
         ":test_kernel",
