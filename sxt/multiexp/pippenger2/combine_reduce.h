@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <numeric>
 
 #include "sxt/algorithm/iteration/for_each.h"
@@ -28,19 +29,25 @@ namespace sxt::mtxpp2 {
 #pragma clang diagnostic ignored "-Wunused-parameter"
 template <bascrv::element T>
 __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __restrict__ partials,
-                                 const unsigned* __restrict__ bit_table_partial_sums,
-                                 unsigned num_partials, unsigned reduction_size,
-                                 unsigned partials_offset, unsigned output_index) noexcept {
+                                            const unsigned* __restrict__ bit_table_partial_sums,
+                                            unsigned num_partials, unsigned reduction_size,
+                                            unsigned partials_offset,
+                                            unsigned output_index) noexcept {
   auto output_index_p = umin(output_index, 1u) - 1u;
   auto output_correction = bit_table_partial_sums[output_index_p] * (output_index != 0) +
                                partials_offset * (output_index == 0);
   auto bit_width = bit_table_partial_sums[output_index] - output_correction;
+  assert(bit_width > 0);
 
   // adjust points
   res += output_index;
   partials += bit_table_partial_sums[output_index] - bit_width - partials_offset;
 
   // combine reduce
+  unsigned bit_index = bit_width - 1u;
+  T e = partials[bit_width - 1u];
+  for (; bit_index-- > 0u;) {
+  }
 }
 #pragma clang diagnostic pop
 
