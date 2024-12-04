@@ -2,9 +2,11 @@
 
 #include <numeric>
 
+#include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/curve/element.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/iterator/index_range_iterator.h"
@@ -39,11 +41,24 @@ xena::future<> combine_reduce_chunk(basct::span<T> res,
   memmg::managed_array<T> partials_dev{slice_num_partials * reduction_size, &resource};
   co_await xendv::strided_copy_host_to_device(partials_dev, stream, partial_products, num_partials,
                                               slice_num_partials, partials_offset);
-  /* template <class T> */
-  /* xena::future<> strided_copy_host_to_device(basct::span<T> dst, const basdv::stream& stream, */
-  /*                                            basct::cspan<T> src, size_t stride, size_t
-   * slice_size, */
-  /*                                            size_t offset) noexcept { */
+  memmg::managed_array<unsigned> bit_table_partial_sums_dev{num_outputs, &resource};
+  basdv::async_copy_host_to_device(bit_table_partial_sums_dev, output_bit_table_partial_sums, stream);
+
+  // combine reduce chunk
+  memmg::managed_array<T> res_dev{num_outputs, &resource};
+  auto f = [
+    // clang-format off
+    partials_offset = partials_offset,
+    reduction_size = reduction_size,
+    num_partials = slice_num_partials,
+    partials = partials_dev.data(),
+    bit_table_partial_sums = bit_table_partial_sums_dev.data()
+    // clang-format on
+  ] __device__ __host__ (unsigned /*num_outputs*/, unsigned output_index) noexcept {
+  };
+  algi::launch_for_each_kernel(stream, f, num_outputs);
+  basdv::async_copy_device_to_host(res, res_dev, stream);
+  co_await xendv::await_stream(stream);
 }
 #pragma clang diagnostic pop
 
