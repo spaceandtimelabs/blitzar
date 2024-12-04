@@ -163,9 +163,7 @@ int main() {
   const unsigned m = 32;
   const unsigned split_factor = 16;
 
-  basdv::get_pinned_buffer_pool();
-
-  auto avg_elapse = run_benchmark(sum2, n, m, split_factor);
+  auto avg_elapse = run_benchmark(sum3, n, m, split_factor);
   std::println("average elapse: {}", avg_elapse);
 
   return 0;
