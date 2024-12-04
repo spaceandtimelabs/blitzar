@@ -133,8 +133,8 @@ static double run_benchmark(benchmark_fn f, unsigned n, unsigned m,
   auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}, split_factor);
 
   // invoker
+  memmg::managed_array<double> sum(n);
   auto invoker = [&] {
-    memmg::managed_array<double> sum(n);
     auto fut = xendv::concurrent_for_each(
         chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
           co_await f(basct::subspan(sum, rng.a(), rng.size()), data, n, rng.a());
@@ -154,6 +154,7 @@ static double run_benchmark(benchmark_fn f, unsigned n, unsigned m,
     auto t2 = std::chrono::steady_clock::now();
     auto elapse = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() / 1.0e3;
     avg += elapse;
+    std::println("sum: {} .. {}", sum[0], sum[n-1]);
   }
   return avg / num_iterations;
 }
