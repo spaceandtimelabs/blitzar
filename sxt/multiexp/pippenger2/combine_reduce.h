@@ -23,10 +23,6 @@ namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
 // combine_reduce_chunk_kernel 
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 template <bascrv::element T>
 __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __restrict__ partials,
                                             const unsigned* __restrict__ bit_table_partial_sums,
@@ -41,15 +37,24 @@ __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __rest
 
   // adjust points
   res += output_index;
-  partials += bit_table_partial_sums[output_index] - bit_width - partials_offset;
+  partials += bit_table_partial_sums[output_index] - partials_offset;
 
   // combine reduce
   unsigned bit_index = bit_width - 1u;
-  T e = partials[bit_width - 1u];
-  for (; bit_index-- > 0u;) {
+  --partials;
+  T e = *partials;
+  for (unsigned reduction_index=1; reduction_index<reduction_size; ++reduction_index) {
+    add_inplace(e, partials[reduction_index * num_partials]);
   }
+  for (; bit_index-- > 0u;) {
+    --partials;
+    double_element(e, e);
+    for (unsigned reduction_index = 0; reduction_index < reduction_size; ++reduction_index) {
+      add_inplace(e, partials[reduction_index * num_partials]);
+    }
+  }
+  *res = e;
 }
-#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // combine_reduce_chunk
