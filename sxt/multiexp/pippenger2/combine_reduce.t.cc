@@ -23,7 +23,13 @@ TEST_CASE("we can combine and reduce partial products") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 3u);
   }
-/* template <bascrv::element T> */
-/* xena::future<> combine_reduce(basct::span<T> res, basct::cspan<unsigned> output_bit_table, */
-/*                               basct::cspan<T> partial_products) noexcept { */
+
+  SECTION("we can combine and reduce a single output with a reduction size of two") {
+    output_bit_table = {1};
+    partial_products = {3u, 4u};
+    auto fut = combine_reduce<E>(res, output_bit_table, partial_products);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 7u);
+  }
 }
