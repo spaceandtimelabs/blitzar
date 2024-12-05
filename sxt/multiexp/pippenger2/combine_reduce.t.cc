@@ -41,4 +41,15 @@ TEST_CASE("we can combine and reduce partial products") {
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 11u);
   }
+
+  SECTION("we can combine and reduce multiple outputs") {
+    output_bit_table = {1, 1};
+    partial_products = {3u, 4u};
+    res.resize(2);
+    auto fut = combine_reduce<E>(res, output_bit_table, partial_products);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 3u);
+    REQUIRE(res[1] == 4u);
+  }
 }
