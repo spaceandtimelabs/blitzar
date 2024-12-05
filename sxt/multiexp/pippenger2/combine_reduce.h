@@ -3,6 +3,8 @@
 #include <cassert>
 #include <numeric>
 
+#include <print>
+
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
 #include "sxt/base/container/span_utility.h"
@@ -29,7 +31,7 @@ __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __rest
                                             unsigned num_partials, unsigned reduction_size,
                                             unsigned partials_offset,
                                             unsigned output_index) noexcept {
-  auto output_index_p = umin(output_index, 1u) - 1u;
+  auto output_index_p = umax(output_index, 1u) - 1u;
   auto output_correction = bit_table_partial_sums[output_index_p] * (output_index != 0) +
                                partials_offset * (output_index == 0);
   auto bit_width = bit_table_partial_sums[output_index] - output_correction;
@@ -44,13 +46,15 @@ __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __rest
   --partials;
   T e = *partials;
   for (unsigned reduction_index=1; reduction_index<reduction_size; ++reduction_index) {
-    add_inplace(e, partials[reduction_index * num_partials]);
+    auto ep = partials[reduction_index*num_partials];
+    add_inplace(e, ep);
   }
   for (; bit_index-- > 0u;) {
     --partials;
     double_element(e, e);
     for (unsigned reduction_index = 0; reduction_index < reduction_size; ++reduction_index) {
-      add_inplace(e, partials[reduction_index * num_partials]);
+      auto ep = partials[reduction_index * num_partials];
+      add_inplace(e, ep);
     }
   }
   *res = e;
@@ -59,10 +63,6 @@ __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __rest
 //--------------------------------------------------------------------------------------------------
 // combine_reduce_chunk
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 template <bascrv::element T>
 xena::future<> combine_reduce_chunk(basct::span<T> res,
                                     basct::cspan<unsigned> output_bit_table_partial_sums,
@@ -76,8 +76,8 @@ xena::future<> combine_reduce_chunk(basct::span<T> res,
   // copy data
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> partials_dev{slice_num_partials * reduction_size, &resource};
-  co_await xendv::strided_copy_host_to_device(partials_dev, stream, partial_products, num_partials,
-                                              slice_num_partials, partials_offset);
+  co_await xendv::strided_copy_host_to_device<T>(partials_dev, stream, partial_products,
+                                                 num_partials, slice_num_partials, partials_offset);
   memmg::managed_array<unsigned> bit_table_partial_sums_dev{num_outputs, &resource};
   basdv::async_copy_host_to_device(bit_table_partial_sums_dev, output_bit_table_partial_sums, stream);
 
@@ -101,7 +101,6 @@ xena::future<> combine_reduce_chunk(basct::span<T> res,
   basdv::async_copy_device_to_host(res, res_dev, stream);
   co_await xendv::await_stream(stream);
 }
-#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // combine_reduce 

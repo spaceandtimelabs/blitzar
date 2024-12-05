@@ -17,11 +17,11 @@ sxt_cc_component(
 sxt_cc_component(
     name = "combine_reduce",
     test_deps = [
-        # "//sxt/base/curve:example_element",
+        "//sxt/base/curve:example_element",
         # "//sxt/base/device:stream",
-        # "//sxt/base/device:synchronization",
+        "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
-        # "//sxt/execution/schedule:scheduler",
+        "//sxt/execution/schedule:scheduler",
         # "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
