@@ -15,6 +15,38 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "pinned_buffer",
+    deps = [
+    ],
+    impl_deps = [
+      ":pinned_buffer_pool",
+    ],
+    test_deps = [
+      "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
+    name = "pinned_buffer_handle",
+    with_test = False,
+    deps = [
+    ],
+)
+
+sxt_cc_component(
+    name = "pinned_buffer_pool",
+    deps = [
+    ],
+    impl_deps = [
+      ":pinned_buffer_handle",
+      "//sxt/base/error:panic",
+    ],
+    test_deps = [
+      "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "pointer_attributes",
     with_test = False,
     deps = [
