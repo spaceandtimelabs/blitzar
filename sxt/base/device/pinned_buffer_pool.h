@@ -24,7 +24,7 @@ class pinned_buffer_pool {
 
   void release_handle(pinned_buffer_handle* handle) noexcept;
 
-  size_t num_buffers() const noexcept;
+  size_t size() const noexcept;
 
 private:
   pinned_buffer_handle* head_ = nullptr;

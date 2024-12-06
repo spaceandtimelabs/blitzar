@@ -68,9 +68,9 @@ void pinned_buffer_pool::release_handle(pinned_buffer_handle* handle) noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
-// num_buffers
+// size
 //--------------------------------------------------------------------------------------------------
-size_t pinned_buffer_pool::num_buffers() const noexcept {
+size_t pinned_buffer_pool::size() const noexcept {
   size_t res = 0;
   auto h = head_;
   while (h != nullptr) {
