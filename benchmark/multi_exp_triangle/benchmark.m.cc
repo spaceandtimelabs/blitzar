@@ -72,7 +72,7 @@ make_partition_table_accessor(unsigned n, GeneratorFunc generatorFunc) noexcept 
   for (unsigned i = 0; i < n; ++i) {
     generatorFunc(generators[i], i);
   }
-  return mtxpp2::make_in_memory_partition_table_accessor<U, T>(generators);
+  return mtxpp2::make_in_memory_partition_table_accessor<U, T>(generators, {});
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -109,14 +109,14 @@ static void grumpkin_generator(cgkt::element_p2& element, unsigned i) {
 //--------------------------------------------------------------------------------------------------
 // fill_exponents
 //--------------------------------------------------------------------------------------------------
-static void fill_exponents(memmg::managed_array<uint8_t>& exponents, unsigned element_num_bytes,
-                           unsigned num_outputs, unsigned n) noexcept {
+static void fill_exponents(memmg::managed_array<uint8_t>& exponents, size_t element_num_bytes,
+                           size_t num_outputs, size_t n) noexcept {
   exponents.resize(num_outputs * n * element_num_bytes);
   std::mt19937 rng{0};
   std::uniform_int_distribution<uint8_t> dist{0, std::numeric_limits<uint8_t>::max()};
-  for (unsigned output_index = 0; output_index < num_outputs; ++output_index) {
-    for (unsigned i = 0; i < n; ++i) {
-      for (unsigned byte_index = 0; byte_index < element_num_bytes; ++byte_index) {
+  for (size_t output_index = 0; output_index < num_outputs; ++output_index) {
+    for (size_t i = 0; i < n; ++i) {
+      for (size_t byte_index = 0; byte_index < element_num_bytes; ++byte_index) {
         exponents[byte_index + element_num_bytes * output_index +
                   element_num_bytes * num_outputs * i] = dist(rng);
       }

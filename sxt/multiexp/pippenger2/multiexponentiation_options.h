@@ -23,6 +23,9 @@ namespace sxt::mtxpp2 {
 struct multiexponentiate_options {
   unsigned split_factor = 1;
   unsigned min_chunk_size = 64;
-  unsigned max_chunk_size = 1024;
+  /* unsigned max_chunk_size = 1024; */
+  unsigned max_chunk_size = 512;
+  /* unsigned max_chunk_size = 256; */
+  /* unsigned max_chunk_size = 128; */
 };
 } // namespace sxt::mtxpp2

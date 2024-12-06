@@ -30,7 +30,8 @@ namespace sxt::mtxpp2 {
 static unsigned get_default_window_width_impl() noexcept {
   auto s = std::getenv("BLITZAR_PARTITION_WINDOW_WIDTH");
   if (s == nullptr) {
-    return 16;
+    /* return 16; */
+    return 14;
   }
   unsigned width;
   auto parse_result = std::from_chars(s, s + std::strlen(s), width);

@@ -124,7 +124,8 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
   }
 
   // handle multiple chunks
-  memmg::managed_array<T> partial_products{num_products * num_chunks, memr::get_pinned_resource()};
+  /* memmg::managed_array<T> partial_products{num_products * num_chunks, memr::get_pinned_resource()}; */
+  memmg::managed_array<T> partial_products(num_products * num_chunks);
   size_t chunk_index = 0;
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
@@ -193,6 +194,7 @@ multiexponentiate_impl2(basct::span<T> res, const partition_table_accessor<U>& a
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
         basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
                    rng.a(), rng.b(), basdv::get_device());
+        std::println(stderr, "chunk {} to {}", rng.a(), rng.b());
         memmg::managed_array<T> partial_products_dev{num_products, memr::get_device_resource()};
         auto scalars_slice =
             scalars.subspan(num_output_bytes * rng.a(), rng.size() * num_output_bytes);

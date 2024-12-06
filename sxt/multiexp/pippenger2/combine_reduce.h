@@ -117,8 +117,8 @@ xena::future<> combine_reduce(basct::span<T> res, basct::cspan<unsigned> output_
   auto reduction_size = partial_products.size() / bit_table_partial_sums[num_outputs - 1];
 
   // split
-  auto [chunk_first, chunk_last] =
-      basit::split(basit::index_range{0, num_outputs}, basdv::get_num_devices());
+  auto [chunk_first, chunk_last] = basit::split(
+      basit::index_range{0, num_outputs}.max_chunk_size(1024u), basdv::get_num_devices());
 
   // combine reduce
   co_await xendv::concurrent_for_each(
