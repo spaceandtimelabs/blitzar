@@ -18,6 +18,8 @@
 
 #include <numeric>
 
+#include <print>
+
 #include "sxt/base/container/span.h"
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/curve/element.h"
@@ -31,6 +33,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/combination.h"
+#include "sxt/multiexp/pippenger2/combine_reduce.h"
 #include "sxt/multiexp/pippenger2/multiexponentiation_options.h"
 #include "sxt/multiexp/pippenger2/partition_product.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
@@ -39,6 +42,9 @@
 #include "sxt/multiexp/pippenger2/variable_length_partition_product.h"
 
 namespace sxt::mtxpp2 {
+constexpr bool use_new = false;
+/* constexpr bool use_new = true; */
+
 //--------------------------------------------------------------------------------------------------
 // async_partition_product_chunk
 //--------------------------------------------------------------------------------------------------
@@ -148,6 +154,65 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
 }
 
 //--------------------------------------------------------------------------------------------------
+// multiexponentiate_impl2
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
+xena::future<>
+multiexponentiate_impl2(basct::span<T> res, const partition_table_accessor<U>& accessor,
+                        basct::cspan<unsigned> output_bit_table,
+                        basct::cspan<unsigned> output_lengths, basct::cspan<uint8_t> scalars,
+                        const multiexponentiate_options& options) noexcept {
+  auto num_outputs = res.size();
+  if (num_outputs == 0) {
+    co_return;
+  }
+  auto num_products = count_products(output_bit_table);
+  auto window_width = accessor.window_width();
+  auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
+  auto n = scalars.size() / num_output_bytes;
+
+  // compute bitwise products
+  //
+  // We split the work by groups of generators so that a single chunk will process
+  // all the outputs for those generators. This minimizes the amount of host->device
+  // copying we need to do for the table of precomputed sums.
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}
+                                                    .chunk_multiple(window_width)
+                                                    .min_chunk_size(options.min_chunk_size)
+                                                    .max_chunk_size(options.max_chunk_size),
+                                                options.split_factor);
+  auto num_chunks = static_cast<size_t>(std::distance(chunk_first, chunk_last));
+  basl::info("computing {} bitwise multiexponentiation products of length {} using {} chunks",
+             num_products, n, num_chunks);
+
+  // handle multiple chunks
+  memmg::managed_array<T> partial_products(num_products * num_chunks);
+  size_t chunk_index = 0;
+  co_await xendv::concurrent_for_each(
+      chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+        basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
+                   rng.a(), rng.b(), basdv::get_device());
+        memmg::managed_array<T> partial_products_dev{num_products, memr::get_device_resource()};
+        auto scalars_slice =
+            scalars.subspan(num_output_bytes * rng.a(), rng.size() * num_output_bytes);
+        co_await async_partition_product_chunk<T>(partial_products_dev, accessor, output_bit_table,
+                                                  output_lengths, scalars_slice, rng.a(),
+                                                  rng.size());
+        basdv::stream stream;
+        basdv::async_copy_device_to_host(
+            basct::subspan(partial_products, num_products * chunk_index, num_products),
+            partial_products_dev, stream);
+        ++chunk_index;
+        co_await xendv::await_stream(stream);
+      });
+
+  // combine the partial products
+  basl::info("combining {} partial product chunks", num_chunks);
+  co_await combine_reduce<T>(res, output_bit_table, partial_products);
+}
+
+//--------------------------------------------------------------------------------------------------
 // multiexponentiation_impl
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, class U>
@@ -208,7 +273,13 @@ xena::future<> async_multiexponentiate(basct::span<T> res,
                                        basct::cspan<uint8_t> scalars) noexcept {
   multiexponentiate_options options;
   options.split_factor = static_cast<unsigned>(basdv::get_num_devices());
-  return multiexponentiate_impl(res, accessor, output_bit_table, output_lengths, scalars, options);
+  if (use_new) {
+    return multiexponentiate_impl2(res, accessor, output_bit_table, output_lengths, scalars,
+                                   options);
+  } else {
+    return multiexponentiate_impl(res, accessor, output_bit_table, output_lengths, scalars,
+                                  options);
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
