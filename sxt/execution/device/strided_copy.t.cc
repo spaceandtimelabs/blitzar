@@ -1,8 +1,10 @@
 #include "sxt/execution/device/strided_copy.h"
 
-#include <vector>
 #include <cstddef>
+#include <numeric>
+#include <vector>
 
+#include "sxt/base/device/pinned_buffer.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
@@ -11,7 +13,8 @@
 using namespace sxt;
 using namespace sxt::xendv;
 
-TEST_CASE("todo") {
+TEST_CASE("we can copy strided memory from host to device") {
+  const auto bufsize = basdv::pinned_buffer::size();
   std::vector<uint8_t> src;
   std::pmr::vector<uint8_t> dst{memr::get_managed_device_resource()};
 
@@ -53,8 +56,17 @@ TEST_CASE("todo") {
     REQUIRE(dst[1] == 3);
   }
 
-  // basic strided copy
-  // strided copy as large as buffer
+  SECTION("we can copy data as large as a single buffer") {
+    src.resize(bufsize);
+    std::iota(src.begin(), src.end(), 0u);
+    dst.resize(bufsize);
+    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    REQUIRE(std::vector<uint8_t>(dst.begin(), dst.end()) == src);
+  }
+
   // strided copy larger than a single buffer
   // strided copy larger than a single buffer x2
 }
