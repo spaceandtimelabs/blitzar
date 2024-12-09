@@ -39,6 +39,13 @@ static xena::future<> strided_copy_host_to_device_one_sweep(std::byte* dst,
 xena::future<> strided_copy_host_to_device(std::byte* dst, const basdv::stream& stream,
                                            const std::byte* src, size_t n, size_t count,
                                            size_t stride) noexcept {
+  SXT_RELEASE_ASSERT(
+      // clang-format off
+      basdv::is_active_device_pointer(dst) &&
+      basdv::is_host_pointer(src) &&
+      stride >= n
+      // clang-format on
+  );
   auto num_bytes = n * count;
   if (num_bytes <= basdv::pinned_buffer::size()) {
     co_return co_await strided_copy_host_to_device_one_sweep(dst, stream, src, n, count, stride);
