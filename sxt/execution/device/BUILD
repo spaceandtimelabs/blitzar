@@ -182,6 +182,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "strided_copy",
     deps = [
+      "//sxt/base/error:assert",
       "//sxt/base/container:span",
         "//sxt/execution/async:future",
     ],
@@ -190,7 +191,6 @@ sxt_cc_component(
         "//sxt/base/device:pinned_buffer",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
-        "//sxt/base/error:assert",
         "//sxt/execution/async:coroutine",
     ],
     test_deps = [
