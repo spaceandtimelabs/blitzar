@@ -32,12 +32,29 @@ TEST_CASE("todo") {
     REQUIRE(dst[0] == 123);
   }
 
+  SECTION("we can copy with an offset") {
+    src = {1, 2};
+    dst.resize(1);
+    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 1);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    REQUIRE(dst[0] == 2);
+  }
+
+  SECTION("we can copy every other element") {
+    src = {1, 2, 3, 4};
+    dst.resize(2);
+    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 2, 1, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    REQUIRE(dst[0] == 1);
+    REQUIRE(dst[1] == 3);
+  }
+
   // basic strided copy
   // strided copy as large as buffer
   // strided copy larger than a single buffer
   // strided copy larger than a single buffer x2
-/* template <class T> */
-/* xena::future<> strided_copy_host_to_device(basct::span<T> dst, const basdv::stream& stream, */
-/*                                            basct::cspan<T> src, size_t stride, size_t slice_size, */
-/*                                            size_t offset) noexcept { */
 }
