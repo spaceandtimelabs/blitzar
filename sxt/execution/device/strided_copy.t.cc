@@ -67,6 +67,36 @@ TEST_CASE("we can copy strided memory from host to device") {
     REQUIRE(std::vector<uint8_t>(dst.begin(), dst.end()) == src);
   }
 
-  // strided copy larger than a single buffer
-  // strided copy larger than a single buffer x2
+  SECTION("we can copy data larger than a single buffer") {
+    src.resize(bufsize + 1u);
+    std::iota(src.begin(), src.end(), 0u);
+    dst.resize(src.size());
+    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    REQUIRE(std::vector<uint8_t>(dst.begin(), dst.end()) == src);
+  }
+
+  SECTION("we can copy data where a single chunk is larger than a single buffer") {
+    src.resize(bufsize + 1u);
+    std::iota(src.begin(), src.end(), 0u);
+    dst.resize(src.size());
+    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, src.size(), src.size(), 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    REQUIRE(std::vector<uint8_t>(dst.begin(), dst.end()) == src);
+  }
+
+  SECTION("we can copy data larger than two buffers") {
+    src.resize(2u * bufsize + 1u);
+    std::iota(src.begin(), src.end(), 0u);
+    dst.resize(src.size());
+    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 0);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    REQUIRE(std::vector<uint8_t>(dst.begin(), dst.end()) == src);
+  }
 }
