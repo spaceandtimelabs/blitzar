@@ -181,13 +181,8 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "copy",
-    deps = [
-      "//sxt/base/error:assert",
-      "//sxt/base/container:span",
-        "//sxt/execution/async:future",
-    ],
     impl_deps = [
-      ":synchronization",
+        ":synchronization",
         "//sxt/base/device:pinned_buffer",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
@@ -200,6 +195,11 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/execution/schedule:scheduler",
         "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/error:assert",
+        "//sxt/execution/async:future",
     ],
 )
 
