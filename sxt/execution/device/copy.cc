@@ -1,4 +1,4 @@
-#include "sxt/execution/device/strided_copy.h"
+#include "sxt/execution/device/copy.h"
 
 #include <cassert>
 #include <cstring>
@@ -12,9 +12,9 @@
 
 namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
-// strided_copy_host_to_device_one_sweep 
+// copy_host_to_device_one_sweep 
 //--------------------------------------------------------------------------------------------------
-static xena::future<> strided_copy_host_to_device_one_sweep(std::byte* dst,
+static xena::future<> copy_host_to_device_one_sweep(std::byte* dst,
                                                             const basdv::stream& stream,
                                                             const std::byte* src, size_t n,
                                                             size_t count, size_t stride) noexcept {
@@ -34,9 +34,9 @@ static xena::future<> strided_copy_host_to_device_one_sweep(std::byte* dst,
 }
 
 //--------------------------------------------------------------------------------------------------
-// strided_copy_host_to_device 
+// copy_host_to_device 
 //--------------------------------------------------------------------------------------------------
-xena::future<> strided_copy_host_to_device(std::byte* dst, const basdv::stream& stream,
+xena::future<> copy_host_to_device(std::byte* dst, const basdv::stream& stream,
                                            const std::byte* src, size_t n, size_t count,
                                            size_t stride) noexcept {
   SXT_RELEASE_ASSERT(
@@ -48,7 +48,7 @@ xena::future<> strided_copy_host_to_device(std::byte* dst, const basdv::stream& 
   );
   auto num_bytes = n * count;
   if (num_bytes <= basdv::pinned_buffer::size()) {
-    co_return co_await strided_copy_host_to_device_one_sweep(dst, stream, src, n, count, stride);
+    co_return co_await copy_host_to_device_one_sweep(dst, stream, src, n, count, stride);
   }
   auto cur_n = n;
    

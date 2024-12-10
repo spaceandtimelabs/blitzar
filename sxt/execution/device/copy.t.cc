@@ -1,4 +1,4 @@
-#include "sxt/execution/device/strided_copy.h"
+#include "sxt/execution/device/copy.h"
 
 #include <cstddef>
 #include <numeric>
@@ -21,14 +21,14 @@ TEST_CASE("we can copy strided memory from host to device") {
   basdv::stream stream;
 
   SECTION("we can copy empty data") {
-    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 1, 0, 0);
+    auto fut = copy_host_to_device<uint8_t>(dst, stream, src, 1, 0, 0);
     REQUIRE(fut.ready());
   }
 
   SECTION("we can copy a single byte") {
     src = {123};
     dst.resize(1);
-    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 0);
+    auto fut = copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -38,7 +38,7 @@ TEST_CASE("we can copy strided memory from host to device") {
   SECTION("we can copy with an offset") {
     src = {1, 2};
     dst.resize(1);
-    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 1);
+    auto fut = copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 1);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -48,7 +48,7 @@ TEST_CASE("we can copy strided memory from host to device") {
   SECTION("we can copy every other element") {
     src = {1, 2, 3, 4};
     dst.resize(2);
-    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 2, 1, 0);
+    auto fut = copy_host_to_device<uint8_t>(dst, stream, src, 2, 1, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -60,7 +60,7 @@ TEST_CASE("we can copy strided memory from host to device") {
     src.resize(bufsize);
     std::iota(src.begin(), src.end(), 0u);
     dst.resize(bufsize);
-    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 0);
+    auto fut = copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -71,7 +71,7 @@ TEST_CASE("we can copy strided memory from host to device") {
     src.resize(bufsize + 1u);
     std::iota(src.begin(), src.end(), 0u);
     dst.resize(src.size());
-    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 0);
+    auto fut = copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -82,7 +82,7 @@ TEST_CASE("we can copy strided memory from host to device") {
     src.resize(bufsize + 1u);
     std::iota(src.begin(), src.end(), 0u);
     dst.resize(src.size());
-    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, src.size(), src.size(), 0);
+    auto fut = copy_host_to_device<uint8_t>(dst, stream, src, src.size(), src.size(), 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
@@ -93,7 +93,7 @@ TEST_CASE("we can copy strided memory from host to device") {
     src.resize(2u * bufsize + 1u);
     std::iota(src.begin(), src.end(), 0u);
     dst.resize(src.size());
-    auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 0);
+    auto fut = copy_host_to_device<uint8_t>(dst, stream, src, 1, 1, 0);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();

@@ -180,7 +180,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "strided_copy",
+    name = "copy",
     deps = [
       "//sxt/base/error:assert",
       "//sxt/base/container:span",
