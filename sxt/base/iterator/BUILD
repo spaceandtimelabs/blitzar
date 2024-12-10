@@ -64,3 +64,18 @@ sxt_cc_component(
         "//sxt/base/type:narrow_cast",
     ],
 )
+
+sxt_cc_component(
+    name = "split",
+    impl_deps = [
+        "//sxt/base/error:assert",
+        "//sxt/base/num:divide_up",
+    ],
+    deps = [
+        ":index_range",
+        ":index_range_iterator",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
