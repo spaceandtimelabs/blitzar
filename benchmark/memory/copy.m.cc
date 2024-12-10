@@ -154,7 +154,6 @@ static double run_benchmark(benchmark_fn f, unsigned n, unsigned m,
     auto t2 = std::chrono::steady_clock::now();
     auto elapse = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() / 1.0e3;
     avg += elapse;
-    std::println("sum: {} .. {}", sum[0], sum[n-1]);
   }
   return avg / num_iterations;
 }
@@ -164,8 +163,14 @@ int main() {
   const unsigned m = 32;
   const unsigned split_factor = 16;
 
-  auto avg_elapse = run_benchmark(sum3, n, m, split_factor);
-  std::println("average elapse: {}", avg_elapse);
+  auto avg_elapse = run_benchmark(sum1, n, m, split_factor);
+  std::println("sum1: average elapse: {}", avg_elapse);
+
+  avg_elapse = run_benchmark(sum2, n, m, split_factor);
+  std::println("sum2: average elapse: {}", avg_elapse);
+
+  avg_elapse = run_benchmark(sum3, n, m, split_factor);
+  std::println("sum3: average elapse: {}", avg_elapse);
 
   return 0;
 }
