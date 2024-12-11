@@ -24,6 +24,9 @@ class active_device_guard {
 public:
   active_device_guard() noexcept;
 
+  explicit active_device_guard(unsigned device) noexcept
+      : active_device_guard{static_cast<int>(device)} {}
+
   explicit active_device_guard(int device) noexcept;
 
   ~active_device_guard() noexcept;
