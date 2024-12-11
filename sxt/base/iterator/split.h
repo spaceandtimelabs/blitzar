@@ -13,7 +13,7 @@ namespace sxt::basit {
 struct split_options {
   size_t min_chunk_size = 1;
   size_t max_chunk_size = std::numeric_limits<size_t>::max();
-  size_t spit_factor = 1;
+  size_t split_factor = 1;
 };
 
 //--------------------------------------------------------------------------------------------------
