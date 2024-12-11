@@ -58,6 +58,7 @@ sxt_cc_component(
         "//sxt/base/iterator:index_range",
         "//sxt/base/iterator:index_range_iterator",
         "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/iterator:split",
         "//sxt/base/macro:cuda_callable",
         "//sxt/base/type:value_type",
         "//sxt/execution/async:coroutine",
