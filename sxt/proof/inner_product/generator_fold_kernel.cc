@@ -17,6 +17,7 @@
 #include "sxt/proof/inner_product/generator_fold_kernel.h"
 
 #include "sxt/algorithm/iteration/transform.h"
+#include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/curve21/type/element_p3.h"
@@ -54,11 +55,12 @@ xena::future<> async_fold_generators(basct::span<c21t::element_p3> g_vector_p,
   // Note: These haven't been informed by much benchmarking. I'm
   // sure there are better values. This is just putting in some
   // ballpark estimates to get started.
-  basit::chunk_options chunk_options{
-      .min_size = 1ull << 9u,
-      .max_size = 1ull << 18u,
+  basit::split_options split_options{
+      .min_chunk_size = 1ull << 9u,
+      .max_chunk_size = 1ull << 18u,
+      .split_factor = basdv::get_num_devices(),
   };
-  co_await algi::transform(g_vector_p, chunk_options, make_f, g_vector.subspan(0, np),
+  co_await algi::transform(g_vector_p, split_options, make_f, g_vector.subspan(0, np),
                            g_vector.subspan(np));
 }
 } // namespace sxt::prfip
