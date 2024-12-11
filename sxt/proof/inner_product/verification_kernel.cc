@@ -21,6 +21,7 @@
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/algorithm/iteration/transform.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/property.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/synchronization.h"
@@ -51,16 +52,17 @@ xena::future<> async_compute_g_exponents_partial(basct::span<s25t::element> g_ex
   // Note: These haven't been informed by much benchmarking. I'm
   // sure there are better values. This is just putting in some
   // ballpark estimates to get started.
-  basit::chunk_options chunk_options{
-      .min_size = 1u << 10u,
-      .max_size = 1u << 20u,
+  basit::split_options split_options{
+      .min_chunk_size = 1u << 10u,
+      .max_chunk_size = 1u << 20u,
+      .split_factor = basdv::get_num_devices(),
   };
   while (a != np) {
     auto& multiplier = *--multiplier_iter;
     auto f = [multiplier] __device__ __host__(s25t::element & val) noexcept {
       s25o::mul(val, multiplier, val);
     };
-    co_await algi::transform(g_exponents.subspan(a, a), chunk_options, f,
+    co_await algi::transform(g_exponents.subspan(a, a), split_options, f,
                              g_exponents.subspan(0, a));
     a *= 2u;
   }

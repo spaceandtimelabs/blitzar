@@ -300,6 +300,7 @@ sxt_cc_component(
         "//sxt/execution/async:future",
         "//sxt/execution/device:synchronization",
         "//sxt/algorithm/iteration:transform",
+        "//sxt/base/device:property",
         "//sxt/base/device:memory_utility",
         "//sxt/base/error:assert",
         "//sxt/scalar25/operation:mul",
