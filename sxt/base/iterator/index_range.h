@@ -29,8 +29,7 @@ public:
 
   index_range(size_t a, size_t b) noexcept;
 
-  index_range(size_t a, size_t b, size_t min_chunk_size, size_t max_chunk_size,
-              size_t chunk_multiple) noexcept;
+  index_range(size_t a, size_t b, size_t chunk_multiple) noexcept;
 
   size_t a() const noexcept { return a_; }
   size_t b() const noexcept { return b_; }
@@ -46,8 +45,6 @@ public:
 private:
   size_t a_{0};
   size_t b_{0};
-  size_t min_chunk_size_{1};
-  size_t max_chunk_size_{std::numeric_limits<size_t>::max()};
   size_t chunk_multiple_{1};
 };
 } // namespace sxt::basit
