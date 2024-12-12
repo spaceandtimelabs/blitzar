@@ -22,8 +22,6 @@
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/base/device/stream.h"
-#include "sxt/base/iterator/index_range_iterator.h"
-#include "sxt/base/iterator/index_range_utility.h"
 #include "sxt/base/iterator/split.h"
 #include "sxt/base/log/log.h"
 #include "sxt/execution/async/coroutine.h"
