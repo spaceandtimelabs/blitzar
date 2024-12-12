@@ -82,9 +82,7 @@ sxt_cc_component(
         "//sxt/execution/async:coroutine",
         "//sxt/base/device:active_device_guard",
         "//sxt/base/device:property",
-        "//sxt/base/iterator:index_range",
-        "//sxt/base/iterator:index_range_iterator",
-        "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/iterator:split",
     ],
     test_deps = [
         "//sxt/base/iterator:index_range",
