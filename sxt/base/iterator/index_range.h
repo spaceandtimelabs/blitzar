@@ -39,13 +39,7 @@ public:
 
   bool operator==(const index_range&) const noexcept = default;
 
-  size_t min_chunk_size() const noexcept { return min_chunk_size_; }
-  size_t max_chunk_size() const noexcept { return max_chunk_size_; }
   size_t chunk_multiple() const noexcept { return chunk_multiple_; }
-
-  [[nodiscard]] index_range min_chunk_size(size_t val) const noexcept;
-
-  [[nodiscard]] index_range max_chunk_size(size_t val) const noexcept;
 
   [[nodiscard]] index_range chunk_multiple(size_t val) const noexcept;
 
