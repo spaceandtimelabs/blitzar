@@ -27,7 +27,6 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range.h"
-#include "sxt/base/iterator/index_range_utility.h"
 #include "sxt/base/log/log.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"

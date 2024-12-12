@@ -147,9 +147,9 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
   }
 
   SECTION("we can split a multi-exponentiation") {
-    multiexponentiate_options options{
-        .split_factor = 2,
+    basit::split_options options{
         .min_chunk_size = 16u,
+        .split_factor = 2u,
     };
     scalars.resize(32);
     scalars[0] = 1;
@@ -161,9 +161,9 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
   }
 
   SECTION("we can split a multi-exponentiation with more than one output") {
-    multiexponentiate_options options{
-        .split_factor = 2,
+    basit::split_options options{
         .min_chunk_size = 16u,
+        .split_factor = 2u,
     };
     scalars.resize(64);
     scalars[0] = 1;

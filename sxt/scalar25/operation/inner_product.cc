@@ -23,9 +23,7 @@
 #include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/base/iterator/index_range.h"
-#include "sxt/base/iterator/index_range_iterator.h"
-#include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/iterator/split.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/device_viewable.h"
 #include "sxt/execution/device/for_each.h"
@@ -80,9 +78,12 @@ xena::future<s25t::element> async_inner_product_impl(basct::cspan<s25t::element>
   SXT_DEBUG_ASSERT(n > 0);
   s25t::element res = s25t::element::identity();
 
-  auto [chunk_first, chunk_last] = basit::split(
-      basit::index_range{0, n}.min_chunk_size(min_chunk_size).max_chunk_size(max_chunk_size),
-      split_factor);
+  basit::split_options split_options{
+      .min_chunk_size = min_chunk_size,
+      .max_chunk_size = max_chunk_size,
+      .split_factor = split_factor,
+  };
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}, split_options);
 
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {

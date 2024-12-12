@@ -25,14 +25,14 @@ namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // get_num_devices
 //--------------------------------------------------------------------------------------------------
-int get_num_devices() noexcept {
+unsigned get_num_devices() noexcept {
   static int num_devices = []() noexcept {
     int res;
     auto rcode = cudaGetDeviceCount(&res);
     if (rcode != cudaSuccess) {
-      return 0;
+      return 0u;
     }
-    return res;
+    return static_cast<unsigned>(res);
   }();
   return num_devices;
 }

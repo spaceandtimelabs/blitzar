@@ -182,15 +182,9 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "multiexponentiation_options",
-    with_test = False,
-)
-
-sxt_cc_component(
     name = "multiexponentiation",
     test_deps = [
         ":in_memory_partition_table_accessor_utility",
-        ":multiexponentiation_options",
         "//sxt/base/curve:example_element",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
@@ -216,8 +210,7 @@ sxt_cc_component(
         "//sxt/base/device:state",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
-        "//sxt/base/iterator:index_range_iterator",
-        "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/iterator:split",
         "//sxt/base/log",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:for_each",
@@ -251,8 +244,7 @@ sxt_cc_component(
         "//sxt/base/device:state",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
-        "//sxt/base/iterator:index_range_iterator",
-        "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/iterator:split",
         "//sxt/base/log",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:for_each",

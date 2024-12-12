@@ -124,9 +124,9 @@ TEST_CASE("we can compute multiexponentiations with varying lengths") {
   }
 
   SECTION("we can split a multiexponentiation") {
-    multiexponentiate_options options{
-        .split_factor = 2,
+    basit::split_options options{
         .min_chunk_size = 16u,
+        .split_factor = 2,
     };
     output_bit_table[0] = 8;
     output_lengths[0] = 17;

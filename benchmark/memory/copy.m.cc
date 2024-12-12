@@ -25,9 +25,7 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/pinned_buffer_pool.h"
 #include "sxt/base/device/stream.h"
-#include "sxt/base/iterator/index_range.h"
-#include "sxt/base/iterator/index_range_iterator.h"
-#include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/iterator/split.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/copy.h"
@@ -147,7 +145,10 @@ static double run_benchmark(benchmark_fn f, unsigned n, unsigned m,
   }
 
   // chunk
-  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}, split_factor);
+  basit::split_options split_options{
+      .split_factor = split_factor,
+  };
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}, split_options);
 
   // invoker
   memmg::managed_array<double> sum(n);
