@@ -27,7 +27,7 @@
 #include "sxt/base/device/event_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
-#include "sxt/base/iterator/index_range.h"
+#include "sxt/base/iterator/split.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
@@ -180,13 +180,17 @@ async_compute_multiexponentiation(basct::cspan<Element> generators,
     min_chunk_size *= num_outputs;
     min_chunk_size = std::min(max_chunk_size, min_chunk_size);
   }
-  auto rng = basit::index_range{0, generators.size()}
-                 .min_chunk_size(min_chunk_size)
-                 .max_chunk_size(max_chunk_size);
-  co_await xendv::concurrent_for_each(rng, [&](const basit::index_range& rng) noexcept {
-    return async_compute_multiexponentiation_partial<Element>(or_alls, products, generators,
-                                                              exponents, rng);
-  });
+  basit::split_options split_options{
+      .min_chunk_size = min_chunk_size,
+      .max_chunk_size = max_chunk_size,
+      .split_factor = basdv::get_num_devices(),
+  };
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, generators.size()}, split_options);
+  co_await xendv::concurrent_for_each(chunk_first, chunk_last,
+                                      [&](const basit::index_range& rng) noexcept {
+                                        return async_compute_multiexponentiation_partial<Element>(
+                                            or_alls, products, generators, exponents, rng);
+                                      });
   memmg::managed_array<Element> res(num_outputs);
   for (size_t i = 0; i < num_outputs; ++i) {
     combine_multiproducts<Element>({&res[i], 1}, or_alls[i], products[i]);
