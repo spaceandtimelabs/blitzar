@@ -31,7 +31,6 @@ sxt_cc_component(
         ":kernel_fit",
         "//sxt/algorithm/base:index_functor",
         "//sxt/base/device:stream",
-        "//sxt/base/iterator:chunk_options",
         "//sxt/base/num:divide_up",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:synchronization",
