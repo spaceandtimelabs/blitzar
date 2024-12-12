@@ -25,8 +25,7 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/base/iterator/index_range.h"
-#include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/iterator/split.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
@@ -122,8 +121,11 @@ try_multiexponentiate(basct::cspan<Element> generators,
   }
   res.resize(num_outputs);
   static constexpr size_t max_output_chunk = 8;
+  basit::split_options split_options{
+    .max_chunk_size = max_output_chunk,
+  };
   auto output_chunks =
-      basit::split(basit::index_range{0, num_outputs}.max_chunk_size(max_output_chunk), 1);
+      basit::split(basit::index_range{0, num_outputs}, split_options);
   for (auto chunk_iter = output_chunks.first; chunk_iter != output_chunks.second; ++chunk_iter) {
     auto chunk = *chunk_iter;
     co_await multiexponentiate<Element>(basct::subspan(res, chunk.a(), chunk.size()), generators,
