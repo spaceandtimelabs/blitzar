@@ -169,7 +169,8 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> products{num_products, &resource};
   co_await multiexponentiate_product_step<T>(products, stream, accessor, num_output_bytes,
-                                             output_bit_table, output_lengths, scalars, split_options);
+                                             output_bit_table, output_lengths, scalars,
+                                             split_options);
 
   // reduce products
   basl::info("reducing {} products to {} outputs", num_products, num_products);

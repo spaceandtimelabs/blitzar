@@ -46,7 +46,7 @@ xena::future<>
 concurrent_for_each(basit::index_range rng,
                     std::function<xena::future<>(const basit::index_range&)> f) noexcept {
   basit::split_options split_options{
-    .split_factor = basdv::get_num_devices(),
+      .split_factor = basdv::get_num_devices(),
   };
   auto [first, last] = basit::split(rng, split_options);
   return concurrent_for_each(first, last, f);

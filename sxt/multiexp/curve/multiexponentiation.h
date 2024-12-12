@@ -185,7 +185,8 @@ async_compute_multiexponentiation(basct::cspan<Element> generators,
       .max_chunk_size = max_chunk_size,
       .split_factor = basdv::get_num_devices(),
   };
-  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, generators.size()}, split_options);
+  auto [chunk_first, chunk_last] =
+      basit::split(basit::index_range{0, generators.size()}, split_options);
   co_await xendv::concurrent_for_each(chunk_first, chunk_last,
                                       [&](const basit::index_range& rng) noexcept {
                                         return async_compute_multiexponentiation_partial<Element>(

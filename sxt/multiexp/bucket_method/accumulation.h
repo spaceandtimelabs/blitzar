@@ -123,9 +123,9 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
     min_chunk_size = std::min(max_chunk_size, min_chunk_size);
   }
   basit::split_options split_options{
-    .min_chunk_size = min_chunk_size,
-    .max_chunk_size = max_chunk_size,
-    .split_factor = split_factor,
+      .min_chunk_size = min_chunk_size,
+      .max_chunk_size = max_chunk_size,
+      .split_factor = split_factor,
   };
   auto [first, last] = basit::split(basit::index_range{0, generators.size()}, split_options);
   auto num_chunks = std::distance(first, last);

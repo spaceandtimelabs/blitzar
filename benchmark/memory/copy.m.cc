@@ -146,7 +146,7 @@ static double run_benchmark(benchmark_fn f, unsigned n, unsigned m,
 
   // chunk
   basit::split_options split_options{
-    .split_factor = split_factor,
+      .split_factor = split_factor,
   };
   auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}, split_options);
 

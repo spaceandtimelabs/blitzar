@@ -79,9 +79,9 @@ xena::future<s25t::element> async_inner_product_impl(basct::cspan<s25t::element>
   s25t::element res = s25t::element::identity();
 
   basit::split_options split_options{
-    .min_chunk_size = min_chunk_size,
-    .max_chunk_size = max_chunk_size,
-    .split_factor = split_factor,
+      .min_chunk_size = min_chunk_size,
+      .max_chunk_size = max_chunk_size,
+      .split_factor = split_factor,
   };
   auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}, split_options);
 
