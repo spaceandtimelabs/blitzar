@@ -124,6 +124,12 @@ xena::future<> combine_reduce(basct::span<T> res, basct::cspan<unsigned> output_
                    bit_table_partial_sums.begin());
   auto reduction_size = partial_products.size() / bit_table_partial_sums[num_outputs - 1];
 
+  // don't split if partials are already in device memory
+  if (basdv::is_active_device_pointer(partial_products.data())) {
+    co_return co_await combine_reduce_chunk(res, bit_table_partial_sums, partial_products,
+                                            reduction_size, 0);
+  }
+
   // split
   basit::split_options split_options{
     .max_chunk_size = 1024,
