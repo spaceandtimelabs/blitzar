@@ -74,8 +74,14 @@ xena::future<s25t::element> async_inner_product_impl(basct::cspan<s25t::element>
                                                      basct::cspan<s25t::element> rhs,
                                                      size_t split_factor, size_t min_chunk_size,
                                                      size_t max_chunk_size) noexcept {
+  SXT_DEBUG_ASSERT(
+      (basdv::is_host_pointer(lhs.data()) && basdv::is_host_pointer(rhs.data())) ||
+      (basdv::is_active_device_pointer(lhs.data()) && basdv::is_active_device_pointer(rhs.data())));
   auto n = std::min(lhs.size(), rhs.size());
   SXT_DEBUG_ASSERT(n > 0);
+  if (basdv::is_active_device_pointer(lhs.data())) {
+    co_return co_await async_inner_product_partial(lhs.subspan(0, n), rhs.subspan(0, n));
+  }
   s25t::element res = s25t::element::identity();
 
   basit::split_options split_options{
