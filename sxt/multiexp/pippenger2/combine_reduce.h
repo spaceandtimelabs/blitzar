@@ -114,7 +114,8 @@ xena::future<> combine_reduce_chunk(basct::span<T> res,
 // combine_reduce 
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
-xena::future<> combine_reduce(basct::span<T> res, basct::cspan<unsigned> output_bit_table,
+xena::future<> combine_reduce(basct::span<T> res, const basit::split_options& split_options,
+                              basct::cspan<unsigned> output_bit_table,
                               basct::cspan<T> partial_products) noexcept {
   auto num_outputs = output_bit_table.size();
 
@@ -131,10 +132,6 @@ xena::future<> combine_reduce(basct::span<T> res, basct::cspan<unsigned> output_
   }
 
   // split
-  basit::split_options split_options{
-    .max_chunk_size = 1024,
-    .split_factor = basdv::get_num_devices(),
-  };
   auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, num_outputs}, split_options);
 
   // combine reduce
@@ -150,5 +147,15 @@ xena::future<> combine_reduce(basct::span<T> res, basct::cspan<unsigned> output_
         co_await combine_reduce_chunk(res_chunk, bit_table_partial_sums_chunk, partial_products,
                                       reduction_size, partials_offset);
       });
+}
+
+template <bascrv::element T>
+xena::future<> combine_reduce(basct::span<T> res, basct::cspan<unsigned> output_bit_table,
+                              basct::cspan<T> partial_products) noexcept {
+  basit::split_options split_options{
+    .max_chunk_size = 1024,
+    .split_factor = basdv::get_num_devices(),
+  };
+  co_await combine_reduce(res, split_options, output_bit_table, partial_products);
 }
 } // namespace sxt::mtxpp2
