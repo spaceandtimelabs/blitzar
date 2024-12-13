@@ -85,6 +85,15 @@ xena::future<> combine_reduce_chunk(basct::span<T> res,
   auto num_partials = partial_products.size() / reduction_size;
   auto num_outputs = output_bit_table_partial_sums.size();
   unsigned slice_num_partials = output_bit_table_partial_sums[num_outputs - 1] - partials_offset;
+  SXT_RELEASE_ASSERT(
+      // clang-format off
+      num_outputs > 0 &&
+      res.size() == num_outputs &&
+      output_bit_table_partial_sums.size() == num_outputs &&
+      partial_products.size() == num_partials * reduction_size &&
+      partials_offset < output_bit_table_partial_sums[num_outputs-1]
+      // clang-format on
+  );
   basdv::stream stream;
 
   // copy data
@@ -133,6 +142,16 @@ xena::future<> combine_reduce(basct::span<T> res, const basit::split_options& sp
                               basct::cspan<unsigned> output_bit_table,
                               basct::cspan<T> partial_products) noexcept {
   auto num_outputs = output_bit_table.size();
+  SXT_RELEASE_ASSERT(
+      // clang-format off
+      res.size() == num_outputs &&
+      output_bit_table.size() == num_outputs
+      // clang-format on
+  );
+
+  if (res.empty()) {
+    co_return;
+  }
 
   // partials
   memmg::managed_array<unsigned> bit_table_partial_sums(num_outputs);

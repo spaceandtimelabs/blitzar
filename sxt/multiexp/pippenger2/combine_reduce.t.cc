@@ -33,6 +33,12 @@ TEST_CASE("we can combine and reduce partial products") {
   std::vector<E> partial_products;
   std::vector<E> res(1);
 
+  SECTION("we handle no outputs") {
+    res.clear();
+    auto fut = combine_reduce<E>(res, output_bit_table, partial_products);
+    REQUIRE(fut.ready());
+  }
+
   SECTION("we can combine and reduce a single element") {
     output_bit_table = {1};
     partial_products = {3u};
