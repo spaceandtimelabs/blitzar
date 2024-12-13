@@ -130,4 +130,14 @@ TEST_CASE("we can compute inner products asynchronously on the GPU") {
     xens::get_scheduler().run();
     REQUIRE(res.value() == expected_res);
   }
+
+  SECTION("we don't split when inputs are already in device memory") {
+    size_t n = 100;
+    make_dataset(a_host, b_host, a_dev, b_dev, rng, n);
+    auto res = async_inner_product_impl(a_dev, b_dev, 4, 1, 10);
+    s25t::element expected_res;
+    inner_product(expected_res, a_host, b_host);
+    xens::get_scheduler().run();
+    REQUIRE(res.value() == expected_res);
+  }
 }
