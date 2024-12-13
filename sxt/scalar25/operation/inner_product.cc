@@ -76,8 +76,7 @@ xena::future<s25t::element> async_inner_product_impl(basct::cspan<s25t::element>
                                                      size_t max_chunk_size) noexcept {
   SXT_DEBUG_ASSERT(
       (basdv::is_host_pointer(lhs.data()) && basdv::is_host_pointer(rhs.data())) ||
-      (basdv::is_active_device_pointer(lhs.data()) && basdv::is_active_device_pointer(rhs.data()))
-  );
+      (basdv::is_active_device_pointer(lhs.data()) && basdv::is_active_device_pointer(rhs.data())));
   auto n = std::min(lhs.size(), rhs.size());
   SXT_DEBUG_ASSERT(n > 0);
   if (basdv::is_active_device_pointer(lhs.data())) {
