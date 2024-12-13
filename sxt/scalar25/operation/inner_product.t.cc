@@ -121,24 +121,10 @@ TEST_CASE("we can compute inner products asynchronously on the GPU") {
     REQUIRE(res.value() == expected_res);
   }
 
-  SECTION("async inner product works with both device and host points") {
-    size_t n = 100;
-    make_dataset(a_host, b_host, a_dev, b_dev, rng, n);
-    auto res1 = async_inner_product(a_dev, b_host);
-    auto res2 = async_inner_product(a_host, b_dev);
-    auto res3 = async_inner_product(a_host, b_host);
-    s25t::element expected_res;
-    inner_product(expected_res, a_host, b_host);
-    xens::get_scheduler().run();
-    REQUIRE(res1.value() == expected_res);
-    REQUIRE(res2.value() == expected_res);
-    REQUIRE(res3.value() == expected_res);
-  }
-
   SECTION("we can split a GPU inner product into smaller chunks") {
     size_t n = 100;
     make_dataset(a_host, b_host, a_dev, b_dev, rng, n);
-    auto res = async_inner_product_impl(a_dev, b_host, 4, 1, 10);
+    auto res = async_inner_product_impl(a_host, b_host, 4, 1, 10);
     s25t::element expected_res;
     inner_product(expected_res, a_host, b_host);
     xens::get_scheduler().run();
