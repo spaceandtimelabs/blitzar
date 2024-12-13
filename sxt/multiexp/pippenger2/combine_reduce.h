@@ -12,11 +12,12 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/split.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
-#include "sxt/execution/device/for_each.h"
 #include "sxt/execution/device/copy.h"
+#include "sxt/execution/device/for_each.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 
@@ -74,9 +75,17 @@ xena::future<> combine_reduce_chunk(basct::span<T> res,
 
   // copy data
   memr::async_device_resource resource{stream};
-  memmg::managed_array<T> partials_dev{slice_num_partials * reduction_size, &resource};
-  co_await xendv::strided_copy_host_to_device<T>(partials_dev, stream, partial_products,
-                                                 num_partials, slice_num_partials, partials_offset);
+  memmg::managed_array<T> partials_dev_data{&resource};
+  basct::cspan<T> partials_dev = partial_products;
+  if (!basdv::is_active_device_pointer(partials_dev.data())) {
+    partials_dev_data.resize(slice_num_partials * reduction_size);
+    co_await xendv::strided_copy_host_to_device<T>(partials_dev_data, stream, partial_products,
+                                                   num_partials, slice_num_partials,
+                                                   partials_offset);
+    partials_dev = partials_dev_data;
+  } else {
+    SXT_RELEASE_ASSERT(partial_products.size() == slice_num_partials * reduction_size);
+  }
   memmg::managed_array<unsigned> bit_table_partial_sums_dev{num_outputs, &resource};
   basdv::async_copy_host_to_device(bit_table_partial_sums_dev, output_bit_table_partial_sums, stream);
 
