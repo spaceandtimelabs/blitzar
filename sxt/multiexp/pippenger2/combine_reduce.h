@@ -18,7 +18,6 @@
 
 #include <cassert>
 #include <numeric>
-#include <print>
 
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/container/span.h"
