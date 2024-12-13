@@ -1,8 +1,23 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2024-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <cassert>
 #include <numeric>
-
 #include <print>
 
 #include "sxt/algorithm/iteration/for_each.h"
@@ -23,7 +38,7 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
-// combine_reduce_chunk_kernel 
+// combine_reduce_chunk_kernel
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __restrict__ partials,
@@ -33,7 +48,7 @@ __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __rest
                                             unsigned output_index) noexcept {
   auto output_index_p = umax(output_index, 1u) - 1u;
   auto output_correction = bit_table_partial_sums[output_index_p] * (output_index != 0) +
-                               partials_offset * (output_index == 0);
+                           partials_offset * (output_index == 0);
   auto bit_width = bit_table_partial_sums[output_index] - output_correction;
   assert(bit_width > 0);
 
@@ -45,8 +60,8 @@ __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __rest
   unsigned bit_index = bit_width - 1u;
   --partials;
   T e = *partials;
-  for (unsigned reduction_index=1; reduction_index<reduction_size; ++reduction_index) {
-    auto ep = partials[reduction_index*num_partials];
+  for (unsigned reduction_index = 1; reduction_index < reduction_size; ++reduction_index) {
+    auto ep = partials[reduction_index * num_partials];
     add_inplace(e, ep);
   }
   for (; bit_index-- > 0u;) {
@@ -87,7 +102,8 @@ xena::future<> combine_reduce_chunk(basct::span<T> res,
     SXT_RELEASE_ASSERT(partial_products.size() == slice_num_partials * reduction_size);
   }
   memmg::managed_array<unsigned> bit_table_partial_sums_dev{num_outputs, &resource};
-  basdv::async_copy_host_to_device(bit_table_partial_sums_dev, output_bit_table_partial_sums, stream);
+  basdv::async_copy_host_to_device(bit_table_partial_sums_dev, output_bit_table_partial_sums,
+                                   stream);
 
   // combine reduce chunk
   memmg::managed_array<T> res_dev{num_outputs, &resource};
@@ -111,7 +127,7 @@ xena::future<> combine_reduce_chunk(basct::span<T> res,
 }
 
 //--------------------------------------------------------------------------------------------------
-// combine_reduce 
+// combine_reduce
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 xena::future<> combine_reduce(basct::span<T> res, const basit::split_options& split_options,
@@ -153,8 +169,8 @@ template <bascrv::element T>
 xena::future<> combine_reduce(basct::span<T> res, basct::cspan<unsigned> output_bit_table,
                               basct::cspan<T> partial_products) noexcept {
   basit::split_options split_options{
-    .max_chunk_size = 1024,
-    .split_factor = basdv::get_num_devices(),
+      .max_chunk_size = 1024,
+      .split_factor = basdv::get_num_devices(),
   };
   co_await combine_reduce(res, split_options, output_bit_table, partial_products);
 }
