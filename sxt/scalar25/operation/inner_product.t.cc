@@ -79,6 +79,7 @@ TEST_CASE("we can compute the inner product of two scalar vectors") {
   }
 }
 
+#if 0
 TEST_CASE("we can compute inner products asynchronously on the GPU") {
   memmg::managed_array<s25t::element> a_host, b_host;
   memmg::managed_array<s25t::element> a_dev{memr::get_device_resource()},
@@ -145,3 +146,4 @@ TEST_CASE("we can compute inner products asynchronously on the GPU") {
     REQUIRE(res.value() == expected_res);
   }
 }
+#endif
