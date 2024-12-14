@@ -187,6 +187,28 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
 }
 
 //--------------------------------------------------------------------------------------------------
+// multiexponentiate_impl_case1 
+//--------------------------------------------------------------------------------------------------
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+template <bascrv::element T, class U>
+  requires std::constructible_from<T, U>
+xena::future<> multiexponentiate_impl_case1(basct::span<T> res,
+                                            const partition_table_accessor<U>& accessor,
+                                            basct::cspan<unsigned> output_bit_table,
+                                            basct::cspan<unsigned> output_lengths,
+                                            basct::cspan<uint8_t> scalars) noexcept {
+#if 0
+        co_await async_partition_product_chunk<T>(partial_products_dev, accessor, output_bit_table,
+                                                  output_lengths, scalars_slice, rng.a(),
+                                                  rng.size());
+#endif
+}
+#pragma clang diagnostic pop
+
+//--------------------------------------------------------------------------------------------------
 // multiexponentiate_impl2
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, class U>
@@ -216,7 +238,13 @@ xena::future<> multiexponentiate_impl2(basct::span<T> res,
   auto num_chunks = static_cast<size_t>(std::distance(chunk_first, chunk_last));
   basl::info("computing {} bitwise multiexponentiation products of length {} using {} chunks",
              num_products, n, num_chunks);
-  
+
+  // handle special case of a single chunk
+  if (num_chunks == 1) {
+    co_return co_await multiexponentiate_impl_case1(res, accessor, output_bit_table, output_lengths,
+                                                    scalars);
+  }
+
   // handle multiple chunks
   memmg::managed_array<T> partial_products(num_products * num_chunks);
   size_t chunk_index = 0;
