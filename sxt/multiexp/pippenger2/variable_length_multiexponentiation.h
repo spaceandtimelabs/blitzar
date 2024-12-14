@@ -289,8 +289,13 @@ xena::future<> async_multiexponentiate(basct::span<T> res,
       .max_chunk_size = 1024,
       .split_factor = basdv::get_num_devices(),
   };
+#if 0
   return multiexponentiate_impl(res, accessor, output_bit_table, output_lengths, scalars,
                                 split_options);
+#else
+  return multiexponentiate_impl2(res, split_options, accessor, output_bit_table, output_lengths,
+                                 scalars);
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------

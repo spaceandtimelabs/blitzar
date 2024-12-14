@@ -133,8 +133,8 @@ TEST_CASE("we can compute multiexponentiations with varying lengths") {
     scalars.resize(32);
     scalars[0] = 1;
     scalars[16] = 1;
-    auto fut = multiexponentiate_impl<E>(res, *accessor, output_bit_table, output_lengths, scalars,
-                                         options);
+    auto fut = multiexponentiate_impl2<E>(res, options, *accessor, output_bit_table, output_lengths,
+                                          scalars);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == generators[0].value + generators[16].value);
