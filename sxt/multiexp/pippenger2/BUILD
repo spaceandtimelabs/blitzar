@@ -260,6 +260,7 @@ sxt_cc_component(
     ],
     deps = [
         ":combination",
+        ":combine_reduce",
         ":partition_table_accessor",
         ":reduce",
         ":variable_length_computation",
