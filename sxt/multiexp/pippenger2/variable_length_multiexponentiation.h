@@ -82,7 +82,7 @@ async_partition_product_chunk(basct::span<T> products, const partition_table_acc
 }
 
 //--------------------------------------------------------------------------------------------------
-// multiexponentiate_impl_case1 
+// multiexponentiate_impl_case1
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
