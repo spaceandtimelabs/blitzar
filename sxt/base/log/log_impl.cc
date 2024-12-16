@@ -27,4 +27,12 @@ void info_impl(std::string_view s) noexcept {
   setup_logger();
   spdlog::info(s);
 }
+
+//--------------------------------------------------------------------------------------------------
+// error_impl
+//--------------------------------------------------------------------------------------------------
+void error_impl(std::string_view s) noexcept {
+  setup_logger();
+  spdlog::error(s);
+}
 } // namespace sxt::basl

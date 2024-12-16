@@ -30,4 +30,13 @@ inline void info(std::string_view s) noexcept { info_impl(s); }
 template <class... Args> void info(std::format_string<Args...> fmt, Args&&... args) noexcept {
   info_impl(std::format(fmt, std::forward<Args>(args)...));
 }
+
+//--------------------------------------------------------------------------------------------------
+// error
+//--------------------------------------------------------------------------------------------------
+inline void error(std::string_view s) noexcept { error_impl(s); }
+
+template <class... Args> void error(std::format_string<Args...> fmt, Args&&... args) noexcept {
+  error_impl(std::format(fmt, std::forward<Args>(args)...));
+}
 } // namespace sxt::basl
