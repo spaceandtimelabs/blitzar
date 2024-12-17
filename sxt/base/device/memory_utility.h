@@ -157,4 +157,9 @@ template <class T> bool is_equal_for_testing(basct::cspan<T> lhs, basct::cspan<T
   return lhs.size() == rhs.size() &&
          is_equal_for_testing(lhs.data(), rhs.data(), sizeof(T) * lhs.size());
 }
+
+//--------------------------------------------------------------------------------------------------
+// get_mem_info
+//--------------------------------------------------------------------------------------------------
+void get_mem_info(size_t& bytes_free, size_t& bytes_total) noexcept;
 } // namespace sxt::basdv
