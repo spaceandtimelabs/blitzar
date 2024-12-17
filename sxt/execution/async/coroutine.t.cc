@@ -69,7 +69,7 @@ static future<int> f_i2() noexcept {
 }
 
 static future<int> f_dev(promise<int>& p) {
-  auto device = basdv::get_num_devices() - 1;
+  auto device = basdv::get_num_devices() - 1u;
   basdv::active_device_guard active_guard{device};
   auto val = co_await future<int>{p} + 1;
   REQUIRE(basdv::get_device() == device);

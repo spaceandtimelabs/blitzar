@@ -82,9 +82,7 @@ sxt_cc_component(
         "//sxt/execution/async:coroutine",
         "//sxt/base/device:active_device_guard",
         "//sxt/base/device:property",
-        "//sxt/base/iterator:index_range",
-        "//sxt/base/iterator:index_range_iterator",
-        "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/iterator:split",
     ],
     test_deps = [
         "//sxt/base/iterator:index_range",
@@ -176,6 +174,30 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:device_resource",
         "//sxt/memory/resource:pinned_resource",
+    ],
+)
+
+sxt_cc_component(
+    name = "copy",
+    impl_deps = [
+        ":synchronization",
+        "//sxt/base/device:pinned_buffer",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/execution/async:coroutine",
+    ],
+    test_deps = [
+        "//sxt/base/device:pinned_buffer",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/error:assert",
+        "//sxt/execution/async:future",
     ],
 )
 

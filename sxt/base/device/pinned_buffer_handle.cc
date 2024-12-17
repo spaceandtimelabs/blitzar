@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
-
-namespace sxt::basdv {
-//--------------------------------------------------------------------------------------------------
-// active_device_guard
-//--------------------------------------------------------------------------------------------------
-class active_device_guard {
-public:
-  active_device_guard() noexcept;
-
-  explicit active_device_guard(unsigned device) noexcept
-      : active_device_guard{static_cast<int>(device)} {}
-
-  explicit active_device_guard(int device) noexcept;
-
-  ~active_device_guard() noexcept;
-
-private:
-  int prev_device_;
-};
-} // namespace sxt::basdv
+#include "sxt/base/device/pinned_buffer_handle.h"

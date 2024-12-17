@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,41 @@
  */
 #pragma once
 
-#include "sxt/base/type/raw_stream.h"
+#include <cstddef>
 
 namespace sxt::basdv {
-//--------------------------------------------------------------------------------------------------
-// get_num_devices
-//--------------------------------------------------------------------------------------------------
-unsigned get_num_devices() noexcept;
+struct pinned_buffer_handle;
+
+constexpr unsigned pinned_buffer_size = 1024u * 1024u * 2u; // 2 megabytes
 
 //--------------------------------------------------------------------------------------------------
-// get_latest_cuda_version_supported_by_driver
+// pinned_buffer_pool
 //--------------------------------------------------------------------------------------------------
-int get_latest_cuda_version_supported_by_driver() noexcept;
+class pinned_buffer_pool {
+public:
+  explicit pinned_buffer_pool(size_t initial_size) noexcept;
+
+  ~pinned_buffer_pool() noexcept;
+
+  pinned_buffer_pool(const pinned_buffer_pool&) = delete;
+  pinned_buffer_pool(pinned_buffer_pool&&) = delete;
+  pinned_buffer_pool& operator=(const pinned_buffer_pool&) = delete;
+
+  pinned_buffer_handle* aquire_handle() noexcept;
+
+  void release_handle(pinned_buffer_handle* handle) noexcept;
+
+  size_t size() const noexcept;
+
+private:
+  pinned_buffer_handle* head_ = nullptr;
+};
 
 //--------------------------------------------------------------------------------------------------
-// get_cuda_version
+// get_pinned_buffer_pool
 //--------------------------------------------------------------------------------------------------
-int get_cuda_version() noexcept;
+/**
+ * Access the thread_local pinned pool.
+ */
+pinned_buffer_pool* get_pinned_buffer_pool(size_t initial_size = 16) noexcept;
 } // namespace sxt::basdv

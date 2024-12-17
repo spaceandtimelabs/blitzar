@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/base/iterator/index_range_utility.h"
+#pragma once
 
-#include <algorithm>
+#include <limits>
+#include <utility>
 
-#include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range.h"
 #include "sxt/base/iterator/index_range_iterator.h"
-#include "sxt/base/num/divide_up.h"
 
 namespace sxt::basit {
+//--------------------------------------------------------------------------------------------------
+// split_options
+//--------------------------------------------------------------------------------------------------
+struct split_options {
+  size_t min_chunk_size = 1;
+  size_t max_chunk_size = std::numeric_limits<size_t>::max();
+  size_t split_factor = 1;
+};
+
 //--------------------------------------------------------------------------------------------------
 // split
 //--------------------------------------------------------------------------------------------------
 std::pair<index_range_iterator, index_range_iterator> split(const index_range& rng,
-                                                            size_t n) noexcept {
-  SXT_DEBUG_ASSERT(n > 0);
-  auto delta = rng.b() - rng.a();
-  auto step = std::max(basn::divide_up(delta, n), size_t{1});
-  step = std::max(step, rng.min_chunk_size());
-  step = std::min(step, rng.max_chunk_size());
-  step = basn::divide_up(step, rng.chunk_multiple()) * rng.chunk_multiple();
-  index_range_iterator first{index_range{rng.a(), rng.b()}, step};
-  index_range_iterator last{index_range{rng.b(), rng.b()}, step};
-  return {first, last};
-}
+                                                            const split_options& options) noexcept;
 } // namespace sxt::basit

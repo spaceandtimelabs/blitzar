@@ -19,6 +19,7 @@
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/algorithm/iteration/transform.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/property.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/async/future_utility.h"
@@ -49,18 +50,19 @@ xena::future<> async_fold_scalars(basct::span<s25t::element> scalars_p,
   // Note: These haven't been informed by much benchmarking. I'm
   // sure there are better values. This is just putting in some
   // ballpark estimates to get started.
-  basit::chunk_options chunk_options{
-      .min_size = 2u << 10u,
-      .max_size = 2u << 20u,
+  basit::split_options split_options{
+      .min_chunk_size = 2u << 10u,
+      .max_chunk_size = 2u << 20u,
+      .split_factor = basdv::get_num_devices(),
   };
 
   // case 1
-  auto fut1 = algi::transform(scalars_p.subspan(0, m), chunk_options, f1, scalars.subspan(0, m),
+  auto fut1 = algi::transform(scalars_p.subspan(0, m), split_options, f1, scalars.subspan(0, m),
                               scalars.subspan(mid));
 
   // case 2
   auto f2 = [m_low] __device__ __host__(s25t::element & x) noexcept { s25o::mul(x, m_low, x); };
-  co_await algi::transform(scalars_p.subspan(m), chunk_options, f2, scalars.subspan(m, mid - m));
+  co_await algi::transform(scalars_p.subspan(m), split_options, f2, scalars.subspan(m, mid - m));
 
   co_await std::move(fut1);
 }

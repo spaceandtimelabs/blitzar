@@ -41,6 +41,34 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "combine_reduce",
+    test_deps = [
+        "//sxt/base/curve:example_element",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+        "//sxt/algorithm/iteration:for_each",
+        "//sxt/base/container:span",
+        "//sxt/base/container:span_utility",
+        "//sxt/base/curve:element",
+        "//sxt/base/error:assert",
+        "//sxt/base/iterator:split",
+        "//sxt/base/macro:cuda_callable",
+        "//sxt/base/type:raw_stream",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:copy",
+        "//sxt/execution/device:for_each",
+        "//sxt/execution/device:synchronization",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+    ],
+)
+
+sxt_cc_component(
     name = "partition_product",
     test_deps = [
         ":in_memory_partition_table_accessor",
@@ -182,15 +210,9 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "multiexponentiation_options",
-    with_test = False,
-)
-
-sxt_cc_component(
     name = "multiexponentiation",
     test_deps = [
         ":in_memory_partition_table_accessor_utility",
-        ":multiexponentiation_options",
         "//sxt/base/curve:example_element",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
@@ -216,8 +238,7 @@ sxt_cc_component(
         "//sxt/base/device:state",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
-        "//sxt/base/iterator:index_range_iterator",
-        "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/iterator:split",
         "//sxt/base/log",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:for_each",
@@ -251,8 +272,7 @@ sxt_cc_component(
         "//sxt/base/device:state",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
-        "//sxt/base/iterator:index_range_iterator",
-        "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/iterator:split",
         "//sxt/base/log",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:for_each",

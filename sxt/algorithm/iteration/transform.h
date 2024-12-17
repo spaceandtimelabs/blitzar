@@ -25,10 +25,7 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/base/iterator/chunk_options.h"
-#include "sxt/base/iterator/index_range.h"
-#include "sxt/base/iterator/index_range_iterator.h"
-#include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/iterator/split.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/base/type/value_type.h"
 #include "sxt/execution/async/coroutine.h"
@@ -87,7 +84,7 @@ template <class F, class Arg1, class... ArgsRest>
   requires algb::transform_functor_factory<F, bast::value_type_t<Arg1>,
                                            bast::value_type_t<ArgsRest>...>
 xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res,
-                         basit::chunk_options chunk_options, F make_f, const Arg1& x1,
+                         basit::split_options split_options, F make_f, const Arg1& x1,
                          const ArgsRest&... xrest) noexcept {
   auto n = res.size();
   SXT_DEBUG_ASSERT(x1.size() == n && ((xrest.size() == n) && ...));
@@ -96,11 +93,9 @@ xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res,
   }
   std::tuple<basct::cspan<bast::value_type_t<Arg1>>, basct::cspan<bast::value_type_t<ArgsRest>>...>
       srcs{x1, xrest...};
-  auto full_rng = basit::index_range{0, n}
-                      .min_chunk_size(chunk_options.min_size)
-                      .max_chunk_size(chunk_options.max_size);
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, n}, split_options);
   co_await xendv::concurrent_for_each(
-      full_rng, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+      chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
         co_await detail::transform_impl(res.subspan(rng.a(), rng.size()), make_f, srcs, rng,
                                         std::make_index_sequence<sizeof...(ArgsRest) + 1>{});
       });
@@ -109,11 +104,11 @@ xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res,
 template <class F, class Arg1, class... ArgsRest>
   requires algb::transform_functor<F, bast::value_type_t<Arg1>, bast::value_type_t<ArgsRest>...>
 xena::future<> transform(basct::span<bast::value_type_t<Arg1>> res,
-                         basit::chunk_options chunk_options, F f, const Arg1& x1,
+                         basit::split_options split_options, F f, const Arg1& x1,
                          const ArgsRest&... xrest) noexcept {
   auto make_f = [&](std::pmr::polymorphic_allocator<> /*alloc*/, basdv::stream& /*stream*/) {
     return xena::make_ready_future<F>(F{f});
   };
-  co_await transform(res, chunk_options, make_f, x1, xrest...);
+  co_await transform(res, split_options, make_f, x1, xrest...);
 }
 } // namespace sxt::algi

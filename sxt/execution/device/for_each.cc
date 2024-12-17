@@ -18,9 +18,7 @@
 
 #include "sxt/base/device/active_device_guard.h"
 #include "sxt/base/device/property.h"
-#include "sxt/base/iterator/index_range.h"
-#include "sxt/base/iterator/index_range_iterator.h"
-#include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/iterator/split.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/available_device.h"
@@ -47,7 +45,10 @@ concurrent_for_each(basit::index_range_iterator first, basit::index_range_iterat
 xena::future<>
 concurrent_for_each(basit::index_range rng,
                     std::function<xena::future<>(const basit::index_range&)> f) noexcept {
-  auto [first, last] = basit::split(rng, basdv::get_num_devices());
+  basit::split_options split_options{
+      .split_factor = basdv::get_num_devices(),
+  };
+  auto [first, last] = basit::split(rng, split_options);
   return concurrent_for_each(first, last, f);
 }
 } // namespace sxt::xendv

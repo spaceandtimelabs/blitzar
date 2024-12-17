@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,12 @@
  */
 #pragma once
 
-#include <cstddef>
-#include <utility>
-
-namespace sxt::basit {
-class index_range;
-class index_range_iterator;
-
+namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
-// split
+// pinned_buffer_handle
 //--------------------------------------------------------------------------------------------------
-std::pair<index_range_iterator, index_range_iterator> split(const index_range& rng,
-                                                            size_t n) noexcept;
-} // namespace sxt::basit
+struct pinned_buffer_handle {
+  void* ptr = nullptr;
+  pinned_buffer_handle* next = nullptr;
+};
+} // namespace sxt::basdv

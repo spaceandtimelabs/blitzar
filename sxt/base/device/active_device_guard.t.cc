@@ -28,6 +28,6 @@ TEST_CASE("we can control the active device") {
   }
 
   SECTION("we can set/unset a specific device") {
-    active_device_guard guard{get_num_devices() - 1};
+    active_device_guard guard{get_num_devices() - 1u};
   }
 }

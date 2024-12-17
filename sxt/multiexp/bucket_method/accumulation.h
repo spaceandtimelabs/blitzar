@@ -25,9 +25,7 @@
 #include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/base/iterator/index_range.h"
-#include "sxt/base/iterator/index_range_iterator.h"
-#include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/iterator/split.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
@@ -124,11 +122,12 @@ xena::future<> accumulate_buckets_impl(basct::span<T> bucket_sums, basct::cspan<
     min_chunk_size *= num_outputs;
     min_chunk_size = std::min(max_chunk_size, min_chunk_size);
   }
-
-  auto [first, last] = basit::split(basit::index_range{0, generators.size()}
-                                        .min_chunk_size(min_chunk_size)
-                                        .max_chunk_size(max_chunk_size),
-                                    split_factor);
+  basit::split_options split_options{
+      .min_chunk_size = min_chunk_size,
+      .max_chunk_size = max_chunk_size,
+      .split_factor = split_factor,
+  };
+  auto [first, last] = basit::split(basit::index_range{0, generators.size()}, split_options);
   auto num_chunks = std::distance(first, last);
 
   memmg::managed_array<T> partial_bucket_sums_data{memr::get_pinned_resource()};

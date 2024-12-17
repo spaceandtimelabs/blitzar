@@ -27,18 +27,18 @@ using namespace sxt::algi;
 
 TEST_CASE("we can transform contigous regions of memory") {
   std::vector<double> res;
-  basit::chunk_options chunk_options;
+  basit::split_options split_options;
 
   SECTION("we handle the empty case") {
     auto f = [] __device__ __host__(double& x) noexcept { x *= 2; };
-    auto fut = transform(res, chunk_options, f, res);
+    auto fut = transform(res, split_options, f, res);
     REQUIRE(fut.ready());
   }
 
   SECTION("we can transform a vector with a single element") {
     res = {123};
     auto f = [] __device__ __host__(double& x) noexcept { x *= 2; };
-    auto fut = transform(res, chunk_options, f, res);
+    auto fut = transform(res, split_options, f, res);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 246);
@@ -48,7 +48,7 @@ TEST_CASE("we can transform contigous regions of memory") {
     res = {2};
     std::vector<double> y = {4};
     auto f = [] __device__ __host__(double& x, double& y) noexcept { x = x + y; };
-    auto fut = transform(res, chunk_options, f, res, y);
+    auto fut = transform(res, split_options, f, res, y);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 6);
@@ -57,8 +57,8 @@ TEST_CASE("we can transform contigous regions of memory") {
   SECTION("we can split transform across multiple chunks") {
     res = {3, 5};
     auto f = [] __device__ __host__(double& x) noexcept { x *= 2; };
-    chunk_options.max_size = 1;
-    auto fut = transform(res, chunk_options, f, res);
+    split_options.split_factor = 2;
+    auto fut = transform(res, split_options, f, res);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 6);
@@ -82,8 +82,8 @@ TEST_CASE("we can transform contigous regions of memory") {
     };
 
     res = {3, 4};
-    chunk_options.max_size = 1;
-    auto fut = transform(res, chunk_options, make_f, res);
+    split_options.split_factor = 2;
+    auto fut = transform(res, split_options, make_f, res);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 18);

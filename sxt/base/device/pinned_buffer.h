@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,34 @@
  */
 #pragma once
 
-#include <cstddef>
-#include <limits>
+#include "sxt/base/device/pinned_buffer_handle.h"
 
-namespace sxt::basit {
+namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
-// chunk_options
+// pinned_buffer
 //--------------------------------------------------------------------------------------------------
-struct chunk_options {
-  size_t min_size = 1;
-  size_t max_size = std::numeric_limits<size_t>::max();
+class pinned_buffer {
+public:
+  pinned_buffer() noexcept;
+  pinned_buffer(pinned_buffer&& ptr) noexcept;
+  pinned_buffer(const pinned_buffer&) noexcept = delete;
+
+  ~pinned_buffer() noexcept;
+
+  pinned_buffer& operator=(pinned_buffer&& ptr) noexcept;
+  pinned_buffer& operator=(const pinned_buffer& ptr) noexcept = delete;
+
+  static size_t size() noexcept;
+
+  void* data() noexcept { return handle_->ptr; }
+
+  const void* data() const noexcept { return handle_->ptr; }
+
+  operator void*() noexcept { return handle_->ptr; }
+
+  operator const void*() const noexcept { return handle_->ptr; }
+
+private:
+  pinned_buffer_handle* handle_;
 };
-} // namespace sxt::basit
+} // namespace sxt::basdv

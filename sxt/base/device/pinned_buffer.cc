@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2024-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "sxt/base/device/pinned_buffer.h"
 
-#include "sxt/base/type/raw_stream.h"
+#include "sxt/base/device/pinned_buffer_pool.h"
 
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
-// get_num_devices
+// consructor
 //--------------------------------------------------------------------------------------------------
-unsigned get_num_devices() noexcept;
+pinned_buffer::pinned_buffer() noexcept : handle_{get_pinned_buffer_pool()->aquire_handle()} {}
+
+pinned_buffer::pinned_buffer(pinned_buffer&& ptr) noexcept : handle_{ptr.handle_} {
+  ptr.handle_ = nullptr;
+}
 
 //--------------------------------------------------------------------------------------------------
-// get_latest_cuda_version_supported_by_driver
+// destructor
 //--------------------------------------------------------------------------------------------------
-int get_latest_cuda_version_supported_by_driver() noexcept;
+pinned_buffer::~pinned_buffer() noexcept {
+  if (handle_ != nullptr) {
+    get_pinned_buffer_pool()->release_handle(handle_);
+  }
+}
 
 //--------------------------------------------------------------------------------------------------
-// get_cuda_version
+// operator=
 //--------------------------------------------------------------------------------------------------
-int get_cuda_version() noexcept;
+pinned_buffer& pinned_buffer::operator=(pinned_buffer&& ptr) noexcept {
+  if (handle_ != nullptr) {
+    get_pinned_buffer_pool()->release_handle(handle_);
+  }
+  handle_ = ptr.handle_;
+  ptr.handle_ = nullptr;
+  return *this;
+}
+
+//--------------------------------------------------------------------------------------------------
+// size
+//--------------------------------------------------------------------------------------------------
+size_t pinned_buffer::size() noexcept { return pinned_buffer_size; }
 } // namespace sxt::basdv
