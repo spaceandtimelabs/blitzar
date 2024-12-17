@@ -7,8 +7,7 @@
 #include "sxt/algorithm/reduction/thread_reduction.h"
 #include "sxt/base/device/state.h"
 #include "sxt/base/device/stream.h"
-#include "sxt/base/iterator/index_range_iterator.h"
-#include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/iterator/split.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/constexpr_switch.h"
 #include "sxt/execution/async/coroutine.h"
@@ -140,7 +139,7 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
 // sum_gpu 
 //--------------------------------------------------------------------------------------------------
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
-                       const sum_options& options, basct::cspan<s25t::element> mles,
+                       const basit::split_options& options, basct::cspan<s25t::element> mles,
                        unsigned n) noexcept {
   auto num_variables = std::max(basn::ceil_log2(n), 1);
   auto mid = 1u << (num_variables - 1u);
@@ -148,10 +147,7 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
   auto num_coefficients = p.size();
 
   // split
-  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, mid}
-                                                    .min_chunk_size(options.min_chunk_size)
-                                                    .max_chunk_size(options.max_chunk_size),
-                                                options.split_factor);
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, mid}, options);
 
   // sum
   size_t counter = 0;
@@ -194,7 +190,11 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
 
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        basct::cspan<s25t::element> mles, unsigned n) noexcept {
-  sum_options options;
+  basit::split_options options{
+    .min_chunk_size = 100'000u,
+    .max_chunk_size = 200'000u,
+    .split_factor = basdv::get_num_devices(),
+  };
   co_await sum_gpu(p, cache, options, mles, n);
 }
 } // namespace sxt::prfsk

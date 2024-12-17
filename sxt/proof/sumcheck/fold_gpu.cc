@@ -6,8 +6,7 @@
 #include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
-#include "sxt/base/iterator/index_range_iterator.h"
-#include "sxt/base/iterator/index_range_utility.h"
+#include "sxt/base/iterator/split.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
@@ -98,10 +97,12 @@ xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::el
   s25o::sub(one_m_r, one_m_r, r);
 
   // split
-  auto [chunk_first, chunk_last] = basit::split(
-      basit::index_range{0, mid}.min_chunk_size(1024 * 128).max_chunk_size(1024 * 256),
-      /* basit::index_range{0, mid}.min_chunk_size(1024 * 512).max_chunk_size(1024 * 1024), */
-      basdv::get_num_devices());
+  basit::split_options split_options{
+    .min_chunk_size = 1024u * 128u,
+    .max_chunk_size = 1024u * 256u,
+    .split_factor = basdv::get_num_devices(),
+  };
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, mid}, split_options);
 
   // fold
   co_await xendv::concurrent_for_each(

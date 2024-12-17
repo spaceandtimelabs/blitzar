@@ -10,6 +10,8 @@ namespace sxt::s25t {
 class element;
 }
 
+namespace sxt::basit { struct split_options; }
+
 namespace sxt::prfsk {
 class device_cache;
 
@@ -27,7 +29,7 @@ struct sum_options {
 // sum_gpu
 //--------------------------------------------------------------------------------------------------
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
-                       const sum_options& options, basct::cspan<s25t::element> mles,
+                       const basit::split_options& options, basct::cspan<s25t::element> mles,
                        unsigned n) noexcept;
 
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,

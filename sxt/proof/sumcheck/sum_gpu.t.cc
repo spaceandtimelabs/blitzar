@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "sxt/base/iterator/split.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
@@ -89,7 +90,7 @@ TEST_CASE("we can sum MLEs") {
     product_terms = {0};
     device_cache cache{product_table, product_terms};
     mles = {0x123_s25, 0x456_s25, 0x789_s25, 0x91011_s25};
-    sum_options options{
+    basit::split_options options{
         .min_chunk_size = 1,
         .max_chunk_size = 1,
         .split_factor = 2,
