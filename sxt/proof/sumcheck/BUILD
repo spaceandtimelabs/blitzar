@@ -121,6 +121,7 @@ sxt_cc_component(
     impl_deps = [
       ":device_cache",
       ":fold_gpu",
+      ":gpu_driver",
       ":sum_gpu",
       "//sxt/algorithm/iteration:transform",
         # ":constant",

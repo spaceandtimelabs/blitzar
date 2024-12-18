@@ -23,7 +23,7 @@ namespace sxt::prfsk {
 // gpu_driver
 //--------------------------------------------------------------------------------------------------
 class gpu_driver final : public driver {
-
+public:
   // driver
   xena::future<std::unique_ptr<workspace>>
   make_workspace(basct::cspan<s25t::element> mles,

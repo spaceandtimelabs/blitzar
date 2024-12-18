@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "sxt/proof/sumcheck/gpu_driver.h"
 #include "sxt/algorithm/iteration/transform.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
@@ -21,6 +22,8 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 namespace {
 struct chunked_gpu_workspace final : public workspace {
+  std::unique_ptr<workspace> single_gpu_workspace;
+
   device_cache cache;
   memmg::managed_array<s25t::element> mles_data;
   basct::cspan<s25t::element> mles;
@@ -54,6 +57,10 @@ chunked_gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 xena::future<> chunked_gpu_driver::sum(basct::span<s25t::element> polynomial,
                                        workspace& ws) const noexcept {
   auto& work = static_cast<chunked_gpu_workspace&>(ws);
+  if (work.single_gpu_workspace) {
+    gpu_driver drv;
+    co_return co_await drv.sum(polynomial, *work.single_gpu_workspace);
+  }
   co_await sum_gpu(polynomial, work.cache, work.mles, work.n);
 }
 
@@ -63,6 +70,10 @@ xena::future<> chunked_gpu_driver::sum(basct::span<s25t::element> polynomial,
 xena::future<> chunked_gpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
   using s25t::operator""_s25;
   auto& work = static_cast<chunked_gpu_workspace&>(ws);
+  if (work.single_gpu_workspace) {
+    gpu_driver drv;
+    co_return co_await drv.fold(*work.single_gpu_workspace, r);
+  }
   auto n = work.n;
   auto mid = 1u << (work.num_variables - 1u);
   auto num_mles = work.mles.size() / n;
