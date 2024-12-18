@@ -2,4 +2,5 @@
 
 #include "sxt/base/test/unit_test.h"
 
-TEST_CASE("todo") {}
+TEST_CASE("we can query the fraction of device memory taken by MLEs") {
+}

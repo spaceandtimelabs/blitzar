@@ -36,6 +36,7 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/base/container:span_utility",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/device:property",
         "//sxt/base/num:divide_up",
         "//sxt/base/num:ceil_log2",
         "//sxt/memory/management:managed_array",

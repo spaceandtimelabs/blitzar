@@ -20,4 +20,9 @@ void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv:
 void copy_folded_mles(basct::span<s25t::element> host_mles, basdv::stream& stream,
                       basct::cspan<s25t::element> device_mles, unsigned np, unsigned a,
                       unsigned b) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// get_gpu_memory_fraction 
+//--------------------------------------------------------------------------------------------------
+double get_gpu_memory_fraction(basct::cspan<s25t::element> mles) noexcept;
 } // namespace sxt::prfsk

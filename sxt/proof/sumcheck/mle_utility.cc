@@ -5,6 +5,7 @@
 
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
@@ -81,4 +82,17 @@ void copy_folded_mles(basct::span<s25t::element> host_mles, basdv::stream& strea
     basdv::async_copy_device_to_host(dst, src, stream);
   }
 }
+
+//--------------------------------------------------------------------------------------------------
+// get_gpu_memory_fraction 
+//--------------------------------------------------------------------------------------------------
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+double get_gpu_memory_fraction(basct::cspan<s25t::element> mles) noexcept {
+  auto total_memory = static_cast<double>(basdv::get_total_device_memory());
+  return static_cast<double>(mles.size() * sizeof(s25t::element)) / total_memory;
+}
+#pragma clang diagnostic pop
 } // namespace sxt::prfsk
