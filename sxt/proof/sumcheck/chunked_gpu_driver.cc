@@ -37,6 +37,14 @@ struct chunked_gpu_workspace final : public workspace {
 } // namespace
 
 //--------------------------------------------------------------------------------------------------
+// constructor
+//--------------------------------------------------------------------------------------------------
+chunked_gpu_driver::chunked_gpu_driver(double no_chunk_cutoff) noexcept
+    : no_chunk_cutoff_{no_chunk_cutoff} {
+  SXT_RELEASE_ASSERT(0 <= no_chunk_cutoff_ && no_chunk_cutoff_ <= 1.0);
+}
+
+//--------------------------------------------------------------------------------------------------
 // make_workspace
 //--------------------------------------------------------------------------------------------------
 xena::future<std::unique_ptr<workspace>>

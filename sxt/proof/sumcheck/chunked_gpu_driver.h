@@ -8,6 +8,8 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 class chunked_gpu_driver final : public driver {
 public:
+  explicit chunked_gpu_driver(double no_chunk_cutoff = 0.5) noexcept;
+
   // driver
   xena::future<std::unique_ptr<workspace>>
   make_workspace(basct::cspan<s25t::element> mles,
@@ -17,5 +19,8 @@ public:
   xena::future<> sum(basct::span<s25t::element> polynomial, workspace& ws) const noexcept override;
 
   xena::future<> fold(workspace& ws, const s25t::element& r) const noexcept override;
+
+private:
+  double no_chunk_cutoff_;
 };
 } // namespace sxt::prfsk
