@@ -40,4 +40,15 @@ void device_cache::lookup(basct::cspan<std::pair<s25t::element, unsigned>>& prod
   product_table = ptr->product_table;
   product_terms = ptr->product_terms;
 }
+
+//--------------------------------------------------------------------------------------------------
+// clear
+//--------------------------------------------------------------------------------------------------
+std::unique_ptr<device_cache_data> device_cache::clear() noexcept {
+  auto res{std::move(data_[basdv::get_device()])};
+  for (auto& ptr : data_) {
+    ptr.reset();
+  }
+  return res;
+}
 } // namespace sxt::prfsk

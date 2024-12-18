@@ -30,6 +30,8 @@ class device_cache {
     void lookup(basct::cspan<std::pair<s25t::element, unsigned>>& product_table,
                 basct::cspan<unsigned>& product_terms, basdv::stream& stream) noexcept;
 
+    std::unique_ptr<device_cache_data> clear() noexcept;
+
   private:
     basct::cspan<std::pair<s25t::element, unsigned>> product_table_;
     basct::cspan<unsigned> product_terms_;
