@@ -66,4 +66,26 @@ int get_cuda_version() noexcept {
   }();
   return version;
 }
+
+//--------------------------------------------------------------------------------------------------
+// get_device_mem_info
+//--------------------------------------------------------------------------------------------------
+void get_device_mem_info(size_t& bytes_free, size_t& bytes_total) noexcept {
+  auto rcode = cudaMemGetInfo(&bytes_free, &bytes_total);
+  if (rcode != cudaSuccess) {
+    baser::panic("cudaMemGetInfo failed: {}", cudaGetErrorString(rcode));
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+// get_total_device_memory
+//--------------------------------------------------------------------------------------------------
+size_t get_total_device_memory() noexcept {
+  static size_t res = []() noexcept {
+    size_t bytes_free, bytes_total;
+    get_device_mem_info(bytes_free, bytes_total);
+    return bytes_total;
+  }();
+  return res;
+}
 } // namespace sxt::basdv
