@@ -43,6 +43,7 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
+        "//sxt/scalar25/type:element",
         "//sxt/base/test:unit_test",
     ],
 )
