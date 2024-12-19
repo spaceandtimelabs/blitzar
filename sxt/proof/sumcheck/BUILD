@@ -124,6 +124,7 @@ sxt_cc_component(
       ":device_cache",
       ":fold_gpu",
       ":gpu_driver",
+      ":mle_utility",
       ":sum_gpu",
       "//sxt/algorithm/iteration:transform",
         # ":constant",

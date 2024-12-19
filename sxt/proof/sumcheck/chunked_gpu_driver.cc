@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-#include "sxt/proof/sumcheck/gpu_driver.h"
 #include "sxt/algorithm/iteration/transform.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
@@ -11,6 +10,8 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/proof/sumcheck/device_cache.h"
 #include "sxt/proof/sumcheck/fold_gpu.h"
+#include "sxt/proof/sumcheck/gpu_driver.h"
+#include "sxt/proof/sumcheck/mle_utility.h"
 #include "sxt/proof/sumcheck/sum_gpu.h"
 #include "sxt/scalar25/operation/sub.h"
 #include "sxt/scalar25/type/element.h"
@@ -53,10 +54,15 @@ chunked_gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
                                    basct::cspan<unsigned> product_terms,
                                    unsigned n) const noexcept {
   auto res = std::make_unique<chunked_gpu_workspace>(product_table, product_terms);
+  auto gpu_memory_fraction = get_gpu_memory_fraction(mles);
   res->mles = mles;
   res->n = n;
   res->num_variables = std::max(basn::ceil_log2(n), 1);
-  return xena::make_ready_future<std::unique_ptr<workspace>>(std::move(res));
+  if (gpu_memory_fraction < no_chunk_cutoff_) {
+    gpu_driver drv;
+    res->single_gpu_workspace = co_await drv.make_workspace(mles, product_table, product_terms, n);
+  }
+  co_return std::unique_ptr<workspace>(std::move(res));
 }
 
 //--------------------------------------------------------------------------------------------------
