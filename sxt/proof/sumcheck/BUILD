@@ -193,6 +193,7 @@ sxt_cc_component(
     ],
     deps = [
         ":driver",
+        "//sxt/memory/management:managed_array_fwd",
     ],
 )
 

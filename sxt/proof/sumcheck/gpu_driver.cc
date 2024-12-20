@@ -80,6 +80,35 @@ struct gpu_workspace final : public workspace {
 //--------------------------------------------------------------------------------------------------
 // make_workspace
 //--------------------------------------------------------------------------------------------------
+xena::future<std::unique_ptr<workspace>> gpu_driver::make_workspace(
+    basct::cspan<s25t::element> mles,
+    memmg::managed_array<std::pair<s25t::element, unsigned>>&& product_table_dev,
+    memmg::managed_array<unsigned>&& product_terms_dev, unsigned n) const noexcept {
+  auto ws = std::make_unique<gpu_workspace>();
+
+  // dimensions
+  ws->n = n;
+  ws->num_variables = std::max(basn::ceil_log2(n), 1);
+
+  // mles
+  ws->mles = memmg::managed_array<s25t::element>{
+      mles.size(),
+      memr::get_device_resource(),
+  };
+  basdv::stream mle_stream;
+  basdv::async_copy_host_to_device(ws->mles, mles, mle_stream);
+
+  // product_table
+  ws->product_table = std::move(product_table_dev);
+
+  // product_terms
+  ws->product_terms = std::move(product_terms_dev);
+
+  // await
+  co_await xendv::await_stream(mle_stream);
+  co_return ws;
+}
+
 xena::future<std::unique_ptr<workspace>>
 gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
                            basct::cspan<std::pair<s25t::element, unsigned>> product_table,

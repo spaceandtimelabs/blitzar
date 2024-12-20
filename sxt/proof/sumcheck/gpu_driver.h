@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "sxt/memory/management/managed_array_fwd.h"
 #include "sxt/proof/sumcheck/driver.h"
 
 namespace sxt::prfsk {
@@ -24,6 +25,11 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 class gpu_driver final : public driver {
 public:
+  xena::future<std::unique_ptr<workspace>>
+  make_workspace(basct::cspan<s25t::element> mles,
+                 memmg::managed_array<std::pair<s25t::element, unsigned>>&& product_table_dev,
+                 memmg::managed_array<unsigned>&& product_terms_dev, unsigned n) const noexcept;
+
   // driver
   xena::future<std::unique_ptr<workspace>>
   make_workspace(basct::cspan<s25t::element> mles,
