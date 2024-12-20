@@ -38,6 +38,28 @@ struct chunked_gpu_workspace final : public workspace {
 } // namespace
 
 //--------------------------------------------------------------------------------------------------
+// try_make_single_gpu_workspace 
+//--------------------------------------------------------------------------------------------------
+static xena::future<> try_make_single_gpu_workspace(chunked_gpu_workspace& work,
+                                                    double no_chunk_cutoff) noexcept {
+  auto gpu_memory_fraction = get_gpu_memory_fraction(work.mles);
+  if (gpu_memory_fraction > no_chunk_cutoff) {
+    co_return;
+  }
+
+  // construct single gpu workspace
+  auto cache_data = work.cache.clear();
+  gpu_driver drv;
+  work.single_gpu_workspace =
+      co_await drv.make_workspace(work.mles, std::move(cache_data->product_table),
+                                  std::move(cache_data->product_terms), work.n);
+
+  // free data we no longer need
+  work.mles_data.reset();
+  work.mles = {};
+}
+
+//--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
 chunked_gpu_driver::chunked_gpu_driver(double no_chunk_cutoff) noexcept
@@ -54,11 +76,11 @@ chunked_gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
                                    basct::cspan<unsigned> product_terms,
                                    unsigned n) const noexcept {
   auto res = std::make_unique<chunked_gpu_workspace>(product_table, product_terms);
-  auto gpu_memory_fraction = get_gpu_memory_fraction(mles);
   res->mles = mles;
   res->n = n;
   res->num_variables = std::max(basn::ceil_log2(n), 1);
-  if (gpu_memory_fraction < no_chunk_cutoff_) {
+  auto gpu_memory_fraction = get_gpu_memory_fraction(mles);
+  if (gpu_memory_fraction <= no_chunk_cutoff_) {
     gpu_driver drv;
     res->single_gpu_workspace = co_await drv.make_workspace(mles, product_table, product_terms, n);
   }
@@ -109,5 +131,8 @@ xena::future<> chunked_gpu_driver::fold(workspace& ws, const s25t::element& r) c
   --work.num_variables;
   work.mles_data = std::move(mles_p);
   work.mles = work.mles_data;
+
+  // check if we should fall back to single gpu workspace
+  co_await try_make_single_gpu_workspace(work, no_chunk_cutoff_);
 }
 } // namespace sxt::prfsk
