@@ -101,4 +101,21 @@ TEST_CASE("we can sum MLEs") {
     REQUIRE(p[0] == mles[0] + mles[1]);
     REQUIRE(p[1] == (mles[2] - mles[0]) + (mles[3] - mles[1]));
   }
+
+  SECTION("we can chunk sums with n=4") {
+    product_table = {{0x1_s25, 1}};
+    product_terms = {0};
+    device_cache cache{product_table, product_terms};
+    mles = {0x2_s25, 0x4_s25, 0x7_s25, 0x9_s25};
+    basit::split_options options{
+        .min_chunk_size = 16,
+        .max_chunk_size = 16,
+        .split_factor = 2,
+    };
+    auto fut = sum_gpu(p, cache, options, mles, 4);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(p[0] == mles[0] + mles[1]);
+    REQUIRE(p[1] == (mles[2] - mles[0]) + (mles[3] - mles[1]));
+  }
 }

@@ -1,6 +1,7 @@
 #include "sxt/proof/sumcheck/chunked_gpu_driver.h"
 
 #include <algorithm>
+#include <print>
 
 #include "sxt/algorithm/iteration/transform.h"
 #include "sxt/base/error/assert.h"
@@ -92,6 +93,7 @@ chunked_gpu_driver::make_workspace(basct::cspan<s25t::element> mles,
 //--------------------------------------------------------------------------------------------------
 xena::future<> chunked_gpu_driver::sum(basct::span<s25t::element> polynomial,
                                        workspace& ws) const noexcept {
+  std::println(stderr, "*********************");
   auto& work = static_cast<chunked_gpu_workspace&>(ws);
   if (work.single_gpu_workspace) {
     gpu_driver drv;
