@@ -61,7 +61,9 @@ xena::future<> prove_sum(basct::span<s25t::element> polynomials,
     evaluation_point[round_index] = r;
 
     // fold the polynomial
-    co_await drv.fold(*ws, r);
+    if (round_index < num_variables - 1u) {
+      co_await drv.fold(*ws, r);
+    }
   }
 }
 } // namespace sxt::prfsk

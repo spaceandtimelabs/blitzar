@@ -22,7 +22,9 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
+#include "sxt/proof/sumcheck/chunked_gpu_driver.h"
 #include "sxt/proof/sumcheck/cpu_driver.h"
+#include "sxt/proof/sumcheck/gpu_driver.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"
@@ -32,9 +34,8 @@ using namespace sxt;
 using namespace sxt::prfsk;
 using s25t::operator""_s25;
 
-TEST_CASE("we can create a sumcheck proof") {
+static void test_proof(const driver& drv) noexcept {
   prft::transcript transcript{"abc"};
-  cpu_driver drv;
   std::vector<s25t::element> polynomials(2);
   std::vector<s25t::element> evaluation_point(1);
   std::vector<s25t::element> mles = {
@@ -143,5 +144,17 @@ TEST_CASE("we can create a sumcheck proof") {
 
     REQUIRE(polynomials[2] == mles[0]);
     REQUIRE(polynomials[3] == mles[1] - mles[0]);
+  }
+}
+
+TEST_CASE("we can create a sumcheck proof") {
+  SECTION("we can prove with the cpu driver") {
+    cpu_driver drv;
+    test_proof(drv);
+  }
+
+  SECTION("we can prove with the gpu driver") {
+    gpu_driver drv;
+    test_proof(drv);
   }
 }

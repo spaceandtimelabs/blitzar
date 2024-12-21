@@ -49,6 +49,9 @@ template <algb::index_functor F> __global__ void for_each_kernel(F f, unsigned n
 //--------------------------------------------------------------------------------------------------
 template <algb::index_functor F>
 void launch_for_each_kernel(bast::raw_stream_t stream, F f, unsigned n) noexcept {
+  if (n == 0) {
+    return;
+  }
   auto dims = fit_iteration_kernel(n);
   for_each_kernel<<<dims.num_blocks, static_cast<unsigned>(dims.block_size), 0, stream>>>(f, n);
 }
@@ -58,6 +61,9 @@ void launch_for_each_kernel(bast::raw_stream_t stream, F f, unsigned n) noexcept
 //--------------------------------------------------------------------------------------------------
 template <algb::index_functor F>
 xena::future<> for_each(basdv::stream&& stream, F f, unsigned n) noexcept {
+  if (n == 0) {
+    return xena::make_ready_future();
+  }
   launch_for_each_kernel(stream, f, n);
   return xendv::await_and_own_stream(std::move(stream));
 }
