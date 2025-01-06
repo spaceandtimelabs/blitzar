@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <cstddef>
+
 #include "sxt/base/type/raw_stream.h"
 
 namespace sxt::basdv {
@@ -33,4 +35,17 @@ int get_latest_cuda_version_supported_by_driver() noexcept;
 // get_cuda_version
 //--------------------------------------------------------------------------------------------------
 int get_cuda_version() noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// get_device_mem_info
+//--------------------------------------------------------------------------------------------------
+void get_device_mem_info(size_t& bytes_free, size_t& bytes_total) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// get_total_device_memory
+//--------------------------------------------------------------------------------------------------
+// Get the total amount of memory available for a single GPU device.
+//
+// Note: assumes each device has the same amount of memory
+size_t get_total_device_memory() noexcept;
 } // namespace sxt::basdv
