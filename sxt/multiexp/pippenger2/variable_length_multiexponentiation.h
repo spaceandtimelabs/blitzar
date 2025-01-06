@@ -140,7 +140,6 @@ xena::future<> multiexponentiate_impl(basct::span<T> res, const basit::split_opt
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
         basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
                    rng.a(), rng.b(), basdv::get_device());
-        std::println(stderr, "chunk {} to {}", rng.a(), rng.b());
         memmg::managed_array<T> partial_products_dev{num_products, memr::get_device_resource()};
         auto scalars_slice =
             scalars.subspan(num_output_bytes * rng.a(), rng.size() * num_output_bytes);
