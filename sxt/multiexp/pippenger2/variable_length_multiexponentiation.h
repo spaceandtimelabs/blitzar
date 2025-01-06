@@ -82,15 +82,16 @@ async_partition_product_chunk(basct::span<T> products, const partition_table_acc
 }
 
 //--------------------------------------------------------------------------------------------------
-// multiexponentiate_impl_case1
+// multiexponentiate_impl_single_chunk
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
-xena::future<>
-multiexponentiate_impl_case1(basct::span<T> res, const partition_table_accessor<U>& accessor,
-                             basct::cspan<unsigned> output_bit_table,
-                             basct::cspan<unsigned> output_lengths, basct::cspan<uint8_t> scalars,
-                             unsigned n, unsigned num_products) noexcept {
+xena::future<> multiexponentiate_impl_single_chunk(basct::span<T> res,
+                                                   const partition_table_accessor<U>& accessor,
+                                                   basct::cspan<unsigned> output_bit_table,
+                                                   basct::cspan<unsigned> output_lengths,
+                                                   basct::cspan<uint8_t> scalars, unsigned n,
+                                                   unsigned num_products) noexcept {
   memmg::managed_array<T> partial_products{num_products, memr::get_device_resource()};
   co_await async_partition_product_chunk<T>(partial_products, accessor, output_bit_table,
                                             output_lengths, scalars, 0, n);
@@ -129,8 +130,8 @@ xena::future<> multiexponentiate_impl(basct::span<T> res, const basit::split_opt
 
   // handle special case of a single chunk
   if (num_chunks == 1) {
-    co_return co_await multiexponentiate_impl_case1(res, accessor, output_bit_table, output_lengths,
-                                                    scalars, n, num_products);
+    co_return co_await multiexponentiate_impl_single_chunk(
+        res, accessor, output_bit_table, output_lengths, scalars, n, num_products);
   }
 
   // handle multiple chunks
