@@ -32,3 +32,11 @@ TEST_CASE("we can get the version of the driver running") {
   auto v2 = get_cuda_version();
   REQUIRE(v1 >= v2);
 }
+
+TEST_CASE("we can query info about device memory") {
+  size_t bytes_free, bytes_total;
+  get_device_mem_info(bytes_free, bytes_total);
+  REQUIRE(0 < bytes_free);
+  REQUIRE(bytes_free <= bytes_total);
+  REQUIRE(bytes_total == get_total_device_memory());
+}
