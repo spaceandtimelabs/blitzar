@@ -101,6 +101,7 @@ sxt_cc_component(
     name = "property",
     impl_deps = [
         "//sxt/base/error:panic",
+        "//sxt/base/log:log",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
