@@ -134,6 +134,64 @@ xena::future<> combine_reduce_chunk(basct::span<T> res,
   co_await xendv::await_stream(stream);
 }
 
+template <bascrv::element T>
+xena::future<> combine_reduce_chunk(basct::span<T> res, unsigned element_num_bytes,
+                                    basct::cspan<T> partial_products, unsigned reduction_size,
+                                    unsigned partials_offset) noexcept {
+  co_return;
+  auto num_partials = partial_products.size() / reduction_size;
+  auto num_outputs = res.size();
+  auto slice_num_partials = num_outputs * element_num_bytes - partials_offset;
+  SXT_RELEASE_ASSERT(
+      // clang-format off
+      num_outputs > 0 &&
+      res.size() == num_outputs &&
+      partial_products.size() == num_partials * reduction_size &&
+      partials_offset < num_outputs * element_num_bytes
+      // clang-format on
+  );
+  basdv::stream stream;
+
+  // copy data
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> partials_dev_data{&resource};
+  basct::cspan<T> partials_dev = partial_products;
+  if (!basdv::is_active_device_pointer(partials_dev.data())) {
+    partials_dev_data.resize(slice_num_partials * reduction_size);
+    co_await xendv::strided_copy_host_to_device<T>(partials_dev_data, stream, partial_products,
+                                                   num_partials, slice_num_partials,
+                                                   partials_offset);
+    partials_dev = partials_dev_data;
+  } else {
+    SXT_RELEASE_ASSERT(partial_products.size() == slice_num_partials * reduction_size);
+  }
+#if 0
+  memmg::managed_array<unsigned> bit_table_partial_sums_dev{num_outputs, &resource};
+  basdv::async_copy_host_to_device(bit_table_partial_sums_dev, output_bit_table_partial_sums,
+                                   stream);
+
+  // combine reduce chunk
+  memmg::managed_array<T> res_dev{num_outputs, &resource};
+  auto f = [
+               // clang-format off
+    num_partials = slice_num_partials,
+    reduction_size = reduction_size,
+    partials_offset = partials_offset,
+    res = res_dev.data(),
+    partials = partials_dev.data(),
+    bit_table_partial_sums = bit_table_partial_sums_dev.data()
+               // clang-format on
+  ] __device__
+           __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
+             combine_reduce_chunk_kernel(res, partials, bit_table_partial_sums, num_partials,
+                                         reduction_size, partials_offset, output_index);
+           };
+  algi::launch_for_each_kernel(stream, f, num_outputs);
+  basdv::async_copy_device_to_host(res, res_dev, stream);
+  co_await xendv::await_stream(stream);
+#endif
+}
+
 //--------------------------------------------------------------------------------------------------
 // combine_reduce
 //--------------------------------------------------------------------------------------------------
