@@ -84,6 +84,19 @@ __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __rest
   combine_reduce_output(res, partials, num_partials, reduction_size, bit_width);
 }
 
+template <bascrv::element T>
+__device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __restrict__ partials,
+                                            unsigned bit_width, unsigned num_partials,
+                                            unsigned reduction_size,
+                                            unsigned output_index) noexcept {
+  // adjust pointers
+  res += output_index;
+  partials += bit_width;
+
+  // combine reduce
+  combine_reduce_output(res, partials, num_partials, reduction_size, bit_width);
+}
+
 //--------------------------------------------------------------------------------------------------
 // combine_reduce_chunk
 //--------------------------------------------------------------------------------------------------
@@ -175,28 +188,29 @@ xena::future<> combine_reduce_chunk(basct::span<T> res, unsigned element_num_byt
   } else {
     SXT_RELEASE_ASSERT(partial_products.size() == slice_num_partials * reduction_size);
   }
-#if 0
 
   // combine reduce chunk
   memmg::managed_array<T> res_dev{num_outputs, &resource};
   auto f = [
                // clang-format off
     num_partials = slice_num_partials,
+    bit_width = 8u * element_num_bytes,
     reduction_size = reduction_size,
-    partials_offset = partials_offset,
     res = res_dev.data(),
-    partials = partials_dev.data(),
-    bit_table_partial_sums = bit_table_partial_sums_dev.data()
+    partials = partials_dev.data()
                // clang-format on
   ] __device__
            __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
-             combine_reduce_chunk_kernel(res, partials, bit_table_partial_sums, num_partials,
-                                         reduction_size, partials_offset, output_index);
+             // adjust pointers
+             res += output_index;
+             partials += bit_width;
+
+             // combine reduce
+             combine_reduce_output(res, partials, num_partials, reduction_size, bit_width);
            };
   algi::launch_for_each_kernel(stream, f, num_outputs);
   basdv::async_copy_device_to_host(res, res_dev, stream);
   co_await xendv::await_stream(stream);
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -263,16 +277,17 @@ xena::future<> combine_reduce(basct::span<T> res, const basit::split_options& sp
   }
 
   auto reduction_size = partial_products.size() / (num_outputs * element_num_bytes);
-#if 0
+
   // don't split if partials are already in device memory
   if (basdv::is_active_device_pointer(partial_products.data())) {
-    co_return co_await combine_reduce_chunk(res, bit_table_partial_sums, partial_products,
+    co_return co_await combine_reduce_chunk(res, element_num_bytes, partial_products,
                                             reduction_size, 0);
   }
 
   // split
   auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, num_outputs}, split_options);
 
+#if 0
   // combine reduce
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](basit::index_range rng) noexcept -> xena::future<> {
