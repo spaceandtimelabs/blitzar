@@ -82,28 +82,6 @@ __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __rest
 
   // combine reduce
   combine_reduce_output(res, partials, num_partials, reduction_size, bit_width);
-/* template <bascrv::element T> */
-/* __device__ void combine_reduce_output(T* __restrict__ res, const T* __restrict__ partials, */
-/*                                       unsigned num_partials, unsigned reduction_size, */
-/*                                       unsigned bit_width) noexcept { */
-#if 0
-  unsigned bit_index = bit_width - 1u;
-  --partials;
-  T e = *partials;
-  for (unsigned reduction_index = 1; reduction_index < reduction_size; ++reduction_index) {
-    auto ep = partials[reduction_index * num_partials];
-    add_inplace(e, ep);
-  }
-  for (; bit_index-- > 0u;) {
-    --partials;
-    double_element(e, e);
-    for (unsigned reduction_index = 0; reduction_index < reduction_size; ++reduction_index) {
-      auto ep = partials[reduction_index * num_partials];
-      add_inplace(e, ep);
-    }
-  }
-  *res = e;
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------
