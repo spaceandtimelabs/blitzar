@@ -37,6 +37,31 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
+// combine_reduce_output 
+//--------------------------------------------------------------------------------------------------
+template <bascrv::element T>
+__device__ void combine_reduce_output(T* __restrict__ res, const T* __restrict__ partials,
+                                      unsigned num_partials, unsigned reduction_size,
+                                      unsigned bit_width) noexcept {
+  unsigned bit_index = bit_width - 1u;
+  --partials;
+  T e = *partials;
+  for (unsigned reduction_index = 1; reduction_index < reduction_size; ++reduction_index) {
+    auto ep = partials[reduction_index * num_partials];
+    add_inplace(e, ep);
+  }
+  for (; bit_index-- > 0u;) {
+    --partials;
+    double_element(e, e);
+    for (unsigned reduction_index = 0; reduction_index < reduction_size; ++reduction_index) {
+      auto ep = partials[reduction_index * num_partials];
+      add_inplace(e, ep);
+    }
+  }
+  *res = e;
+}
+
+//--------------------------------------------------------------------------------------------------
 // combine_reduce_chunk_kernel
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
@@ -56,6 +81,12 @@ __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __rest
   partials += bit_table_partial_sums[output_index] - partials_offset;
 
   // combine reduce
+  combine_reduce_output(res, partials, num_partials, reduction_size, bit_width);
+/* template <bascrv::element T> */
+/* __device__ void combine_reduce_output(T* __restrict__ res, const T* __restrict__ partials, */
+/*                                       unsigned num_partials, unsigned reduction_size, */
+/*                                       unsigned bit_width) noexcept { */
+#if 0
   unsigned bit_index = bit_width - 1u;
   --partials;
   T e = *partials;
@@ -72,6 +103,7 @@ __device__ void combine_reduce_chunk_kernel(T* __restrict__ res, const T* __rest
     }
   }
   *res = e;
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -166,9 +198,6 @@ xena::future<> combine_reduce_chunk(basct::span<T> res, unsigned element_num_byt
     SXT_RELEASE_ASSERT(partial_products.size() == slice_num_partials * reduction_size);
   }
 #if 0
-  memmg::managed_array<unsigned> bit_table_partial_sums_dev{num_outputs, &resource};
-  basdv::async_copy_host_to_device(bit_table_partial_sums_dev, output_bit_table_partial_sums,
-                                   stream);
 
   // combine reduce chunk
   memmg::managed_array<T> res_dev{num_outputs, &resource};
