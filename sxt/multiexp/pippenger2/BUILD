@@ -226,6 +226,7 @@ sxt_cc_component(
     ],
     deps = [
         ":combination",
+        ":combine_reduce",
         ":partition_product",
         ":partition_table_accessor",
         ":reduce",

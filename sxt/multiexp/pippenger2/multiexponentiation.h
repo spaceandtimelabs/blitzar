@@ -37,6 +37,7 @@
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/combination.h"
+#include "sxt/multiexp/pippenger2/combine_reduce.h"
 #include "sxt/multiexp/pippenger2/partition_product.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 #include "sxt/multiexp/pippenger2/reduce.h"
@@ -198,39 +199,10 @@ xena::future<> multiexponentiate_impl2(basct::span<T> res,
         ++chunk_index;
         co_await xendv::await_stream(stream);
       });
-#if 0
+
   // combine the partial products
   basl::info("combining {} partial product chunks", num_chunks);
-  co_await combine_reduce<T>(res, output_bit_table, partial_products);
-#endif
-
-#if 0
-  auto num_outputs = res.size();
-  auto num_products = num_outputs * element_num_bytes * 8u;
-  SXT_DEBUG_ASSERT(
-      // clang-format off
-      scalars.size() % (num_outputs * element_num_bytes) == 0
-      // clang-format on
-  );
-
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<T> products{num_products, &resource};
-  co_await multiexponentiate_product_step<T>(
-      products, stream, accessor, num_outputs * element_num_bytes, scalars, split_options);
-
-  // reduce the products
-  basl::info("reducing products for {} outputs", num_outputs);
-  memmg::managed_array<T> res_dev{num_outputs, &resource};
-  reduce_products<T>(res_dev, stream, products);
-  products.reset();
-  basl::info("completed {} reductions", num_outputs);
-
-  // copy result
-  basdv::async_copy_device_to_host(res, res_dev, stream);
-  co_await xendv::await_stream(stream);
-  basl::info("complete multiexponentiation");
-#endif
+  co_await combine_reduce<T>(res, element_num_bytes, partial_products);
 }
 #pragma clang diagnostic pop
 
