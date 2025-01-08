@@ -164,13 +164,13 @@ xena::future<> combine_reduce_chunk(basct::span<T> res, unsigned element_num_byt
   auto num_partials = partial_products.size() / reduction_size;
   auto num_outputs = res.size();
   auto bit_width = 8u * element_num_bytes;
-  auto slice_num_partials = num_outputs * bit_width - partials_offset;
+  auto slice_num_partials = num_outputs * bit_width;
   SXT_RELEASE_ASSERT(
       // clang-format off
       num_outputs > 0 &&
       res.size() == num_outputs &&
       partial_products.size() == num_partials * reduction_size &&
-      partials_offset < num_outputs * bit_width
+      partials_offset < num_partials
       // clang-format on
   );
   basdv::stream stream;

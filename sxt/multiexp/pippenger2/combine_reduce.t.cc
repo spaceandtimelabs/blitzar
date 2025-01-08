@@ -79,17 +79,17 @@ TEST_CASE("we can combine and reduce partial products with outputs of fixed size
     REQUIRE(res[0] == 11u);
   }
 
-  /* SECTION("we can combine and reduce multiple outputs") { */
-  /*   partial_products.resize(16); */
-  /*   partial_products[0] = 3u; */
-  /*   partial_products[8] = 4u; */
-  /*   res.resize(2); */
-  /*   auto fut = combine_reduce<E>(res, element_num_bytes, partial_products); */
-  /*   xens::get_scheduler().run(); */
-  /*   REQUIRE(fut.ready()); */
-  /*   REQUIRE(res[0] == 3u); */
-  /*   REQUIRE(res[1] == 4u); */
-  /* } */
+  SECTION("we can combine and reduce multiple outputs") {
+    partial_products.resize(16);
+    partial_products[0] = 3u;
+    partial_products[8] = 4u;
+    res.resize(2);
+    auto fut = combine_reduce<E>(res, element_num_bytes, partial_products);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 3u);
+    REQUIRE(res[1] == 4u);
+  }
 
 #if 0
   SECTION("we can combine and reduce in chunks") {
