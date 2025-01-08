@@ -48,6 +48,17 @@ TEST_CASE("we can combine and reduce partial products with outputs of fixed size
     REQUIRE(res[0] == 3u);
   }
 
+  SECTION("we can combine and reduce a two byte output") {
+    partial_products.resize(16);
+    partial_products[0] = 3u;
+    partial_products[8] = 4u;
+    element_num_bytes = 2;
+    auto fut = combine_reduce<E>(res, element_num_bytes, partial_products);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 3u + (1u << 8u) * 4u);
+  }
+
   SECTION("we can combine and reduce elements already on device") {
     partial_products.resize(8);
     partial_products[0] = 3u;
