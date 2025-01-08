@@ -37,7 +37,7 @@
 
 namespace sxt::mtxpp2 {
 //--------------------------------------------------------------------------------------------------
-// combine_reduce_output 
+// combine_reduce_output
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T>
 __device__ void combine_reduce_output(T* __restrict__ res, const T* __restrict__ partials,
