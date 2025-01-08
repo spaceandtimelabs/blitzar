@@ -48,18 +48,18 @@ TEST_CASE("we can combine and reduce partial products with outputs of fixed size
     REQUIRE(res[0] == 3u);
   }
 
-#if 0
   SECTION("we can combine and reduce elements already on device") {
-    output_bit_table = {1};
-    partial_products = {3u};
+    partial_products.resize(8);
+    partial_products[0] = 3u;
     std::pmr::vector<E> partial_products_dev{partial_products.begin(), partial_products.end(),
                                              memr::get_managed_device_resource()};
-    auto fut = combine_reduce<E>(res, output_bit_table, partial_products_dev);
+    auto fut = combine_reduce<E>(res, element_num_bytes, partial_products_dev);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 3u);
   }
 
+#if 0
   SECTION("we can combine and reduce a single output with a reduction size of two") {
     output_bit_table = {1};
     partial_products = {3u, 4u};

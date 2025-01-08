@@ -163,7 +163,8 @@ xena::future<> combine_reduce_chunk(basct::span<T> res, unsigned element_num_byt
                                     unsigned partials_offset) noexcept {
   auto num_partials = partial_products.size() / reduction_size;
   auto num_outputs = res.size();
-  auto slice_num_partials = num_outputs * element_num_bytes - partials_offset;
+  auto bit_width = 8u * element_num_bytes;
+  auto slice_num_partials = num_outputs * bit_width - partials_offset;
   SXT_RELEASE_ASSERT(
       // clang-format off
       num_outputs > 0 &&
@@ -193,7 +194,7 @@ xena::future<> combine_reduce_chunk(basct::span<T> res, unsigned element_num_byt
   auto f = [
                // clang-format off
     num_partials = slice_num_partials,
-    bit_width = 8u * element_num_bytes,
+    bit_width = bit_width,
     reduction_size = reduction_size,
     res = res_dev.data(),
     partials = partials_dev.data()
