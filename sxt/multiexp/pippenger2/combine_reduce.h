@@ -161,7 +161,6 @@ template <bascrv::element T>
 xena::future<> combine_reduce_chunk(basct::span<T> res, unsigned element_num_bytes,
                                     basct::cspan<T> partial_products, unsigned reduction_size,
                                     unsigned partials_offset) noexcept {
-  co_return;
   auto num_partials = partial_products.size() / reduction_size;
   auto num_outputs = res.size();
   auto slice_num_partials = num_outputs * element_num_bytes - partials_offset;
@@ -201,12 +200,8 @@ xena::future<> combine_reduce_chunk(basct::span<T> res, unsigned element_num_byt
                // clang-format on
   ] __device__
            __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
-             // adjust pointers
-             res += output_index;
-             partials += bit_width;
-
-             // combine reduce
-             combine_reduce_output(res, partials, num_partials, reduction_size, bit_width);
+             combine_reduce_output(res + output_index, partials + bit_width, num_partials,
+                                   reduction_size, bit_width);
            };
   algi::launch_for_each_kernel(stream, f, num_outputs);
   basdv::async_copy_device_to_host(res, res_dev, stream);
@@ -262,10 +257,6 @@ xena::future<> combine_reduce(basct::span<T> res, const basit::split_options& sp
       });
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 template <bascrv::element T>
 xena::future<> combine_reduce(basct::span<T> res, const basit::split_options& split_options,
                               unsigned element_num_bytes,
@@ -300,7 +291,6 @@ xena::future<> combine_reduce(basct::span<T> res, const basit::split_options& sp
                                       reduction_size, partials_offset);
       });
 }
-#pragma clang diagnostic pop
 
 template <bascrv::element T>
 xena::future<> combine_reduce(basct::span<T> res, basct::cspan<unsigned> output_bit_table,
