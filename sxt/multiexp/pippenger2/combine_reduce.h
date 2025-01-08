@@ -271,12 +271,13 @@ xena::future<> combine_reduce(basct::span<T> res, const basit::split_options& sp
                               unsigned element_num_bytes,
                               basct::cspan<T> partial_products) noexcept {
   auto num_outputs = res.size();
+  auto bit_width = element_num_bytes * 8u;
 
   if (res.empty()) {
     co_return;
   }
 
-  auto reduction_size = partial_products.size() / (num_outputs * element_num_bytes);
+  auto reduction_size = partial_products.size() / (num_outputs * bit_width);
 
   // don't split if partials are already in device memory
   if (basdv::is_active_device_pointer(partial_products.data())) {
@@ -287,21 +288,17 @@ xena::future<> combine_reduce(basct::span<T> res, const basit::split_options& sp
   // split
   auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, num_outputs}, split_options);
 
-#if 0
   // combine reduce
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](basit::index_range rng) noexcept -> xena::future<> {
         auto output_first = rng.a();
 
         auto res_chunk = res.subspan(output_first, rng.size());
-        auto bit_table_partial_sums_chunk =
-            basct::subspan(bit_table_partial_sums, output_first, rng.size());
-        auto partials_offset = output_first > 0 ? bit_table_partial_sums[output_first - 1] : 0u;
+        auto partials_offset = output_first * bit_width;
 
-        co_await combine_reduce_chunk(res_chunk, bit_table_partial_sums_chunk, partial_products,
+        co_await combine_reduce_chunk(res_chunk, element_num_bytes, partial_products,
                                       reduction_size, partials_offset);
       });
-#endif
 }
 #pragma clang diagnostic pop
 
