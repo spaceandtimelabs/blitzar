@@ -91,16 +91,16 @@ TEST_CASE("we can combine and reduce partial products with outputs of fixed size
     REQUIRE(res[1] == 4u);
   }
 
-#if 0
   SECTION("we can combine and reduce in chunks") {
-    output_bit_table = {1, 1};
-    partial_products = {3u, 4u};
+    partial_products.resize(16);
+    partial_products[0] = 3u;
+    partial_products[8] = 4u;
     res.resize(2);
     basit::split_options split_options{
         .max_chunk_size = 1u,
         .split_factor = 2u,
     };
-    auto fut = combine_reduce<E>(res, split_options, output_bit_table, partial_products);
+    auto fut = combine_reduce<E>(res, split_options, element_num_bytes, partial_products);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 3u);
@@ -184,5 +184,4 @@ TEST_CASE("we can combine and reduce partial products with outputs of varying si
     REQUIRE(res[0] == 3u);
     REQUIRE(res[1] == 4u);
   }
-#endif
 }
