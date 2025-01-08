@@ -201,8 +201,8 @@ xena::future<> combine_reduce_chunk(basct::span<T> res, unsigned element_num_byt
                // clang-format on
   ] __device__
            __host__(unsigned /*num_outputs*/, unsigned output_index) noexcept {
-             combine_reduce_output(res + output_index, partials + bit_width, num_partials,
-                                   reduction_size, bit_width);
+             combine_reduce_output(res + output_index, partials + bit_width * (output_index + 1u),
+                                   num_partials, reduction_size, bit_width);
            };
   algi::launch_for_each_kernel(stream, f, num_outputs);
   basdv::async_copy_device_to_host(res, res_dev, stream);
