@@ -170,7 +170,7 @@ xena::future<> combine_reduce_chunk(basct::span<T> res, unsigned element_num_byt
       num_outputs > 0 &&
       res.size() == num_outputs &&
       partial_products.size() == num_partials * reduction_size &&
-      partials_offset < num_outputs * element_num_bytes
+      partials_offset < num_outputs * bit_width
       // clang-format on
   );
   basdv::stream stream;

@@ -59,36 +59,39 @@ TEST_CASE("we can combine and reduce partial products with outputs of fixed size
     REQUIRE(res[0] == 3u);
   }
 
-#if 0
   SECTION("we can combine and reduce a single output with a reduction size of two") {
-    output_bit_table = {1};
-    partial_products = {3u, 4u};
-    auto fut = combine_reduce<E>(res, output_bit_table, partial_products);
+    partial_products.resize(16);
+    partial_products[0] = 3u;
+    partial_products[8] = 4u;
+    auto fut = combine_reduce<E>(res, element_num_bytes, partial_products);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 7u);
   }
 
-  SECTION("we can combine and reduce an output with a bit width of 2") {
-    output_bit_table = {2};
-    partial_products = {3u, 4u};
-    auto fut = combine_reduce<E>(res, output_bit_table, partial_products);
+  SECTION("we can combine and reduce an output with a bit width of 8") {
+    partial_products.resize(8);
+    partial_products[0] = 3u;
+    partial_products[1] = 4u;
+    auto fut = combine_reduce<E>(res, element_num_bytes, partial_products);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(res[0] == 11u);
   }
 
-  SECTION("we can combine and reduce multiple outputs") {
-    output_bit_table = {1, 1};
-    partial_products = {3u, 4u};
-    res.resize(2);
-    auto fut = combine_reduce<E>(res, output_bit_table, partial_products);
-    xens::get_scheduler().run();
-    REQUIRE(fut.ready());
-    REQUIRE(res[0] == 3u);
-    REQUIRE(res[1] == 4u);
-  }
+  /* SECTION("we can combine and reduce multiple outputs") { */
+  /*   partial_products.resize(16); */
+  /*   partial_products[0] = 3u; */
+  /*   partial_products[8] = 4u; */
+  /*   res.resize(2); */
+  /*   auto fut = combine_reduce<E>(res, element_num_bytes, partial_products); */
+  /*   xens::get_scheduler().run(); */
+  /*   REQUIRE(fut.ready()); */
+  /*   REQUIRE(res[0] == 3u); */
+  /*   REQUIRE(res[1] == 4u); */
+  /* } */
 
+#if 0
   SECTION("we can combine and reduce in chunks") {
     output_bit_table = {1, 1};
     partial_products = {3u, 4u};
