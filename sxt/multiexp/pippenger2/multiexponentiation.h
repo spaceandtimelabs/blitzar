@@ -107,11 +107,10 @@ multiexponentiate_product_step(basct::span<T> products, basdv::stream& reduction
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
-xena::future<> multiexponentiate_impl_single_chunk(basct::span<T> res,
-                                                   const partition_table_accessor<U>& accessor,
-                                                   unsigned element_num_bytes,
-                                                   basct::cspan<uint8_t> scalars, unsigned n,
-                                                   unsigned num_products) noexcept {
+xena::future<>
+multiexponentiate_impl_single_chunk(basct::span<T> res, const partition_table_accessor<U>& accessor,
+                                    unsigned element_num_bytes, basct::cspan<uint8_t> scalars,
+                                    unsigned n, unsigned num_products) noexcept {
   memmg::managed_array<T> partial_products_dev{num_products, memr::get_device_resource()};
   co_await async_partition_product<T>(partial_products_dev, accessor, scalars, 0);
   co_await combine_reduce<T>(res, element_num_bytes, partial_products_dev);
@@ -126,43 +125,6 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
                                       const partition_table_accessor<U>& accessor,
                                       unsigned element_num_bytes, basct::cspan<uint8_t> scalars,
                                       const basit::split_options& split_options) noexcept {
-  auto num_outputs = res.size();
-  auto num_products = num_outputs * element_num_bytes * 8u;
-  SXT_DEBUG_ASSERT(
-      // clang-format off
-      scalars.size() % (num_outputs * element_num_bytes) == 0
-      // clang-format on
-  );
-
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<T> products{num_products, &resource};
-  co_await multiexponentiate_product_step<T>(
-      products, stream, accessor, num_outputs * element_num_bytes, scalars, split_options);
-
-  // reduce the products
-  basl::info("reducing products for {} outputs", num_outputs);
-  memmg::managed_array<T> res_dev{num_outputs, &resource};
-  reduce_products<T>(res_dev, stream, products);
-  products.reset();
-  basl::info("completed {} reductions", num_outputs);
-
-  // copy result
-  basdv::async_copy_device_to_host(res, res_dev, stream);
-  co_await xendv::await_stream(stream);
-  basl::info("complete multiexponentiation");
-}
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
-template <bascrv::element T, class U>
-  requires std::constructible_from<T, U>
-xena::future<> multiexponentiate_impl2(basct::span<T> res,
-                                       const partition_table_accessor<U>& accessor,
-                                       unsigned element_num_bytes, basct::cspan<uint8_t> scalars,
-                                       const basit::split_options& split_options) noexcept {
   auto num_outputs = res.size();
   if (num_outputs == 0) {
     co_return;
@@ -217,7 +179,6 @@ xena::future<> multiexponentiate_impl2(basct::span<T> res,
   basl::info("combining {} partial product chunks", num_chunks);
   co_await combine_reduce<T>(res, element_num_bytes, partial_products);
 }
-#pragma clang diagnostic pop
 
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
@@ -272,19 +233,6 @@ async_multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& a
       .split_factor = basdv::get_num_devices(),
   };
   return multiexponentiate_impl(res, accessor, element_num_bytes, scalars, split_options);
-}
-
-template <bascrv::element T, class U>
-  requires std::constructible_from<T, U>
-xena::future<>
-async_multiexponentiate2(basct::span<T> res, const partition_table_accessor<U>& accessor,
-                         unsigned element_num_bytes, basct::cspan<uint8_t> scalars) noexcept {
-  basit::split_options split_options{
-      .min_chunk_size = 64,
-      .max_chunk_size = 1024,
-      .split_factor = basdv::get_num_devices(),
-  };
-  return multiexponentiate_impl2(res, accessor, element_num_bytes, scalars, split_options);
 }
 
 template <bascrv::element T, class U>
