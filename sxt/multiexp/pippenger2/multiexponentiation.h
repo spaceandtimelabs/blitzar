@@ -136,7 +136,7 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
 xena::future<>
-multiexponentiate_impl2(basct::span<T> res, const partition_table_accessor<U>& accessor,
+multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& accessor,
                        basct::cspan<unsigned> output_bit_table, basct::cspan<uint8_t> scalars,
                        const basit::split_options& split_options) noexcept {
   auto num_outputs = res.size();
@@ -229,7 +229,7 @@ xena::future<> async_multiexponentiate(basct::span<T> res,
       .max_chunk_size = 1024,
       .split_factor = basdv::get_num_devices(),
   };
-  return multiexponentiate_impl2(res, accessor, output_bit_table, scalars, split_options);
+  return multiexponentiate_impl(res, accessor, output_bit_table, scalars, split_options);
 }
 
 //--------------------------------------------------------------------------------------------------
