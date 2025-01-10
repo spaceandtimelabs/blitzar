@@ -130,6 +130,7 @@ xena::future<> multiexponentiate_impl(basct::span<T> res,
   // combine the partial products
   basl::info("combining {} partial product chunks", num_chunks);
   co_await combine_reduce<T>(res, element_num_bytes, partial_products);
+  basl::info("complete multiexponentiation");
 }
 
 template <bascrv::element T, class U>

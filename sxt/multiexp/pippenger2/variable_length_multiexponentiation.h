@@ -30,7 +30,6 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
-#include "sxt/multiexp/pippenger2/combination.h"
 #include "sxt/multiexp/pippenger2/combine_reduce.h"
 #include "sxt/multiexp/pippenger2/partition_product.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
@@ -158,6 +157,7 @@ xena::future<> multiexponentiate_impl(basct::span<T> res, const basit::split_opt
   // combine the partial products
   basl::info("combining {} partial product chunks", num_chunks);
   co_await combine_reduce<T>(res, output_bit_table, partial_products);
+  basl::info("complete multiexponentiation");
 }
 
 //--------------------------------------------------------------------------------------------------

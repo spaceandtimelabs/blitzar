@@ -15,32 +15,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "combination",
-    test_deps = [
-        "//sxt/base/curve:example_element",
-        "//sxt/base/device:stream",
-        "//sxt/base/device:synchronization",
-        "//sxt/base/test:unit_test",
-        "//sxt/execution/schedule:scheduler",
-        "//sxt/memory/resource:managed_device_resource",
-    ],
-    deps = [
-        "//sxt/algorithm/iteration:for_each",
-        "//sxt/base/container:span",
-        "//sxt/base/container:span_utility",
-        "//sxt/base/curve:element",
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/error:assert",
-        "//sxt/base/macro:cuda_callable",
-        "//sxt/base/type:raw_stream",
-        "//sxt/execution/async:coroutine",
-        "//sxt/execution/device:synchronization",
-        "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:async_device_resource",
-    ],
-)
-
-sxt_cc_component(
     name = "combine_reduce",
     test_deps = [
         "//sxt/base/curve:example_element",
@@ -259,7 +233,6 @@ sxt_cc_component(
         "//sxt/ristretto/random:element",
     ],
     deps = [
-        ":combination",
         ":combine_reduce",
         ":partition_table_accessor",
         ":reduce",
