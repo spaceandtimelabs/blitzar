@@ -231,7 +231,6 @@ xena::future<>
 multiexponentiate_impl2(basct::span<T> res, const partition_table_accessor<U>& accessor,
                        basct::cspan<unsigned> output_bit_table, basct::cspan<uint8_t> scalars,
                        const basit::split_options& split_options) noexcept {
-  co_return;
   auto num_outputs = res.size();
   auto num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0u);
   auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
@@ -313,7 +312,7 @@ async_multiexponentiate(basct::span<T> res, const partition_table_accessor<U>& a
 
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
-xena::future<> async_multiexponentiate(basct::span<T> res,
+xena::future<> async_multiexponentiateX(basct::span<T> res,
                                        const partition_table_accessor<U>& accessor,
                                        basct::cspan<unsigned> output_bit_table,
                                        basct::cspan<uint8_t> scalars) noexcept {
@@ -327,7 +326,7 @@ xena::future<> async_multiexponentiate(basct::span<T> res,
 
 template <bascrv::element T, class U>
   requires std::constructible_from<T, U>
-xena::future<> async_multiexponentiate2(basct::span<T> res,
+xena::future<> async_multiexponentiate(basct::span<T> res,
                                        const partition_table_accessor<U>& accessor,
                                        basct::cspan<unsigned> output_bit_table,
                                        basct::cspan<uint8_t> scalars) noexcept {
