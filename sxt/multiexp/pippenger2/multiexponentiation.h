@@ -36,7 +36,6 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/memory/resource/pinned_resource.h"
-#include "sxt/multiexp/pippenger2/combination.h"
 #include "sxt/multiexp/pippenger2/combine_reduce.h"
 #include "sxt/multiexp/pippenger2/partition_product.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
