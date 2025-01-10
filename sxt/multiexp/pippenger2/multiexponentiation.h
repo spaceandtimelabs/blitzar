@@ -235,7 +235,6 @@ multiexponentiate_impl2(basct::span<T> res, const partition_table_accessor<U>& a
   if (num_outputs == 0) {
     co_return;
   }
-#if 0
   auto n = scalars.size() / num_output_bytes;
   auto window_width = accessor.window_width();
 
@@ -252,8 +251,10 @@ multiexponentiate_impl2(basct::span<T> res, const partition_table_accessor<U>& a
 
   // handle special case of a single chunk
   if (num_chunks == 1) {
-    co_return co_await multiexponentiate_impl_single_chunk(res, accessor, element_num_bytes,
-                                                           scalars, n, num_products);
+    // TODO handle single chunk
+    co_return;
+    /* co_return co_await multiexponentiate_impl_single_chunk(res, accessor, element_num_bytes, */
+    /*                                                        scalars, n, num_products); */
   }
 
   // handle multiple chunks
@@ -261,6 +262,8 @@ multiexponentiate_impl2(basct::span<T> res, const partition_table_accessor<U>& a
   size_t chunk_index = 0;
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
+      co_return;
+#if 0
         basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
                    rng.a(), rng.b(), basdv::get_device());
         memmg::managed_array<T> partial_products_dev{num_products, memr::get_device_resource()};
@@ -273,12 +276,12 @@ multiexponentiate_impl2(basct::span<T> res, const partition_table_accessor<U>& a
             partial_products_dev, stream);
         ++chunk_index;
         co_await xendv::await_stream(stream);
+#endif
       });
 
   // combine the partial products
   basl::info("combining {} partial product chunks", num_chunks);
-  co_await combine_reduce<T>(res, element_num_bytes, partial_products);
-#endif
+  co_await combine_reduce<T>(res, output_bit_table, partial_products);
   // old
 #if 0
   auto num_outputs = res.size();
