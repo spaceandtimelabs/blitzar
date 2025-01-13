@@ -180,11 +180,6 @@ sxt_cc_component(
 sxt_cc_component(
     name = "generate",
     impl_deps = [
-        # ":synchronization",
-        # "//sxt/base/device:pinned_buffer",
-        # "//sxt/base/device:memory_utility",
-        # "//sxt/base/device:stream",
-        # "//sxt/execution/async:coroutine",
     ],
     test_deps = [
         # "//sxt/base/device:pinned_buffer",
@@ -195,9 +190,14 @@ sxt_cc_component(
         # "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
-        # "//sxt/base/container:span",
-        # "//sxt/base/error:assert",
-        # "//sxt/execution/async:future",
+        ":synchronization",
+        "//sxt/base/device:pinned_buffer",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/execution/async:coroutine",
+        "//sxt/base/container:span",
+        "//sxt/base/error:assert",
+        "//sxt/execution/async:future",
     ],
 )
 
