@@ -9,6 +9,33 @@
 
 namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
+// generate_to_device_one_sweep
+//--------------------------------------------------------------------------------------------------
+template <class T, class F>
+  requires requires(basct::span<T> buf, F f, size_t i) {
+    { f(buf, i) } noexcept;
+  }
+xena::future<> generate_to_device_one_sweep(basct::span<T> dst, const basdv::stream& stream,
+                                            F f) noexcept {
+  auto n = dst.size();
+  auto num_bytes = n * sizeof(T);
+  SXT_RELEASE_ASSERT(
+      // clang-format off
+      basdv::is_active_device_pointer(dst) &&
+      num_bytes <= basdv::pinned_buffer::size()
+      // clang-format on
+  );
+  if (num_bytes == 0) {
+    co_return;
+  }
+  basdv::pinned_buffer buffer;
+  auto data = static_cast<T*>(buffer.data());
+  f(basct::span<T>{data, n}, 0u);
+  basdv::async_memcpy_host_to_device(static_cast<void*>(dst), buffer.data(), num_bytes, stream);
+  co_await await_stream(stream);
+}
+
+//--------------------------------------------------------------------------------------------------
 // generate_to_device
 //--------------------------------------------------------------------------------------------------
 #pragma clang diagnostic push
@@ -19,18 +46,17 @@ template <class T, class F>
   requires requires(T& dst, F f, size_t i) { dst = f(i, i); }
 xena::future<> generate_to_device(basct::span<T> dst, const basdv::stream& stream, F f) noexcept {
   auto n = dst.size();
-  return {};
   SXT_RELEASE_ASSERT(
       // clang-format off
       basdv::is_active_device_pointer(dst) &&
       sizeof(T) < basdv::pinned_buffer::size()
       // clang-format on
   );
-#if 0
-  auto num_bytes = n * count;
+  auto num_bytes = n * sizeof(T);
   if (num_bytes <= basdv::pinned_buffer::size()) {
-    co_return co_await strided_copy_host_to_device_one_sweep(dst, stream, src, n, count, stride);
+    co_return co_await generate_to_device_one_sweep(dst, stream, f);
   }
+#if 0
   auto cur_n = n;
 
   auto fill_buffer = [&](basdv::pinned_buffer& buffer) noexcept {
