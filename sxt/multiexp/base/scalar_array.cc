@@ -93,14 +93,30 @@ static __global__ void transpose_kernel(uint8_t* __restrict__ dst,
 //--------------------------------------------------------------------------------------------------
 // transpose_scalars 
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 void transpose_scalars(basct::span<uint8_t> array, const uint8_t* scalars,
-                       unsigned element_num_bytes, size_t offset) noexcept {
+                       unsigned element_num_bytes, unsigned n, size_t offset) noexcept {
+  auto remaining_size = array.size();
+  auto byte_index = offset / n;
+
+  // copy for first byte position
+  auto byte_offset = static_cast<unsigned>(offset - byte_index * n);
+  auto chunk_size = std::min(static_cast<size_t>(n - byte_offset), remaining_size);
+  auto out = array.data();
+  for (unsigned i=0; i<chunk_size; ++i) {
+    *out++ = *(scalars + byte_index + i * element_num_bytes);
+  }
+  remaining_size -= chunk_size;
+
+  // copy remaining byte positions
+  while (remaining_size > 0) {
+    ++byte_index;
+    auto chunk_size = std::min(static_cast<size_t>(n), remaining_size);
+    for (unsigned i = 0; i < chunk_size; ++i) {
+      *out++ = *(scalars + byte_index + i * element_num_bytes);
+    }
+    remaining_size -= chunk_size;
+  }
 }
-#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // transpose_scalars_to_device
@@ -161,14 +177,14 @@ xena::future<> transpose_scalars_to_device2(basct::span<uint8_t> array,
     auto output_index = index / bytes_per_output;
     auto offset = index - output_index * bytes_per_output;
     auto chunk_size = std::min(bytes_per_output - offset, remaining_bytes);
-    transpose_scalars(buffer.subspan(0, chunk_size), scalars[output_index], element_num_bytes,
+    transpose_scalars(buffer.subspan(0, chunk_size), scalars[output_index], element_num_bytes, n,
                       offset);
     remaining_bytes -= chunk_size;
     while (remaining_bytes > 0) {
       ++output_index;
       chunk_size = std::min(bytes_per_output, remaining_bytes);
       transpose_scalars(buffer.subspan(buffer.size() - remaining_bytes, chunk_size),
-                        scalars[output_index], element_num_bytes, 0);
+                        scalars[output_index], element_num_bytes, n, 0);
       remaining_bytes -= chunk_size;
     }
   };
