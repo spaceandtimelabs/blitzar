@@ -49,4 +49,14 @@ TEST_CASE("we can generate an array into device memory") {
     REQUIRE(dst[0] == 0);
     REQUIRE(dst[1] == 1);
   }
+
+  SECTION("we can generate ints") {
+    std::pmr::vector<int> dst_p{2, memr::get_managed_device_resource()};
+    auto fut = generate_to_device<int>(dst_p, stream, f);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    REQUIRE(dst_p[0] == 0);
+    REQUIRE(dst_p[1] == 1);
+  }
 }
