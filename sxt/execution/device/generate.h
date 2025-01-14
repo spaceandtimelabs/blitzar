@@ -17,21 +17,22 @@ template <class T, class F>
   }
 xena::future<> generate_to_device_one_sweep(basct::span<T> dst, const basdv::stream& stream,
                                             F f) noexcept {
+  if (dst.empty()) {
+    co_return;
+  }
   auto n = dst.size();
   auto num_bytes = n * sizeof(T);
   SXT_RELEASE_ASSERT(
       // clang-format off
-      basdv::is_active_device_pointer(dst) &&
+      basdv::is_active_device_pointer(dst.data()) &&
       num_bytes <= basdv::pinned_buffer::size()
       // clang-format on
   );
-  if (num_bytes == 0) {
-    co_return;
-  }
   basdv::pinned_buffer buffer;
   auto data = static_cast<T*>(buffer.data());
   f(basct::span<T>{data, n}, 0u);
-  basdv::async_memcpy_host_to_device(static_cast<void*>(dst), buffer.data(), num_bytes, stream);
+  basdv::async_memcpy_host_to_device(static_cast<void*>(dst.data()), buffer.data(), num_bytes,
+                                     stream);
   co_await await_stream(stream);
 }
 
@@ -43,10 +44,13 @@ template <class T, class F>
     { f(buffer, i) } noexcept;
   }
 xena::future<> generate_to_device(basct::span<T> dst, const basdv::stream& stream, F f) noexcept {
+  if (dst.empty()) {
+    co_return;
+  }
   auto n = dst.size();
   SXT_RELEASE_ASSERT(
       // clang-format off
-      basdv::is_active_device_pointer(dst) &&
+      basdv::is_active_device_pointer(dst.data()) &&
       sizeof(T) < basdv::pinned_buffer::size()
       // clang-format on
   );
@@ -59,7 +63,7 @@ xena::future<> generate_to_device(basct::span<T> dst, const basdv::stream& strea
 
   auto fill_buffer = [&](basdv::pinned_buffer& buffer) noexcept {
     size_t remaining_size = buffer.size();
-    auto data = static_cast<std::byte*>(buffer.data());
+    auto data = static_cast<T*>(buffer.data());
     while (remaining_size > 0 && pos < n) {
       auto chunk_size = std::min(remaining_size / sizeof(T), n - pos);
       if (chunk_size == 0) {

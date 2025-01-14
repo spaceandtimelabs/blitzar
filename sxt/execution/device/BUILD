@@ -182,12 +182,12 @@ sxt_cc_component(
     impl_deps = [
     ],
     test_deps = [
-        # "//sxt/base/device:pinned_buffer",
-        # "//sxt/base/device:stream",
-        # "//sxt/base/device:synchronization",
+        "//sxt/base/device:pinned_buffer",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
-        # "//sxt/execution/schedule:scheduler",
-        # "//sxt/memory/resource:managed_device_resource",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
     ],
     deps = [
         ":synchronization",
