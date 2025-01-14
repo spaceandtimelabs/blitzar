@@ -30,4 +30,23 @@ TEST_CASE("we can generate an array into device memory") {
     auto fut = generate_to_device<uint8_t>(dst, stream, f);
     REQUIRE(fut.ready());
   }
+
+  SECTION("we can generate a single element") {
+    dst.resize(1);
+    auto fut = generate_to_device<uint8_t>(dst, stream, f);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    REQUIRE(dst[0] == 0);
+  }
+
+  SECTION("we can generate two elements") {
+    dst.resize(2);
+    auto fut = generate_to_device<uint8_t>(dst, stream, f);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    REQUIRE(dst[0] == 0);
+    REQUIRE(dst[1] == 1);
+  }
 }
