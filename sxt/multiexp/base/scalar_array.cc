@@ -141,10 +141,6 @@ xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
   co_await xendv::await_stream(std::move(stream));
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 xena::future<> transpose_scalars_to_device2(basct::span<uint8_t> array,
                                             basct::cspan<const uint8_t*> scalars,
                                             unsigned element_num_bytes, unsigned n) noexcept {
@@ -176,6 +172,7 @@ xena::future<> transpose_scalars_to_device2(basct::span<uint8_t> array,
       remaining_bytes -= chunk_size;
     }
   };
+  basdv::stream stream;
+  co_await xendv::generate_to_device(array.subspan(0, num_outputs * bytes_per_output), stream, f);
 }
-#pragma clang diagnostic pop
 } // namespace sxt::mtxb
