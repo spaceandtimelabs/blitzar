@@ -15,7 +15,7 @@ using namespace sxt;
 using namespace sxt::xendv;
 
 TEST_CASE("we can generate an array into device memory") {
-  /* const auto bufsize = basdv::pinned_buffer::size(); */
+  const auto bufsize = basdv::pinned_buffer::size();
   std::pmr::vector<uint8_t> dst{memr::get_managed_device_resource()};
 
   basdv::stream stream;
@@ -58,5 +58,16 @@ TEST_CASE("we can generate an array into device memory") {
     basdv::synchronize_device();
     REQUIRE(dst_p[0] == 0);
     REQUIRE(dst_p[1] == 1);
+  }
+
+  SECTION("we can generate elements larger than the buffersize") {
+    std::pmr::vector<int> dst_p{bufsize, memr::get_managed_device_resource()};
+    auto fut = generate_to_device<int>(dst_p, stream, f);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    for (int i=0; i<bufsize; ++i) {
+      REQUIRE(dst_p[i] == i);
+    }
   }
 }
