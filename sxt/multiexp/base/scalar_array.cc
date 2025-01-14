@@ -16,6 +16,7 @@
  */
 #include "sxt/multiexp/base/scalar_array.h"
 
+#include <strings.h>
 #include <vector>
 
 #include "cub/cub.cuh"
@@ -26,6 +27,7 @@
 #include "sxt/base/num/constexpr_switch.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/generate.h"
 #include "sxt/execution/device/synchronization.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
@@ -89,6 +91,18 @@ static __global__ void transpose_kernel(uint8_t* __restrict__ dst,
 }
 
 //--------------------------------------------------------------------------------------------------
+// transpose_scalars 
+//--------------------------------------------------------------------------------------------------
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+void transpose_scalars(basct::span<uint8_t> array, const uint8_t* scalars,
+                       unsigned element_num_bytes, size_t offset) noexcept {
+}
+#pragma clang diagnostic pop
+
+//--------------------------------------------------------------------------------------------------
 // transpose_scalars_to_device
 //--------------------------------------------------------------------------------------------------
 xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
@@ -126,4 +140,42 @@ xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
       });
   co_await xendv::await_stream(std::move(stream));
 }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+xena::future<> transpose_scalars_to_device2(basct::span<uint8_t> array,
+                                            basct::cspan<const uint8_t*> scalars,
+                                            unsigned element_num_bytes, unsigned n) noexcept {
+  auto num_outputs = static_cast<unsigned>(scalars.size());
+  size_t bytes_per_output = element_num_bytes * n;
+  if (n == 0 || num_outputs == 0) {
+    co_return;
+  }
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      array.size() == num_outputs * bytes_per_output &&
+      basdv::is_active_device_pointer(array.data()) &&
+      basdv::is_host_pointer(scalars[0])
+      // clang-format on
+  );
+  auto f = [&](basct::span<uint8_t> buffer, size_t index) noexcept {
+    auto remaining_bytes = buffer.size();
+    auto output_index = index / bytes_per_output;
+    auto offset = index - output_index * bytes_per_output;
+    auto chunk_size = std::min(bytes_per_output - offset, remaining_bytes);
+    transpose_scalars(buffer.subspan(0, chunk_size), scalars[output_index], element_num_bytes,
+                      offset);
+    remaining_bytes -= chunk_size;
+    while (remaining_bytes > 0) {
+      ++output_index;
+      chunk_size = std::min(bytes_per_output, remaining_bytes);
+      transpose_scalars(buffer.subspan(buffer.size() - remaining_bytes, chunk_size),
+                        scalars[output_index], element_num_bytes, 0);
+      remaining_bytes -= chunk_size;
+    }
+  };
+}
+#pragma clang diagnostic pop
 } // namespace sxt::mtxb

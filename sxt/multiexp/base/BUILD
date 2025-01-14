@@ -56,6 +56,7 @@ sxt_cc_component(
         "//sxt/base/num:divide_up",
         "//sxt/execution/async:future",
         "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:generate",
         "//sxt/execution/device:synchronization",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
