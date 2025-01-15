@@ -204,8 +204,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "copy",
     impl_deps = [
-        ":synchronization",
-        "//sxt/base/device:pinned_buffer",
+        ":generate",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/execution/async:coroutine",
