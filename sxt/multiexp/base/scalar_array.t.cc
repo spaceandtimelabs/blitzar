@@ -30,6 +30,43 @@
 
 using namespace sxt;
 using namespace sxt::mtxb;
+/* void transpose_scalars(basct::span<uint8_t> array, const uint8_t* scalars, */
+/*                        unsigned element_num_bytes, size_t offset) noexcept; */
+TEST_CASE("we can transpose scalars") {
+  std::vector<uint8_t> array;
+  std::vector<uint8_t> scalars;
+
+  SECTION("we handle a single scalar") {
+    scalars = {123};
+    array.resize(scalars.size());
+    transpose_scalars(array, scalars.data(), 1, 1, 0);
+    REQUIRE(array[0] == scalars[0]);
+  }
+
+  SECTION("we handle transposing scalars of two bytes") {
+    scalars = {1, 2, 3, 4};
+    array.resize(scalars.size());
+    transpose_scalars(array, scalars.data(), 2, 2, 0);
+    std::vector<uint8_t> expected = {1, 3, 2, 4};
+    REQUIRE(array == expected);
+  }
+
+  SECTION("we handle transpose with an offset") {
+    scalars = {1, 2, 3, 4};
+    array.resize(scalars.size() - 1u);
+    transpose_scalars(array, scalars.data(), 2, 2, 1);
+    std::vector<uint8_t> expected = {3, 2, 4};
+    REQUIRE(array == expected);
+  }
+
+  SECTION("we can do a partial transpose") {
+    scalars = {1, 2, 3, 4};
+    array.resize(scalars.size() - 1u);
+    transpose_scalars(array, scalars.data(), 2, 2, 0);
+    std::vector<uint8_t> expected = {1, 3, 2};
+    REQUIRE(array == expected);
+  }
+}
 
 TEST_CASE("we can copy transpose scalar arrays to device memory") {
   memmg::managed_array<uint8_t> array{memr::get_managed_device_resource()};

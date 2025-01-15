@@ -41,7 +41,7 @@ void transpose_scalars(basct::span<uint8_t> array, const uint8_t* scalars,
   auto chunk_size = std::min(static_cast<size_t>(n - byte_offset), remaining_size);
   auto out = array.data();
   for (unsigned i = 0; i < chunk_size; ++i) {
-    *out++ = *(scalars + byte_index + i * element_num_bytes);
+    *out++ = *(scalars + byte_index + (i + byte_offset) * element_num_bytes);
   }
   remaining_size -= chunk_size;
 

@@ -26,7 +26,7 @@ namespace sxt::mtxb {
 // transpose_scalars
 //--------------------------------------------------------------------------------------------------
 void transpose_scalars(basct::span<uint8_t> array, const uint8_t* scalars,
-                       unsigned element_num_bytes, size_t offset) noexcept;
+                       unsigned element_num_bytes, unsigned n, size_t offset) noexcept;
 
 //--------------------------------------------------------------------------------------------------
 // transpose_scalars_to_device
