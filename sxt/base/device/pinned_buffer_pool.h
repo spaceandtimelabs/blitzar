@@ -36,7 +36,7 @@ public:
   pinned_buffer_pool(pinned_buffer_pool&&) = delete;
   pinned_buffer_pool& operator=(const pinned_buffer_pool&) = delete;
 
-  pinned_buffer_handle* aquire_handle() noexcept;
+  pinned_buffer_handle* acquire_handle() noexcept;
 
   void release_handle(pinned_buffer_handle* handle) noexcept;
 
