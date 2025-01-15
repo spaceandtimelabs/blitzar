@@ -191,12 +191,12 @@ sxt_cc_component(
     ],
     deps = [
         ":synchronization",
-        "//sxt/base/device:pinned_buffer",
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/device:stream",
-        "//sxt/execution/async:coroutine",
         "//sxt/base/container:span",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:pinned_buffer",
+        "//sxt/base/device:stream",
         "//sxt/base/error:assert",
+        "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
     ],
 )

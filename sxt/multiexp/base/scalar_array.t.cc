@@ -16,6 +16,7 @@
  */
 #include "sxt/multiexp/base/scalar_array.h"
 
+#include <iostream>
 #include <numeric>
 #include <vector>
 
@@ -118,5 +119,24 @@ TEST_CASE("we can copy transpose scalar arrays to device memory") {
     REQUIRE(array[3] == 33u);
     REQUIRE(array[62] == 31u);
     REQUIRE(array[63] == 63u);
+  }
+
+  SECTION("problem case") {
+    size_t n = 2049;
+    /* size_t n = 2048; */
+    std::vector<uint8_t> scalars1(n * 32u);
+    std::iota(scalars1.begin(), scalars1.end(), 0);
+    array.resize(scalars1.size());
+    std::vector<const uint8_t*> scalars = {scalars1.data()};
+    auto fut = transpose_scalars_to_device(array, scalars, 32, n);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    std::cerr << "array[0] = " << static_cast<unsigned>(array[0]) << "\n";
+    std::cerr << "array[1] = " << static_cast<unsigned>(array[1]) << "\n";
+    std::cerr << "array[2] = " << static_cast<unsigned>(array[2]) << "\n";
+    std::cerr << "array[end] = " << static_cast<unsigned>(array[array.size() - 1]) << "\n";
+    std::cerr << "array[end] = " << static_cast<unsigned>(array[array.size() - 2]) << "\n";
+    std::cerr << "array[end] = " << static_cast<unsigned>(array[array.size() - 3]) << "\n";
+    std::cerr << "array[end] = " << static_cast<unsigned>(array[array.size() - 4]) << "\n";
   }
 }
