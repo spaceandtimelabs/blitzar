@@ -123,7 +123,6 @@ TEST_CASE("we can copy transpose scalar arrays to device memory") {
 
   SECTION("problem case") {
     size_t n = 2049;
-    /* size_t n = 2048; */
     std::vector<uint8_t> scalars1(n * 32u);
     std::iota(scalars1.begin(), scalars1.end(), 0);
     array.resize(scalars1.size());
@@ -131,12 +130,8 @@ TEST_CASE("we can copy transpose scalar arrays to device memory") {
     auto fut = transpose_scalars_to_device(array, scalars, 32, n);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
-    std::cerr << "array[0] = " << static_cast<unsigned>(array[0]) << "\n";
-    std::cerr << "array[1] = " << static_cast<unsigned>(array[1]) << "\n";
-    std::cerr << "array[2] = " << static_cast<unsigned>(array[2]) << "\n";
-    std::cerr << "array[end] = " << static_cast<unsigned>(array[array.size() - 1]) << "\n";
-    std::cerr << "array[end] = " << static_cast<unsigned>(array[array.size() - 2]) << "\n";
-    std::cerr << "array[end] = " << static_cast<unsigned>(array[array.size() - 3]) << "\n";
-    std::cerr << "array[end] = " << static_cast<unsigned>(array[array.size() - 4]) << "\n";
+    for (size_t i = 0; i < array.size(); ++i) {
+      REQUIRE(array[i] == static_cast<uint8_t>((i / n) + (i % n) * 32u));
+    }
   }
 }
