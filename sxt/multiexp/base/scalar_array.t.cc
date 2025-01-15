@@ -30,6 +30,42 @@
 using namespace sxt;
 using namespace sxt::mtxb;
 
+TEST_CASE("we can transpose scalars") {
+  std::vector<uint8_t> array;
+  std::vector<uint8_t> scalars;
+
+  SECTION("we handle a single scalar") {
+    scalars = {123};
+    array.resize(scalars.size());
+    transpose_scalars(array, scalars.data(), 1, 1, 0);
+    REQUIRE(array[0] == scalars[0]);
+  }
+
+  SECTION("we handle transposing scalars of two bytes") {
+    scalars = {1, 2, 3, 4};
+    array.resize(scalars.size());
+    transpose_scalars(array, scalars.data(), 2, 2, 0);
+    std::vector<uint8_t> expected = {1, 3, 2, 4};
+    REQUIRE(array == expected);
+  }
+
+  SECTION("we handle transpose with an offset") {
+    scalars = {1, 2, 3, 4};
+    array.resize(scalars.size() - 1u);
+    transpose_scalars(array, scalars.data(), 2, 2, 1);
+    std::vector<uint8_t> expected = {3, 2, 4};
+    REQUIRE(array == expected);
+  }
+
+  SECTION("we can do a partial transpose") {
+    scalars = {1, 2, 3, 4};
+    array.resize(scalars.size() - 1u);
+    transpose_scalars(array, scalars.data(), 2, 2, 0);
+    std::vector<uint8_t> expected = {1, 3, 2};
+    REQUIRE(array == expected);
+  }
+}
+
 TEST_CASE("we can copy transpose scalar arrays to device memory") {
   memmg::managed_array<uint8_t> array{memr::get_managed_device_resource()};
 
@@ -118,5 +154,19 @@ TEST_CASE("we can copy transpose scalar arrays to device memory") {
     REQUIRE(array[3] == 33u);
     REQUIRE(array[62] == 31u);
     REQUIRE(array[63] == 63u);
+  }
+
+  SECTION("problem case") {
+    size_t n = 2049;
+    std::vector<uint8_t> scalars1(n * 32u);
+    std::iota(scalars1.begin(), scalars1.end(), 0);
+    array.resize(scalars1.size());
+    std::vector<const uint8_t*> scalars = {scalars1.data()};
+    auto fut = transpose_scalars_to_device(array, scalars, 32, n);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    for (size_t i = 0; i < array.size(); ++i) {
+      REQUIRE(array[i] == static_cast<uint8_t>((i / n) + (i % n) * 32u));
+    }
   }
 }
