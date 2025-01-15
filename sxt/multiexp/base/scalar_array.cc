@@ -121,6 +121,7 @@ void transpose_scalars(basct::span<uint8_t> array, const uint8_t* scalars,
 //--------------------------------------------------------------------------------------------------
 // transpose_scalars_to_device
 //--------------------------------------------------------------------------------------------------
+#if 0
 xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
                                            basct::cspan<const uint8_t*> scalars,
                                            unsigned element_num_bytes, unsigned n) noexcept {
@@ -156,8 +157,9 @@ xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
       });
   co_await xendv::await_stream(std::move(stream));
 }
+#endif
 
-xena::future<> transpose_scalars_to_device2(basct::span<uint8_t> array,
+xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
                                             basct::cspan<const uint8_t*> scalars,
                                             unsigned element_num_bytes, unsigned n) noexcept {
   auto num_outputs = static_cast<unsigned>(scalars.size());
@@ -175,11 +177,15 @@ xena::future<> transpose_scalars_to_device2(basct::span<uint8_t> array,
   auto f = [&](basct::span<uint8_t> buffer, size_t index) noexcept {
     auto remaining_bytes = buffer.size();
     auto output_index = index / bytes_per_output;
+
+    // first output
     auto offset = index - output_index * bytes_per_output;
     auto chunk_size = std::min(bytes_per_output - offset, remaining_bytes);
     transpose_scalars(buffer.subspan(0, chunk_size), scalars[output_index], element_num_bytes, n,
                       offset);
     remaining_bytes -= chunk_size;
+
+    // remaining outputs
     while (remaining_bytes > 0) {
       ++output_index;
       chunk_size = std::min(bytes_per_output, remaining_bytes);
