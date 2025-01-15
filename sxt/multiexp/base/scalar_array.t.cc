@@ -29,8 +29,7 @@
 
 using namespace sxt;
 using namespace sxt::mtxb;
-/* void transpose_scalars(basct::span<uint8_t> array, const uint8_t* scalars, */
-/*                        unsigned element_num_bytes, size_t offset) noexcept; */
+
 TEST_CASE("we can transpose scalars") {
   std::vector<uint8_t> array;
   std::vector<uint8_t> scalars;
