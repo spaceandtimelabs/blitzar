@@ -16,7 +16,6 @@
  */
 #include "sxt/multiexp/base/scalar_array.h"
 
-#include <iostream>
 #include <numeric>
 #include <vector>
 
