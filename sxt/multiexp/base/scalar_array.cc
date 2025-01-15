@@ -20,18 +20,12 @@
 
 #include <vector>
 
-#include "cub/cub.cuh"
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
-#include "sxt/base/num/ceil_log2.h"
-#include "sxt/base/num/constexpr_switch.h"
-#include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/generate.h"
 #include "sxt/execution/device/synchronization.h"
-#include "sxt/memory/management/managed_array.h"
-#include "sxt/memory/resource/async_device_resource.h"
 
 namespace sxt::mtxb {
 //--------------------------------------------------------------------------------------------------
