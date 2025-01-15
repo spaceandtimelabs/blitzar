@@ -104,7 +104,7 @@ Although the primary goal of this library is to provide GPU acceleration for cry
 
 #### Multi-Scalar Multiplication (MSM) / Generalized Pedersen Commitment / Multiexponentiation
 
-Blitzar provides an implementation of Multi-Scalar Multiplication (i.e. generalized Pedersen commitments)
+Blitzar provides an implementation of Multi-Scalar Multiplication (i.e. generalized Pedersen commitments).
 
 Let $g_0\ldots g_n\in \mathbb{G}$ be elements of a group (with prime order), and let $a_0\ldots a_n\in\mathbb{F}$ be elements of the corresponding scalar field. (i.e. the field $\mathbb{F}_p$ where $p$ is the order of the group.)
 
@@ -181,7 +181,7 @@ See the [example](./example) folder for some examples.
 
 Prerequisites:
 * `x86_64` Linux instance.
-* Nix with flake support (check out [The Determinate Nix Installer](https://github.com/DeterminateSystems/nix-installer))
+* Nix with flake support (check out [The Determinate Nix Installer](https://github.com/DeterminateSystems/nix-installer)).
 * Nvidia GPU capable of running CUDA 12.6 code.
 
 From your terminal, run the following command in the root of the source directory to set
