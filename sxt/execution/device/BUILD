@@ -178,10 +178,33 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "generate",
+    impl_deps = [
+    ],
+    test_deps = [
+        "//sxt/base/device:pinned_buffer",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+        ":synchronization",
+        "//sxt/base/container:span",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:pinned_buffer",
+        "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+    ],
+)
+
+sxt_cc_component(
     name = "copy",
     impl_deps = [
-        ":synchronization",
-        "//sxt/base/device:pinned_buffer",
+        ":generate",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/execution/async:coroutine",
