@@ -26,7 +26,7 @@ TEST_CASE("we can manage pinned buffers") {
   auto num_buffers = 5u;
   auto pool = get_pinned_buffer_pool(num_buffers);
 
-  SECTION("we can aquire and release a pinned buffer") {
+  SECTION("we can acquire and release a pinned buffer") {
     {
       pinned_buffer buf;
       REQUIRE(pool->size() == num_buffers - 1);

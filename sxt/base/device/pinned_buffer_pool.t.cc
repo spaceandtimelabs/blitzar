@@ -26,16 +26,16 @@ TEST_CASE("we can pool pinned buffers") {
   pinned_buffer_pool pool{num_buffers};
   REQUIRE(pool.size() == num_buffers);
 
-  SECTION("we can aquire and release buffers") {
-    auto h = pool.aquire_handle();
+  SECTION("we can acquire and release buffers") {
+    auto h = pool.acquire_handle();
     REQUIRE(pool.size() == num_buffers - 1);
     pool.release_handle(h);
     REQUIRE(pool.size() == num_buffers);
   }
 
-  SECTION("we can aquire a handle from an empty pool") {
+  SECTION("we can acquire a handle from an empty pool") {
     pinned_buffer_pool empty_pool{0};
-    auto h = empty_pool.aquire_handle();
+    auto h = empty_pool.acquire_handle();
     empty_pool.release_handle(h);
     REQUIRE(empty_pool.size() == 1);
   }

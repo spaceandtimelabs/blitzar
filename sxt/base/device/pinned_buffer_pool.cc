@@ -62,9 +62,9 @@ pinned_buffer_pool::~pinned_buffer_pool() noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
-// aquire_handle
+// acquire_handle
 //--------------------------------------------------------------------------------------------------
-pinned_buffer_handle* pinned_buffer_pool::aquire_handle() noexcept {
+pinned_buffer_handle* pinned_buffer_pool::acquire_handle() noexcept {
   if (head_ == nullptr) {
     head_ = new_handle();
   }

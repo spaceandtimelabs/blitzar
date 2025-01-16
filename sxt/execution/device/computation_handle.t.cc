@@ -51,7 +51,7 @@ TEST_CASE("computation_handle manages a collection of streams") {
       computation_handle comp;
       comp.add_stream(std::move(s));
     }
-    auto handle = pool->aquire_handle();
+    auto handle = pool->acquire_handle();
     REQUIRE(handle->stream == ptr);
     pool->release_handle(handle);
   }
