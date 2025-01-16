@@ -16,75 +16,43 @@
  */
 #include "sxt/multiexp/base/scalar_array.h"
 
+#include <strings.h>
+
 #include <vector>
 
-#include "cub/cub.cuh"
 #include "sxt/base/container/span_utility.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
-#include "sxt/base/num/ceil_log2.h"
-#include "sxt/base/num/constexpr_switch.h"
-#include "sxt/base/num/divide_up.h"
 #include "sxt/execution/async/coroutine.h"
+#include "sxt/execution/device/generate.h"
 #include "sxt/execution/device/synchronization.h"
-#include "sxt/memory/management/managed_array.h"
-#include "sxt/memory/resource/async_device_resource.h"
 
 namespace sxt::mtxb {
 //--------------------------------------------------------------------------------------------------
-// scalar_blob
+// transpose_scalars
 //--------------------------------------------------------------------------------------------------
-namespace {
-template <unsigned NumBytes> struct scalar_blob {
-  uint8_t data[NumBytes];
-};
-} // namespace
+void transpose_scalars(basct::span<uint8_t> array, const uint8_t* scalars,
+                       unsigned element_num_bytes, unsigned n, size_t offset) noexcept {
+  auto remaining_size = array.size();
+  auto byte_index = offset / n;
 
-//--------------------------------------------------------------------------------------------------
-// transpose_kernel
-//--------------------------------------------------------------------------------------------------
-template <unsigned NumBytes>
-static __global__ void transpose_kernel(uint8_t* __restrict__ dst,
-                                        const scalar_blob<NumBytes>* __restrict__ src,
-                                        unsigned n) noexcept {
-  using Scalar = scalar_blob<NumBytes>;
+  // copy for first byte position
+  auto byte_offset = static_cast<unsigned>(offset - byte_index * n);
+  auto chunk_size = std::min(static_cast<size_t>(n - byte_offset), remaining_size);
+  auto out = array.data();
+  for (unsigned i = 0; i < chunk_size; ++i) {
+    *out++ = *(scalars + byte_index + (i + byte_offset) * element_num_bytes);
+  }
+  remaining_size -= chunk_size;
 
-  auto byte_index = threadIdx.x;
-  auto tile_index = blockIdx.x;
-  auto output_index = blockIdx.y;
-  auto num_tiles = gridDim.x;
-  auto n_per_tile = basn::divide_up(basn::divide_up(n, NumBytes), num_tiles) * NumBytes;
-
-  auto first = tile_index * n_per_tile;
-  auto m = min(n_per_tile, n - first);
-
-  // adjust pointers
-  src += first;
-  src += output_index * n;
-  dst += byte_index * n + first;
-  dst += output_index * NumBytes * n;
-
-  // set up algorithm
-  using BlockExchange = cub::BlockExchange<uint8_t, NumBytes, NumBytes>;
-  __shared__ typename BlockExchange::TempStorage temp_storage;
-
-  // transpose
-  Scalar s;
-  unsigned out_first = 0;
-  for (unsigned i = byte_index; i < n_per_tile; i += NumBytes) {
-    if (i < m) {
-      s = src[i];
+  // copy remaining byte positions
+  while (remaining_size > 0) {
+    ++byte_index;
+    auto chunk_size = std::min(static_cast<size_t>(n), remaining_size);
+    for (unsigned i = 0; i < chunk_size; ++i) {
+      *out++ = *(scalars + byte_index + i * element_num_bytes);
     }
-    BlockExchange(temp_storage).StripedToBlocked(s.data);
-    __syncthreads();
-    for (unsigned j = 0; j < NumBytes; ++j) {
-      auto out_index = out_first + j;
-      if (out_index < m) {
-        dst[out_index] = s.data[j];
-      }
-    }
-    out_first += NumBytes;
-    __syncthreads();
+    remaining_size -= chunk_size;
   }
 }
 
@@ -95,35 +63,38 @@ xena::future<> transpose_scalars_to_device(basct::span<uint8_t> array,
                                            basct::cspan<const uint8_t*> scalars,
                                            unsigned element_num_bytes, unsigned n) noexcept {
   auto num_outputs = static_cast<unsigned>(scalars.size());
+  size_t bytes_per_output = element_num_bytes * n;
   if (n == 0 || num_outputs == 0) {
     co_return;
   }
   SXT_DEBUG_ASSERT(
       // clang-format off
-      array.size() == num_outputs * element_num_bytes * n &&
+      array.size() == num_outputs * bytes_per_output &&
       basdv::is_active_device_pointer(array.data()) &&
       basdv::is_host_pointer(scalars[0])
       // clang-format on
   );
+  auto f = [&](basct::span<uint8_t> buffer, size_t index) noexcept {
+    auto remaining_bytes = buffer.size();
+    auto output_index = index / bytes_per_output;
+
+    // first output
+    auto offset = index - output_index * bytes_per_output;
+    auto chunk_size = std::min(bytes_per_output - offset, remaining_bytes);
+    transpose_scalars(buffer.subspan(0, chunk_size), scalars[output_index], element_num_bytes, n,
+                      offset);
+    remaining_bytes -= chunk_size;
+
+    // remaining outputs
+    while (remaining_bytes > 0) {
+      ++output_index;
+      chunk_size = std::min(bytes_per_output, remaining_bytes);
+      transpose_scalars(buffer.subspan(buffer.size() - remaining_bytes, chunk_size),
+                        scalars[output_index], element_num_bytes, n, 0);
+      remaining_bytes -= chunk_size;
+    }
+  };
   basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<uint8_t> array_p{array.size(), &resource};
-  auto num_bytes_per_output = element_num_bytes * n;
-  for (size_t output_index = 0; output_index < num_outputs; ++output_index) {
-    basdv::async_copy_host_to_device(
-        basct::subspan(array_p, output_index * num_bytes_per_output, num_bytes_per_output),
-        basct::cspan<uint8_t>{scalars[output_index], num_bytes_per_output}, stream);
-  }
-  auto num_tiles = std::min(basn::divide_up(n, num_outputs * element_num_bytes), 64u);
-  auto num_bytes_log2 = basn::ceil_log2(element_num_bytes);
-  basn::constexpr_switch<6>(
-      num_bytes_log2,
-      [&]<unsigned LogNumBytes>(std::integral_constant<unsigned, LogNumBytes>) noexcept {
-        constexpr auto NumBytes = 1u << LogNumBytes;
-        SXT_DEBUG_ASSERT(NumBytes == element_num_bytes);
-        transpose_kernel<NumBytes><<<dim3(num_tiles, num_outputs, 1), NumBytes, 0, stream>>>(
-            array.data(), reinterpret_cast<scalar_blob<NumBytes>*>(array_p.data()), n);
-      });
-  co_await xendv::await_stream(std::move(stream));
+  co_await xendv::generate_to_device(array.subspan(0, num_outputs * bytes_per_output), stream, f);
 }
 } // namespace sxt::mtxb

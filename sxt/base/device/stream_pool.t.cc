@@ -28,9 +28,9 @@ TEST_CASE("we can pool cuda streams for reuse") {
     return;
   }
 
-  SECTION("if we aquire a stream handle it is non-null") {
+  SECTION("if we acquire a stream handle it is non-null") {
     stream_pool pool{1};
-    auto handle = pool.aquire_handle();
+    auto handle = pool.acquire_handle();
     REQUIRE(handle != nullptr);
     REQUIRE(handle->stream != nullptr);
     REQUIRE(handle->next == nullptr);
@@ -39,26 +39,26 @@ TEST_CASE("we can pool cuda streams for reuse") {
 
   SECTION("stream handles are reused") {
     stream_pool pool{1};
-    auto handle = pool.aquire_handle();
+    auto handle = pool.acquire_handle();
     pool.release_handle(handle);
-    auto handle_p = pool.aquire_handle();
+    auto handle_p = pool.acquire_handle();
     REQUIRE(handle == handle_p);
     pool.release_handle(handle_p);
   }
 
   SECTION("new handles are made if none are available") {
     stream_pool pool{0};
-    auto handle = pool.aquire_handle();
+    auto handle = pool.acquire_handle();
     REQUIRE(handle != nullptr);
     pool.release_handle(handle);
-    auto handle_p = pool.aquire_handle();
+    auto handle_p = pool.acquire_handle();
     REQUIRE(handle == handle_p);
     pool.release_handle(handle_p);
   }
 
   SECTION("we can acquire handles from a thread-local pool") {
     auto pool = get_stream_pool();
-    auto handle = pool->aquire_handle();
+    auto handle = pool->acquire_handle();
     REQUIRE(handle != nullptr);
     REQUIRE(handle->stream != nullptr);
     REQUIRE(handle->next == nullptr);

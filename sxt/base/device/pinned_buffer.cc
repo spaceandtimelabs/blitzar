@@ -22,7 +22,7 @@ namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // consructor
 //--------------------------------------------------------------------------------------------------
-pinned_buffer::pinned_buffer() noexcept : handle_{get_pinned_buffer_pool()->aquire_handle()} {}
+pinned_buffer::pinned_buffer() noexcept : handle_{get_pinned_buffer_pool()->acquire_handle()} {}
 
 pinned_buffer::pinned_buffer(pinned_buffer&& ptr) noexcept : handle_{ptr.handle_} {
   ptr.handle_ = nullptr;
