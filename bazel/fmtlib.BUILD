@@ -1,0 +1,20 @@
+cc_library(
+    name = "fmt",
+    srcs = [
+        #"src/fmt.cc", # No C++ module support, yet in Bazel (https://github.com/bazelbuild/bazel/pull/19940)
+        "src/format.cc",
+        "src/os.cc",
+    ],
+    hdrs = glob([
+        "include/fmt/*.h",
+    ]),
+    copts = [
+      "-std=c++2b",
+    ],
+    includes = [
+        "include",
+    ],
+    linkstatic = 1,
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+)

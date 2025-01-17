@@ -10,11 +10,19 @@ git_repository(
     remote = "https://github.com/ianlancetaylor/libbacktrace",
 )
 
+# fmtlib
+git_repository(
+    name = "com_github_fmtlib_fmt",
+    build_file = "//bazel:fmtlib.BUILD",
+    commit = "937b7c5",
+    remote = "https://github.com/fmtlib/fmt",
+)
+
 # spdlog
 git_repository(
     name = "com_github_gabime_spdlog",
     build_file = "//bazel:spdlog.BUILD",
-    commit = "5ebfc92",
+    commit = "128a9fc",
     remote = "https://github.com/gabime/spdlog",
 )
 

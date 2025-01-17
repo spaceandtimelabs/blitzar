@@ -18,6 +18,7 @@
 
 #include <array>
 #include <iomanip>
+#include <iostream>
 
 #include "sxt/fieldgk/base/byte_conversion.h"
 #include "sxt/fieldgk/base/reduce.h"
