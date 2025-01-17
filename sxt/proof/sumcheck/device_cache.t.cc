@@ -53,4 +53,20 @@ TEST_CASE("we can cache device values that don't change as a proof is computed")
     REQUIRE(product_table_p == product_table);
     REQUIRE(product_terms_p == product_terms);
   }
+
+  SECTION("we can clear the device cache") {
+    product_table = {{0x123_s25, 0}};
+    product_terms = {0};
+    device_cache cache{product_table, product_terms};
+    cache.lookup(product_table_dev, product_terms_dev, stream);
+
+    std::vector<std::pair<s25t::element, unsigned>> product_table_p(product_table.size());
+    basdv::async_copy_device_to_host(product_table_p, product_table_dev, stream);
+
+    std::vector<unsigned> product_terms_p(product_terms.size());
+    basdv::async_copy_device_to_host(product_terms_p, product_terms_dev, stream);
+
+    basdv::synchronize_stream(stream);
+    cache.clear();
+  }
 }
