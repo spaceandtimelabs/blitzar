@@ -23,6 +23,9 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
+      "//sxt/base/device:stream",
+      "//sxt/base/device:synchronization",
+        "//sxt/scalar25/type:literal",
         "//sxt/base/test:unit_test",
     ],
 )
