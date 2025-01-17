@@ -122,10 +122,10 @@ void exercise_driver(const driver& drv) {
     fut = drv.sum(p, *ws.value());
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
-  
+
     mles[0] = (0x1_s25 - r) * mles[0] + r * mles[2];
     mles[1] = (0x1_s25 - r) * mles[1];
-  
+
     REQUIRE(p[0] == mles[0]);
     REQUIRE(p[1] == mles[1] - mles[0]);
   }

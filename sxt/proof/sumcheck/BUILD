@@ -11,10 +11,17 @@ sxt_cc_component(
 sxt_cc_component(
     name = "device_cache",
     impl_deps = [
-      "//sxt/base/device:memory_utility",
-      "//sxt/base/device:state",
-      "//sxt/base/device:stream",
-      "//sxt/memory/resource:device_resource",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:state",
+        "//sxt/base/device:stream",
+        "//sxt/memory/resource:device_resource",
+    ],
+    test_deps = [
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:literal",
     ],
     deps = [
         "//sxt/base/container:span",
@@ -22,20 +29,10 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/scalar25/type:element",
     ],
-    test_deps = [
-      "//sxt/base/device:stream",
-      "//sxt/base/device:synchronization",
-        "//sxt/scalar25/type:literal",
-        "//sxt/base/test:unit_test",
-    ],
 )
 
 sxt_cc_component(
     name = "mle_utility",
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/memory/management:managed_array_fwd",
-    ],
     impl_deps = [
         "//sxt/base/container:span_utility",
         "//sxt/base/device:memory_utility",
@@ -46,8 +43,12 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
-        "//sxt/scalar25/type:element",
         "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:element",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/memory/management:managed_array_fwd",
     ],
 )
 
@@ -124,12 +125,12 @@ sxt_cc_component(
 sxt_cc_component(
     name = "chunked_gpu_driver",
     impl_deps = [
-      ":device_cache",
-      ":fold_gpu",
-      ":gpu_driver",
-      ":mle_utility",
-      ":sum_gpu",
-      "//sxt/algorithm/iteration:transform",
+        ":device_cache",
+        ":fold_gpu",
+        ":gpu_driver",
+        ":mle_utility",
+        ":sum_gpu",
+        "//sxt/algorithm/iteration:transform",
         # ":constant",
         # ":partial_polynomial_mapper",
         # ":polynomial_mapper",
@@ -233,8 +234,8 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
-        ":cpu_driver",
         ":chunked_gpu_driver",
+        ":cpu_driver",
         ":gpu_driver",
         "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
@@ -252,8 +253,8 @@ sxt_cc_component(
 sxt_cc_component(
     name = "fold_gpu",
     impl_deps = [
-      ":mle_utility",
-      "//sxt/algorithm/iteration:kernel_fit",
+        ":mle_utility",
+        "//sxt/algorithm/iteration:kernel_fit",
         "//sxt/base/error:assert",
         "//sxt/base/device:property",
         "//sxt/base/device:stream",
@@ -273,24 +274,24 @@ sxt_cc_component(
         "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:device_resource",
     ],
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/execution/async:future_fwd",
-    ],
     test_deps = [
+        "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
-      "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
     ],
 )
 
 sxt_cc_component(
     name = "fold_gpu2",
     impl_deps = [
-      ":mle_utility",
-      "//sxt/algorithm/iteration:kernel_fit",
+        ":mle_utility",
+        "//sxt/algorithm/iteration:kernel_fit",
         "//sxt/base/error:assert",
         "//sxt/base/device:property",
         "//sxt/base/device:stream",
@@ -310,29 +311,29 @@ sxt_cc_component(
         "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:device_resource",
     ],
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/execution/async:future_fwd",
-    ],
     test_deps = [
+        "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
-      "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
     ],
 )
 
 sxt_cc_component(
     name = "sum_gpu",
     impl_deps = [
-      ":constant",
-      ":device_cache",
-      ":mle_utility",
-      ":polynomial_mapper2",
-      ":reduction_gpu",
-      "//sxt/algorithm/reduction:kernel_fit",
-      "//sxt/algorithm/reduction:thread_reduction",
+        ":constant",
+        ":device_cache",
+        ":mle_utility",
+        ":polynomial_mapper2",
+        ":reduction_gpu",
+        "//sxt/algorithm/reduction:kernel_fit",
+        "//sxt/algorithm/reduction:thread_reduction",
         "//sxt/base/device:stream",
         "//sxt/base/device:state",
         "//sxt/base/iterator:split",
@@ -341,19 +342,19 @@ sxt_cc_component(
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
         "//sxt/execution/device:for_each",
-      #   "//sxt/execution/device:synchronization",
+        #   "//sxt/execution/device:synchronization",
         "//sxt/execution/kernel:kernel_dims",
-      #   "//sxt/execution/kernel:launch",
-      #   "//sxt/memory/management:managed_array",
+        #   "//sxt/execution/kernel:launch",
+        #   "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:device_resource",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/scalar25/operation:add",
         "//sxt/scalar25/operation:mul",
-      #   "//sxt/scalar25/operation:accumulator",
+        #   "//sxt/scalar25/operation:accumulator",
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
-      ":device_cache",
+        ":device_cache",
         # "//sxt/base/device:stream",
         "//sxt/base/iterator:split",
         "//sxt/base/test:unit_test",
@@ -373,9 +374,9 @@ sxt_cc_component(
 sxt_cc_component(
     name = "reduction_gpu",
     impl_deps = [
-      "//sxt/algorithm/base:identity_mapper",
-      "//sxt/algorithm/reduction:kernel_fit",
-      "//sxt/algorithm/reduction:thread_reduction",
+        "//sxt/algorithm/base:identity_mapper",
+        "//sxt/algorithm/reduction:kernel_fit",
+        "//sxt/algorithm/reduction:thread_reduction",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",

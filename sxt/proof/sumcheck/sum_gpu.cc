@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2025-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include "sxt/proof/sumcheck/sum_gpu.h"
 
 #include <cstddef>
@@ -44,7 +60,7 @@ template <unsigned Degree> struct polynomial_reducer {
 } // namespace
 
 //--------------------------------------------------------------------------------------------------
-// partial_sum_kernel_impl 
+// partial_sum_kernel_impl
 //--------------------------------------------------------------------------------------------------
 template <unsigned BlockSize, unsigned NumTerms>
 __device__ static void partial_sum_kernel_impl(s25t::element* __restrict__ shared_data,
@@ -67,7 +83,7 @@ __device__ static void partial_sum_kernel_impl(s25t::element* __restrict__ share
 }
 
 //--------------------------------------------------------------------------------------------------
-// partial_sum_kernel 
+// partial_sum_kernel
 //--------------------------------------------------------------------------------------------------
 template <unsigned BlockSize>
 __global__ static void
@@ -109,7 +125,7 @@ partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restr
 }
 
 //--------------------------------------------------------------------------------------------------
-// partial_sum 
+// partial_sum
 //--------------------------------------------------------------------------------------------------
 static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& stream,
                                   basct::cspan<s25t::element> mles,
@@ -136,7 +152,7 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
 }
 
 //--------------------------------------------------------------------------------------------------
-// sum_gpu 
+// sum_gpu
 //--------------------------------------------------------------------------------------------------
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        const basit::split_options& options, basct::cspan<s25t::element> mles,
@@ -192,9 +208,9 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        basct::cspan<s25t::element> mles, unsigned n) noexcept {
   basit::split_options options{
-    .min_chunk_size = 100'000u,
-    .max_chunk_size = 200'000u,
-    .split_factor = basdv::get_num_devices(),
+      .min_chunk_size = 100'000u,
+      .max_chunk_size = 200'000u,
+      .split_factor = basdv::get_num_devices(),
   };
   co_await sum_gpu(p, cache, options, mles, n);
 }

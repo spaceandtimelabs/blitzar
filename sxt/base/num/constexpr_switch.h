@@ -16,9 +16,9 @@
  */
 #pragma once
 
+#include <cassert>
 #include <type_traits>
 #include <utility>
-#include <cassert>
 
 #include "sxt/base/error/assert.h"
 #include "sxt/base/macro/cuda_callable.h"
