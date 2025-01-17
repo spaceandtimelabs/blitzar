@@ -9,6 +9,29 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "device_cache",
+    impl_deps = [
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:state",
+        "//sxt/base/device:stream",
+        "//sxt/memory/resource:device_resource",
+    ],
+    test_deps = [
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/device:device_map",
+        "//sxt/memory/management:managed_array",
+        "//sxt/scalar25/type:element",
+    ],
+)
+
+sxt_cc_component(
     name = "workspace",
     with_test = False,
 )
