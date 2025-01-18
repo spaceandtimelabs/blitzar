@@ -123,8 +123,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     target_path = args.path
     include_dir_order = args.include_dir_order.split(',')
-    reorderd_source = reorder_headers(target_path)
+    reordered_source = reorder_headers(target_path)
     if args.rewrite:
-        pathlib.Path(target_path).write_text(reorderd_source, encoding='utf-8')
+        pathlib.Path(target_path).write_text(reordered_source, encoding='utf-8')
     else:
-        sys.stdout.buffer.write(reorderd_source.encode('utf-8'))
+        sys.stdout.buffer.write(reordered_source.encode('utf-8'))
