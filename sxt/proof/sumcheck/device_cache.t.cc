@@ -66,7 +66,11 @@ TEST_CASE("we can cache device values that don't change as a proof is computed")
     std::vector<unsigned> product_terms_p(product_terms.size());
     basdv::async_copy_device_to_host(product_terms_p, product_terms_dev, stream);
 
+    auto data = cache.clear();
+    basdv::async_copy_device_to_host(product_table_p, data->product_table, stream);
+    basdv::async_copy_device_to_host(product_terms_p, data->product_terms, stream);
     basdv::synchronize_stream(stream);
-    cache.clear();
+    REQUIRE(product_table_p == product_table);
+    REQUIRE(product_terms_p == product_terms);
   }
 }
