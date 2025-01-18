@@ -71,9 +71,9 @@ stream_pool::~stream_pool() noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
-// aquire_handle
+// acquire_handle
 //--------------------------------------------------------------------------------------------------
-stream_handle* stream_pool::aquire_handle(int device) noexcept {
+stream_handle* stream_pool::acquire_handle(int device) noexcept {
   auto& head = heads_[device];
   if (head == nullptr) {
     return make_stream_handle(device);

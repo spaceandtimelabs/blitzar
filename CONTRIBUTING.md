@@ -27,7 +27,7 @@ When you contribute code, you affirm that the contribution is your original work
 
 ## <a name="style"></a> Style Guidelines
 
-See [style guide](STYLE.md)
+See [style guide](STYLE.md).
 
 ## <a name="submit"></a> Submission Guidelines
 
@@ -281,7 +281,7 @@ Must be one of the following:
 * **perf!**: A code change that improves performance and introduces breaking changes (this correlates with MAJOR in Semantic Versioning).
 * **refactor**: A code change that neither fixes a bug nor adds a feature (this correlates with a PATCH in Semantic Versioning).
 * **refactor!**: A code change that neither fixes a bug nor adds a feature and introduces breaking changes (this correlates with MAJOR in Semantic Versioning).
-* **test**: Adding missing tests or correcting existing tests
+* **test**: Adding missing tests or correcting existing tests.
 * **bench**: Adding missing benchmarks or correcting existing benchmarks (this does not correlate with any semantic versioning update).
 * **build**: Changes that affect the build system or external dependencies (this correlates with a PATCH in Semantic Versioning).
 * **ci**: Changes to our CI configuration files and scripts.
@@ -295,9 +295,9 @@ Try to not fill your commit with many unrelated changes to your code, as it make
 
 Use the summary field to provide a succinct description of the change (less than 80 characters):
 
-* use the imperative, present tense: "change", not "changing", nor "changed", and nor "changes"
-* don't capitalize the first letter
-* no dot (.) at the end
+* use the imperative, present tense: "change", not "changing", nor "changed", and nor "changes".
+* don't capitalize the first letter.
+* no dot (.) at the end.
 
 ### <a name="commit-body"></a>Commit Message Body
 

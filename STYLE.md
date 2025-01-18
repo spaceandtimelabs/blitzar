@@ -15,7 +15,7 @@ belongs to the package "iterator", and "iterator" belongs to the package group "
 If another component `sxt/multiexp/pippenger_multiprod/multiproduct` depends on
 `base/iterator/counting_iterator`, then no component in the package group "base"
 can depend on a component in the package group "multiexp" as that would introduce
-a cycle (§3.5 of [1], [3])
+a cycle (§3.5 of [1], [3]).
 
 All packages are given a unique namespace. For example, all components within
 the package `base/iterator` use the namespace "basit". The first three letters
@@ -92,9 +92,9 @@ should be readable and describe code's behavior.
 
 3: John Lakos. [Advanced Levelization Techniques](https://youtu.be/QjFpKJ8Xx78).
 
-4: https://github.com/envoyproxy/envoy/blob/main/STYLE.md#error-handling
+4: https://github.com/envoyproxy/envoy/blob/main/STYLE.md#error-handling.
 
-5: Matt Klein. [Crash early and crash often for more reliable software](https://medium.com/@mattklein123/crash-early-and-crash-often-for-more-reliable-software-597738dd21c5)
+5: Matt Klein. [Crash early and crash often for more reliable software](https://medium.com/@mattklein123/crash-early-and-crash-often-for-more-reliable-software-597738dd21c5).
 
 6: Scott Meyers. [Effective Modern C++](https://www.amazon.com/Effective-Modern-Specific-Ways-Improve/dp/1491903996?asin=1491903996&revisionId=&format=4&depth=1).
 
