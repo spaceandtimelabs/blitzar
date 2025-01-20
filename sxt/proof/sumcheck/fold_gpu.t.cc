@@ -24,6 +24,7 @@
 #include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"
 #include "sxt/scalar25/type/literal.h"
+
 using namespace sxt;
 using namespace sxt::prfsk;
 using s25t::operator""_s25;

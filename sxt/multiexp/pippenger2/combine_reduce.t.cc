@@ -26,7 +26,100 @@
 using namespace sxt;
 using namespace sxt::mtxpp2;
 
-TEST_CASE("we can combine and reduce partial products") {
+TEST_CASE("we can combine and reduce partial products with outputs of fixed size") {
+  using E = bascrv::element97;
+
+  unsigned element_num_bytes = 1;
+  std::vector<E> partial_products;
+  std::vector<E> res(1);
+
+  SECTION("we handle no outputs") {
+    res.clear();
+    auto fut = combine_reduce<E>(res, element_num_bytes, partial_products);
+    REQUIRE(fut.ready());
+  }
+
+  SECTION("we can combine and reduce a single element") {
+    partial_products.resize(8);
+    partial_products[0] = 3u;
+    auto fut = combine_reduce<E>(res, element_num_bytes, partial_products);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 3u);
+  }
+
+  SECTION("we can combine and reduce a two byte output") {
+    partial_products.resize(16);
+    partial_products[0] = 3u;
+    partial_products[8] = 4u;
+    element_num_bytes = 2;
+    auto fut = combine_reduce<E>(res, element_num_bytes, partial_products);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 3u + (1u << 8u) * 4u);
+  }
+
+  SECTION("we can combine and reduce elements already on device") {
+    partial_products.resize(8);
+    partial_products[0] = 3u;
+    std::pmr::vector<E> partial_products_dev{partial_products.begin(), partial_products.end(),
+                                             memr::get_managed_device_resource()};
+    auto fut = combine_reduce<E>(res, element_num_bytes, partial_products_dev);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 3u);
+  }
+
+  SECTION("we can combine and reduce a single output with a reduction size of two") {
+    partial_products.resize(16);
+    partial_products[0] = 3u;
+    partial_products[8] = 4u;
+    auto fut = combine_reduce<E>(res, element_num_bytes, partial_products);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 7u);
+  }
+
+  SECTION("we can combine and reduce an output with a bit width of 8") {
+    partial_products.resize(8);
+    partial_products[0] = 3u;
+    partial_products[1] = 4u;
+    auto fut = combine_reduce<E>(res, element_num_bytes, partial_products);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 11u);
+  }
+
+  SECTION("we can combine and reduce multiple outputs") {
+    partial_products.resize(16);
+    partial_products[0] = 3u;
+    partial_products[8] = 4u;
+    res.resize(2);
+    auto fut = combine_reduce<E>(res, element_num_bytes, partial_products);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 3u);
+    REQUIRE(res[1] == 4u);
+  }
+
+  SECTION("we can combine and reduce in chunks") {
+    partial_products.resize(16);
+    partial_products[0] = 3u;
+    partial_products[8] = 4u;
+    res.resize(2);
+    basit::split_options split_options{
+        .max_chunk_size = 1u,
+        .split_factor = 2u,
+    };
+    auto fut = combine_reduce<E>(res, split_options, element_num_bytes, partial_products);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == 3u);
+    REQUIRE(res[1] == 4u);
+  }
+}
+
+TEST_CASE("we can combine and reduce partial products with outputs of varying size") {
   using E = bascrv::element97;
 
   std::vector<unsigned> output_bit_table;

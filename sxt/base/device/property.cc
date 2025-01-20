@@ -20,16 +20,18 @@
 #include <cuda_runtime.h>
 
 #include "sxt/base/error/panic.h"
+#include "sxt/base/log/log.h"
 
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // get_num_devices
 //--------------------------------------------------------------------------------------------------
 unsigned get_num_devices() noexcept {
-  static int num_devices = []() noexcept {
+  static unsigned num_devices = []() noexcept {
     int res;
     auto rcode = cudaGetDeviceCount(&res);
     if (rcode != cudaSuccess) {
+      basl::error("cudaGetDeviceCount failed: {}", cudaGetErrorString(rcode));
       return 0u;
     }
     return static_cast<unsigned>(res);

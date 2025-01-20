@@ -29,7 +29,7 @@ struct stream_handle;
 /**
  * Pool of CUDA streams.
  *
- * This allows us to cheaply aquire streams without having to continually pay the cost
+ * This allows us to cheaply acquire streams without having to continually pay the cost
  * of recreation. See https://stackoverflow.com/a/52934292 for reasons of why this is worthwhile.
  *
  * Similar to https://seastar.io/ this assumes that the application is sharded and access
@@ -46,7 +46,7 @@ public:
   stream_pool(stream_pool&&) = delete;
   stream_pool& operator=(const stream_pool&) = delete;
 
-  stream_handle* aquire_handle(int device = 0) noexcept;
+  stream_handle* acquire_handle(int device = 0) noexcept;
 
   void release_handle(stream_handle* handle) noexcept;
 

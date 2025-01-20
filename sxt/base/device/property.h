@@ -44,6 +44,8 @@ void get_device_mem_info(size_t& bytes_free, size_t& bytes_total) noexcept;
 //--------------------------------------------------------------------------------------------------
 // get_total_device_memory
 //--------------------------------------------------------------------------------------------------
+// Get the total amount of memory available for a single GPU device.
+//
 // Note: assumes each device has the same amount of memory
 size_t get_total_device_memory() noexcept;
 } // namespace sxt::basdv

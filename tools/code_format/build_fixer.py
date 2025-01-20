@@ -44,9 +44,9 @@ if __name__ == '__main__':
         sys.stdout.write(fix_build(sys.argv[1]))
         sys.exit(0)
     elif len(sys.argv) == 3:
-        reorderd_source = fix_build(sys.argv[1])
+        reordered_source = fix_build(sys.argv[1])
         with open(sys.argv[2], 'w') as f:
-            f.write(reorderd_source)
+            f.write(reordered_source)
         sys.exit(0)
     print('Usage: %s <source file path> [<destination file path>]' % sys.argv[0])
     sys.exit(1)
