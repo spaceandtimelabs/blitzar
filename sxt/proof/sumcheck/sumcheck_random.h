@@ -23,7 +23,7 @@ struct random_sumcheck_descriptor {
   unsigned min_num_products = 1;
   unsigned max_num_products = 5;
 
-  unsigned min_product_length = 1;
+  unsigned min_product_length = 2;
   unsigned max_product_length = max_degree_v;
 
   unsigned min_num_mles = 1;

@@ -19,6 +19,7 @@
 #include <utility>
 #include <vector>
 
+#include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
@@ -149,6 +150,19 @@ static void test_proof(const driver& drv) noexcept {
   }
 
   SECTION("we can verify random sumcheck problems") {
+    for (unsigned i = 0; i < 10; ++i) {
+      basn::fast_random_number_generator rng{1, 2};
+      random_sumcheck_descriptor descriptor;
+      unsigned n;
+      generate_random_sumcheck_problem(mles, product_table, product_terms, n, rng, descriptor);
+      auto num_variables = n == 1 ? 1 : basn::ceil_log2(n);
+      evaluation_point.resize(num_variables);
+      std::println("n = {} {}", n, num_variables);
+      polynomials.resize((descriptor.max_product_length + 1u) * num_variables);
+      auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                           product_terms, n);
+      xens::get_scheduler().run();
+    }
   }
 }
 
@@ -157,12 +171,12 @@ TEST_CASE("we can create a sumcheck proof") {
     cpu_driver drv;
     test_proof(drv);
   }
-
+  
   SECTION("we can prove with the gpu driver") {
     gpu_driver drv;
     test_proof(drv);
   }
-
+  
   SECTION("we can prove with the chunked gpu driver") {
     chunked_gpu_driver drv{0.0};
     test_proof(drv);

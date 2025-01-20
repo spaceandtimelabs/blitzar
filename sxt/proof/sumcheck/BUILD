@@ -252,6 +252,7 @@ sxt_cc_component(
         ":cpu_driver",
         ":gpu_driver",
         ":sumcheck_random",
+        "//sxt/base/num:ceil_log2",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",

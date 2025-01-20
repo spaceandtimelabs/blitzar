@@ -107,7 +107,7 @@ partial_sum_kernel(s25t::element* __restrict__ out, const s25t::element* __restr
   }
 
   // sum
-  basn::constexpr_switch<1, max_degree_v>(
+  basn::constexpr_switch<1, max_degree_v + 1u>(
       num_terms, [&]<unsigned NumTerms>(std::integral_constant<unsigned, NumTerms>) noexcept {
         partial_sum_kernel_impl<BlockSize, NumTerms>(shared_data, mles, product_terms, split, n);
       });
