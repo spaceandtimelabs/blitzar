@@ -13,7 +13,13 @@ sxt_cc_component(
     with_test = False,
     deps = [
       ":constant",
-    ]
+    ],
+    impl_deps = [
+        "//sxt/base/error:assert",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/scalar25/random:element",
+        "//sxt/scalar25/type:element",
+    ],
 )
 
 sxt_cc_component(
