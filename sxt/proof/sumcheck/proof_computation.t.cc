@@ -28,6 +28,7 @@
 #include "sxt/proof/sumcheck/cpu_driver.h"
 #include "sxt/proof/sumcheck/gpu_driver.h"
 #include "sxt/proof/sumcheck/sumcheck_random.h"
+#include "sxt/proof/sumcheck/verification.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"
@@ -155,13 +156,29 @@ static void test_proof(const driver& drv) noexcept {
       random_sumcheck_descriptor descriptor;
       unsigned n;
       generate_random_sumcheck_problem(mles, product_table, product_terms, n, rng, descriptor);
+
+      unsigned polynomial_length = 0;
+      for (auto [_, len] : product_table) {
+        polynomial_length = std::max(polynomial_length, len + 1u);
+      }
+
       auto num_variables = n == 1 ? 1 : basn::ceil_log2(n);
       evaluation_point.resize(num_variables);
       std::println("n = {} {}", n, num_variables);
-      polynomials.resize((descriptor.max_product_length + 1u) * num_variables);
+      polynomials.resize(polynomial_length * num_variables);
       auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
                            product_terms, n);
       xens::get_scheduler().run();
+
+      // we can verify
+      {
+        prft::transcript transcript{"abc"};
+      }
+/* bool verify_sumcheck_no_evaluation(s25t::element& expected_sum, */
+/*                                    basct::span<s25t::element> evaluation_point, */
+/*                                    prft::transcript& transcript, */
+/*                                    basct::cspan<s25t::element> round_polynomials, */
+/*                                    unsigned round_degree) noexcept; */
     }
   }
 }
