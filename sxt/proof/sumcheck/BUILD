@@ -9,6 +9,14 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "sumcheck_random",
+    with_test = False,
+    deps = [
+      ":constant",
+    ]
+)
+
+sxt_cc_component(
     name = "device_cache",
     impl_deps = [
         "//sxt/base/device:memory_utility",
