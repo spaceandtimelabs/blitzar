@@ -19,12 +19,14 @@
 #include <utility>
 #include <vector>
 
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/proof/sumcheck/chunked_gpu_driver.h"
 #include "sxt/proof/sumcheck/cpu_driver.h"
 #include "sxt/proof/sumcheck/gpu_driver.h"
+#include "sxt/proof/sumcheck/sumcheck_random.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"
@@ -144,6 +146,9 @@ static void test_proof(const driver& drv) noexcept {
 
     REQUIRE(polynomials[2] == mles[0]);
     REQUIRE(polynomials[3] == mles[1] - mles[0]);
+  }
+
+  SECTION("we can verify random sumcheck problems") {
   }
 }
 
