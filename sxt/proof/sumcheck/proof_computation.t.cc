@@ -19,6 +19,7 @@
 #include <utility>
 #include <vector>
 
+#include "sxt/base/container/span_utility.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
@@ -27,6 +28,7 @@
 #include "sxt/proof/sumcheck/chunked_gpu_driver.h"
 #include "sxt/proof/sumcheck/cpu_driver.h"
 #include "sxt/proof/sumcheck/gpu_driver.h"
+#include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/proof/sumcheck/sumcheck_random.h"
 #include "sxt/proof/sumcheck/verification.h"
 #include "sxt/proof/transcript/transcript.h"
@@ -173,6 +175,8 @@ static void test_proof(const driver& drv) noexcept {
       // we can verify
       {
         prft::transcript transcript{"abc"};
+        s25t::element expected_sum;
+        sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
       }
 /* bool verify_sumcheck_no_evaluation(s25t::element& expected_sum, */
 /*                                    basct::span<s25t::element> evaluation_point, */
