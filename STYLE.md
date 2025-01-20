@@ -82,7 +82,7 @@ To make writing async code easier, we adopt the future-promise design from
 We try to follow the guidelines from Kevlin Henney's talk "Structure and Interpretation of Test Cases"
 ([7], [8]).
 
-In additional to checking correctness, tests also serve as documentation and
+In addition to checking correctness, tests also serve as documentation and
 should be readable and describe code's behavior.
 
 ## References
