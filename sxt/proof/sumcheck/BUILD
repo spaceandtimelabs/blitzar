@@ -277,6 +277,7 @@ sxt_cc_component(
         "//sxt/algorithm/iteration:kernel_fit",
         "//sxt/base/error:assert",
         "//sxt/base/device:property",
+        "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/num:ceil_log2",
         "//sxt/scalar25/type:element",

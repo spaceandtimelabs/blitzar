@@ -19,6 +19,7 @@
 #include <cassert>
 
 #include "sxt/algorithm/iteration/kernel_fit.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/property.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
@@ -100,8 +101,36 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<
 //--------------------------------------------------------------------------------------------------
 // fold_gpu
 //--------------------------------------------------------------------------------------------------
+static xena::future<> fold_gpu_to_device(basct::span<s25t::element> mles_p,
+                                         basct::cspan<s25t::element> mles, unsigned n,
+                                         const s25t::element& r) noexcept {
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<s25t::element> mles_data{&resource};
+  basct::cspan<s25t::element> mles_dev;
+  if (!basdv::is_active_device_pointer(mles.data())) {
+    mles_data.resize(mles.size());
+    basdv::async_copy_host_to_device(mles_data, mles, stream);
+    mles_dev = mles_data;
+  } else {
+    mles_dev = mles;
+  }
+  (void)mles_p;
+  (void)stream;
+  (void)mles;
+  (void)n;
+  (void)r;
+  return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+// fold_gpu
+//--------------------------------------------------------------------------------------------------
 xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::element> mles,
                         unsigned n, const s25t::element& r) noexcept {
+  if (basdv::is_active_device_pointer(mles_p.data())) {
+    co_return co_await fold_gpu_to_device(mles_p, mles, n, r);
+  }
   using s25t::operator""_s25;
   auto num_mles = mles.size() / n;
   auto num_variables = std::max(basn::ceil_log2(n), 1);
