@@ -157,12 +157,6 @@ static void test_proof(const driver& drv) noexcept {
     for (unsigned i = 0; i < 10; ++i) {
       basn::fast_random_number_generator rng{1, 2};
       random_sumcheck_descriptor descriptor;
-      descriptor.min_length = 3;
-      descriptor.max_length = 3;
-      descriptor.max_num_products = 1;
-      descriptor.max_product_length = 2;
-      descriptor.min_num_mles = 3;
-      descriptor.max_num_mles = 3;
       unsigned n;
       generate_random_sumcheck_problem(mles, product_table, product_terms, n, rng, descriptor);
       std::println("num_mles = {}", mles.size() / n);
@@ -202,6 +196,7 @@ static void test_proof(const driver& drv) noexcept {
         sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
         auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
                                                    polynomials, polynomial_length - 1u);
+        REQUIRE(valid);
         std::println("v {}", valid);
       }
 /* bool verify_sumcheck_no_evaluation(s25t::element& expected_sum, */
