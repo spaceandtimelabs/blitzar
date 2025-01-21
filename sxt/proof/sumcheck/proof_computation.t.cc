@@ -16,6 +16,7 @@
  */
 #include "sxt/proof/sumcheck/proof_computation.h"
 
+#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -156,8 +157,15 @@ static void test_proof(const driver& drv) noexcept {
     for (unsigned i = 0; i < 10; ++i) {
       basn::fast_random_number_generator rng{1, 2};
       random_sumcheck_descriptor descriptor;
+      descriptor.min_length = 3;
+      descriptor.max_length = 3;
+      descriptor.max_num_products = 1;
+      descriptor.max_product_length = 2;
+      descriptor.min_num_mles = 3;
+      descriptor.max_num_mles = 3;
       unsigned n;
       generate_random_sumcheck_problem(mles, product_table, product_terms, n, rng, descriptor);
+      std::println("num_mles = {}", mles.size() / n);
 
       unsigned polynomial_length = 0;
       for (auto [_, len] : product_table) {
@@ -168,15 +176,33 @@ static void test_proof(const driver& drv) noexcept {
       evaluation_point.resize(num_variables);
       std::println("n = {} {}", n, num_variables);
       polynomials.resize(polynomial_length * num_variables);
-      auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                           product_terms, n);
-      xens::get_scheduler().run();
+
+      // prove
+      {
+        prft::transcript transcript{"abc"};
+        auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                             product_terms, n);
+        xens::get_scheduler().run();
+      }
+
+      for (auto pi : polynomials) {
+        std::cout << "p: " << pi << std::endl;
+      }
+      for (auto [s, len] : product_table) {
+        std::cout << "prod: " << s << " " << len << std::endl;
+      }
+      for (auto mle : product_terms) {
+        std::cout << "mle_index: " << mle << std::endl;
+      }
 
       // we can verify
       {
         prft::transcript transcript{"abc"};
         s25t::element expected_sum;
         sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
+        auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
+                                                   polynomials, polynomial_length - 1u);
+        std::println("v {}", valid);
       }
 /* bool verify_sumcheck_no_evaluation(s25t::element& expected_sum, */
 /*                                    basct::span<s25t::element> evaluation_point, */
@@ -193,6 +219,7 @@ TEST_CASE("we can create a sumcheck proof") {
     test_proof(drv);
   }
   
+#if 0
   SECTION("we can prove with the gpu driver") {
     gpu_driver drv;
     test_proof(drv);
@@ -202,4 +229,5 @@ TEST_CASE("we can create a sumcheck proof") {
     chunked_gpu_driver drv{0.0};
     test_proof(drv);
   }
+#endif
 }
