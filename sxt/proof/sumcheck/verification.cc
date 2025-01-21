@@ -62,7 +62,6 @@ bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
     s25t::element sum;
     sum_polynomial_01(sum, polynomial);
     if (expected_sum != sum) {
-      std::println("failed: {}", round_index);
       basl::info("sumcheck verification failed on round {}", round_index + 1);
       return false;
     }
@@ -70,7 +69,6 @@ bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
     // draw a random scalar
     s25t::element r;
     round_challenge(r, transcript, polynomial);
-    std::cout << "eval: " << evaluation_point[round_index] << " " << r << std::endl;
     evaluation_point[round_index] = r;
 
     // evaluate at random point

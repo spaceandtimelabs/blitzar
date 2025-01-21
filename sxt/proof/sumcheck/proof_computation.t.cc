@@ -154,8 +154,9 @@ static void test_proof(const driver& drv) noexcept {
   }
 
   SECTION("we can verify random sumcheck problems") {
+    basn::fast_random_number_generator rng{1, 2};
+
     for (unsigned i = 0; i < 10; ++i) {
-      basn::fast_random_number_generator rng{1, 2};
       random_sumcheck_descriptor descriptor;
       unsigned n;
       generate_random_sumcheck_problem(mles, product_table, product_terms, n, rng, descriptor);
@@ -168,7 +169,6 @@ static void test_proof(const driver& drv) noexcept {
 
       auto num_variables = n == 1 ? 1 : basn::ceil_log2(n);
       evaluation_point.resize(num_variables);
-      std::println("n = {} {}", n, num_variables);
       polynomials.resize(polynomial_length * num_variables);
 
       // prove
@@ -179,16 +179,6 @@ static void test_proof(const driver& drv) noexcept {
         xens::get_scheduler().run();
       }
 
-      for (auto pi : polynomials) {
-        std::cout << "p: " << pi << std::endl;
-      }
-      for (auto [s, len] : product_table) {
-        std::cout << "prod: " << s << " " << len << std::endl;
-      }
-      for (auto mle : product_terms) {
-        std::cout << "mle_index: " << mle << std::endl;
-      }
-
       // we can verify
       {
         prft::transcript transcript{"abc"};
@@ -197,13 +187,18 @@ static void test_proof(const driver& drv) noexcept {
         auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
                                                    polynomials, polynomial_length - 1u);
         REQUIRE(valid);
-        std::println("v {}", valid);
       }
-/* bool verify_sumcheck_no_evaluation(s25t::element& expected_sum, */
-/*                                    basct::span<s25t::element> evaluation_point, */
-/*                                    prft::transcript& transcript, */
-/*                                    basct::cspan<s25t::element> round_polynomials, */
-/*                                    unsigned round_degree) noexcept; */
+
+      // verification fails if we break the proof
+      {
+        prft::transcript transcript{"abc"};
+        s25t::element expected_sum;
+        sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
+        polynomials[polynomials.size()-1] = polynomials[0] + polynomials[1];
+        auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
+                                                   polynomials, polynomial_length - 1u);
+        REQUIRE(!valid);
+      }
     }
   }
 }
