@@ -43,8 +43,7 @@ struct random_sumcheck_descriptor {
   unsigned max_product_length = max_degree_v;
 
   unsigned min_num_mles = 1;
-  unsigned max_num_mles = 1;
-  /* unsigned max_num_mles = 5; */
+  unsigned max_num_mles = 5;
 };
 
 //--------------------------------------------------------------------------------------------------
