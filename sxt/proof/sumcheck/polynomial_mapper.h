@@ -24,7 +24,7 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // polynomial_mapper
 //--------------------------------------------------------------------------------------------------
-template <unsigned Degree> struct polynomial_mapper2 {
+template <unsigned Degree> struct polynomial_mapper {
   using value_type = std::array<s25t::element, Degree + 1u>;
 
   CUDA_CALLABLE

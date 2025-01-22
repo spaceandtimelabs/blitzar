@@ -38,7 +38,7 @@
 #include "sxt/proof/sumcheck/constant.h"
 #include "sxt/proof/sumcheck/device_cache.h"
 #include "sxt/proof/sumcheck/mle_utility.h"
-#include "sxt/proof/sumcheck/polynomial_mapper2.h"
+#include "sxt/proof/sumcheck/polynomial_mapper.h"
 #include "sxt/proof/sumcheck/reduction_gpu.h"
 #include "sxt/scalar25/operation/add.h"
 #include "sxt/scalar25/operation/mul.h"
@@ -68,7 +68,7 @@ __device__ static void partial_sum_kernel_impl(s25t::element* __restrict__ share
                                                const s25t::element* __restrict__ mles,
                                                const unsigned* __restrict__ product_terms,
                                                unsigned split, unsigned n) noexcept {
-  using Mapper = polynomial_mapper2<NumTerms>;
+  using Mapper = polynomial_mapper<NumTerms>;
   using Reducer = polynomial_reducer<NumTerms>;
   using T = Mapper::value_type;
   Mapper mapper{

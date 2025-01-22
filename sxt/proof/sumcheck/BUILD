@@ -317,7 +317,7 @@ sxt_cc_component(
         ":constant",
         ":device_cache",
         ":mle_utility",
-        ":polynomial_mapper2",
+        ":polynomial_mapper",
         ":reduction_gpu",
         "//sxt/algorithm/reduction:kernel_fit",
         "//sxt/algorithm/reduction:thread_reduction",
@@ -420,7 +420,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "polynomial_mapper2",
+    name = "polynomial_mapper",
     test_deps = [
         # "//sxt/algorithm/base:mapper",
         "//sxt/base/test:unit_test",

@@ -14,4 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/proof/sumcheck/polynomial_mapper2.h"
+#include "sxt/proof/sumcheck/polynomial_mapper.h"
