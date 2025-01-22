@@ -99,7 +99,7 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<
 }
 
 //--------------------------------------------------------------------------------------------------
-// fold_gpu
+// fold_gpu_to_device
 //--------------------------------------------------------------------------------------------------
 static xena::future<> fold_gpu_to_device(basct::span<s25t::element> mles_p,
                                          basct::cspan<s25t::element> mles, unsigned n,
@@ -115,6 +115,15 @@ static xena::future<> fold_gpu_to_device(basct::span<s25t::element> mles_p,
   } else {
     mles_dev = mles;
   }
+
+  // fold
+#if 0
+  auto np = mles_dev.size() / num_mles;
+  auto dims = algi::fit_iteration_kernel(split);
+  fold_kernel<<<dim3(dims.num_blocks, num_mles, 1), static_cast<unsigned>(dims.block_size), 0,
+                stream>>>(mles_dev.data(), np, split, r, one_m_r);
+#endif
+
   (void)mles_p;
   (void)stream;
   (void)mles;
