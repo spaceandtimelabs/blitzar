@@ -169,142 +169,12 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
       polynomial.size() - 1u <= max_degree_v
       // clang-format on
   );
-
-  co_return co_await sum_gpu(polynomial, work.mles, work.product_table, work.product_terms, n);
-#if 0
-xena::future<> sum_gpu(basct::span<s25t::element> p, basct::cspan<s25t::element> mles,
-                       basct::cspan<std::pair<s25t::element, unsigned>> product_table,
-                       basct::cspan<unsigned> product_terms, unsigned n) noexcept;
-#endif
-
-  for (auto& pi : polynomial) {
-    pi = {};
-  }
-
-  auto n1 = n - mid;
-
-  // sum full terms
-  xena::future<> fut1;
-  auto f1 = [&]<unsigned MaxDegree>(std::integral_constant<unsigned, MaxDegree>) noexcept {
-    if (n1 == 0) {
-      fut1 = xena::make_ready_future();
-      return;
-    }
-    polynomial_mapper<MaxDegree> mapper{
-        .mles = work.mles.data(),
-        .product_table = work.product_table.data(),
-        .product_terms = work.product_terms.data(),
-        .num_products = static_cast<unsigned>(work.product_table.size()),
-        .mid = mid,
-        .n = n,
-    };
-    auto fut = algr::reduce<polynomial_reducer<MaxDegree>>(basdv::stream{}, mapper, n1);
-    fut1 = fut.then([&](std::array<s25t::element, MaxDegree + 1u> p) noexcept {
-      for (unsigned i = 0; i < p.size(); ++i) {
-        s25o::add(polynomial[i], polynomial[i], p[i]);
-      }
-    });
-  };
-  basn::constexpr_switch<1u, max_degree_v + 1u>(polynomial.size() - 1u, f1);
-
-  // sum partial terms
-  xena::future<> fut2;
-  auto f2 = [&]<unsigned MaxDegree>(std::integral_constant<unsigned, MaxDegree>) noexcept {
-    if (n1 == mid) {
-      fut2 = xena::make_ready_future();
-      return;
-    }
-    partial_polynomial_mapper<MaxDegree> mapper{
-        .mles = work.mles.data() + n1,
-        .product_table = work.product_table.data(),
-        .product_terms = work.product_terms.data(),
-        .num_products = static_cast<unsigned>(work.product_table.size()),
-        .n = n,
-    };
-    auto fut = algr::reduce<polynomial_reducer<MaxDegree>>(basdv::stream{}, mapper, mid - n1);
-    fut2 = fut.then([&](std::array<s25t::element, MaxDegree + 1u> p) noexcept {
-      for (unsigned i = 0; i < p.size(); ++i) {
-        s25o::add(polynomial[i], polynomial[i], p[i]);
-      }
-    });
-  };
-  basn::constexpr_switch<1u, max_degree_v + 1u>(polynomial.size() - 1u, f2);
-
-  // await results
-  co_await std::move(fut1);
-  co_await std::move(fut2);
+  co_await sum_gpu(polynomial, work.mles, work.product_table, work.product_terms, n);
 }
 
 //--------------------------------------------------------------------------------------------------
 // fold
 //--------------------------------------------------------------------------------------------------
-#if 0
-xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
-  using s25t::operator""_s25;
-  auto& work = static_cast<gpu_workspace&>(ws);
-  auto n = work.n;
-  auto mid = 1u << (work.num_variables - 1u);
-  auto num_mles = work.mles.size() / n;
-  SXT_RELEASE_ASSERT(
-      // clang-format off
-      work.n >= mid && work.mles.size() % n == 0
-      // clang-format on
-  );
-
-  auto n1 = work.n - mid;
-  s25t::element one_m_r = 0x1_s25;
-  s25o::sub(one_m_r, one_m_r, r);
-
-  // fold full terms
-  auto f1 = [
-                // clang-format off
-    mles = work.mles.data(),
-    n = n,
-    num_mles = num_mles,
-    mid = mid,
-    r = r,
-    one_m_r = one_m_r
-                // clang-format on
-  ] __device__
-            __host__(unsigned /*n1*/, unsigned i) noexcept {
-              for (unsigned mle_index = 0; mle_index < num_mles; ++mle_index) {
-                auto data = mles + n * mle_index;
-                auto val = data[i];
-                s25o::mul(val, val, one_m_r);
-                s25o::muladd(val, r, data[mid + i], val);
-                data[i] = val;
-              }
-            };
-  auto fut1 = algi::for_each(f1, n1);
-
-  // fold partial terms
-  auto f2 = [
-                // clang-format off
-    mles = work.mles.data() + n1,
-    n = n,
-    num_mles = num_mles,
-    one_m_r = one_m_r
-                // clang-format on
-  ] __device__
-            __host__(unsigned /*n1*/, unsigned i) noexcept {
-              for (unsigned mle_index = 0; mle_index < num_mles; ++mle_index) {
-                auto data = mles + n * mle_index;
-                auto val = data[i];
-                s25o::mul(val, val, one_m_r);
-                data[i] = val;
-              }
-            };
-  auto fut2 = algi::for_each(f2, mid - n1);
-
-  // complete
-  co_await std::move(fut1);
-  co_await std::move(fut2);
-  work.n = mid;
-  --work.num_variables;
-  work.mles.shrink(num_mles * mid);
-}
-#endif
-
 xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
   using s25t::operator""_s25;
   auto& work = static_cast<gpu_workspace&>(ws);
@@ -322,7 +192,6 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
   s25o::sub(one_m_r, one_m_r, r);
 
   memmg::managed_array<s25t::element> mles_p{num_mles * mid, memr::get_device_resource()};
-  /* memmg::managed_array<s25t::element> mles_p{num_mles * mid, memr::get_managed_device_resource()}; */
 
   auto f = [
                // clang-format off
@@ -348,7 +217,6 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
 
   // complete
   co_await std::move(fut);
-  /* basdv::synchronize_device(); */
 
   {
     std::cerr << "******************************************\n";
