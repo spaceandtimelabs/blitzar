@@ -32,6 +32,32 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "mle_utility",
+    impl_deps = [
+        "//sxt/base/container:span_utility",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:property",
+        "//sxt/base/num:divide_up",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/memory/management:managed_array",
+        "//sxt/scalar25/type:element",
+    ],
+    test_deps = [
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/memory/management:managed_array_fwd",
+    ],
+)
+
+sxt_cc_component(
     name = "workspace",
     with_test = False,
 )
