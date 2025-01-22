@@ -74,8 +74,13 @@ void copy_folded_mles(basct::span<s25t::element> host_mles, basdv::stream& strea
   auto num_mles = host_mles.size() / np;
   auto slice_n = device_mles.size() / num_mles;
   auto slice_np = b - a;
-  SXT_DEBUG_ASSERT(host_mles.size() == num_mles * np && device_mles.size() == num_mles * slice_n &&
-                   b <= np);
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      host_mles.size() == num_mles * np && 
+      device_mles.size() == num_mles * slice_n &&
+      b <= np
+      // clang-format on
+  );
   for (unsigned mle_index = 0; mle_index < num_mles; ++mle_index) {
     auto src = device_mles.subspan(mle_index * slice_n, slice_np);
     auto dst = host_mles.subspan(mle_index * np + a, slice_np);

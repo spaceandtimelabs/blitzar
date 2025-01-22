@@ -1,4 +1,4 @@
-Benchmarking for cpu vs gpu of naive scalar multiplication
+# Benchmarking for cpu vs gpu of naive scalar multiplication
 
 ## Results
 
