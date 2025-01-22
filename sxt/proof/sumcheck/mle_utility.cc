@@ -40,19 +40,15 @@ void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv:
   auto mid = 1u << (num_variables - 1u);
   auto num_mles = mles.size() / n;
   auto part1_size = b - a;
-  /* SXT_DEBUG_ASSERT( */
-  /*     b <= mid */
-  /* ); */
+  SXT_DEBUG_ASSERT(
+      a < b && b <= n
+  );
   auto ap = std::min(mid + a, n);
   auto bp = std::min(mid + b, n);
   auto part2_size = bp - ap;
 
   // resize array
   auto partial_length = part1_size + part2_size;
-  std::cerr << "n = " << n << std::endl;
-  std::cerr << "num_mles = " << num_mles << std::endl;
-  std::cerr << "part1 = " << part1_size << std::endl;
-  std::cerr << "part2 = " << part2_size << std::endl;
   partial_mles.resize(partial_length * num_mles);
 
   // copy data
@@ -80,13 +76,6 @@ void copy_folded_mles(basct::span<s25t::element> host_mles, basdv::stream& strea
   auto num_mles = host_mles.size() / np;
   auto slice_n = device_mles.size() / num_mles;
   auto slice_np = b - a;
-  std::cout << "copy_folded_mles: np = " << np << std::endl;
-  std::cout << "copy_folded_mles: a, b = " << a << " " << b << std::endl;
-  std::cout << "copy_folded_mles: num_mles = " << num_mles << std::endl;
-  std::cout << "copy_folded_mles: slice_n = " << slice_n << std::endl;
-  std::cout << "copy_folded_mles: slice_np = " << slice_np << std::endl;
-  std::cout << "copy_folded_mles: host_mles.size() = " << host_mles.size() << std::endl;
-  std::cout << "copy_folded_mles: device_mles.size() = " << device_mles.size() << std::endl;
   SXT_DEBUG_ASSERT(host_mles.size() == num_mles * np && device_mles.size() == num_mles * slice_n &&
                    b <= np);
   for (unsigned mle_index = 0; mle_index < num_mles; ++mle_index) {
@@ -99,13 +88,8 @@ void copy_folded_mles(basct::span<s25t::element> host_mles, basdv::stream& strea
 //--------------------------------------------------------------------------------------------------
 // get_gpu_memory_fraction
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 double get_gpu_memory_fraction(basct::cspan<s25t::element> mles) noexcept {
   auto total_memory = static_cast<double>(basdv::get_total_device_memory());
   return static_cast<double>(mles.size() * sizeof(s25t::element)) / total_memory;
 }
-#pragma clang diagnostic pop
 } // namespace sxt::prfsk

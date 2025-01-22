@@ -43,10 +43,15 @@ TEST_CASE("we can copy a slice of mles to device memory") {
     memmg::managed_array<s25t::element> expected = {0x123_s25};
     REQUIRE(partial_mles == expected);
   }
+
+  SECTION("we can copy a slice of MLEs") {
+    mles = {0x1_s25, 0x2_s25, 0x3_s25, 0x4_s25, 0x5_s25, 0x6_s25};
+    copy_partial_mles(partial_mles, stream, mles, 3, 0, 1);
+    basdv::synchronize_stream(stream);
+    memmg::managed_array<s25t::element> expected = {0x1_s25, 0x3_s25, 0x4_s25, 0x6_s25};
+    REQUIRE(partial_mles == expected);
+  }
 }
-/* void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv::stream& stream, */
-/*                        basct::cspan<s25t::element> mles, unsigned n, unsigned a, */
-/*                        unsigned b) noexcept; */
 
 TEST_CASE("we can query the fraction of device memory taken by MLEs") {
   std::vector<s25t::element> mles;
