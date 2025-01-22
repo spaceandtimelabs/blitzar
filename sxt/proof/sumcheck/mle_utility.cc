@@ -40,9 +40,7 @@ void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv:
   auto mid = 1u << (num_variables - 1u);
   auto num_mles = mles.size() / n;
   auto part1_size = b - a;
-  SXT_DEBUG_ASSERT(
-      a < b && b <= n
-  );
+  SXT_DEBUG_ASSERT(a < b && b <= n);
   auto ap = std::min(mid + a, n);
   auto bp = std::min(mid + b, n);
   auto part2_size = bp - ap;

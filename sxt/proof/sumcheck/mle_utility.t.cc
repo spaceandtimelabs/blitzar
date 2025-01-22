@@ -53,6 +53,31 @@ TEST_CASE("we can copy a slice of mles to device memory") {
   }
 }
 
+TEST_CASE("we can copy partially folded MLEs to the host") {
+  std::pmr::vector<s25t::element> device_mles{memr::get_managed_device_resource()};
+  std::vector<s25t::element> host_mles;
+
+  basdv::stream stream;
+
+  SECTION("we can copy a single element") {
+    device_mles = {0x123_s25};
+    host_mles.resize(1);
+    copy_folded_mles(host_mles, stream, device_mles, 1, 0, 1);
+    basdv::synchronize_stream(stream);
+    std::vector<s25t::element> expected = {0x123_s25};
+    REQUIRE(host_mles == expected);
+  }
+
+  SECTION("we can copy partially folded MLEs") {
+    device_mles = {0x123_s25, 0x456_s25};
+    host_mles.resize(4);
+    copy_folded_mles(host_mles, stream, device_mles, 2, 0, 1);
+    basdv::synchronize_stream(stream);
+    std::vector<s25t::element> expected = {0x123_s25, 0x0_s25, 0x456_s25, 0x0_s25};
+    REQUIRE(host_mles == expected);
+  }
+}
+
 TEST_CASE("we can query the fraction of device memory taken by MLEs") {
   std::vector<s25t::element> mles;
 

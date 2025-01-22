@@ -10,15 +10,15 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "sumcheck_random",
-    with_test = False,
-    deps = [
-      ":constant",
-    ],
     impl_deps = [
         "//sxt/base/error:assert",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/scalar25/random:element",
         "//sxt/scalar25/type:element",
+    ],
+    with_test = False,
+    deps = [
+        ":constant",
     ],
 )
 
@@ -57,11 +57,11 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
-        "//sxt/base/device:synchronization",
-        "//sxt/base/device:stream",
-        "//sxt/base/test:unit_test",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
     ],

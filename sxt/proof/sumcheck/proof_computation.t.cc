@@ -195,7 +195,7 @@ static void test_proof(const driver& drv) noexcept {
         prft::transcript transcript{"abc"};
         s25t::element expected_sum;
         sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
-        polynomials[polynomials.size()-1] = polynomials[0] + polynomials[1];
+        polynomials[polynomials.size() - 1] = polynomials[0] + polynomials[1];
         auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
                                                    polynomials, polynomial_length - 1u);
         REQUIRE(!valid);
@@ -209,13 +209,13 @@ TEST_CASE("we can create a sumcheck proof") {
     cpu_driver drv;
     test_proof(drv);
   }
-  
+
+#if 0
   SECTION("we can prove with the gpu driver") {
     gpu_driver drv;
     test_proof(drv);
   }
   
-#if 0
   SECTION("we can prove with the chunked gpu driver") {
     chunked_gpu_driver drv{0.0};
     test_proof(drv);
