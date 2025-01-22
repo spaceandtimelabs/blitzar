@@ -158,8 +158,7 @@ static void test_proof(const driver& drv) noexcept {
   SECTION("we can verify random sumcheck problems") {
     basn::fast_random_number_generator rng{1, 2};
 
-    /* for (unsigned i = 0; i < 10; ++i) { */
-    for (unsigned i = 0; i < 1; ++i) {
+    for (unsigned i = 0; i < 10; ++i) {
       random_sumcheck_descriptor descriptor;
       unsigned n;
       generate_random_sumcheck_problem(mles, product_table, product_terms, n, rng, descriptor);
