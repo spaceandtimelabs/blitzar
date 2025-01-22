@@ -289,4 +289,49 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
   --work.num_variables;
   work.mles.shrink(num_mles * mid);
 }
+
+xena::future<> gpu_driver::fold2(workspace& ws, const s25t::element& r) const noexcept {
+  using s25t::operator""_s25;
+  auto& work = static_cast<gpu_workspace&>(ws);
+  auto n = work.n;
+  auto mid = 1u << (work.num_variables - 1u);
+  auto num_mles = work.mles.size() / n;
+  SXT_RELEASE_ASSERT(
+      // clang-format off
+      work.n >= mid && work.mles.size() % n == 0
+      // clang-format on
+  );
+
+  auto n1 = work.n - mid;
+  s25t::element one_m_r = 0x1_s25;
+  s25o::sub(one_m_r, one_m_r, r);
+
+  memmg::managed_array<s25t::element> mles_p{num_mles * mid, memr::get_device_resource()};
+
+  auto f = [
+               // clang-format off
+    mles_p = mles_p.data(),
+    mles = work.mles.data(),
+    n = n,
+    num_mles = num_mles,
+    r = r,
+    one_m_r = one_m_r
+               // clang-format on
+  ] __device__
+           __host__(unsigned mid, unsigned i) noexcept {
+             auto val = mles[i];
+             s25o::mul(val, val, one_m_r);
+             if (mid + i < n) {
+               s25o::muladd(val, r, mles[mid + i], val);
+             }
+             mles_p[i] = val;
+           };
+  auto fut = algi::for_each(f, mid);
+
+  // complete
+  co_await std::move(fut);
+  work.n = mid;
+  --work.num_variables;
+  work.mles = std::move(mles_p);
+}
 } // namespace sxt::prfsk

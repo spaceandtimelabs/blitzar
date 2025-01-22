@@ -39,5 +39,7 @@ public:
   xena::future<> sum(basct::span<s25t::element> polynomial, workspace& ws) const noexcept override;
 
   xena::future<> fold(workspace& ws, const s25t::element& r) const noexcept override;
+
+  xena::future<> fold2(workspace& ws, const s25t::element& r) const noexcept;
 };
 } // namespace sxt::prfsk
