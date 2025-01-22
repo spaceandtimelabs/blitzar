@@ -225,6 +225,7 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
 //--------------------------------------------------------------------------------------------------
 // fold
 //--------------------------------------------------------------------------------------------------
+#if 0
 xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
   using s25t::operator""_s25;
   auto& work = static_cast<gpu_workspace&>(ws);
@@ -289,8 +290,9 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
   --work.num_variables;
   work.mles.shrink(num_mles * mid);
 }
+#endif
 
-xena::future<> gpu_driver::fold2(workspace& ws, const s25t::element& r) const noexcept {
+xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noexcept {
   using s25t::operator""_s25;
   auto& work = static_cast<gpu_workspace&>(ws);
   auto n = work.n;
@@ -319,12 +321,14 @@ xena::future<> gpu_driver::fold2(workspace& ws, const s25t::element& r) const no
                // clang-format on
   ] __device__
            __host__(unsigned mid, unsigned i) noexcept {
-             auto val = mles[i];
-             s25o::mul(val, val, one_m_r);
-             if (mid + i < n) {
-               s25o::muladd(val, r, mles[mid + i], val);
+             for (unsigned mle_index = 0; mle_index < num_mles; ++mle_index) {
+               auto val = mles[i + mle_index * n];
+               s25o::mul(val, val, one_m_r);
+               if (mid + i < n) {
+                 s25o::muladd(val, r, mles[mid + i + mle_index * n], val);
+               }
+               mles_p[i + mle_index * mid] = val;
              }
-             mles_p[i] = val;
            };
   auto fut = algi::for_each(f, mid);
 

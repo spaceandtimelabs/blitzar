@@ -18,11 +18,35 @@
 
 #include <vector>
 
+#include "sxt/base/device/stream.h"
+#include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/managed_device_resource.h"
 #include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::prfsk;
+using s25t::operator""_s25;
+
+TEST_CASE("we can copy a slice of mles to device memory") {
+  std::pmr::vector<s25t::element> mles{memr::get_managed_device_resource()};
+  memmg::managed_array<s25t::element> partial_mles{memr::get_managed_device_resource()};
+
+  basdv::stream stream;
+
+  SECTION("we can copy an mle with a single element") {
+    mles = {0x123_s25};
+    copy_partial_mles(partial_mles, stream, mles, 1, 0, 1);
+    basdv::synchronize_stream(stream);
+    memmg::managed_array<s25t::element> expected = {0x123_s25};
+    REQUIRE(partial_mles == expected);
+  }
+}
+/* void copy_partial_mles(memmg::managed_array<s25t::element>& partial_mles, basdv::stream& stream, */
+/*                        basct::cspan<s25t::element> mles, unsigned n, unsigned a, */
+/*                        unsigned b) noexcept; */
 
 TEST_CASE("we can query the fraction of device memory taken by MLEs") {
   std::vector<s25t::element> mles;

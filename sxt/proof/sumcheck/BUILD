@@ -57,8 +57,13 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/device:stream",
         "//sxt/base/test:unit_test",
         "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
     ],
     deps = [
         "//sxt/base/container:span",
