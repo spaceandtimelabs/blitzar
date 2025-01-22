@@ -24,8 +24,6 @@
 #include "sxt/base/device/synchronization.h"
 
 #include "sxt/algorithm/iteration/for_each.h"
-#include "sxt/algorithm/reduction/reduction.h"
-#include "sxt/base/container/stack_array.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/panic.h"
@@ -37,10 +35,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
-#include "sxt/memory/resource/managed_device_resource.h"
 #include "sxt/proof/sumcheck/constant.h"
-#include "sxt/proof/sumcheck/partial_polynomial_mapper.h"
-#include "sxt/proof/sumcheck/polynomial_mapper.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/proof/sumcheck/sum_gpu.h"
 #include "sxt/scalar25/operation/mul.h"
@@ -50,21 +45,6 @@
 #include "sxt/scalar25/type/literal.h"
 
 namespace sxt::prfsk {
-//--------------------------------------------------------------------------------------------------
-// polynomial_reducer
-//--------------------------------------------------------------------------------------------------
-namespace {
-template <unsigned MaxDegree> struct polynomial_reducer {
-  using value_type = std::array<s25t::element, MaxDegree + 1u>;
-
-  CUDA_CALLABLE static void accumulate_inplace(value_type& res, const value_type& e) noexcept {
-    for (unsigned i = 0; i < res.size(); ++i) {
-      s25o::add(res[i], res[i], e[i]);
-    }
-  }
-};
-} // namespace
-
 //--------------------------------------------------------------------------------------------------
 // gpu_workspace
 //--------------------------------------------------------------------------------------------------
