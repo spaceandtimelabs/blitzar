@@ -16,9 +16,12 @@
  */
 #include "sxt/proof/sumcheck/gpu_driver.h"
 
+#include <iostream>
 #include <algorithm>
 #include <chrono>
 #include <print>
+
+#include "sxt/base/device/synchronization.h"
 
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/algorithm/reduction/reduction.h"
@@ -34,10 +37,12 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
+#include "sxt/memory/resource/managed_device_resource.h"
 #include "sxt/proof/sumcheck/constant.h"
 #include "sxt/proof/sumcheck/partial_polynomial_mapper.h"
 #include "sxt/proof/sumcheck/polynomial_mapper.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
+#include "sxt/proof/sumcheck/sum_gpu.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
 #include "sxt/scalar25/operation/sub.h"
@@ -164,6 +169,14 @@ xena::future<> gpu_driver::sum(basct::span<s25t::element> polynomial,
       polynomial.size() - 1u <= max_degree_v
       // clang-format on
   );
+
+  co_return co_await sum_gpu(polynomial, work.mles, work.product_table, work.product_terms, n);
+#if 0
+xena::future<> sum_gpu(basct::span<s25t::element> p, basct::cspan<s25t::element> mles,
+                       basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+                       basct::cspan<unsigned> product_terms, unsigned n) noexcept;
+#endif
+
   for (auto& pi : polynomial) {
     pi = {};
   }
@@ -309,6 +322,7 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
   s25o::sub(one_m_r, one_m_r, r);
 
   memmg::managed_array<s25t::element> mles_p{num_mles * mid, memr::get_device_resource()};
+  /* memmg::managed_array<s25t::element> mles_p{num_mles * mid, memr::get_managed_device_resource()}; */
 
   auto f = [
                // clang-format off
@@ -334,6 +348,17 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
 
   // complete
   co_await std::move(fut);
+  /* basdv::synchronize_device(); */
+
+  {
+    std::cerr << "******************************************\n";
+    std::vector<s25t::element> mles_host(mles_p.size());
+    basdv::memcpy_device_to_host(mles_host.data(), mles_p.data(), mles_p.size() * sizeof(s25t::element));
+    for (auto& xi : mles_host) {
+      std::cerr << "mle: " << xi << std::endl;
+    }
+  }
+
   work.n = mid;
   --work.num_variables;
   work.mles = std::move(mles_p);

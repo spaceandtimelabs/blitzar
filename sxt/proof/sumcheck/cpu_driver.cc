@@ -154,6 +154,13 @@ xena::future<> cpu_driver::fold(workspace& ws, const s25t::element& r) const noe
     }
   }
 
+  {
+    std::cerr << "******************************************\n";
+    for (auto& xi : mles_p) {
+      std::cerr << "mle: " << xi << std::endl;
+    }
+  }
+
   work.n = mid;
   --work.num_variables;
   work.mles = std::move(mles_p);

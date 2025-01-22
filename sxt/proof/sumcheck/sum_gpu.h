@@ -52,4 +52,8 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
 
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        basct::cspan<s25t::element> mles, unsigned n) noexcept;
+
+xena::future<> sum_gpu(basct::span<s25t::element> p, basct::cspan<s25t::element> mles,
+                       basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+                       basct::cspan<unsigned> product_terms, unsigned n) noexcept;
 } // namespace sxt::prfsk

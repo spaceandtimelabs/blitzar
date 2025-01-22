@@ -21,6 +21,7 @@
 
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
+#include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/state.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/iterator/split.h"
@@ -213,5 +214,22 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
       .split_factor = basdv::get_num_devices(),
   };
   co_await sum_gpu(p, cache, options, mles, n);
+}
+
+xena::future<> sum_gpu(basct::span<s25t::element> p, basct::cspan<s25t::element> mles,
+                       basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+                       basct::cspan<unsigned> product_terms, unsigned n) noexcept {
+  auto num_variables = std::max(basn::ceil_log2(n), 1);
+  auto mid = 1u << (num_variables - 1u);
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      basdv::is_host_pointer(p.data()) &&
+      basdv::is_active_device_pointer(mles.data()) &&
+      basdv::is_active_device_pointer(product_table.data()) &&
+      basdv::is_active_device_pointer(product_terms.data())
+      // clang-format on
+  );
+  basdv::stream stream;
+  co_await partial_sum(p, stream, mles, product_table, product_terms, mid, n);
 }
 } // namespace sxt::prfsk
