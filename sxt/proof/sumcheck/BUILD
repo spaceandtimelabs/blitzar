@@ -58,6 +58,20 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "sumcheck_random",
+    impl_deps = [
+        "//sxt/base/error:assert",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/scalar25/random:element",
+        "//sxt/scalar25/type:element",
+    ],
+    with_test = False,
+    deps = [
+        ":constant",
+    ],
+)
+
+sxt_cc_component(
     name = "workspace",
     with_test = False,
 )
