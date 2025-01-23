@@ -16,16 +16,15 @@
  */
 #include "sxt/proof/sumcheck/gpu_driver.h"
 
-#include <iostream>
 #include <algorithm>
 #include <chrono>
+#include <iostream>
 #include <print>
-
-#include "sxt/base/device/synchronization.h"
 
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/device/synchronization.h"
 #include "sxt/base/error/panic.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/constexpr_switch.h"
@@ -201,7 +200,8 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
   {
     std::cerr << "******************************************\n";
     std::vector<s25t::element> mles_host(mles_p.size());
-    basdv::memcpy_device_to_host(mles_host.data(), mles_p.data(), mles_p.size() * sizeof(s25t::element));
+    basdv::memcpy_device_to_host(mles_host.data(), mles_p.data(),
+                                 mles_p.size() * sizeof(s25t::element));
     for (auto& xi : mles_host) {
       std::cerr << "mle: " << xi << std::endl;
     }

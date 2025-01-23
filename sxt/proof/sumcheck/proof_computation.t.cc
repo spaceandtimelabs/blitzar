@@ -217,7 +217,7 @@ TEST_CASE("we can create a sumcheck proof") {
     gpu_driver drv;
     test_proof(drv);
   }
-  
+
 #if 0
   SECTION("we can prove with the chunked gpu driver") {
     chunked_gpu_driver drv{0.0};
