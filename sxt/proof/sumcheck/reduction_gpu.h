@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2023-present Space and Time Labs, Inc.
+ * Copyright 2025-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,20 @@
  */
 #pragma once
 
-#include <concepts>
+#include "sxt/base/container/span.h"
+#include "sxt/execution/async/future_fwd.h"
 
-namespace sxt::algb {
-//--------------------------------------------------------------------------------------------------
-// mapper
-//--------------------------------------------------------------------------------------------------
-/**
- * Describe a generic map function that can be used within CUDA kernels.
- *
- * Mapper turns an index into a value.
- */
-template <class M>
-concept mapper = requires(M m, typename M::value_type& x, unsigned int i) {
-  // Note: the std::convertable_to concept gives a compilation error in GPU code.
-  // As a work around, it's commented out and the constraint on the returned
-  // value is ignored.
-  /* { m.map_index(i) } noexcept -> std::convertible_to<typename M::value_type>; */
-  { m.map_index(i) } noexcept;
+namespace sxt::basdv {
+class stream;
+}
+namespace sxt::s25t {
+class element;
+}
 
-  { m.map_index(x, i) } noexcept;
-};
-} // namespace sxt::algb
+namespace sxt::prfsk {
+//--------------------------------------------------------------------------------------------------
+// reduce_sums
+//--------------------------------------------------------------------------------------------------
+xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
+                           basct::cspan<s25t::element> partial_terms) noexcept;
+} // namespace sxt::prfsk
