@@ -36,8 +36,7 @@ namespace sxt::algr {
  */
 template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Mapper>
   requires std::same_as<typename Reducer::value_type, typename Mapper::value_type>
-__device__ void thread_reduce(typename Reducer::value_type* out,
-                              typename Reducer::value_type* shared_data, Mapper mapper,
+__device__ void thread_reduce(typename Reducer::value_type* shared_data, Mapper mapper,
                               unsigned int n, unsigned int step, unsigned int thread_index,
                               unsigned int index) {
   // clang-format off
@@ -50,7 +49,7 @@ __device__ void thread_reduce(typename Reducer::value_type* out,
   // handle BlockSize == 1 as a special case
   if constexpr (BlockSize == 1) {
     if (n == 1) {
-      mapper.map_index(*out, index);
+      mapper.map_index(*shared_data, index);
       return;
     }
   }
@@ -97,6 +96,15 @@ __device__ void thread_reduce(typename Reducer::value_type* out,
   if (thread_index < 32) {
     warp_reduce<Reducer, BlockSize>(shared_data, thread_index);
   }
+}
+
+template <algb::reducer Reducer, unsigned int BlockSize, algb::mapper Mapper>
+  requires std::same_as<typename Reducer::value_type, typename Mapper::value_type>
+__device__ void thread_reduce(typename Reducer::value_type* out,
+                              typename Reducer::value_type* shared_data, Mapper mapper,
+                              unsigned int n, unsigned int step, unsigned int thread_index,
+                              unsigned int index) {
+  thread_reduce<Reducer, BlockSize>(shared_data, mapper, n, step, thread_index, index);
   if (thread_index == 0) {
     *out = shared_data[0];
   }
