@@ -9,20 +9,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "sumcheck_random",
-    impl_deps = [
-        "//sxt/base/error:assert",
-        "//sxt/base/num:fast_random_number_generator",
-        "//sxt/scalar25/random:element",
-        "//sxt/scalar25/type:element",
-    ],
-    with_test = False,
-    deps = [
-        ":constant",
-    ],
-)
-
-sxt_cc_component(
     name = "device_cache",
     impl_deps = [
         "//sxt/base/device:memory_utility",
@@ -68,6 +54,20 @@ sxt_cc_component(
     deps = [
         "//sxt/base/container:span",
         "//sxt/memory/management:managed_array_fwd",
+    ],
+)
+
+sxt_cc_component(
+    name = "sumcheck_random",
+    impl_deps = [
+        "//sxt/base/error:assert",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/scalar25/random:element",
+        "//sxt/scalar25/type:element",
+    ],
+    with_test = False,
+    deps = [
+        ":constant",
     ],
 )
 
@@ -360,6 +360,28 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "verification",
+    impl_deps = [
+        ":polynomial_utility",
+        ":transcript_utility",
+        "//sxt/base/error:assert",
+        "//sxt/base/log:log",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+        "//sxt/proof/transcript:transcript_utility",
+    ],
+    test_deps = [
+        ":transcript_utility",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "reduction_gpu",
     impl_deps = [
         "//sxt/algorithm/base:identity_mapper",
@@ -397,27 +419,6 @@ sxt_cc_component(
     ],
 )
 
-sxt_cc_component(
-    name = "verification",
-    impl_deps = [
-        ":polynomial_utility",
-        ":transcript_utility",
-        "//sxt/base/error:assert",
-        "//sxt/base/log:log",
-        "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
-        "//sxt/proof/transcript:transcript_utility",
-    ],
-    test_deps = [
-        ":transcript_utility",
-        "//sxt/base/test:unit_test",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-    ],
-)
 
 sxt_cc_component(
     name = "polynomial_mapper",

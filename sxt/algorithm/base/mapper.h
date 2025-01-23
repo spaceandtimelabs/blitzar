@@ -29,7 +29,12 @@ namespace sxt::algb {
  */
 template <class M>
 concept mapper = requires(M m, typename M::value_type& x, unsigned int i) {
+  // Note: the std::convertable_to concept gives a compilation error in GPU code.
+  // As a work around, it's commented out and the constraint on the returned
+  // value is ignored.
   /* { m.map_index(i) } noexcept -> std::convertible_to<typename M::value_type>; */
+  { m.map_index(i) } noexcept;
+
   { m.map_index(x, i) } noexcept;
 };
 } // namespace sxt::algb
