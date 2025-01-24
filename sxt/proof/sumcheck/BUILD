@@ -333,6 +333,8 @@ sxt_cc_component(
         "//sxt/algorithm/base:mapper",
         "//sxt/base/test:unit_test",
         "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
     ],
     deps = [
         ":polynomial_utility",
