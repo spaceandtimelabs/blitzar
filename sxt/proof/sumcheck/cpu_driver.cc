@@ -129,31 +129,41 @@ xena::future<> cpu_driver::fold(workspace& ws, const s25t::element& r) const noe
   );
 
   auto mles = work.mles.data();
+  memmg::managed_array<s25t::element> mles_p(num_mles * mid);
+
   s25t::element one_m_r = 0x1_s25;
   s25o::sub(one_m_r, one_m_r, r);
   auto n1 = work.n - mid;
   for (auto mle_index = 0; mle_index < num_mles; ++mle_index) {
     auto data = mles + n * mle_index;
+    auto data_p = mles_p.data() + mid * mle_index;
 
     // fold paired terms
     for (unsigned i = 0; i < n1; ++i) {
       auto val = data[i];
       s25o::mul(val, val, one_m_r);
       s25o::muladd(val, r, data[mid + i], val);
-      data[i] = val;
+      data_p[i] = val;
     }
 
     // fold terms paired with zero
     for (unsigned i = n1; i < mid; ++i) {
       auto val = data[i];
       s25o::mul(val, val, one_m_r);
-      data[i] = val;
+      data_p[i] = val;
+    }
+  }
+
+  {
+    std::cerr << "******************************************\n";
+    for (auto& xi : mles_p) {
+      std::cerr << "mle: " << xi << std::endl;
     }
   }
 
   work.n = mid;
   --work.num_variables;
-  work.mles.shrink(num_mles * mid);
+  work.mles = std::move(mles_p);
   return xena::make_ready_future();
 }
 } // namespace sxt::prfsk

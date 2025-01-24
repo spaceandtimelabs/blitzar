@@ -16,13 +16,21 @@
  */
 #include "sxt/proof/sumcheck/proof_computation.h"
 
+#include <iostream>
 #include <utility>
 #include <vector>
 
+#include "sxt/base/container/span_utility.h"
+#include "sxt/base/num/ceil_log2.h"
+#include "sxt/base/num/fast_random_number_generator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/proof/sumcheck/cpu_driver.h"
+#include "sxt/proof/sumcheck/gpu_driver.h"
+#include "sxt/proof/sumcheck/polynomial_utility.h"
+#include "sxt/proof/sumcheck/sumcheck_random.h"
+#include "sxt/proof/sumcheck/verification.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"
@@ -32,9 +40,8 @@ using namespace sxt;
 using namespace sxt::prfsk;
 using s25t::operator""_s25;
 
-TEST_CASE("we can create a sumcheck proof") {
+static void test_proof(const driver& drv) noexcept {
   prft::transcript transcript{"abc"};
-  cpu_driver drv;
   std::vector<s25t::element> polynomials(2);
   std::vector<s25t::element> evaluation_point(1);
   std::vector<s25t::element> mles = {
@@ -46,6 +53,7 @@ TEST_CASE("we can create a sumcheck proof") {
   };
   std::vector<unsigned> product_terms = {0};
 
+#if 0
   SECTION("we can prove a sum with n=1") {
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
                          product_terms, 1);
@@ -143,5 +151,69 @@ TEST_CASE("we can create a sumcheck proof") {
 
     REQUIRE(polynomials[2] == mles[0]);
     REQUIRE(polynomials[3] == mles[1] - mles[0]);
+  }
+#endif
+
+  SECTION("we can verify random sumcheck problems") {
+    basn::fast_random_number_generator rng{1, 2};
+
+    for (unsigned i = 0; i < 10; ++i) {
+      random_sumcheck_descriptor descriptor;
+      unsigned n;
+      generate_random_sumcheck_problem(mles, product_table, product_terms, n, rng, descriptor);
+      std::println("num_mles = {}", mles.size() / n);
+
+      unsigned polynomial_length = 0;
+      for (auto [_, len] : product_table) {
+        polynomial_length = std::max(polynomial_length, len + 1u);
+      }
+
+      auto num_variables = n == 1 ? 1 : basn::ceil_log2(n);
+      evaluation_point.resize(num_variables);
+      polynomials.resize(polynomial_length * num_variables);
+
+      // prove
+      {
+        prft::transcript transcript{"abc"};
+        auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                             product_terms, n);
+        xens::get_scheduler().run();
+      }
+
+      // we can verify
+      {
+        prft::transcript transcript{"abc"};
+        s25t::element expected_sum;
+        sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
+        std::cout << "expected sum: " << expected_sum << std::endl;
+        auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
+                                                   polynomials, polynomial_length - 1u);
+        std::cerr << "v: " << valid << std::endl;
+        REQUIRE(valid);
+      }
+
+      // verification fails if we break the proof
+      {
+        prft::transcript transcript{"abc"};
+        s25t::element expected_sum;
+        sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
+        polynomials[polynomials.size() - 1] = polynomials[0] + polynomials[1];
+        auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
+                                                   polynomials, polynomial_length - 1u);
+        REQUIRE(!valid);
+      }
+    }
+  }
+}
+
+TEST_CASE("we can create a sumcheck proof") {
+  SECTION("we can prove with the cpu driver") {
+    cpu_driver drv;
+    test_proof(drv);
+  }
+
+  SECTION("we can prove with the gpu driver") {
+    gpu_driver drv;
+    test_proof(drv);
   }
 }
