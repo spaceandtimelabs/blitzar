@@ -158,7 +158,6 @@ static void test_proof(const driver& drv) noexcept {
       random_sumcheck_descriptor descriptor;
       unsigned n;
       generate_random_sumcheck_problem(mles, product_table, product_terms, n, rng, descriptor);
-      std::println("num_mles = {}", mles.size() / n);
 
       unsigned polynomial_length = 0;
       for (auto [_, len] : product_table) {
