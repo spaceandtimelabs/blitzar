@@ -17,7 +17,6 @@
 #include "sxt/proof/sumcheck/cpu_driver.h"
 
 #include <algorithm>
-#include <iostream>
 
 #include "sxt/base/container/stack_array.h"
 #include "sxt/base/error/panic.h"
@@ -151,13 +150,6 @@ xena::future<> cpu_driver::fold(workspace& ws, const s25t::element& r) const noe
       auto val = data[i];
       s25o::mul(val, val, one_m_r);
       data_p[i] = val;
-    }
-  }
-
-  {
-    std::cerr << "******************************************\n";
-    for (auto& xi : mles_p) {
-      std::cerr << "mle: " << xi << std::endl;
     }
   }
 
