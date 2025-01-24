@@ -18,8 +18,6 @@
 
 #include <algorithm>
 #include <chrono>
-#include <iostream>
-#include <print>
 
 #include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/device/memory_utility.h"
@@ -35,7 +33,6 @@
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/proof/sumcheck/constant.h"
-#include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/proof/sumcheck/sum_gpu.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
@@ -166,7 +163,6 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
       // clang-format on
   );
 
-  auto n1 = work.n - mid;
   s25t::element one_m_r = 0x1_s25;
   s25o::sub(one_m_r, one_m_r, r);
 
@@ -196,16 +192,6 @@ xena::future<> gpu_driver::fold(workspace& ws, const s25t::element& r) const noe
 
   // complete
   co_await std::move(fut);
-
-  {
-    std::cerr << "******************************************\n";
-    std::vector<s25t::element> mles_host(mles_p.size());
-    basdv::memcpy_device_to_host(mles_host.data(), mles_p.data(),
-                                 mles_p.size() * sizeof(s25t::element));
-    for (auto& xi : mles_host) {
-      std::cerr << "mle: " << xi << std::endl;
-    }
-  }
 
   work.n = mid;
   --work.num_variables;

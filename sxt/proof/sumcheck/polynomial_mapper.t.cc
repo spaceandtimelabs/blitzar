@@ -16,6 +16,46 @@
  */
 #include "sxt/proof/sumcheck/polynomial_mapper.h"
 
-#include "sxt/base/test/unit_test.h"
+#include <vector>
 
-TEST_CASE("todo") {}
+#include "sxt/base/test/unit_test.h"
+#include "sxt/scalar25/operation/overload.h"
+#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/type/literal.h"
+
+using namespace sxt;
+using namespace sxt::prfsk;
+using s25t::operator""_s25;
+
+TEST_CASE("we can map indexes to expanded polynomials") {
+  std::vector<s25t::element> mles;
+  std::vector<unsigned> product_terms;
+
+  SECTION("we can map a single element mle") {
+    mles = {0x123_s25};
+    product_terms = {0};
+    polynomial_mapper<1> m{
+        .mles = mles.data(),
+        .product_terms = product_terms.data(),
+        .split = 1,
+        .n = 1,
+    };
+    auto p = m.map_index(0);
+    REQUIRE(p[0] == mles[0]);
+    REQUIRE(p[1] == -mles[0]);
+  }
+
+  SECTION("we can map an mle with two elements") {
+    mles = {0x123_s25, 0x456_s25};
+    product_terms = {0};
+    polynomial_mapper<1> m{
+        .mles = mles.data(),
+        .product_terms = product_terms.data(),
+        .split = 1,
+        .n = 2,
+    };
+    auto p = m.map_index(0);
+    REQUIRE(p[0] == mles[0]);
+    REQUIRE(p[1] == mles[1] - mles[0]);
+  }
+}
