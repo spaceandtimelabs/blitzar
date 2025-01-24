@@ -58,6 +58,49 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "sum_gpu",
+    impl_deps = [
+        ":constant",
+        ":device_cache",
+        ":mle_utility",
+        ":polynomial_mapper",
+        ":reduction_gpu",
+        "//sxt/algorithm/reduction:kernel_fit",
+        "//sxt/algorithm/reduction:thread_reduction",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:state",
+        "//sxt/base/iterator:split",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/base/num:constexpr_switch",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/execution/device:for_each",
+        "//sxt/execution/kernel:kernel_dims",
+        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/scalar25/operation:add",
+        "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/type:element",
+    ],
+    test_deps = [
+        ":device_cache",
+        # "//sxt/base/device:stream",
+        "//sxt/base/iterator:split",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
+    ],
+)
+
+sxt_cc_component(
     name = "sumcheck_random",
     impl_deps = [
         "//sxt/base/error:assert",
@@ -145,9 +188,8 @@ sxt_cc_component(
     name = "gpu_driver",
     impl_deps = [
         ":constant",
-        ":partial_polynomial_mapper",
         ":polynomial_mapper",
-        ":polynomial_utility",
+        ":sum_gpu",
         "//sxt/algorithm/iteration:for_each",
         "//sxt/algorithm/reduction:reduction",
         "//sxt/base/container:stack_array",
@@ -282,24 +324,6 @@ sxt_cc_component(
     deps = [
         "//sxt/base/container:span",
         "//sxt/execution/async:future_fwd",
-    ],
-)
-
-sxt_cc_component(
-    name = "partial_polynomial_mapper",
-    test_deps = [
-        "//sxt/algorithm/base:mapper",
-        "//sxt/base/test:unit_test",
-        "//sxt/scalar25/operation:overload",
-    ],
-    deps = [
-        ":polynomial_utility",
-        "//sxt/base/macro:cuda_callable",
-        "//sxt/scalar25/operation:add",
-        "//sxt/scalar25/operation:mul",
-        "//sxt/scalar25/operation:muladd",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
     ],
 )
 
