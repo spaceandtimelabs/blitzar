@@ -85,7 +85,6 @@ sxt_cc_component(
     ],
     test_deps = [
         ":device_cache",
-        # "//sxt/base/device:stream",
         "//sxt/base/iterator:split",
         "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
