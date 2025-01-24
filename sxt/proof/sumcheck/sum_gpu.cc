@@ -136,11 +136,11 @@ static xena::future<> partial_sum(basct::span<s25t::element> p, basdv::stream& s
   auto num_coefficients = p.size();
   auto num_products = product_table.size();
   auto dims = algr::fit_reduction_kernel(split);
-  /* emr::async_device_resource resource{stream}; */
+  memr::async_device_resource resource{stream};
 
   // partials
   memmg::managed_array<s25t::element> partials{num_coefficients * dims.num_blocks * num_products,
-                                               memr::get_device_resource()};
+                                               &resource};
   xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
                                            std::integral_constant<unsigned, BlockSize>) noexcept {
     partial_sum_kernel<BlockSize><<<dim3(dims.num_blocks, num_products, 1), BlockSize, 0, stream>>>(
@@ -170,13 +170,11 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
   size_t counter = 0;
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](basit::index_range rng) noexcept -> xena::future<> {
-        std::println("**************** sum: {}-{}", rng.a(), rng.b());
         basdv::stream stream;
-        /* memr::async_device_resource resource{stream}; */
+        memr::async_device_resource resource{stream};
 
         // copy partial mles to device
-        /* memmg::managed_array<s25t::element> partial_mles{&resource}; */
-        memmg::managed_array<s25t::element> partial_mles{memr::get_device_resource()};
+        memmg::managed_array<s25t::element> partial_mles{&resource};
         copy_partial_mles(partial_mles, stream, mles, n, rng.a(), rng.b());
         auto split = rng.b() - rng.a();
         auto np = partial_mles.size() / num_mles;
@@ -202,7 +200,6 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
           }
         }
         ++counter;
-        std::cout << "************************* sum done: " << basdv::get_device() << std::endl;
       });
 }
 
