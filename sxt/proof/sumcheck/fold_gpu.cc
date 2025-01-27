@@ -99,52 +99,19 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<
 }
 
 //--------------------------------------------------------------------------------------------------
-// fold_gpu_to_device
-//--------------------------------------------------------------------------------------------------
-static xena::future<> fold_gpu_to_device(basct::span<s25t::element> mles_p,
-                                         basct::cspan<s25t::element> mles, unsigned n,
-                                         const s25t::element& r) noexcept {
-  basdv::stream stream;
-  memr::async_device_resource resource{stream};
-  memmg::managed_array<s25t::element> mles_data{&resource};
-  basct::cspan<s25t::element> mles_dev;
-  if (!basdv::is_active_device_pointer(mles.data())) {
-    mles_data.resize(mles.size());
-    basdv::async_copy_host_to_device(mles_data, mles, stream);
-    mles_dev = mles_data;
-  } else {
-    mles_dev = mles;
-  }
-
-  // fold
-#if 0
-  auto np = mles_dev.size() / num_mles;
-  auto dims = algi::fit_iteration_kernel(split);
-  fold_kernel<<<dim3(dims.num_blocks, num_mles, 1), static_cast<unsigned>(dims.block_size), 0,
-                stream>>>(mles_dev.data(), np, split, r, one_m_r);
-#endif
-
-  (void)mles_p;
-  (void)stream;
-  (void)mles;
-  (void)n;
-  (void)r;
-  return {};
-}
-
-//--------------------------------------------------------------------------------------------------
 // fold_gpu
 //--------------------------------------------------------------------------------------------------
 xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::element> mles,
                         unsigned n, const s25t::element& r) noexcept {
-  if (basdv::is_active_device_pointer(mles_p.data())) {
-    co_return co_await fold_gpu_to_device(mles_p, mles, n, r);
-  }
   using s25t::operator""_s25;
   auto num_mles = mles.size() / n;
   auto num_variables = std::max(basn::ceil_log2(n), 1);
   auto mid = 1u << (num_variables - 1u);
-  SXT_DEBUG_ASSERT(n > 1 && mles.size() == num_mles * n);
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      n > 1 && mles.size() == num_mles * n
+      // clang-format on
+  );
   s25t::element one_m_r = 0x1_s25;
   s25o::sub(one_m_r, one_m_r, r);
 
