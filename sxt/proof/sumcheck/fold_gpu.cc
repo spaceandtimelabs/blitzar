@@ -101,6 +101,36 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<
 //--------------------------------------------------------------------------------------------------
 // fold_gpu
 //--------------------------------------------------------------------------------------------------
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+xena::future<> fold_gpu(basct::span<s25t::element> mles_p,
+                        const basit::split_options& split_options, basct::cspan<s25t::element> mles,
+                        unsigned n, const s25t::element& r) noexcept {
+  using s25t::operator""_s25;
+  auto num_mles = mles.size() / n;
+  auto num_variables = std::max(basn::ceil_log2(n), 1);
+  auto mid = 1u << (num_variables - 1u);
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      n > 1 && mles.size() == num_mles * n
+      // clang-format on
+  );
+  s25t::element one_m_r = 0x1_s25;
+  s25o::sub(one_m_r, one_m_r, r);
+
+  // split
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, mid}, split_options);
+
+  // fold
+  co_await xendv::concurrent_for_each(
+      chunk_first, chunk_last, [&](basit::index_range rng) noexcept -> xena::future<> {
+        co_await fold_impl(mles_p, mles, n, mid, rng.a(), rng.b(), r, one_m_r);
+      });
+}
+#pragma clang diagnostic pop
+
 xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::element> mles,
                         unsigned n, const s25t::element& r) noexcept {
   using s25t::operator""_s25;

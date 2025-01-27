@@ -23,10 +23,18 @@ namespace sxt::s25t {
 class element;
 }
 
+namespace sxt::basit {
+struct split_options;
+}
+
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // fold_gpu
 //--------------------------------------------------------------------------------------------------
+xena::future<> fold_gpu(basct::span<s25t::element> mles_p,
+                        const basit::split_options& split_options, basct::cspan<s25t::element> mles,
+                        unsigned n, const s25t::element& r) noexcept;
+
 xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::element> mles,
                         unsigned n, const s25t::element& r) noexcept;
 } // namespace sxt::prfsk
