@@ -54,7 +54,6 @@ static void test_proof(const driver& drv) noexcept {
   };
   std::vector<unsigned> product_terms = {0};
 
-#if 0
   SECTION("we can prove a sum with n=1") {
     auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
                          product_terms, 1);
@@ -153,7 +152,6 @@ static void test_proof(const driver& drv) noexcept {
     REQUIRE(polynomials[2] == mles[0]);
     REQUIRE(polynomials[3] == mles[1] - mles[0]);
   }
-#endif
 
   SECTION("we can verify random sumcheck problems") {
     basn::fast_random_number_generator rng{1, 2};
@@ -162,7 +160,6 @@ static void test_proof(const driver& drv) noexcept {
       random_sumcheck_descriptor descriptor;
       unsigned n;
       generate_random_sumcheck_problem(mles, product_table, product_terms, n, rng, descriptor);
-      std::println("num_mles = {}", mles.size() / n);
 
       unsigned polynomial_length = 0;
       for (auto [_, len] : product_table) {
@@ -186,10 +183,8 @@ static void test_proof(const driver& drv) noexcept {
         prft::transcript transcript{"abc"};
         s25t::element expected_sum;
         sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
-        std::cout << "expected sum: " << expected_sum << std::endl;
         auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
                                                    polynomials, polynomial_length - 1u);
-        std::cerr << "v: " << valid << std::endl;
         REQUIRE(valid);
       }
 
