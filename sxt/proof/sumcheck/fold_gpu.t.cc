@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "sxt/base/iterator/split.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
@@ -56,6 +57,24 @@ TEST_CASE("we can fold scalars using the gpu") {
     expected = {
         one_m_r * mles[0] + r * mles[2],
         one_m_r * mles[1],
+    };
+    REQUIRE(mles_p == expected);
+  }
+
+  SECTION("we can split folds") {
+    basit::split_options split_options{
+        .min_chunk_size = 1,
+        .max_chunk_size = 1,
+        .split_factor = 2,
+    };
+    mles = {0x123_s25, 0x456_s25, 0x789_s25, 0x101112_s25};
+    mles_p.resize(2);
+    auto fut = fold_gpu(mles_p, split_options, mles, 4, r);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    expected = {
+        one_m_r * mles[0] + r * mles[2],
+        one_m_r * mles[1] + r * mles[3],
     };
     REQUIRE(mles_p == expected);
   }
