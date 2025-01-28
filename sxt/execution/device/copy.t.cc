@@ -19,7 +19,6 @@
 #include <cstddef>
 #include <numeric>
 #include <vector>
-#include <random>
 
 #include "sxt/base/device/pinned_buffer.h"
 #include "sxt/base/device/stream.h"
@@ -38,7 +37,6 @@ TEST_CASE("we can copy strided memory from host to device") {
 
   basdv::stream stream;
 
-#if 0
   SECTION("we can copy empty data") {
     auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 1, 0, 0);
     REQUIRE(fut.ready());
@@ -117,51 +115,5 @@ TEST_CASE("we can copy strided memory from host to device") {
     REQUIRE(fut.ready());
     basdv::synchronize_device();
     REQUIRE(std::vector<uint8_t>(dst.begin(), dst.end()) == src);
-  }
-#endif
-
-#if 0
-  SECTION("we can perform random copies") {
-    std::mt19937 rng{0};
-    for (int i = 0; i < 10; ++i) {
-      auto n = std::uniform_int_distribution<size_t>{0, bufsize * 10}(rng);
-      src.resize(4 * n);
-      auto data = reinterpret_cast<unsigned*>(src.data());
-      std::iota(data, data + n, 0u);
-      dst.resize(src.size() - 1);
-      auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 4 * n - 1, 4 * n - 1, 1);
-      xens::get_scheduler().run();
-      REQUIRE(fut.ready());
-      basdv::synchronize_device();
-      REQUIRE(std::vector<uint8_t>(dst.begin(), dst.end()) ==
-              std::vector<uint8_t>(src.begin() + 1, src.end()));
-    }
-  }
-#endif
-
-  SECTION("we can perform random copies") {
-    std::mt19937 rng{0};
-    for (int i = 0; i < 10; ++i) {
-      auto n = std::uniform_int_distribution<size_t>{0, bufsize * 10}(rng);
-      src.resize(4 * n);
-      std::iota(src.begin(), src.end(), 0);
-      /* auto data = reinterpret_cast<unsigned*>(src.data()); */
-      /* std::iota(data, data + n, 0u); */
-      dst.resize(2 * n);
-      auto fut = strided_copy_host_to_device<uint8_t>(dst, stream, src, 2 * n, n, 0);
-      xens::get_scheduler().run();
-      REQUIRE(fut.ready());
-      basdv::synchronize_device();
-      /* for (size_t i=0; i<dst.size(); ++i) { */
-      for (size_t i = 0; i < 2 * n - 1; ++i) {
-        auto expected = 2 * n * (i / n) + (i % n);
-        /* auto expected = n * (i / n) + (i % n); */
-        /* std::println("dst[{}]", i); */
-        REQUIRE(dst[i] == static_cast<uint8_t>(expected));
-      }
-      std::println("dst[last] = {}", dst[dst.size() - 4]);
-      /* REQUIRE(std::vector<uint8_t>(dst.begin(), dst.end()) == */
-      /*         std::vector<uint8_t>(src.begin() + 1, src.end())); */
-    }
   }
 }
