@@ -1,11 +1,23 @@
 #include "sxt/base/system/file_io.h"
 
-#include <fstream>
 #include <cerrno>
+#include <filesystem>
+#include <fstream>
 
 #include "sxt/base/error/panic.h"
 
 namespace sxt::bassy {
+//--------------------------------------------------------------------------------------------------
+// file_size
+//--------------------------------------------------------------------------------------------------
+size_t file_size(const char* filename) noexcept {
+  try {
+    return std::filesystem::file_size(filename);
+  } catch (const std::exception& e) {
+    baser::panic("failed to get file size of {}: {}", filename, e.what());
+  }
+}
+
 //--------------------------------------------------------------------------------------------------
 // write_to_file
 //--------------------------------------------------------------------------------------------------
