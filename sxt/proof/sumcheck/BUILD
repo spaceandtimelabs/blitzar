@@ -32,6 +32,45 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "fold_gpu",
+    impl_deps = [
+        ":mle_utility",
+        "//sxt/algorithm/iteration:kernel_fit",
+        "//sxt/base/error:assert",
+        "//sxt/base/device:property",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/iterator:split",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+        "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/operation:muladd",
+        "//sxt/scalar25/operation:sub",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/execution/device:for_each",
+        "//sxt/execution/device:synchronization",
+        "//sxt/execution/kernel:kernel_dims",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:device_resource",
+    ],
+    test_deps = [
+        "//sxt/base/iterator:split",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
+    ],
+)
+
+sxt_cc_component(
     name = "mle_utility",
     impl_deps = [
         "//sxt/base/container:span_utility",
