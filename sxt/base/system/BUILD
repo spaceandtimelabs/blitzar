@@ -8,6 +8,10 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
     ],
+    impl_deps = [
+      "//sxt/base/error:panic",
+    ],
     deps = [
+      "//sxt/base/container:span",
     ],
 )
