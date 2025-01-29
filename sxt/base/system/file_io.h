@@ -40,5 +40,8 @@ template <class T> void read_file(std::vector<T>& values, const char* filename) 
   }
   values.resize(n);
   in.read(reinterpret_cast<char*>(values.data()), sz);
+  if (!in.good()) {
+    baser::panic("failed to read {}: {}", filename, std::strerror(errno));
+  }
 }
 } // namespace sxt::bassy
