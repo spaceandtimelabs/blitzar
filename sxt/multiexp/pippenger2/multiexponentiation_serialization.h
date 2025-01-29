@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <cstddef>
 #include <memory>
 #include <vector>
@@ -27,5 +28,6 @@ template <bascrv::element T, class U>
 void write_multiexponentiation(const char* dir, const partition_table_accessor<U>& accessor,
                                basct::cspan<unsigned> output_bit_table,
                                basct::cspan<unsigned> output_lengths,
-                               basct::cspan<uint8_t> scalars) noexcept;
+                               basct::cspan<uint8_t> scalars) noexcept {
+}
 } // namespace sxt::mtxpp2
