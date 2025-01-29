@@ -1,8 +1,11 @@
 #pragma once
 
+#include <cerrno>
 #include <cstddef>
+#include <fstream>
 
 #include "sxt/base/container/span.h"
+#include "sxt/base/error/panic.h"
 
 namespace sxt::bassy {
 //--------------------------------------------------------------------------------------------------
@@ -26,5 +29,16 @@ void write_to_file(const char* filename, basct::cspan<T> values) noexcept {
 // read_from_file
 //--------------------------------------------------------------------------------------------------
 template <class T> void read_from_file(std::vector<T>& values, const char* filename) noexcept {
+  auto sz = file_size(filename);
+  if (sz % sizeof(T) != 0) {
+    baser::panic("{} file size {} is not a multiple of element size {}", filename, sz, sizeof(T));
+  }
+  auto n = sz / sizeof(T);
+  std::ifstream in{filename, std::ios::binary};
+  if (!in.good()) {
+    baser::panic("failed to open {}: {}", filename, std::strerror(errno));
+  }
+  values.resize(n);
+  in.read(reinterpret_cast<char*>(values.data()), sz);
 }
 } // namespace sxt::bassy

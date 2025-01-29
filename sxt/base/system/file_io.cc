@@ -1,10 +1,6 @@
 #include "sxt/base/system/file_io.h"
 
-#include <cerrno>
 #include <filesystem>
-#include <fstream>
-
-#include "sxt/base/error/panic.h"
 
 namespace sxt::bassy {
 //--------------------------------------------------------------------------------------------------
