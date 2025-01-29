@@ -81,9 +81,8 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<
 
   // copy MLEs to device
   basdv::stream stream;
-  /* memr::async_device_resource resource{stream}; */
-  /* memmg::managed_array<s25t::element> mles_dev{&resource}; */
-  memmg::managed_array<s25t::element> mles_dev{memr::get_device_resource()};
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<s25t::element> mles_dev{&resource};
   copy_partial_mles(mles_dev, stream, mles, n, a, b);
 
   // fold
@@ -101,10 +100,6 @@ static xena::future<> fold_impl(basct::span<s25t::element> mles_p, basct::cspan<
 //--------------------------------------------------------------------------------------------------
 // fold_gpu
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 xena::future<> fold_gpu(basct::span<s25t::element> mles_p,
                         const basit::split_options& split_options, basct::cspan<s25t::element> mles,
                         unsigned n, const s25t::element& r) noexcept {
@@ -129,7 +124,6 @@ xena::future<> fold_gpu(basct::span<s25t::element> mles_p,
         co_await fold_impl(mles_p, mles, n, mid, rng.a(), rng.b(), r, one_m_r);
       });
 }
-#pragma clang diagnostic pop
 
 xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::element> mles,
                         unsigned n, const s25t::element& r) noexcept {
