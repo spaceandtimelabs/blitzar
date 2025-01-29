@@ -7,9 +7,9 @@
 
 namespace sxt::bassy {
 //--------------------------------------------------------------------------------------------------
-// write_bytes
+// write_to_file
 //--------------------------------------------------------------------------------------------------
-void write_bytes(const char* filename, basct::cspan<uint8_t> bytes) noexcept {
+void write_to_file(const char* filename, basct::cspan<uint8_t> bytes) noexcept {
   std::ofstream out{filename, std::ios::binary};
   if (!out.good()) {
     baser::panic("failed to open {}: {}", filename, std::strerror(errno));
