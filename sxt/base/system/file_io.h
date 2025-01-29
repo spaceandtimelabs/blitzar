@@ -14,21 +14,21 @@ namespace sxt::bassy {
 size_t file_size(const char* filename) noexcept;
 
 //--------------------------------------------------------------------------------------------------
-// write_to_file
+// write_file
 //--------------------------------------------------------------------------------------------------
-void write_to_file(const char* filename, basct::cspan<uint8_t> bytes) noexcept;
+void write_file(const char* filename, basct::cspan<uint8_t> bytes) noexcept;
 
 template <class T>
-void write_to_file(const char* filename, basct::cspan<T> values) noexcept {
+void write_file(const char* filename, basct::cspan<T> values) noexcept {
   basct::cspan<uint8_t> bytes{reinterpret_cast<const uint8_t*>(values.data()),
                               values.size() * sizeof(T)};
-  write_to_file(filename, bytes);
+  write_file(filename, bytes);
 }
 
 //--------------------------------------------------------------------------------------------------
-// read_from_file
+// read_file
 //--------------------------------------------------------------------------------------------------
-template <class T> void read_from_file(std::vector<T>& values, const char* filename) noexcept {
+template <class T> void read_file(std::vector<T>& values, const char* filename) noexcept {
   auto sz = file_size(filename);
   if (sz % sizeof(T) != 0) {
     baser::panic("{} file size {} is not a multiple of element size {}", filename, sz, sizeof(T));

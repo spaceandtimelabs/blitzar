@@ -15,9 +15,9 @@ size_t file_size(const char* filename) noexcept {
 }
 
 //--------------------------------------------------------------------------------------------------
-// write_to_file
+// write_file
 //--------------------------------------------------------------------------------------------------
-void write_to_file(const char* filename, basct::cspan<uint8_t> bytes) noexcept {
+void write_file(const char* filename, basct::cspan<uint8_t> bytes) noexcept {
   std::ofstream out{filename, std::ios::binary};
   if (!out.good()) {
     baser::panic("failed to open {}: {}", filename, std::strerror(errno));
