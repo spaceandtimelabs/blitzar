@@ -258,6 +258,17 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "multiexponentiation_serialization",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/curve:element",
+    ],
+)
+
+sxt_cc_component(
     name = "reduce",
     test_deps = [
         "//sxt/base/curve:example_element",
