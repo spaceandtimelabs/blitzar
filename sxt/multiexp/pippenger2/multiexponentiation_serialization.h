@@ -54,5 +54,9 @@ void write_multiexponentiation(const char* dir, const partition_table_accessor<U
   bassy::write_file(std::format("{}/output_bit_table.bin", dir), output_bit_table);
   bassy::write_file(std::format("{}/output_lengths.bin", dir), output_lengths);
   bassy::write_file(std::format("{}/scalars.bin", dir), scalars);
+
+  std::vector<T> generators(n);
+  accessor.copy_generators(generators);
+  bassy::write_file(std::format("{}/generators.bin", dir), generators);
 }
 } // namespace sxt::mtxpp2

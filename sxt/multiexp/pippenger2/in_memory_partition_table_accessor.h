@@ -65,6 +65,13 @@ public:
   // partition_table_accessor
   unsigned window_width() const noexcept override { return window_width_; }
 
+  void copy_generators(basct::span<T> generators) const noexcept {
+    SXT_RELEASE_ASSERT(generators.size() * partition_table_size_ <= table_.size());
+    for (size_t i=0; i<generators.size(); ++i) {
+      generators[i] = table_[1 + i * partition_table_size_];
+    }
+  }
+
   void async_copy_to_device(basct::span<T> dest, bast::raw_stream_t stream,
                             unsigned first) const noexcept override {
     SXT_RELEASE_ASSERT(table_.size() >= dest.size() + first * partition_table_size_);
