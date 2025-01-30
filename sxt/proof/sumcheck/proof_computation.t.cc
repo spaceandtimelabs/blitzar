@@ -25,6 +25,7 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
+#include "sxt/proof/sumcheck/chunked_gpu_driver.h"
 #include "sxt/proof/sumcheck/cpu_driver.h"
 #include "sxt/proof/sumcheck/gpu_driver.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
@@ -208,6 +209,11 @@ TEST_CASE("we can create a sumcheck proof") {
 
   SECTION("we can prove with the gpu driver") {
     gpu_driver drv;
+    test_proof(drv);
+  }
+
+  SECTION("we can prove with the chunked gpu driver") {
+    chunked_gpu_driver drv{0.0};
     test_proof(drv);
   }
 }
