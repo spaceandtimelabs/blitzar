@@ -263,7 +263,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
-      ":partition_table_accessor",
+        ":partition_table_accessor",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
     ],

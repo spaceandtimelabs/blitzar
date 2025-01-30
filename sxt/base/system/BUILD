@@ -6,10 +6,11 @@ load(
 sxt_cc_component(
     name = "file_io",
     test_deps = [
+        "//sxt/base/test:temp_file",
         "//sxt/base/test:unit_test",
     ],
     deps = [
-      "//sxt/base/container:span",
-      "//sxt/base/error:panic",
+        "//sxt/base/container:span",
+        "//sxt/base/error:panic",
     ],
 )
