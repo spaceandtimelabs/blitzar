@@ -15,7 +15,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "combination",
+    name = "combine_reduce",
     test_deps = [
         "//sxt/base/curve:example_element",
         "//sxt/base/device:stream",
@@ -29,11 +29,13 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/base/container:span_utility",
         "//sxt/base/curve:element",
-        "//sxt/base/device:memory_utility",
         "//sxt/base/error:assert",
+        "//sxt/base/iterator:split",
         "//sxt/base/macro:cuda_callable",
         "//sxt/base/type:raw_stream",
         "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:copy",
+        "//sxt/execution/device:for_each",
         "//sxt/execution/device:synchronization",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
@@ -153,6 +155,7 @@ sxt_cc_component(
         "//sxt/base/device:memory_utility",
         "//sxt/base/error:assert",
         "//sxt/base/error:panic",
+        "//sxt/base/memory:alloc",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:pinned_resource",
     ],
@@ -181,15 +184,9 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "multiexponentiation_options",
-    with_test = False,
-)
-
-sxt_cc_component(
     name = "multiexponentiation",
     test_deps = [
         ":in_memory_partition_table_accessor_utility",
-        ":multiexponentiation_options",
         "//sxt/base/curve:example_element",
         "//sxt/base/num:fast_random_number_generator",
         "//sxt/base/test:unit_test",
@@ -202,7 +199,7 @@ sxt_cc_component(
         "//sxt/ristretto/random:element",
     ],
     deps = [
-        ":combination",
+        ":combine_reduce",
         ":partition_product",
         ":partition_table_accessor",
         ":reduce",
@@ -215,8 +212,7 @@ sxt_cc_component(
         "//sxt/base/device:state",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
-        "//sxt/base/iterator:index_range_iterator",
-        "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/iterator:split",
         "//sxt/base/log",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:for_each",
@@ -237,7 +233,7 @@ sxt_cc_component(
         "//sxt/ristretto/random:element",
     ],
     deps = [
-        ":combination",
+        ":combine_reduce",
         ":partition_table_accessor",
         ":reduce",
         ":variable_length_computation",
@@ -250,8 +246,7 @@ sxt_cc_component(
         "//sxt/base/device:state",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
-        "//sxt/base/iterator:index_range_iterator",
-        "//sxt/base/iterator:index_range_utility",
+        "//sxt/base/iterator:split",
         "//sxt/base/log",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/device:for_each",
