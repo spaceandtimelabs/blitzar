@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <format>
 #include <fstream>
@@ -46,6 +47,10 @@ void write_multiexponentiation(const char* dir, const partition_table_accessor<U
                                basct::cspan<unsigned> output_bit_table,
                                basct::cspan<unsigned> output_lengths,
                                basct::cspan<uint8_t> scalars) noexcept {
+  size_t n = 0;
+  if (!output_lengths.empty()) {
+     n = *std::max_element(output_lengths.begin(), output_lengths.end());
+  }
   bassy::write_file(std::format("{}/output_bit_table.bin", dir), output_bit_table);
   bassy::write_file(std::format("{}/output_lengths.bin", dir), output_lengths);
   bassy::write_file(std::format("{}/scalars.bin", dir), scalars);
