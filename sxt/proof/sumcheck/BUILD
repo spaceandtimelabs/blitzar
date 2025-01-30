@@ -279,6 +279,33 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "chunked_gpu_driver",
+    impl_deps = [
+        ":device_cache",
+        ":fold_gpu",
+        ":gpu_driver",
+        ":mle_utility",
+        ":sum_gpu",
+        "//sxt/algorithm/iteration:transform",
+        "//sxt/base/error:assert",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
+        "//sxt/scalar25/operation:sub",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+    test_deps = [
+        ":driver_test",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":driver",
+    ],
+)
+
+sxt_cc_component(
     name = "proof_computation",
     impl_deps = [
         ":driver",
@@ -290,8 +317,10 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
+        ":chunked_gpu_driver",
         ":cpu_driver",
         ":gpu_driver",
+        ":mle_utility",
         ":sumcheck_random",
         ":verification",
         "//sxt/base/test:unit_test",
