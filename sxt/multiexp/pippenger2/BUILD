@@ -263,9 +263,11 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
+        ":in_memory_partition_table_accessor_utility",
         ":partition_table_accessor",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
+        "//sxt/base/error:assert",
         "//sxt/base/system:file_io",
     ],
 )
