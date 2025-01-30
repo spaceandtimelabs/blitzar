@@ -28,6 +28,7 @@
 #include "sxt/proof/sumcheck/chunked_gpu_driver.h"
 #include "sxt/proof/sumcheck/cpu_driver.h"
 #include "sxt/proof/sumcheck/gpu_driver.h"
+#include "sxt/proof/sumcheck/mle_utility.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/proof/sumcheck/sumcheck_random.h"
 #include "sxt/proof/sumcheck/verification.h"
@@ -214,6 +215,13 @@ TEST_CASE("we can create a sumcheck proof") {
 
   SECTION("we can prove with the chunked gpu driver") {
     chunked_gpu_driver drv{0.0};
+    test_proof(drv);
+  }
+
+  SECTION("we can prove with a chunked driver that switches over to the single gpu driver") {
+    std::vector<s25t::element> mles(4);
+    auto fraction = get_gpu_memory_fraction(mles);
+    chunked_gpu_driver drv{fraction};
     test_proof(drv);
   }
 }

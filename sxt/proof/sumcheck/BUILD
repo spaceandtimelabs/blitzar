@@ -317,9 +317,10 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
-        ":cpu_driver",
         ":chunked_gpu_driver",
+        ":cpu_driver",
         ":gpu_driver",
+        ":mle_utility",
         ":sumcheck_random",
         ":verification",
         "//sxt/base/test:unit_test",
