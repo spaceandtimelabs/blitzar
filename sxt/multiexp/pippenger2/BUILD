@@ -266,6 +266,7 @@ sxt_cc_component(
         ":partition_table_accessor",
         "//sxt/base/container:span",
         "//sxt/base/curve:element",
+        "//sxt/base/system:file_io",
     ],
 )
 

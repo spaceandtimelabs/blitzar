@@ -17,11 +17,13 @@
 #pragma once
 
 #include <cstddef>
+#include <format>
 #include <fstream>
 #include <memory>
 #include <vector>
 
 #include "sxt/base/container/span.h"
+#include "sxt/base/system/file_io.h"
 #include "sxt/base/curve/element.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
 
@@ -43,5 +45,9 @@ template <bascrv::element T, class U>
 void write_multiexponentiation(const char* dir, const partition_table_accessor<U>& accessor,
                                basct::cspan<unsigned> output_bit_table,
                                basct::cspan<unsigned> output_lengths,
-                               basct::cspan<uint8_t> scalars) noexcept {}
+                               basct::cspan<uint8_t> scalars) noexcept {
+  bassy::write_file(std::format("{}/output_bit_table.bin", dir), output_bit_table);
+  bassy::write_file(std::format("{}/output_lengths.bin", dir), output_lengths);
+  bassy::write_file(std::format("{}/scalars.bin", dir), scalars);
+}
 } // namespace sxt::mtxpp2
