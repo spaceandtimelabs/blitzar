@@ -59,7 +59,7 @@ void write_multiexponentiation(std::string_view dir, const partition_table_acces
 
   std::vector<T> generators(n);
   accessor.copy_generators(generators);
-  bassy::write_file(std::format("{}/generators.bin", dir), generators);
+  bassy::write_file<T>(std::format("{}/generators.bin", dir), generators);
 
   uint64_t window_width = accessor.window_width();
   bassy::write_file(std::format("{}/window_width.bin", dir),

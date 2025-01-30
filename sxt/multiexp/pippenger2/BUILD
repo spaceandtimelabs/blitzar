@@ -156,6 +156,7 @@ sxt_cc_component(
         "//sxt/base/error:assert",
         "//sxt/base/error:panic",
         "//sxt/base/memory:alloc",
+        "//sxt/base/num:divide_up",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:pinned_resource",
     ],
@@ -260,6 +261,8 @@ sxt_cc_component(
 sxt_cc_component(
     name = "multiexponentiation_serialization",
     test_deps = [
+        "//sxt/base/curve:example_element",
+        "//sxt/base/test:temp_directory",
         "//sxt/base/test:unit_test",
     ],
     deps = [

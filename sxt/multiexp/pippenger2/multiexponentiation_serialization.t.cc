@@ -16,6 +16,30 @@
  */
 #include "sxt/multiexp/pippenger2/multiexponentiation_serialization.h"
 
+#include "sxt/base/curve/example_element.h"
+#include "sxt/base/test/temp_directory.h"
 #include "sxt/base/test/unit_test.h"
+using namespace sxt;
+using namespace sxt::mtxpp2;
 
-TEST_CASE("todo") {}
+TEST_CASE("we can serialize and deserialize a variable length multiexponentiation") {
+  using E = bascrv::element97;
+
+  bastst::temp_directory dir;
+
+
+  std::vector<E> generators = {11, 22, 33};
+  auto accessor = make_in_memory_partition_table_accessor<E>(generators);
+  std::vector<unsigned> output_bit_table = {1, 1};
+  std::vector<unsigned> output_lengths = {1, 2};
+  std::vector<uint8_t> scalars = {3, 2, 1};
+
+  SECTION("we can serialize then deserialize") {
+    write_multiexponentiation<E>(dir.name(), *accessor, output_bit_table, output_lengths, scalars);
+/* template <bascrv::element T, class U> */
+/* void write_multiexponentiation(std::string_view dir, const partition_table_accessor<U>& accessor, */
+/*                                basct::cspan<unsigned> output_bit_table, */
+/*                                basct::cspan<unsigned> output_lengths, */
+/*                                basct::cspan<uint8_t> scalars) noexcept { */
+  }
+}

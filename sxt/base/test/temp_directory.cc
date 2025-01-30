@@ -20,7 +20,7 @@ temp_directory::temp_directory() noexcept try : name_{std::tmpnam(nullptr)} {
 //--------------------------------------------------------------------------------------------------
 temp_directory::~temp_directory() noexcept {
   try {
-  std::filesystem::remove(name_);
+  std::filesystem::remove_all(name_);
   } catch(const std::exception& e) {
   baser::panic("failed to remove directory {}: {}", name_, e.what());
   }
