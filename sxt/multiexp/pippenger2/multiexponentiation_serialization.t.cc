@@ -36,10 +36,16 @@ TEST_CASE("we can serialize and deserialize a variable length multiexponentiatio
 
   SECTION("we can serialize then deserialize") {
     write_multiexponentiation<E>(dir.name(), *accessor, output_bit_table, output_lengths, scalars);
-/* template <bascrv::element T, class U> */
-/* void write_multiexponentiation(std::string_view dir, const partition_table_accessor<U>& accessor, */
-/*                                basct::cspan<unsigned> output_bit_table, */
-/*                                basct::cspan<unsigned> output_lengths, */
-/*                                basct::cspan<uint8_t> scalars) noexcept { */
+
+    variable_length_multiexponentiation_descriptor<E, E> descr;
+    read_multiexponentiation(descr, dir.name());
+    REQUIRE(descr.output_bit_table == output_bit_table);
+    REQUIRE(descr.output_lengths == output_lengths);
+    REQUIRE(descr.scalars == scalars);
+    std::vector<E> generators_p(2);
+    descr.accessor->copy_generators(generators_p);
+    REQUIRE(generators[0] == generators_p[0]);
+    REQUIRE(generators[1] == generators_p[1]);
+    REQUIRE(descr.accessor->window_width() == accessor->window_width());
   }
 }
