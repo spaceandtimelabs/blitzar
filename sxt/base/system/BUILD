@@ -14,3 +14,14 @@ sxt_cc_component(
         "//sxt/base/error:panic",
     ],
 )
+
+sxt_cc_component(
+    name = "directory_recorder",
+    test_deps = [
+        "//sxt/base/test:temp_directory",
+        "//sxt/base/test:unit_test",
+    ],
+    impl_deps = [
+        "//sxt/base/error:panic",
+    ],
+)
