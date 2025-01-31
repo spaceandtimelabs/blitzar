@@ -51,7 +51,7 @@ void write_multiexponentiation(std::string_view dir, const partition_table_acces
                                basct::cspan<uint8_t> scalars) noexcept {
   size_t n = 0;
   if (!output_lengths.empty()) {
-     n = *std::max_element(output_lengths.begin(), output_lengths.end());
+    n = *std::max_element(output_lengths.begin(), output_lengths.end());
   }
   bassy::write_file(std::format("{}/output_bit_table.bin", dir), output_bit_table);
   bassy::write_file(std::format("{}/output_lengths.bin", dir), output_lengths);
@@ -67,7 +67,7 @@ void write_multiexponentiation(std::string_view dir, const partition_table_acces
 }
 
 //--------------------------------------------------------------------------------------------------
-// read_multiexponentiation 
+// read_multiexponentiation
 //--------------------------------------------------------------------------------------------------
 template <bascrv::element T, class U>
 void read_multiexponentiation(variable_length_multiexponentiation_descriptor<T, U>& descr,

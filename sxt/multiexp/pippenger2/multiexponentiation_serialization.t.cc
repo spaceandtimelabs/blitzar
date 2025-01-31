@@ -19,6 +19,7 @@
 #include "sxt/base/curve/example_element.h"
 #include "sxt/base/test/temp_directory.h"
 #include "sxt/base/test/unit_test.h"
+
 using namespace sxt;
 using namespace sxt::mtxpp2;
 
@@ -26,7 +27,6 @@ TEST_CASE("we can serialize and deserialize a variable length multiexponentiatio
   using E = bascrv::element97;
 
   bastst::temp_directory dir;
-
 
   std::vector<E> generators = {11, 22, 33};
   auto accessor = make_in_memory_partition_table_accessor<E>(generators);

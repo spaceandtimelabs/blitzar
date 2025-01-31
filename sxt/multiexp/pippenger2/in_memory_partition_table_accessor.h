@@ -70,8 +70,8 @@ public:
     auto num_groups = basn::divide_up<size_t>(generators.size(), window_width_);
     SXT_RELEASE_ASSERT(num_groups * partition_table_size_ <= table_.size());
     size_t out = 0;
-    for (size_t group_index = 0; group_index<num_groups; ++group_index) {
-      for (size_t j=0; j<window_width_; ++j) {
+    for (size_t group_index = 0; group_index < num_groups; ++group_index) {
+      for (size_t j = 0; j < window_width_; ++j) {
         if (out == generators.size()) {
           return;
         }
