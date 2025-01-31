@@ -26,6 +26,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/error/panic.h"
 #include "sxt/base/memory/alloc.h"
+#include "sxt/base/num/divide_up.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/pinned_resource.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor.h"
@@ -64,6 +65,21 @@ public:
 
   // partition_table_accessor
   unsigned window_width() const noexcept override { return window_width_; }
+
+  void copy_generators(basct::span<T> generators) const noexcept override {
+    auto num_groups = basn::divide_up<size_t>(generators.size(), window_width_);
+    SXT_RELEASE_ASSERT(num_groups * partition_table_size_ <= table_.size());
+    size_t out = 0;
+    for (size_t group_index = 0; group_index < num_groups; ++group_index) {
+      for (size_t j = 0; j < window_width_; ++j) {
+        if (out == generators.size()) {
+          return;
+        }
+        auto offset = 1u << j;
+        generators[out++] = table_[group_index * partition_table_size_ + offset];
+      }
+    }
+  }
 
   void async_copy_to_device(basct::span<T> dest, bast::raw_stream_t stream,
                             unsigned first) const noexcept override {

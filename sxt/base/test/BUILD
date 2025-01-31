@@ -12,6 +12,13 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "temp_directory",
+    impl_deps = [
+    ],
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "temp_file",
     impl_deps = [
     ],

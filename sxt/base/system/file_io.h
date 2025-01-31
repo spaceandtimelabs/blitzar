@@ -40,6 +40,10 @@ template <class T> void write_file(const char* filename, basct::cspan<T> values)
   write_file(filename, bytes);
 }
 
+template <class T> void write_file(std::string_view filename, basct::cspan<T> values) noexcept {
+  write_file(std::string{filename}.c_str(), values);
+}
+
 //--------------------------------------------------------------------------------------------------
 // read_file
 //--------------------------------------------------------------------------------------------------
@@ -58,5 +62,9 @@ template <class T> void read_file(std::vector<T>& values, const char* filename) 
   if (!in.good()) {
     baser::panic("failed to read {}: {}", filename, std::strerror(errno));
   }
+}
+
+template <class T> void read_file(std::vector<T>& values, std::string_view filename) noexcept {
+  read_file(values, std::string{filename}.c_str());
 }
 } // namespace sxt::bassy

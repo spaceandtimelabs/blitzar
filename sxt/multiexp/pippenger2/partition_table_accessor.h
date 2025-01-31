@@ -42,6 +42,11 @@ public:
   virtual unsigned window_width() const noexcept { return 16u; }
 
   /**
+   * Copy a subset of generators
+   */
+  virtual void copy_generators(basct::span<T> generators) const noexcept = 0;
+
+  /**
    * Asynchronously copy precomputed sums of partitions to device.
    *
    * `first` specifies the partition group offset to use.
