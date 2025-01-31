@@ -252,7 +252,6 @@ void gpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
         basct::cspan<unsigned> output_lengths_span{output_lengths, num_outputs};
         auto scalars_span = make_scalars_span(scalars, output_bit_table_span, output_lengths_span);
 
-
         bassy::directory_recorder recorder{"vlen-multiexponentiation"};
         if (recorder.recording()) {
           mtxpp2::write_multiexponentiation<T>(
