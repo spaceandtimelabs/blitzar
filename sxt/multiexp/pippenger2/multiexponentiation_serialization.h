@@ -61,9 +61,7 @@ void write_multiexponentiation(std::string_view dir, const partition_table_acces
                                basct::cspan<uint8_t> scalars) noexcept {
   size_t num_products = std::accumulate(output_bit_table.begin(), output_bit_table.end(), 0ull);
   auto num_output_bytes = basn::divide_up<size_t>(num_products, 8);
-  SXT_DEBUG_ASSERT(
-      scalars.size() % num_output_bytes == 0
-  );
+  SXT_DEBUG_ASSERT(scalars.size() % num_output_bytes == 0);
   auto n = scalars.size() / num_output_bytes;
 
   bassy::write_file(std::format("{}/output_bit_table.bin", dir), output_bit_table);

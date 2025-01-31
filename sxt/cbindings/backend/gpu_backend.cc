@@ -233,10 +233,23 @@ void gpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
     auto output_num_bytes =
         basn::divide_up(std::accumulate(output_bit_table, output_bit_table + num_outputs, 0), 8);
     basct::cspan<uint8_t> scalars_span{scalars, output_num_bytes * n};
+
+    bassy::directory_recorder recorder{"packed-multiexponentiation"};
+    if (recorder.recording()) {
+      mtxpp2::write_multiexponentiation<T>(
+          recorder.dir(), static_cast<const mtxpp2::partition_table_accessor<U>&>(accessor),
+          output_bit_table_span, scalars_span);
+    }
+
     auto fut = mtxpp2::async_multiexponentiate<T>(
         res_span, static_cast<const mtxpp2::partition_table_accessor<U>&>(accessor),
         output_bit_table_span, scalars_span);
+
     xens::get_scheduler().run();
+
+    if (recorder.recording()) {
+      bassy::write_file<T>(std::format("{}/result.bin", recorder.dir()), res_span);
+    }
   });
 }
 
