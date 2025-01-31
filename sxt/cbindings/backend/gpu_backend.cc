@@ -21,6 +21,8 @@
 
 #include "sxt/base/error/assert.h"
 #include "sxt/base/num/divide_up.h"
+#include "sxt/base/system/directory_recorder.h"
+#include "sxt/base/system/file_io.h"
 #include "sxt/cbindings/backend/computational_backend_utility.h"
 #include "sxt/cbindings/base/curve_id_utility.h"
 #include "sxt/curve21/operation/add.h"
@@ -52,6 +54,7 @@
 #include "sxt/multiexp/curve/multiexponentiation.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor_utility.h"
 #include "sxt/multiexp/pippenger2/multiexponentiation.h"
+#include "sxt/multiexp/pippenger2/multiexponentiation_serialization.h"
 #include "sxt/multiexp/pippenger2/variable_length_multiexponentiation.h"
 #include "sxt/proof/inner_product/gpu_driver.h"
 #include "sxt/proof/inner_product/proof_computation.h"
@@ -248,10 +251,24 @@ void gpu_backend::fixed_multiexponentiation(void* res, cbnb::curve_id_t curve_id
         basct::cspan<unsigned> output_bit_table_span{output_bit_table, num_outputs};
         basct::cspan<unsigned> output_lengths_span{output_lengths, num_outputs};
         auto scalars_span = make_scalars_span(scalars, output_bit_table_span, output_lengths_span);
+
+
+        bassy::directory_recorder recorder{"vlen-multiexponentiation"};
+        if (recorder.recording()) {
+          mtxpp2::write_multiexponentiation<T>(
+              recorder.dir(), static_cast<const mtxpp2::partition_table_accessor<U>&>(accessor),
+              output_bit_table_span, output_lengths_span, scalars_span);
+        }
+
         auto fut = mtxpp2::async_multiexponentiate<T>(
             res_span, static_cast<const mtxpp2::partition_table_accessor<U>&>(accessor),
             output_bit_table_span, output_lengths_span, scalars_span);
+
         xens::get_scheduler().run();
+
+        if (recorder.recording()) {
+          bassy::write_file<T>(std::format("{}/result.bin", recorder.dir()), res_span);
+        }
       });
 }
 

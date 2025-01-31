@@ -28,6 +28,6 @@ using namespace sxt::bassy;
 TEST_CASE("we can set up a directory for recording") {
   bastst::temp_directory dir;
   directory_recorder recorder{"abc", dir.name()};
-  std::ofstream out{std::format("{}/t", recorder.name())};
+  std::ofstream out{std::format("{}/t", recorder.dir())};
   REQUIRE(out.good());
 }

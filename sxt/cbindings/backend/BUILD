@@ -39,6 +39,8 @@ sxt_cc_component(
     impl_deps = [
         ":computational_backend_utility",
         "//sxt/base/error:assert",
+        "//sxt/base/system:directory_recorder",
+        "//sxt/base/system:file_io",
         "//sxt/base/num:divide_up",
         "//sxt/proof/transcript:transcript",
         "//sxt/scalar25/type:element",
@@ -75,6 +77,7 @@ sxt_cc_component(
         "//sxt/multiexp/curve:multiexponentiation",
         "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor_utility",
         "//sxt/multiexp/pippenger2:multiexponentiation",
+        "//sxt/multiexp/pippenger2:multiexponentiation_serialization",
         "//sxt/multiexp/pippenger2:variable_length_multiexponentiation",
         "//sxt/seqcommit/generator:precomputed_generators",
         "//sxt/proof/inner_product:proof_descriptor",

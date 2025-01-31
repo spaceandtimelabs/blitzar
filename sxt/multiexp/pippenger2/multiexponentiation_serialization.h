@@ -57,9 +57,9 @@ void write_multiexponentiation(std::string_view dir, const partition_table_acces
   bassy::write_file(std::format("{}/output_lengths.bin", dir), output_lengths);
   bassy::write_file(std::format("{}/scalars.bin", dir), scalars);
 
-  std::vector<T> generators(n);
+  std::vector<U> generators(n);
   accessor.copy_generators(generators);
-  bassy::write_file<T>(std::format("{}/generators.bin", dir), generators);
+  bassy::write_file<U>(std::format("{}/generators.bin", dir), generators);
 
   uint64_t window_width = accessor.window_width();
   bassy::write_file(std::format("{}/window_width.bin", dir),
@@ -80,9 +80,10 @@ void read_multiexponentiation(variable_length_multiexponentiation_descriptor<T, 
   std::vector<uint64_t> window_width;
   bassy::read_file(window_width, std::format("{}/window_width.bin", dir));
   SXT_RELEASE_ASSERT(window_width.size() == 1);
-  std::vector<T> generators;
+  std::vector<U> generators;
   bassy::read_file(generators, std::format("{}/generators.bin", dir));
+  std::vector<T> generators_p{generators.begin(), generators.end()};
   descr.accessor =
-      make_in_memory_partition_table_accessor<U>(generators, basm::alloc_t{}, window_width[0]);
+      make_in_memory_partition_table_accessor<U>(generators_p, basm::alloc_t{}, window_width[0]);
 }
 } // namespace sxt::mtxpp2

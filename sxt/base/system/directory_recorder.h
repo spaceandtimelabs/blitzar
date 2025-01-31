@@ -30,7 +30,7 @@ public:
 
   bool recording() const noexcept { return !name_.empty(); }
 
-  std::string_view name() const noexcept { return name_; }
+  std::string_view dir() const noexcept { return name_; }
 
 private:
   static std::atomic<unsigned> counter_;
