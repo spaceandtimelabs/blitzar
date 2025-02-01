@@ -26,27 +26,22 @@
   <a href="https://github.com/spaceandtimelabs/blitzar/blob/main/LICENSE">
     <img alt="License" src="https://img.shields.io/badge/License-Apache_2.0-blue.svg">
     </a>
-  </a>
 
   <a href="https://en.cppreference.com/w/cpp/20">
     <img alt="C++ Logo" src="https://img.shields.io/badge/C%2B%2B-20-blue?style=flat&logo=c%2B%2B">
     </a>
-  </a>
 
   <a href="https://www.linux.org/">
     <img alt="OS" src="https://img.shields.io/badge/OS-Linux-blue?logo=linux">
     </a>
-  </a>
 
   <a href="https://www.linux.org/">
     <img alt="CPU" src="https://img.shields.io/badge/CPU-x86-red">
     </a>
-  </a>
 
   <a href="https://developer.nvidia.com/cuda-downloads">
     <img alt="CUDA" src="https://img.shields.io/badge/CUDA-12.6-green?style=flat&logo=nvidia">
     </a>
-  </a>
 
   <p align="center">
     Space and Time C++ library for accelerating cryptographic zero-knowledge proofs algorithms on the CPU and GPU.
