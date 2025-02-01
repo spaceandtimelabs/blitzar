@@ -376,7 +376,7 @@ class FormatChecker:
 
 def normalize_path(path):
     """Convert path to form ./path/to/dir/ for directories and ./path/to/file otherwise"""
-    if not path.startswith("./"):
+    if not path.startswith(("./", "/")):
         path = "./" + path
 
     isdir = os.path.isdir(path)
