@@ -115,7 +115,7 @@ void read_multiexponentiation(packed_multiexponentiation_descriptor<T, U>& descr
   bassy::read_file(generators, std::format("{}/generators.bin", dir));
   std::vector<T> generators_p{generators.begin(), generators.end()};
   descr.accessor =
-      make_in_memory_partition_table_accessor<U>(generators_p, basm::alloc_t{}, window_width[0]);
+      make_in_memory_partition_table_accessor<U, T>(generators_p, basm::alloc_t{}, window_width[0]);
 }
 
 template <bascrv::element T, class U>
@@ -133,6 +133,6 @@ void read_multiexponentiation(variable_length_multiexponentiation_descriptor<T, 
   bassy::read_file(generators, std::format("{}/generators.bin", dir));
   std::vector<T> generators_p{generators.begin(), generators.end()};
   descr.accessor =
-      make_in_memory_partition_table_accessor<U>(generators_p, basm::alloc_t{}, window_width[0]);
+      make_in_memory_partition_table_accessor<U, T>(generators_p, basm::alloc_t{}, window_width[0]);
 }
 } // namespace sxt::mtxpp2
