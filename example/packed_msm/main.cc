@@ -1,4 +1,5 @@
 #include <print>
+#include <iostream>
 
 #include "sxt/curve_g1/operation/add.h"
 #include "sxt/curve_g1/operation/compression.h"
@@ -23,8 +24,14 @@ int main() {
                                           "dory_multi_gpu_bug/packed-multiexponentiation-0/");
   std::println("num_outputs = {}", descr.output_bit_table.size());
   std::vector<cg1t::element_p2> res(descr.output_bit_table.size());
+  for (auto oi : descr.output_bit_table) {
+    std::println("tbl: {}", oi);
+  }
   auto fut = mtxpp2::async_multiexponentiate<cg1t::element_p2>(
       res, *descr.accessor, descr.output_bit_table, descr.scalars);
   xens::get_scheduler().run();
+  for (auto& ri : res) {
+    std::cout << ri.X << " " << ri.Y << "\n";
+  }
   return 0;
 }
