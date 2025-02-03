@@ -23,7 +23,7 @@
 using namespace sxt;
 using namespace sxt::mtxpp2;
 
-TEST_CASE("we can serialize and deserialize a variable length multiexponentiation") {
+TEST_CASE("we can serialize and deserialize a multiexponentiations") {
   using E = bascrv::element97;
 
   bastst::temp_directory dir;
@@ -32,15 +32,29 @@ TEST_CASE("we can serialize and deserialize a variable length multiexponentiatio
   auto accessor = make_in_memory_partition_table_accessor<E>(generators);
   std::vector<unsigned> output_bit_table = {1, 1};
   std::vector<unsigned> output_lengths = {1, 2};
-  std::vector<uint8_t> scalars = {3, 2, 1};
+  std::vector<uint8_t> scalars = {3, 0, 2, 1};
 
-  SECTION("we can serialize then deserialize") {
+  SECTION("we can serialize then deserialize a variable length multiexponentiation") {
     write_multiexponentiation<E>(dir.name(), *accessor, output_bit_table, output_lengths, scalars);
 
     variable_length_multiexponentiation_descriptor<E, E> descr;
     read_multiexponentiation(descr, dir.name());
     REQUIRE(descr.output_bit_table == output_bit_table);
     REQUIRE(descr.output_lengths == output_lengths);
+    REQUIRE(descr.scalars == scalars);
+    std::vector<E> generators_p(2);
+    descr.accessor->copy_generators(generators_p);
+    REQUIRE(generators[0] == generators_p[0]);
+    REQUIRE(generators[1] == generators_p[1]);
+    REQUIRE(descr.accessor->window_width() == accessor->window_width());
+  }
+
+  SECTION("we can serialize then deserialize a packed multiexponentiation") {
+    write_multiexponentiation<E>(dir.name(), *accessor, output_bit_table, scalars);
+
+    packed_multiexponentiation_descriptor<E, E> descr;
+    read_multiexponentiation(descr, dir.name());
+    REQUIRE(descr.output_bit_table == output_bit_table);
     REQUIRE(descr.scalars == scalars);
     std::vector<E> generators_p(2);
     descr.accessor->copy_generators(generators_p);
