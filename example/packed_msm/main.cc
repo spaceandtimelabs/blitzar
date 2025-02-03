@@ -27,9 +27,14 @@ int main() {
   for (auto oi : descr.output_bit_table) {
     std::println("tbl: {}", oi);
   }
-  auto fut = mtxpp2::async_multiexponentiate<cg1t::element_p2>(
-      res, *descr.accessor, descr.output_bit_table, descr.scalars);
-  xens::get_scheduler().run();
+  if (false) {
+    auto fut = mtxpp2::async_multiexponentiate<cg1t::element_p2>(
+        res, *descr.accessor, descr.output_bit_table, descr.scalars);
+    xens::get_scheduler().run();
+  } else {
+    mtxpp2::multiexponentiate<cg1t::element_p2>(res, *descr.accessor, descr.output_bit_table,
+                                                descr.scalars);
+  }
   for (auto& ri : res) {
     std::cout << ri.X << " " << ri.Y << "\n";
   }
