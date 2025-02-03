@@ -1,6 +1,5 @@
 #include <print>
 
-#include "sxt/multiexp/pippenger2/multiexponentiation_serialization.h"
 #include "sxt/curve_g1/operation/add.h"
 #include "sxt/curve_g1/operation/compression.h"
 #include "sxt/curve_g1/operation/double.h"
@@ -13,16 +12,19 @@
 #include "sxt/curve_gk/type/conversion_utility.h"
 #include "sxt/curve_gk/type/element_affine.h"
 #include "sxt/curve_gk/type/element_p2.h"
+#include "sxt/execution/schedule/scheduler.h"
+#include "sxt/multiexp/pippenger2/multiexponentiation.h"
+#include "sxt/multiexp/pippenger2/multiexponentiation_serialization.h"
 using namespace sxt;
 
 int main() {
   mtxpp2::packed_multiexponentiation_descriptor<cg1t::element_p2, cg1t::compact_element> descr;
   mtxpp2::read_multiexponentiation(descr, "/home/rnburn/proj/blitzar/example/packed_msm/"
                                           "dory_multi_gpu_bug/packed-multiexponentiation-0/");
-  /* f(std::type_identity<cg1t::compact_element>{}, std::type_identity<cg1t::element_p2>{}); */
-  std::println("arf");
-/* template <bascrv::element T, class U> */
-/* void read_multiexponentiation(packed_multiexponentiation_descriptor<T, U>& descr, */
-/*                               std::string_view dir) noexcept { */
+  std::println("num_outputs = {}", descr.output_bit_table.size());
+  std::vector<cg1t::element_p2> res(descr.output_bit_table.size());
+  auto fut = mtxpp2::async_multiexponentiate<cg1t::element_p2>(
+      res, *descr.accessor, descr.output_bit_table, descr.scalars);
+  xens::get_scheduler().run();
   return 0;
 }
