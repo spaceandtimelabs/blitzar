@@ -49,7 +49,7 @@ TEST_CASE("we can serialize and deserialize a multiexponentiations") {
     REQUIRE(descr.accessor->window_width() == accessor->window_width());
   }
 
-  SECTION("we can serialize then deserialize a multiexponentiation") {
+  SECTION("we can serialize then deserialize a packed multiexponentiation") {
     write_multiexponentiation<E>(dir.name(), *accessor, output_bit_table, scalars);
 
     packed_multiexponentiation_descriptor<E, E> descr;
