@@ -16,6 +16,7 @@
  */
 #include "sxt/multiexp/pippenger2/multiexponentiation.h"
 
+#include <cstdlib>
 #include <random>
 #include <vector>
 
@@ -188,7 +189,7 @@ TEST_CASE("we can compute multiexponentiations with packed scalars") {
     g = std::uniform_int_distribution<unsigned>{0, 96}(rng);
   }
 
-  auto accessor = make_in_memory_partition_table_accessor<E>(generators);
+  auto accessor = make_in_memory_partition_table_accessor<E>(generators, {}, 2);
 
   std::vector<uint8_t> scalars(1);
   std::vector<E> res(1);
@@ -234,6 +235,26 @@ TEST_CASE("we can compute multiexponentiations with packed scalars") {
     REQUIRE(res[0] == 3u * generators[0].value + generators[1].value);
     REQUIRE(res[1] == generators[1].value);
     REQUIRE(res[2] == 6u * generators[0].value + 5u * generators[1].value);
+  }
+
+  SECTION("we can compute chunked multiexponentiations") {
+    output_bit_table = {1};
+    scalars = {
+        0b1,
+        0b0,
+        0b1,
+        0b1,
+    };
+    res.resize(1);
+    basit::split_options split_options{
+        .min_chunk_size = 1,
+        .max_chunk_size = 1,
+        .split_factor = 1,
+    };
+    auto fut = multiexponentiate_impl<E>(res, *accessor, output_bit_table, scalars, split_options);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == generators[0].value + generators[2].value + generators[3].value);
   }
 
   SECTION("we can compute packed multiexponentiations on the host") {

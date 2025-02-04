@@ -175,7 +175,6 @@ multiexponentiate_impl(basct::span<T> res, const partition_table_accessor<U>& ac
   size_t chunk_index = 0;
   co_await xendv::concurrent_for_each(
       chunk_first, chunk_last, [&](const basit::index_range& rng) noexcept -> xena::future<> {
-        co_return;
         basl::info("computing {} multiproducts for generators [{}, {}] on device {}", num_products,
                    rng.a(), rng.b(), basdv::get_device());
         memmg::managed_array<T> partial_products_dev{num_products, memr::get_device_resource()};
