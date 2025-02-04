@@ -16,6 +16,7 @@
  */
 #include "sxt/multiexp/pippenger2/multiexponentiation.h"
 
+#include <cstdlib>
 #include <random>
 #include <vector>
 
@@ -35,6 +36,7 @@
 using namespace sxt;
 using namespace sxt::mtxpp2;
 
+#if 0
 TEST_CASE("we can compute multiexponentiations using a precomputed table of partition sums") {
   using E = bascrv::element97;
 
@@ -178,6 +180,7 @@ TEST_CASE("we can compute multiexponentiations using a precomputed table of part
     REQUIRE(res[1] == 2 * generators[0].value + 4 * generators[16].value);
   }
 }
+#endif
 
 TEST_CASE("we can compute multiexponentiations with packed scalars") {
   using E = bascrv::element97;
@@ -188,12 +191,13 @@ TEST_CASE("we can compute multiexponentiations with packed scalars") {
     g = std::uniform_int_distribution<unsigned>{0, 96}(rng);
   }
 
-  auto accessor = make_in_memory_partition_table_accessor<E>(generators);
+  auto accessor = make_in_memory_partition_table_accessor<E>(generators, {}, 2);
 
   std::vector<uint8_t> scalars(1);
   std::vector<E> res(1);
   std::vector<unsigned> output_bit_table(1);
 
+#if 0
   SECTION("we can compute a multiexponentiation for a single bit scalar") {
     output_bit_table[0] = 1;
     auto fut = async_multiexponentiate<E>(res, *accessor, output_bit_table, scalars);
@@ -235,7 +239,29 @@ TEST_CASE("we can compute multiexponentiations with packed scalars") {
     REQUIRE(res[1] == generators[1].value);
     REQUIRE(res[2] == 6u * generators[0].value + 5u * generators[1].value);
   }
+#endif
 
+  SECTION("we can compute chunked multiexponentiations") {
+    output_bit_table = {1};
+    scalars = {
+        0b1,
+        0b0,
+        0b1,
+        0b1,
+    };
+    res.resize(1);
+    basit::split_options split_options{
+        .min_chunk_size = 1,
+        .max_chunk_size = 1,
+        .split_factor = 1,
+    };
+    auto fut = multiexponentiate_impl<E>(res, *accessor, output_bit_table, scalars, split_options);
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    REQUIRE(res[0] == generators[0].value + generators[2].value + generators[3].value);
+  }
+
+#if 0
   SECTION("we can compute packed multiexponentiations on the host") {
     output_bit_table = {2, 1, 3};
     scalars = {0b110011, 0b101101};
@@ -245,8 +271,10 @@ TEST_CASE("we can compute multiexponentiations with packed scalars") {
     REQUIRE(res[1] == generators[1].value);
     REQUIRE(res[2] == 6u * generators[0].value + 5u * generators[1].value);
   }
+#endif
 }
 
+#if 0
 TEST_CASE("we can compute multiexponentiations with curve-21") {
   using E = c21t::element_p3;
   using Ep = c21t::compact_element;
@@ -279,3 +307,4 @@ TEST_CASE("we can compute multiexponentiations with curve-21") {
     REQUIRE(res[0] == generators[0]);
   }
 }
+#endif

@@ -297,8 +297,9 @@ template <bascrv::element T>
 xena::future<> combine_reduce(basct::span<T> res, basct::cspan<unsigned> output_bit_table,
                               basct::cspan<T> partial_products) noexcept {
   basit::split_options split_options{
-      .max_chunk_size = 1024,
-      .split_factor = basdv::get_num_devices(),
+      .max_chunk_size = 1024000,
+      /* .split_factor = basdv::get_num_devices(), */
+      .split_factor = 1,
   };
   co_await combine_reduce(res, split_options, output_bit_table, partial_products);
 }
