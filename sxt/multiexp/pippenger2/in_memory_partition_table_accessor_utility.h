@@ -61,11 +61,14 @@ std::unique_ptr<partition_table_accessor<U>> make_in_memory_partition_table_acce
 // make_in_memory_partition_table_accessor
 //--------------------------------------------------------------------------------------------------
 template <class U, class T>
-  requires(!std::same_as<U, T>)
 std::unique_ptr<partition_table_accessor<U>> make_in_memory_partition_table_accessor(
     basct::cspan<T> generators, basm::alloc_t alloc = memr::get_pinned_resource(),
     unsigned window_width = get_default_window_width()) noexcept {
-  return make_in_memory_partition_table_accessor_impl<U, T>(generators, alloc, window_width);
+  if constexpr (!std::is_same_v<U, T>) {
+    return make_in_memory_partition_table_accessor_impl<U, T>(generators, alloc, window_width);
+  } else {
+    return make_in_memory_partition_table_accessor_impl<T, T>(generators, alloc, window_width);
+  }
 }
 
 template <class T>
