@@ -60,7 +60,7 @@ void write_meta_info(std::string_view filename, size_t num_outputs) noexcept {
   std::string s;
   s.append(std::format("element type: {}\n", typeid(T).name()));
   s.append(std::format("accessor type: {}\n", typeid(U).name()));
-  s.append(std::format("num_outputs: {}\n", typeid(U).name()));
+  s.append(std::format("num_outputs: {}\n", num_outputs));
   bassy::write_file<char>(filename, s);
 }
 
