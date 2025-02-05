@@ -147,6 +147,17 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "reference_transcript",
+    with_test = False,
+    deps = [
+      ":sumcheck_transcript",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "sumcheck_random",
     impl_deps = [
         "//sxt/base/error:assert",
