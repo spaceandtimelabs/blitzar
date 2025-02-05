@@ -139,6 +139,14 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "sumcheck_transcript",
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+    ]
+)
+
+sxt_cc_component(
     name = "sumcheck_random",
     impl_deps = [
         "//sxt/base/error:assert",
