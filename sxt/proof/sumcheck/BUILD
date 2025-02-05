@@ -151,6 +151,10 @@ sxt_cc_component(
     with_test = False,
     deps = [
       ":sumcheck_transcript",
+      "//sxt/proof/transcript:transcript",
+    ],
+    impl_deps = [
+      "//sxt/proof/transcript:transcript_utility",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",

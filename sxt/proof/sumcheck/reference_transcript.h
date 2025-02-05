@@ -1,6 +1,7 @@
 #pragma once
 
 #include "sxt/proof/sumcheck/sumcheck_transcript.h"
+#include "sxt/proof/transcript/transcript.h"
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
@@ -17,5 +18,6 @@ class reference_transcript final : public sumcheck_transcript {
    /* virtual void round_challenge(s25t::element& r, */
    /*                              basct::cspan<s25t::element> polynomial) noexcept = 0; */
  private:
+   prft::transcript transcript_;
 };
 } // namespace sxt::prfsk
