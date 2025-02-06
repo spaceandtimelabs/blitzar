@@ -364,6 +364,7 @@ sxt_cc_component(
     name = "verification",
     impl_deps = [
         ":polynomial_utility",
+        ":sumcheck_transcript",
         ":transcript_utility",
         "//sxt/base/error:assert",
         "//sxt/base/log:log",
