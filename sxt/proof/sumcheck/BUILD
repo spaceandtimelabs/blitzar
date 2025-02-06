@@ -334,6 +334,7 @@ sxt_cc_component(
     impl_deps = [
         ":driver",
         ":transcript_utility",
+        ":sumcheck_transcript",
         "//sxt/execution/async:future",
         "//sxt/base/error:assert",
         "//sxt/base/num:ceil_log2",
