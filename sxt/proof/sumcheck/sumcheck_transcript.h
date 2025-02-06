@@ -12,7 +12,7 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // sumcheck_transcript 
 //--------------------------------------------------------------------------------------------------
-struct sumcheck_transcript {
+class sumcheck_transcript {
   public:
     virtual ~sumcheck_transcript() noexcept = default;
 

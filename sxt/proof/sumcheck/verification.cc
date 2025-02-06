@@ -82,7 +82,6 @@ bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
                                    sumcheck_transcript& transcript,
                                    basct::cspan<s25t::element> round_polynomials,
                                    unsigned round_degree) noexcept {
-  return true;
   auto num_variables = evaluation_point.size();
   SXT_RELEASE_ASSERT(
       // clang-format off

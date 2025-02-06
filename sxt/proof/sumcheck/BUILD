@@ -373,6 +373,7 @@ sxt_cc_component(
         "//sxt/proof/transcript:transcript_utility",
     ],
     test_deps = [
+      ":reference_transcript",
         ":transcript_utility",
         "//sxt/base/test:unit_test",
         "//sxt/scalar25/type:element",

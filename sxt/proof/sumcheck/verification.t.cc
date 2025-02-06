@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/proof/sumcheck/reference_transcript.h"
 #include "sxt/proof/sumcheck/transcript_utility.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/operation/overload.h"
@@ -32,7 +33,8 @@ using sxt::s25t::operator""_s25;
 TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
   s25t::element expected_sum = 0x0_s25;
   std::vector<s25t::element> evaluation_point = {0x0_s25};
-  prft::transcript transcript{"abc"};
+  prft::transcript base_transcript{"abc"};
+  reference_transcript transcript{base_transcript};
   std::vector<s25t::element> round_polynomials = {0x0_s25, 0x0_s25};
 
   SECTION("verification fails if dimensions don't match") {
@@ -67,9 +69,10 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
     // draw scalar
     s25t::element r;
     {
-      prft::transcript transcript_p{"abc"};
-      init_transcript(transcript_p, 2, 1);
-      round_challenge(r, transcript_p, basct::span<s25t::element>{round_polynomials}.subspan(0, 2));
+      prft::transcript base_transcript_p{"abc"};
+      reference_transcript transcript_p{base_transcript_p};
+      transcript_p.init(2, 1);
+      transcript_p.round_challenge(r, basct::span<s25t::element>{round_polynomials}.subspan(0, 2));
     }
 
     // round 2
