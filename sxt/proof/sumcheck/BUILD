@@ -148,7 +148,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "reference_transcript",
-    with_test = False,
     deps = [
       ":sumcheck_transcript",
       "//sxt/proof/transcript:transcript",
@@ -159,6 +158,7 @@ sxt_cc_component(
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:literal",
     ],
 )
 

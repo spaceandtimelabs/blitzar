@@ -9,6 +9,8 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 class reference_transcript final : public sumcheck_transcript {
  public:
+   explicit reference_transcript(prft::transcript& transcript) noexcept;
+
    void init(size_t num_variables, size_t round_degree) noexcept override;
 
    void round_challenge(s25t::element& r, basct::cspan<s25t::element> polynomial) noexcept override;
@@ -18,6 +20,6 @@ class reference_transcript final : public sumcheck_transcript {
    /* virtual void round_challenge(s25t::element& r, */
    /*                              basct::cspan<s25t::element> polynomial) noexcept = 0; */
  private:
-   prft::transcript transcript_;
+   prft::transcript& transcript_;
 };
 } // namespace sxt::prfsk
