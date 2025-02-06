@@ -154,7 +154,8 @@ sxt_cc_component(
       "//sxt/proof/transcript:transcript",
     ],
     impl_deps = [
-      "//sxt/proof/transcript:transcript_utility",
+        "//sxt/scalar25/type:element",
+        "//sxt/proof/transcript:transcript_utility",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
