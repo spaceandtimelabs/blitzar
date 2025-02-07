@@ -143,15 +143,11 @@ sxt_cc_component(
     with_test = False,
     deps = [
         "//sxt/base/container:span",
-    ]
+    ],
 )
 
 sxt_cc_component(
     name = "reference_transcript",
-    deps = [
-      ":sumcheck_transcript",
-      "//sxt/proof/transcript:transcript",
-    ],
     impl_deps = [
         "//sxt/scalar25/type:element",
         "//sxt/proof/transcript:transcript_utility",
@@ -159,6 +155,10 @@ sxt_cc_component(
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        ":sumcheck_transcript",
+        "//sxt/proof/transcript",
     ],
 )
 
@@ -357,7 +357,7 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
-      ":reference_transcript",
+        ":reference_transcript",
         "//sxt/base/test:unit_test",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
