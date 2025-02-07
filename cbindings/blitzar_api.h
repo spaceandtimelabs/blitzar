@@ -30,6 +30,8 @@ extern "C" {
 #define SXT_CURVE_BN_254 2
 #define SXT_CURVE_GRUMPKIN 3
 
+#define SXT_FIELD_SCALAR255 0
+
 /** config struct to hold the chosen backend */
 struct sxt_config {
   int backend;
@@ -689,6 +691,22 @@ void sxt_fixed_vlen_multiexponentiation(void* res, const struct sxt_multiexp_han
                                         const unsigned* output_bit_table,
                                         const unsigned* output_lengths, unsigned num_outputs,
                                         const uint8_t* scalars);
+
+/**
+ * TODO: fill me in
+ */
+void sxt_prove_sumcheck(
+    void* polynomials,
+    void* evaluation_point,
+    unsigned field_id,
+    const void* transcript_callback,
+    void* transcript_context,
+    const void* mles,
+    const void* product_table,
+    const unsigned* product_terms,
+    unsigned num_outputs,
+    unsigned n);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
