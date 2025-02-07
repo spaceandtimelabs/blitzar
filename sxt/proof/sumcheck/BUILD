@@ -346,6 +346,7 @@ sxt_cc_component(
         ":cpu_driver",
         ":gpu_driver",
         ":mle_utility",
+        ":reference_transcript",
         ":sumcheck_random",
         ":verification",
         "//sxt/base/test:unit_test",
