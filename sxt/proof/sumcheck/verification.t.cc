@@ -20,7 +20,6 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/proof/sumcheck/reference_transcript.h"
-#include "sxt/proof/sumcheck/transcript_utility.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"

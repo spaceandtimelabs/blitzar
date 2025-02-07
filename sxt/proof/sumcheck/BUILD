@@ -232,21 +232,6 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "transcript_utility",
-    impl_deps = [
-        "//sxt/scalar25/type:element",
-        "//sxt/proof/transcript:transcript_utility",
-    ],
-    test_deps = [
-        "//sxt/base/test:unit_test",
-        "//sxt/proof/transcript",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
     name = "gpu_driver",
     impl_deps = [
         ":constant",
@@ -333,7 +318,6 @@ sxt_cc_component(
     name = "proof_computation",
     impl_deps = [
         ":driver",
-        ":transcript_utility",
         ":sumcheck_transcript",
         "//sxt/execution/async:future",
         "//sxt/base/error:assert",
@@ -367,16 +351,13 @@ sxt_cc_component(
     impl_deps = [
         ":polynomial_utility",
         ":sumcheck_transcript",
-        ":transcript_utility",
         "//sxt/base/error:assert",
         "//sxt/base/log:log",
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:element",
-        "//sxt/proof/transcript:transcript_utility",
     ],
     test_deps = [
       ":reference_transcript",
-        ":transcript_utility",
         "//sxt/base/test:unit_test",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
@@ -407,7 +388,6 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
-        ":transcript_utility",
         "//sxt/base/device:property",
         "//sxt/base/device:stream",
         "//sxt/base/test:unit_test",

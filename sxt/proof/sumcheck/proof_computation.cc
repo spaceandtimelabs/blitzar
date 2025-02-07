@@ -22,7 +22,6 @@
 #include "sxt/execution/async/future.h"
 #include "sxt/proof/sumcheck/driver.h"
 #include "sxt/proof/sumcheck/sumcheck_transcript.h"
-#include "sxt/proof/sumcheck/transcript_utility.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {

@@ -20,8 +20,6 @@
 #include "sxt/base/log/log.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/proof/sumcheck/sumcheck_transcript.h"
-#include "sxt/proof/sumcheck/transcript_utility.h"
-#include "sxt/proof/transcript/transcript_utility.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {
