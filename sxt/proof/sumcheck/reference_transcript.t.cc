@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2025-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/proof/sumcheck/transcript_utility.h"
+#include "sxt/proof/sumcheck/reference_transcript.h"
 
 #include <vector>
 
@@ -26,29 +26,32 @@ using namespace sxt;
 using namespace sxt::prfsk;
 using s25t::operator""_s25;
 
-TEST_CASE("we can perform basic operations on a transcript") {
-  prft::transcript transcript{"abc"};
+TEST_CASE("we provide an implementation of sumcheck transcript") {
+  prft::transcript base_transcript{"abc"};
+  reference_transcript transcript{base_transcript};
   std::vector<s25t::element> p = {0x123_s25};
   s25t::element r, rp;
 
   SECTION("we don't draw the same challenge from a transcript") {
-    round_challenge(r, transcript, p);
-    round_challenge(rp, transcript, p);
+    transcript.round_challenge(r, p);
+    transcript.round_challenge(rp, p);
     REQUIRE(r != rp);
 
-    prft::transcript transcript_p{"abc"};
+    prft::transcript base_transcript_p{"abc"};
+    reference_transcript transcript_p{base_transcript_p};
     p[0] = 0x456_s25;
-    round_challenge(rp, transcript_p, p);
+    transcript_p.round_challenge(rp, p);
     REQUIRE(r != rp);
   }
 
   SECTION("init_transcript produces different results based on parameters") {
-    init_transcript(transcript, 1, 2);
-    round_challenge(r, transcript, p);
+    transcript.init(1, 2);
+    transcript.round_challenge(r, p);
 
-    prft::transcript transcript_p{"abc"};
-    init_transcript(transcript_p, 2, 1);
-    round_challenge(rp, transcript_p, p);
+    prft::transcript base_transcript_p{"abc"};
+    reference_transcript transcript_p{base_transcript_p};
+    transcript.init(2, 1);
+    transcript.round_challenge(rp, p);
 
     REQUIRE(r != rp);
   }

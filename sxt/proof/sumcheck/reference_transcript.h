@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2025-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,22 @@
  */
 #pragma once
 
-#include <utility>
-
-#include "sxt/base/container/span.h"
-#include "sxt/execution/async/future_fwd.h"
-
-namespace sxt::prft {
-class transcript;
-}
-namespace sxt::s25t {
-class element;
-}
+#include "sxt/proof/sumcheck/sumcheck_transcript.h"
+#include "sxt/proof/transcript/transcript.h"
 
 namespace sxt::prfsk {
-class driver;
-class sumcheck_transcript;
+//--------------------------------------------------------------------------------------------------
+// reference_transcript
+//--------------------------------------------------------------------------------------------------
+class reference_transcript final : public sumcheck_transcript {
+public:
+  explicit reference_transcript(prft::transcript& transcript) noexcept;
 
-//--------------------------------------------------------------------------------------------------
-// prove_sum
-//--------------------------------------------------------------------------------------------------
-xena::future<> prove_sum(basct::span<s25t::element> polynomials,
-                         basct::span<s25t::element> evaluation_point,
-                         sumcheck_transcript& transcript, const driver& drv,
-                         basct::cspan<s25t::element> mles,
-                         basct::cspan<std::pair<s25t::element, unsigned>> product_table,
-                         basct::cspan<unsigned> product_terms, unsigned n) noexcept;
+  void init(size_t num_variables, size_t round_degree) noexcept override;
+
+  void round_challenge(s25t::element& r, basct::cspan<s25t::element> polynomial) noexcept override;
+
+private:
+  prft::transcript& transcript_;
+};
 } // namespace sxt::prfsk

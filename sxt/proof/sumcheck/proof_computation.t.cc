@@ -30,6 +30,7 @@
 #include "sxt/proof/sumcheck/gpu_driver.h"
 #include "sxt/proof/sumcheck/mle_utility.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
+#include "sxt/proof/sumcheck/reference_transcript.h"
 #include "sxt/proof/sumcheck/sumcheck_random.h"
 #include "sxt/proof/sumcheck/verification.h"
 #include "sxt/proof/transcript/transcript.h"
@@ -42,7 +43,8 @@ using namespace sxt::prfsk;
 using s25t::operator""_s25;
 
 static void test_proof(const driver& drv) noexcept {
-  prft::transcript transcript{"abc"};
+  prft::transcript base_transcript{"abc"};
+  reference_transcript transcript{base_transcript};
   std::vector<s25t::element> polynomials(2);
   std::vector<s25t::element> evaluation_point(1);
   std::vector<s25t::element> mles = {
@@ -172,7 +174,8 @@ static void test_proof(const driver& drv) noexcept {
 
       // prove
       {
-        prft::transcript transcript{"abc"};
+        prft::transcript base_transcript{"abc"};
+        reference_transcript transcript{base_transcript};
         auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
                              product_terms, n);
         xens::get_scheduler().run();
@@ -180,7 +183,8 @@ static void test_proof(const driver& drv) noexcept {
 
       // we can verify
       {
-        prft::transcript transcript{"abc"};
+        prft::transcript base_transcript{"abc"};
+        reference_transcript transcript{base_transcript};
         s25t::element expected_sum;
         sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
         auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
@@ -190,7 +194,8 @@ static void test_proof(const driver& drv) noexcept {
 
       // verification fails if we break the proof
       {
-        prft::transcript transcript{"abc"};
+        prft::transcript base_transcript{"abc"};
+        reference_transcript transcript{base_transcript};
         s25t::element expected_sum;
         sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
         polynomials[polynomials.size() - 1] = polynomials[0] + polynomials[1];

@@ -139,6 +139,30 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "sumcheck_transcript",
+    with_test = False,
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
+    name = "reference_transcript",
+    impl_deps = [
+        "//sxt/scalar25/type:element",
+        "//sxt/proof/transcript:transcript_utility",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        ":sumcheck_transcript",
+        "//sxt/proof/transcript",
+    ],
+)
+
+sxt_cc_component(
     name = "sumcheck_random",
     impl_deps = [
         "//sxt/base/error:assert",
@@ -204,21 +228,6 @@ sxt_cc_component(
     deps = [
         ":driver",
         ":workspace",
-    ],
-)
-
-sxt_cc_component(
-    name = "transcript_utility",
-    impl_deps = [
-        "//sxt/scalar25/type:element",
-        "//sxt/proof/transcript:transcript_utility",
-    ],
-    test_deps = [
-        "//sxt/base/test:unit_test",
-        "//sxt/proof/transcript",
-    ],
-    deps = [
-        "//sxt/base/container:span",
     ],
 )
 
@@ -309,7 +318,7 @@ sxt_cc_component(
     name = "proof_computation",
     impl_deps = [
         ":driver",
-        ":transcript_utility",
+        ":sumcheck_transcript",
         "//sxt/execution/async:future",
         "//sxt/base/error:assert",
         "//sxt/base/num:ceil_log2",
@@ -321,6 +330,7 @@ sxt_cc_component(
         ":cpu_driver",
         ":gpu_driver",
         ":mle_utility",
+        ":reference_transcript",
         ":sumcheck_random",
         ":verification",
         "//sxt/base/test:unit_test",
@@ -340,15 +350,14 @@ sxt_cc_component(
     name = "verification",
     impl_deps = [
         ":polynomial_utility",
-        ":transcript_utility",
+        ":sumcheck_transcript",
         "//sxt/base/error:assert",
         "//sxt/base/log:log",
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:element",
-        "//sxt/proof/transcript:transcript_utility",
     ],
     test_deps = [
-        ":transcript_utility",
+        ":reference_transcript",
         "//sxt/base/test:unit_test",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
@@ -379,7 +388,6 @@ sxt_cc_component(
         "//sxt/scalar25/type:element",
     ],
     test_deps = [
-        ":transcript_utility",
         "//sxt/base/device:property",
         "//sxt/base/device:stream",
         "//sxt/base/test:unit_test",

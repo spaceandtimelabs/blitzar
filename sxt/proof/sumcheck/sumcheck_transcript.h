@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2025-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,25 @@
  */
 #pragma once
 
+#include <cstddef>
+
 #include "sxt/base/container/span.h"
 
-namespace sxt::prft {
-class transcript;
-}
 namespace sxt::s25t {
 class element;
 }
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
-// init_transcript
+// sumcheck_transcript
 //--------------------------------------------------------------------------------------------------
-void init_transcript(prft::transcript& transcript, unsigned num_variables,
-                     unsigned round_degree) noexcept;
+class sumcheck_transcript {
+public:
+  virtual ~sumcheck_transcript() noexcept = default;
 
-//--------------------------------------------------------------------------------------------------
-// round_challenge
-//--------------------------------------------------------------------------------------------------
-void round_challenge(s25t::element& r, prft::transcript& transcript,
-                     basct::cspan<s25t::element> polynomial) noexcept;
+  virtual void init(size_t num_variables, size_t round_degree) noexcept = 0;
+
+  virtual void round_challenge(s25t::element& r,
+                               basct::cspan<s25t::element> polynomial) noexcept = 0;
+};
 } // namespace sxt::prfsk

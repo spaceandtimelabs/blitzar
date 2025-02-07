@@ -21,7 +21,7 @@
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/proof/sumcheck/driver.h"
-#include "sxt/proof/sumcheck/transcript_utility.h"
+#include "sxt/proof/sumcheck/sumcheck_transcript.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {
@@ -29,8 +29,9 @@ namespace sxt::prfsk {
 // prove_sum
 //--------------------------------------------------------------------------------------------------
 xena::future<> prove_sum(basct::span<s25t::element> polynomials,
-                         basct::span<s25t::element> evaluation_point, prft::transcript& transcript,
-                         const driver& drv, basct::cspan<s25t::element> mles,
+                         basct::span<s25t::element> evaluation_point,
+                         sumcheck_transcript& transcript, const driver& drv,
+                         basct::cspan<s25t::element> mles,
                          basct::cspan<std::pair<s25t::element, unsigned>> product_table,
                          basct::cspan<unsigned> product_terms, unsigned n) noexcept {
   SXT_RELEASE_ASSERT(0 < n);
@@ -45,7 +46,7 @@ xena::future<> prove_sum(basct::span<s25t::element> polynomials,
       // clang-format on
   );
 
-  init_transcript(transcript, num_variables, polynomial_length - 1);
+  transcript.init(num_variables, polynomial_length - 1);
 
   auto ws = co_await drv.make_workspace(mles, product_table, product_terms, n);
 
@@ -57,7 +58,7 @@ xena::future<> prove_sum(basct::span<s25t::element> polynomials,
 
     // draw the next random challenge
     s25t::element r;
-    round_challenge(r, transcript, polynomial);
+    transcript.round_challenge(r, polynomial);
     evaluation_point[round_index] = r;
 
     // fold the polynomial

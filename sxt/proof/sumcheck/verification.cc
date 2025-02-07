@@ -19,8 +19,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/log/log.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
-#include "sxt/proof/sumcheck/transcript_utility.h"
-#include "sxt/proof/transcript/transcript_utility.h"
+#include "sxt/proof/sumcheck/sumcheck_transcript.h"
 #include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {
@@ -29,7 +28,7 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
                                    basct::span<s25t::element> evaluation_point,
-                                   prft::transcript& transcript,
+                                   sumcheck_transcript& transcript,
                                    basct::cspan<s25t::element> round_polynomials,
                                    unsigned round_degree) noexcept {
   auto num_variables = evaluation_point.size();
@@ -49,7 +48,7 @@ bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
     return false;
   }
 
-  init_transcript(transcript, num_variables, round_degree);
+  transcript.init(num_variables, round_degree);
 
   // go through sumcheck rounds
   for (unsigned round_index = 0; round_index < num_variables; ++round_index) {
@@ -66,7 +65,7 @@ bool verify_sumcheck_no_evaluation(s25t::element& expected_sum,
 
     // draw a random scalar
     s25t::element r;
-    round_challenge(r, transcript, polynomial);
+    transcript.round_challenge(r, polynomial);
     evaluation_point[round_index] = r;
 
     // evaluate at random point

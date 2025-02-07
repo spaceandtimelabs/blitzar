@@ -29,6 +29,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/proof/sumcheck/gpu_driver.h"
 #include "sxt/proof/sumcheck/proof_computation.h"
+#include "sxt/proof/sumcheck/reference_transcript.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/random/element.h"
 #include "sxt/scalar25/type/element.h"
@@ -109,7 +110,8 @@ int main(int argc, char* argv[]) {
   std::println("num_samples = {}", p.num_samples);
   memmg::managed_array<s25t::element> polynomials((p.degree + 1u) * num_rounds);
   memmg::managed_array<s25t::element> evaluation_point(num_rounds);
-  prft::transcript transcript{"abc123"};
+  prft::transcript base_transcript{"abc123"};
+  prfsk::reference_transcript transcript{base_transcript};
   prfsk::gpu_driver drv;
 
   // initial run
