@@ -43,6 +43,15 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "field_id_utility",
+    deps = [
+        ":field_id",
+        "//sxt/base/error:panic",
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "multiexp_handle",
     with_test = False,
     deps = [
