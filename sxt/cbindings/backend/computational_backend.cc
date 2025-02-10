@@ -28,14 +28,22 @@ namespace sxt::cbnbck {
 //--------------------------------------------------------------------------------------------------
 namespace {
 class sumcheck_transcript final : public prfsk::sumcheck_transcript {
-  public:
-    void init(size_t /*num_variables*/, size_t /*round_degree*/) noexcept override {}
+public:
+  using callback_t = void (*)(s25t::element* r, void* context, const s25t::element* polynomial,
+                              unsigned round_degree);
+  sumcheck_transcript(callback_t f, void* context) noexcept : f_{f}, context_{context} {}
 
-    void round_challenge(s25t::element& r, basct::cspan<s25t::element> polynomial) noexcept override {
-      (void)r;
-      (void)polynomial;
+  void init(size_t /*num_variables*/, size_t /*round_degree*/) noexcept override {}
+
+  void round_challenge(s25t::element& r, basct::cspan<s25t::element> polynomial) noexcept override {
+    (void)r;
+    (void)polynomial;
+    (void)f_;
+    (void)context_;
     }
   private:
+    callback_t f_;
+    void* context_;
 };
 } // anonymous namespace
 
