@@ -36,14 +36,12 @@ public:
   void init(size_t /*num_variables*/, size_t /*round_degree*/) noexcept override {}
 
   void round_challenge(s25t::element& r, basct::cspan<s25t::element> polynomial) noexcept override {
-    (void)r;
-    (void)polynomial;
-    (void)f_;
-    (void)context_;
-    }
-  private:
-    callback_t f_;
-    void* context_;
+    f_(&r, context_, polynomial.data(), static_cast<unsigned>(polynomial.size()));
+  }
+
+private:
+  callback_t f_;
+  void* context_;
 };
 } // anonymous namespace
 
