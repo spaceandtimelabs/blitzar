@@ -18,9 +18,27 @@
 #include "sxt/cbindings/backend/computational_backend.h"
 
 #include "sxt/cbindings/base/curve_id_utility.h"
+#include "sxt/cbindings/base/field_id_utility.h"
 #include "sxt/multiexp/pippenger2/in_memory_partition_table_accessor.h"
+#include "sxt/proof/sumcheck/sumcheck_transcript.h"
 
 namespace sxt::cbnbck {
+//--------------------------------------------------------------------------------------------------
+// sumcheck_transcript
+//--------------------------------------------------------------------------------------------------
+namespace {
+class sumcheck_transcript final : public prfsk::sumcheck_transcript {
+  public:
+    void init(size_t /*num_variables*/, size_t /*round_degree*/) noexcept override {}
+
+    void round_challenge(s25t::element& r, basct::cspan<s25t::element> polynomial) noexcept override {
+      (void)r;
+      (void)polynomial;
+    }
+  private:
+};
+} // anonymous namespace
+
 //--------------------------------------------------------------------------------------------------
 // prove_sumcheck
 //--------------------------------------------------------------------------------------------------
