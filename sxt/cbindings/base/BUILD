@@ -18,6 +18,13 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "sumcheck_descriptor",
+    with_test = False,
+    deps = [
+    ],
+)
+
+sxt_cc_component(
     name = "curve_id_utility",
     deps = [
         ":curve_id",
