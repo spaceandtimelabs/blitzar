@@ -25,6 +25,7 @@
 #include "sxt/base/system/file_io.h"
 #include "sxt/cbindings/backend/computational_backend_utility.h"
 #include "sxt/cbindings/base/curve_id_utility.h"
+#include "sxt/cbindings/base/field_id_utility.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/operation/neg.h"

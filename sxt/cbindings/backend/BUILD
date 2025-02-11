@@ -50,6 +50,7 @@ sxt_cc_component(
     name = "gpu_backend",
     impl_deps = [
         ":computational_backend_utility",
+        ":callback_sumcheck_transcript",
         "//sxt/base/error:assert",
         "//sxt/base/system:directory_recorder",
         "//sxt/base/system:file_io",
@@ -57,6 +58,7 @@ sxt_cc_component(
         "//sxt/proof/transcript:transcript",
         "//sxt/scalar25/type:element",
         "//sxt/cbindings/base:curve_id_utility",
+        "//sxt/cbindings/base:field_id_utility",
         "//sxt/curve_bng1/operation:add",
         "//sxt/curve_bng1/operation:double",
         "//sxt/curve_bng1/operation:neg",
