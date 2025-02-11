@@ -129,6 +129,20 @@ struct sxt_sequence_descriptor {
   int is_signed;
 };
 
+//--------------------------------------------------------------------------------------------------
+// sumcheck_descriptor
+//--------------------------------------------------------------------------------------------------
+struct sumcheck_descriptor {
+  const void* mles;
+  const void* product_table;
+  const unsigned* product_terms;
+  unsigned n;
+  unsigned num_mles;
+  unsigned num_products;
+  unsigned num_product_terms;
+  unsigned round_degree;
+};
+
 /** resources for multiexponentiations with pre-specified generators */
 struct sxt_multiexp_handle;
 
@@ -695,17 +709,8 @@ void sxt_fixed_vlen_multiexponentiation(void* res, const struct sxt_multiexp_han
 /**
  * TODO: fill me in
  */
-void sxt_prove_sumcheck(
-    void* polynomials,
-    void* evaluation_point,
-    unsigned field_id,
-    const void* transcript_callback,
-    void* transcript_context,
-    const void* mles,
-    const void* product_table,
-    const unsigned* product_terms,
-    unsigned num_outputs,
-    unsigned n);
+void sxt_prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id,
+                        const sumcheck_descriptor* descriptor);
 
 #ifdef __cplusplus
 } // extern "C"

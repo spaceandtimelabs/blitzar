@@ -115,11 +115,26 @@ void gpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsi
                           [&]<class T>(std::type_identity<T>) noexcept {
                             static_assert(std::same_as<T, s25t::element>,
                                           "only support curve-255 right now");
-                            // fill me in
+                            // transcript
                             callback_sumcheck_transcript transcript{
                                 reinterpret_cast<callback_sumcheck_transcript::callback_t>(
                                     const_cast<void*>(transcript_callback)),
                                 transcript_context};
+
+                            // prove
+                            prfsk::chunked_gpu_driver drv;
+                            (void)drv;
+                            /* auto fut = prfsk::prove_sum( */
+                            /*  */
+                            /* ); */
+#if 0
+xena::future<> prove_sum(basct::span<s25t::element> polynomials,
+                         basct::span<s25t::element> evaluation_point,
+                         sumcheck_transcript& transcript, const driver& drv,
+                         basct::cspan<s25t::element> mles,
+                         basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+                         basct::cspan<unsigned> product_terms, unsigned n) noexcept;
+#endif
                           });
 }
 #pragma clang diagnostic pop
