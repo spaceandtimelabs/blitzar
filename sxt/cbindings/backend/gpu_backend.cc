@@ -96,6 +96,20 @@ static void pre_initialize_gpu() noexcept {
 gpu_backend::gpu_backend() noexcept { pre_initialize_gpu(); }
 
 //--------------------------------------------------------------------------------------------------
+// prove_sumcheck
+//--------------------------------------------------------------------------------------------------
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+void gpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id,
+                                 const void* transcript_callback, void* transcript_context,
+                                 const void* mles, const void* product_table,
+                                 const unsigned* product_terms, unsigned num_outputs,
+                                 unsigned n) noexcept {}
+#pragma clang diagnostic pop
+
+//--------------------------------------------------------------------------------------------------
 // compute_commitments
 //--------------------------------------------------------------------------------------------------
 void gpu_backend::compute_commitments(basct::span<rstt::compressed_element> commitments,
