@@ -57,6 +57,13 @@ void computational_backend::prove_sumcheck(void* polynomials, void* evaluation_p
                                            void* transcript_context, const void* mles,
                                            const void* product_table, const unsigned* product_terms,
                                            unsigned num_outputs, unsigned n) noexcept {
+  cbnb::switch_field_type(
+      static_cast<cbnb::field_id_t>(field_id), [&]<class T>(std::type_identity<T>) noexcept {
+        sumcheck_transcript transcript{reinterpret_cast<sumcheck_transcript::callback_t>(
+                                           const_cast<void*>(transcript_callback)),
+                                       transcript_context};
+        (void)transcript;
+      });
 }
 #pragma clang diagnostic pop
 
