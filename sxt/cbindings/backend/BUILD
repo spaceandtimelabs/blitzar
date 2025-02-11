@@ -4,6 +4,16 @@ load(
 )
 
 sxt_cc_component(
+    name = "callback_sumcheck_transcript",
+    impl_deps = [
+    ],
+    with_test = False,
+    deps = [
+        "//sxt/proof/sumcheck:sumcheck_transcript",
+    ],
+)
+
+sxt_cc_component(
     name = "computational_backend",
     impl_deps = [
         "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor",
