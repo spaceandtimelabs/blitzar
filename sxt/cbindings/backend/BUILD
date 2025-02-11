@@ -23,12 +23,10 @@ sxt_cc_component(
         ":computational_backend_utility",
         "//sxt/base/container:span",
         "//sxt/cbindings/base:curve_id_utility",
-        "//sxt/cbindings/base:field_id_utility",
         "//sxt/cbindings/base:sumcheck_descriptor",
         "//sxt/curve21/type:element_p3",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/pippenger2:partition_table_accessor_base",
-        "//sxt/proof/sumcheck:sumcheck_transcript",
         "//sxt/ristretto/type:compressed_element",
     ],
 )
