@@ -710,7 +710,10 @@ void sxt_fixed_vlen_multiexponentiation(void* res, const struct sxt_multiexp_han
  * TODO: fill me in
  */
 void sxt_prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id,
-                        const sumcheck_descriptor* descriptor);
+                        const sumcheck_descriptor* descriptor,
+                        void* transcript_callback,
+                        void* transcript_context
+                        );
 
 #ifdef __cplusplus
 } // extern "C"

@@ -30,10 +30,11 @@ class gpu_backend final : public computational_backend {
 public:
   gpu_backend() noexcept;
 
-  void prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id,
-                      const void* transcript_callback, void* transcript_context, const void* mles,
-                      const void* product_table, const unsigned* product_terms,
-                      unsigned num_outputs, unsigned n) noexcept override;
+  void prove_sum(void* polynomials, void* evaluation_point, unsigned field_id,
+                         const cbnb::sumcheck_descriptor& descriptor,
+                         void* transcript_callback,
+                         void* transcript_context
+                         ) noexcept override;
 
   void compute_commitments(basct::span<rstt::compressed_element> commitments,
                            basct::cspan<mtxb::exponent_sequence> value_sequences,

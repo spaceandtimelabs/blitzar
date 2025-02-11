@@ -106,11 +106,9 @@ gpu_backend::gpu_backend() noexcept { pre_initialize_gpu(); }
 #pragma clang diagnostic ignored "-Wunused-function"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #pragma clang diagnostic ignored "-Wunused-parameter"
-void gpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id,
-                                 const void* transcript_callback, void* transcript_context,
-                                 const void* mles, const void* product_table,
-                                 const unsigned* product_terms, unsigned num_outputs,
-                                 unsigned n) noexcept {
+void gpu_backend::prove_sum(void* polynomials, void* evaluation_point, unsigned field_id,
+                            const cbnb::sumcheck_descriptor& descriptor, void* transcript_callback,
+                            void* transcript_context) noexcept {
   cbnb::switch_field_type(static_cast<cbnb::field_id_t>(field_id),
                           [&]<class T>(std::type_identity<T>) noexcept {
                             static_assert(std::same_as<T, s25t::element>,
