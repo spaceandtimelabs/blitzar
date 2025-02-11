@@ -61,6 +61,8 @@
 #include "sxt/proof/inner_product/gpu_driver.h"
 #include "sxt/proof/inner_product/proof_computation.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
+#include "sxt/proof/sumcheck/chunked_gpu_driver.h"
+#include "sxt/proof/sumcheck/proof_computation.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/compressed_element.h"

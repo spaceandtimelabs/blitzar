@@ -97,6 +97,8 @@ sxt_cc_component(
         "//sxt/proof/inner_product:proof_descriptor",
         "//sxt/proof/inner_product:proof_computation",
         "//sxt/proof/inner_product:gpu_driver",
+        "//sxt/proof/sumcheck:chunked_gpu_driver",
+        "//sxt/proof/sumcheck:proof_computation",
     ],
     with_test = False,
     deps = [
