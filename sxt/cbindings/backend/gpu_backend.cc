@@ -23,6 +23,7 @@
 #include "sxt/base/num/divide_up.h"
 #include "sxt/base/system/directory_recorder.h"
 #include "sxt/base/system/file_io.h"
+#include "sxt/cbindings/backend/callback_sumcheck_transcript.h"
 #include "sxt/cbindings/backend/computational_backend_utility.h"
 #include "sxt/cbindings/base/curve_id_utility.h"
 #include "sxt/cbindings/base/field_id_utility.h"
@@ -107,7 +108,18 @@ void gpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsi
                                  const void* transcript_callback, void* transcript_context,
                                  const void* mles, const void* product_table,
                                  const unsigned* product_terms, unsigned num_outputs,
-                                 unsigned n) noexcept {}
+                                 unsigned n) noexcept {
+  cbnb::switch_field_type(static_cast<cbnb::field_id_t>(field_id),
+                          [&]<class T>(std::type_identity<T>) noexcept {
+                            static_assert(std::same_as<T, s25t::element>,
+                                          "only support curve-255 right now");
+                            // fill me in
+                            callback_sumcheck_transcript transcript{
+                                reinterpret_cast<callback_sumcheck_transcript::callback_t>(
+                                    const_cast<void*>(transcript_callback)),
+                                transcript_context};
+                          });
+}
 #pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
