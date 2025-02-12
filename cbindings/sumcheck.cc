@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "cbindings/sumcheck.h"
 #include "cbindings/backend.h"
-#include "cbindings/fixed_pedersen.h"
 
 using namespace sxt;
 
