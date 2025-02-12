@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 #include "cbindings/sumcheck.h"
+
 #include "cbindings/backend.h"
 
 using namespace sxt;

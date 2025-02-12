@@ -225,6 +225,7 @@ sxt_cc_component(
         ":backend",
         "//sxt/base/test:unit_test",
         "//sxt/proof/sumcheck:reference_transcript",
+        "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
     ],

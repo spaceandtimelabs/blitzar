@@ -21,6 +21,7 @@
 #include "cbindings/backend.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/proof/sumcheck/reference_transcript.h"
+#include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/type/element.h"
 #include "sxt/scalar25/type/literal.h"
 
@@ -58,23 +59,21 @@ TEST_CASE("todo") {
         *r, {polynomial, polynomial_len});
   };
 
-  SECTION("we can prove a sum with n=1 on GPU") {
+  SECTION("we can prove a sum with n=2 on GPU") {
     cbn::reset_backend_for_testing();
     const sxt_config config = {SXT_GPU_BACKEND, 0};
     REQUIRE(sxt_init(&config) == 0);
 
     sxt_prove_sumcheck(polynomials.data(), evaluation_point.data(), SXT_FIELD_SCALAR255,
                        &descriptor, reinterpret_cast<void*>(+f), &transcript);
+    REQUIRE(polynomials[0] == mles[0]);
+    REQUIRE(polynomials[1] == mles[1] - mles[0]);
+    {
+      prft::transcript base_transcript_p{"abc"};
+      prfsk::reference_transcript transcript_p{base_transcript_p};
+      s25t::element r;
+      transcript_p.round_challenge(r, polynomials);
+      REQUIRE(evaluation_point[0] == r);
+    }
   }
 }
-#if 0
-
-  SECTION("we can prove a sum with n=1") {
-    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                         product_terms, 1);
-    xens::get_scheduler().run();
-    REQUIRE(fut.ready());
-    REQUIRE(polynomials[0] == mles[0]);
-    REQUIRE(polynomials[1] == -mles[0]);
-  }
-#endif
