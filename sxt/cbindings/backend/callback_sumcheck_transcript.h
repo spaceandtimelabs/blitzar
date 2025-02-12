@@ -9,7 +9,7 @@ namespace sxt::cbnbck {
 class callback_sumcheck_transcript final : public prfsk::sumcheck_transcript {
 public:
   using callback_t = void (*)(s25t::element* r, void* context, const s25t::element* polynomial,
-                              unsigned round_degree);
+                              unsigned polynomial_len);
 
   callback_sumcheck_transcript(callback_t f, void* context) noexcept : f_{f}, context_{context} {}
 

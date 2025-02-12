@@ -24,6 +24,16 @@ TEST_CASE("todo") {
       {0x1_s25, 1},
   };
   std::vector<unsigned> product_terms = {0};
+  sumcheck_descriptor descriptor{
+      .mles = mles.data(),
+      .product_table = product_table.data(),
+      .product_terms = product_terms.data(),
+      .n = 2,
+      .num_mles = 1,
+      .num_products = 1,
+      .num_product_terms = 1,
+      .round_degree = 1,
+  };
 
   auto f = [](s25t::element* r, void* context, const s25t::element* polynomial,
               unsigned polynomial_len) noexcept {
@@ -35,11 +45,9 @@ TEST_CASE("todo") {
     cbn::reset_backend_for_testing();
     const sxt_config config = {SXT_GPU_BACKEND, 0};
     REQUIRE(sxt_init(&config) == 0);
-#if 0
-void sxt_prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id,
-                        const sumcheck_descriptor* descriptor, void* transcript_callback,
-                        void* transcript_context) {
-#endif
+
+    sxt_prove_sumcheck(polynomials.data(), evaluation_point.data(), SXT_FIELD_SCALAR255,
+                       &descriptor, reinterpret_cast<void*>(+f), &transcript);
   }
 }
 #if 0
