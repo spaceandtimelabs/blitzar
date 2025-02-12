@@ -17,6 +17,7 @@ cuda_library(
         ":get_one_commit",
         ":inner_product_proof",
         ":pedersen",
+        ":sumcheck",
     ],
     alwayslink = 1,
 )
@@ -208,6 +209,21 @@ sxt_cc_component(
         "//sxt/scalar25/random:element",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        ":blitzar_api",
+    ],
+    alwayslink = 1,
+)
+
+sxt_cc_component(
+    name = "sumcheck",
+    impl_deps = [
+        ":backend",
+    ],
+    test_deps = [
+        ":backend",
+        "//sxt/base/test:unit_test",
     ],
     deps = [
         ":blitzar_api",

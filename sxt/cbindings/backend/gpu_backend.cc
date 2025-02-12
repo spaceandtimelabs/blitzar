@@ -104,9 +104,9 @@ gpu_backend::gpu_backend() noexcept { pre_initialize_gpu(); }
 //--------------------------------------------------------------------------------------------------
 // prove_sumcheck
 //--------------------------------------------------------------------------------------------------
-void gpu_backend::prove_sum(void* polynomials, void* evaluation_point, unsigned field_id,
-                            const cbnb::sumcheck_descriptor& descriptor, void* transcript_callback,
-                            void* transcript_context) noexcept {
+void gpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id,
+                                 const cbnb::sumcheck_descriptor& descriptor,
+                                 void* transcript_callback, void* transcript_context) noexcept {
   auto num_variables = static_cast<size_t>(std::max(basn::ceil_log2(descriptor.n), 1));
   cbnb::switch_field_type(static_cast<cbnb::field_id_t>(field_id),
                           [&]<class T>(std::type_identity<T>) noexcept {
