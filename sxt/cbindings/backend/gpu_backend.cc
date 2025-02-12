@@ -104,10 +104,6 @@ gpu_backend::gpu_backend() noexcept { pre_initialize_gpu(); }
 //--------------------------------------------------------------------------------------------------
 // prove_sumcheck
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 void gpu_backend::prove_sum(void* polynomials, void* evaluation_point, unsigned field_id,
                             const cbnb::sumcheck_descriptor& descriptor, void* transcript_callback,
                             void* transcript_context) noexcept {
@@ -148,17 +144,9 @@ void gpu_backend::prove_sum(void* polynomials, void* evaluation_point, unsigned 
                             auto fut = prfsk::prove_sum(
                                 polynomials_span, evaluation_point_span, transcript, drv, mles_span,
                                 product_table_span, product_terms_span, descriptor.n);
-#if 0
-xena::future<> prove_sum(basct::span<s25t::element> polynomials,
-                         basct::span<s25t::element> evaluation_point,
-                         sumcheck_transcript& transcript, const driver& drv,
-                         basct::cspan<s25t::element> mles,
-                         basct::cspan<std::pair<s25t::element, unsigned>> product_table,
-                         basct::cspan<unsigned> product_terms, unsigned n) noexcept;
-#endif
+                            xens::get_scheduler().run();
                           });
 }
-#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // compute_commitments
