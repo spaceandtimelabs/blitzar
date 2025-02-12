@@ -135,6 +135,15 @@ void gpu_backend::prove_sum(void* polynomials, void* evaluation_point, unsigned 
                                 static_cast<const s25t::element*>(descriptor.mles),
                                 descriptor.n * descriptor.num_mles,
                             };
+                            basct::cspan<std::pair<s25t::element, unsigned>> product_table_span{
+                                static_cast<const std::pair<s25t::element, unsigned>*>(
+                                    descriptor.product_table),
+                                descriptor.num_products,
+                            };
+                            basct::cspan<unsigned> product_terms_span{
+                                descriptor.product_terms,
+                                descriptor.num_product_terms,
+                            };
                             prfsk::chunked_gpu_driver drv;
                             (void)drv;
                             /* auto fut = prfsk::prove_sum( */
