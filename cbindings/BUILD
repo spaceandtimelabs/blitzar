@@ -224,6 +224,9 @@ sxt_cc_component(
     test_deps = [
         ":backend",
         "//sxt/base/test:unit_test",
+        "//sxt/proof/sumcheck:reference_transcript",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
     ],
     deps = [
         ":blitzar_api",
