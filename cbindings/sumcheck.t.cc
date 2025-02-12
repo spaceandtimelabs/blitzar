@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "cbindings/backend.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/proof/sumcheck/reference_transcript.h"
 #include "sxt/scalar25/type/element.h"
@@ -29,6 +30,17 @@ TEST_CASE("todo") {
     static_cast<prfsk::reference_transcript*>(context)->round_challenge(
         *r, {polynomial, polynomial_len});
   };
+
+  SECTION("we can prove a sum with n=1 on GPU") {
+    cbn::reset_backend_for_testing();
+    const sxt_config config = {SXT_GPU_BACKEND, 0};
+    REQUIRE(sxt_init(&config) == 0);
+#if 0
+void sxt_prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id,
+                        const sumcheck_descriptor* descriptor, void* transcript_callback,
+                        void* transcript_context) {
+#endif
+  }
 }
 #if 0
 
