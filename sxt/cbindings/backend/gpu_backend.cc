@@ -145,10 +145,9 @@ void gpu_backend::prove_sum(void* polynomials, void* evaluation_point, unsigned 
                                 descriptor.num_product_terms,
                             };
                             prfsk::chunked_gpu_driver drv;
-                            (void)drv;
-                            /* auto fut = prfsk::prove_sum( */
-                            /*  */
-                            /* ); */
+                            auto fut = prfsk::prove_sum(
+                                polynomials_span, evaluation_point_span, transcript, drv, mles_span,
+                                product_table_span, product_terms_span, descriptor.n);
 #if 0
 xena::future<> prove_sum(basct::span<s25t::element> polynomials,
                          basct::span<s25t::element> evaluation_point,
