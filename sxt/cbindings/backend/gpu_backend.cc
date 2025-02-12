@@ -18,8 +18,10 @@
 
 #include <numeric>
 #include <vector>
+#include <algorithm>
 
 #include "sxt/base/error/assert.h"
+#include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/base/system/directory_recorder.h"
 #include "sxt/base/system/file_io.h"
@@ -109,6 +111,7 @@ gpu_backend::gpu_backend() noexcept { pre_initialize_gpu(); }
 void gpu_backend::prove_sum(void* polynomials, void* evaluation_point, unsigned field_id,
                             const cbnb::sumcheck_descriptor& descriptor, void* transcript_callback,
                             void* transcript_context) noexcept {
+  auto num_variables = static_cast<size_t>(std::max(basn::ceil_log2(descriptor.n), 1));
   cbnb::switch_field_type(static_cast<cbnb::field_id_t>(field_id),
                           [&]<class T>(std::type_identity<T>) noexcept {
                             static_assert(std::same_as<T, s25t::element>,
@@ -120,6 +123,18 @@ void gpu_backend::prove_sum(void* polynomials, void* evaluation_point, unsigned 
                                 transcript_context};
 
                             // prove
+                            basct::span<s25t::element> polynomials_span{
+                                static_cast<s25t::element*>(polynomials),
+                                (descriptor.round_degree + 1u) * num_variables,
+                            };
+                            basct::span<s25t::element> evaluation_point_span{
+                                static_cast<s25t::element*>(evaluation_point),
+                                num_variables,
+                            };
+                            basct::cspan<s25t::element> mles_span{
+                                static_cast<const s25t::element*>(descriptor.mles),
+                                descriptor.n * descriptor.num_mles,
+                            };
                             prfsk::chunked_gpu_driver drv;
                             (void)drv;
                             /* auto fut = prfsk::prove_sum( */

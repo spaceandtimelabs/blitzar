@@ -54,6 +54,7 @@ sxt_cc_component(
         "//sxt/base/system:directory_recorder",
         "//sxt/base/system:file_io",
         "//sxt/base/num:divide_up",
+        "//sxt/base/num:ceil_log2",
         "//sxt/proof/transcript:transcript",
         "//sxt/scalar25/type:element",
         "//sxt/cbindings/base:curve_id_utility",
