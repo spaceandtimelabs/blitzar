@@ -76,7 +76,7 @@ TEST_CASE("we correctly reduces arrays with 64 bytes") {
     element s = 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ec_s25;
     element expected_s = s;
     uint8_t s_data[64] = {};
-    std::memcpy(s_data, s.data(), 32); // we copy the 32 bytes to the begginning of s_data
+    std::memcpy(s_data, s.data(), 32); // we copy the 32 bytes to the beginning of s_data
     reduce64(s, s_data);
     REQUIRE(s == expected_s);
   }
@@ -84,7 +84,7 @@ TEST_CASE("we correctly reduces arrays with 64 bytes") {
   SECTION("we correctly reduce A when A = L (L = the field order)") {
     element s = 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_s25;
     uint8_t s_data[64] = {};
-    std::memcpy(s_data, s.data(), 32); // we copy the 32 bytes to the begginning of s_data
+    std::memcpy(s_data, s.data(), 32); // we copy the 32 bytes to the beginning of s_data
     reduce64(s, s_data);
     REQUIRE(s == 0x0_s25);
   }
@@ -92,7 +92,7 @@ TEST_CASE("we correctly reduces arrays with 64 bytes") {
   SECTION("we correctly reduce A when A = L + 103 (L = the field order)") {
     element s = 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d454_s25;
     uint8_t s_data[64] = {};
-    std::memcpy(s_data, s.data(), 32); // we copy the 32 bytes to the begginning of s_data
+    std::memcpy(s_data, s.data(), 32); // we copy the 32 bytes to the beginning of s_data
     reduce64(s, s_data);
     REQUIRE(s == 0x67_s25);
   }
@@ -100,7 +100,7 @@ TEST_CASE("we correctly reduces arrays with 64 bytes") {
   SECTION("we correctly reduce A when A is the biggest 256bits integer") {
     element s = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_s25;
     uint8_t s_data[64] = {};
-    std::memcpy(s_data, s.data(), 32); // we copy the 32 bytes to the begginning of s_data
+    std::memcpy(s_data, s.data(), 32); // we copy the 32 bytes to the beginning of s_data
     reduce64(s, s_data);
     REQUIRE(s == 0xffffffffffffffffffffffffffffffec6ef5bf4737dcf70d6ec31748d98951c_s25);
   }
@@ -108,7 +108,7 @@ TEST_CASE("we correctly reduces arrays with 64 bytes") {
   SECTION("we correctly reduce A when A is the biggest 512bits integer") {
     element s = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_s25;
     uint8_t s_data[64] = {};
-    std::memcpy(s_data, s.data(), 32);      // we copy the 32 bytes to the begginning of s_data
+    std::memcpy(s_data, s.data(), 32);      // we copy the 32 bytes to the beginning of s_data
     std::memcpy(s_data + 32, s.data(), 32); // we copy the 32 bytes to the end of s_data
     reduce64(s, s_data);
     REQUIRE(s == 0x399411b7c309a3dceec73d217f5be65d00e1ba768859347a40611e3449c0f00_s25);
