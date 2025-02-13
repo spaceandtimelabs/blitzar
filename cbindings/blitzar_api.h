@@ -129,11 +129,11 @@ struct sxt_sequence_descriptor {
   int is_signed;
 };
 
-//--------------------------------------------------------------------------------------------------
-// sumcheck_descriptor
-//--------------------------------------------------------------------------------------------------
+/** describe inputs to a sumcheck proof */
 struct sumcheck_descriptor {
+  // multilinear extensions referenced in a sumcheck proof
   const void* mles;
+
   const void* product_table;
   const unsigned* product_terms;
   unsigned n;
