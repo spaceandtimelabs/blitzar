@@ -755,7 +755,7 @@ void sxt_fixed_vlen_multiexponentiation(void* res, const struct sxt_multiexp_han
  *  and will be invoked each sumcheck round to draw a random FIELD entry.
  *
  * output:
- * polynomials points to an (round_degree + 1) x (num_variables) matrix of type FIELD
+ * polynomials points to an (round_degree + 1) x (num_variables) column major matrix of type FIELD
  * and will be filled with the sumcheck round polynomials upon completion.
  *
  * evaluation_point points to a num_variables array of type FIELD and will contain
