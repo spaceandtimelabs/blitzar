@@ -27,6 +27,8 @@ void sxt_prove_sumcheck(void* polynomials, void* evaluation_point, unsigned fiel
                         const sumcheck_descriptor* descriptor, void* transcript_callback,
                         void* transcript_context) {
   auto backend = cbn::get_backend();
+  static_assert(sizeof(sumcheck_descriptor) == sizeof(cbnb::sumcheck_descriptor),
+                "sumcheck descriptors must be binary compatible");
   backend->prove_sumcheck(polynomials, evaluation_point, field_id,
                           *reinterpret_cast<const cbnb::sumcheck_descriptor*>(descriptor),
                           transcript_callback, transcript_context);
