@@ -110,10 +110,13 @@ sxt_cc_component(
 sxt_cc_component(
     name = "cpu_backend",
     impl_deps = [
+        ":callback_sumcheck_transcript",
         ":computational_backend_utility",
         "//sxt/base/error:panic",
+        "//sxt/base/num:ceil_log2",
         "//sxt/base/num:round_up",
         "//sxt/cbindings/base:curve_id_utility",
+        "//sxt/cbindings/base:field_id_utility",
         "//sxt/proof/transcript:transcript",
         "//sxt/scalar25/type:element",
         "//sxt/curve_bng1/operation:add",
@@ -152,6 +155,8 @@ sxt_cc_component(
         "//sxt/proof/inner_product:proof_descriptor",
         "//sxt/proof/inner_product:proof_computation",
         "//sxt/proof/inner_product:cpu_driver",
+        "//sxt/proof/sumcheck:cpu_driver",
+        "//sxt/proof/sumcheck:proof_computation",
     ],
     with_test = False,
     deps = [

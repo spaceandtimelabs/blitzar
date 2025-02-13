@@ -76,4 +76,22 @@ TEST_CASE("todo") {
       REQUIRE(evaluation_point[0] == r);
     }
   }
+
+  SECTION("we can prove a sum with n=2 on CPU") {
+    cbn::reset_backend_for_testing();
+    const sxt_config config = {SXT_CPU_BACKEND, 0};
+    REQUIRE(sxt_init(&config) == 0);
+
+    sxt_prove_sumcheck(polynomials.data(), evaluation_point.data(), SXT_FIELD_SCALAR255,
+                       &descriptor, reinterpret_cast<void*>(+f), &transcript);
+    REQUIRE(polynomials[0] == mles[0]);
+    REQUIRE(polynomials[1] == mles[1] - mles[0]);
+    {
+      prft::transcript base_transcript_p{"abc"};
+      prfsk::reference_transcript transcript_p{base_transcript_p};
+      s25t::element r;
+      transcript_p.round_challenge(r, polynomials);
+      REQUIRE(evaluation_point[0] == r);
+    }
+  }
 }
