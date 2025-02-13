@@ -32,10 +32,10 @@
 
 namespace sxt::mtxpi {
 //--------------------------------------------------------------------------------------------------
-// aggegate_term
+// aggregate_term
 //--------------------------------------------------------------------------------------------------
-static void aggegate_term(exponent_aggregates& aggregates, basct::cspan<uint8_t> term,
-                          size_t output_index, size_t term_index) noexcept {
+static void aggregate_term(exponent_aggregates& aggregates, basct::cspan<uint8_t> term,
+                           size_t output_index, size_t term_index) noexcept {
   basbt::or_equal(aggregates.term_or_all[term_index], term);
   basbt::or_equal(aggregates.output_or_all[output_index], term);
   basbt::max_equal(aggregates.max_exponent, term);
@@ -50,7 +50,7 @@ static void aggregate_unsigned_terms(exponent_aggregates& aggregates, size_t out
   auto element_nbytes = sequence.element_nbytes;
   for (size_t term_index = 0; term_index < sequence.n; ++term_index) {
     basct::cspan<uint8_t> term{sequence.data + term_index * element_nbytes, element_nbytes};
-    aggegate_term(aggregates, term, output_index, term_index);
+    aggregate_term(aggregates, term, output_index, term_index);
   }
 }
 
@@ -66,9 +66,9 @@ static void aggregate_signed_terms(exponent_aggregates& aggregates, size_t outpu
     auto abs_x = basn::abs_to_unsigned(x);
     basct::cspan<uint8_t> term{reinterpret_cast<uint8_t*>(&abs_x), NumBytes};
     if (x >= 0) {
-      aggegate_term(aggregates, term, output_index, term_index);
+      aggregate_term(aggregates, term, output_index, term_index);
     } else {
-      aggegate_term(aggregates, term, output_index + 1, term_index);
+      aggregate_term(aggregates, term, output_index + 1, term_index);
     }
   }
 }
