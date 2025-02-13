@@ -35,7 +35,7 @@ namespace sxt::mtxpi {
 // aggregate_term
 //--------------------------------------------------------------------------------------------------
 static void aggregate_term(exponent_aggregates& aggregates, basct::cspan<uint8_t> term,
-                          size_t output_index, size_t term_index) noexcept {
+                           size_t output_index, size_t term_index) noexcept {
   basbt::or_equal(aggregates.term_or_all[term_index], term);
   basbt::or_equal(aggregates.output_or_all[output_index], term);
   basbt::max_equal(aggregates.max_exponent, term);
