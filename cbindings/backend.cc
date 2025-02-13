@@ -75,7 +75,7 @@ static void try_get_environ_backend(int& backend) noexcept {
     return;
   }
   std::string s{val};
-  basl::info("override default backend with environmental varaible BLITZAR_BACKEND={}", s);
+  basl::info("override default backend with environmental variable BLITZAR_BACKEND={}", s);
   for (auto& c : s) {
     c = std::tolower(c);
   }
