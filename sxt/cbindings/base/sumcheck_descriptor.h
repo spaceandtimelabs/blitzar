@@ -20,6 +20,7 @@ namespace sxt::cbnb {
 //--------------------------------------------------------------------------------------------------
 // sumcheck_descriptor
 //--------------------------------------------------------------------------------------------------
+// Note: This should match the structure used in blitzar_api.h
 struct sumcheck_descriptor {
   const void* mles;
   const void* product_table;
