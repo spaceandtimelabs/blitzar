@@ -16,15 +16,19 @@
  */
 #include "sxt/cbindings/backend/gpu_backend.h"
 
+#include <algorithm>
 #include <numeric>
 #include <vector>
 
 #include "sxt/base/error/assert.h"
+#include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/divide_up.h"
 #include "sxt/base/system/directory_recorder.h"
 #include "sxt/base/system/file_io.h"
+#include "sxt/cbindings/backend/callback_sumcheck_transcript.h"
 #include "sxt/cbindings/backend/computational_backend_utility.h"
 #include "sxt/cbindings/base/curve_id_utility.h"
+#include "sxt/cbindings/base/field_id_utility.h"
 #include "sxt/curve21/operation/add.h"
 #include "sxt/curve21/operation/double.h"
 #include "sxt/curve21/operation/neg.h"
@@ -59,6 +63,8 @@
 #include "sxt/proof/inner_product/gpu_driver.h"
 #include "sxt/proof/inner_product/proof_computation.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
+#include "sxt/proof/sumcheck/chunked_gpu_driver.h"
+#include "sxt/proof/sumcheck/proof_computation.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/compressed_element.h"
@@ -94,6 +100,51 @@ static void pre_initialize_gpu() noexcept {
 // gpu_backend
 //--------------------------------------------------------------------------------------------------
 gpu_backend::gpu_backend() noexcept { pre_initialize_gpu(); }
+
+//--------------------------------------------------------------------------------------------------
+// prove_sumcheck
+//--------------------------------------------------------------------------------------------------
+void gpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id,
+                                 const cbnb::sumcheck_descriptor& descriptor,
+                                 void* transcript_callback, void* transcript_context) noexcept {
+  auto num_variables = static_cast<size_t>(std::max(basn::ceil_log2(descriptor.n), 1));
+  cbnb::switch_field_type(
+      static_cast<cbnb::field_id_t>(field_id), [&]<class T>(std::type_identity<T>) noexcept {
+        static_assert(std::same_as<T, s25t::element>, "only support curve-255 right now");
+        // transcript
+        callback_sumcheck_transcript transcript{
+            reinterpret_cast<callback_sumcheck_transcript::callback_t>(
+                const_cast<void*>(transcript_callback)),
+            transcript_context};
+
+        // prove
+        basct::span<s25t::element> polynomials_span{
+            static_cast<s25t::element*>(polynomials),
+            (descriptor.round_degree + 1u) * num_variables,
+        };
+        basct::span<s25t::element> evaluation_point_span{
+            static_cast<s25t::element*>(evaluation_point),
+            num_variables,
+        };
+        basct::cspan<s25t::element> mles_span{
+            static_cast<const s25t::element*>(descriptor.mles),
+            descriptor.n * descriptor.num_mles,
+        };
+        basct::cspan<std::pair<s25t::element, unsigned>> product_table_span{
+            static_cast<const std::pair<s25t::element, unsigned>*>(descriptor.product_table),
+            descriptor.num_products,
+        };
+        basct::cspan<unsigned> product_terms_span{
+            descriptor.product_terms,
+            descriptor.num_product_terms,
+        };
+        prfsk::chunked_gpu_driver drv;
+        auto fut =
+            prfsk::prove_sum(polynomials_span, evaluation_point_span, transcript, drv, mles_span,
+                             product_table_span, product_terms_span, descriptor.n);
+        xens::get_scheduler().run();
+      });
+}
 
 //--------------------------------------------------------------------------------------------------
 // compute_commitments

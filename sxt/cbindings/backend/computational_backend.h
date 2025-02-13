@@ -22,6 +22,7 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/cbindings/base/curve_id.h"
+#include "sxt/cbindings/base/sumcheck_descriptor.h"
 #include "sxt/multiexp/pippenger2/partition_table_accessor_base.h"
 
 namespace sxt::mtxb {
@@ -70,6 +71,10 @@ namespace sxt::cbnbck {
 class computational_backend {
 public:
   virtual ~computational_backend() noexcept = default;
+
+  virtual void prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id,
+                              const cbnb::sumcheck_descriptor& descriptor,
+                              void* transcript_callback, void* transcript_context) noexcept = 0;
 
   virtual void compute_commitments(basct::span<rstt::compressed_element> commitments,
                                    basct::cspan<mtxb::exponent_sequence> value_sequences,
