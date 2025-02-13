@@ -135,12 +135,5 @@ public:
   void write_partition_table_accessor(cbnb::curve_id_t curve_id,
                                       const mtxpp2::partition_table_accessor_base& accessor,
                                       const char* filename) const noexcept;
-
-private:
-  /* void prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id, */
-  /*                     const void* transcript_callback, void* transcript_context, const void*
-   * mles, */
-  /*                     const void* product_table, const unsigned* product_terms, */
-  /*                     unsigned num_outputs, unsigned n) noexcept; */
 };
 } // namespace sxt::cbnbck
