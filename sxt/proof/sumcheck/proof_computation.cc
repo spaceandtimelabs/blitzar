@@ -41,6 +41,7 @@ xena::future<> prove_sum(basct::span<s25t::element> polynomials,
   SXT_RELEASE_ASSERT(
       // clang-format off
       polynomial_length > 1 &&
+      evaluation_point.size() == num_variables &&
       polynomials.size() == num_variables * polynomial_length &&
       mles.size() == n * num_mles
       // clang-format on

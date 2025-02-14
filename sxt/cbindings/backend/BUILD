@@ -4,6 +4,16 @@ load(
 )
 
 sxt_cc_component(
+    name = "callback_sumcheck_transcript",
+    impl_deps = [
+    ],
+    with_test = False,
+    deps = [
+        "//sxt/proof/sumcheck:sumcheck_transcript",
+    ],
+)
+
+sxt_cc_component(
     name = "computational_backend",
     impl_deps = [
         "//sxt/multiexp/pippenger2:in_memory_partition_table_accessor",
@@ -12,7 +22,8 @@ sxt_cc_component(
     deps = [
         ":computational_backend_utility",
         "//sxt/base/container:span",
-        "//sxt/cbindings/base:curve_id",
+        "//sxt/cbindings/base:curve_id_utility",
+        "//sxt/cbindings/base:sumcheck_descriptor",
         "//sxt/curve21/type:element_p3",
         "//sxt/multiexp/base:exponent_sequence",
         "//sxt/multiexp/pippenger2:partition_table_accessor_base",
@@ -38,13 +49,16 @@ sxt_cc_component(
     name = "gpu_backend",
     impl_deps = [
         ":computational_backend_utility",
+        ":callback_sumcheck_transcript",
         "//sxt/base/error:assert",
         "//sxt/base/system:directory_recorder",
         "//sxt/base/system:file_io",
         "//sxt/base/num:divide_up",
+        "//sxt/base/num:ceil_log2",
         "//sxt/proof/transcript:transcript",
         "//sxt/scalar25/type:element",
         "//sxt/cbindings/base:curve_id_utility",
+        "//sxt/cbindings/base:field_id_utility",
         "//sxt/curve_bng1/operation:add",
         "//sxt/curve_bng1/operation:double",
         "//sxt/curve_bng1/operation:neg",
@@ -83,6 +97,8 @@ sxt_cc_component(
         "//sxt/proof/inner_product:proof_descriptor",
         "//sxt/proof/inner_product:proof_computation",
         "//sxt/proof/inner_product:gpu_driver",
+        "//sxt/proof/sumcheck:chunked_gpu_driver",
+        "//sxt/proof/sumcheck:proof_computation",
     ],
     with_test = False,
     deps = [
@@ -94,10 +110,13 @@ sxt_cc_component(
 sxt_cc_component(
     name = "cpu_backend",
     impl_deps = [
+        ":callback_sumcheck_transcript",
         ":computational_backend_utility",
         "//sxt/base/error:panic",
+        "//sxt/base/num:ceil_log2",
         "//sxt/base/num:round_up",
         "//sxt/cbindings/base:curve_id_utility",
+        "//sxt/cbindings/base:field_id_utility",
         "//sxt/proof/transcript:transcript",
         "//sxt/scalar25/type:element",
         "//sxt/curve_bng1/operation:add",
@@ -136,6 +155,8 @@ sxt_cc_component(
         "//sxt/proof/inner_product:proof_descriptor",
         "//sxt/proof/inner_product:proof_computation",
         "//sxt/proof/inner_product:cpu_driver",
+        "//sxt/proof/sumcheck:cpu_driver",
+        "//sxt/proof/sumcheck:proof_computation",
     ],
     with_test = False,
     deps = [

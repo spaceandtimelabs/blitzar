@@ -11,6 +11,20 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "field_id",
+    with_test = False,
+    deps = [
+    ],
+)
+
+sxt_cc_component(
+    name = "sumcheck_descriptor",
+    with_test = False,
+    deps = [
+    ],
+)
+
+sxt_cc_component(
     name = "curve_id_utility",
     deps = [
         ":curve_id",
@@ -32,6 +46,18 @@ sxt_cc_component(
         "//sxt/curve_gk/operation:double",
         "//sxt/curve_gk/operation:neg",
         "//sxt/curve_gk/type:element_p2",
+    ],
+)
+
+sxt_cc_component(
+    name = "field_id_utility",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":field_id",
+        "//sxt/base/error:panic",
+        "//sxt/scalar25/type:element",
     ],
 )
 

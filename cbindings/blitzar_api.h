@@ -30,6 +30,8 @@ extern "C" {
 #define SXT_CURVE_BN_254 2
 #define SXT_CURVE_GRUMPKIN 3
 
+#define SXT_FIELD_SCALAR255 0
+
 /** config struct to hold the chosen backend */
 struct sxt_config {
   int backend;
@@ -125,6 +127,56 @@ struct sxt_sequence_descriptor {
   // Whether the elements are signed.
   // Note: if signed, then `element_nbytes` must be `<= 16`.
   int is_signed;
+};
+
+/** Describe inputs to a sumcheck proof.
+ *
+ * The sumcheck proof is constructed using a polynomial of the form
+ *
+ * sum_i^num_products {mult_i x prod_j^product_length_i f_j(X1, ..., Xr)}
+ *
+ * where f_j(X1, ..., Xr) denotes a multilinear extension of r variables.
+ *
+ * Pointer types are dependent on the field type as specified
+ * by the field id.
+ *
+ * We will let FIELD denote the field type when describing fields.
+ */
+struct sumcheck_descriptor {
+  // multilinear extensions referenced in a sumcheck proof
+  //
+  // mles should point to a n x num_mles column major matrix of
+  // type FIELD
+  const void* mles;
+
+  // Describe each product of the sumcheck polynomial. product_table should
+  // point to an num_products array with entries of type
+  //
+  // struct {
+  //    FIELD multiplier
+  //    unsigned product_length
+  // }
+  const void* product_table;
+
+  // MLE indices for the entries in product_table
+  const unsigned* product_terms;
+
+  // The length of each MLE
+  unsigned n;
+
+  // The number of distinct MLEs
+  unsigned num_mles;
+
+  // The number of products in the sumcheck polynomial
+  unsigned num_products;
+
+  /// The total number of total product terms in the sumcheck polynomial
+  // sum_i product_length_i
+  unsigned num_product_terms;
+
+  // The degree of the round polynomial for sumcheck
+  // max_i product_length_i
+  unsigned round_degree;
 };
 
 /** resources for multiexponentiations with pre-specified generators */
@@ -689,6 +741,31 @@ void sxt_fixed_vlen_multiexponentiation(void* res, const struct sxt_multiexp_han
                                         const unsigned* output_bit_table,
                                         const unsigned* output_lengths, unsigned num_outputs,
                                         const uint8_t* scalars);
+
+/**
+ * Construct a sumcheck proof for a polynomial
+ *
+ * sum_i^num_products {mult_i x prod_j^product_length_i f_j(X1, ..., Xr)}
+ *
+ * input:
+ * field_id identifies the field of the sumcheck polynomial
+ * descriptor describes the sumcheck polynomial
+ * transcript_callback points to a function with signature
+ *      void (FIELD* r, void* context, FIELD* polynomial, unsigned polynomial_length)
+ *  and will be invoked each sumcheck round to draw a random FIELD entry.
+ *
+ * output:
+ * polynomials points to an (round_degree + 1) x (num_variables) column major matrix of type FIELD
+ * and will be filled with the sumcheck round polynomials upon completion.
+ *
+ * evaluation_point points to a num_variables array of type FIELD and will contain
+ * the evaluation point for sumcheck upon completion as set by the transcript_callback.
+ *
+ */
+void sxt_prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id,
+                        const struct sumcheck_descriptor* descriptor, void* transcript_callback,
+                        void* transcript_context);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
