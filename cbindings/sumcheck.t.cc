@@ -28,7 +28,7 @@
 using namespace sxt;
 using s25t::operator""_s25;
 
-TEST_CASE("todo") {
+TEST_CASE("we can create sumcheck proofs") {
   prft::transcript base_transcript{"abc"};
   prfsk::reference_transcript transcript{base_transcript};
 
