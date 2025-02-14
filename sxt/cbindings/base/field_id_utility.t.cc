@@ -16,8 +16,15 @@
  */
 #include "sxt/cbindings/base/field_id_utility.h"
 
+#include <type_traits>
+
 #include "sxt/base/test/unit_test.h"
 
 using namespace sxt;
+using namespace sxt::cbnb;
 
-TEST_CASE("todo") {}
+TEST_CASE("we can translate a runtime field id value to a compile-time type") {
+  switch_field_type(field_id_t::scalar25519, [&]<class T>(std::type_identity<T>) {
+    REQUIRE(std::is_same_v<T, s25t::element>);
+  });
+}
