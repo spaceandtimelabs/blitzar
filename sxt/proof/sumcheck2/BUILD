@@ -4,6 +4,15 @@ load(
 )
 
 sxt_cc_component(
+    name = "sumcheck_transcript",
+    with_test = False,
+    deps = [
+      "//sxt/base/container:span",
+      "//sxt/base/field:element",
+    ],
+)
+
+sxt_cc_component(
     name = "verification",
     # impl_deps = [
     #     ":polynomial_utility",
@@ -20,6 +29,8 @@ sxt_cc_component(
         # "//sxt/scalar25/type:literal",
     ],
     deps = [
+      ":sumcheck_transcript",
         "//sxt/base/container:span",
+        "//sxt/base/log:log",
     ],
 )
