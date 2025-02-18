@@ -10,17 +10,12 @@ namespace sxt::prfsk2 {
 //--------------------------------------------------------------------------------------------------
 // verify_sumcheck_no_evaluation
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 template <basfld::element T>
 bool verify_sumcheck_no_evaluation(T& expected_sum,
                                    basct::span<T> evaluation_point,
                                    sumcheck_transcript<T>& transcript,
                                    basct::cspan<T> round_polynomials,
                                    unsigned round_degree) noexcept {
-  return true;
   auto num_variables = evaluation_point.size();
   SXT_RELEASE_ASSERT(
       // clang-format off
@@ -58,13 +53,10 @@ bool verify_sumcheck_no_evaluation(T& expected_sum,
     transcript.round_challenge(r, polynomial);
     evaluation_point[round_index] = r;
 
-#if 0
     // evaluate at random point
     evaluate_polynomial(expected_sum, polynomial, r);
-#endif
   }
 
   return true;
 }
-#pragma clang diagnostic pop
 } // namespace sxt::prfsk2

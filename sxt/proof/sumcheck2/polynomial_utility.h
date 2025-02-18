@@ -22,4 +22,22 @@ void sum_polynomial_01(T& e, basct::cspan<T> polynomial) noexcept {
     add(e, e, polynomial[i]);
   }
 }
+
+//--------------------------------------------------------------------------------------------------
+// evaluate_polynomial
+//--------------------------------------------------------------------------------------------------
+template <basfld::element T>
+void evaluate_polynomial(T& e, basct::cspan<T> polynomial, const T& x) noexcept {
+  if (polynomial.empty()) {
+    e = T{};
+    return;
+  }
+  auto i = polynomial.size();
+  --i;
+  e = polynomial[i];
+  while (i > 0) {
+    --i;
+    muladd(e, e, x, polynomial[i]);
+  }
+}
 } // namespace sxt::prfsk2
