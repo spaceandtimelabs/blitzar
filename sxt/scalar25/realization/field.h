@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sxt/base/concept/field.h"
+#include "sxt/base/field/element.h"
 #include "sxt/scalar25/operation/add.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
@@ -9,4 +9,4 @@
 #include "sxt/scalar25/type/element.h"
 
 static_assert(
-    sxt::bascpt::field<sxt::s25t::element>);
+    sxt::basfld::element<sxt::s25t::element>);
