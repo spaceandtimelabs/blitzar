@@ -23,7 +23,6 @@ sxt_cc_component(
 sxt_cc_component(
     name = "verification",
     # impl_deps = [
-    #     ":polynomial_utility",
     #     ":sumcheck_transcript",
     #     "//sxt/base/error:assert",
     #     "//sxt/base/log:log",
@@ -37,6 +36,7 @@ sxt_cc_component(
         # "//sxt/scalar25/type:literal",
     ],
     deps = [
+        ":polynomial_utility",
       ":sumcheck_transcript",
         "//sxt/base/container:span",
         "//sxt/base/log:log",

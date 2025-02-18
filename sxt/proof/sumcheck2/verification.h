@@ -4,6 +4,7 @@
 #include "sxt/base/error/assert.h"
 #include "sxt/base/log/log.h"
 #include "sxt/proof/sumcheck2/sumcheck_transcript.h"
+#include "sxt/proof/sumcheck2/polynomial_utility.h"
 
 namespace sxt::prfsk2 {
 //--------------------------------------------------------------------------------------------------
@@ -44,9 +45,8 @@ bool verify_sumcheck_no_evaluation(T& expected_sum,
     auto polynomial =
         round_polynomials.subspan((round_degree + 1u) * round_index, round_degree + 1u);
 
-#if 0
     // check sum
-    s25t::element sum;
+    T sum;
     sum_polynomial_01(sum, polynomial);
     if (expected_sum != sum) {
       basl::info("sumcheck verification failed on round {}", round_index + 1);
@@ -54,10 +54,11 @@ bool verify_sumcheck_no_evaluation(T& expected_sum,
     }
 
     // draw a random scalar
-    s25t::element r;
+    T r;
     transcript.round_challenge(r, polynomial);
     evaluation_point[round_index] = r;
 
+#if 0
     // evaluate at random point
     evaluate_polynomial(expected_sum, polynomial, r);
 #endif
