@@ -4,6 +4,14 @@ load(
 )
 
 sxt_cc_component(
+    name = "polynomial_utility",
+    deps = [
+      "//sxt/base/container:span",
+      "//sxt/base/field:element",
+    ],
+)
+
+sxt_cc_component(
     name = "sumcheck_transcript",
     with_test = False,
     deps = [
