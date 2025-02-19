@@ -27,6 +27,20 @@ sxt_cc_component(
       "//sxt/base/container:span",
       "//sxt/base/field:element",
     ],
+    test_deps = [
+      "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
+    name = "proof_computation",
+    deps = [
+      "//sxt/base/container:span",
+      "//sxt/base/field:element",
+    ],
+    test_deps = [
+      "//sxt/base/test:unit_test",
+    ],
 )
 
 sxt_cc_component(
