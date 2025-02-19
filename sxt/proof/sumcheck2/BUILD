@@ -35,8 +35,14 @@ sxt_cc_component(
 sxt_cc_component(
     name = "proof_computation",
     deps = [
+      ":sumcheck_transcript",
+      ":driver",
       "//sxt/base/container:span",
+      "//sxt/base/error:assert",
       "//sxt/base/field:element",
+      "//sxt/base/num:ceil_log2",
+      "//sxt/execution/async:future",
+      "//sxt/execution/async:coroutine",
     ],
     test_deps = [
       "//sxt/base/test:unit_test",
