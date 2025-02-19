@@ -26,6 +26,7 @@ sxt_cc_component(
       ":sumcheck_transcript",
       "//sxt/base/container:span",
       "//sxt/base/field:element",
+      "//sxt/proof/transcript:transcript_utility",
     ],
 )
 
