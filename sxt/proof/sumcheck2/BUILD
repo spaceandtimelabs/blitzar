@@ -26,14 +26,14 @@ sxt_cc_component(
     #     ":sumcheck_transcript",
     #     "//sxt/base/error:assert",
     #     "//sxt/base/log:log",
-    #     "//sxt/scalar25/operation:overload",
     #     "//sxt/scalar25/type:element",
     # ],
     test_deps = [
         # ":reference_transcript",
         "//sxt/base/test:unit_test",
-        # "//sxt/scalar25/type:element",
-        # "//sxt/scalar25/type:literal",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
     ],
     deps = [
         ":polynomial_utility",
