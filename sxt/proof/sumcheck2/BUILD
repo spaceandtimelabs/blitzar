@@ -21,6 +21,15 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "reference_transcript",
+    deps = [
+      ":sumcheck_transcript",
+      "//sxt/base/container:span",
+      "//sxt/base/field:element",
+    ],
+)
+
+sxt_cc_component(
     name = "verification",
     # impl_deps = [
     #     ":sumcheck_transcript",
