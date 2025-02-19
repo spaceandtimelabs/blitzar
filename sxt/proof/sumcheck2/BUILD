@@ -4,6 +4,24 @@ load(
 )
 
 sxt_cc_component(
+    name = "workspace",
+    with_test = False,
+    deps = [
+    ],
+)
+
+sxt_cc_component(
+    name = "driver",
+    with_test = False,
+    deps = [
+      ":workspace",
+        "//sxt/execution/async:future_fwd",
+      "//sxt/base/container:span",
+      "//sxt/base/field:element",
+    ],
+)
+
+sxt_cc_component(
     name = "polynomial_utility",
     deps = [
       "//sxt/base/container:span",
