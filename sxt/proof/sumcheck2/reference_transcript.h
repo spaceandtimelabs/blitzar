@@ -11,7 +11,8 @@ namespace sxt::prfsk2 {
 template <basfld::element T>
 class reference_transcript final : public sumcheck_transcript<T> {
 public:
-  explicit reference_transcript(prft::transcript& transcript) noexcept;
+  explicit reference_transcript(prft::transcript& transcript) noexcept
+    : transcript_{transcript} {}
 
   void init(size_t num_variables, size_t round_degree) noexcept {
     prft::set_domain(transcript_, "sumcheck proof v1");

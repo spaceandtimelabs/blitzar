@@ -39,10 +39,10 @@ sxt_cc_component(
     #     "//sxt/scalar25/type:element",
     # ],
     test_deps = [
-        # ":reference_transcript",
+        ":reference_transcript",
         "//sxt/base/test:unit_test",
         "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
     ],
     deps = [
