@@ -1,10 +1,12 @@
 #pragma once
 
+#include "sxt/base/container/stack_array.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
-#include "sxt/proof/sumcheck2/driver.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/proof/sumcheck2/driver.h"
+#include "sxt/proof/sumcheck2/polynomial_utility.h"
 
 namespace sxt::prfsk2 {
 //--------------------------------------------------------------------------------------------------
@@ -50,7 +52,6 @@ public:
   }
 
   // expand paired terms
-#if 0
   auto n1 = work.n - mid;
   for (unsigned i = 0; i < n1; ++i) {
     unsigned term_first = 0;
@@ -66,6 +67,7 @@ public:
     }
   }
 
+#if 0
   // expand terms where the corresponding pair is zero (i.e. n is not a power of 2)
   for (unsigned i = n1; i < mid; ++i) {
     unsigned term_first = 0;

@@ -25,6 +25,8 @@ sxt_cc_component(
   name = "cpu_driver",
   deps = [
     ":driver",
+    ":polynomial_utility",
+    "//sxt/base/container:stack_array",
     "//sxt/base/error:assert",
     "//sxt/base/num:ceil_log2",
     "//sxt/execution/async:coroutine",
