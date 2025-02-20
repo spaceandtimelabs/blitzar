@@ -38,52 +38,50 @@ public:
   }
 
   xena::future<> sum(basct::span<T> polynomial, workspace& ws) const noexcept override {
-  auto& work = static_cast<cpu_workspace&>(ws);
-  auto n = work.n;
-  auto mid = 1u << (work.num_variables - 1u);
-  SXT_RELEASE_ASSERT(work.n >= mid);
+    auto& work = static_cast<cpu_workspace&>(ws);
+    auto n = work.n;
+    auto mid = 1u << (work.num_variables - 1u);
+    SXT_RELEASE_ASSERT(work.n >= mid);
 
-  auto mles = work.mles.data();
-  auto product_table = work.product_table;
-  auto product_terms = work.product_terms;
+    auto mles = work.mles.data();
+    auto product_table = work.product_table;
+    auto product_terms = work.product_terms;
 
-  for (auto& val : polynomial) {
-    val = {};
-  }
-
-  // expand paired terms
-  auto n1 = work.n - mid;
-  for (unsigned i = 0; i < n1; ++i) {
-    unsigned term_first = 0;
-    for (auto [mult, num_terms] : product_table) {
-      SXT_RELEASE_ASSERT(num_terms < polynomial.size());
-      auto terms = product_terms.subspan(term_first, num_terms);
-      SXT_STACK_ARRAY(p, num_terms + 1u, T);
-      expand_products(p, mles + i, n, mid, terms);
-      for (unsigned term_index = 0; term_index < p.size(); ++term_index) {
-        muladd(polynomial[term_index], mult, p[term_index], polynomial[term_index]);
-      }
-      term_first += num_terms;
+    for (auto& val : polynomial) {
+      val = {};
     }
-  }
 
-#if 0
-  // expand terms where the corresponding pair is zero (i.e. n is not a power of 2)
-  for (unsigned i = n1; i < mid; ++i) {
-    unsigned term_first = 0;
-    for (auto [mult, num_terms] : product_table) {
-      auto terms = product_terms.subspan(term_first, num_terms);
-      SXT_STACK_ARRAY(p, num_terms + 1u, T);
-      partial_expand_products(p, mles + i, n, terms);
-      for (unsigned term_index = 0; term_index < p.size(); ++term_index) {
-        muladd(polynomial[term_index], mult, p[term_index], polynomial[term_index]);
+    // expand paired terms
+    auto n1 = work.n - mid;
+    for (unsigned i = 0; i < n1; ++i) {
+      unsigned term_first = 0;
+      for (auto [mult, num_terms] : product_table) {
+        SXT_RELEASE_ASSERT(num_terms < polynomial.size());
+        auto terms = product_terms.subspan(term_first, num_terms);
+        SXT_STACK_ARRAY(p, num_terms + 1u, T);
+        expand_products(p, mles + i, n, mid, terms);
+        for (unsigned term_index = 0; term_index < p.size(); ++term_index) {
+          muladd(polynomial[term_index], mult, p[term_index], polynomial[term_index]);
+        }
+        term_first += num_terms;
       }
-      term_first += num_terms;
     }
-  }
-#endif
 
-  return xena::make_ready_future();
+    // expand terms where the corresponding pair is zero (i.e. n is not a power of 2)
+    for (unsigned i = n1; i < mid; ++i) {
+      unsigned term_first = 0;
+      for (auto [mult, num_terms] : product_table) {
+        auto terms = product_terms.subspan(term_first, num_terms);
+        SXT_STACK_ARRAY(p, num_terms + 1u, T);
+        partial_expand_products(p, mles + i, n, terms);
+        for (unsigned term_index = 0; term_index < p.size(); ++term_index) {
+          muladd(polynomial[term_index], mult, p[term_index], polynomial[term_index]);
+        }
+        term_first += num_terms;
+      }
+    }
+
+    return xena::make_ready_future();
   }
 
   xena::future<> fold(workspace& ws, T& r) const noexcept override {
