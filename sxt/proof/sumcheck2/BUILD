@@ -46,6 +46,9 @@ sxt_cc_component(
     ],
     test_deps = [
       "//sxt/base/test:unit_test",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/realization:field",
+        "//sxt/scalar25/type:literal",
     ],
 )
 
