@@ -54,6 +54,12 @@ public:
 
   static constexpr element identity() noexcept { return element{}; };
 
+  static constexpr element one() noexcept {
+    element res{};
+    res.data_[0] = 1;
+    return res;
+  }
+
 private:
   uint8_t data_[32];
 };

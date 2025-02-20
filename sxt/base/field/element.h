@@ -14,5 +14,6 @@ concept element = requires(T& res, const T& e) {
   mul(res, e, e);
   muladd(res, e, e, e);
   { T::identity() } noexcept -> std::same_as<T>;
+  { T::one() } noexcept -> std::same_as<T>;
 };
 } // namespace sxt::basfld

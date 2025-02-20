@@ -51,6 +51,7 @@ sxt_cc_component(
     "//sxt/memory/management:managed_array",
   ],
   test_deps = [
+    ":driver_test",
     "//sxt/base/test:unit_test",
   ],
 )
