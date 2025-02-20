@@ -40,6 +40,7 @@ sxt_cc_component(
     deps = [
       "//sxt/base/container:span",
       "//sxt/base/field:element",
+      "//sxt/base/macro:cuda_callable",
     ],
     test_deps = [
       "//sxt/base/test:unit_test",
