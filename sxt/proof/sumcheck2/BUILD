@@ -22,6 +22,16 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+  name = "cpu_driver",
+  deps = [
+    ":driver",
+  ],
+  test_deps = [
+    "//sxt/base/test:unit_test",
+  ],
+)
+
+sxt_cc_component(
     name = "polynomial_utility",
     deps = [
       "//sxt/base/container:span",
