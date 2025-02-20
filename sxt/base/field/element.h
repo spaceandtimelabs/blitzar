@@ -1,5 +1,7 @@
 #pragma once
 
+#include <concepts>
+
 namespace sxt::basfld {
 //--------------------------------------------------------------------------------------------------
 // element
@@ -11,5 +13,6 @@ concept element = requires(T& res, const T& e) {
   sub(res, e, e);
   mul(res, e, e);
   muladd(res, e, e, e);
+  { T::identity() } noexcept -> std::same_as<T>;
 };
 } // namespace sxt::basfld

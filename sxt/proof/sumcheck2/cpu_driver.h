@@ -85,10 +85,6 @@ public:
   }
 
   xena::future<> fold(workspace& ws, T& r) const noexcept override {
-    return {};
-#if 0
-  using s25t::operator""_s25;
-
   auto& work = static_cast<cpu_workspace&>(ws);
   auto n = work.n;
   auto mid = 1u << (work.num_variables - 1u);
@@ -100,10 +96,10 @@ public:
   );
 
   auto mles = work.mles.data();
-  memmg::managed_array<s25t::element> mles_p(num_mles * mid);
+  memmg::managed_array<T> mles_p(num_mles * mid);
 
-  s25t::element one_m_r = 0x1_s25;
-  s25o::sub(one_m_r, one_m_r, r);
+  T one_m_r = T::identity();
+  sub(one_m_r, one_m_r, r);
   auto n1 = work.n - mid;
   for (auto mle_index = 0; mle_index < num_mles; ++mle_index) {
     auto data = mles + n * mle_index;
@@ -112,15 +108,15 @@ public:
     // fold paired terms
     for (unsigned i = 0; i < n1; ++i) {
       auto val = data[i];
-      s25o::mul(val, val, one_m_r);
-      s25o::muladd(val, r, data[mid + i], val);
+      mul(val, val, one_m_r);
+      muladd(val, r, data[mid + i], val);
       data_p[i] = val;
     }
 
     // fold terms paired with zero
     for (unsigned i = n1; i < mid; ++i) {
       auto val = data[i];
-      s25o::mul(val, val, one_m_r);
+      mul(val, val, one_m_r);
       data_p[i] = val;
     }
   }
@@ -129,7 +125,6 @@ public:
   --work.num_variables;
   work.mles = std::move(mles_p);
   return xena::make_ready_future();
-#endif
   }
 };
 } // namespace sxt::prfsk2
