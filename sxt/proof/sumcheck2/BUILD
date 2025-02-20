@@ -22,6 +22,24 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "driver_test",
+    deps = [
+        ":driver",
+        "//sxt/scalar25/realization:field",
+    ],
+    impl_deps = [
+        ":workspace",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+    with_test = False,
+)
+
+sxt_cc_component(
   name = "cpu_driver",
   deps = [
     ":driver",
