@@ -25,6 +25,9 @@ sxt_cc_component(
   name = "cpu_driver",
   deps = [
     ":driver",
+    "//sxt/base/num:ceil_log2",
+    "//sxt/execution/async:coroutine",
+    "//sxt/memory/management:managed_array",
   ],
   test_deps = [
     "//sxt/base/test:unit_test",
