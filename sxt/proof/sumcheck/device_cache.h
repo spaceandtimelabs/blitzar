@@ -30,22 +30,6 @@ class stream;
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
-// make_device_copy
-//--------------------------------------------------------------------------------------------------
-template <basfld::element T>
-std::unique_ptr<device_cache_data<T>>
-make_device_copy(basct::cspan<std::pair<T, unsigned>> product_table,
-                 basct::cspan<unsigned> product_terms, basdv::stream& stream) noexcept {
-  device_cache_data res{
-      .product_table{product_table.size(), memr::get_device_resource()},
-      .product_terms{product_terms.size(), memr::get_device_resource()},
-  };
-  basdv::async_copy_host_to_device(res.product_table, product_table, stream);
-  basdv::async_copy_host_to_device(res.product_terms, product_terms, stream);
-  return std::make_unique<device_cache_data>(std::move(res));
-}
-
-//--------------------------------------------------------------------------------------------------
 // device_cache_data
 //--------------------------------------------------------------------------------------------------
 struct device_cache_data {
