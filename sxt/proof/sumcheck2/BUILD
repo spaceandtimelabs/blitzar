@@ -78,6 +78,15 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "polynomial_reducer",
+    deps = [
+      "//sxt/base/field:element",
+      "//sxt/base/macro:cuda_callable",
+    ],
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "polynomial_utility",
     deps = [
       "//sxt/base/container:span",
