@@ -105,7 +105,6 @@ partial_sum_kernel(T* __restrict__ out, const T* __restrict__ mles,
 //--------------------------------------------------------------------------------------------------
 // partial_sum
 //--------------------------------------------------------------------------------------------------
-#if 0
 template <basfld::element T>
 static xena::future<> partial_sum(basct::span<T> p, basdv::stream& stream,
                                   basct::cspan<T> mles,
@@ -130,7 +129,6 @@ static xena::future<> partial_sum(basct::span<T> p, basdv::stream& stream,
   // reduce partials
   co_await reduce_sums(p, stream, partials);
 }
-#endif
 
 //--------------------------------------------------------------------------------------------------
 // sum_gpu
