@@ -57,6 +57,23 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+  name = "gpu_driver",
+  deps = [
+    ":driver",
+    # ":polynomial_utility",
+    # "//sxt/base/container:stack_array",
+    # "//sxt/base/error:assert",
+    # "//sxt/base/num:ceil_log2",
+    # "//sxt/execution/async:coroutine",
+    # "//sxt/memory/management:managed_array",
+  ],
+  test_deps = [
+    ":driver_test",
+    "//sxt/base/test:unit_test",
+  ],
+)
+
+sxt_cc_component(
     name = "polynomial_utility",
     deps = [
       "//sxt/base/container:span",
