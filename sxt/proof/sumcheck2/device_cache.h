@@ -46,12 +46,26 @@ template <basfld::element T>
 class device_cache {
 public:
   device_cache(basct::cspan<std::pair<T, unsigned>> product_table,
-               basct::cspan<unsigned> product_terms) noexcept;
+               basct::cspan<unsigned> product_terms) noexcept
+      : product_table_{product_table}, product_terms_{product_terms} {}
 
   void lookup(basct::cspan<std::pair<T, unsigned>>& product_table,
-              basct::cspan<unsigned>& product_terms, basdv::stream& stream) noexcept;
+              basct::cspan<unsigned>& product_terms, basdv::stream& stream) noexcept {
+    auto& ptr = data_[basdv::get_device()];
+    if (ptr == nullptr) {
+      ptr = make_device_copy(product_table_, product_terms_, stream);
+    }
+    product_table = ptr->product_table;
+    product_terms = ptr->product_terms;
+  }
 
-  std::unique_ptr<device_cache_data<T>> clear() noexcept;
+  std::unique_ptr<device_cache_data<T>> clear() noexcept {
+    auto res{std::move(data_[basdv::get_device()])};
+    for (auto& ptr : data_) {
+      ptr.reset();
+    }
+    return res;
+  }
 
 private:
   basct::cspan<std::pair<T, unsigned>> product_table_;
