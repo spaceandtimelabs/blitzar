@@ -21,7 +21,7 @@
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/proof/sumcheck2/polynomial_mapper.h"
 #include "sxt/proof/sumcheck2/polynomial_reducer.h"
-#include "sxt/proof/sumcheck/constant.h"
+#include "sxt/proof/sumcheck2/constant.h"
 /* #include "sxt/proof/sumcheck/device_cache.h" */
 /* #include "sxt/proof/sumcheck/mle_utility.h" */
 /* #include "sxt/proof/sumcheck/polynomial_mapper.h" */
@@ -59,6 +59,78 @@ __device__ static void partial_sum_kernel_impl(T* __restrict__ shared_data,
   algr::thread_reduce<Reducer, BlockSize>(reinterpret_cast<U*>(shared_data), mapper, split, step,
                                           threadIdx.x, index);
 }
+
+//--------------------------------------------------------------------------------------------------
+// partial_sum_kernel
+//--------------------------------------------------------------------------------------------------
+template <unsigned BlockSize, basfld::element T>
+__global__ static void
+partial_sum_kernel(T* __restrict__ out, const T* __restrict__ mles,
+                   const std::pair<T, unsigned>* __restrict__ product_table,
+                   const unsigned* __restrict__ product_terms, unsigned num_coefficients,
+                   unsigned split, unsigned n) noexcept {
+  auto product_index = blockIdx.y;
+  auto num_terms = product_table[product_index].second;
+  auto thread_index = threadIdx.x;
+  auto output_step = gridDim.x * gridDim.y;
+
+  // shared data for reduction
+  __shared__ T shared_data[2 * BlockSize * (max_degree_v + 1u)];
+
+  // adjust pointers
+  out += blockIdx.x;
+  out += gridDim.x * product_index;
+  for (unsigned i = 0; i < product_index; ++i) {
+    product_terms += product_table[i].second;
+  }
+
+  // sum
+  basn::constexpr_switch<1, max_degree_v + 1u>(
+      num_terms, [&]<unsigned NumTerms>(std::integral_constant<unsigned, NumTerms>) noexcept {
+        partial_sum_kernel_impl<BlockSize, NumTerms, T>(shared_data, mles, product_terms, split, n);
+      });
+
+  // write out result
+  auto mult = product_table[product_index].first;
+  for (unsigned i = thread_index; i < num_coefficients; i += BlockSize) {
+    auto output_index = output_step * i;
+    if (i < num_terms + 1u) {
+      mul(out[output_index], mult, shared_data[i]);
+    } else {
+      out[output_index] = T{};
+    }
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+// partial_sum
+//--------------------------------------------------------------------------------------------------
+#if 0
+template <basfld::element T>
+static xena::future<> partial_sum(basct::span<T> p, basdv::stream& stream,
+                                  basct::cspan<T> mles,
+                                  basct::cspan<std::pair<T, unsigned>> product_table,
+                                  basct::cspan<unsigned> product_terms, unsigned split,
+                                  unsigned n) noexcept {
+  auto num_coefficients = p.size();
+  auto num_products = product_table.size();
+  auto dims = algr::fit_reduction_kernel(split);
+  memr::async_device_resource resource{stream};
+
+  // partials
+  memmg::managed_array<T> partials{num_coefficients * dims.num_blocks * num_products,
+                                               &resource};
+  xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
+                                           std::integral_constant<unsigned, BlockSize>) noexcept {
+    partial_sum_kernel<BlockSize><<<dim3(dims.num_blocks, num_products, 1), BlockSize, 0, stream>>>(
+        partials.data(), mles.data(), product_table.data(), product_terms.data(), num_coefficients,
+        split, n);
+  });
+
+  // reduce partials
+  co_await reduce_sums(p, stream, partials);
+}
+#endif
 
 //--------------------------------------------------------------------------------------------------
 // sum_gpu
