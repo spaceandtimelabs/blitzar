@@ -2,8 +2,10 @@
 
 #include <algorithm>
 
+#include "sxt/algorithm/iteration/for_each.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/synchronization.h"
@@ -77,7 +79,50 @@ public:
   }
 
   xena::future<> fold(workspace& ws, const T& r) const noexcept override {
-    return {};
+    auto& work = static_cast<gpu_workspace&>(ws);
+    auto n = work.n;
+    auto mid = 1u << (work.num_variables - 1u);
+    auto num_mles = work.mles.size() / n;
+    SXT_RELEASE_ASSERT(
+        // clang-format off
+      work.n >= mid && work.mles.size() % n == 0
+        // clang-format on
+    );
+
+    T one_m_r = T::one();
+    sub(one_m_r, one_m_r, r);
+
+    memmg::managed_array<T> mles_p{num_mles * mid, memr::get_device_resource()};
+
+    auto f =
+        [
+            // clang-format off
+    mles_p = mles_p.data(),
+    mles = work.mles.data(),
+    n = n,
+    num_mles = num_mles,
+    r = r,
+    one_m_r = one_m_r
+            // clang-format on
+    ] __device__
+        __host__(unsigned mid, unsigned i) noexcept {
+          for (unsigned mle_index = 0; mle_index < num_mles; ++mle_index) {
+            auto val = mles[i + mle_index * n];
+            mul(val, val, one_m_r);
+            if (mid + i < n) {
+              muladd(val, r, mles[mid + i + mle_index * n], val);
+            }
+            mles_p[i + mle_index * mid] = val;
+          }
+        };
+    auto fut = algi::for_each(f, mid);
+
+    // complete
+    co_await std::move(fut);
+
+    work.n = mid;
+    --work.num_variables;
+    work.mles = std::move(mles_p);
   }
 };
 } // namespace sxt::prfsk2

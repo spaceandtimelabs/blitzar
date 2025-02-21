@@ -61,7 +61,8 @@ sxt_cc_component(
   deps = [
     ":driver",
     # ":polynomial_utility",
-    # "//sxt/base/error:assert",
+    "//sxt/base/error:assert",
+    "//sxt/algorithm/iteration:for_each",
     "//sxt/base/device:memory_utility",
     "//sxt/base/device:stream",
     "//sxt/base/num:ceil_log2",
