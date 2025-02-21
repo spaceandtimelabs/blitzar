@@ -37,6 +37,31 @@ struct sum_options {
 };
 
 //--------------------------------------------------------------------------------------------------
+// partial_sum_kernel_impl
+//--------------------------------------------------------------------------------------------------
+#if 0
+template <unsigned BlockSize, unsigned NumTerms, basfld::element T>
+__device__ static void partial_sum_kernel_impl(T* __restrict__ shared_data,
+                                               const T* __restrict__ mles,
+                                               const unsigned* __restrict__ product_terms,
+                                               unsigned split, unsigned n) noexcept {
+  using Mapper = polynomial_mapper<NumTerms>;
+  using Reducer = polynomial_reducer<NumTerms>;
+  using T = Mapper::value_type;
+  Mapper mapper{
+      .mles = mles,
+      .product_terms = product_terms,
+      .split = split,
+      .n = n,
+  };
+  auto index = blockIdx.x * (BlockSize * 2) + threadIdx.x;
+  auto step = BlockSize * 2 * gridDim.x;
+  algr::thread_reduce<Reducer, BlockSize>(reinterpret_cast<T*>(shared_data), mapper, split, step,
+                                          threadIdx.x, index);
+}
+#endif
+
+//--------------------------------------------------------------------------------------------------
 // sum_gpu
 //--------------------------------------------------------------------------------------------------
 #if 0

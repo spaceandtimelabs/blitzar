@@ -85,6 +85,18 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "polynomial_mapper",
+    deps = [
+      ":polynomial_utility",
+      "//sxt/base/field:element",
+      "//sxt/base/macro:cuda_callable",
+    ],
+    test_deps = [
+      "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "polynomial_reducer",
     deps = [
       "//sxt/base/field:element",
