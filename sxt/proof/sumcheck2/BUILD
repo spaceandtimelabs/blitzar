@@ -18,6 +18,27 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "device_cache",
+    test_deps = [
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:state",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:device_map",
+        "//sxt/base/field:element",
+        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/management:managed_array",
+    ],
+)
+
+sxt_cc_component(
     name = "driver",
     with_test = False,
     deps = [
