@@ -87,9 +87,11 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
   };
   co_await sum_gpu(p, cache, options, mles, n);
 }
+#endif
 
-xena::future<> sum_gpu(basct::span<s25t::element> p, basct::cspan<s25t::element> mles,
-                       basct::cspan<std::pair<s25t::element, unsigned>> product_table,
+template <basfld::element T>
+xena::future<> sum_gpu(basct::span<T> p, basct::cspan<T> mles,
+                       basct::cspan<std::pair<T, unsigned>> product_table,
                        basct::cspan<unsigned> product_terms, unsigned n) noexcept {
   auto num_variables = std::max(basn::ceil_log2(n), 1);
   auto mid = 1u << (num_variables - 1u);
@@ -102,7 +104,7 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, basct::cspan<s25t::element>
       // clang-format on
   );
   basdv::stream stream;
-  co_await partial_sum(p, stream, mles, product_table, product_terms, mid, n);
+  /* co_await partial_sum(p, stream, mles, product_table, product_terms, mid, n); */
+  return {};
 }
-#endif
 } // namespace sxt::prfsk2
