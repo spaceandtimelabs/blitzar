@@ -135,6 +135,46 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "sum_gpu",
+    impl_deps = [
+        # ":constant",
+        # ":device_cache",
+        # ":mle_utility",
+        # ":polynomial_mapper",
+        # ":reduction_gpu",
+        "//sxt/algorithm/reduction:kernel_fit",
+        "//sxt/algorithm/reduction:thread_reduction",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:state",
+        "//sxt/base/field:element",
+        "//sxt/base/iterator:split",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/base/num:constexpr_switch",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/execution/device:for_each",
+        "//sxt/execution/kernel:kernel_dims",
+        "//sxt/memory/resource:device_resource",
+        "//sxt/memory/resource:async_device_resource",
+    ],
+    test_deps = [
+        # ":device_cache",
+        "//sxt/base/iterator:split",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future_fwd",
+    ],
+)
+
+sxt_cc_component(
     name = "verification",
     # impl_deps = [
     #     ":sumcheck_transcript",
