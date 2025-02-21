@@ -19,6 +19,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
+#include "sxt/proof/sumcheck2/polynomial_mapper.h"
 #include "sxt/proof/sumcheck2/polynomial_reducer.h"
 #include "sxt/proof/sumcheck/constant.h"
 /* #include "sxt/proof/sumcheck/device_cache.h" */
@@ -39,15 +40,14 @@ struct sum_options {
 //--------------------------------------------------------------------------------------------------
 // partial_sum_kernel_impl
 //--------------------------------------------------------------------------------------------------
-#if 0
 template <unsigned BlockSize, unsigned NumTerms, basfld::element T>
 __device__ static void partial_sum_kernel_impl(T* __restrict__ shared_data,
                                                const T* __restrict__ mles,
                                                const unsigned* __restrict__ product_terms,
                                                unsigned split, unsigned n) noexcept {
-  using Mapper = polynomial_mapper<NumTerms>;
-  using Reducer = polynomial_reducer<NumTerms>;
-  using T = Mapper::value_type;
+  using Mapper = polynomial_mapper<NumTerms, T>;
+  using Reducer = polynomial_reducer<NumTerms, T>;
+  using U = Mapper::value_type;
   Mapper mapper{
       .mles = mles,
       .product_terms = product_terms,
@@ -56,10 +56,9 @@ __device__ static void partial_sum_kernel_impl(T* __restrict__ shared_data,
   };
   auto index = blockIdx.x * (BlockSize * 2) + threadIdx.x;
   auto step = BlockSize * 2 * gridDim.x;
-  algr::thread_reduce<Reducer, BlockSize>(reinterpret_cast<T*>(shared_data), mapper, split, step,
+  algr::thread_reduce<Reducer, BlockSize>(reinterpret_cast<U*>(shared_data), mapper, split, step,
                                           threadIdx.x, index);
 }
-#endif
 
 //--------------------------------------------------------------------------------------------------
 // sum_gpu
