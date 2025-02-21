@@ -4,6 +4,13 @@ load(
 )
 
 sxt_cc_component(
+    name = "constant",
+    with_test = False,
+    deps = [
+    ],
+)
+
+sxt_cc_component(
     name = "workspace",
     with_test = False,
     deps = [
@@ -146,7 +153,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "sum_gpu",
     impl_deps = [
-        # ":constant",
+        ":constant",
         # ":device_cache",
         # ":mle_utility",
         # ":polynomial_mapper",

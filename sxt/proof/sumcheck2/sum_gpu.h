@@ -19,7 +19,8 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
-/* #include "sxt/proof/sumcheck/constant.h" */
+#include "sxt/proof/sumcheck2/polynomial_reducer.h"
+#include "sxt/proof/sumcheck/constant.h"
 /* #include "sxt/proof/sumcheck/device_cache.h" */
 /* #include "sxt/proof/sumcheck/mle_utility.h" */
 /* #include "sxt/proof/sumcheck/polynomial_mapper.h" */
