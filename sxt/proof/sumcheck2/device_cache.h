@@ -30,13 +30,13 @@ template <basfld::element T>
 std::unique_ptr<device_cache_data<T>>
 make_device_copy(basct::cspan<std::pair<T, unsigned>> product_table,
                  basct::cspan<unsigned> product_terms, basdv::stream& stream) noexcept {
-  device_cache_data res{
+  device_cache_data<T> res{
       .product_table{product_table.size(), memr::get_device_resource()},
       .product_terms{product_terms.size(), memr::get_device_resource()},
   };
   basdv::async_copy_host_to_device(res.product_table, product_table, stream);
   basdv::async_copy_host_to_device(res.product_terms, product_terms, stream);
-  return std::make_unique<device_cache_data>(std::move(res));
+  return std::make_unique<device_cache_data<T>>(std::move(res));
 }
 
 //--------------------------------------------------------------------------------------------------

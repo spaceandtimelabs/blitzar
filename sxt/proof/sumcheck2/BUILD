@@ -24,6 +24,7 @@ sxt_cc_component(
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
+        "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
     ],
     deps = [
