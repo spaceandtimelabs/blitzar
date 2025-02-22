@@ -24,7 +24,6 @@
 #include "sxt/proof/sumcheck2/constant.h"
 #include "sxt/proof/sumcheck2/device_cache.h"
 #include "sxt/proof/sumcheck2/mle_utility.h"
-/* #include "sxt/proof/sumcheck/polynomial_mapper.h" */
 /* #include "sxt/proof/sumcheck/reduction_gpu.h" */
 
 namespace sxt::prfsk2 {

@@ -239,7 +239,7 @@ sxt_cc_component(
         "//sxt/execution/async:future",
         "//sxt/execution/schedule:scheduler",
         "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
     ],
     deps = [
