@@ -212,7 +212,7 @@ sxt_cc_component(
     impl_deps = [
         ":constant",
         ":device_cache",
-        # ":mle_utility",
+        ":mle_utility",
         ":polynomial_mapper",
         ":polynomial_reducer",
         # ":reduction_gpu",

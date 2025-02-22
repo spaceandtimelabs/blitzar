@@ -23,7 +23,7 @@
 #include "sxt/proof/sumcheck2/polynomial_reducer.h"
 #include "sxt/proof/sumcheck2/constant.h"
 #include "sxt/proof/sumcheck2/device_cache.h"
-/* #include "sxt/proof/sumcheck/mle_utility.h" */
+#include "sxt/proof/sumcheck2/mle_utility.h"
 /* #include "sxt/proof/sumcheck/polynomial_mapper.h" */
 /* #include "sxt/proof/sumcheck/reduction_gpu.h" */
 
@@ -133,9 +133,9 @@ static xena::future<> partial_sum(basct::span<T> p, basdv::stream& stream,
 //--------------------------------------------------------------------------------------------------
 // sum_gpu
 //--------------------------------------------------------------------------------------------------
-#if 0
-xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
-                       const basit::split_options& options, basct::cspan<s25t::element> mles,
+template <basfld::element T>
+xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
+                       const basit::split_options& options, basct::cspan<T> mles,
                        unsigned n) noexcept {
   auto num_variables = std::max(basn::ceil_log2(n), 1);
   auto mid = 1u << (num_variables - 1u);
@@ -153,19 +153,19 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
         memr::async_device_resource resource{stream};
 
         // copy partial mles to device
-        memmg::managed_array<s25t::element> partial_mles{&resource};
-        copy_partial_mles(partial_mles, stream, mles, n, rng.a(), rng.b());
+        memmg::managed_array<T> partial_mles{&resource};
+        copy_partial_mles<T>(partial_mles, stream, mles, n, rng.a(), rng.b());
         auto split = rng.b() - rng.a();
         auto np = partial_mles.size() / num_mles;
 
         // lookup problem descriptor
-        basct::cspan<std::pair<s25t::element, unsigned>> product_table;
+        basct::cspan<std::pair<T, unsigned>> product_table;
         basct::cspan<unsigned> product_terms;
         cache.lookup(product_table, product_terms, stream);
 
         // compute
-        memmg::managed_array<s25t::element> partial_p(num_coefficients);
-        co_await partial_sum(partial_p, stream, partial_mles, product_table, product_terms, split,
+        memmg::managed_array<T> partial_p(num_coefficients);
+        co_await partial_sum<T>(partial_p, stream, partial_mles, product_table, product_terms, split,
                              np);
 
         // fill in the result
@@ -175,13 +175,14 @@ xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
           }
         } else {
           for (unsigned i = 0; i < num_coefficients; ++i) {
-            s25o::add(p[i], p[i], partial_p[i]);
+            add(p[i], p[i], partial_p[i]);
           }
         }
         ++counter;
       });
 }
 
+#if 0
 xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
                        basct::cspan<s25t::element> mles, unsigned n) noexcept {
   basit::split_options options{
