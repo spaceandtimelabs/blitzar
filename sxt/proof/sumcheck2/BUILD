@@ -124,7 +124,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
-        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
     ],
 )
