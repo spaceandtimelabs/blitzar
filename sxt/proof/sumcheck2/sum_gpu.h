@@ -22,7 +22,7 @@
 #include "sxt/proof/sumcheck2/polynomial_mapper.h"
 #include "sxt/proof/sumcheck2/polynomial_reducer.h"
 #include "sxt/proof/sumcheck2/constant.h"
-/* #include "sxt/proof/sumcheck/device_cache.h" */
+#include "sxt/proof/sumcheck2/device_cache.h"
 /* #include "sxt/proof/sumcheck/mle_utility.h" */
 /* #include "sxt/proof/sumcheck/polynomial_mapper.h" */
 /* #include "sxt/proof/sumcheck/reduction_gpu.h" */
