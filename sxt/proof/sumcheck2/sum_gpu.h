@@ -182,17 +182,16 @@ xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
       });
 }
 
-#if 0
-xena::future<> sum_gpu(basct::span<s25t::element> p, device_cache& cache,
-                       basct::cspan<s25t::element> mles, unsigned n) noexcept {
+template <basfld::element T>
+xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
+                       basct::cspan<T> mles, unsigned n) noexcept {
   basit::split_options options{
       .min_chunk_size = 100'000u,
       .max_chunk_size = 200'000u,
       .split_factor = basdv::get_num_devices(),
   };
-  co_await sum_gpu(p, cache, options, mles, n);
+  co_await sum_gpu<T>(p, cache, options, mles, n);
 }
-#endif
 
 template <basfld::element T>
 xena::future<> sum_gpu(basct::span<T> p, basct::cspan<T> mles,
@@ -209,7 +208,6 @@ xena::future<> sum_gpu(basct::span<T> p, basct::cspan<T> mles,
       // clang-format on
   );
   basdv::stream stream;
-  /* co_await partial_sum(p, stream, mles, product_table, product_terms, mid, n); */
-  return {};
+  co_await partial_sum<T>(p, stream, mles, product_table, product_terms, mid, n);
 }
 } // namespace sxt::prfsk2
