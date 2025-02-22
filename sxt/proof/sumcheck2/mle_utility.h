@@ -50,4 +50,37 @@ void copy_partial_mles(memmg::managed_array<T>& partial_mles, basdv::stream& str
     }
   }
 }
+
+//--------------------------------------------------------------------------------------------------
+// copy_folded_mles
+//--------------------------------------------------------------------------------------------------
+template <basfld::element T>
+void copy_folded_mles(basct::span<T> host_mles, basdv::stream& stream,
+                      basct::cspan<T> device_mles, unsigned np, unsigned a,
+                      unsigned b) noexcept {
+  auto num_mles = host_mles.size() / np;
+  auto slice_n = device_mles.size() / num_mles;
+  auto slice_np = b - a;
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      host_mles.size() == num_mles * np && 
+      device_mles.size() == num_mles * slice_n &&
+      b <= np
+      // clang-format on
+  );
+  for (unsigned mle_index = 0; mle_index < num_mles; ++mle_index) {
+    auto src = device_mles.subspan(mle_index * slice_n, slice_np);
+    auto dst = host_mles.subspan(mle_index * np + a, slice_np);
+    basdv::async_copy_device_to_host(dst, src, stream);
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+// get_gpu_memory_fraction
+//--------------------------------------------------------------------------------------------------
+template <basfld::element T>
+double get_gpu_memory_fraction(basct::cspan<T> mles) noexcept {
+  auto total_memory = static_cast<double>(basdv::get_total_device_memory());
+  return static_cast<double>(mles.size() * sizeof(T)) / total_memory;
+}
 } // namespace sxt::prfsk2
