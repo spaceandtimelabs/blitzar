@@ -86,6 +86,43 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "fold_gpu",
+    test_deps = [
+        "//sxt/base/iterator:split",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/realization:field",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        ":mle_utility",
+        "//sxt/algorithm/iteration:kernel_fit",
+        "//sxt/base/container:span",
+        "//sxt/base/error:assert",
+        "//sxt/base/device:property",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/field:element",
+        "//sxt/base/iterator:split",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+        "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/operation:muladd",
+        "//sxt/scalar25/operation:sub",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/execution/device:for_each",
+        "//sxt/execution/device:synchronization",
+        "//sxt/execution/kernel:kernel_dims",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+        "//sxt/memory/resource:device_resource",
+    ],
+)
+
+sxt_cc_component(
   name = "gpu_driver",
   deps = [
     ":driver",
