@@ -87,6 +87,34 @@ xena::future<> fold_impl(basct::span<T> mles_p, basct::cspan<T> mles, unsigned n
 //--------------------------------------------------------------------------------------------------
 // fold_gpu
 //--------------------------------------------------------------------------------------------------
+template <basfld::element T>
+xena::future<> fold_gpu(basct::span<T> mles_p,
+                        const basit::split_options& split_options, basct::cspan<T> mles,
+                        unsigned n, const T& r) noexcept {
+  auto num_mles = mles.size() / n;
+  auto num_variables = std::max(basn::ceil_log2(n), 1);
+  auto mid = 1u << (num_variables - 1u);
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      n > 1 && mles.size() == num_mles * n
+      // clang-format on
+  );
+  auto one_m_r = T::one();
+  sub(one_m_r, one_m_r, r);
+
+  // split
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, mid}, split_options);
+
+  // fold
+  co_await xendv::concurrent_for_each(
+      chunk_first, chunk_last, [&](basit::index_range rng) noexcept -> xena::future<> {
+        co_await fold_impl<T>(mles_p, mles, n, mid, rng.a(), rng.b(), r, one_m_r);
+      });
+}
+
+//--------------------------------------------------------------------------------------------------
+// fold_gpu
+//--------------------------------------------------------------------------------------------------
 /* xena::future<> fold_gpu(basct::span<s25t::element> mles_p, */
 /*                         const basit::split_options& split_options, basct::cspan<s25t::element> mles, */
 /*                         unsigned n, const s25t::element& r) noexcept; */
