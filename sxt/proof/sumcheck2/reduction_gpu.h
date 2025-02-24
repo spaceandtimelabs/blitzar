@@ -43,12 +43,12 @@ __global__ static void reduction_kernel(T* __restrict__ out,
                                                          step, thread_index, index);
 }
 
-#if 0
 //--------------------------------------------------------------------------------------------------
 // reduce_sums
 //--------------------------------------------------------------------------------------------------
-xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
-                           basct::cspan<s25t::element> partial_terms) noexcept {
+template <basfld::element T>
+xena::future<> reduce_sums(basct::span<T> p, basdv::stream& stream,
+                           basct::cspan<T> partial_terms) noexcept {
   auto num_coefficients = p.size();
   auto n = partial_terms.size() / num_coefficients;
   SXT_DEBUG_ASSERT(
@@ -63,7 +63,7 @@ xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
 
   // p_dev
   memr::async_device_resource resource{stream};
-  memmg::managed_array<s25t::element> p_dev{num_coefficients * dims.num_blocks, &resource};
+  memmg::managed_array<T> p_dev{num_coefficients * dims.num_blocks, &resource};
 
   // launch kernel
   xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
@@ -74,8 +74,8 @@ xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
   });
 
   // copy polynomial to host
-  memmg::managed_array<s25t::element> p_host_data;
-  basct::span<s25t::element> p_host = p;
+  memmg::managed_array<T> p_host_data;
+  basct::span<T> p_host = p;
   if (dims.num_blocks > 1) {
     p_host_data.resize(p_dev.size());
     p_host = p_host_data;
@@ -90,10 +90,9 @@ xena::future<> reduce_sums(basct::span<s25t::element> p, basdv::stream& stream,
   for (unsigned coefficient_index = 0; coefficient_index < num_coefficients; ++coefficient_index) {
     p[coefficient_index] = p_host[coefficient_index * dims.num_blocks];
     for (unsigned block_index = 1; block_index < dims.num_blocks; ++block_index) {
-      s25o::add(p[coefficient_index], p[coefficient_index],
-                p_host[coefficient_index * dims.num_blocks + block_index]);
+      add(p[coefficient_index], p[coefficient_index],
+          p_host[coefficient_index * dims.num_blocks + block_index]);
     }
   }
 }
-#endif
 } // namespace sxt::prfsk2
