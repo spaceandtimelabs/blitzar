@@ -35,6 +35,25 @@ class chunked_gpu_driver final : public driver<T> {
         : cache{product_table, product_terms} {}
   };
 
+  static xena::future<> try_make_single_gpu_workspace(chunked_gpu_workspace& work,
+                                                      double no_chunk_cutoff) noexcept {
+    auto gpu_memory_fraction = get_gpu_memory_fraction<T>(work.mles);
+    if (gpu_memory_fraction > no_chunk_cutoff) {
+      co_return;
+    }
+
+    // construct single gpu workspace
+    auto cache_data = work.cache.clear();
+    gpu_driver<T> drv;
+    work.single_gpu_workspace =
+        co_await drv.make_workspace(work.mles, std::move(cache_data->product_table),
+                                    std::move(cache_data->product_terms), work.n);
+
+    // free data we no longer need
+    work.mles_data.reset();
+    work.mles = {};
+  }
+
 public:
   explicit chunked_gpu_driver(double no_chunk_cutoff = 0.5) noexcept
       : no_chunk_cutoff_{no_chunk_cutoff} {}
@@ -57,11 +76,44 @@ public:
   }
 
   xena::future<> sum(basct::span<T> polynomial, workspace& ws) const noexcept override {
-    return {};
+    auto& work = static_cast<chunked_gpu_workspace&>(ws);
+    if (work.single_gpu_workspace) {
+      gpu_driver<T> drv;
+      co_return co_await drv.sum(polynomial, *work.single_gpu_workspace);
+    }
+    co_await sum_gpu<T>(polynomial, work.cache, work.mles, work.n);
   }
 
   xena::future<> fold(workspace& ws, const T& r) const noexcept override {
-    return {};
+    auto& work = static_cast<chunked_gpu_workspace&>(ws);
+    if (work.single_gpu_workspace) {
+      gpu_driver<T> drv;
+      co_return co_await drv.fold(*work.single_gpu_workspace, r);
+    }
+    auto n = work.n;
+    auto mid = 1u << (work.num_variables - 1u);
+    auto num_mles = work.mles.size() / n;
+    SXT_RELEASE_ASSERT(
+        // clang-format off
+      work.n >= mid && work.mles.size() % n == 0
+        // clang-format on
+    );
+
+    auto one_m_r = T::one();
+    sub(one_m_r, one_m_r, r);
+
+    // fold
+    memmg::managed_array<T> mles_p(num_mles * mid);
+    co_await fold_gpu<T>(mles_p, work.mles, n, r);
+
+    // update
+    work.n = mid;
+    --work.num_variables;
+    work.mles_data = std::move(mles_p);
+    work.mles = work.mles_data;
+
+    // check if we should fall back to single gpu workspace
+    co_await try_make_single_gpu_workspace(work, no_chunk_cutoff_);
   }
 
 private:
