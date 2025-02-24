@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include "sxt/algorithm/base/identity_mapper.h"
 #include "sxt/algorithm/reduction/kernel_fit.h"
@@ -6,6 +6,7 @@
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
+#include "sxt/base/field/accumulator.h"
 #include "sxt/base/field/element.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
@@ -38,8 +39,8 @@ __global__ static void reduction_kernel(T* __restrict__ out,
   algb::identity_mapper<T> mapper{partials};
 
   // reduce
-  /* algr::thread_reduce<s25o::accumulator, BlockSize>(out + block_index, shared_data, mapper, n, step, */
-  /*                                                   thread_index, index); */
+  algr::thread_reduce<basfld::accumulator<T>, BlockSize>(out + block_index, shared_data, mapper, n,
+                                                         step, thread_index, index);
 }
 
 #if 0

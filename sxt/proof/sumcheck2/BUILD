@@ -228,6 +228,7 @@ sxt_cc_component(
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",
+        "//sxt/base/field:accumulator",
         "//sxt/base/field:element",
         "//sxt/execution/async:future_fwd",
         "//sxt/execution/async:coroutine",
