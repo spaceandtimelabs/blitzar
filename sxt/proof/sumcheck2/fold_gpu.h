@@ -19,7 +19,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
-#include "sxt/proof/sumcheck/mle_utility.h"
+#include "sxt/proof/sumcheck2/mle_utility.h"
 #include "sxt/scalar25/operation/mul.h"
 #include "sxt/scalar25/operation/muladd.h"
 #include "sxt/scalar25/operation/sub.h"
