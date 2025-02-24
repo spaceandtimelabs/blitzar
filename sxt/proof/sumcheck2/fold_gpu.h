@@ -58,6 +58,33 @@ __global__ void fold_kernel(T* __restrict__ mles, unsigned np, unsigned split, T
 }
 
 //--------------------------------------------------------------------------------------------------
+// fold_impl
+//--------------------------------------------------------------------------------------------------
+template <basfld::element T>
+xena::future<> fold_impl(basct::span<T> mles_p, basct::cspan<T> mles, unsigned n, unsigned mid,
+                         unsigned a, unsigned b, const T& r, const T& one_m_r) noexcept {
+  auto num_mles = mles.size() / n;
+  auto split = b - a;
+
+  // copy MLEs to device
+  basdv::stream stream;
+  memr::async_device_resource resource{stream};
+  memmg::managed_array<T> mles_dev{&resource};
+  copy_partial_mles<T>(mles_dev, stream, mles, n, a, b);
+
+  // fold
+  auto np = mles_dev.size() / num_mles;
+  auto dims = algi::fit_iteration_kernel(split);
+  fold_kernel<<<dim3(dims.num_blocks, num_mles, 1), static_cast<unsigned>(dims.block_size), 0,
+                stream>>>(mles_dev.data(), np, split, r, one_m_r);
+
+  // copy results back
+  copy_folded_mles<T>(mles_p, stream, mles_dev, mid, a, b);
+
+  co_await xendv::await_stream(stream);
+}
+
+//--------------------------------------------------------------------------------------------------
 // fold_gpu
 //--------------------------------------------------------------------------------------------------
 /* xena::future<> fold_gpu(basct::span<s25t::element> mles_p, */
