@@ -249,7 +249,7 @@ sxt_cc_component(
         ":mle_utility",
         ":polynomial_mapper",
         ":polynomial_reducer",
-        # ":reduction_gpu",
+        ":reduction_gpu",
         "//sxt/algorithm/reduction:kernel_fit",
         "//sxt/algorithm/reduction:thread_reduction",
         "//sxt/base/device:memory_utility",

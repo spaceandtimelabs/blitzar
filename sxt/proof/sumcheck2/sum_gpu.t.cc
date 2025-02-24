@@ -23,7 +23,6 @@ TEST_CASE("we can sum MLEs") {
   std::vector<T> mles;
   std::vector<T> p(2);
 
-#if 0
   SECTION("we can sum an MLE with a single term and n=1") {
     product_table = {{0x1_s25, 1}};
     product_terms = {0};
@@ -122,5 +121,4 @@ TEST_CASE("we can sum MLEs") {
     REQUIRE(p[0] == mles[0] + mles[1]);
     REQUIRE(p[1] == (mles[2] - mles[0]) + (mles[3] - mles[1]));
   }
-#endif
 }

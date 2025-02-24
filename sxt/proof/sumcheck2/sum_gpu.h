@@ -2,12 +2,12 @@
 
 #include <cstddef>
 
-#include "sxt/base/field/element.h"
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/state.h"
 #include "sxt/base/device/stream.h"
+#include "sxt/base/field/element.h"
 #include "sxt/base/iterator/split.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/constexpr_switch.h"
@@ -19,12 +19,12 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 #include "sxt/memory/resource/device_resource.h"
-#include "sxt/proof/sumcheck2/polynomial_mapper.h"
-#include "sxt/proof/sumcheck2/polynomial_reducer.h"
 #include "sxt/proof/sumcheck2/constant.h"
 #include "sxt/proof/sumcheck2/device_cache.h"
 #include "sxt/proof/sumcheck2/mle_utility.h"
-/* #include "sxt/proof/sumcheck/reduction_gpu.h" */
+#include "sxt/proof/sumcheck2/polynomial_mapper.h"
+#include "sxt/proof/sumcheck2/polynomial_reducer.h"
+#include "sxt/proof/sumcheck2/reduction_gpu.h"
 
 namespace sxt::prfsk2 {
 //--------------------------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ static xena::future<> partial_sum(basct::span<T> p, basdv::stream& stream,
   });
 
   // reduce partials
-  co_await reduce_sums(p, stream, partials);
+  co_await reduce_sums<T>(p, stream, partials);
 }
 
 //--------------------------------------------------------------------------------------------------
