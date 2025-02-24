@@ -112,13 +112,14 @@ xena::future<> fold_gpu(basct::span<T> mles_p,
       });
 }
 
-//--------------------------------------------------------------------------------------------------
-// fold_gpu
-//--------------------------------------------------------------------------------------------------
-/* xena::future<> fold_gpu(basct::span<s25t::element> mles_p, */
-/*                         const basit::split_options& split_options, basct::cspan<s25t::element> mles, */
-/*                         unsigned n, const s25t::element& r) noexcept; */
-/*  */
-/* xena::future<> fold_gpu(basct::span<s25t::element> mles_p, basct::cspan<s25t::element> mles, */
-/*                         unsigned n, const s25t::element& r) noexcept; */
+template <basfld::element T>
+xena::future<> fold_gpu(basct::span<T> mles_p, basct::cspan<T> mles,
+                        unsigned n, const T& r) noexcept {
+  basit::split_options split_options{
+      .min_chunk_size = 1024u * 128u,
+      .max_chunk_size = 1024u * 256u,
+      .split_factor = basdv::get_num_devices(),
+  };
+  co_await fold_gpu(mles_p, split_options, mles, n, r);
+}
 } // namespace sxt::prfsk2
