@@ -12,6 +12,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/proof/sumcheck2/driver.h"
+#include "sxt/proof/sumcheck2/sum_gpu.h"
 
 namespace sxt::prfsk2 {
 //--------------------------------------------------------------------------------------------------
@@ -75,7 +76,16 @@ public:
   }
 
   xena::future<> sum(basct::span<T> polynomial, workspace& ws) const noexcept override {
-    return {};
+    auto& work = static_cast<gpu_workspace&>(ws);
+    auto n = work.n;
+    auto mid = 1u << (work.num_variables - 1u);
+    SXT_RELEASE_ASSERT(
+        // clang-format off
+      work.n >= mid &&
+      polynomial.size() - 1u <= max_degree_v
+        // clang-format on
+    );
+    co_await sum_gpu<T>(polynomial, work.mles, work.product_table, work.product_terms, n);
   }
 
   xena::future<> fold(workspace& ws, const T& r) const noexcept override {

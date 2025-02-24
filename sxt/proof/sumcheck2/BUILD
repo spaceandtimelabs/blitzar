@@ -89,7 +89,7 @@ sxt_cc_component(
   name = "gpu_driver",
   deps = [
     ":driver",
-    # ":polynomial_utility",
+    ":sum_gpu",
     "//sxt/base/error:assert",
     "//sxt/algorithm/iteration:for_each",
     "//sxt/base/device:memory_utility",
@@ -204,6 +204,39 @@ sxt_cc_component(
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
+    ],
+)
+
+sxt_cc_component(
+    name = "reduction_gpu",
+    test_deps = [
+        "//sxt/base/device:property",
+        "//sxt/base/device:stream",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/realization:field",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/algorithm/base:identity_mapper",
+        "//sxt/algorithm/reduction:kernel_fit",
+        "//sxt/algorithm/reduction:thread_reduction",
+        "//sxt/base/container:span",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
+        "//sxt/base/field:element",
+        "//sxt/execution/async:future_fwd",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/execution/device:synchronization",
+        "//sxt/execution/kernel:kernel_dims",
+        "//sxt/execution/kernel:launch",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
     ],
 )
 
