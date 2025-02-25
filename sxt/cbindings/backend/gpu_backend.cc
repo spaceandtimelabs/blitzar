@@ -65,11 +65,13 @@
 #include "sxt/proof/inner_product/proof_descriptor.h"
 #include "sxt/proof/sumcheck/chunked_gpu_driver.h"
 #include "sxt/proof/sumcheck/proof_computation.h"
+#include "sxt/proof/sumcheck2/chunked_gpu_driver.h"
+#include "sxt/proof/sumcheck2/proof_computation.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/ristretto/type/literal.h"
-#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/realization/field.h"
 #include "sxt/seqcommit/generator/precomputed_generators.h"
 
 using sxt::rstt::operator""_rs;
@@ -142,6 +144,43 @@ void gpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsi
         auto fut =
             prfsk::prove_sum(polynomials_span, evaluation_point_span, transcript, drv, mles_span,
                              product_table_span, product_terms_span, descriptor.n);
+        xens::get_scheduler().run();
+      });
+  return;
+  cbnb::switch_field_type(
+      static_cast<cbnb::field_id_t>(field_id), [&]<class T>(std::type_identity<T>) noexcept {
+        static_assert(std::same_as<T, s25t::element>, "only support curve-255 right now");
+        // transcript
+        callback_sumcheck_transcript2<T> transcript{
+            reinterpret_cast<callback_sumcheck_transcript2<T>::callback_t>(
+                const_cast<void*>(transcript_callback)),
+            transcript_context};
+
+        // prove
+        basct::span<s25t::element> polynomials_span{
+            static_cast<s25t::element*>(polynomials),
+            (descriptor.round_degree + 1u) * num_variables,
+        };
+        basct::span<s25t::element> evaluation_point_span{
+            static_cast<s25t::element*>(evaluation_point),
+            num_variables,
+        };
+        basct::cspan<s25t::element> mles_span{
+            static_cast<const s25t::element*>(descriptor.mles),
+            descriptor.n * descriptor.num_mles,
+        };
+        basct::cspan<std::pair<s25t::element, unsigned>> product_table_span{
+            static_cast<const std::pair<s25t::element, unsigned>*>(descriptor.product_table),
+            descriptor.num_products,
+        };
+        basct::cspan<unsigned> product_terms_span{
+            descriptor.product_terms,
+            descriptor.num_product_terms,
+        };
+        prfsk2::chunked_gpu_driver<T> drv;
+        auto fut =
+            prfsk2::prove_sum<T>(polynomials_span, evaluation_point_span, transcript, drv,
+                                 mles_span, product_table_span, product_terms_span, descriptor.n);
         xens::get_scheduler().run();
       });
 }

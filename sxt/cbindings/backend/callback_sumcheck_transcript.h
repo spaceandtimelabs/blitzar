@@ -44,7 +44,7 @@ private:
 template <basfld::element T>
 class callback_sumcheck_transcript2 final : public prfsk2::sumcheck_transcript<T> {
 public:
-  using callback_t = void (*)(T* r, void* context, T* polynomial, unsigned polynomial_len);
+  using callback_t = void (*)(T* r, void* context, const T* polynomial, unsigned polynomial_len);
 
   callback_sumcheck_transcript2(callback_t f, void* context) noexcept : f_{f}, context_{context} {}
 
