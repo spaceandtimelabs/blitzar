@@ -15,7 +15,7 @@
 #include "sxt/proof/sumcheck2/mle_utility.h"
 #include "sxt/proof/sumcheck2/polynomial_utility.h"
 #include "sxt/proof/sumcheck2/reference_transcript.h"
-/* #include "sxt/proof/sumcheck2/sumcheck_random.h" */
+#include "sxt/proof/sumcheck2/sumcheck_random.h"
 #include "sxt/proof/sumcheck2/verification.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/operation/overload.h"
@@ -141,7 +141,6 @@ static void test_proof(const driver<T>& drv) noexcept {
     REQUIRE(polynomials[3] == mles[1] - mles[0]);
   }
 
-#if 0
   SECTION("we can verify random sumcheck problems") {
     basn::fast_random_number_generator rng{1, 2};
 
@@ -162,8 +161,8 @@ static void test_proof(const driver<T>& drv) noexcept {
       // prove
       {
         prft::transcript base_transcript{"abc"};
-        reference_transcript transcript{base_transcript};
-        auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
+        reference_transcript<T> transcript{base_transcript};
+        auto fut = prove_sum<T>(polynomials, evaluation_point, transcript, drv, mles, product_table,
                              product_terms, n);
         xens::get_scheduler().run();
       }
@@ -171,10 +170,10 @@ static void test_proof(const driver<T>& drv) noexcept {
       // we can verify
       {
         prft::transcript base_transcript{"abc"};
-        reference_transcript transcript{base_transcript};
+        reference_transcript<T> transcript{base_transcript};
         s25t::element expected_sum;
-        sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
-        auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
+        sum_polynomial_01<T>(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
+        auto valid = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
                                                    polynomials, polynomial_length - 1u);
         REQUIRE(valid);
       }
@@ -182,41 +181,38 @@ static void test_proof(const driver<T>& drv) noexcept {
       // verification fails if we break the proof
       {
         prft::transcript base_transcript{"abc"};
-        reference_transcript transcript{base_transcript};
+        reference_transcript<T> transcript{base_transcript};
         s25t::element expected_sum;
-        sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
+        sum_polynomial_01<T>(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
         polynomials[polynomials.size() - 1] = polynomials[0] + polynomials[1];
-        auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
+        auto valid = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
                                                    polynomials, polynomial_length - 1u);
         REQUIRE(!valid);
       }
     }
   }
-#endif
 }
 
 TEST_CASE("we can create a sumcheck proof") {
-#if 0
   SECTION("we can prove with the cpu driver") {
-    cpu_driver drv;
+    cpu_driver<T> drv;
     test_proof(drv);
   }
 
   SECTION("we can prove with the gpu driver") {
-    gpu_driver drv;
+    gpu_driver<T> drv;
     test_proof(drv);
   }
 
   SECTION("we can prove with the chunked gpu driver") {
-    chunked_gpu_driver drv{0.0};
+    chunked_gpu_driver<T> drv{0.0};
     test_proof(drv);
   }
 
   SECTION("we can prove with a chunked driver that switches over to the single gpu driver") {
     std::vector<s25t::element> mles(4);
-    auto fraction = get_gpu_memory_fraction(mles);
-    chunked_gpu_driver drv{fraction};
+    auto fraction = get_gpu_memory_fraction<T>(mles);
+    chunked_gpu_driver<T> drv{fraction};
     test_proof(drv);
   }
-#endif
 }

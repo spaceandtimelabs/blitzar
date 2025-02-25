@@ -242,7 +242,7 @@ sxt_cc_component(
         ":gpu_driver",
         ":mle_utility",
         ":reference_transcript",
-        # ":sumcheck_random",
+        ":sumcheck_random",
         ":verification",
         "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
