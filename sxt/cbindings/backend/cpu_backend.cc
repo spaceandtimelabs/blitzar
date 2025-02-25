@@ -59,22 +59,18 @@
 #include "sxt/proof/inner_product/cpu_driver.h"
 #include "sxt/proof/inner_product/proof_computation.h"
 #include "sxt/proof/inner_product/proof_descriptor.h"
-#include "sxt/proof/sumcheck/cpu_driver.h"
-#include "sxt/proof/sumcheck/proof_computation.h"
+#include "sxt/proof/sumcheck2/cpu_driver.h"
+#include "sxt/proof/sumcheck2/proof_computation.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/compressed_element.h"
-#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/realization/field.h"
 #include "sxt/seqcommit/generator/precomputed_generators.h"
 
 namespace sxt::cbnbck {
 //--------------------------------------------------------------------------------------------------
 // prove_sumcheck
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 void cpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsigned field_id,
                                  const cbnb::sumcheck_descriptor& descriptor,
                                  void* transcript_callback, void* transcript_context) noexcept {
@@ -83,8 +79,8 @@ void cpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsi
       static_cast<cbnb::field_id_t>(field_id), [&]<class T>(std::type_identity<T>) noexcept {
         static_assert(std::same_as<T, s25t::element>, "only support curve-255 right now");
         // transcript
-        callback_sumcheck_transcript transcript{
-            reinterpret_cast<callback_sumcheck_transcript::callback_t>(
+        callback_sumcheck_transcript2<T> transcript{
+            reinterpret_cast<callback_sumcheck_transcript2<T>::callback_t>(
                 const_cast<void*>(transcript_callback)),
             transcript_context};
 
@@ -109,14 +105,13 @@ void cpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsi
             descriptor.product_terms,
             descriptor.num_product_terms,
         };
-        prfsk::cpu_driver drv;
+        prfsk2::cpu_driver<T> drv;
         auto fut =
-            prfsk::prove_sum(polynomials_span, evaluation_point_span, transcript, drv, mles_span,
-                             product_table_span, product_terms_span, descriptor.n);
+            prfsk2::prove_sum<T>(polynomials_span, evaluation_point_span, transcript, drv,
+                                 mles_span, product_table_span, product_terms_span, descriptor.n);
         SXT_RELEASE_ASSERT(fut.ready());
       });
 }
-#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // compute_commitments
