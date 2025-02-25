@@ -17,7 +17,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
-      ":operation_adl_stub",
+        ":operation_adl_stub",
         "//sxt/base/macro:cuda_callable",
     ],
 )

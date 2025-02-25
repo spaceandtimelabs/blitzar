@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2025-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <cstddef>
@@ -63,11 +79,11 @@ __device__ static void partial_sum_kernel_impl(T* __restrict__ shared_data,
 // partial_sum_kernel
 //--------------------------------------------------------------------------------------------------
 template <unsigned BlockSize, basfld::element T>
-__global__ static void
-partial_sum_kernel(T* __restrict__ out, const T* __restrict__ mles,
-                   const std::pair<T, unsigned>* __restrict__ product_table,
-                   const unsigned* __restrict__ product_terms, unsigned num_coefficients,
-                   unsigned split, unsigned n) noexcept {
+__global__ static void partial_sum_kernel(T* __restrict__ out, const T* __restrict__ mles,
+                                          const std::pair<T, unsigned>* __restrict__ product_table,
+                                          const unsigned* __restrict__ product_terms,
+                                          unsigned num_coefficients, unsigned split,
+                                          unsigned n) noexcept {
   auto product_index = blockIdx.y;
   auto num_terms = product_table[product_index].second;
   auto thread_index = threadIdx.x;
@@ -105,8 +121,7 @@ partial_sum_kernel(T* __restrict__ out, const T* __restrict__ mles,
 // partial_sum
 //--------------------------------------------------------------------------------------------------
 template <basfld::element T>
-static xena::future<> partial_sum(basct::span<T> p, basdv::stream& stream,
-                                  basct::cspan<T> mles,
+static xena::future<> partial_sum(basct::span<T> p, basdv::stream& stream, basct::cspan<T> mles,
                                   basct::cspan<std::pair<T, unsigned>> product_table,
                                   basct::cspan<unsigned> product_terms, unsigned split,
                                   unsigned n) noexcept {
@@ -116,8 +131,7 @@ static xena::future<> partial_sum(basct::span<T> p, basdv::stream& stream,
   memr::async_device_resource resource{stream};
 
   // partials
-  memmg::managed_array<T> partials{num_coefficients * dims.num_blocks * num_products,
-                                               &resource};
+  memmg::managed_array<T> partials{num_coefficients * dims.num_blocks * num_products, &resource};
   xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
                                            std::integral_constant<unsigned, BlockSize>) noexcept {
     partial_sum_kernel<BlockSize><<<dim3(dims.num_blocks, num_products, 1), BlockSize, 0, stream>>>(
@@ -164,8 +178,8 @@ xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
 
         // compute
         memmg::managed_array<T> partial_p(num_coefficients);
-        co_await partial_sum<T>(partial_p, stream, partial_mles, product_table, product_terms, split,
-                             np);
+        co_await partial_sum<T>(partial_p, stream, partial_mles, product_table, product_terms,
+                                split, np);
 
         // fill in the result
         if (counter == 0) {
@@ -182,8 +196,8 @@ xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
 }
 
 template <basfld::element T>
-xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
-                       basct::cspan<T> mles, unsigned n) noexcept {
+xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache, basct::cspan<T> mles,
+                       unsigned n) noexcept {
   basit::split_options options{
       .min_chunk_size = 100'000u,
       .max_chunk_size = 200'000u,

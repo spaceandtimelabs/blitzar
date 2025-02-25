@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2025-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <cassert>
@@ -14,8 +30,7 @@ namespace sxt::prfsk2 {
 //    f_a(X) = a[0] + a[1] * X + a[2] * X^2 + ...
 // compute the sum
 //    f_a(0) + f_a(1)
-template <basfld::element T>
-void sum_polynomial_01(T& e, basct::cspan<T> polynomial) noexcept {
+template <basfld::element T> void sum_polynomial_01(T& e, basct::cspan<T> polynomial) noexcept {
   if (polynomial.empty()) {
     e = T{};
     return;
@@ -48,9 +63,8 @@ void evaluate_polynomial(T& e, basct::cspan<T> polynomial, const T& x) noexcept 
 // expand_products
 //--------------------------------------------------------------------------------------------------
 template <basfld::element T>
-CUDA_CALLABLE
-void expand_products(basct::span<T> p, const T* mles, unsigned n,
-                     unsigned step, basct::cspan<unsigned> terms) noexcept {
+CUDA_CALLABLE void expand_products(basct::span<T> p, const T* mles, unsigned n, unsigned step,
+                                   basct::cspan<unsigned> terms) noexcept {
   auto num_terms = terms.size();
   assert(
       // clang-format off
@@ -89,9 +103,8 @@ void expand_products(basct::span<T> p, const T* mles, unsigned n,
 // partial_expand_products
 //--------------------------------------------------------------------------------------------------
 template <basfld::element T>
-CUDA_CALLABLE
-void partial_expand_products(basct::span<T> p, const T* mles, unsigned n,
-                             basct::cspan<unsigned> terms) noexcept {
+CUDA_CALLABLE void partial_expand_products(basct::span<T> p, const T* mles, unsigned n,
+                                           basct::cspan<unsigned> terms) noexcept {
   auto num_terms = terms.size();
   assert(
       // clang-format off

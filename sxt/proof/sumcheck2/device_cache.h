@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2025-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <utility>
@@ -17,8 +33,7 @@ namespace sxt::prfsk2 {
 //--------------------------------------------------------------------------------------------------
 // device_cache_data
 //--------------------------------------------------------------------------------------------------
-template <basfld::element T>
-struct device_cache_data {
+template <basfld::element T> struct device_cache_data {
   memmg::managed_array<std::pair<T, unsigned>> product_table;
   memmg::managed_array<unsigned> product_terms;
 };
@@ -42,8 +57,7 @@ make_device_copy(basct::cspan<std::pair<T, unsigned>> product_table,
 //--------------------------------------------------------------------------------------------------
 // device_cache
 //--------------------------------------------------------------------------------------------------
-template <basfld::element T>
-class device_cache {
+template <basfld::element T> class device_cache {
 public:
   device_cache(basct::cspan<std::pair<T, unsigned>> product_table,
                basct::cspan<unsigned> product_terms) noexcept

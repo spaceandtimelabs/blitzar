@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2025-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <algorithm>
@@ -20,8 +36,7 @@ namespace sxt::prfsk2 {
 //--------------------------------------------------------------------------------------------------
 template <basfld::element T>
 void copy_partial_mles(memmg::managed_array<T>& partial_mles, basdv::stream& stream,
-                       basct::cspan<T> mles, unsigned n, unsigned a,
-                       unsigned b) noexcept {
+                       basct::cspan<T> mles, unsigned n, unsigned a, unsigned b) noexcept {
   auto num_variables = std::max(basn::ceil_log2(n), 1);
   auto mid = 1u << (num_variables - 1u);
   auto num_mles = mles.size() / n;
@@ -55,9 +70,8 @@ void copy_partial_mles(memmg::managed_array<T>& partial_mles, basdv::stream& str
 // copy_folded_mles
 //--------------------------------------------------------------------------------------------------
 template <basfld::element T>
-void copy_folded_mles(basct::span<T> host_mles, basdv::stream& stream,
-                      basct::cspan<T> device_mles, unsigned np, unsigned a,
-                      unsigned b) noexcept {
+void copy_folded_mles(basct::span<T> host_mles, basdv::stream& stream, basct::cspan<T> device_mles,
+                      unsigned np, unsigned a, unsigned b) noexcept {
   auto num_mles = host_mles.size() / np;
   auto slice_n = device_mles.size() / num_mles;
   auto slice_np = b - a;
@@ -78,8 +92,7 @@ void copy_folded_mles(basct::span<T> host_mles, basdv::stream& stream,
 //--------------------------------------------------------------------------------------------------
 // get_gpu_memory_fraction
 //--------------------------------------------------------------------------------------------------
-template <basfld::element T>
-double get_gpu_memory_fraction(basct::cspan<T> mles) noexcept {
+template <basfld::element T> double get_gpu_memory_fraction(basct::cspan<T> mles) noexcept {
   auto total_memory = static_cast<double>(basdv::get_total_device_memory());
   return static_cast<double>(mles.size() * sizeof(T)) / total_memory;
 }

@@ -29,13 +29,13 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/container:span",
+        "//sxt/base/device:device_map",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:state",
         "//sxt/base/device:stream",
-        "//sxt/base/device:device_map",
         "//sxt/base/field:element",
-        "//sxt/memory/resource:device_resource",
         "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:device_resource",
     ],
 )
 
@@ -43,19 +43,15 @@ sxt_cc_component(
     name = "driver",
     with_test = False,
     deps = [
-      ":workspace",
+        ":workspace",
+        "//sxt/base/container:span",
+        "//sxt/base/field:element",
         "//sxt/execution/async:future_fwd",
-      "//sxt/base/container:span",
-      "//sxt/base/field:element",
     ],
 )
 
 sxt_cc_component(
     name = "driver_test",
-    deps = [
-        ":driver",
-        "//sxt/scalar25/realization:field",
-    ],
     impl_deps = [
         ":workspace",
         "//sxt/base/test:unit_test",
@@ -66,23 +62,27 @@ sxt_cc_component(
         "//sxt/scalar25/type:literal",
     ],
     with_test = False,
+    deps = [
+        ":driver",
+        "//sxt/scalar25/realization:field",
+    ],
 )
 
 sxt_cc_component(
-  name = "cpu_driver",
-  deps = [
-    ":driver",
-    ":polynomial_utility",
-    "//sxt/base/container:stack_array",
-    "//sxt/base/error:assert",
-    "//sxt/base/num:ceil_log2",
-    "//sxt/execution/async:coroutine",
-    "//sxt/memory/management:managed_array",
-  ],
-  test_deps = [
-    ":driver_test",
-    "//sxt/base/test:unit_test",
-  ],
+    name = "cpu_driver",
+    test_deps = [
+        ":driver_test",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":driver",
+        ":polynomial_utility",
+        "//sxt/base/container:stack_array",
+        "//sxt/base/error:assert",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/execution/async:coroutine",
+        "//sxt/memory/management:managed_array",
+    ],
 )
 
 sxt_cc_component(
@@ -99,18 +99,13 @@ sxt_cc_component(
         ":mle_utility",
         "//sxt/algorithm/iteration:kernel_fit",
         "//sxt/base/container:span",
-        "//sxt/base/error:assert",
-        "//sxt/base/device:property",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/device:property",
         "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
         "//sxt/base/field:element",
         "//sxt/base/iterator:split",
         "//sxt/base/num:ceil_log2",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
-        "//sxt/scalar25/operation:mul",
-        "//sxt/scalar25/operation:muladd",
-        "//sxt/scalar25/operation:sub",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
         "//sxt/execution/device:for_each",
@@ -119,28 +114,33 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:device_resource",
+        "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/operation:muladd",
+        "//sxt/scalar25/operation:sub",
+        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
     ],
 )
 
 sxt_cc_component(
-  name = "gpu_driver",
-  deps = [
-    ":driver",
-    ":sum_gpu",
-    "//sxt/base/error:assert",
-    "//sxt/algorithm/iteration:for_each",
-    "//sxt/base/device:memory_utility",
-    "//sxt/base/device:stream",
-    "//sxt/base/num:ceil_log2",
-    "//sxt/execution/async:coroutine",
-    "//sxt/execution/device:synchronization",
-    "//sxt/memory/management:managed_array",
-    "//sxt/memory/resource:device_resource",
-  ],
-  test_deps = [
-    ":driver_test",
-    "//sxt/base/test:unit_test",
-  ],
+    name = "gpu_driver",
+    test_deps = [
+        ":driver_test",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":driver",
+        ":sum_gpu",
+        "//sxt/algorithm/iteration:for_each",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:synchronization",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:device_resource",
+    ],
 )
 
 sxt_cc_component(
@@ -150,8 +150,8 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
-        ":driver",
         ":device_cache",
+        ":driver",
         ":fold_gpu",
         ":gpu_driver",
         ":mle_utility",
@@ -190,52 +190,42 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "polynomial_mapper",
-    deps = [
-      ":polynomial_utility",
-      "//sxt/base/field:element",
-      "//sxt/base/macro:cuda_callable",
-    ],
     test_deps = [
-      "//sxt/base/test:unit_test",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":polynomial_utility",
+        "//sxt/base/field:element",
+        "//sxt/base/macro:cuda_callable",
     ],
 )
 
 sxt_cc_component(
     name = "polynomial_reducer",
-    deps = [
-      "//sxt/base/field:element",
-      "//sxt/base/macro:cuda_callable",
-    ],
     with_test = False,
+    deps = [
+        "//sxt/base/field:element",
+        "//sxt/base/macro:cuda_callable",
+    ],
 )
 
 sxt_cc_component(
     name = "polynomial_utility",
-    deps = [
-      "//sxt/base/container:span",
-      "//sxt/base/field:element",
-      "//sxt/base/macro:cuda_callable",
-    ],
     test_deps = [
-      "//sxt/base/test:unit_test",
+        "//sxt/base/test:unit_test",
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/field:element",
+        "//sxt/base/macro:cuda_callable",
     ],
 )
 
 sxt_cc_component(
     name = "proof_computation",
-    deps = [
-      ":sumcheck_transcript",
-      ":driver",
-      "//sxt/base/container:span",
-      "//sxt/base/error:assert",
-      "//sxt/base/field:element",
-      "//sxt/base/num:ceil_log2",
-      "//sxt/execution/async:future",
-      "//sxt/execution/async:coroutine",
-    ],
     test_deps = [
         ":chunked_gpu_driver",
         ":cpu_driver",
@@ -251,14 +241,24 @@ sxt_cc_component(
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/realization:field",
     ],
+    deps = [
+        ":driver",
+        ":sumcheck_transcript",
+        "//sxt/base/container:span",
+        "//sxt/base/error:assert",
+        "//sxt/base/field:element",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+    ],
 )
 
 sxt_cc_component(
     name = "sumcheck_transcript",
     with_test = False,
     deps = [
-      "//sxt/base/container:span",
-      "//sxt/base/field:element",
+        "//sxt/base/container:span",
+        "//sxt/base/field:element",
     ],
 )
 
@@ -278,17 +278,17 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "reference_transcript",
-    deps = [
-      ":sumcheck_transcript",
-      "//sxt/base/container:span",
-      "//sxt/base/field:element",
-      "//sxt/proof/transcript:transcript_utility",
-    ],
     test_deps = [
         "//sxt/base/test:unit_test",
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        ":sumcheck_transcript",
+        "//sxt/base/container:span",
+        "//sxt/base/field:element",
+        "//sxt/proof/transcript:transcript_utility",
     ],
 )
 
@@ -315,9 +315,9 @@ sxt_cc_component(
         "//sxt/base/error:assert",
         "//sxt/base/field:accumulator",
         "//sxt/base/field:element",
-        "//sxt/execution/async:future_fwd",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
+        "//sxt/execution/async:future_fwd",
         "//sxt/execution/device:synchronization",
         "//sxt/execution/kernel:kernel_dims",
         "//sxt/execution/kernel:launch",
@@ -384,8 +384,8 @@ sxt_cc_component(
     ],
     deps = [
         ":polynomial_utility",
-      ":sumcheck_transcript",
+        ":sumcheck_transcript",
         "//sxt/base/container:span",
-        "//sxt/base/log:log",
+        "//sxt/base/log",
     ],
 )

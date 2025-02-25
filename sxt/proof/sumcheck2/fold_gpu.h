@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2025-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include <cassert>
@@ -88,9 +104,8 @@ xena::future<> fold_impl(basct::span<T> mles_p, basct::cspan<T> mles, unsigned n
 // fold_gpu
 //--------------------------------------------------------------------------------------------------
 template <basfld::element T>
-xena::future<> fold_gpu(basct::span<T> mles_p,
-                        const basit::split_options& split_options, basct::cspan<T> mles,
-                        unsigned n, const T& r) noexcept {
+xena::future<> fold_gpu(basct::span<T> mles_p, const basit::split_options& split_options,
+                        basct::cspan<T> mles, unsigned n, const T& r) noexcept {
   auto num_mles = mles.size() / n;
   auto num_variables = std::max(basn::ceil_log2(n), 1);
   auto mid = 1u << (num_variables - 1u);
@@ -113,8 +128,8 @@ xena::future<> fold_gpu(basct::span<T> mles_p,
 }
 
 template <basfld::element T>
-xena::future<> fold_gpu(basct::span<T> mles_p, basct::cspan<T> mles,
-                        unsigned n, const T& r) noexcept {
+xena::future<> fold_gpu(basct::span<T> mles_p, basct::cspan<T> mles, unsigned n,
+                        const T& r) noexcept {
   basit::split_options split_options{
       .min_chunk_size = 1024u * 128u,
       .max_chunk_size = 1024u * 256u,

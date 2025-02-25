@@ -1,23 +1,37 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2025-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #pragma once
 
 #include "sxt/base/error/assert.h"
+#include "sxt/base/field/element.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/coroutine.h"
-#include "sxt/base/field/element.h"
+#include "sxt/execution/async/future.h"
 #include "sxt/proof/sumcheck2/driver.h"
 #include "sxt/proof/sumcheck2/sumcheck_transcript.h"
-#include "sxt/execution/async/future.h"
 
 namespace sxt::prfsk2 {
 //--------------------------------------------------------------------------------------------------
 // prove_sum
 //--------------------------------------------------------------------------------------------------
 template <basfld::element T>
-xena::future<> prove_sum(basct::span<T> polynomials,
-                         basct::span<T> evaluation_point,
+xena::future<> prove_sum(basct::span<T> polynomials, basct::span<T> evaluation_point,
                          sumcheck_transcript<T>& transcript, const driver<T>& drv,
-                         basct::cspan<T> mles,
-                         basct::cspan<std::pair<T, unsigned>> product_table,
+                         basct::cspan<T> mles, basct::cspan<std::pair<T, unsigned>> product_table,
                          basct::cspan<unsigned> product_terms, unsigned n) noexcept {
   SXT_RELEASE_ASSERT(0 < n);
   auto num_variables = std::max(basn::ceil_log2(n), 1);
@@ -53,4 +67,4 @@ xena::future<> prove_sum(basct::span<T> polynomials,
     }
   }
 }
-} // namespace sxt:prfsk2
+} // namespace sxt::prfsk2

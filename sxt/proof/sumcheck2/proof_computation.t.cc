@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2025-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include "sxt/proof/sumcheck2/proof_computation.h"
 
 #include <utility>
@@ -163,7 +179,7 @@ static void test_proof(const driver<T>& drv) noexcept {
         prft::transcript base_transcript{"abc"};
         reference_transcript<T> transcript{base_transcript};
         auto fut = prove_sum<T>(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                             product_terms, n);
+                                product_terms, n);
         xens::get_scheduler().run();
       }
 
@@ -174,7 +190,7 @@ static void test_proof(const driver<T>& drv) noexcept {
         s25t::element expected_sum;
         sum_polynomial_01<T>(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
         auto valid = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
-                                                   polynomials, polynomial_length - 1u);
+                                                      polynomials, polynomial_length - 1u);
         REQUIRE(valid);
       }
 
@@ -186,7 +202,7 @@ static void test_proof(const driver<T>& drv) noexcept {
         sum_polynomial_01<T>(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
         polynomials[polynomials.size() - 1] = polynomials[0] + polynomials[1];
         auto valid = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
-                                                   polynomials, polynomial_length - 1u);
+                                                      polynomials, polynomial_length - 1u);
         REQUIRE(!valid);
       }
     }

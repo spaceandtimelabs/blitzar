@@ -1,3 +1,19 @@
+/** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
+ *
+ * Copyright 2025-present Space and Time Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include "sxt/proof/sumcheck2/verification.h"
 
 #include <vector>
@@ -23,13 +39,13 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
 
   SECTION("verification fails if dimensions don't match") {
     auto res = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
-                                                         round_polynomials, 2);
+                                                round_polynomials, 2);
     REQUIRE(!res);
   }
 
   SECTION("we can verify a single round") {
     auto res = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
-                                                         round_polynomials, 1);
+                                                round_polynomials, 1);
     REQUIRE(res);
     REQUIRE(evaluation_point[0] != 0x0_s25);
   }
@@ -37,7 +53,7 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
   SECTION("verification fails if the round polynomial doesn't match the sum") {
     round_polynomials[1] = 0x1_s25;
     auto res = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
-                                                         round_polynomials, 1);
+                                                round_polynomials, 1);
     REQUIRE(!res);
   }
 
@@ -67,7 +83,7 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
     // prove
     evaluation_point.resize(2);
     auto res = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
-                                                         round_polynomials, 1);
+                                                round_polynomials, 1);
     REQUIRE(evaluation_point[0] == r);
     REQUIRE(res);
   }
@@ -92,7 +108,7 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
     // prove
     evaluation_point.resize(2);
     auto res = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
-                                                         round_polynomials, 1);
+                                                round_polynomials, 1);
     REQUIRE(!res);
   }
 
@@ -107,7 +123,7 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
     };
     expected_sum = 0x3_s25 * -0x2_s25 - 0x7_s25 * 0x4_s25;
     auto res = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
-                                                         round_polynomials, 2);
+                                                round_polynomials, 2);
     REQUIRE(res);
     REQUIRE(evaluation_point[0] != 0x0_s25);
   }
