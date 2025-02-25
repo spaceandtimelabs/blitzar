@@ -237,7 +237,19 @@ sxt_cc_component(
       "//sxt/execution/async:coroutine",
     ],
     test_deps = [
-      "//sxt/base/test:unit_test",
+        ":chunked_gpu_driver",
+        ":cpu_driver",
+        ":gpu_driver",
+        ":mle_utility",
+        ":reference_transcript",
+        # ":sumcheck_random",
+        ":verification",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/proof/transcript",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/realization:field",
     ],
 )
 
