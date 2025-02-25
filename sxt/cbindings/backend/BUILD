@@ -10,6 +10,7 @@ sxt_cc_component(
     with_test = False,
     deps = [
         "//sxt/proof/sumcheck:sumcheck_transcript",
+        "//sxt/proof/sumcheck2:sumcheck_transcript",
     ],
 )
 
