@@ -192,6 +192,9 @@ sxt_cc_component(
     name = "polynomial_mapper",
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/realization:field",
+        "//sxt/scalar25/type:literal",
     ],
     deps = [
         ":polynomial_utility",
