@@ -20,7 +20,7 @@
 #include "sxt/proof/sumcheck/driver_test.h"
 
 using namespace sxt;
-using namespace sxt::prfsk2;
+using namespace sxt::prfsk;
 
 TEST_CASE("we can perform the primitive operations for sumcheck proofs") {
   SECTION("we handle the case when only chunking is used") {

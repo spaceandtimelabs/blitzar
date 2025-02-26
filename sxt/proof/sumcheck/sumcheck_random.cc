@@ -23,7 +23,7 @@
 #include "sxt/scalar25/random/element.h"
 #include "sxt/scalar25/type/element.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // generate_random_sumcheck_problem
 //--------------------------------------------------------------------------------------------------
@@ -74,4 +74,4 @@ void generate_random_sumcheck_problem(
     term = mle_dist(rng_p);
   }
 }
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

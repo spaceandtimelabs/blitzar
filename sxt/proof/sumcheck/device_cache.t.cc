@@ -26,7 +26,7 @@
 #include "sxt/scalar25/type/literal.h"
 
 using namespace sxt;
-using namespace sxt::prfsk2;
+using namespace sxt::prfsk;
 using s25t::operator""_s25;
 
 TEST_CASE("we can cache device values that don't change as a proof is computed") {

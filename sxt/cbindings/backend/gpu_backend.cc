@@ -138,10 +138,10 @@ void gpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsi
             descriptor.product_terms,
             descriptor.num_product_terms,
         };
-        prfsk2::chunked_gpu_driver<T> drv;
+        prfsk::chunked_gpu_driver<T> drv;
         auto fut =
-            prfsk2::prove_sum<T>(polynomials_span, evaluation_point_span, transcript, drv,
-                                 mles_span, product_table_span, product_terms_span, descriptor.n);
+            prfsk::prove_sum<T>(polynomials_span, evaluation_point_span, transcript, drv, mles_span,
+                                product_table_span, product_terms_span, descriptor.n);
         xens::get_scheduler().run();
       });
 }

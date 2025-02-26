@@ -27,7 +27,7 @@
 #include "sxt/scalar25/type/element.h"
 #include "sxt/scalar25/type/literal.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 using s25t::operator""_s25;
 
 //--------------------------------------------------------------------------------------------------
@@ -130,4 +130,4 @@ void exercise_driver(const driver<s25t::element>& drv) {
     REQUIRE(p[1] == mles[1] - mles[0]);
   }
 }
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

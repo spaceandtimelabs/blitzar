@@ -22,7 +22,7 @@
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 #include "sxt/proof/sumcheck/sumcheck_transcript.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // verify_sumcheck_no_evaluation
 //--------------------------------------------------------------------------------------------------
@@ -74,4 +74,4 @@ bool verify_sumcheck_no_evaluation(T& expected_sum, basct::span<T> evaluation_po
 
   return true;
 }
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

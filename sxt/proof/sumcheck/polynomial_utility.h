@@ -22,7 +22,7 @@
 #include "sxt/base/field/element.h"
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // sum_polynomial_01
 //--------------------------------------------------------------------------------------------------
@@ -135,4 +135,4 @@ CUDA_CALLABLE void partial_expand_products(basct::span<T> p, const T* mles, unsi
     mul(p[i + 1u], c_prev, b);
   }
 }
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

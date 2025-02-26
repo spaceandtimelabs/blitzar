@@ -28,7 +28,7 @@ namespace sxt::basn {
 class fast_random_number_generator;
 }
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // random_sumcheck_descriptor
 //--------------------------------------------------------------------------------------------------
@@ -54,4 +54,4 @@ void generate_random_sumcheck_problem(
     std::vector<std::pair<s25t::element, unsigned>>& product_table,
     std::vector<unsigned>& product_terms, unsigned& n, basn::fast_random_number_generator& rng,
     const random_sumcheck_descriptor& descriptor) noexcept;
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

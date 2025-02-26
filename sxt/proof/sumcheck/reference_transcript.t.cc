@@ -23,7 +23,7 @@
 #include "sxt/scalar25/type/literal.h"
 
 using namespace sxt;
-using namespace sxt::prfsk2;
+using namespace sxt::prfsk;
 using sxt::s25t::operator""_s25;
 
 TEST_CASE("we provide an implementation of sumcheck transcript") {

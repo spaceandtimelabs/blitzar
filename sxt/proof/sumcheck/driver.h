@@ -23,7 +23,7 @@
 #include "sxt/execution/async/future_fwd.h"
 #include "sxt/proof/sumcheck/workspace.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // driver
 //--------------------------------------------------------------------------------------------------
@@ -39,4 +39,4 @@ public:
 
   virtual xena::future<> fold(workspace& ws, const T& r) const noexcept = 0;
 };
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

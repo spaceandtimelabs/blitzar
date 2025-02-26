@@ -32,7 +32,7 @@
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/async_device_resource.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // reduction_kernel
 //--------------------------------------------------------------------------------------------------
@@ -110,4 +110,4 @@ xena::future<> reduce_sums(basct::span<T> p, basdv::stream& stream,
     }
   }
 }
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

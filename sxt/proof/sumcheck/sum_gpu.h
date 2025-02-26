@@ -42,7 +42,7 @@
 #include "sxt/proof/sumcheck/polynomial_reducer.h"
 #include "sxt/proof/sumcheck/reduction_gpu.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // sum_options
 //--------------------------------------------------------------------------------------------------
@@ -223,4 +223,4 @@ xena::future<> sum_gpu(basct::span<T> p, basct::cspan<T> mles,
   basdv::stream stream;
   co_await partial_sum<T>(p, stream, mles, product_table, product_terms, mid, n);
 }
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

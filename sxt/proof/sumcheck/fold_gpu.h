@@ -42,7 +42,7 @@
 #include "sxt/scalar25/type/element.h"
 #include "sxt/scalar25/type/literal.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // fold_kernel
 //--------------------------------------------------------------------------------------------------
@@ -137,4 +137,4 @@ xena::future<> fold_gpu(basct::span<T> mles_p, basct::cspan<T> mles, unsigned n,
   };
   co_await fold_gpu(mles_p, split_options, mles, n, r);
 }
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

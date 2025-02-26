@@ -24,7 +24,7 @@
 #include "sxt/proof/sumcheck/driver.h"
 #include "sxt/proof/sumcheck/sumcheck_transcript.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // prove_sum
 //--------------------------------------------------------------------------------------------------
@@ -67,4 +67,4 @@ xena::future<> prove_sum(basct::span<T> polynomials, basct::span<T> evaluation_p
     }
   }
 }
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

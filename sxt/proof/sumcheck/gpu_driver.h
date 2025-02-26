@@ -30,7 +30,7 @@
 #include "sxt/proof/sumcheck/driver.h"
 #include "sxt/proof/sumcheck/sum_gpu.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // gpu_driver
 //--------------------------------------------------------------------------------------------------
@@ -149,4 +149,4 @@ public:
     work.mles = std::move(mles_p);
   }
 };
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

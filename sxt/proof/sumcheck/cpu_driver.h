@@ -24,7 +24,7 @@
 #include "sxt/proof/sumcheck/driver.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // cpu_driver
 //--------------------------------------------------------------------------------------------------
@@ -141,4 +141,4 @@ public:
     return xena::make_ready_future();
   }
 };
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

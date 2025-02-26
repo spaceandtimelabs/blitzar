@@ -20,7 +20,7 @@
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // polynomial_mapper
 //--------------------------------------------------------------------------------------------------
@@ -48,4 +48,4 @@ template <unsigned Degree, basfld::element T> struct polynomial_mapper {
   unsigned split;
   unsigned n;
 };
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

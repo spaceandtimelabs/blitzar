@@ -19,9 +19,9 @@
 #include "sxt/proof/sumcheck/driver.h"
 #include "sxt/scalar25/realization/field.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // exercise_driver
 //--------------------------------------------------------------------------------------------------
 void exercise_driver(const driver<s25t::element>& drv);
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

@@ -20,7 +20,7 @@
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/proof/transcript/transcript_utility.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // reference_transcript
 //--------------------------------------------------------------------------------------------------
@@ -42,4 +42,4 @@ public:
 private:
   prft::transcript& transcript_;
 };
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

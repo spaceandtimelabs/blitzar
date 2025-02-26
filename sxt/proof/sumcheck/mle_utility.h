@@ -30,7 +30,7 @@
 #include "sxt/base/num/divide_up.h"
 #include "sxt/memory/management/managed_array.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // copy_partial_mles
 //--------------------------------------------------------------------------------------------------
@@ -96,4 +96,4 @@ template <basfld::element T> double get_gpu_memory_fraction(basct::cspan<T> mles
   auto total_memory = static_cast<double>(basdv::get_total_device_memory());
   return static_cast<double>(mles.size() * sizeof(T)) / total_memory;
 }
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

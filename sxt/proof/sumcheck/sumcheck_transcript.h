@@ -19,7 +19,7 @@
 #include "sxt/base/container/span.h"
 #include "sxt/base/field/element.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // sumcheck_transcript
 //--------------------------------------------------------------------------------------------------
@@ -31,4 +31,4 @@ public:
 
   virtual void round_challenge(T& r, basct::cspan<T> polynomial) noexcept = 0;
 };
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

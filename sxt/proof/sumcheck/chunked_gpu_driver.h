@@ -31,7 +31,7 @@
 #include "sxt/proof/sumcheck/mle_utility.h"
 #include "sxt/proof/sumcheck/sum_gpu.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // chunked_gpu_driver
 //--------------------------------------------------------------------------------------------------
@@ -134,4 +134,4 @@ public:
 private:
   double no_chunk_cutoff_;
 };
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

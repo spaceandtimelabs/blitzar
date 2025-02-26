@@ -23,7 +23,7 @@ namespace sxt::cbnbck {
 // callback_sumcheck_transcript
 //--------------------------------------------------------------------------------------------------
 template <basfld::element T>
-class callback_sumcheck_transcript final : public prfsk2::sumcheck_transcript<T> {
+class callback_sumcheck_transcript final : public prfsk::sumcheck_transcript<T> {
 public:
   using callback_t = void (*)(T* r, void* context, const T* polynomial, unsigned polynomial_len);
 

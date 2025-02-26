@@ -19,7 +19,7 @@
 #include "sxt/base/field/element.h"
 #include "sxt/base/macro/cuda_callable.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // polynomial_reducer
 //--------------------------------------------------------------------------------------------------
@@ -32,4 +32,4 @@ template <unsigned Degree, basfld::element T> struct polynomial_reducer {
     }
   }
 };
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk

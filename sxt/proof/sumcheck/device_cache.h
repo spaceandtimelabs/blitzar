@@ -29,7 +29,7 @@
 #include "sxt/memory/resource/device_resource.h"
 #include "sxt/scalar25/type/element.h"
 
-namespace sxt::prfsk2 {
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // device_cache_data
 //--------------------------------------------------------------------------------------------------
@@ -86,4 +86,4 @@ private:
   basct::cspan<unsigned> product_terms_;
   basdv::device_map<std::unique_ptr<device_cache_data<T>>> data_;
 };
-} // namespace sxt::prfsk2
+} // namespace sxt::prfsk
