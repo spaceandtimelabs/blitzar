@@ -69,7 +69,6 @@
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/ristretto/type/literal.h"
-#include "sxt/scalar25/realization/field.h"
 #include "sxt/seqcommit/generator/precomputed_generators.h"
 
 using sxt::rstt::operator""_rs;

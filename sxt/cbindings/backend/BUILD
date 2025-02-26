@@ -99,7 +99,6 @@ sxt_cc_component(
         "//sxt/proof/inner_product:gpu_driver",
         "//sxt/proof/sumcheck:chunked_gpu_driver",
         "//sxt/proof/sumcheck:proof_computation",
-        "//sxt/scalar25/realization:field",
     ],
     with_test = False,
     deps = [
@@ -158,7 +157,6 @@ sxt_cc_component(
         "//sxt/proof/inner_product:cpu_driver",
         "//sxt/proof/sumcheck:cpu_driver",
         "//sxt/proof/sumcheck:proof_computation",
-        "//sxt/scalar25/realization:field",
     ],
     with_test = False,
     deps = [
