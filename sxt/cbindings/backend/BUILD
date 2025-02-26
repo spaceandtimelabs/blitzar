@@ -9,7 +9,7 @@ sxt_cc_component(
     ],
     with_test = False,
     deps = [
-        "//sxt/proof/sumcheck2:sumcheck_transcript",
+        "//sxt/proof/sumcheck:sumcheck_transcript",
     ],
 )
 
@@ -97,8 +97,8 @@ sxt_cc_component(
         "//sxt/proof/inner_product:proof_descriptor",
         "//sxt/proof/inner_product:proof_computation",
         "//sxt/proof/inner_product:gpu_driver",
-        "//sxt/proof/sumcheck2:chunked_gpu_driver",
-        "//sxt/proof/sumcheck2:proof_computation",
+        "//sxt/proof/sumcheck:chunked_gpu_driver",
+        "//sxt/proof/sumcheck:proof_computation",
         "//sxt/scalar25/realization:field",
     ],
     with_test = False,
@@ -156,8 +156,8 @@ sxt_cc_component(
         "//sxt/proof/inner_product:proof_descriptor",
         "//sxt/proof/inner_product:proof_computation",
         "//sxt/proof/inner_product:cpu_driver",
-        "//sxt/proof/sumcheck2:cpu_driver",
-        "//sxt/proof/sumcheck2:proof_computation",
+        "//sxt/proof/sumcheck:cpu_driver",
+        "//sxt/proof/sumcheck:proof_computation",
         "//sxt/scalar25/realization:field",
     ],
     with_test = False,

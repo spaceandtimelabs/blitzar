@@ -16,27 +16,12 @@
  */
 #pragma once
 
-#include "sxt/proof/sumcheck/sumcheck_transcript.h"
+#include "sxt/proof/sumcheck/driver.h"
+#include "sxt/scalar25/realization/field.h"
 
-namespace sxt::cbnbck {
+namespace sxt::prfsk2 {
 //--------------------------------------------------------------------------------------------------
-// callback_sumcheck_transcript
+// exercise_driver
 //--------------------------------------------------------------------------------------------------
-template <basfld::element T>
-class callback_sumcheck_transcript final : public prfsk2::sumcheck_transcript<T> {
-public:
-  using callback_t = void (*)(T* r, void* context, const T* polynomial, unsigned polynomial_len);
-
-  callback_sumcheck_transcript(callback_t f, void* context) noexcept : f_{f}, context_{context} {}
-
-  void init(size_t /*num_variables*/, size_t /*round_degree*/) noexcept override {}
-
-  void round_challenge(T& r, basct::cspan<T> polynomial) noexcept override {
-    f_(&r, context_, polynomial.data(), static_cast<unsigned>(polynomial.size()));
-  }
-
-private:
-  callback_t f_;
-  void* context_;
-};
-} // namespace sxt::cbnbck
+void exercise_driver(const driver<s25t::element>& drv);
+} // namespace sxt::prfsk2

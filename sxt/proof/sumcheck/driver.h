@@ -16,27 +16,27 @@
  */
 #pragma once
 
-#include "sxt/proof/sumcheck/sumcheck_transcript.h"
+#include <memory>
 
-namespace sxt::cbnbck {
+#include "sxt/base/container/span.h"
+#include "sxt/base/field/element.h"
+#include "sxt/execution/async/future_fwd.h"
+#include "sxt/proof/sumcheck/workspace.h"
+
+namespace sxt::prfsk2 {
 //--------------------------------------------------------------------------------------------------
-// callback_sumcheck_transcript
+// driver
 //--------------------------------------------------------------------------------------------------
-template <basfld::element T>
-class callback_sumcheck_transcript final : public prfsk2::sumcheck_transcript<T> {
+template <basfld::element T> class driver {
 public:
-  using callback_t = void (*)(T* r, void* context, const T* polynomial, unsigned polynomial_len);
+  virtual ~driver() noexcept = default;
 
-  callback_sumcheck_transcript(callback_t f, void* context) noexcept : f_{f}, context_{context} {}
+  virtual xena::future<std::unique_ptr<workspace>>
+  make_workspace(basct::cspan<T> mles, basct::cspan<std::pair<T, unsigned>> product_table,
+                 basct::cspan<unsigned> product_terms, unsigned n) const noexcept = 0;
 
-  void init(size_t /*num_variables*/, size_t /*round_degree*/) noexcept override {}
+  virtual xena::future<> sum(basct::span<T> polynomial, workspace& ws) const noexcept = 0;
 
-  void round_challenge(T& r, basct::cspan<T> polynomial) noexcept override {
-    f_(&r, context_, polynomial.data(), static_cast<unsigned>(polynomial.size()));
-  }
-
-private:
-  callback_t f_;
-  void* context_;
+  virtual xena::future<> fold(workspace& ws, const T& r) const noexcept = 0;
 };
-} // namespace sxt::cbnbck
+} // namespace sxt::prfsk2

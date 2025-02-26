@@ -17,26 +17,29 @@
 #pragma once
 
 #include "sxt/proof/sumcheck/sumcheck_transcript.h"
+#include "sxt/proof/transcript/transcript.h"
+#include "sxt/proof/transcript/transcript_utility.h"
 
-namespace sxt::cbnbck {
+namespace sxt::prfsk2 {
 //--------------------------------------------------------------------------------------------------
-// callback_sumcheck_transcript
+// reference_transcript
 //--------------------------------------------------------------------------------------------------
-template <basfld::element T>
-class callback_sumcheck_transcript final : public prfsk2::sumcheck_transcript<T> {
+template <basfld::element T> class reference_transcript final : public sumcheck_transcript<T> {
 public:
-  using callback_t = void (*)(T* r, void* context, const T* polynomial, unsigned polynomial_len);
+  explicit reference_transcript(prft::transcript& transcript) noexcept : transcript_{transcript} {}
 
-  callback_sumcheck_transcript(callback_t f, void* context) noexcept : f_{f}, context_{context} {}
+  void init(size_t num_variables, size_t round_degree) noexcept {
+    prft::set_domain(transcript_, "sumcheck proof v1");
+    prft::append_value(transcript_, "n", num_variables);
+    prft::append_value(transcript_, "k", round_degree);
+  }
 
-  void init(size_t /*num_variables*/, size_t /*round_degree*/) noexcept override {}
-
-  void round_challenge(T& r, basct::cspan<T> polynomial) noexcept override {
-    f_(&r, context_, polynomial.data(), static_cast<unsigned>(polynomial.size()));
+  void round_challenge(T& r, basct::cspan<T> polynomial) noexcept {
+    prft::append_values(transcript_, "P", polynomial);
+    prft::challenge_value(r, transcript_, "R");
   }
 
 private:
-  callback_t f_;
-  void* context_;
+  prft::transcript& transcript_;
 };
-} // namespace sxt::cbnbck
+} // namespace sxt::prfsk2

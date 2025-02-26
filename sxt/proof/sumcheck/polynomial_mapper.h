@@ -16,27 +16,36 @@
  */
 #pragma once
 
-#include "sxt/proof/sumcheck/sumcheck_transcript.h"
+#include "sxt/base/field/element.h"
+#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/proof/sumcheck/polynomial_utility.h"
 
-namespace sxt::cbnbck {
+namespace sxt::prfsk2 {
 //--------------------------------------------------------------------------------------------------
-// callback_sumcheck_transcript
+// polynomial_mapper
 //--------------------------------------------------------------------------------------------------
-template <basfld::element T>
-class callback_sumcheck_transcript final : public prfsk2::sumcheck_transcript<T> {
-public:
-  using callback_t = void (*)(T* r, void* context, const T* polynomial, unsigned polynomial_len);
+template <unsigned Degree, basfld::element T> struct polynomial_mapper {
+  using value_type = std::array<T, Degree + 1u>;
 
-  callback_sumcheck_transcript(callback_t f, void* context) noexcept : f_{f}, context_{context} {}
-
-  void init(size_t /*num_variables*/, size_t /*round_degree*/) noexcept override {}
-
-  void round_challenge(T& r, basct::cspan<T> polynomial) noexcept override {
-    f_(&r, context_, polynomial.data(), static_cast<unsigned>(polynomial.size()));
+  CUDA_CALLABLE
+  value_type map_index(unsigned index) const noexcept {
+    value_type res;
+    this->map_index(res, index);
+    return res;
   }
 
-private:
-  callback_t f_;
-  void* context_;
+  CUDA_CALLABLE
+  void map_index(value_type& p, unsigned index) const noexcept {
+    if (index + split < n) {
+      expand_products<T>(p, mles + index, n, split, {product_terms, Degree});
+    } else {
+      partial_expand_products<T>(p, mles + index, n, {product_terms, Degree});
+    }
+  }
+
+  const T* __restrict__ mles;
+  const unsigned* __restrict__ product_terms;
+  unsigned split;
+  unsigned n;
 };
-} // namespace sxt::cbnbck
+} // namespace sxt::prfsk2
