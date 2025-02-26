@@ -20,11 +20,13 @@
 #include <cstdint>
 #include <iosfwd>
 
+#include "sxt/fieldgk/type/operation_adl_stub.h"
+
 namespace sxt::fgkt {
 //--------------------------------------------------------------------------------------------------
 // element
 //--------------------------------------------------------------------------------------------------
-class element {
+class element : public fgko::operation_adl_stub {
 public:
   static constexpr size_t num_limbs_v = 4;
 

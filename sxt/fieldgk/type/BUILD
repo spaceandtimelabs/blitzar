@@ -4,10 +4,18 @@ load(
 )
 
 sxt_cc_component(
+    name = "operation_adl_stub",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "element",
     impl_deps = [
         "//sxt/fieldgk/base:byte_conversion",
         "//sxt/fieldgk/base:reduce",
+    ],
+    deps = [
+      ":operation_adl_stub",
     ],
     is_cuda = True,
     test_deps = [
