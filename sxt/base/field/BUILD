@@ -14,3 +14,17 @@ sxt_cc_component(
         "//sxt/base/type:narrow_cast",
     ],
 )
+
+sxt_cc_component(
+    name = "element",
+    with_test = False,
+)
+
+sxt_cc_component(
+    name = "accumulator",
+    with_test = False,
+    deps = [
+        ":element",
+        "//sxt/base/macro:cuda_callable",
+    ],
+)

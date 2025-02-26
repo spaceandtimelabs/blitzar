@@ -6,47 +6,106 @@ load(
 sxt_cc_component(
     name = "constant",
     with_test = False,
+    deps = [
+    ],
+)
+
+sxt_cc_component(
+    name = "workspace",
+    with_test = False,
+    deps = [
+    ],
 )
 
 sxt_cc_component(
     name = "device_cache",
-    impl_deps = [
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/device:state",
-        "//sxt/base/device:stream",
-        "//sxt/memory/resource:device_resource",
-    ],
     test_deps = [
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
+        "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
     ],
     deps = [
         "//sxt/base/container:span",
         "//sxt/base/device:device_map",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:state",
+        "//sxt/base/device:stream",
+        "//sxt/base/field:element",
         "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:device_resource",
+    ],
+)
+
+sxt_cc_component(
+    name = "driver",
+    with_test = False,
+    deps = [
+        ":workspace",
+        "//sxt/base/container:span",
+        "//sxt/base/field:element",
+        "//sxt/execution/async:future_fwd",
+    ],
+)
+
+sxt_cc_component(
+    name = "driver_test",
+    impl_deps = [
+        ":workspace",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/type:element",
+        "//sxt/scalar25/type:literal",
+    ],
+    with_test = False,
+    deps = [
+        ":driver",
+        "//sxt/scalar25/realization:field",
+    ],
+)
+
+sxt_cc_component(
+    name = "cpu_driver",
+    test_deps = [
+        ":driver_test",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":driver",
+        ":polynomial_utility",
+        "//sxt/base/container:stack_array",
+        "//sxt/base/error:assert",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/execution/async:coroutine",
+        "//sxt/memory/management:managed_array",
     ],
 )
 
 sxt_cc_component(
     name = "fold_gpu",
-    impl_deps = [
+    test_deps = [
+        "//sxt/base/iterator:split",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/realization:field",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
         ":mle_utility",
         "//sxt/algorithm/iteration:kernel_fit",
-        "//sxt/base/error:assert",
-        "//sxt/base/device:property",
+        "//sxt/base/container:span",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/device:property",
         "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
+        "//sxt/base/field:element",
         "//sxt/base/iterator:split",
         "//sxt/base/num:ceil_log2",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
-        "//sxt/scalar25/operation:mul",
-        "//sxt/scalar25/operation:muladd",
-        "//sxt/scalar25/operation:sub",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
         "//sxt/execution/device:for_each",
@@ -55,18 +114,54 @@ sxt_cc_component(
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:async_device_resource",
         "//sxt/memory/resource:device_resource",
-    ],
-    test_deps = [
-        "//sxt/base/iterator:split",
-        "//sxt/base/test:unit_test",
-        "//sxt/execution/async:future",
-        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/operation:mul",
+        "//sxt/scalar25/operation:muladd",
+        "//sxt/scalar25/operation:sub",
         "//sxt/scalar25/type:element",
         "//sxt/scalar25/type:literal",
     ],
+)
+
+sxt_cc_component(
+    name = "gpu_driver",
+    test_deps = [
+        ":driver_test",
+        "//sxt/base/test:unit_test",
+    ],
     deps = [
-        "//sxt/base/container:span",
-        "//sxt/execution/async:future_fwd",
+        ":driver",
+        ":sum_gpu",
+        "//sxt/algorithm/iteration:for_each",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:synchronization",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:device_resource",
+    ],
+)
+
+sxt_cc_component(
+    name = "chunked_gpu_driver",
+    test_deps = [
+        ":driver_test",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":device_cache",
+        ":driver",
+        ":fold_gpu",
+        ":gpu_driver",
+        ":mle_utility",
+        ":sum_gpu",
+        "//sxt/algorithm/iteration:transform",
+        "//sxt/base/error:assert",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/memory/management:managed_array",
     ],
 )
 
@@ -76,10 +171,11 @@ sxt_cc_component(
         "//sxt/base/container:span_utility",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:property",
+        "//sxt/base/container:span",
+        "//sxt/base/field:element",
         "//sxt/base/num:divide_up",
         "//sxt/base/num:ceil_log2",
         "//sxt/memory/management:managed_array",
-        "//sxt/scalar25/type:element",
     ],
     test_deps = [
         "//sxt/base/device:stream",
@@ -87,54 +183,76 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
-        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/memory/management:managed_array_fwd",
     ],
 )
 
 sxt_cc_component(
-    name = "sum_gpu",
-    impl_deps = [
-        ":constant",
-        ":device_cache",
-        ":mle_utility",
-        ":polynomial_mapper",
-        ":reduction_gpu",
-        "//sxt/algorithm/reduction:kernel_fit",
-        "//sxt/algorithm/reduction:thread_reduction",
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/device:stream",
-        "//sxt/base/device:state",
-        "//sxt/base/iterator:split",
-        "//sxt/base/num:ceil_log2",
-        "//sxt/base/num:constexpr_switch",
-        "//sxt/execution/async:coroutine",
-        "//sxt/execution/async:future",
-        "//sxt/execution/device:for_each",
-        "//sxt/execution/kernel:kernel_dims",
-        "//sxt/memory/resource:device_resource",
-        "//sxt/memory/resource:async_device_resource",
-        "//sxt/scalar25/operation:add",
-        "//sxt/scalar25/operation:mul",
-        "//sxt/scalar25/type:element",
-    ],
+    name = "polynomial_mapper",
     test_deps = [
-        ":device_cache",
-        "//sxt/base/iterator:split",
         "//sxt/base/test:unit_test",
-        "//sxt/execution/async:future",
-        "//sxt/execution/schedule:scheduler",
         "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/realization:field",
+        "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        ":polynomial_utility",
+        "//sxt/base/field:element",
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
+    name = "polynomial_reducer",
+    with_test = False,
+    deps = [
+        "//sxt/base/field:element",
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
+    name = "polynomial_utility",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
     ],
     deps = [
         "//sxt/base/container:span",
-        "//sxt/execution/async:future_fwd",
+        "//sxt/base/field:element",
+        "//sxt/base/macro:cuda_callable",
+    ],
+)
+
+sxt_cc_component(
+    name = "proof_computation",
+    test_deps = [
+        ":chunked_gpu_driver",
+        ":cpu_driver",
+        ":gpu_driver",
+        ":mle_utility",
+        ":reference_transcript",
+        ":sumcheck_random",
+        ":verification",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/proof/transcript",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/realization:field",
+    ],
+    deps = [
+        ":driver",
+        ":sumcheck_transcript",
+        "//sxt/base/container:span",
+        "//sxt/base/error:assert",
+        "//sxt/base/field:element",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
     ],
 )
 
@@ -143,22 +261,7 @@ sxt_cc_component(
     with_test = False,
     deps = [
         "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
-    name = "reference_transcript",
-    impl_deps = [
-        "//sxt/scalar25/type:element",
-        "//sxt/proof/transcript:transcript_utility",
-    ],
-    test_deps = [
-        "//sxt/base/test:unit_test",
-        "//sxt/scalar25/type:literal",
-    ],
-    deps = [
-        ":sumcheck_transcript",
-        "//sxt/proof/transcript",
+        "//sxt/base/field:element",
     ],
 )
 
@@ -177,168 +280,89 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "workspace",
-    with_test = False,
-)
-
-sxt_cc_component(
-    name = "driver",
-    with_test = False,
+    name = "reference_transcript",
+    test_deps = [
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/scalar25/realization:field",
+        "//sxt/scalar25/type:literal",
+    ],
     deps = [
-        ":workspace",
+        ":sumcheck_transcript",
         "//sxt/base/container:span",
-        "//sxt/execution/async:future_fwd",
+        "//sxt/base/field:element",
+        "//sxt/proof/transcript:transcript_utility",
     ],
 )
 
 sxt_cc_component(
-    name = "driver_test",
-    impl_deps = [
-        ":driver",
-        ":workspace",
+    name = "reduction_gpu",
+    test_deps = [
+        "//sxt/base/device:property",
+        "//sxt/base/device:stream",
         "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
         "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/resource:managed_device_resource",
         "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
-    ],
-    with_test = False,
-)
-
-sxt_cc_component(
-    name = "cpu_driver",
-    impl_deps = [
-        ":polynomial_utility",
-        "//sxt/base/container:stack_array",
-        "//sxt/base/error:panic",
-        "//sxt/base/num:ceil_log2",
-        "//sxt/execution/async:future",
-        "//sxt/memory/management:managed_array",
-        "//sxt/scalar25/operation:mul",
-        "//sxt/scalar25/operation:sub",
-        "//sxt/scalar25/operation:muladd",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
-    ],
-    test_deps = [
-        ":driver_test",
-        "//sxt/base/test:unit_test",
     ],
     deps = [
-        ":driver",
-        ":workspace",
+        "//sxt/algorithm/base:identity_mapper",
+        "//sxt/algorithm/reduction:kernel_fit",
+        "//sxt/algorithm/reduction:thread_reduction",
+        "//sxt/base/container:span",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
+        "//sxt/base/field:accumulator",
+        "//sxt/base/field:element",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/async:future",
+        "//sxt/execution/async:future_fwd",
+        "//sxt/execution/device:synchronization",
+        "//sxt/execution/kernel:kernel_dims",
+        "//sxt/execution/kernel:launch",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
     ],
 )
 
 sxt_cc_component(
-    name = "gpu_driver",
+    name = "sum_gpu",
     impl_deps = [
         ":constant",
+        ":device_cache",
+        ":mle_utility",
         ":polynomial_mapper",
-        ":sum_gpu",
-        "//sxt/algorithm/iteration:for_each",
-        "//sxt/algorithm/reduction:reduction",
-        "//sxt/base/container:stack_array",
-        "//sxt/base/device:stream",
+        ":polynomial_reducer",
+        ":reduction_gpu",
+        "//sxt/algorithm/reduction:kernel_fit",
+        "//sxt/algorithm/reduction:thread_reduction",
         "//sxt/base/device:memory_utility",
-        "//sxt/base/error:panic",
+        "//sxt/base/device:stream",
+        "//sxt/base/device:state",
+        "//sxt/base/field:element",
+        "//sxt/base/iterator:split",
         "//sxt/base/num:ceil_log2",
         "//sxt/base/num:constexpr_switch",
         "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
-        "//sxt/execution/device:synchronization",
-        "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:async_device_resource",
+        "//sxt/execution/device:for_each",
+        "//sxt/execution/kernel:kernel_dims",
         "//sxt/memory/resource:device_resource",
-        "//sxt/scalar25/operation:mul",
-        "//sxt/scalar25/operation:sub",
-        "//sxt/scalar25/operation:muladd",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
+        "//sxt/memory/resource:async_device_resource",
     ],
     test_deps = [
-        ":driver_test",
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        ":driver",
-    ],
-)
-
-sxt_cc_component(
-    name = "polynomial_utility",
-    impl_deps = [
-        "//sxt/scalar25/operation:add",
-        "//sxt/scalar25/operation:mul",
-        "//sxt/scalar25/operation:sub",
-        "//sxt/scalar25/operation:muladd",
-        "//sxt/scalar25/operation:neg",
-        "//sxt/scalar25/type:element",
-    ],
-    test_deps = [
-        "//sxt/base/test:unit_test",
-        "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
-    name = "chunked_gpu_driver",
-    impl_deps = [
-        ":device_cache",
-        ":fold_gpu",
-        ":gpu_driver",
-        ":mle_utility",
-        ":sum_gpu",
-        "//sxt/algorithm/iteration:transform",
-        "//sxt/base/error:assert",
-        "//sxt/base/num:ceil_log2",
-        "//sxt/execution/async:coroutine",
-        "//sxt/execution/async:future",
-        "//sxt/memory/management:managed_array",
-        "//sxt/scalar25/operation:sub",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
-    ],
-    test_deps = [
-        ":driver_test",
-        "//sxt/base/test:unit_test",
-    ],
-    deps = [
-        ":driver",
-    ],
-)
-
-sxt_cc_component(
-    name = "proof_computation",
-    impl_deps = [
-        ":driver",
-        ":sumcheck_transcript",
-        "//sxt/execution/async:future",
-        "//sxt/base/error:assert",
-        "//sxt/base/num:ceil_log2",
-        "//sxt/execution/async:coroutine",
-        "//sxt/scalar25/type:element",
-    ],
-    test_deps = [
-        ":chunked_gpu_driver",
-        ":cpu_driver",
-        ":gpu_driver",
-        ":mle_utility",
-        ":reference_transcript",
-        ":sumcheck_random",
-        ":verification",
+        # ":device_cache",
+        "//sxt/base/iterator:split",
         "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
         "//sxt/execution/schedule:scheduler",
-        "//sxt/proof/transcript",
         "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/realization:field",
+        "//sxt/scalar25/type:literal",
     ],
     deps = [
         "//sxt/base/container:span",
@@ -348,78 +372,23 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "verification",
-    impl_deps = [
-        ":polynomial_utility",
-        ":sumcheck_transcript",
-        "//sxt/base/error:assert",
-        "//sxt/base/log:log",
-        "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
-    ],
+    # impl_deps = [
+    #     ":sumcheck_transcript",
+    #     "//sxt/base/error:assert",
+    #     "//sxt/base/log:log",
+    #     "//sxt/scalar25/type:element",
+    # ],
     test_deps = [
         ":reference_transcript",
         "//sxt/base/test:unit_test",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-    ],
-)
-
-sxt_cc_component(
-    name = "reduction_gpu",
-    impl_deps = [
-        "//sxt/algorithm/base:identity_mapper",
-        "//sxt/algorithm/reduction:kernel_fit",
-        "//sxt/algorithm/reduction:thread_reduction",
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/device:stream",
-        "//sxt/base/error:assert",
-        "//sxt/execution/async:coroutine",
-        "//sxt/execution/async:future",
-        "//sxt/execution/device:synchronization",
-        "//sxt/execution/kernel:kernel_dims",
-        "//sxt/execution/kernel:launch",
-        "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:async_device_resource",
-        "//sxt/scalar25/operation:add",
-        "//sxt/scalar25/operation:accumulator",
-        "//sxt/scalar25/type:element",
-    ],
-    test_deps = [
-        "//sxt/base/device:property",
-        "//sxt/base/device:stream",
-        "//sxt/base/test:unit_test",
-        "//sxt/execution/async:future",
-        "//sxt/execution/schedule:scheduler",
-        "//sxt/memory/resource:managed_device_resource",
         "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
-    ],
-    deps = [
-        "//sxt/base/container:span",
-        "//sxt/execution/async:future_fwd",
-    ],
-)
-
-sxt_cc_component(
-    name = "polynomial_mapper",
-    test_deps = [
-        "//sxt/algorithm/base:mapper",
-        "//sxt/base/test:unit_test",
-        "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
     ],
     deps = [
         ":polynomial_utility",
-        "//sxt/base/macro:cuda_callable",
-        "//sxt/scalar25/operation:add",
-        "//sxt/scalar25/operation:mul",
-        "//sxt/scalar25/operation:muladd",
-        "//sxt/scalar25/type:element",
-        "//sxt/scalar25/type:literal",
+        ":sumcheck_transcript",
+        "//sxt/base/container:span",
+        "//sxt/base/log",
     ],
 )

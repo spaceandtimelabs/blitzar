@@ -69,7 +69,6 @@
 #include "sxt/ristretto/operation/compression.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/ristretto/type/literal.h"
-#include "sxt/scalar25/type/element.h"
 #include "sxt/seqcommit/generator/precomputed_generators.h"
 
 using sxt::rstt::operator""_rs;
@@ -112,8 +111,8 @@ void gpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsi
       static_cast<cbnb::field_id_t>(field_id), [&]<class T>(std::type_identity<T>) noexcept {
         static_assert(std::same_as<T, s25t::element>, "only support curve-255 right now");
         // transcript
-        callback_sumcheck_transcript transcript{
-            reinterpret_cast<callback_sumcheck_transcript::callback_t>(
+        callback_sumcheck_transcript<T> transcript{
+            reinterpret_cast<callback_sumcheck_transcript<T>::callback_t>(
                 const_cast<void*>(transcript_callback)),
             transcript_context};
 
@@ -138,10 +137,10 @@ void gpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsi
             descriptor.product_terms,
             descriptor.num_product_terms,
         };
-        prfsk::chunked_gpu_driver drv;
+        prfsk::chunked_gpu_driver<T> drv;
         auto fut =
-            prfsk::prove_sum(polynomials_span, evaluation_point_span, transcript, drv, mles_span,
-                             product_table_span, product_terms_span, descriptor.n);
+            prfsk::prove_sum<T>(polynomials_span, evaluation_point_span, transcript, drv, mles_span,
+                                product_table_span, product_terms_span, descriptor.n);
         xens::get_scheduler().run();
       });
 }

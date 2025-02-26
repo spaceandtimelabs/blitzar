@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2025-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ using s25t::operator""_s25;
 //--------------------------------------------------------------------------------------------------
 // exercise_driver
 //--------------------------------------------------------------------------------------------------
-void exercise_driver(const driver& drv) {
+void exercise_driver(const driver<s25t::element>& drv) {
   std::vector<s25t::element> mles;
   std::vector<std::pair<s25t::element, unsigned>> product_table{
       {0x1_s25, 1},

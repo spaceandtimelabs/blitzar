@@ -32,7 +32,7 @@
 #include "sxt/proof/sumcheck/reference_transcript.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/random/element.h"
-#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/realization/field.h"
 
 using namespace sxt;
 
@@ -111,13 +111,13 @@ int main(int argc, char* argv[]) {
   memmg::managed_array<s25t::element> polynomials((p.degree + 1u) * num_rounds);
   memmg::managed_array<s25t::element> evaluation_point(num_rounds);
   prft::transcript base_transcript{"abc123"};
-  prfsk::reference_transcript transcript{base_transcript};
-  prfsk::gpu_driver drv;
+  prfsk::reference_transcript<s25t::element> transcript{base_transcript};
+  prfsk::gpu_driver<s25t::element> drv;
 
   // initial run
   {
-    auto fut = prfsk::prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                                product_terms, p.n);
+    auto fut = prfsk::prove_sum<s25t::element>(polynomials, evaluation_point, transcript, drv, mles,
+                                               product_table, product_terms, p.n);
     xens::get_scheduler().run();
   }
 
@@ -125,8 +125,8 @@ int main(int argc, char* argv[]) {
   double elapse = 0;
   for (unsigned i = 0; i < (p.num_samples + 1u); ++i) {
     auto t1 = std::chrono::steady_clock::now();
-    auto fut = prfsk::prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                                product_terms, p.n);
+    auto fut = prfsk::prove_sum<s25t::element>(polynomials, evaluation_point, transcript, drv, mles,
+                                               product_table, product_terms, p.n);
     xens::get_scheduler().run();
     auto t2 = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);

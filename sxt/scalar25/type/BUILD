@@ -4,6 +4,11 @@ load(
 )
 
 sxt_cc_component(
+    name = "operation_adl_stub",
+    with_test = False,
+)
+
+sxt_cc_component(
     name = "element",
     impl_deps = [
         "//sxt/base/error:assert",
@@ -12,6 +17,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
     deps = [
+        ":operation_adl_stub",
         "//sxt/base/macro:cuda_callable",
     ],
 )

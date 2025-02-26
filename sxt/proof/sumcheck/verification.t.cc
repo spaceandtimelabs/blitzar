@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2025-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include "sxt/proof/sumcheck/reference_transcript.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/operation/overload.h"
-#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/realization/field.h"
 #include "sxt/scalar25/type/literal.h"
 
 using namespace sxt;
@@ -30,29 +30,30 @@ using namespace sxt::prfsk;
 using sxt::s25t::operator""_s25;
 
 TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
+  using T = s25t::element;
   s25t::element expected_sum = 0x0_s25;
-  std::vector<s25t::element> evaluation_point = {0x0_s25};
+  std::vector<T> evaluation_point = {0x0_s25};
   prft::transcript base_transcript{"abc"};
-  reference_transcript transcript{base_transcript};
-  std::vector<s25t::element> round_polynomials = {0x0_s25, 0x0_s25};
+  reference_transcript<T> transcript{base_transcript};
+  std::vector<T> round_polynomials = {0x0_s25, 0x0_s25};
 
   SECTION("verification fails if dimensions don't match") {
-    auto res = sxt::prfsk::verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
-                                                         round_polynomials, 2);
+    auto res = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
+                                                round_polynomials, 2);
     REQUIRE(!res);
   }
 
   SECTION("we can verify a single round") {
-    auto res = sxt::prfsk::verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
-                                                         round_polynomials, 1);
+    auto res = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
+                                                round_polynomials, 1);
     REQUIRE(res);
     REQUIRE(evaluation_point[0] != 0x0_s25);
   }
 
   SECTION("verification fails if the round polynomial doesn't match the sum") {
     round_polynomials[1] = 0x1_s25;
-    auto res = sxt::prfsk::verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
-                                                         round_polynomials, 1);
+    auto res = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
+                                                round_polynomials, 1);
     REQUIRE(!res);
   }
 
@@ -69,9 +70,9 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
     s25t::element r;
     {
       prft::transcript base_transcript_p{"abc"};
-      reference_transcript transcript_p{base_transcript_p};
+      reference_transcript<T> transcript_p{base_transcript_p};
       transcript_p.init(2, 1);
-      transcript_p.round_challenge(r, basct::span<s25t::element>{round_polynomials}.subspan(0, 2));
+      transcript_p.round_challenge(r, basct::span<T>{round_polynomials}.subspan(0, 2));
     }
 
     // round 2
@@ -81,8 +82,8 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
 
     // prove
     evaluation_point.resize(2);
-    auto res = sxt::prfsk::verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
-                                                         round_polynomials, 1);
+    auto res = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
+                                                round_polynomials, 1);
     REQUIRE(evaluation_point[0] == r);
     REQUIRE(res);
   }
@@ -106,8 +107,8 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
 
     // prove
     evaluation_point.resize(2);
-    auto res = sxt::prfsk::verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
-                                                         round_polynomials, 1);
+    auto res = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
+                                                round_polynomials, 1);
     REQUIRE(!res);
   }
 
@@ -121,8 +122,8 @@ TEST_CASE("we can verify a sumcheck proof up to the polynomial evaluation") {
         (-0x3_s25 - 0x7_s25) * (0x2_s25 + 0x4_s25),
     };
     expected_sum = 0x3_s25 * -0x2_s25 - 0x7_s25 * 0x4_s25;
-    auto res = sxt::prfsk::verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
-                                                         round_polynomials, 2);
+    auto res = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
+                                                round_polynomials, 2);
     REQUIRE(res);
     REQUIRE(evaluation_point[0] != 0x0_s25);
   }

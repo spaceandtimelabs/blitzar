@@ -19,6 +19,6 @@ sxt_cc_benchmark(
         "//sxt/proof/sumcheck:reference_transcript",
         "//sxt/proof/transcript",
         "//sxt/scalar25/random:element",
-        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/realization:field",
     ],
 )

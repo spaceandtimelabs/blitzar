@@ -20,7 +20,7 @@
 
 #include "sxt/base/error/panic.h"
 #include "sxt/cbindings/base/field_id.h"
-#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/realization/field.h"
 
 namespace sxt::cbnb {
 //--------------------------------------------------------------------------------------------------

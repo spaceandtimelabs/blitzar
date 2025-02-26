@@ -9,3 +9,8 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
     ],
 )
+
+sxt_cc_component(
+    name = "field",
+    with_test = False,
+)

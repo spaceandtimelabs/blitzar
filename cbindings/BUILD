@@ -226,7 +226,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/proof/sumcheck:reference_transcript",
         "//sxt/scalar25/operation:overload",
-        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
     ],
     deps = [

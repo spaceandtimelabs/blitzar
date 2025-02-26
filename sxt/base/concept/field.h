@@ -14,4 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/proof/sumcheck/driver.h"
+#pragma once
+
+namespace sxt::bascpt {
+//--------------------------------------------------------------------------------------------------
+// field
+//--------------------------------------------------------------------------------------------------
+template <class T>
+concept field = requires(T& res, const T& e) {
+  neg(res, e);
+  add(res, e, e);
+  sub(res, e, e);
+  mul(res, e, e);
+  muladd(res, e, e, e);
+};
+} // namespace sxt::bascpt

@@ -16,25 +16,19 @@
  */
 #pragma once
 
-#include <cstddef>
-
 #include "sxt/base/container/span.h"
-
-namespace sxt::s25t {
-class element;
-}
+#include "sxt/base/field/element.h"
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // sumcheck_transcript
 //--------------------------------------------------------------------------------------------------
-class sumcheck_transcript {
+template <basfld::element T> class sumcheck_transcript {
 public:
   virtual ~sumcheck_transcript() noexcept = default;
 
   virtual void init(size_t num_variables, size_t round_degree) noexcept = 0;
 
-  virtual void round_challenge(s25t::element& r,
-                               basct::cspan<s25t::element> polynomial) noexcept = 0;
+  virtual void round_challenge(T& r, basct::cspan<T> polynomial) noexcept = 0;
 };
 } // namespace sxt::prfsk

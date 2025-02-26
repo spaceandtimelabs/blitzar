@@ -22,6 +22,7 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/scalar25/realization/field.h"
 #include "sxt/scalar25/type/literal.h"
 
 using namespace sxt;
@@ -29,6 +30,7 @@ using namespace sxt::prfsk;
 using s25t::operator""_s25;
 
 TEST_CASE("we can cache device values that don't change as a proof is computed") {
+  using T = s25t::element;
   std::vector<std::pair<s25t::element, unsigned>> product_table;
   std::vector<unsigned> product_terms;
 
@@ -40,7 +42,7 @@ TEST_CASE("we can cache device values that don't change as a proof is computed")
   SECTION("we can access values from device memory") {
     product_table = {{0x123_s25, 0}};
     product_terms = {0};
-    device_cache cache{product_table, product_terms};
+    device_cache<T> cache{product_table, product_terms};
     cache.lookup(product_table_dev, product_terms_dev, stream);
 
     std::vector<std::pair<s25t::element, unsigned>> product_table_p(product_table.size());
@@ -57,7 +59,7 @@ TEST_CASE("we can cache device values that don't change as a proof is computed")
   SECTION("we can clear the device cache") {
     product_table = {{0x123_s25, 0}};
     product_terms = {0};
-    device_cache cache{product_table, product_terms};
+    device_cache<T> cache{product_table, product_terms};
     cache.lookup(product_table_dev, product_terms_dev, stream);
 
     std::vector<std::pair<s25t::element, unsigned>> product_table_p(product_table.size());

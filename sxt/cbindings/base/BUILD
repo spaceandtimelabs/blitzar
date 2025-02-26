@@ -57,7 +57,7 @@ sxt_cc_component(
     deps = [
         ":field_id",
         "//sxt/base/error:panic",
-        "//sxt/scalar25/type:element",
+        "//sxt/scalar25/realization:field",
     ],
 )
 

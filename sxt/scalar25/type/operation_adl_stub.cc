@@ -14,4 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sxt/proof/sumcheck/driver.h"
+#include "sxt/scalar25/type/operation_adl_stub.h"

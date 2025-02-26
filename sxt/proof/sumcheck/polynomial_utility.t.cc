@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2025-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,55 +20,58 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/scalar25/operation/overload.h"
-#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/realization/field.h"
 #include "sxt/scalar25/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::prfsk;
 using s25t::operator""_s25;
 
+using T = s25t::element;
+
 TEST_CASE("we perform basic operations on polynomials") {
+
   s25t::element e;
 
   std::vector<s25t::element> p;
 
   SECTION("we can compute the 0-1 sum of a zero polynomials") {
-    sum_polynomial_01(e, p);
+    sum_polynomial_01<T>(e, p);
     REQUIRE(e == 0x0_s25);
   }
 
   SECTION("we can compute the 0-1 sum of a constant polynomial") {
     p = {0x123_s25};
-    sum_polynomial_01(e, p);
+    sum_polynomial_01<T>(e, p);
     REQUIRE(e == 0x246_s25);
   }
 
   SECTION("we can compute the 0-1 sum of a 1 degree polynomial") {
     p = {0x123_s25, 0x456_s25};
-    sum_polynomial_01(e, p);
+    sum_polynomial_01<T>(e, p);
     REQUIRE(e == 0x246_s25 + 0x456_s25);
   }
 
   SECTION("we can evaluate the zero polynomial") {
-    evaluate_polynomial(e, p, 0x123_s25);
+    evaluate_polynomial<T>(e, p, 0x123_s25);
     REQUIRE(e == 0x0_s25);
   }
 
   SECTION("we can evaluate a constant polynomial") {
     p = {0x123_s25};
-    evaluate_polynomial(e, p, 0x321_s25);
+    evaluate_polynomial<T>(e, p, 0x321_s25);
     REQUIRE(e == 0x123_s25);
   }
 
   SECTION("we can evaluate a polynomial of degree 1") {
     p = {0x123_s25, 0x456_s25};
-    evaluate_polynomial(e, p, 0x321_s25);
+    evaluate_polynomial<T>(e, p, 0x321_s25);
     REQUIRE(e == 0x123_s25 + 0x456_s25 * 0x321_s25);
   }
 
   SECTION("we can evaluate a polynomial of degree 2") {
     p = {0x123_s25, 0x456_s25, 0x789_s25};
-    evaluate_polynomial(e, p, 0x321_s25);
+    evaluate_polynomial<T>(e, p, 0x321_s25);
     REQUIRE(e == 0x123_s25 + 0x456_s25 * 0x321_s25 + 0x789_s25 * 0x321_s25 * 0x321_s25);
   }
 }
@@ -82,7 +85,7 @@ TEST_CASE("we can expand a product of MLEs") {
     p.resize(2);
     mles = {0x123_s25, 0x456_s25};
     terms = {0};
-    expand_products(p, mles.data(), 2, 1, terms);
+    expand_products<T>(p, mles.data(), 2, 1, terms);
     REQUIRE(p[0] == mles[0]);
     REQUIRE(p[1] == mles[1] - mles[0]);
   }
@@ -91,10 +94,10 @@ TEST_CASE("we can expand a product of MLEs") {
     mles = {0x123_s25, 0x0_s25};
     p.resize(2);
     terms = {0};
-    partial_expand_products(p, mles.data(), 1, terms);
+    partial_expand_products<T>(p, mles.data(), 1, terms);
 
     std::vector<s25t::element> expected(2);
-    expand_products(expected, mles.data(), 2, 1, terms);
+    expand_products<T>(expected, mles.data(), 2, 1, terms);
     REQUIRE(p == expected);
   }
 
@@ -102,7 +105,7 @@ TEST_CASE("we can expand a product of MLEs") {
     p.resize(3);
     mles = {0x123_s25, 0x456_s25, 0x1122_s25, 0x4455_s25};
     terms = {0, 1};
-    expand_products(p, mles.data(), 2, 1, terms);
+    expand_products<T>(p, mles.data(), 2, 1, terms);
     auto a1 = mles[0];
     auto a2 = mles[1] - mles[0];
     auto b1 = mles[2];
@@ -116,7 +119,7 @@ TEST_CASE("we can expand a product of MLEs") {
     p.resize(4);
     mles = {0x123_s25, 0x456_s25, 0x1122_s25, 0x4455_s25, 0x2233_s25, 0x5566_s25};
     terms = {0, 1, 2};
-    expand_products(p, mles.data(), 2, 1, terms);
+    expand_products<T>(p, mles.data(), 2, 1, terms);
     auto a1 = mles[0];
     auto a2 = mles[1] - mles[0];
     auto b1 = mles[2];

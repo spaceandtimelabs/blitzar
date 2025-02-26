@@ -16,16 +16,16 @@
  */
 #pragma once
 
+#include "sxt/base/field/element.h"
 #include "sxt/base/macro/cuda_callable.h"
 #include "sxt/proof/sumcheck/polynomial_utility.h"
-#include "sxt/scalar25/type/element.h"
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // polynomial_mapper
 //--------------------------------------------------------------------------------------------------
-template <unsigned Degree> struct polynomial_mapper {
-  using value_type = std::array<s25t::element, Degree + 1u>;
+template <unsigned Degree, basfld::element T> struct polynomial_mapper {
+  using value_type = std::array<T, Degree + 1u>;
 
   CUDA_CALLABLE
   value_type map_index(unsigned index) const noexcept {
@@ -37,13 +37,13 @@ template <unsigned Degree> struct polynomial_mapper {
   CUDA_CALLABLE
   void map_index(value_type& p, unsigned index) const noexcept {
     if (index + split < n) {
-      expand_products(p, mles + index, n, split, {product_terms, Degree});
+      expand_products<T>(p, mles + index, n, split, {product_terms, Degree});
     } else {
-      partial_expand_products(p, mles + index, n, {product_terms, Degree});
+      partial_expand_products<T>(p, mles + index, n, {product_terms, Degree});
     }
   }
 
-  const s25t::element* __restrict__ mles;
+  const T* __restrict__ mles;
   const unsigned* __restrict__ product_terms;
   unsigned split;
   unsigned n;

@@ -22,7 +22,7 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/proof/sumcheck/reference_transcript.h"
 #include "sxt/scalar25/operation/overload.h"
-#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/realization/field.h"
 #include "sxt/scalar25/type/literal.h"
 
 using namespace sxt;
@@ -30,7 +30,7 @@ using s25t::operator""_s25;
 
 TEST_CASE("we can create sumcheck proofs") {
   prft::transcript base_transcript{"abc"};
-  prfsk::reference_transcript transcript{base_transcript};
+  prfsk::reference_transcript<s25t::element> transcript{base_transcript};
 
   std::vector<s25t::element> polynomials(2);
   std::vector<s25t::element> evaluation_point(1);
@@ -55,7 +55,7 @@ TEST_CASE("we can create sumcheck proofs") {
 
   auto f = [](s25t::element* r, void* context, const s25t::element* polynomial,
               unsigned polynomial_len) noexcept {
-    static_cast<prfsk::reference_transcript*>(context)->round_challenge(
+    static_cast<prfsk::reference_transcript<s25t::element>*>(context)->round_challenge(
         *r, {polynomial, polynomial_len});
   };
 
@@ -70,7 +70,7 @@ TEST_CASE("we can create sumcheck proofs") {
     REQUIRE(polynomials[1] == mles[1] - mles[0]);
     {
       prft::transcript base_transcript_p{"abc"};
-      prfsk::reference_transcript transcript_p{base_transcript_p};
+      prfsk::reference_transcript<s25t::element> transcript_p{base_transcript_p};
       s25t::element r;
       transcript_p.round_challenge(r, polynomials);
       REQUIRE(evaluation_point[0] == r);
@@ -88,7 +88,7 @@ TEST_CASE("we can create sumcheck proofs") {
     REQUIRE(polynomials[1] == mles[1] - mles[0]);
     {
       prft::transcript base_transcript_p{"abc"};
-      prfsk::reference_transcript transcript_p{base_transcript_p};
+      prfsk::reference_transcript<s25t::element> transcript_p{base_transcript_p};
       s25t::element r;
       transcript_p.round_challenge(r, polynomials);
       REQUIRE(evaluation_point[0] == r);

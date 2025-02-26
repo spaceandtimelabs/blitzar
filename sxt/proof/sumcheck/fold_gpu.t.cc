@@ -23,7 +23,7 @@
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/scalar25/operation/overload.h"
-#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/realization/field.h"
 #include "sxt/scalar25/type/literal.h"
 
 using namespace sxt;
@@ -31,6 +31,7 @@ using namespace sxt::prfsk;
 using s25t::operator""_s25;
 
 TEST_CASE("we can fold scalars using the gpu") {
+  using T = s25t::element;
   std::vector<s25t::element> mles, mles_p, expected;
 
   auto r = 0xabc123_s25;
@@ -39,7 +40,7 @@ TEST_CASE("we can fold scalars using the gpu") {
   SECTION("we can fold a single mle with n=2") {
     mles = {0x1_s25, 0x2_s25};
     mles_p.resize(1);
-    auto fut = fold_gpu(mles_p, mles, 2, r);
+    auto fut = fold_gpu<T>(mles_p, mles, 2, r);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     expected = {
@@ -51,7 +52,7 @@ TEST_CASE("we can fold scalars using the gpu") {
   SECTION("we can fold a single mle with n=3") {
     mles = {0x123_s25, 0x456_s25, 0x789_s25};
     mles_p.resize(2);
-    auto fut = fold_gpu(mles_p, mles, 3, r);
+    auto fut = fold_gpu<T>(mles_p, mles, 3, r);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     expected = {
@@ -69,7 +70,7 @@ TEST_CASE("we can fold scalars using the gpu") {
     };
     mles = {0x123_s25, 0x456_s25, 0x789_s25, 0x101112_s25};
     mles_p.resize(2);
-    auto fut = fold_gpu(mles_p, split_options, mles, 4, r);
+    auto fut = fold_gpu<T>(mles_p, split_options, mles, 4, r);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     expected = {

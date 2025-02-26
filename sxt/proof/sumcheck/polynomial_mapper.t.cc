@@ -20,12 +20,14 @@
 
 #include "sxt/base/test/unit_test.h"
 #include "sxt/scalar25/operation/overload.h"
-#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/realization/field.h"
 #include "sxt/scalar25/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::prfsk;
 using s25t::operator""_s25;
+
+using T = s25t::element;
 
 TEST_CASE("we can map indexes to expanded polynomials") {
   std::vector<s25t::element> mles;
@@ -34,7 +36,7 @@ TEST_CASE("we can map indexes to expanded polynomials") {
   SECTION("we can map a single element mle") {
     mles = {0x123_s25};
     product_terms = {0};
-    polynomial_mapper<1> m{
+    polynomial_mapper<1, T> m{
         .mles = mles.data(),
         .product_terms = product_terms.data(),
         .split = 1,
@@ -48,7 +50,7 @@ TEST_CASE("we can map indexes to expanded polynomials") {
   SECTION("we can map an mle with two elements") {
     mles = {0x123_s25, 0x456_s25};
     product_terms = {0};
-    polynomial_mapper<1> m{
+    polynomial_mapper<1, T> m{
         .mles = mles.data(),
         .product_terms = product_terms.data(),
         .split = 1,

@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2025-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
  */
 #pragma once
 
-namespace sxt::prfsk {
-class driver;
+#include "sxt/proof/sumcheck/driver.h"
+#include "sxt/scalar25/realization/field.h"
 
+namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // exercise_driver
 //--------------------------------------------------------------------------------------------------
-void exercise_driver(const driver& drv);
+void exercise_driver(const driver<s25t::element>& drv);
 } // namespace sxt::prfsk

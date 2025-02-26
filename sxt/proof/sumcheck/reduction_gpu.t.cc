@@ -24,7 +24,7 @@
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/resource/managed_device_resource.h"
 #include "sxt/scalar25/operation/overload.h"
-#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/realization/field.h"
 #include "sxt/scalar25/type/literal.h"
 
 using namespace sxt;
@@ -32,6 +32,7 @@ using namespace sxt::prfsk;
 using s25t::operator""_s25;
 
 TEST_CASE("we can reduce sumcheck polynomials") {
+  using T = s25t::element;
   std::vector<s25t::element> p;
   std::pmr::vector<s25t::element> partial_terms{memr::get_managed_device_resource()};
 
@@ -40,7 +41,7 @@ TEST_CASE("we can reduce sumcheck polynomials") {
   SECTION("we can reduce a sum with a single term") {
     p.resize(1);
     partial_terms = {0x123_s25};
-    auto fut = reduce_sums(p, stream, partial_terms);
+    auto fut = reduce_sums<T>(p, stream, partial_terms);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(p[0] == 0x123_s25);
@@ -49,7 +50,7 @@ TEST_CASE("we can reduce sumcheck polynomials") {
   SECTION("we can reduce two terms") {
     p.resize(1);
     partial_terms = {0x123_s25, 0x456_s25};
-    auto fut = reduce_sums(p, stream, partial_terms);
+    auto fut = reduce_sums<T>(p, stream, partial_terms);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(p[0] == 0x123_s25 + 0x456_s25);
@@ -58,7 +59,7 @@ TEST_CASE("we can reduce sumcheck polynomials") {
   SECTION("we can reduce multiple coefficients") {
     p.resize(2);
     partial_terms = {0x123_s25, 0x456_s25};
-    auto fut = reduce_sums(p, stream, partial_terms);
+    auto fut = reduce_sums<T>(p, stream, partial_terms);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(p[0] == 0x123_s25);

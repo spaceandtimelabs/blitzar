@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2025-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,30 +35,32 @@
 #include "sxt/proof/sumcheck/verification.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/operation/overload.h"
-#include "sxt/scalar25/type/element.h"
+#include "sxt/scalar25/realization/field.h"
 #include "sxt/scalar25/type/literal.h"
 
 using namespace sxt;
 using namespace sxt::prfsk;
 using s25t::operator""_s25;
 
-static void test_proof(const driver& drv) noexcept {
+using T = s25t::element;
+
+static void test_proof(const driver<T>& drv) noexcept {
   prft::transcript base_transcript{"abc"};
-  reference_transcript transcript{base_transcript};
+  reference_transcript<T> transcript{base_transcript};
   std::vector<s25t::element> polynomials(2);
   std::vector<s25t::element> evaluation_point(1);
   std::vector<s25t::element> mles = {
       0x8_s25,
       0x3_s25,
   };
-  std::vector<std::pair<s25t::element, unsigned>> product_table = {
+  std::vector<std::pair<T, unsigned>> product_table = {
       {0x1_s25, 1},
   };
   std::vector<unsigned> product_terms = {0};
 
   SECTION("we can prove a sum with n=1") {
-    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                         product_terms, 1);
+    auto fut = prove_sum<T>(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                            product_terms, 1);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == mles[0]);
@@ -66,8 +68,8 @@ static void test_proof(const driver& drv) noexcept {
   }
 
   SECTION("we can prove a sum with a single variable") {
-    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                         product_terms, 2);
+    auto fut = prove_sum<T>(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                            product_terms, 2);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == mles[0]);
@@ -80,8 +82,8 @@ static void test_proof(const driver& drv) noexcept {
     };
     product_terms = {0, 0};
     polynomials.resize(3);
-    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                         product_terms, 2);
+    auto fut = prove_sum<T>(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                            product_terms, 2);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == mles[0] * mles[0]);
@@ -97,8 +99,8 @@ static void test_proof(const driver& drv) noexcept {
     polynomials.resize(3);
     mles.push_back(0x7_s25);
     mles.push_back(0x10_s25);
-    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                         product_terms, 2);
+    auto fut = prove_sum<T>(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                            product_terms, 2);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == mles[0] * mles[2]);
@@ -108,8 +110,8 @@ static void test_proof(const driver& drv) noexcept {
 
   SECTION("we can prove a sum where the term multiplier is different from one") {
     product_table[0].first = 0x2_s25;
-    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                         product_terms, 2);
+    auto fut = prove_sum<T>(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                            product_terms, 2);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == 0x2_s25 * mles[0]);
@@ -121,8 +123,8 @@ static void test_proof(const driver& drv) noexcept {
     mles.push_back(0x7_s25);
     polynomials.resize(4);
     evaluation_point.resize(2);
-    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                         product_terms, 4);
+    auto fut = prove_sum<T>(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                            product_terms, 4);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == mles[0] + mles[1]);
@@ -140,8 +142,8 @@ static void test_proof(const driver& drv) noexcept {
     mles.push_back(0x4_s25);
     polynomials.resize(4);
     evaluation_point.resize(2);
-    auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                         product_terms, 3);
+    auto fut = prove_sum<T>(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                            product_terms, 3);
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     REQUIRE(polynomials[0] == mles[0] + mles[1]);
@@ -175,32 +177,32 @@ static void test_proof(const driver& drv) noexcept {
       // prove
       {
         prft::transcript base_transcript{"abc"};
-        reference_transcript transcript{base_transcript};
-        auto fut = prove_sum(polynomials, evaluation_point, transcript, drv, mles, product_table,
-                             product_terms, n);
+        reference_transcript<T> transcript{base_transcript};
+        auto fut = prove_sum<T>(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                                product_terms, n);
         xens::get_scheduler().run();
       }
 
       // we can verify
       {
         prft::transcript base_transcript{"abc"};
-        reference_transcript transcript{base_transcript};
+        reference_transcript<T> transcript{base_transcript};
         s25t::element expected_sum;
-        sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
-        auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
-                                                   polynomials, polynomial_length - 1u);
+        sum_polynomial_01<T>(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
+        auto valid = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
+                                                      polynomials, polynomial_length - 1u);
         REQUIRE(valid);
       }
 
       // verification fails if we break the proof
       {
         prft::transcript base_transcript{"abc"};
-        reference_transcript transcript{base_transcript};
+        reference_transcript<T> transcript{base_transcript};
         s25t::element expected_sum;
-        sum_polynomial_01(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
+        sum_polynomial_01<T>(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
         polynomials[polynomials.size() - 1] = polynomials[0] + polynomials[1];
-        auto valid = verify_sumcheck_no_evaluation(expected_sum, evaluation_point, transcript,
-                                                   polynomials, polynomial_length - 1u);
+        auto valid = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
+                                                      polynomials, polynomial_length - 1u);
         REQUIRE(!valid);
       }
     }
@@ -209,24 +211,24 @@ static void test_proof(const driver& drv) noexcept {
 
 TEST_CASE("we can create a sumcheck proof") {
   SECTION("we can prove with the cpu driver") {
-    cpu_driver drv;
+    cpu_driver<T> drv;
     test_proof(drv);
   }
 
   SECTION("we can prove with the gpu driver") {
-    gpu_driver drv;
+    gpu_driver<T> drv;
     test_proof(drv);
   }
 
   SECTION("we can prove with the chunked gpu driver") {
-    chunked_gpu_driver drv{0.0};
+    chunked_gpu_driver<T> drv{0.0};
     test_proof(drv);
   }
 
   SECTION("we can prove with a chunked driver that switches over to the single gpu driver") {
     std::vector<s25t::element> mles(4);
-    auto fraction = get_gpu_memory_fraction(mles);
-    chunked_gpu_driver drv{fraction};
+    auto fraction = get_gpu_memory_fraction<T>(mles);
+    chunked_gpu_driver<T> drv{fraction};
     test_proof(drv);
   }
 }

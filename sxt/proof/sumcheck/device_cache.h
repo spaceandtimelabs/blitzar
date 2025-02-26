@@ -21,38 +21,69 @@
 
 #include "sxt/base/container/span.h"
 #include "sxt/base/device/device_map.h"
+#include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/state.h"
+#include "sxt/base/device/stream.h"
+#include "sxt/base/field/element.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/memory/resource/device_resource.h"
 #include "sxt/scalar25/type/element.h"
-
-namespace sxt::basdv {
-class stream;
-}
 
 namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 // device_cache_data
 //--------------------------------------------------------------------------------------------------
-struct device_cache_data {
-  memmg::managed_array<std::pair<s25t::element, unsigned>> product_table;
+template <basfld::element T> struct device_cache_data {
+  memmg::managed_array<std::pair<T, unsigned>> product_table;
   memmg::managed_array<unsigned> product_terms;
 };
 
 //--------------------------------------------------------------------------------------------------
+// make_device_copy
+//--------------------------------------------------------------------------------------------------
+template <basfld::element T>
+std::unique_ptr<device_cache_data<T>>
+make_device_copy(basct::cspan<std::pair<T, unsigned>> product_table,
+                 basct::cspan<unsigned> product_terms, basdv::stream& stream) noexcept {
+  device_cache_data<T> res{
+      .product_table{product_table.size(), memr::get_device_resource()},
+      .product_terms{product_terms.size(), memr::get_device_resource()},
+  };
+  basdv::async_copy_host_to_device(res.product_table, product_table, stream);
+  basdv::async_copy_host_to_device(res.product_terms, product_terms, stream);
+  return std::make_unique<device_cache_data<T>>(std::move(res));
+}
+
+//--------------------------------------------------------------------------------------------------
 // device_cache
 //--------------------------------------------------------------------------------------------------
-class device_cache {
+template <basfld::element T> class device_cache {
 public:
-  device_cache(basct::cspan<std::pair<s25t::element, unsigned>> product_table,
-               basct::cspan<unsigned> product_terms) noexcept;
+  device_cache(basct::cspan<std::pair<T, unsigned>> product_table,
+               basct::cspan<unsigned> product_terms) noexcept
+      : product_table_{product_table}, product_terms_{product_terms} {}
 
-  void lookup(basct::cspan<std::pair<s25t::element, unsigned>>& product_table,
-              basct::cspan<unsigned>& product_terms, basdv::stream& stream) noexcept;
+  void lookup(basct::cspan<std::pair<T, unsigned>>& product_table,
+              basct::cspan<unsigned>& product_terms, basdv::stream& stream) noexcept {
+    auto& ptr = data_[basdv::get_device()];
+    if (ptr == nullptr) {
+      ptr = make_device_copy(product_table_, product_terms_, stream);
+    }
+    product_table = ptr->product_table;
+    product_terms = ptr->product_terms;
+  }
 
-  std::unique_ptr<device_cache_data> clear() noexcept;
+  std::unique_ptr<device_cache_data<T>> clear() noexcept {
+    auto res{std::move(data_[basdv::get_device()])};
+    for (auto& ptr : data_) {
+      ptr.reset();
+    }
+    return res;
+  }
 
 private:
-  basct::cspan<std::pair<s25t::element, unsigned>> product_table_;
+  basct::cspan<std::pair<T, unsigned>> product_table_;
   basct::cspan<unsigned> product_terms_;
-  basdv::device_map<std::unique_ptr<device_cache_data>> data_;
+  basdv::device_map<std::unique_ptr<device_cache_data<T>>> data_;
 };
 } // namespace sxt::prfsk

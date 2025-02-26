@@ -23,6 +23,7 @@
 #include <iosfwd>
 
 #include "sxt/base/macro/cuda_callable.h"
+#include "sxt/scalar25/type/operation_adl_stub.h"
 
 namespace sxt::s25t {
 //--------------------------------------------------------------------------------------------------
@@ -33,7 +34,7 @@ namespace sxt::s25t {
  * L being the order of the main subgroup
  * (L = 2^252 + 27742317777372353535851937790883648493).
  */
-class element {
+class element : public s25o::operation_adl_stub {
 public:
   element() noexcept = default;
 
@@ -52,6 +53,12 @@ public:
   const uint8_t* data() const noexcept { return data_; }
 
   static constexpr element identity() noexcept { return element{}; };
+
+  static constexpr element one() noexcept {
+    element res{};
+    res.data_[0] = 1;
+    return res;
+  }
 
 private:
   uint8_t data_[32];
