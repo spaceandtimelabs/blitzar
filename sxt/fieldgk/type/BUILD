@@ -16,6 +16,7 @@ sxt_cc_component(
     ],
     deps = [
       ":operation_adl_stub",
+      "//sxt/fieldgk/base:constants",
     ],
     is_cuda = True,
     test_deps = [
