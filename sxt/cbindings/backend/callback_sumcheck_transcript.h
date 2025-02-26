@@ -16,37 +16,18 @@
  */
 #pragma once
 
-#include "sxt/proof/sumcheck/sumcheck_transcript.h"
 #include "sxt/proof/sumcheck2/sumcheck_transcript.h"
 
 namespace sxt::cbnbck {
 //--------------------------------------------------------------------------------------------------
 // callback_sumcheck_transcript
 //--------------------------------------------------------------------------------------------------
-class callback_sumcheck_transcript final : public prfsk::sumcheck_transcript {
-public:
-  using callback_t = void (*)(s25t::element* r, void* context, const s25t::element* polynomial,
-                              unsigned polynomial_len);
-
-  callback_sumcheck_transcript(callback_t f, void* context) noexcept : f_{f}, context_{context} {}
-
-  void init(size_t /*num_variables*/, size_t /*round_degree*/) noexcept override {}
-
-  void round_challenge(s25t::element& r, basct::cspan<s25t::element> polynomial) noexcept override {
-    f_(&r, context_, polynomial.data(), static_cast<unsigned>(polynomial.size()));
-  }
-
-private:
-  callback_t f_;
-  void* context_;
-};
-
 template <basfld::element T>
-class callback_sumcheck_transcript2 final : public prfsk2::sumcheck_transcript<T> {
+class callback_sumcheck_transcript final : public prfsk2::sumcheck_transcript<T> {
 public:
   using callback_t = void (*)(T* r, void* context, const T* polynomial, unsigned polynomial_len);
 
-  callback_sumcheck_transcript2(callback_t f, void* context) noexcept : f_{f}, context_{context} {}
+  callback_sumcheck_transcript(callback_t f, void* context) noexcept : f_{f}, context_{context} {}
 
   void init(size_t /*num_variables*/, size_t /*round_degree*/) noexcept override {}
 

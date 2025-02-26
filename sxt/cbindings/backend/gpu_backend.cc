@@ -112,8 +112,8 @@ void gpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsi
       static_cast<cbnb::field_id_t>(field_id), [&]<class T>(std::type_identity<T>) noexcept {
         static_assert(std::same_as<T, s25t::element>, "only support curve-255 right now");
         // transcript
-        callback_sumcheck_transcript2<T> transcript{
-            reinterpret_cast<callback_sumcheck_transcript2<T>::callback_t>(
+        callback_sumcheck_transcript<T> transcript{
+            reinterpret_cast<callback_sumcheck_transcript<T>::callback_t>(
                 const_cast<void*>(transcript_callback)),
             transcript_context};
 
