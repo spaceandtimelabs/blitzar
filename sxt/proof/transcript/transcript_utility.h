@@ -68,6 +68,9 @@ void challenge_value(fgkt::element& value, transcript& trans, std::string_view l
 void challenge_values(basct::span<s25t::element> values, transcript& trans,
                       std::string_view label) noexcept;
 
+void challenge_values(basct::span<fgkt::element> values, transcript& trans,
+                      std::string_view label) noexcept;
+
 //--------------------------------------------------------------------------------------------------
 // set_domain
 //--------------------------------------------------------------------------------------------------

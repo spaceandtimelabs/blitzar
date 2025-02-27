@@ -104,4 +104,10 @@ TEST_CASE("we can get challenge values from a transcript") {
       REQUIRE(std::memcmp(xip.data(), xi.data(), sizeof(s25t::element)) == 0);
     }
   }
+
+  SECTION("we can challenge an array of grumpkin curve values") {
+    fgkt::element vals[2];
+    challenge_values(vals, trans, "123");
+    REQUIRE(vals[0] != vals[1]);
+  }
 }

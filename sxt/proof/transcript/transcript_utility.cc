@@ -31,9 +31,9 @@ void challenge_value(s25t::element& value, transcript& trans, std::string_view l
 }
 
 void challenge_value(fgkt::element& value, transcript& trans, std::string_view label) noexcept {
-  uint64_t data[4];
-  trans.challenge_bytes({reinterpret_cast<uint8_t*>(data), 32}, label);
-  fgkb::to_bytes_le(reinterpret_cast<uint8_t*>(value.data()), data);
+  auto data = reinterpret_cast<uint8_t*>(value.data());
+  trans.challenge_bytes({data, sizeof(fgkt::element)}, label);
+  fgkb::to_bytes_le(data, value.data());
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -45,6 +45,15 @@ void challenge_values(basct::span<s25t::element> values, transcript& trans,
       {reinterpret_cast<uint8_t*>(values.data()), values.size() * sizeof(s25t::element)}, label);
   for (auto& val : values) {
     s25o::reduce32(val);
+  }
+}
+
+void challenge_values(basct::span<fgkt::element> values, transcript& trans,
+                      std::string_view label) noexcept {
+  trans.challenge_bytes(
+      {reinterpret_cast<uint8_t*>(values.data()), sizeof(fgkt::element) * values.size()}, label);
+  for (auto& val : values) {
+    fgkb::to_bytes_le(reinterpret_cast<uint8_t*>(val.data()), val.data());
   }
 }
 } // namespace sxt::prft
