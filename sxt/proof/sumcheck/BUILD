@@ -240,6 +240,8 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
         "//sxt/execution/schedule:scheduler",
+        "//sxt/fieldgk/realization:field",
+        "//sxt/fieldgk/type:literal",
         "//sxt/proof/transcript",
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/realization:field",

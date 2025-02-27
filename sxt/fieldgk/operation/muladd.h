@@ -8,9 +8,8 @@ namespace sxt::fgko {
 //--------------------------------------------------------------------------------------------------
 // muladd
 //--------------------------------------------------------------------------------------------------
-CUDA_CALLABLE
-void muladd(fgkt::element& s, const fgkt::element& a, const fgkt::element& b,
-            const fgkt::element& c) noexcept {
+inline CUDA_CALLABLE void muladd(fgkt::element& s, const fgkt::element& a, const fgkt::element& b,
+                                 const fgkt::element& c) noexcept {
   mul(s, a, b);
   add(s, s, c);
 }

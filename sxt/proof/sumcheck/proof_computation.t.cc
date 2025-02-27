@@ -25,6 +25,8 @@
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
+#include "sxt/fieldgk/realization/field.h"
+#include "sxt/fieldgk/type/literal.h"
 #include "sxt/proof/sumcheck/chunked_gpu_driver.h"
 #include "sxt/proof/sumcheck/cpu_driver.h"
 #include "sxt/proof/sumcheck/gpu_driver.h"
@@ -41,10 +43,40 @@
 using namespace sxt;
 using namespace sxt::prfsk;
 using s25t::operator""_s25;
+using fgkt::operator""_fgk;
 
 using T = s25t::element;
+using Tp = fgkt::element;
 
-static void test_proof(const driver<T>& drv) noexcept {
+#if 0
+static void test_proof_grumpkin(const driver<Tp>& drv) {
+  prft::transcript base_transcript{"abc"};
+  reference_transcript<Tp> transcript{base_transcript};
+  std::vector<Tp> polynomials(2);
+  std::vector<Tp> evaluation_point(1);
+  std::vector<Tp> mles = {
+      0x8_fgk,
+      0x3_fgk,
+  };
+  std::vector<std::pair<Tp, unsigned>> product_table = {
+      {0x1_fgk, 1},
+  };
+  std::vector<unsigned> product_terms = {0};
+
+  SECTION("we can prove a sum with n=1") {
+    /* auto fut = prove_sum<Tp>(polynomials, evaluation_point, transcript, drv, mles, product_table, */
+    /*                          product_terms, 1); */
+    xens::get_scheduler().run();
+    /* REQUIRE(fut.ready()); */
+    REQUIRE(polynomials[0] == mles[0]);
+    fgkt::element expected;
+    fgko::neg(expected, mles[0]);
+    REQUIRE(polynomials[1] == expected);
+  }
+}
+#endif
+
+static void test_proof(const driver<T>& drv) {
   prft::transcript base_transcript{"abc"};
   reference_transcript<T> transcript{base_transcript};
   std::vector<s25t::element> polynomials(2);
