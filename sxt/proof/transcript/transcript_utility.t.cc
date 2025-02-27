@@ -20,6 +20,7 @@
 #include <string>
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/fieldgk/type/element.h"
 #include "sxt/ristretto/type/compressed_element.h"
 #include "sxt/scalar25/operation/reduce.h"
 #include "sxt/scalar25/type/element.h"
@@ -73,6 +74,13 @@ TEST_CASE("we can get challenge values from a transcript") {
 
   SECTION("challenge values aren't equal") {
     s25t::element x1, x2;
+    challenge_value(x1, trans, "xyz");
+    challenge_value(x2, trans, "123");
+    REQUIRE(x1 != x2);
+  }
+
+  SECTION("we can challenge values from the grumpkin field") {
+    fgkt::element x1, x2;
     challenge_value(x1, trans, "xyz");
     challenge_value(x2, trans, "123");
     REQUIRE(x1 != x2);

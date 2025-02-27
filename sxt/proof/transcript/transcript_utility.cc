@@ -16,6 +16,8 @@
  */
 #include "sxt/proof/transcript/transcript_utility.h"
 
+#include "sxt/fieldgk/base/byte_conversion.h"
+#include "sxt/fieldgk/type/element.h"
 #include "sxt/scalar25/operation/reduce.h"
 #include "sxt/scalar25/type/element.h"
 
@@ -26,6 +28,12 @@ namespace sxt::prft {
 void challenge_value(s25t::element& value, transcript& trans, std::string_view label) noexcept {
   trans.challenge_bytes({reinterpret_cast<uint8_t*>(&value), sizeof(s25t::element)}, label);
   s25o::reduce32(value);
+}
+
+void challenge_value(fgkt::element& value, transcript& trans, std::string_view label) noexcept {
+  uint64_t data[4];
+  trans.challenge_bytes({reinterpret_cast<uint8_t*>(data), 32}, label);
+  fgkb::to_bytes_le(reinterpret_cast<uint8_t*>(value.data()), data);
 }
 
 //--------------------------------------------------------------------------------------------------

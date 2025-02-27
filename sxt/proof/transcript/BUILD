@@ -53,9 +53,12 @@ sxt_cc_component(
     impl_deps = [
         "//sxt/scalar25/operation:reduce",
         "//sxt/scalar25/type:element",
+        "//sxt/fieldgk/base:byte_conversion",
+        "//sxt/fieldgk/type:element",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/fieldgk/type:element",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/scalar25/operation:reduce",
         "//sxt/scalar25/type:element",
