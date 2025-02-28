@@ -14,13 +14,13 @@ sxt_cc_component(
         "//sxt/fieldgk/base:byte_conversion",
         "//sxt/fieldgk/base:reduce",
     ],
-    deps = [
-      ":operation_adl_stub",
-      "//sxt/fieldgk/base:constants",
-    ],
     is_cuda = True,
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/fieldgk/base:constants",
+    ],
+    deps = [
+        ":operation_adl_stub",
         "//sxt/fieldgk/base:constants",
     ],
 )

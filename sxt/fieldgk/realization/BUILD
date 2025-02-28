@@ -16,4 +16,3 @@ sxt_cc_component(
         "//sxt/fieldgk/type:element",
     ],
 )
-

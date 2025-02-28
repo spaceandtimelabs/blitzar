@@ -84,13 +84,13 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-  name = "muladd",
-  with_test = False,
-  deps = [
-    ":add",
-    ":mul",
-    "//sxt/base/macro:cuda_callable",
-  ],
+    name = "muladd",
+    with_test = False,
+    deps = [
+        ":add",
+        ":mul",
+        "//sxt/base/macro:cuda_callable",
+    ],
 )
 
 sxt_cc_component(

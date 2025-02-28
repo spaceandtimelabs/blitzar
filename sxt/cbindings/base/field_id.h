@@ -27,5 +27,6 @@ namespace sxt::cbnb {
  */
 enum class field_id_t : unsigned {
   scalar25519 = 0,
+  grumpkin = 1,
 };
 } // namespace sxt::cbnb

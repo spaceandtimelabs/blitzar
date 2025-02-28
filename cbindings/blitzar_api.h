@@ -31,6 +31,7 @@ extern "C" {
 #define SXT_CURVE_GRUMPKIN 3
 
 #define SXT_FIELD_SCALAR255 0
+#define SXT_FIELD_GRUMPKIN 1
 
 /** config struct to hold the chosen backend */
 struct sxt_config {

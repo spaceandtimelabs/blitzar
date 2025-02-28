@@ -46,9 +46,7 @@ public:
 
   constexpr uint64_t* data() noexcept { return data_; }
 
-  static constexpr element identity() noexcept {
-    return {0, 0, 0, 0};
-  }
+  static constexpr element identity() noexcept { return {0, 0, 0, 0}; }
 
   static constexpr element one() noexcept {
     return {fgkb::r_v[0], fgkb::r_v[1], fgkb::r_v[2], fgkb::r_v[3]};
