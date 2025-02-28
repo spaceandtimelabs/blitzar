@@ -48,34 +48,6 @@ using fgkt::operator""_fgk;
 using T = s25t::element;
 using Tp = fgkt::element;
 
-#if 0
-static void test_proof_grumpkin(const driver<Tp>& drv) {
-  prft::transcript base_transcript{"abc"};
-  reference_transcript<Tp> transcript{base_transcript};
-  std::vector<Tp> polynomials(2);
-  std::vector<Tp> evaluation_point(1);
-  std::vector<Tp> mles = {
-      0x8_fgk,
-      0x3_fgk,
-  };
-  std::vector<std::pair<Tp, unsigned>> product_table = {
-      {0x1_fgk, 1},
-  };
-  std::vector<unsigned> product_terms = {0};
-
-  SECTION("we can prove a sum with n=1") {
-    /* auto fut = prove_sum<Tp>(polynomials, evaluation_point, transcript, drv, mles, product_table, */
-    /*                          product_terms, 1); */
-    xens::get_scheduler().run();
-    /* REQUIRE(fut.ready()); */
-    REQUIRE(polynomials[0] == mles[0]);
-    fgkt::element expected;
-    fgko::neg(expected, mles[0]);
-    REQUIRE(polynomials[1] == expected);
-  }
-}
-#endif
-
 static void test_proof(const driver<T>& drv) {
   prft::transcript base_transcript{"abc"};
   reference_transcript<T> transcript{base_transcript};
@@ -266,29 +238,23 @@ TEST_CASE("we can create a sumcheck proof") {
 
   SECTION("we can construct proofs with the grumpkin field") {
     prft::transcript base_transcript{"abc"};
-    /* reference_transcript<Tp> transcript{base_transcript}; */
-    /* std::vector<Tp> polynomials(2); */
-    /* std::vector<Tp> evaluation_point(1); */
-    /* std::vector<Tp> mles = { */
-    /*     0x8_fgk, */
-    /*     0x3_fgk, */
-    /* }; */
-    /* std::vector<std::pair<Tp, unsigned>> product_table = { */
-    /*     {0x1_fgk, 1}, */
-    /* }; */
-    /* std::vector<unsigned> product_terms = {0}; */
-
-#if 0
-  SECTION("we can prove a sum with n=1") {
-    /* auto fut = prove_sum<Tp>(polynomials, evaluation_point, transcript, drv, mles, product_table, */
-    /*                          product_terms, 1); */
-    xens::get_scheduler().run();
-    /* REQUIRE(fut.ready()); */
+    reference_transcript<Tp> transcript{base_transcript};
+    std::vector<Tp> polynomials(2);
+    std::vector<Tp> evaluation_point(1);
+    std::vector<Tp> mles = {
+        0x8_fgk,
+        0x3_fgk,
+    };
+    std::vector<std::pair<Tp, unsigned>> product_table = {
+        {0x1_fgk, 1},
+    };
+    std::vector<unsigned> product_terms = {0};
+    cpu_driver<Tp> drv;
+    prove_sum<Tp>(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                  product_terms, 1);
     REQUIRE(polynomials[0] == mles[0]);
     fgkt::element expected;
     fgko::neg(expected, mles[0]);
     REQUIRE(polynomials[1] == expected);
-  }
-#endif
   }
 }

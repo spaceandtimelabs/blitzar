@@ -10,7 +10,8 @@ namespace sxt::fgko {
 //--------------------------------------------------------------------------------------------------
 inline CUDA_CALLABLE void muladd(fgkt::element& s, const fgkt::element& a, const fgkt::element& b,
                                  const fgkt::element& c) noexcept {
+  auto cp = c;
   mul(s, a, b);
-  add(s, s, c);
+  add(s, s, cp);
 }
 } // namespace sxt::fgko

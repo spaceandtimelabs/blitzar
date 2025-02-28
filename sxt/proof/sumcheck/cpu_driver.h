@@ -62,7 +62,7 @@ public:
     auto product_terms = work.product_terms;
 
     for (auto& val : polynomial) {
-      val = {};
+      val = T::identity();
     }
 
     // expand paired terms
