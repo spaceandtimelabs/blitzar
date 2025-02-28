@@ -9,7 +9,7 @@ mkShell {
   buildInputs = [
     bazel-buildtools
     python3
-    rust-bin.nightly."2023-12-01".default
+    rust-bin.nightly."2024-08-02".default
     rust-bindgen
     patchelf
     nodejs
