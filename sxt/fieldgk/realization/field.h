@@ -16,17 +16,12 @@
  */
 #pragma once
 
-namespace sxt::cbnb {
-//--------------------------------------------------------------------------------------------------
-// field_id_t
-//--------------------------------------------------------------------------------------------------
-/**
- * Ids for the various fields we support.
- *
- * Note: The values should match those in blitzar_api.h.
- */
-enum class field_id_t : unsigned {
-  scalar25519 = 0,
-  grumpkin = 1,
-};
-} // namespace sxt::cbnb
+#include "sxt/base/field/element.h"
+#include "sxt/fieldgk/operation/add.h"
+#include "sxt/fieldgk/operation/mul.h"
+#include "sxt/fieldgk/operation/muladd.h"
+#include "sxt/fieldgk/operation/neg.h"
+#include "sxt/fieldgk/operation/sub.h"
+#include "sxt/fieldgk/type/element.h"
+
+static_assert(sxt::basfld::element<sxt::fgkt::element>);

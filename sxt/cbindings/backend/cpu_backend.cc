@@ -76,7 +76,6 @@ void cpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsi
   auto num_variables = static_cast<size_t>(std::max(basn::ceil_log2(descriptor.n), 1));
   cbnb::switch_field_type(
       static_cast<cbnb::field_id_t>(field_id), [&]<class T>(std::type_identity<T>) noexcept {
-        static_assert(std::same_as<T, s25t::element>, "only support curve-255 right now");
         // transcript
         callback_sumcheck_transcript<T> transcript{
             reinterpret_cast<callback_sumcheck_transcript<T>::callback_t>(
@@ -84,20 +83,20 @@ void cpu_backend::prove_sumcheck(void* polynomials, void* evaluation_point, unsi
             transcript_context};
 
         // prove
-        basct::span<s25t::element> polynomials_span{
-            static_cast<s25t::element*>(polynomials),
+        basct::span<T> polynomials_span{
+            static_cast<T*>(polynomials),
             (descriptor.round_degree + 1u) * num_variables,
         };
-        basct::span<s25t::element> evaluation_point_span{
-            static_cast<s25t::element*>(evaluation_point),
+        basct::span<T> evaluation_point_span{
+            static_cast<T*>(evaluation_point),
             num_variables,
         };
-        basct::cspan<s25t::element> mles_span{
-            static_cast<const s25t::element*>(descriptor.mles),
+        basct::cspan<T> mles_span{
+            static_cast<const T*>(descriptor.mles),
             descriptor.n * descriptor.num_mles,
         };
-        basct::cspan<std::pair<s25t::element, unsigned>> product_table_span{
-            static_cast<const std::pair<s25t::element, unsigned>*>(descriptor.product_table),
+        basct::cspan<std::pair<T, unsigned>> product_table_span{
+            static_cast<const std::pair<T, unsigned>*>(descriptor.product_table),
             descriptor.num_products,
         };
         basct::cspan<unsigned> product_terms_span{

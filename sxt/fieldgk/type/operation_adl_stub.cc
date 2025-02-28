@@ -14,19 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
-
-namespace sxt::cbnb {
-//--------------------------------------------------------------------------------------------------
-// field_id_t
-//--------------------------------------------------------------------------------------------------
-/**
- * Ids for the various fields we support.
- *
- * Note: The values should match those in blitzar_api.h.
- */
-enum class field_id_t : unsigned {
-  scalar25519 = 0,
-  grumpkin = 1,
-};
-} // namespace sxt::cbnb
+#include "sxt/fieldgk/type/operation_adl_stub.h"

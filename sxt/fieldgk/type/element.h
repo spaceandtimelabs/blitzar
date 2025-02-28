@@ -20,11 +20,14 @@
 #include <cstdint>
 #include <iosfwd>
 
+#include "sxt/fieldgk/base/constants.h"
+#include "sxt/fieldgk/type/operation_adl_stub.h"
+
 namespace sxt::fgkt {
 //--------------------------------------------------------------------------------------------------
 // element
 //--------------------------------------------------------------------------------------------------
-class element {
+class element : public fgko::operation_adl_stub {
 public:
   static constexpr size_t num_limbs_v = 4;
 
@@ -42,6 +45,12 @@ public:
   constexpr const uint64_t* data() const noexcept { return data_; }
 
   constexpr uint64_t* data() noexcept { return data_; }
+
+  static constexpr element identity() noexcept { return {0, 0, 0, 0}; }
+
+  static constexpr element one() noexcept {
+    return {fgkb::r_v[0], fgkb::r_v[1], fgkb::r_v[2], fgkb::r_v[3]};
+  }
 
 private:
   uint64_t data_[num_limbs_v];

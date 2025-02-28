@@ -26,6 +26,10 @@ namespace sxt::s25t {
 class element;
 }
 
+namespace sxt::fgkt {
+class element;
+}
+
 namespace sxt::prft {
 //--------------------------------------------------------------------------------------------------
 // is_transcript_primitive_v
@@ -33,5 +37,6 @@ namespace sxt::prft {
 template <class T>
 constexpr bool is_transcript_primitive_v =
     std::is_integral_v<T> || std::is_same_v<T, unsigned char> ||
-    std::is_same_v<T, rstt::compressed_element> || std::is_same_v<T, s25t::element>;
+    std::is_same_v<T, rstt::compressed_element> || std::is_same_v<T, s25t::element> ||
+    std::is_same_v<T, fgkt::element>;
 } // namespace sxt::prft

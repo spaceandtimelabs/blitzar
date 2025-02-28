@@ -16,27 +16,18 @@
  */
 #pragma once
 
-#include <type_traits>
+#include "sxt/base/macro/cuda_callable.h"
+#include "sxt/fieldgk/operation/add.h"
+#include "sxt/fieldgk/operation/mul.h"
 
-#include "sxt/base/error/panic.h"
-#include "sxt/cbindings/base/field_id.h"
-#include "sxt/fieldgk/realization/field.h"
-#include "sxt/scalar25/realization/field.h"
-
-namespace sxt::cbnb {
+namespace sxt::fgko {
 //--------------------------------------------------------------------------------------------------
-// switch_field_type
+// muladd
 //--------------------------------------------------------------------------------------------------
-template <class F> void switch_field_type(field_id_t id, F f) {
-  switch (id) {
-  case field_id_t::scalar25519:
-    f(std::type_identity<s25t::element>{});
-    break;
-  case field_id_t::grumpkin:
-    f(std::type_identity<fgkt::element>{});
-    break;
-  default:
-    baser::panic("unsupported field id {}", static_cast<unsigned>(id));
-  }
+inline CUDA_CALLABLE void muladd(fgkt::element& s, const fgkt::element& a, const fgkt::element& b,
+                                 const fgkt::element& c) noexcept {
+  auto cp = c;
+  mul(s, a, b);
+  add(s, s, cp);
 }
-} // namespace sxt::cbnb
+} // namespace sxt::fgko

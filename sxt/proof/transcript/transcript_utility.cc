@@ -16,6 +16,8 @@
  */
 #include "sxt/proof/transcript/transcript_utility.h"
 
+#include "sxt/fieldgk/base/byte_conversion.h"
+#include "sxt/fieldgk/type/element.h"
 #include "sxt/scalar25/operation/reduce.h"
 #include "sxt/scalar25/type/element.h"
 
@@ -28,6 +30,12 @@ void challenge_value(s25t::element& value, transcript& trans, std::string_view l
   s25o::reduce32(value);
 }
 
+void challenge_value(fgkt::element& value, transcript& trans, std::string_view label) noexcept {
+  auto data = reinterpret_cast<uint8_t*>(value.data());
+  trans.challenge_bytes({data, sizeof(fgkt::element)}, label);
+  fgkb::to_bytes_le(data, value.data());
+}
+
 //--------------------------------------------------------------------------------------------------
 // challenge_values
 //--------------------------------------------------------------------------------------------------
@@ -37,6 +45,15 @@ void challenge_values(basct::span<s25t::element> values, transcript& trans,
       {reinterpret_cast<uint8_t*>(values.data()), values.size() * sizeof(s25t::element)}, label);
   for (auto& val : values) {
     s25o::reduce32(val);
+  }
+}
+
+void challenge_values(basct::span<fgkt::element> values, transcript& trans,
+                      std::string_view label) noexcept {
+  trans.challenge_bytes(
+      {reinterpret_cast<uint8_t*>(values.data()), sizeof(fgkt::element) * values.size()}, label);
+  for (auto& val : values) {
+    fgkb::to_bytes_le(reinterpret_cast<uint8_t*>(val.data()), val.data());
   }
 }
 } // namespace sxt::prft

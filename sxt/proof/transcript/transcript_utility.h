@@ -27,6 +27,10 @@ namespace sxt::s25t {
 class element;
 }
 
+namespace sxt::fgkt {
+class element;
+}
+
 namespace sxt::prft {
 //--------------------------------------------------------------------------------------------------
 // append_value
@@ -56,10 +60,15 @@ inline void append_values(transcript& trans, std::string_view label,
 //--------------------------------------------------------------------------------------------------
 void challenge_value(s25t::element& value, transcript& trans, std::string_view label) noexcept;
 
+void challenge_value(fgkt::element& value, transcript& trans, std::string_view label) noexcept;
+
 //--------------------------------------------------------------------------------------------------
 // challenge_values
 //--------------------------------------------------------------------------------------------------
 void challenge_values(basct::span<s25t::element> values, transcript& trans,
+                      std::string_view label) noexcept;
+
+void challenge_values(basct::span<fgkt::element> values, transcript& trans,
                       std::string_view label) noexcept;
 
 //--------------------------------------------------------------------------------------------------
