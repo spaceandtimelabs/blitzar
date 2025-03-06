@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <iostream>
+
 #include "sxt/base/error/assert.h"
 #include "sxt/base/field/element.h"
 #include "sxt/base/num/ceil_log2.h"
@@ -45,6 +47,14 @@ xena::future<> prove_sum(basct::span<T> polynomials, basct::span<T> evaluation_p
       mles.size() == n * num_mles
       // clang-format on
   );
+
+  for (size_t i=0; i<mles.size(); ++i) {
+    std::cerr << "mle_" << i << " " << mles[i] << std::endl;
+  }
+  for (size_t i=0; i<product_table.size(); ++i) {
+    std::cerr << "prod_" << i << ": " << product_table[i].first << " " << product_table[i].second
+              << std::endl;
+  }
 
   transcript.init(num_variables, polynomial_length - 1);
 

@@ -228,6 +228,8 @@ sxt_cc_component(
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
+        "//sxt/fieldgk/realization:field",
+        "//sxt/fieldgk/type:literal",
     ],
     deps = [
         ":blitzar_api",

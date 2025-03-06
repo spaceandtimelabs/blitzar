@@ -17,6 +17,7 @@
 #include "cbindings/sumcheck.h"
 
 #include <vector>
+#include <iostream>
 
 #include "cbindings/backend.h"
 #include "sxt/base/test/unit_test.h"
@@ -24,9 +25,12 @@
 #include "sxt/scalar25/operation/overload.h"
 #include "sxt/scalar25/realization/field.h"
 #include "sxt/scalar25/type/literal.h"
+#include "sxt/fieldgk/realization/field.h"
+#include "sxt/fieldgk/type/literal.h"
 
 using namespace sxt;
 using s25t::operator""_s25;
+using fgkt::operator""_fgk;
 
 TEST_CASE("we can create sumcheck proofs") {
   prft::transcript base_transcript{"abc"};
@@ -94,4 +98,75 @@ TEST_CASE("we can create sumcheck proofs") {
       REQUIRE(evaluation_point[0] == r);
     }
   }
+}
+
+TEST_CASE("we can create sumcheck proofs with grumpkin fields") {
+  prft::transcript base_transcript{"abc"};
+  prfsk::reference_transcript<fgkt::element> transcript{base_transcript};
+
+  std::vector<fgkt::element> polynomials(2);
+  std::vector<fgkt::element> evaluation_point(1);
+  std::vector<fgkt::element> mles = {
+      0x8_fgk,
+      0x3_fgk,
+  };
+  std::vector<std::pair<fgkt::element, unsigned>> product_table = {
+      {0x1_fgk, 1},
+  };
+  std::vector<unsigned> product_terms = {0};
+  sumcheck_descriptor descriptor{
+      .mles = mles.data(),
+      .product_table = product_table.data(),
+      .product_terms = product_terms.data(),
+      .n = 2,
+      .num_mles = 1,
+      .num_products = 1,
+      .num_product_terms = 1,
+      .round_degree = 1,
+  };
+
+  auto f = [](fgkt::element* r, void* context, const fgkt::element* polynomial,
+              unsigned polynomial_len) noexcept {
+    static_cast<prfsk::reference_transcript<fgkt::element>*>(context)->round_challenge(
+        *r, {polynomial, polynomial_len});
+  };
+
+  SECTION("we can prove a sum with n=2 on GPU") {
+    cbn::reset_backend_for_testing();
+    const sxt_config config = {SXT_GPU_BACKEND, 0};
+    REQUIRE(sxt_init(&config) == 0);
+
+    std::cerr << "one_gk = " << fgkt::element::one() << std::endl;
+    sxt_prove_sumcheck(polynomials.data(), evaluation_point.data(), SXT_FIELD_GRUMPKIN,
+                       &descriptor, reinterpret_cast<void*>(+f), &transcript);
+    REQUIRE(polynomials[0] == mles[0]);
+    /* REQUIRE(polynomials[1] == mles[1] - mles[0]); */
+    {
+      prft::transcript base_transcript_p{"abc"};
+      prfsk::reference_transcript<fgkt::element> transcript_p{base_transcript_p};
+      fgkt::element r;
+      transcript_p.round_challenge(r, polynomials);
+      REQUIRE(evaluation_point[0] == r);
+    }
+  }
+
+#if 0
+  SECTION("we can prove a sum with n=2 on CPU") {
+    cbn::reset_backend_for_testing();
+    const sxt_config config = {SXT_CPU_BACKEND, 0};
+    REQUIRE(sxt_init(&config) == 0);
+
+    sxt_prove_sumcheck(polynomials.data(), evaluation_point.data(), SXT_FIELD_SCALAR255,
+                       &descriptor, reinterpret_cast<void*>(+f), &transcript);
+    REQUIRE(polynomials[0] == mles[0]);
+    REQUIRE(polynomials[1] == mles[1] - mles[0]);
+    {
+      prft::transcript base_transcript_p{"abc"};
+      prfsk::reference_transcript<s25t::element> transcript_p{base_transcript_p};
+      s25t::element r;
+      transcript_p.round_challenge(r, polynomials);
+      REQUIRE(evaluation_point[0] == r);
+    }
+  }
+#endif
 }
