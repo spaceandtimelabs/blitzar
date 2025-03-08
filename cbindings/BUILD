@@ -203,7 +203,7 @@ sxt_cc_component(
         "//sxt/base/test:unit_test",
         "//sxt/curve21/operation:overload",
         "//sxt/curve21/type:element_p3",
-        "//sxt/proof/transcript",
+        "//sxt/proof/transcript:transcript",
         "//sxt/ristretto/type:compressed_element",
         "//sxt/scalar25/operation:overload",
         "//sxt/scalar25/random:element",
