@@ -35,7 +35,7 @@
 #include "sxt/scalar25/type/element.h"
 
 using namespace sxt;
-using namespace sxt::bncip;
+using namespace sxt::prfip;
 
 //--------------------------------------------------------------------------------------------------
 // print_result
