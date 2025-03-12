@@ -78,7 +78,6 @@ sxt_cc_component(
     name = "for_each",
     impl_deps = [
         ":available_device",
-        "//sxt/execution/async:future",
         "//sxt/execution/async:coroutine",
         "//sxt/base/device:active_device_guard",
         "//sxt/base/device:property",
@@ -90,7 +89,8 @@ sxt_cc_component(
         "//sxt/execution/async:future",
     ],
     deps = [
-        "//sxt/execution/async:future_fwd",
+      "//sxt/base/device:stream",
+        "//sxt/execution/async:future",
         "//sxt/execution/schedule:scheduler",
     ],
 )

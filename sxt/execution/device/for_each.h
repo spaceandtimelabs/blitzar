@@ -17,8 +17,10 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 
-#include "sxt/execution/async/future_fwd.h"
+#include "sxt/base/device/stream.h"
+#include "sxt/execution/async/future.h"
 
 namespace sxt::basit {
 class index_range;
@@ -26,6 +28,15 @@ class index_range_iterator;
 } // namespace sxt::basit
 
 namespace sxt::xendv {
+//--------------------------------------------------------------------------------------------------
+// device_context
+//--------------------------------------------------------------------------------------------------
+struct device_context {
+  unsigned device_index;
+  unsigned num_devices_used;
+  xena::future<> alt_future;
+};
+
 //--------------------------------------------------------------------------------------------------
 // concurrent_for_each
 //--------------------------------------------------------------------------------------------------
@@ -44,4 +55,15 @@ concurrent_for_each(basit::index_range_iterator first, basit::index_range_iterat
 xena::future<>
 concurrent_for_each(basit::index_range rng,
                     std::function<xena::future<>(const basit::index_range&)> f) noexcept;
+
+//--------------------------------------------------------------------------------------------------
+// for_each_device
+//--------------------------------------------------------------------------------------------------
+/**
+ * Invoke the function f on the range of chunks provided, splitting the work across available
+ * devices.
+ */
+xena::future<> for_each_device(
+    basit::index_range_iterator first, basit::index_range_iterator last,
+    std::function<xena::future<>(device_context& ctx, const basit::index_range&)> f) noexcept;
 } // namespace sxt::xendv

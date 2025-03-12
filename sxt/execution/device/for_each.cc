@@ -51,4 +51,62 @@ concurrent_for_each(basit::index_range rng,
   auto [first, last] = basit::split(rng, split_options);
   return concurrent_for_each(first, last, f);
 }
+
+//--------------------------------------------------------------------------------------------------
+// for_each_device
+//--------------------------------------------------------------------------------------------------
+/**
+ * Invoke the function f on the range of chunks provided, splitting the work across available
+ * devices.
+ */
+xena::future<> for_each_device(
+    basit::index_range_iterator first, basit::index_range_iterator last,
+    std::function<xena::future<>(device_context& ctx, const basit::index_range&)> f) noexcept {
+  auto num_chunks = static_cast<unsigned>(std::distance(first, last));
+  auto num_devices = basdv::get_num_devices();
+  auto num_devices_used = std::min(num_chunks, num_devices);
+
+  std::vector<device_context> contexts(num_devices_used);
+
+  // initial launch
+  for (unsigned device_index=0; device_index<num_devices_used; ++device_index) {
+    basdv::active_device_guard guard{device_index};
+    auto& ctx = contexts[device_index];
+    ctx.device_index = device_index;
+    ctx.num_devices_used = num_devices_used;
+    ctx.alt_future = xena::make_ready_future();
+    auto chunk = *first++;
+    ctx.alt_future = f(ctx, chunk);
+  }
+
+  // start futures for
+  //   device_1, ..., device_m
+  // fut_1, ..., fut_m
+  //
+  //   f() {
+  //      while (!chunks.empty()) {
+  //        chunk <- get_chunk()
+  //        stream s;
+  //        copy_memory(s, chunk)
+  //        invoke kernel(s, chunk)
+  //        yield;
+  //        chunk_p <- get_chunk()
+  //        stream sp;
+  //        copy_memory(sp, chunk_p);
+  //        await s
+  //        invoke_kernel(sp, chunk_p)
+  //      }
+  //   }
+  //
+  //  // if given a functor like this, can I do the rest of the management code?
+  //  [](stream& s, stream& sp, chunk) {
+  //     copy_memory(s, chunk);
+  //     await sp;
+  //     invoke_kernel(s, chunk);
+  //  }
+  (void)first;
+  (void)last;
+  (void)f;
+  return {};
+}
 } // namespace sxt::xendv
