@@ -180,6 +180,19 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "split",
+    impl_deps = [
+      ":property",
+    ],
+    deps = [
+      "//sxt/base/iterator:split",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "state",
     impl_deps = [
         "//sxt/base/error:panic",
