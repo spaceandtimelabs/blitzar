@@ -81,6 +81,7 @@ sxt_cc_component(
         "//sxt/execution/async:coroutine",
         "//sxt/base/device:active_device_guard",
         "//sxt/base/device:property",
+        "//sxt/base/device:state",
         "//sxt/base/iterator:split",
     ],
     test_deps = [

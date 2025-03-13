@@ -18,6 +18,7 @@
 
 #include "sxt/base/device/active_device_guard.h"
 #include "sxt/base/device/property.h"
+#include "sxt/base/device/state.h"
 #include "sxt/base/iterator/split.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
@@ -62,6 +63,8 @@ concurrent_for_each(basit::index_range rng,
 xena::future<> for_each_device(
     basit::index_range_iterator first, basit::index_range_iterator last,
     std::function<xena::future<>(device_context& ctx, const basit::index_range&)> f) noexcept {
+  basdv::active_device_guard guard;
+
   auto num_chunks = static_cast<unsigned>(std::distance(first, last));
   auto num_devices = basdv::get_num_devices();
   auto num_devices_used = std::min(num_chunks, num_devices);
@@ -70,13 +73,49 @@ xena::future<> for_each_device(
 
   // initial launch
   for (unsigned device_index=0; device_index<num_devices_used; ++device_index) {
-    basdv::active_device_guard guard{device_index};
+    basdv::set_device(device_index);
     auto& ctx = contexts[device_index];
     ctx.device_index = device_index;
     ctx.num_devices_used = num_devices_used;
     ctx.alt_future = xena::make_ready_future();
     auto chunk = *first++;
     ctx.alt_future = f(ctx, chunk);
+  }
+
+  // alternate launch
+  std::vector<xena::future<>> futs;
+  futs.reserve(num_devices_used);
+  for (unsigned device_index=0; device_index<num_devices_used; ++device_index) {
+    if (first == last) {
+      break;
+    }
+    basdv::set_device(device_index);
+    auto chunk = *first++;
+    auto fut = f(contexts[device_index], chunk);
+    futs.emplace_back(std::move(fut));
+  }
+
+  // continue launches until all chunks are processed
+  while (first != last) {
+    for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
+      if (first == last) {
+        break;
+      }
+      basdv::set_device(device_index);
+      auto chunk = *first++;
+      auto& ctx = contexts[device_index];
+      co_await std::move(ctx.alt_future);
+      ctx.alt_future = std::move(futs[device_index]);
+      futs[device_index] = f(ctx, chunk);
+    }
+  }
+
+  // wait for everything to finish
+  for (auto& ctx : contexts) {
+    co_await std::move(ctx.alt_future);
+  }
+  for (auto& fut : futs) {
+    co_await std::move(fut);
   }
 
   // start futures for
@@ -107,6 +146,6 @@ xena::future<> for_each_device(
   (void)first;
   (void)last;
   (void)f;
-  return {};
+  
 }
 } // namespace sxt::xendv
