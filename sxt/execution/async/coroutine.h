@@ -26,6 +26,12 @@ namespace sxt {
 //--------------------------------------------------------------------------------------------------
 // operator co_await
 //--------------------------------------------------------------------------------------------------
+inline xena::awaiter<void> operator co_await(xena::future<>& fut) noexcept {
+  xena::awaiter<void> res{std::move(fut)};
+  fut = xena::make_ready_future();
+  return res;
+}
+
 template <class T> xena::awaiter<T> operator co_await(xena::future<T>&& fut) noexcept {
   return xena::awaiter<T>{std::move(fut)};
 }

@@ -27,6 +27,7 @@
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
+#include "sxt/proof/sumcheck/chunked_gpu_driver.h"
 #include "sxt/proof/sumcheck/gpu_driver.h"
 #include "sxt/proof/sumcheck/proof_computation.h"
 #include "sxt/proof/sumcheck/reference_transcript.h"
@@ -112,7 +113,8 @@ int main(int argc, char* argv[]) {
   memmg::managed_array<s25t::element> evaluation_point(num_rounds);
   prft::transcript base_transcript{"abc123"};
   prfsk::reference_transcript<s25t::element> transcript{base_transcript};
-  prfsk::gpu_driver<s25t::element> drv;
+  /* prfsk::gpu_driver<s25t::element> drv; */
+  prfsk::chunked_gpu_driver<s25t::element> drv;
 
   // initial run
   {

@@ -343,6 +343,7 @@ sxt_cc_component(
         "//sxt/algorithm/reduction:kernel_fit",
         "//sxt/algorithm/reduction:thread_reduction",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/device:split",
         "//sxt/base/device:stream",
         "//sxt/base/device:state",
         "//sxt/base/field:element",

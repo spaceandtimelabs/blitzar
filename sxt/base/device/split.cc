@@ -9,7 +9,7 @@ namespace sxt::basdv {
 basit::split_options plan_split(size_t bytes) noexcept {
   auto device_memory = get_total_device_memory();
 
-  auto high_memory_target = device_memory / 4u;
+  auto high_memory_target = device_memory / 16u;
   auto low_memory_target = device_memory / 64u;
 
   auto high_target = high_memory_target / bytes;
@@ -21,7 +21,7 @@ basit::split_options plan_split(size_t bytes) noexcept {
   return basit::split_options{
     .min_chunk_size = low_target,
     .max_chunk_size = high_target,
-    .split_factor = basdv::get_num_devices(),
+    .split_factor = basdv::get_num_devices() * 2u,
   };
 }
 } // namespace sxt::basdv

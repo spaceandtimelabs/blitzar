@@ -21,6 +21,7 @@
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/split.h"
 #include "sxt/base/device/state.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/field/element.h"
@@ -222,5 +223,77 @@ xena::future<> sum_gpu(basct::span<T> p, basct::cspan<T> mles,
   );
   basdv::stream stream;
   co_await partial_sum<T>(p, stream, mles, product_table, product_terms, mid, n);
+}
+
+//--------------------------------------------------------------------------------------------------
+// sum_gpu2
+//--------------------------------------------------------------------------------------------------
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+template <basfld::element T>
+xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
+                        const basit::split_options& options, basct::cspan<T> mles,
+                        unsigned n) noexcept {
+  auto num_variables = std::max(basn::ceil_log2(n), 1);
+  auto mid = 1u << (num_variables - 1u);
+  auto num_mles = mles.size() / n;
+  auto num_coefficients = p.size();
+
+  // split
+  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, mid}, options);
+
+  // sum
+  size_t counter = 0;
+  co_await xendv::for_each_device(
+      chunk_first, chunk_last,
+      [&](xendv::device_context& ctx, const basit::index_range& rng) noexcept -> xena::future<> {
+        std::println(stderr, "chunk {}: {}", ctx.device_index, rng.size());
+        basdv::stream stream;
+        memr::async_device_resource resource{stream};
+
+        // copy partial mles to device
+        memmg::managed_array<T> partial_mles{&resource};
+        copy_partial_mles<T>(partial_mles, stream, mles, n, rng.a(), rng.b());
+        auto split = rng.b() - rng.a();
+        auto np = partial_mles.size() / num_mles;
+
+        // lookup problem descriptor
+        basct::cspan<std::pair<T, unsigned>> product_table;
+        basct::cspan<unsigned> product_terms;
+        cache.lookup(product_table, product_terms, stream);
+
+        // compute
+        co_await ctx.alt_future;
+        memmg::managed_array<T> partial_p(num_coefficients);
+        co_await partial_sum<T>(partial_p, stream, partial_mles, product_table, product_terms,
+                                split, np);
+
+        // fill in the result
+        if (counter == 0) {
+          for (unsigned i = 0; i < num_coefficients; ++i) {
+            p[i] = partial_p[i];
+          }
+        } else {
+          for (unsigned i = 0; i < num_coefficients; ++i) {
+            add(p[i], p[i], partial_p[i]);
+          }
+        }
+        ++counter;
+
+      });
+}
+#pragma clang diagnostic pop
+
+template <basfld::element T>
+xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache, basct::cspan<T> mles,
+                       unsigned n) noexcept {
+  auto num_mles = mles.size() / n;
+  auto options = basdv::plan_split(num_mles * sizeof(T));
+  std::println(stderr, "options.min_chunk_size = {}", options.min_chunk_size);
+  std::println(stderr, "options.max_chunk_size = {}", options.max_chunk_size);
+  std::println(stderr, "options.split_factor = {}", options.split_factor);
+  co_await sum_gpu2<T>(p, cache, options, mles, n);
 }
 } // namespace sxt::prfsk
