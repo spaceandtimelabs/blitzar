@@ -269,6 +269,7 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
         memmg::managed_array<T> partial_p(num_coefficients);
         co_await partial_sum<T>(partial_p, stream, partial_mles, product_table, product_terms,
                                 split, np);
+        std::println(stderr, "sum done: {}", ctx.device_index);
 
         // fill in the result
         if (counter == 0) {

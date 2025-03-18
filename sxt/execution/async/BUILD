@@ -144,6 +144,26 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+  name = "shared_future",
+  deps = [
+    ":future",
+  ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
+  name = "shared_future_state",
+  deps = [
+    ":future",
+  ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "future_utility",
     impl_deps = [
         ":coroutine",
