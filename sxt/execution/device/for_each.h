@@ -35,7 +35,7 @@ namespace sxt::xendv {
 struct device_context {
   unsigned device_index;
   unsigned num_devices_used;
-  xena::shared_future<> alt_future2;
+  xena::shared_future<> alt_future;
 };
 
 //--------------------------------------------------------------------------------------------------

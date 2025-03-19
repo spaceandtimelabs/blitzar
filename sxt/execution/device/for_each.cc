@@ -77,9 +77,9 @@ xena::future<> for_each_device(
     auto& ctx = contexts[device_index];
     ctx.device_index = device_index;
     ctx.num_devices_used = num_devices_used;
-    ctx.alt_future2 = xena::shared_future<>{xena::make_ready_future()};
+    ctx.alt_future = xena::shared_future<>{xena::make_ready_future()};
     auto chunk = *first++;
-    ctx.alt_future2 = f(ctx, chunk);
+    ctx.alt_future = f(ctx, chunk);
   }
 
   // alternate launch
@@ -104,8 +104,8 @@ xena::future<> for_each_device(
       basdv::set_device(device_index);
       auto chunk = *first++;
       auto& ctx = contexts[device_index];
-      co_await ctx.alt_future2.get_future();
-      ctx.alt_future2 = xena::shared_future<>{std::move(futs[device_index])};
+      co_await ctx.alt_future.get_future();
+      ctx.alt_future = xena::shared_future<>{std::move(futs[device_index])};
       futs[device_index] = f(ctx, chunk);
     }
   }
@@ -115,7 +115,7 @@ xena::future<> for_each_device(
     co_await std::move(fut);
   }
   for (auto& ctx : contexts) {
-    co_await ctx.alt_future2.get_future();
+    co_await ctx.alt_future.get_future();
   }
 
   // start futures for
