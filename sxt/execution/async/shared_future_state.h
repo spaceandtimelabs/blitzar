@@ -27,7 +27,11 @@ public:
 
   future<T> get_future() noexcept {
     if (fut_.ready()) {
-      return make_ready_future<T>(fut_.get_value());
+      if constexpr (std::is_same_v<T, void>) {
+        return make_ready_future<T>();
+      } else {
+        return make_ready_future<T>(fut_.value());
+      }
     }
     if (promises_.empty()) {
       fut_.then(
@@ -39,7 +43,11 @@ public:
 private:
   void run_and_dispose() noexcept override {
     while (!promises_.empty()) {
-      promises_.back().set_value(fut_.get_value());
+      if constexpr (std::is_same_v<T, void>) {
+        promises_.back().set_value();
+      } else {
+        promises_.back().set_value(fut_.get_value());
+      }
       promises_.pop_back();
     }
   }

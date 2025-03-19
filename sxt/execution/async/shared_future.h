@@ -8,7 +8,7 @@ namespace sxt::xena {
 //--------------------------------------------------------------------------------------------------
 // shared_future
 //--------------------------------------------------------------------------------------------------
-template <class T> class shared_future {
+template <class T=void> class shared_future {
 public:
   shared_future() noexcept = default;
 

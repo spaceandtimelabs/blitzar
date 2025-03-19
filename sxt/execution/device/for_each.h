@@ -21,6 +21,7 @@
 
 #include "sxt/base/device/stream.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/async/shared_future.h"
 
 namespace sxt::basit {
 class index_range;
@@ -35,6 +36,7 @@ struct device_context {
   unsigned device_index;
   unsigned num_devices_used;
   xena::future<> alt_future;
+  xena::shared_future<> alt_future2;
 };
 
 //--------------------------------------------------------------------------------------------------
