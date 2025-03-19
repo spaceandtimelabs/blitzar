@@ -28,14 +28,19 @@ public:
   future<T> get_future() noexcept {
     if (fut_.ready()) {
       if constexpr (std::is_same_v<T, void>) {
-        return make_ready_future<T>();
+        return make_ready_future();
       } else {
         return make_ready_future<T>(fut_.value());
       }
     }
     if (promises_.empty()) {
-      fut_.then(
-          [ptr = this->shared_from_this()](const T& val) noexcept { ptr->run_and_dispose(); });
+      if constexpr (std::is_same_v<T, void>) {
+        fut_.then(
+            [ptr = this->shared_from_this()]() noexcept { ptr->run_and_dispose(); });
+      } else {
+        fut_.then(
+            [ptr = this->shared_from_this()](const T& val) noexcept { ptr->run_and_dispose(); });
+      }
     }
     promises_.emplace_back();
     return future<T>{promises_.back()};
