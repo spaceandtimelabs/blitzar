@@ -157,6 +157,7 @@ sxt_cc_component(
   name = "shared_future_state",
   deps = [
     ":future",
+    ":promise",
   ],
     test_deps = [
         "//sxt/base/test:unit_test",
