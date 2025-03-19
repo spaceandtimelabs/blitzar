@@ -78,6 +78,7 @@ xena::future<> for_each_device(
     ctx.device_index = device_index;
     ctx.num_devices_used = num_devices_used;
     ctx.alt_future = xena::make_ready_future();
+    ctx.alt_future2 = xena::shared_future<>{xena::make_ready_future()};
     auto chunk = *first++;
     ctx.alt_future = f(ctx, chunk);
   }

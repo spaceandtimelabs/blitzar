@@ -44,7 +44,7 @@ private:
   void run_and_dispose() noexcept override {
     while (!promises_.empty()) {
       if constexpr (std::is_same_v<T, void>) {
-        promises_.back().set_value();
+        promises_.back().make_ready();
       } else {
         promises_.back().set_value(fut_.get_value());
       }
