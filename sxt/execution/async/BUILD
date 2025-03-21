@@ -159,6 +159,7 @@ sxt_cc_component(
   deps = [
     ":future",
     ":promise",
+    "//sxt/base/error:assert",
   ],
     test_deps = [
         "//sxt/base/test:unit_test",

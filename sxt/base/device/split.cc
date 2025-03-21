@@ -9,8 +9,10 @@ namespace sxt::basdv {
 basit::split_options plan_split(size_t bytes) noexcept {
   auto device_memory = get_total_device_memory();
 
-  auto high_memory_target = device_memory / 16u;
-  auto low_memory_target = device_memory / 64u;
+  /* auto high_memory_target = device_memory / 16u; */
+  /* auto low_memory_target = device_memory / 64u; */
+  auto high_memory_target = device_memory / (100u * 16u);
+  auto low_memory_target = device_memory / (100u * 64u);
 
   auto high_target = high_memory_target / bytes;
   auto low_target = low_memory_target / bytes;

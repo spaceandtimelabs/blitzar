@@ -79,7 +79,10 @@ xena::future<> for_each_device(
     ctx.num_devices_used = num_devices_used;
     ctx.alt_future = xena::shared_future<>{xena::make_ready_future()};
     auto chunk = *first++;
-    ctx.alt_future = f(ctx, chunk);
+    auto fut = f(ctx, chunk);
+    assert(fut.ready() || fut.promise() != nullptr);
+    /* ctx.alt_future = f(ctx, chunk); */
+    ctx.alt_future = xena::shared_future<>{std::move(fut)};
   }
 
   // alternate launch

@@ -249,7 +249,6 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
   co_await xendv::for_each_device(
       chunk_first, chunk_last,
       [&](xendv::device_context& ctx, const basit::index_range& rng) noexcept -> xena::future<> {
-        std::println(stderr, "chunk {}: {}", ctx.device_index, rng.size());
         basdv::stream stream;
         memr::async_device_resource resource{stream};
 
@@ -269,7 +268,6 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
         memmg::managed_array<T> partial_p(num_coefficients);
         co_await partial_sum<T>(partial_p, stream, partial_mles, product_table, product_terms,
                                 split, np);
-        std::println(stderr, "sum done: {}", ctx.device_index);
 
         // fill in the result
         if (counter == 0) {
@@ -292,9 +290,6 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache, basct::cspan<T
                        unsigned n) noexcept {
   auto num_mles = mles.size() / n;
   auto options = basdv::plan_split(num_mles * sizeof(T));
-  std::println(stderr, "options.min_chunk_size = {}", options.min_chunk_size);
-  std::println(stderr, "options.max_chunk_size = {}", options.max_chunk_size);
-  std::println(stderr, "options.split_factor = {}", options.split_factor);
   co_await sum_gpu2<T>(p, cache, options, mles, n);
 }
 } // namespace sxt::prfsk
