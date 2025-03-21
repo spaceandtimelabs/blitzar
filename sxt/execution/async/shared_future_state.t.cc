@@ -14,6 +14,30 @@ TEST_CASE("we can manage shared future state") {
     REQUIRE(fut.ready());
     REQUIRE(fut.value() == 123);
   }
+
+  SECTION("we can create a future from a shared pending event") {
+    auto fut = s->make_future();
+    REQUIRE(!fut.ready());
+    ps.set_value(123);
+    REQUIRE(fut.ready());
+    REQUIRE(fut.value() == 123);
+  }
+
+  SECTION("we can create multiple futures from a shared state") {
+    auto fut1 = s->make_future();
+    REQUIRE(!fut1.ready());
+
+    auto fut2 = s->make_future();
+    REQUIRE(!fut2.ready());
+
+    ps.set_value(123);
+
+    REQUIRE(fut1.ready());
+    REQUIRE(fut1.value() == 123);
+
+    REQUIRE(fut2.ready());
+    REQUIRE(fut2.value() == 123);
+  }
 }
 // shared future is kept alive even if there are no references to it
 // shared future is destroyed
