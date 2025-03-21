@@ -249,6 +249,7 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
   co_await xendv::for_each_device(
       chunk_first, chunk_last,
       [&](xendv::device_context& ctx, const basit::index_range& rng) noexcept -> xena::future<> {
+        std::println(stderr, "sum {}: {}-{}", ctx.device_index, rng.a(), rng.b());
         basdv::stream stream;
         memr::async_device_resource resource{stream};
 
