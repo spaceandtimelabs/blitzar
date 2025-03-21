@@ -10,6 +10,9 @@ TEST_CASE("we can manage shared future state") {
 
   SECTION("we can create a future from a shared ready state") {
     ps.set_value(123);
+    auto fut = s->make_future();
+    REQUIRE(fut.ready());
+    REQUIRE(fut.value() == 123);
   }
 }
 // shared future is kept alive even if there are no references to it

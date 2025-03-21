@@ -33,7 +33,7 @@ public:
       if constexpr (std::is_same_v<T, void>) {
         return make_ready_future();
       } else {
-        return make_ready_future<T>(fut_.value());
+        return make_ready_future<T>(T{fut_.value()});
       }
     }
     if (promises_.empty()) {
@@ -56,7 +56,7 @@ private:
     keep_alive_.reset();
   }
 
-  std::shared_ptr<T> keep_alive_;
+  std::shared_ptr<shared_future_state<T>> keep_alive_;
   future<T> fut_;
   std::list<promise<T>> promises_;
 };
