@@ -291,6 +291,8 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache, basct::cspan<T
                        unsigned n) noexcept {
   auto num_mles = mles.size() / n;
   auto options = basdv::plan_split(num_mles * sizeof(T));
+  std::println(stderr, "*********************** sum init");
   co_await sum_gpu2<T>(p, cache, options, mles, n);
+  std::println(stderr, "*********************** sum done");
 }
 } // namespace sxt::prfsk
