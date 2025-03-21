@@ -28,7 +28,7 @@ public:
   shared_future_state& operator=(const shared_future_state&) = delete;
   shared_future_state& operator=(shared_future_state&&) = delete;
 
-  future<T> get_future() noexcept {
+  future<T> make_future() noexcept {
     if (fut_.ready()) {
       if constexpr (std::is_same_v<T, void>) {
         return make_ready_future();
@@ -49,7 +49,7 @@ private:
       if constexpr (std::is_same_v<T, void>) {
         promises_.back().make_ready();
       } else {
-        promises_.back().set_value(fut_.get_value());
+        promises_.back().set_value(fut_.value());
       }
       promises_.pop_back();
     }

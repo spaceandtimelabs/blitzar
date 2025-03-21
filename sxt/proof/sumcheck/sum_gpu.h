@@ -265,7 +265,7 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
         cache.lookup(product_table, product_terms, stream);
 
         // compute
-        co_await ctx.alt_future.get_future();
+        co_await ctx.alt_future.make_future();
         memmg::managed_array<T> partial_p(num_coefficients);
         co_await partial_sum<T>(partial_p, stream, partial_mles, product_table, product_terms,
                                 split, np);

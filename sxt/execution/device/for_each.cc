@@ -107,7 +107,7 @@ xena::future<> for_each_device(
       basdv::set_device(device_index);
       auto chunk = *first++;
       auto& ctx = contexts[device_index];
-      co_await ctx.alt_future.get_future();
+      co_await ctx.alt_future.make_future();
       ctx.alt_future = xena::shared_future<>{std::move(futs[device_index])};
       futs[device_index] = f(ctx, chunk);
     }
@@ -118,7 +118,7 @@ xena::future<> for_each_device(
     co_await std::move(fut);
   }
   for (auto& ctx : contexts) {
-    co_await ctx.alt_future.get_future();
+    co_await ctx.alt_future.make_future();
   }
 
   // start futures for

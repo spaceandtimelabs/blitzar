@@ -19,9 +19,9 @@ public:
     state_ = std::make_shared<shared_future_state<T>>(std::move(fut));
   }
 
-  future<T> get_future() const noexcept {
+  future<T> make_future() const noexcept {
     assert(state_ != nullptr);
-    return state_->get_future();
+    return state_->make_future();
   }
 
 private:
