@@ -14,9 +14,6 @@ template <class T=void> class shared_future {
 public:
   shared_future() noexcept = default;
 
-  /* shared_future(future<T>&& fut) noexcept */
-  /*     : state_{std::make_shared<shared_future_state<T>>(std::move(fut))} {} */
-
   shared_future(future<T>&& fut) noexcept {
     assert(fut.promise() != nullptr || fut.ready());
     state_ = std::make_shared<shared_future_state<T>>(std::move(fut));
