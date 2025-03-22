@@ -49,7 +49,7 @@ TEST_CASE("the lifetime of future states are properly managed") {
       std::pmr::polymorphic_allocator<>{&resource}, future<int>{ps});
   REQUIRE(resource.bytes_allocated() > 0);
 
-  SECTION("shared future events are kept alive if there is a pending promise") {
+  SECTION("shared future states are kept alive if there is a pending promise") {
     auto fut = s->make_future();
     s.reset();
     REQUIRE(resource.bytes_deallocated() == 0);
@@ -59,6 +59,18 @@ TEST_CASE("the lifetime of future states are properly managed") {
     REQUIRE(fut.ready());
     REQUIRE(fut.value() == 123);
     REQUIRE(resource.bytes_deallocated() == resource.bytes_allocated());
+  }
+}
+
+TEST_CASE("we can manage void future states") {
+  promise<> ps;
+  auto s = std::make_shared<shared_future_state<void>>(future<void>{ps});
+
+  SECTION("we can create a future from a shared ready state") {
+    auto fut = s->make_future();
+    REQUIRE(!fut.ready());
+    ps.make_ready();
+    REQUIRE(fut.ready());
   }
 }
 // shared future is kept alive even if there are no references to it
