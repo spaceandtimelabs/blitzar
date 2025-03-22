@@ -73,7 +73,3 @@ TEST_CASE("we can manage void future states") {
     REQUIRE(fut.ready());
   }
 }
-// shared future is kept alive even if there are no references to it
-// shared future is destroyed
-// we can create a future from shared future state
-// we can create both events with a value and void events
