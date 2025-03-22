@@ -1,6 +1,7 @@
 #include "sxt/execution/async/shared_future_state.h"
 
 #include "sxt/base/test/unit_test.h"
+#include "sxt/memory/resource/counting_resource.h"
 using namespace sxt;
 using namespace sxt::xena;
 
@@ -39,9 +40,28 @@ TEST_CASE("we can manage shared future state") {
     REQUIRE(fut2.value() == 123);
   }
 }
+
+TEST_CASE("the lifetime of future states are properly managed") {
+  memr::counting_resource resource;
+  REQUIRE(resource.bytes_allocated() == 0);
+  promise<int> ps;
+  auto s = std::allocate_shared<shared_future_state<int>>(
+      std::pmr::polymorphic_allocator<>{&resource}, future<int>{ps});
+  REQUIRE(resource.bytes_allocated() > 0);
+
+  SECTION("shared future events are kept alive if there is a pending promise") {
+    auto fut = s->make_future();
+    s.reset();
+    REQUIRE(resource.bytes_deallocated() == 0);
+    REQUIRE(s == nullptr);
+    REQUIRE(!fut.ready());
+    ps.set_value(123);
+    REQUIRE(fut.ready());
+    REQUIRE(fut.value() == 123);
+    REQUIRE(resource.bytes_deallocated() == resource.bytes_allocated());
+  }
+}
 // shared future is kept alive even if there are no references to it
 // shared future is destroyed
-// we can create a future from a ready state
 // we can create a future from shared future state
-// we can create multiple futures from shared future state
 // we can create both events with a value and void events

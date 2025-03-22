@@ -162,6 +162,7 @@ sxt_cc_component(
     "//sxt/base/error:assert",
   ],
     test_deps = [
+      "//sxt/memory/resource:counting_resource",
         "//sxt/base/test:unit_test",
     ],
 )
