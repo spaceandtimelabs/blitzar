@@ -29,6 +29,13 @@ namespace sxt::xena {
 //--------------------------------------------------------------------------------------------------
 // shared_future_state
 //--------------------------------------------------------------------------------------------------
+/**
+ * Manage state for a future that can be awaited multiple times.
+ *
+ * This is a highly simplified version of a shared_future derived from seastar
+ *
+ * See https://seastar.io/futures-promises/
+ */
 template <class T>
 class shared_future_state final : public task,
                                   public std::enable_shared_from_this<shared_future_state<T>> {
