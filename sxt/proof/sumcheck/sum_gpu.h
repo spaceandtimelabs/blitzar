@@ -281,14 +281,13 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
           }
         }
         ++counter;
-
       });
 }
 #pragma clang diagnostic pop
 
 template <basfld::element T>
 xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache, basct::cspan<T> mles,
-                       unsigned n) noexcept {
+                        unsigned n) noexcept {
   auto num_mles = mles.size() / n;
   auto options = basdv::plan_split(num_mles * sizeof(T));
   std::println(stderr, "*********************** sum init");

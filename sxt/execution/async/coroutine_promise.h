@@ -74,9 +74,7 @@ template <>
 class coroutine_promise<void> final
     : public detail::coroutine_promise_impl<void, coroutine_promise<void>> {
 public:
-  void return_void() noexcept {
-    this->promise_.make_ready();
-  }
+  void return_void() noexcept { this->promise_.make_ready(); }
 };
 
 // Disable explicit instantiation. Workaround to

@@ -72,7 +72,7 @@ xena::future<> for_each_device(
   std::vector<device_context> contexts(num_devices_used);
 
   // initial launch
-  for (unsigned device_index=0; device_index<num_devices_used; ++device_index) {
+  for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
     basdv::set_device(device_index);
     auto& ctx = contexts[device_index];
     ctx.device_index = device_index;
@@ -88,7 +88,7 @@ xena::future<> for_each_device(
   // alternate launch
   std::vector<xena::future<>> futs;
   futs.reserve(num_devices_used);
-  for (unsigned device_index=0; device_index<num_devices_used; ++device_index) {
+  for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
     if (first == last) {
       break;
     }
@@ -149,6 +149,5 @@ xena::future<> for_each_device(
   (void)first;
   (void)last;
   (void)f;
-  
 }
 } // namespace sxt::xendv

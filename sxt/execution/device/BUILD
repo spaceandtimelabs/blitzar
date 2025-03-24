@@ -90,7 +90,7 @@ sxt_cc_component(
         "//sxt/execution/async:future",
     ],
     deps = [
-      "//sxt/base/device:stream",
+        "//sxt/base/device:stream",
         "//sxt/execution/async:future",
         "//sxt/execution/async:shared_future",
         "//sxt/execution/schedule:scheduler",

@@ -144,26 +144,26 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-  name = "shared_future",
-  deps = [
-    ":future",
-    ":shared_future_state",
-  ],
+    name = "shared_future",
     test_deps = [
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":future",
+        ":shared_future_state",
     ],
 )
 
 sxt_cc_component(
-  name = "shared_future_state",
-  deps = [
-    ":future",
-    ":promise",
-    "//sxt/base/error:assert",
-  ],
+    name = "shared_future_state",
     test_deps = [
-      "//sxt/memory/resource:counting_resource",
         "//sxt/base/test:unit_test",
+        "//sxt/memory/resource:counting_resource",
+    ],
+    deps = [
+        ":future",
+        ":promise",
+        "//sxt/base/error:assert",
     ],
 )
 

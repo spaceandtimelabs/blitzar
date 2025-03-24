@@ -182,13 +182,13 @@ sxt_cc_component(
 sxt_cc_component(
     name = "split",
     impl_deps = [
-      ":property",
-    ],
-    deps = [
-      "//sxt/base/iterator:split",
+        ":property",
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/iterator:split",
     ],
 )
 
