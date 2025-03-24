@@ -28,6 +28,7 @@ using namespace sxt::xena;
 static future<> f_v() noexcept;
 static future<int> f_i() noexcept;
 static future<int> f_i2() noexcept;
+static future<int> f_mi() noexcept;
 static future<int> f_dev(promise<int>& p);
 
 TEST_CASE("futures interoperate with coroutines") {
@@ -57,6 +58,12 @@ TEST_CASE("futures interoperate with coroutines") {
     REQUIRE(res.value() == 124);
     REQUIRE(basdv::get_device() == 0);
   }
+
+  SECTION("we can await shared futures") {
+    auto res = f_mi();
+    REQUIRE(res.ready());
+    REQUIRE(res.value() == 124);
+  }
 }
 
 static future<> f_v() noexcept { co_return; }
@@ -65,6 +72,11 @@ static future<int> f_i() noexcept { co_return 123; }
 
 static future<int> f_i2() noexcept {
   auto x = co_await f_i();
+  co_return x + 1;
+}
+
+static future<int> f_mi() noexcept {
+  auto x = co_await shared_future<int>{f_i()};
   co_return x + 1;
 }
 

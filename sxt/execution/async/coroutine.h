@@ -21,6 +21,7 @@
 #include "sxt/execution/async/awaiter.h"
 #include "sxt/execution/async/coroutine_promise.h"
 #include "sxt/execution/async/future.h"
+#include "sxt/execution/async/shared_future.h"
 
 namespace sxt {
 //--------------------------------------------------------------------------------------------------
@@ -37,6 +38,10 @@ template <class Fut>
 auto operator co_await(Fut&& fut) noexcept {
   using T = typename Fut::value_type;
   return xena::awaiter<T>{xena::future<T>{std::move(fut)}};
+}
+
+template <class T> xena::awaiter<T> operator co_await(const xena::shared_future<T>& fut) noexcept {
+  return xena::awaiter<T>{fut.make_future()};
 }
 } // namespace sxt
 
