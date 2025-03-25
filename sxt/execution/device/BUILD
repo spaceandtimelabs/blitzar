@@ -4,6 +4,14 @@ load(
 )
 
 sxt_cc_component(
+    name = "chunk_context",
+    with_test = False,
+    deps = [
+      "//sxt/execution/async:shared_future",
+    ],
+)
+
+sxt_cc_component(
     name = "device_viewable",
     test_deps = [
         "//sxt/base/device:active_device_guard",
