@@ -63,6 +63,10 @@ concurrent_for_each(basit::index_range rng,
 xena::future<> for_each_device(
     basit::index_range_iterator first, basit::index_range_iterator last,
     std::function<xena::future<>(device_context& ctx, const basit::index_range&)> f) noexcept {
+  if (first == last) {
+    co_return;
+  }
+
   basdv::active_device_guard guard;
 
   auto num_chunks = static_cast<unsigned>(std::distance(first, last));
@@ -120,34 +124,76 @@ xena::future<> for_each_device(
   for (auto& ctx : contexts) {
     co_await ctx.alt_future.make_future();
   }
-
-  // start futures for
-  //   device_1, ..., device_m
-  // fut_1, ..., fut_m
-  //
-  //   f() {
-  //      while (!chunks.empty()) {
-  //        chunk <- get_chunk()
-  //        stream s;
-  //        copy_memory(s, chunk)
-  //        invoke kernel(s, chunk)
-  //        yield;
-  //        chunk_p <- get_chunk()
-  //        stream sp;
-  //        copy_memory(sp, chunk_p);
-  //        await s
-  //        invoke_kernel(sp, chunk_p)
-  //      }
-  //   }
-  //
-  //  // if given a functor like this, can I do the rest of the management code?
-  //  [](stream& s, stream& sp, chunk) {
-  //     copy_memory(s, chunk);
-  //     await sp;
-  //     invoke_kernel(s, chunk);
-  //  }
-  (void)first;
-  (void)last;
-  (void)f;
 }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+xena::future<> for_each_device(
+    basit::index_range_iterator first, basit::index_range_iterator last,
+    std::function<xena::future<>(chunk_context& ctx, const basit::index_range&)> f) noexcept {
+  if (first == last) {
+    co_return;
+  }
+
+  basdv::active_device_guard guard;
+  unsigned chunk_index = 0;
+  auto num_chunks = static_cast<unsigned>(std::distance(first, last));
+  auto num_devices = basdv::get_num_devices();
+  auto num_devices_used = static_cast<unsigned>(std::min(num_chunks, num_devices));
+  std::vector<chunk_context> contexts(num_devices_used);
+
+  // initial launches
+  for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
+    basdv::set_device(device_index);
+    auto& ctx = contexts[device_index];
+    ctx.chunk_index = chunk_index++;
+    ctx.device_index = device_index;
+    ctx.num_devices_used = num_devices_used;
+    ctx.alt_future = xena::shared_future<>{xena::make_ready_future()};
+    auto chunk = *first++;
+    ctx.alt_future = f(ctx, chunk);
+  }
+
+  // alternate launches
+  std::vector<xena::future<>> futs;
+  futs.reserve(num_devices_used);
+  for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
+    if (first == last) {
+      break;
+    }
+    basdv::set_device(device_index);
+    auto& ctx = contexts[device_index];
+    ctx.chunk_index = chunk_index++;
+    auto chunk = *first++;
+    auto fut = f(ctx, chunk);
+    futs.emplace_back(std::move(fut));
+  }
+
+  // continue launching until all chunks are processed
+  while (first != last) {
+    for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
+      if (first == last) {
+        break;
+      }
+      basdv::set_device(device_index);
+      auto& ctx = contexts[device_index];
+      ctx.chunk_index = chunk_index++;
+      auto chunk = *first++;
+      co_await ctx.alt_future.make_future();
+      ctx.alt_future = std::move(futs[device_index]);
+      futs[device_index] = f(ctx, chunk);
+    }
+  }
+
+  // wait for everything to finish
+  for (auto& fut : futs) {
+    co_await std::move(fut);
+  }
+  for (auto& ctx : contexts) {
+    co_await ctx.alt_future.make_future();
+  }
+}
+#pragma clang diagnostic pop
 } // namespace sxt::xendv
