@@ -94,6 +94,7 @@ sxt_cc_component(
     ],
     test_deps = [
         "//sxt/base/iterator:index_range",
+        "//sxt/base/iterator:index_range_iterator",
         "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
     ],

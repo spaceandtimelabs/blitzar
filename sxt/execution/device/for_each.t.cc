@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "sxt/base/iterator/index_range.h"
+#include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/test/unit_test.h"
 #include "sxt/execution/async/future.h"
 
@@ -65,5 +66,20 @@ TEST_CASE("we can concurrently invoke code on different GPUs") {
       t = ranges[i].second;
     }
     REQUIRE(t == 11);
+  }
+}
+
+TEST_CASE("we can manage asynchronous chunked computations") {
+  std::vector<std::pair<unsigned, unsigned>> ranges;
+  xena::promise<int> ps;
+  
+  SECTION("we handle no chunks") {
+    basit::index_range_iterator iter{basit::index_range{2, 2}, 1};
+    auto fut = for_each_device(
+        iter, iter, [&](const device_context& ctx, basit::index_range rng) -> xena::future<> {
+        return xena::future<int>{ps}.then([](int /*val*/) noexcept {
+        });
+    });
+    REQUIRE(fut.ready());
   }
 }
