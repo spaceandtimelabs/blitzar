@@ -71,5 +71,5 @@ xena::future<> for_each_device(
 
 xena::future<> for_each_device(
     basit::index_range_iterator first, basit::index_range_iterator last,
-    std::function<xena::future<>(chunk_context& ctx, const basit::index_range&)> f) noexcept;
+    std::function<xena::future<>(const chunk_context& ctx, const basit::index_range&)> f) noexcept;
 } // namespace sxt::xendv

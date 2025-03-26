@@ -28,19 +28,22 @@ namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 // for_each_device_impl
 //--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
 static xena::future<> for_each_device_impl(
     chunk_context& ctx, unsigned& chunk_index, basit::index_range_iterator& iter,
     basit::index_range_iterator last,
-    std::function<xena::future<>(chunk_context& ctx, const basit::index_range&)> f) noexcept {
-  while (iter != last) {
+    std::function<xena::future<>(const chunk_context& ctx, const basit::index_range&)> f) noexcept {
+  while (true) {
+    if (iter == last) {
+      co_return;
+    }
+    basdv::set_device(ctx.device_index);
+    ctx.chunk_index = chunk_index++;
+    auto chunk = *iter++;
+    auto fut = f(ctx, chunk);
     co_await ctx.alt_future;
+    ctx.alt_future = std::move(fut);
   }
 }
-#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // concurrent_for_each
@@ -145,7 +148,7 @@ xena::future<> for_each_device(
 
 xena::future<> for_each_device(
     basit::index_range_iterator first, basit::index_range_iterator last,
-    std::function<xena::future<>(chunk_context& ctx, const basit::index_range&)> f) noexcept {
+    std::function<xena::future<>(const chunk_context& ctx, const basit::index_range&)> f) noexcept {
   if (first == last) {
     co_return;
   }
@@ -164,7 +167,7 @@ xena::future<> for_each_device(
     ctx.chunk_index = chunk_index++;
     ctx.device_index = device_index;
     ctx.num_devices_used = num_devices_used;
-    ctx.alt_future = xena::shared_future<>{xena::make_ready_future()};
+    ctx.alt_future = xena::make_ready_future();
     auto chunk = *first++;
     ctx.alt_future = f(ctx, chunk);
   }
