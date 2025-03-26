@@ -16,6 +16,9 @@
  */
 #include "sxt/execution/device/for_each.h"
 
+#include <algorithm>
+#include <numeric>
+#include <random>
 #include <utility>
 #include <vector>
 
@@ -122,5 +125,68 @@ TEST_CASE("we can manage asynchronous chunked computations") {
     REQUIRE(fut.ready());
     std::vector<std::pair<unsigned, unsigned>> expected = {{0, 1}, {1, 2}};
     REQUIRE(ranges == expected);
+  }
+
+  SECTION("we can iterate over different chunk sizes") {
+    for (unsigned k = 3; k < 10; ++k) {
+      promises.clear();
+      ranges.clear();
+      promises.resize(k);
+      basit::index_range_iterator first{basit::index_range{0, k}, 1};
+      basit::index_range_iterator last{basit::index_range{k, k}, 1};
+      auto fut = for_each_device(
+          first, last, [&](const chunk_context& ctx, basit::index_range rng) -> xena::future<> {
+            ranges.emplace_back(rng.a(), rng.b());
+            return xena::future<int>{promises[ctx.chunk_index]}.then(
+                [chunk_index = ctx.chunk_index](int val) noexcept {
+                  SXT_RELEASE_ASSERT(val == chunk_index);
+                });
+          });
+      std::vector<std::pair<unsigned, unsigned>> expected;
+      for (unsigned i=0; i<k; ++i) {
+        REQUIRE(!fut.ready());
+        promises[i].set_value(i);
+        expected.emplace_back(i, i+1);
+      }
+      REQUIRE(fut.ready());
+      REQUIRE(ranges == expected);
+    }
+  }
+
+  SECTION("we can iterate over different chunks funished in an arbitrary order") {
+    std::mt19937 rng{0};
+
+    for (unsigned k = 3; k < 10; ++k) {
+      std::println(stderr, "******************** k = {}", k);
+      promises.clear();
+      promises.resize(k);
+      std::vector<bool> finished(k);
+      std::vector<xena::future<int>> futs;
+      for (auto& ps : promises) {
+        futs.emplace_back(ps);
+      }
+      basit::index_range_iterator first{basit::index_range{0, k}, 1};
+      basit::index_range_iterator last{basit::index_range{k, k}, 1};
+      auto fut = for_each_device(
+          first, last, [&](const chunk_context& ctx, basit::index_range rng) -> xena::future<> {
+            return futs[ctx.chunk_index].then(
+                [&finished, chunk_index = ctx.chunk_index](int val) noexcept {
+                finished[chunk_index] = true;
+                  SXT_RELEASE_ASSERT(val == chunk_index);
+                });
+          });
+      std::vector<std::pair<unsigned, unsigned>> expected;
+      std::vector<unsigned> ix(k);
+      std::iota(ix.begin(), ix.end(), 0);
+      std::shuffle(ix.begin(), ix.end(), rng);
+      for (auto i : ix) {
+        std::println(stderr, "i = {}", i);
+        REQUIRE(!fut.ready());
+        promises[i].set_value(i);
+        expected.emplace_back(i, i+1);
+      }
+      REQUIRE(fut.ready());
+      REQUIRE(std::count(finished.begin(), finished.end(), true) == k);
+    }
   }
 }

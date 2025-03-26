@@ -107,6 +107,7 @@ public:
     if (state_.ready()) {
       future_state<Tp> state_p;
       invoke_continuation_fn(state_p, f, state_);
+      state_p.make_ready();
       return future<Tp>{std::move(state_p)};
     }
     auto ps = this->promise();
