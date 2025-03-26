@@ -93,6 +93,7 @@ sxt_cc_component(
         "//sxt/base/iterator:split",
     ],
     test_deps = [
+        "//sxt/base/error:assert",
         "//sxt/base/iterator:index_range",
         "//sxt/base/iterator:index_range_iterator",
         "//sxt/base/test:unit_test",

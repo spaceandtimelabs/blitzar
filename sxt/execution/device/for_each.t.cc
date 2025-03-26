@@ -19,6 +19,7 @@
 #include <utility>
 #include <vector>
 
+#include "sxt/base/error/assert.h"
 #include "sxt/base/iterator/index_range.h"
 #include "sxt/base/iterator/index_range_iterator.h"
 #include "sxt/base/test/unit_test.h"
@@ -71,15 +72,55 @@ TEST_CASE("we can concurrently invoke code on different GPUs") {
 
 TEST_CASE("we can manage asynchronous chunked computations") {
   std::vector<std::pair<unsigned, unsigned>> ranges;
-  xena::promise<int> ps;
+  std::vector<xena::promise<int>> promises(10);
   
-  SECTION("we handle no chunks") {
+  SECTION("we iterate over no chunks") {
     basit::index_range_iterator iter{basit::index_range{2, 2}, 1};
     auto fut = for_each_device(
-        iter, iter, [&](const device_context& ctx, basit::index_range rng) -> xena::future<> {
-        return xena::future<int>{ps}.then([](int /*val*/) noexcept {
+        iter, iter, [&](const chunk_context& ctx, basit::index_range rng) -> xena::future<> {
+        return xena::future<int>{promises[0]}.then([](int /*val*/) noexcept {
         });
     });
     REQUIRE(fut.ready());
+  }
+
+  SECTION("we can iterate over a single chunk") {
+    basit::index_range_iterator first{basit::index_range{0, 1}, 1};
+    basit::index_range_iterator last{basit::index_range{1, 1}, 1};
+    auto fut = for_each_device(
+        first, last, [&](const chunk_context& ctx, basit::index_range rng) -> xena::future<> {
+          ranges.emplace_back(rng.a(), rng.b());
+          return xena::future<int>{promises[0]}.then(
+              [&](int val) noexcept { SXT_RELEASE_ASSERT(val == 123); });
+        });
+    REQUIRE(!fut.ready());
+    promises[0].set_value(123);
+    REQUIRE(fut.ready());
+    std::vector<std::pair<unsigned, unsigned>> expected = {{0, 1}};
+    REQUIRE(ranges == expected);
+  }
+
+  SECTION("we can iterate over two chunks") {
+    basit::index_range_iterator first{basit::index_range{0, 2}, 1};
+    basit::index_range_iterator last{basit::index_range{2, 2}, 1};
+    auto fut = for_each_device(
+        first, last, [&](const chunk_context& ctx, basit::index_range rng) -> xena::future<> {
+          ranges.emplace_back(rng.a(), rng.b());
+          return xena::future<int>{promises[ctx.chunk_index]}.then(
+              [chunk_index = ctx.chunk_index](int val) noexcept {
+                if (chunk_index == 0) {
+                  SXT_RELEASE_ASSERT(val == 123);
+                } else {
+                  SXT_RELEASE_ASSERT(val == 456);
+                }
+              });
+        });
+    REQUIRE(!fut.ready());
+    promises[0].set_value(123);
+    REQUIRE(!fut.ready());
+    promises[1].set_value(456);
+    REQUIRE(fut.ready());
+    std::vector<std::pair<unsigned, unsigned>> expected = {{0, 1}, {1, 2}};
+    REQUIRE(ranges == expected);
   }
 }
