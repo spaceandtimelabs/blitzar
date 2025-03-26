@@ -76,14 +76,13 @@ TEST_CASE("we can concurrently invoke code on different GPUs") {
 TEST_CASE("we can manage asynchronous chunked computations") {
   std::vector<std::pair<unsigned, unsigned>> ranges;
   std::vector<xena::promise<int>> promises(10);
-  
+
   SECTION("we iterate over no chunks") {
     basit::index_range_iterator iter{basit::index_range{2, 2}, 1};
     auto fut = for_each_device(
         iter, iter, [&](const chunk_context& ctx, basit::index_range rng) -> xena::future<> {
-        return xena::future<int>{promises[0]}.then([](int /*val*/) noexcept {
+          return xena::future<int>{promises[0]}.then([](int /*val*/) noexcept {});
         });
-    });
     REQUIRE(fut.ready());
   }
 
@@ -143,10 +142,10 @@ TEST_CASE("we can manage asynchronous chunked computations") {
                 });
           });
       std::vector<std::pair<unsigned, unsigned>> expected;
-      for (unsigned i=0; i<k; ++i) {
+      for (unsigned i = 0; i < k; ++i) {
         REQUIRE(!fut.ready());
         promises[i].set_value(i);
-        expected.emplace_back(i, i+1);
+        expected.emplace_back(i, i + 1);
       }
       REQUIRE(fut.ready());
       REQUIRE(ranges == expected);
@@ -171,7 +170,7 @@ TEST_CASE("we can manage asynchronous chunked computations") {
           first, last, [&](const chunk_context& ctx, basit::index_range rng) -> xena::future<> {
             return futs[ctx.chunk_index].then(
                 [&finished, chunk_index = ctx.chunk_index](int val) noexcept {
-                finished[chunk_index] = true;
+                  finished[chunk_index] = true;
                   SXT_RELEASE_ASSERT(val == chunk_index);
                 });
           });
@@ -183,7 +182,7 @@ TEST_CASE("we can manage asynchronous chunked computations") {
         std::println(stderr, "i = {}", i);
         REQUIRE(!fut.ready());
         promises[i].set_value(i);
-        expected.emplace_back(i, i+1);
+        expected.emplace_back(i, i + 1);
       }
       REQUIRE(fut.ready());
       REQUIRE(std::count(finished.begin(), finished.end(), true) == k);

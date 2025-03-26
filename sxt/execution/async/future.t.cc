@@ -143,6 +143,7 @@ TEST_CASE("future manages an asynchronously computed result") {
       val.reset();
       return 456;
     });
+    REQUIRE(fut_p.ready());
     REQUIRE(fut_p.value() == 456);
   }
 

@@ -7,7 +7,7 @@ sxt_cc_component(
     name = "chunk_context",
     with_test = False,
     deps = [
-      "//sxt/execution/async:shared_future",
+        "//sxt/execution/async:shared_future",
     ],
 )
 
@@ -100,7 +100,7 @@ sxt_cc_component(
         "//sxt/execution/async:future",
     ],
     deps = [
-      ":chunk_context",
+        ":chunk_context",
         "//sxt/base/device:stream",
         "//sxt/execution/async:future",
         "//sxt/execution/async:shared_future",

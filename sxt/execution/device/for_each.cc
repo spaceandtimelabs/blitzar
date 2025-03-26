@@ -175,7 +175,7 @@ xena::future<> for_each_device(
   // continue launching until all chunks are processed
   std::vector<xena::future<>> futs;
   futs.reserve(num_devices_used);
-  for (unsigned device_index=0; device_index<num_devices_used; ++device_index) {
+  for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
     auto fut = for_each_device_impl(contexts[device_index], chunk_index, first, last, f);
     futs.emplace_back(std::move(fut));
   }
