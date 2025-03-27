@@ -67,9 +67,5 @@ concurrent_for_each(basit::index_range rng,
  */
 xena::future<> for_each_device(
     basit::index_range_iterator first, basit::index_range_iterator last,
-    std::function<xena::future<>(device_context& ctx, const basit::index_range&)> f) noexcept;
-
-xena::future<> for_each_device(
-    basit::index_range_iterator first, basit::index_range_iterator last,
     std::function<xena::future<>(const chunk_context& ctx, const basit::index_range&)> f) noexcept;
 } // namespace sxt::xendv
