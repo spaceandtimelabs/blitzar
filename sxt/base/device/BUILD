@@ -185,6 +185,7 @@ sxt_cc_component(
         ":property",
     ],
     test_deps = [
+        ":property",
         "//sxt/base/test:unit_test",
     ],
     deps = [

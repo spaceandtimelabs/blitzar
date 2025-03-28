@@ -16,6 +16,7 @@
  */
 #include "sxt/base/device/split.h"
 
+#include <cassert>
 #include <cmath>
 
 #include "sxt/base/device/property.h"
@@ -27,9 +28,12 @@ namespace sxt::basdv {
 basit::split_options plan_split_impl(size_t bytes, size_t total_device_memory,
                                      double memory_target_low, double memory_target_high,
                                      size_t split_factor) noexcept {
-  auto target_low = static_cast<size_t>(std::floor(total_device_memory * memory_target_low));
+  assert(memory_target_low <= memory_target_high);
+  auto target_low =
+      static_cast<size_t>(std::floor(total_device_memory * memory_target_low / bytes));
   target_low = std::max(size_t{1}, target_low);
-  auto target_high = static_cast<size_t>(std::floor(total_device_memory * memory_target_high));
+  auto target_high =
+      static_cast<size_t>(std::floor(total_device_memory * memory_target_high / bytes));
   target_high = std::max(size_t{1}, target_high);
   return basit::split_options{
       .min_chunk_size = target_low,
@@ -42,23 +46,11 @@ basit::split_options plan_split_impl(size_t bytes, size_t total_device_memory,
 // plan_split
 //--------------------------------------------------------------------------------------------------
 basit::split_options plan_split(size_t bytes) noexcept {
-  auto device_memory = get_total_device_memory();
-
-  auto high_memory_target = device_memory / 16u;
-  auto low_memory_target = device_memory / 64u;
-  /* auto high_memory_target = device_memory / (100u * 16u); */
-  /* auto low_memory_target = device_memory / (100u * 64u); */
-
-  auto high_target = high_memory_target / bytes;
-  auto low_target = low_memory_target / bytes;
-
-  high_target = std::max<size_t>(1u, high_target);
-  low_target = std::max<size_t>(1u, low_target);
-
-  return basit::split_options{
-      .min_chunk_size = low_target,
-      .max_chunk_size = high_target,
-      .split_factor = basdv::get_num_devices() * 2u,
-  };
+  auto memory_target_low = 1.0 / 64.0;
+  auto memory_target_high = 1.0 / 16.0;
+  auto total_device_memory = get_total_device_memory();
+  auto split_factor = basdv::get_num_devices() * 2u;
+  return plan_split_impl(bytes, total_device_memory, memory_target_low, memory_target_high,
+                         split_factor);
 }
 } // namespace sxt::basdv
