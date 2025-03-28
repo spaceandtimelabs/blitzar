@@ -33,6 +33,7 @@ static xena::future<> for_each_device_impl(
     basit::index_range_iterator last,
     std::function<xena::future<>(const chunk_context& ctx, const basit::index_range&)> f) noexcept {
   while (true) {
+    std::println(stderr, "processing {} on {}", chunk_index, ctx.device_index);
     if (iter == last) {
       co_return;
     }
@@ -40,10 +41,37 @@ static xena::future<> for_each_device_impl(
     ctx.chunk_index = chunk_index++;
     auto chunk = *iter++;
     auto fut = f(ctx, chunk);
+    std::println("for_each_device_impl: awaiting alt_future {}", ctx.device_index);
     co_await ctx.alt_future;
-    ctx.alt_future = std::move(fut);
+    std::println("for_each_device_impl: awaiting alt_future done {}", ctx.device_index);
+    co_await std::move(fut);
+    /* ctx.alt_future = std::move(fut); */
   }
 }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+static xena::future<> for_each_device_impl2(
+    chunk_context* ctx, chunk_context* ctx_p, unsigned& chunk_index,
+    basit::index_range_iterator& iter, basit::index_range_iterator last,
+    std::function<xena::future<>(const chunk_context& ctx, const basit::index_range&)> f) noexcept {
+  while (true) {
+    if (iter == last) {
+      co_await ctx_p->alt_future;
+      co_return;
+    }
+    auto chunk = *iter++;
+    ctx_p->chunk_index = chunk_index++;
+    auto fut = f(*ctx_p, chunk);
+    co_await ctx_p->alt_future;
+    ctx->alt_future = std::move(fut);
+    std::swap(ctx, ctx_p);
+  }
+  co_await ctx->alt_future;
+}
+#pragma clang diagnostic pop
 
 //--------------------------------------------------------------------------------------------------
 // concurrent_for_each
@@ -87,6 +115,54 @@ xena::future<> for_each_device(
     co_return;
   }
 
+  unsigned chunk_index = 0;
+  auto num_chunks = static_cast<unsigned>(std::distance(first, last));
+  auto num_devices = basdv::get_num_devices();
+  auto num_devices_used = static_cast<unsigned>(std::min(num_chunks, num_devices));
+
+  // set up contexts
+  std::vector<chunk_context> contexts(num_devices_used);
+  for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
+    auto& ctx = contexts[device_index];
+    ctx.device_index = device_index;
+    ctx.alt_future = xena::make_ready_future();
+    ctx.num_devices_used = num_devices_used;
+  }
+  std::vector<chunk_context> contexts_p(contexts);
+
+
+  // initial launches
+  for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
+    auto& ctx = contexts[device_index];
+    ctx.chunk_index = chunk_index++;
+    auto chunk = *first++;
+    contexts_p[device_index].alt_future = f(ctx, chunk);
+  }
+
+  // continue launching until all chunks are processed
+  std::vector<xena::future<>> futs(num_devices_used);
+  for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
+    futs[device_index] = for_each_device_impl2(&contexts[device_index], &contexts_p[device_index],
+                                               chunk_index, first, last, f);
+  }
+
+  // wait for everything to finish
+  for (auto& fut : futs) {
+    co_await std::move(fut);
+  }
+
+  /* chunk_context ctx; */
+  /* ctx.chunk_index = 0; */
+  /* ctx.device_index = 0; */
+  /* ctx.alt_future = xena::make_ready_future(); */
+  /* co_await for_each_device_impl(ctx, ctx.chunk_index, first, last, f); */
+  /* co_return; */
+  /* for (; first != last; ++first) { */
+  /*   co_await f(ctx, *first);  */
+  /* } */
+  /* co_return; */
+
+#if 0
   basdv::active_device_guard guard;
   unsigned chunk_index = 0;
   auto num_chunks = static_cast<unsigned>(std::distance(first, last));
@@ -103,7 +179,10 @@ xena::future<> for_each_device(
     ctx.num_devices_used = num_devices_used;
     ctx.alt_future = xena::make_ready_future();
     auto chunk = *first++;
-    ctx.alt_future = f(ctx, chunk);
+    /* ctx.alt_future = f(ctx, chunk); */
+    auto fut = f(ctx, chunk);
+    co_await std::move(fut);
+    ctx.alt_future = xena::make_ready_future();
   }
 
   // continue launching until all chunks are processed
@@ -111,7 +190,8 @@ xena::future<> for_each_device(
   futs.reserve(num_devices_used);
   for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
     auto fut = for_each_device_impl(contexts[device_index], chunk_index, first, last, f);
-    futs.emplace_back(std::move(fut));
+    co_await std::move(fut);
+    /* futs.emplace_back(std::move(fut)); */
   }
 
   // wait for everything to finish
@@ -121,5 +201,6 @@ xena::future<> for_each_device(
   for (auto& ctx : contexts) {
     co_await ctx.alt_future;
   }
+#endif
 }
 } // namespace sxt::xendv

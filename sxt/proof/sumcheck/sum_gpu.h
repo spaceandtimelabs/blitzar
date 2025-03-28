@@ -248,7 +248,7 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
   size_t counter = 0;
   co_await xendv::for_each_device(
       chunk_first, chunk_last,
-      [&](const xendv::chunk_context& ctx, const basit::index_range& rng) noexcept -> xena::future<> {
+      [&](const xendv::chunk_context& ctx, basit::index_range rng) noexcept -> xena::future<> {
         std::println(stderr, "sum {}: {}-{}", ctx.device_index, rng.a(), rng.b());
         basdv::stream stream;
         memr::async_device_resource resource{stream};
@@ -265,10 +265,13 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
         cache.lookup(product_table, product_terms, stream);
 
         // compute
-        co_await ctx.alt_future;
+        std::println(stderr, "awaiting alt {}", ctx.device_index);
+        co_await ctx.alt_future.make_future();
+        std::println(stderr, "awaiting alt done {}", ctx.device_index);
         memmg::managed_array<T> partial_p(num_coefficients);
         co_await partial_sum<T>(partial_p, stream, partial_mles, product_table, product_terms,
                                 split, np);
+        std::println(stderr, "sum done {}", ctx.device_index);
 
         // fill in the result
         if (counter == 0) {
