@@ -265,10 +265,9 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
         cache.lookup(product_table, product_terms, stream);
 
         // compute
-        std::println(stderr, "awaiting alt {}", ctx.device_index);
         co_await ctx.alt_future.make_future();
-        std::println(stderr, "awaiting alt done {}", ctx.device_index);
         memmg::managed_array<T> partial_p(num_coefficients);
+        std::println("launch sum {}", ctx.device_index);
         co_await partial_sum<T>(partial_p, stream, partial_mles, product_table, product_terms,
                                 split, np);
         std::println(stderr, "sum done {}", ctx.device_index);

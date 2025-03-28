@@ -23,9 +23,31 @@ namespace sxt::xendv {
 // chunk_context
 //--------------------------------------------------------------------------------------------------
 struct chunk_context {
+  // a counter tracking the processing index for the given chunk
   unsigned chunk_index = 0;
+
+  // the device used to process the chunk
   unsigned device_index = 0;
+
+  // the total number of devices used to process the collection of chunks
   unsigned num_devices_used = 0;
+
+  // When two chunks are scheduled for the same device, alt_future gives
+  // a handle to the asynchronous computation associated with the other
+  // chunk.
+  //
+  // alt_future can be used to overlap memory transfer with kernel computation. For
+  // example, a functor to process chunks might look something like this
+  //    f(const chunk_context& ctx, index_range rng) noexcept -> xena::future<> {
+  //        ...
+  //        async_copy_memory(stream, ...);
+  //
+  //        co_await ctx.alt_future;
+  //            // wait for the other future to finish so that we don't oversubscribe the GPU
+  //
+  //         launch_kernel(stream, ...);
+  //         co_await synchronize_stream(stream);
+  //    }
   xena::shared_future<> alt_future;
 };
 } // namespace sxt::xendv
