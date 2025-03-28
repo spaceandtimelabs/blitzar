@@ -4,6 +4,14 @@ load(
 )
 
 sxt_cc_component(
+    name = "chunk_context",
+    with_test = False,
+    deps = [
+        "//sxt/execution/async:shared_future",
+    ],
+)
+
+sxt_cc_component(
     name = "device_viewable",
     test_deps = [
         "//sxt/base/device:active_device_guard",
@@ -78,19 +86,24 @@ sxt_cc_component(
     name = "for_each",
     impl_deps = [
         ":available_device",
-        "//sxt/execution/async:future",
         "//sxt/execution/async:coroutine",
         "//sxt/base/device:active_device_guard",
         "//sxt/base/device:property",
+        "//sxt/base/device:state",
         "//sxt/base/iterator:split",
     ],
     test_deps = [
+        "//sxt/base/error:assert",
         "//sxt/base/iterator:index_range",
+        "//sxt/base/iterator:index_range_iterator",
         "//sxt/base/test:unit_test",
         "//sxt/execution/async:future",
     ],
     deps = [
-        "//sxt/execution/async:future_fwd",
+        ":chunk_context",
+        "//sxt/base/device:stream",
+        "//sxt/execution/async:future",
+        "//sxt/execution/async:shared_future",
         "//sxt/execution/schedule:scheduler",
     ],
 )
