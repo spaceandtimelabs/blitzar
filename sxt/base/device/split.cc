@@ -16,9 +16,28 @@
  */
 #include "sxt/base/device/split.h"
 
+#include <cmath>
+
 #include "sxt/base/device/property.h"
 
 namespace sxt::basdv {
+//--------------------------------------------------------------------------------------------------
+// plan_split_impl
+//--------------------------------------------------------------------------------------------------
+basit::split_options plan_split_impl(size_t bytes, size_t total_device_memory,
+                                     double memory_target_low, double memory_target_high,
+                                     size_t split_factor) noexcept {
+  auto target_low = static_cast<size_t>(std::floor(total_device_memory * memory_target_low));
+  target_low = std::max(size_t{1}, target_low);
+  auto target_high = static_cast<size_t>(std::floor(total_device_memory * memory_target_high));
+  target_high = std::max(size_t{1}, target_high);
+  return basit::split_options{
+      .min_chunk_size = target_low,
+      .max_chunk_size = target_high,
+      .split_factor = split_factor,
+  };
+}
+
 //--------------------------------------------------------------------------------------------------
 // plan_split
 //--------------------------------------------------------------------------------------------------

@@ -20,6 +20,13 @@
 
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
+// plan_split_impl
+//--------------------------------------------------------------------------------------------------
+basit::split_options plan_split_impl(size_t bytes, size_t total_device_memory,
+                                     double memory_target_low, double memory_target_high,
+                                     size_t split_factor) noexcept;
+
+//--------------------------------------------------------------------------------------------------
 // plan_split
 //--------------------------------------------------------------------------------------------------
 basit::split_options plan_split(size_t bytes) noexcept;
