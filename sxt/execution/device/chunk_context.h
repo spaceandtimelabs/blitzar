@@ -22,6 +22,9 @@ namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 // chunk_context
 //--------------------------------------------------------------------------------------------------
+/**
+ * Give context for an individual chunk of a chunked computation
+ */
 struct chunk_context {
   // a counter tracking the processing index for the given chunk
   unsigned chunk_index = 0;
