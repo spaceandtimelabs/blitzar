@@ -18,12 +18,37 @@
 
 #include "sxt/base/device/active_device_guard.h"
 #include "sxt/base/device/property.h"
+#include "sxt/base/device/state.h"
 #include "sxt/base/iterator/split.h"
 #include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/async/future.h"
 #include "sxt/execution/device/available_device.h"
 
 namespace sxt::xendv {
+//--------------------------------------------------------------------------------------------------
+// for_each_device_impl
+//--------------------------------------------------------------------------------------------------
+static xena::future<> for_each_device_impl(
+    chunk_context* ctx, chunk_context* ctx_p, unsigned& chunk_index,
+    basit::index_range_iterator& iter, basit::index_range_iterator last,
+    std::function<xena::future<>(const chunk_context& ctx, const basit::index_range&)> f) noexcept {
+  auto device_index = ctx->device_index;
+  while (true) {
+    if (iter == last) {
+      co_await ctx_p->alt_future;
+      co_return;
+    }
+    auto chunk = *iter++;
+    ctx_p->chunk_index = chunk_index++;
+    basdv::set_device(device_index);
+    auto fut = f(*ctx_p, chunk);
+    co_await ctx_p->alt_future;
+    ctx->alt_future = std::move(fut);
+    std::swap(ctx, ctx_p);
+  }
+  co_await ctx->alt_future;
+}
+
 //--------------------------------------------------------------------------------------------------
 // concurrent_for_each
 //--------------------------------------------------------------------------------------------------
@@ -50,5 +75,54 @@ concurrent_for_each(basit::index_range rng,
   };
   auto [first, last] = basit::split(rng, split_options);
   return concurrent_for_each(first, last, f);
+}
+
+//--------------------------------------------------------------------------------------------------
+// for_each_device
+//--------------------------------------------------------------------------------------------------
+xena::future<> for_each_device(
+    basit::index_range_iterator first, basit::index_range_iterator last,
+    std::function<xena::future<>(const chunk_context& ctx, const basit::index_range&)> f) noexcept {
+  if (first == last) {
+    co_return;
+  }
+
+  unsigned chunk_index = 0;
+  auto num_chunks = static_cast<unsigned>(std::distance(first, last));
+  auto num_devices = basdv::get_num_devices();
+  auto num_devices_used = static_cast<unsigned>(std::min(num_chunks, num_devices));
+
+  basdv::active_device_guard guard;
+
+  // set up contexts
+  std::vector<chunk_context> contexts(num_devices_used);
+  for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
+    auto& ctx = contexts[device_index];
+    ctx.device_index = device_index;
+    ctx.alt_future = xena::make_ready_future();
+    ctx.num_devices_used = num_devices_used;
+  }
+  std::vector<chunk_context> contexts_p(contexts);
+
+  // initial launches
+  for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
+    auto& ctx = contexts[device_index];
+    ctx.chunk_index = chunk_index++;
+    auto chunk = *first++;
+    basdv::set_device(device_index);
+    contexts_p[device_index].alt_future = f(ctx, chunk);
+  }
+
+  // continue launching until all chunks are processed
+  std::vector<xena::future<>> futs(num_devices_used);
+  for (unsigned device_index = 0; device_index < num_devices_used; ++device_index) {
+    futs[device_index] = for_each_device_impl(&contexts[device_index], &contexts_p[device_index],
+                                              chunk_index, first, last, f);
+  }
+
+  // wait for everything to finish
+  for (auto& fut : futs) {
+    co_await std::move(fut);
+  }
 }
 } // namespace sxt::xendv
