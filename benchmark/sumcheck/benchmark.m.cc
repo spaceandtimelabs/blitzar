@@ -28,9 +28,11 @@
 #include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/proof/sumcheck/chunked_gpu_driver.h"
+#include "sxt/proof/sumcheck/cpu_driver.h"
 #include "sxt/proof/sumcheck/gpu_driver.h"
 #include "sxt/proof/sumcheck/proof_computation.h"
 #include "sxt/proof/sumcheck/reference_transcript.h"
+#include "sxt/proof/sumcheck/verification.h"
 #include "sxt/proof/transcript/transcript.h"
 #include "sxt/scalar25/random/element.h"
 #include "sxt/scalar25/realization/field.h"
@@ -79,6 +81,20 @@ static bool read_params(params& p, int argc, char* argv[]) noexcept {
   return true;
 }
 
+static void check_verifiy(basct::cspan<s25t::element> round_polynomials, unsigned round_degree,
+                          unsigned num_rounds) noexcept {
+  prft::transcript base_transcript{"abc123"};
+  prfsk::reference_transcript<s25t::element> transcript{base_transcript};
+  memmg::managed_array<s25t::element> evaluation_point(num_rounds);
+  s25t::element expected_sum;
+  prfsk::sum_polynomial_01(expected_sum, round_polynomials.subspan(0, round_degree + 1));
+  auto was_successful = prfsk::verify_sumcheck_no_evaluation<s25t::element>(
+      expected_sum, evaluation_point, transcript, round_polynomials, round_degree);
+  if (!was_successful) {
+    baser::panic("verification failed");
+  }
+}
+
 int main(int argc, char* argv[]) {
   params p;
   if (!read_params(p, argc, argv)) {
@@ -113,14 +129,18 @@ int main(int argc, char* argv[]) {
   memmg::managed_array<s25t::element> evaluation_point(num_rounds);
   prft::transcript base_transcript{"abc123"};
   prfsk::reference_transcript<s25t::element> transcript{base_transcript};
+  prfsk::cpu_driver<s25t::element> drv;
   /* prfsk::gpu_driver<s25t::element> drv; */
-  prfsk::chunked_gpu_driver<s25t::element> drv;
+  /* prfsk::chunked_gpu_driver<s25t::element> drv; */
+
+  s25t::element expect_sum;
 
   // initial run
   {
     auto fut = prfsk::prove_sum<s25t::element>(polynomials, evaluation_point, transcript, drv, mles,
                                                product_table, product_terms, p.n);
     xens::get_scheduler().run();
+    check_verifiy(polynomials, p.degree, num_rounds);
   }
 
   // sample

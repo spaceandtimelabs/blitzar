@@ -65,6 +65,9 @@ public:
       val = T::identity();
     }
 
+    std::vector<T> p;
+    p.reserve(polynomial.size());
+
     // expand paired terms
     auto n1 = work.n - mid;
     for (unsigned i = 0; i < n1; ++i) {
@@ -72,8 +75,8 @@ public:
       for (auto [mult, num_terms] : product_table) {
         SXT_RELEASE_ASSERT(num_terms < polynomial.size());
         auto terms = product_terms.subspan(term_first, num_terms);
-        SXT_STACK_ARRAY(p, num_terms + 1u, T);
-        expand_products(p, mles + i, n, mid, terms);
+        p.resize(num_terms + 1u);
+        expand_products<T>(p, mles + i, n, mid, terms);
         for (unsigned term_index = 0; term_index < p.size(); ++term_index) {
           muladd(polynomial[term_index], mult, p[term_index], polynomial[term_index]);
         }
@@ -86,8 +89,8 @@ public:
       unsigned term_first = 0;
       for (auto [mult, num_terms] : product_table) {
         auto terms = product_terms.subspan(term_first, num_terms);
-        SXT_STACK_ARRAY(p, num_terms + 1u, T);
-        partial_expand_products(p, mles + i, n, terms);
+        p.resize(num_terms + 1u);
+        partial_expand_products<T>(p, mles + i, n, terms);
         for (unsigned term_index = 0; term_index < p.size(); ++term_index) {
           muladd(polynomial[term_index], mult, p[term_index], polynomial[term_index]);
         }
