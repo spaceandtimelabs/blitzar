@@ -17,7 +17,6 @@
 #pragma once
 
 #include <cstddef>
-
 #include <iostream>
 
 #include "sxt/algorithm/reduction/kernel_fit.h"
