@@ -133,8 +133,6 @@ int main(int argc, char* argv[]) {
   prfsk::gpu_driver<s25t::element> drv;
   /* prfsk::chunked_gpu_driver<s25t::element> drv; */
 
-  s25t::element expect_sum;
-
   // initial run
   {
     auto fut = prfsk::prove_sum<s25t::element>(polynomials, evaluation_point, transcript, drv, mles,
