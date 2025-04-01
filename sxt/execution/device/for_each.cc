@@ -31,7 +31,7 @@ namespace sxt::xendv {
 static xena::future<> for_each_device_impl(
     chunk_context* ctx, chunk_context* ctx_p, unsigned& chunk_index,
     basit::index_range_iterator& iter, basit::index_range_iterator last,
-    std::function<xena::future<>(const chunk_context& ctx, const basit::index_range&)> f) noexcept {
+    std::function<xena::future<>(const chunk_context& ctx, basit::index_range)> f) noexcept {
   auto device_index = ctx->device_index;
   while (true) {
     if (iter == last) {
@@ -82,7 +82,7 @@ concurrent_for_each(basit::index_range rng,
 //--------------------------------------------------------------------------------------------------
 xena::future<> for_each_device(
     basit::index_range_iterator first, basit::index_range_iterator last,
-    std::function<xena::future<>(const chunk_context& ctx, const basit::index_range&)> f) noexcept {
+    std::function<xena::future<>(const chunk_context& ctx, basit::index_range)> f) noexcept {
   if (first == last) {
     co_return;
   }

@@ -152,11 +152,10 @@ TEST_CASE("we can manage asynchronous chunked computations") {
     }
   }
 
-  SECTION("we can iterate over different chunks funished in an arbitrary order") {
+  SECTION("we can iterate over different chunks finished in an arbitrary order") {
     std::mt19937 rng{0};
 
     for (unsigned k = 3; k < 10; ++k) {
-      std::println(stderr, "******************** k = {}", k);
       promises.clear();
       promises.resize(k);
       std::vector<bool> finished(k);
@@ -179,7 +178,6 @@ TEST_CASE("we can manage asynchronous chunked computations") {
       std::iota(ix.begin(), ix.end(), 0);
       std::shuffle(ix.begin(), ix.end(), rng);
       for (auto i : ix) {
-        std::println(stderr, "i = {}", i);
         REQUIRE(!fut.ready());
         promises[i].set_value(i);
         expected.emplace_back(i, i + 1);
