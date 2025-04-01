@@ -16,7 +16,6 @@
  */
 #pragma once
 
-#include "sxt/base/container/stack_array.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/execution/async/coroutine.h"
