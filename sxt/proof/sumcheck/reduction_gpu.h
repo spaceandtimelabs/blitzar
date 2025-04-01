@@ -81,7 +81,6 @@ xena::future<> reduce_sums(basct::span<T> p, basdv::stream& stream,
   memmg::managed_array<T> p_dev{num_coefficients * dims.num_blocks, &resource};
 
   // launch kernel
-  std::println(stderr, "reduction block_size={}", static_cast<unsigned>(dims.block_size));
   xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
                                            std::integral_constant<unsigned, BlockSize>) noexcept {
     reduction_kernel<BlockSize>

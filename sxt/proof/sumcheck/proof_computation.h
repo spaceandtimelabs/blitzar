@@ -57,11 +57,6 @@ xena::future<> prove_sum(basct::span<T> polynomials, basct::span<T> evaluation_p
 
     // compute the round polynomial
     co_await drv.sum(polynomial, *ws);
-    std::println(stderr, "********** polynomial");
-    for (auto& pi : polynomial) {
-      std::cerr << pi << std::endl;
-    }
-    std::println(stderr, "**********");
 
     // draw the next random challenge
     T r;

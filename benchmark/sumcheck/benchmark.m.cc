@@ -130,8 +130,8 @@ int main(int argc, char* argv[]) {
   prft::transcript base_transcript{"abc123"};
   prfsk::reference_transcript<s25t::element> transcript{base_transcript};
   /* prfsk::cpu_driver<s25t::element> drv; */
-  prfsk::gpu_driver<s25t::element> drv;
-  /* prfsk::chunked_gpu_driver<s25t::element> drv; */
+  /* prfsk::gpu_driver<s25t::element> drv; */
+  prfsk::chunked_gpu_driver<s25t::element> drv;
 
   // initial run
   {

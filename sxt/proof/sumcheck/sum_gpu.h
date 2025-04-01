@@ -133,8 +133,6 @@ static xena::future<> partial_sum(basct::span<T> p, basdv::stream& stream, basct
   memr::async_device_resource resource{stream};
 
   // partials
-  std::println(stderr, "partial_sum: num_coefficients={}, num_blocks={}, num_products={}",
-               num_coefficients, dims.num_blocks, num_products);
   memmg::managed_array<T> partials{num_coefficients * dims.num_blocks * num_products, &resource};
   xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
                                            std::integral_constant<unsigned, BlockSize>) noexcept {
