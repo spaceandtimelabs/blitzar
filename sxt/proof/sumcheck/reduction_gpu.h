@@ -47,7 +47,7 @@ __global__ static void reduction_kernel(T* __restrict__ out, const T* __restrict
   __shared__ T shared_data[2 * BlockSize];
 
   // coefficient adjustment
-  out += coefficient_index;
+  out += coefficient_index * gridDim.x;
   partials += coefficient_index * n;
 
   // mapper
@@ -81,6 +81,7 @@ xena::future<> reduce_sums(basct::span<T> p, basdv::stream& stream,
   memmg::managed_array<T> p_dev{num_coefficients * dims.num_blocks, &resource};
 
   // launch kernel
+  std::println(stderr, "reduction block_size={}", static_cast<unsigned>(dims.block_size));
   xenk::launch_kernel(dims.block_size, [&]<unsigned BlockSize>(
                                            std::integral_constant<unsigned, BlockSize>) noexcept {
     reduction_kernel<BlockSize>
@@ -110,4 +111,23 @@ xena::future<> reduce_sums(basct::span<T> p, basdv::stream& stream,
     }
   }
 }
+
+#if 0
+template <basfld::element T>
+xena::future<> reduce_sums(basct::span<T> p, basdv::stream& stream,
+                           basct::cspan<T> partial_terms) noexcept {
+  auto num_coefficients = p.size();
+  auto n = partial_terms.size() / num_coefficients;
+  memmg::managed_array<T> partial_terms_host(partial_terms.size());
+  basdv::async_copy_device_to_host(partial_terms_host, partial_terms, stream);
+  co_await xendv::await_stream(stream);
+  for (unsigned coefficient_index = 0; coefficient_index < num_coefficients; ++coefficient_index) {
+    p[coefficient_index] = partial_terms_host[coefficient_index * n];
+    for (unsigned k=1; k<n; ++k) {
+      add(p[coefficient_index], p[coefficient_index],
+          partial_terms_host[coefficient_index * n + k]);
+    }
+  }
+}
+#endif
 } // namespace sxt::prfsk

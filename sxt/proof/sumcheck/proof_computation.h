@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <iostream>
+
 #include "sxt/base/error/assert.h"
 #include "sxt/base/field/element.h"
 #include "sxt/base/num/ceil_log2.h"
@@ -55,6 +57,11 @@ xena::future<> prove_sum(basct::span<T> polynomials, basct::span<T> evaluation_p
 
     // compute the round polynomial
     co_await drv.sum(polynomial, *ws);
+    std::println(stderr, "********** polynomial");
+    for (auto& pi : polynomial) {
+      std::cerr << pi << std::endl;
+    }
+    std::println(stderr, "**********");
 
     // draw the next random challenge
     T r;
