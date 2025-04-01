@@ -47,7 +47,7 @@ __global__ static void reduction_kernel(T* __restrict__ out, const T* __restrict
   __shared__ T shared_data[2 * BlockSize];
 
   // coefficient adjustment
-  out += coefficient_index;
+  out += coefficient_index * gridDim.x;
   partials += coefficient_index * n;
 
   // mapper
