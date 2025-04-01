@@ -211,6 +211,50 @@ static void test_proof(const driver<T>& drv) {
       }
     }
   }
+
+  SECTION("we can verify larger random sumcheck problems") {
+    basn::fast_random_number_generator rng{1, 2};
+
+    for (unsigned i = 0; i < 2; ++i) {
+      random_sumcheck_descriptor descriptor;
+      descriptor.min_length = 1025;
+      descriptor.max_length = 2050;
+      descriptor.max_num_mles = 3;
+      descriptor.min_product_length = 3;
+      descriptor.max_product_length = 3;
+      unsigned n;
+      generate_random_sumcheck_problem(mles, product_table, product_terms, n, rng, descriptor);
+
+      unsigned polynomial_length = 0;
+      for (auto [_, len] : product_table) {
+        polynomial_length = std::max(polynomial_length, len + 1u);
+      }
+
+      auto num_variables = n == 1 ? 1 : basn::ceil_log2(n);
+      evaluation_point.resize(num_variables);
+      polynomials.resize(polynomial_length * num_variables);
+
+      // prove
+      {
+        prft::transcript base_transcript{"abc"};
+        reference_transcript<T> transcript{base_transcript};
+        auto fut = prove_sum<T>(polynomials, evaluation_point, transcript, drv, mles, product_table,
+                                product_terms, n);
+        xens::get_scheduler().run();
+      }
+
+      // we can verify
+      {
+        prft::transcript base_transcript{"abc"};
+        reference_transcript<T> transcript{base_transcript};
+        s25t::element expected_sum;
+        sum_polynomial_01<T>(expected_sum, basct::subspan(polynomials, 0, polynomial_length));
+        auto valid = verify_sumcheck_no_evaluation<T>(expected_sum, evaluation_point, transcript,
+                                                      polynomials, polynomial_length - 1u);
+        REQUIRE(valid);
+      }
+    }
+  }
 }
 
 TEST_CASE("we can create a sumcheck proof") {
