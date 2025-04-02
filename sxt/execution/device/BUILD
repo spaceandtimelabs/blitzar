@@ -15,6 +15,8 @@ sxt_cc_component(
     name = "basic_copier",
     deps = [
         "//sxt/base/container:span",
+        "//sxt/base/device:pinned_buffer",
+        "//sxt/execution/async:coroutine",
         "//sxt/execution/async:future",
     ],
     test_deps = [
