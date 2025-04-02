@@ -28,6 +28,20 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "pinned_buffer2",
+    impl_deps = [
+        ":pinned_buffer_pool",
+    ],
+    test_deps = [
+        ":pinned_buffer_pool",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+    ],
+)
+
+sxt_cc_component(
     name = "pinned_buffer_handle",
     with_test = False,
     deps = [
