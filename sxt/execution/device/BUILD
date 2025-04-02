@@ -12,6 +12,17 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "basic_copier",
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/execution/async:future",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+)
+
+sxt_cc_component(
     name = "device_viewable",
     test_deps = [
         "//sxt/base/device:active_device_guard",
