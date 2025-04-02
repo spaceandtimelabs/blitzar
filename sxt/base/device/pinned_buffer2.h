@@ -14,6 +14,7 @@ class pinned_buffer2 {
 public:
   pinned_buffer2() noexcept = default;
   pinned_buffer2(const pinned_buffer2&) noexcept = delete;
+  pinned_buffer2(pinned_buffer2&& other) noexcept;
 
   ~pinned_buffer2() noexcept;
 
