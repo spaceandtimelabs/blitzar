@@ -13,10 +13,19 @@ pinned_buffer2::pinned_buffer2(pinned_buffer2&& other) noexcept
 // destructor
 //--------------------------------------------------------------------------------------------------
 pinned_buffer2::~pinned_buffer2() noexcept {
-  if (handle_ == nullptr) {
-    return;
+  if (handle_ != nullptr) {
+    get_pinned_buffer_pool()->release_handle(handle_);
   }
-  get_pinned_buffer_pool()->release_handle(handle_);
+}
+
+//--------------------------------------------------------------------------------------------------
+// operator=
+//--------------------------------------------------------------------------------------------------
+pinned_buffer2& pinned_buffer2::operator=(pinned_buffer2&& other) noexcept {
+  this->reset();
+  handle_ = std::exchange(other.handle_, nullptr);
+  size_ = std::exchange(other.size_, 0);
+  return *this;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -38,5 +47,16 @@ basct::cspan<std::byte> pinned_buffer2::fill_from_host(basct::cspan<std::byte> s
   std::copy_n(src.data(), n, static_cast<std::byte*>(handle_->ptr) + size_);
   size_ += n;
   return {src.data() + n, src.size() - n};
+}
+
+//--------------------------------------------------------------------------------------------------
+// reset
+//--------------------------------------------------------------------------------------------------
+void pinned_buffer2::reset() noexcept {
+  if (handle_ == nullptr) {
+    return;
+  }
+  get_pinned_buffer_pool()->release_handle(handle_);
+  size_ = 0;
 }
 } // namespace sxt::basdv
