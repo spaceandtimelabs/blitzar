@@ -12,7 +12,7 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
-    name = "basic_copier",
+    name = "to_device_copier",
     impl_deps = [
       ":synchronization",
         "//sxt/base/device:memory_utility",

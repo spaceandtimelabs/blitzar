@@ -10,11 +10,11 @@
 
 namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
-// basic_copier
+// to_device_copier
 //--------------------------------------------------------------------------------------------------
-class basic_copier {
+class to_device_copier {
  public:
-   basic_copier(basct::span<std::byte> dst, basdv::stream& stream) noexcept;
+   to_device_copier(basct::span<std::byte> dst, basdv::stream& stream) noexcept;
 
    xena::future<> copy(basct::cspan<std::byte> src) noexcept;
 

@@ -1,4 +1,4 @@
-#include "sxt/execution/device/basic_copier.h"
+#include "sxt/execution/device/to_device_copier.h"
 
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/error/assert.h"
@@ -9,13 +9,13 @@ namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
-basic_copier::basic_copier(basct::span<std::byte> dst, basdv::stream& stream) noexcept
+to_device_copier::to_device_copier(basct::span<std::byte> dst, basdv::stream& stream) noexcept
     : dst_{dst}, stream_{stream} {}
 
 //--------------------------------------------------------------------------------------------------
 // copy
 //--------------------------------------------------------------------------------------------------
-xena::future<> basic_copier::copy(basct::cspan<std::byte> src) noexcept {
+xena::future<> to_device_copier::copy(basct::cspan<std::byte> src) noexcept {
   SXT_RELEASE_ASSERT(src.size() <= dst_.size());
   if (dst_.empty() || src.empty()) {
     co_return;
