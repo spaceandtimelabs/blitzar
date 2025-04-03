@@ -52,23 +52,6 @@ public:
   basct::cspan<std::byte> fill_from_host(basct::cspan<std::byte> src) noexcept;
 
   void reset() noexcept;
-#if 0
-  pinned_buffer() noexcept;
-  pinned_buffer(pinned_buffer&& ptr) noexcept;
-  pinned_buffer(const pinned_buffer&) noexcept = delete;
-
-  ~pinned_buffer() noexcept;
-
-  pinned_buffer& operator=(pinned_buffer&& ptr) noexcept;
-  pinned_buffer& operator=(const pinned_buffer& ptr) noexcept = delete;
-
-  static size_t size() noexcept;
-
-
-  operator void*() noexcept { return handle_->ptr; }
-
-  operator const void*() const noexcept { return handle_->ptr; }
-#endif
 
 private:
   pinned_buffer_handle* handle_ = nullptr;

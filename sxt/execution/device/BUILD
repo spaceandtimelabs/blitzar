@@ -13,10 +13,17 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "basic_copier",
+    impl_deps = [
+      ":synchronization",
+        "//sxt/base/device:memory_utility",
+        "//sxt/execution/async:coroutine",
+    ],
     deps = [
         "//sxt/base/container:span",
+        "//sxt/base/error:assert",
         "//sxt/base/device:pinned_buffer",
-        "//sxt/execution/async:coroutine",
+        "//sxt/base/device:pinned_buffer2",
+        "//sxt/base/device:stream",
         "//sxt/execution/async:future",
     ],
     test_deps = [
