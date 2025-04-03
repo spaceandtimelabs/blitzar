@@ -166,7 +166,7 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "mle_utility",
-    impl_deps = [
+    deps = [
         "//sxt/base/container:span_utility",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:property",
@@ -174,6 +174,7 @@ sxt_cc_component(
         "//sxt/base/field:element",
         "//sxt/base/num:divide_up",
         "//sxt/base/num:ceil_log2",
+        "//sxt/execution/device:to_device_copier",
         "//sxt/memory/management:managed_array",
     ],
     test_deps = [

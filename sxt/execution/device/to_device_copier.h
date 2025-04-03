@@ -16,7 +16,23 @@ class to_device_copier {
  public:
    to_device_copier(basct::span<std::byte> dst, basdv::stream& stream) noexcept;
 
+   template <class Cont>
+     requires requires(Cont& dst) {
+       dst.data();
+       dst.size();
+     }
+   to_device_copier(Cont& dst, basdv::stream& stream) noexcept
+       : to_device_copier{basct::span<std::byte>{reinterpret_cast<std::byte*>(dst.data()),
+                                                 dst.size() * sizeof(*dst.data())},
+                          stream} {}
+
    xena::future<> copy(basct::cspan<std::byte> src) noexcept;
+
+   template <class Cont>
+   xena::future<> copy(const Cont& src) noexcept {
+     return this->copy(
+         basct::span<std::byte>{reinterpret_cast<std::byte*>(src.data()), src.size()});
+   }
 
  private:
    basct::span<std::byte> dst_;

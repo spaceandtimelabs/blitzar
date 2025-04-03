@@ -17,7 +17,7 @@ to_device_copier::to_device_copier(basct::span<std::byte> dst, basdv::stream& st
 //--------------------------------------------------------------------------------------------------
 xena::future<> to_device_copier::copy(basct::cspan<std::byte> src) noexcept {
   SXT_RELEASE_ASSERT(src.size() <= dst_.size());
-  if (dst_.empty() || src.empty()) {
+  if (dst_.empty()) {
     co_return;
   }
   while (true) {
