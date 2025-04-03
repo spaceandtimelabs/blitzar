@@ -27,9 +27,9 @@ size_t pinned_buffer2::capacity() const noexcept { return pinned_buffer_size; }
 //--------------------------------------------------------------------------------------------------
 // fill
 //--------------------------------------------------------------------------------------------------
-size_t pinned_buffer2::fill(basct::cspan<std::byte> src) noexcept {
+basct::cspan<std::byte> pinned_buffer2::fill_from_host(basct::cspan<std::byte> src) noexcept {
   if (src.empty()) {
-    return 0;
+    return src;
   }
   if (handle_ == nullptr) {
     handle_ = get_pinned_buffer_pool()->acquire_handle();
@@ -37,6 +37,6 @@ size_t pinned_buffer2::fill(basct::cspan<std::byte> src) noexcept {
   auto n = std::min(src.size(), this->capacity() - size_);
   std::copy_n(src.data(), n, static_cast<std::byte*>(handle_->ptr) + size_);
   size_ += n;
-  return n;
+  return {src.data() + n, src.size() - n};
 }
 } // namespace sxt::basdv

@@ -48,7 +48,7 @@ public:
     return handle_->ptr;
   }
 
-  size_t fill(basct::cspan<std::byte> src) noexcept;
+  basct::cspan<std::byte> fill_from_host(basct::cspan<std::byte> src) noexcept;
 #if 0
   pinned_buffer() noexcept;
   pinned_buffer(pinned_buffer&& ptr) noexcept;
