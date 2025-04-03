@@ -42,24 +42,12 @@ xena::future<> basic_copier::copy(basct::cspan<std::byte> src) noexcept {
     dst_ = dst_.subspan(active_buffer_.size());
     std::swap(active_buffer_, alt_buffer_);
   }
-
-    // fill active buffer
-   // assert(!active_buffer_.empty());
-   // copy(active_buffer_, src);
-   // src <- rest
-
-
-  // if (!active_buffer.full() && !dst.full()) {
-  //    co_return;
-  // }
-  //
-  // fut = copy(dst, active_buffer);
-  // co_await alt_future;
-  // if (dst.full()) {
-  //    co_await fut;
-  //    co_return;
-  // }
-  // std::swap(active_buffer_, alt_buffer_);
-  // alt_future = std::move(fut);
+  SXT_RELEASE_ASSERT(src.empty());
+  basdv::async_memcpy_host_to_device(static_cast<void*>(dst_.data()), active_buffer_.data(),
+                                     active_buffer_.size(), stream_);
+  co_await await_stream(stream_);
+  dst_ = {};
+  active_buffer_.reset();
+  alt_buffer_.reset();
 }
 } // sxt::xendv
