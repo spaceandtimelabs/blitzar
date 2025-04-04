@@ -24,7 +24,6 @@ xena::future<> to_device_copier::copy(basct::cspan<std::byte> src) noexcept {
     if (src.empty()) {
       co_return;
     }
-    SXT_RELEASE_ASSERT(!active_buffer_.empty());
     src = active_buffer_.fill_from_host(src);
     if (active_buffer_.size() == dst_.size()) {
       break;

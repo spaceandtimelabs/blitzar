@@ -46,7 +46,7 @@ basct::cspan<std::byte> pinned_buffer2::fill_from_host(basct::cspan<std::byte> s
   auto n = std::min(src.size(), this->capacity() - size_);
   std::copy_n(src.data(), n, static_cast<std::byte*>(handle_->ptr) + size_);
   size_ += n;
-  return {src.data() + n, src.size() - n};
+  return src.subspan(n);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -57,6 +57,7 @@ void pinned_buffer2::reset() noexcept {
     return;
   }
   get_pinned_buffer_pool()->release_handle(handle_);
+  handle_ = nullptr;
   size_ = 0;
 }
 } // namespace sxt::basdv

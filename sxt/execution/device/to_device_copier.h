@@ -30,8 +30,8 @@ class to_device_copier {
 
    template <class Cont>
    xena::future<> copy(const Cont& src) noexcept {
-     return this->copy(
-         basct::span<std::byte>{reinterpret_cast<std::byte*>(src.data()), src.size()});
+     return this->copy(basct::cspan<std::byte>{reinterpret_cast<const std::byte*>(src.data()),
+                                               src.size() * sizeof(*src.data())});
    }
 
  private:
