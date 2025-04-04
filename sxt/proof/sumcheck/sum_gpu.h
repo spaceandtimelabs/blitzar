@@ -256,8 +256,8 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
 
         // copy partial mles to device
         memmg::managed_array<T> partial_mles{&resource};
-        copy_partial_mles<T>(partial_mles, stream, mles, n, rng.a(), rng.b());
-        /* co_await copy_partial_mles2<T>(partial_mles, stream, mles, n, rng.a(), rng.b()); */
+        /* copy_partial_mles<T>(partial_mles, stream, mles, n, rng.a(), rng.b()); */
+        co_await copy_partial_mles2<T>(partial_mles, stream, mles, n, rng.a(), rng.b());
         auto split = rng.b() - rng.a();
         auto np = partial_mles.size() / num_mles;
 
@@ -294,11 +294,15 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache, basct::cspan<T
                         unsigned n) noexcept {
   auto num_mles = mles.size() / n;
   auto options = basdv::plan_split(num_mles * sizeof(T));
-  std::println(stderr, "*********************** sum init");
+  if (n > 1000000) {
+    std::println(stderr, "*********************** sum init");
+  }
   auto t1 = std::chrono::steady_clock::now();
   co_await sum_gpu2<T>(p, cache, options, mles, n);
   auto t2 = std::chrono::steady_clock::now();
   auto d = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-  std::println(stderr, "*********************** sum done: {}", d / 1.0e3);
+  if (n > 1000000) {
+    std::println(stderr, "*********************** sum done: {}", d / 1.0e3);
+  }
 }
 } // namespace sxt::prfsk
