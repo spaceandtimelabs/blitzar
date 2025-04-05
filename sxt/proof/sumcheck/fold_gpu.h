@@ -87,7 +87,7 @@ xena::future<> fold_impl(basct::span<T> mles_p, basct::cspan<T> mles, unsigned n
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> mles_dev{&resource};
-  copy_partial_mles<T>(mles_dev, stream, mles, n, a, b);
+  co_await copy_partial_mles2<T>(mles_dev, stream, mles, n, a, b);
 
   // fold
   auto np = mles_dev.size() / num_mles;

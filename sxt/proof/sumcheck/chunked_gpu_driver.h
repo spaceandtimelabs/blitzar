@@ -122,7 +122,7 @@ public:
 
     // fold
     memmg::managed_array<T> mles_p(num_mles * mid);
-    co_await fold_gpu<T>(mles_p, work.mles, n, r);
+    co_await fold_gpu2<T>(mles_p, work.mles, n, r);
 
     // update
     work.n = mid;
