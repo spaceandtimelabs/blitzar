@@ -100,6 +100,7 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:property",
+        "//sxt/base/device:split",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",
         "//sxt/base/field:element",
