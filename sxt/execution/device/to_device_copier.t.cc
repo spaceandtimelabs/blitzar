@@ -1,6 +1,8 @@
 #include "sxt/execution/device/to_device_copier.h"
 
+#include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
 using namespace sxt;
@@ -15,5 +17,19 @@ TEST_CASE("we can copy memory from host to device") {
     to_device_copier copier{dev, stream};
     auto fut = copier.copy(host);
     REQUIRE(fut.ready());
+  }
+
+  SECTION("we can a single integer") {
+    dev.resize(1);
+    to_device_copier copier{dev, stream};
+
+    host = {123};
+    auto fut = copier.copy(host);
+    REQUIRE(!fut.ready());
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    memmg::managed_array<int> expected = {123};
+    REQUIRE(dev == expected);
   }
 }

@@ -27,9 +27,11 @@ sxt_cc_component(
         "//sxt/execution/async:future",
     ],
     test_deps = [
+      "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
+        "//sxt/execution/schedule:scheduler",
     ],
 )
 
