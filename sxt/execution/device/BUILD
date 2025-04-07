@@ -28,6 +28,8 @@ sxt_cc_component(
     ],
     test_deps = [
         "//sxt/base/test:unit_test",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:managed_device_resource",
     ],
 )
 
