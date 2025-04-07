@@ -32,4 +32,23 @@ TEST_CASE("we can copy memory from host to device") {
     memmg::managed_array<int> expected = {123};
     REQUIRE(dev == expected);
   }
+
+  SECTION("we can copy two integers in to two passes") {
+    dev.resize(2);
+    to_device_copier copier{dev, stream};
+
+    host = {123};
+    auto fut = copier.copy(host);
+    REQUIRE(fut.ready());
+
+    host = {456};
+    fut = copier.copy(host);
+    REQUIRE(!fut.ready());
+
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    memmg::managed_array<int> expected = {123, 456};
+    REQUIRE(dev == expected);
+  }
 }
