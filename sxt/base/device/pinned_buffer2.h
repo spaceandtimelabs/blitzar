@@ -33,7 +33,7 @@ public:
     return size_;
   }
 
-  size_t capacity() const noexcept;
+  static size_t capacity() noexcept;
 
   void* data() noexcept {
     if (handle_ == nullptr) {

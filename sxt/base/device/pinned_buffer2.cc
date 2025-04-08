@@ -31,7 +31,7 @@ pinned_buffer2& pinned_buffer2::operator=(pinned_buffer2&& other) noexcept {
 //--------------------------------------------------------------------------------------------------
 // capacity
 //--------------------------------------------------------------------------------------------------
-size_t pinned_buffer2::capacity() const noexcept { return pinned_buffer_size; }
+size_t pinned_buffer2::capacity() noexcept { return pinned_buffer_size; }
 
 //--------------------------------------------------------------------------------------------------
 // fill
