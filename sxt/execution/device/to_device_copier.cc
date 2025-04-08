@@ -25,7 +25,7 @@ namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
-to_device_copier::to_device_copier(basct::span<std::byte> dst, basdv::stream& stream) noexcept
+to_device_copier::to_device_copier(basct::span<std::byte> dst, const basdv::stream& stream) noexcept
     : dst_{dst}, stream_{stream} {}
 
 //--------------------------------------------------------------------------------------------------

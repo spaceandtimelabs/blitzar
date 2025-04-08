@@ -30,7 +30,7 @@ namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 class to_device_copier {
 public:
-  to_device_copier(basct::span<std::byte> dst, basdv::stream& stream) noexcept;
+  to_device_copier(basct::span<std::byte> dst, const basdv::stream& stream) noexcept;
 
   template <class Cont>
     requires requires(Cont& dst) {
@@ -51,7 +51,7 @@ public:
 
 private:
   basct::span<std::byte> dst_;
-  basdv::stream& stream_;
+  const basdv::stream& stream_;
   basdv::pinned_buffer2 active_buffer_;
   basdv::pinned_buffer2 alt_buffer_;
 };

@@ -242,7 +242,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "copy",
     impl_deps = [
-        ":generate",
+        ":to_device_copier",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/execution/async:coroutine",
