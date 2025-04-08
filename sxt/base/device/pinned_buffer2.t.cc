@@ -13,16 +13,39 @@ TEST_CASE("we can manage a buffer of pinned memory") {
 
   SECTION("we can add a single byte to a buffer") {
     pinned_buffer2 buf;
-    std::vector<std::byte> data = {static_cast<std::byte>(123)};
+    std::vector<std::byte> data = {std::byte{123}};
     auto rest = buf.fill_from_host(data);
     REQUIRE(rest.empty());
     REQUIRE(buf.size() == 1);
     REQUIRE(*static_cast<std::byte*>(buf.data()) == data[0]);
   }
 
+  SECTION("we can move construct a buffer") {
+    pinned_buffer2 buf;
+    std::vector<std::byte> data = {static_cast<std::byte>(123)};
+    buf.fill_from_host(data);
+    pinned_buffer2 buf_p{std::move(buf)};
+    REQUIRE(buf.empty());
+    REQUIRE(buf_p.size() == 1);
+    REQUIRE(*static_cast<std::byte*>(buf_p.data()) == data[0]);
+  }
+
+  SECTION("we can move assign a buffer") {
+    pinned_buffer2 buf;
+    std::vector<std::byte> data = {std::byte{123}};
+    buf.fill_from_host(data);
+
+    pinned_buffer2 buf_p;
+    data[0] = std::byte{3};
+    buf_p.fill_from_host(data);
+    buf_p = std::move(buf);
+    REQUIRE(buf.empty());
+    REQUIRE(*static_cast<std::byte*>(buf_p.data()) == std::byte{123});
+  }
+
   SECTION("we can fill a buffer") {
     pinned_buffer2 buf;
-    std::vector<std::byte> data(buf.capacity() + 1, static_cast<std::byte>(123));
+    std::vector<std::byte> data(buf.capacity() + 1, std::byte{123});
     auto rest = buf.fill_from_host(data);
     REQUIRE(rest.size() == 1);
     REQUIRE(buf.size() == buf.capacity());
