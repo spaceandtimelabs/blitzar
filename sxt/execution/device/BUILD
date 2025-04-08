@@ -16,6 +16,7 @@ sxt_cc_component(
     impl_deps = [
         ":synchronization",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/functional:function_ref",
         "//sxt/execution/async:coroutine",
     ],
     test_deps = [
