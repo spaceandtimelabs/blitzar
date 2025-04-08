@@ -67,7 +67,7 @@ TEST_CASE("we can copy memory from host to device") {
     REQUIRE(dev == host);
   }
 
-  SECTION("we can copy one larger than the full buffer") {
+  SECTION("we can copy data larger than the full buffer") {
     dev.resize(basdv::pinned_buffer_size / sizeof(int) + 1u);
     auto sz = dev.size();
     to_device_copier copier{dev, stream};
@@ -86,7 +86,7 @@ TEST_CASE("we can copy memory from host to device") {
     REQUIRE(dev == host);
   }
 
-  SECTION("we can copy one larger than two full buffers") {
+  SECTION("we can copy data larger than two full buffers") {
     dev.resize(2u * basdv::pinned_buffer_size / sizeof(int) + 1u);
     auto sz = dev.size();
     to_device_copier copier{dev, stream};
@@ -101,6 +101,21 @@ TEST_CASE("we can copy memory from host to device") {
     fut = copier.copy(basct::cspan<int>{host.data() + sz - 1, 1});
     REQUIRE(!fut.ready());
 
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
+    basdv::synchronize_device();
+    REQUIRE(dev == host);
+  }
+
+  SECTION("we can copy data many multiples of a single buffer size") {
+    dev.resize(10u * basdv::pinned_buffer_size / sizeof(int) + 11u);
+    auto sz = dev.size();
+    to_device_copier copier{dev, stream};
+    host.resize(sz);
+    std::iota(host.begin(), host.end(), 0);
+
+    auto fut = copier.copy(host);
+    REQUIRE(!fut.ready());
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
     basdv::synchronize_device();
