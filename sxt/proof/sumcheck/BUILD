@@ -167,17 +167,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "mle_utility",
-    deps = [
-        "//sxt/base/container:span_utility",
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/device:property",
-        "//sxt/base/container:span",
-        "//sxt/base/field:element",
-        "//sxt/base/num:divide_up",
-        "//sxt/base/num:ceil_log2",
-        "//sxt/execution/device:to_device_copier",
-        "//sxt/memory/management:managed_array",
-    ],
     test_deps = [
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
@@ -186,6 +175,17 @@ sxt_cc_component(
         "//sxt/memory/resource:managed_device_resource",
         "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/container:span_utility",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:property",
+        "//sxt/base/field:element",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/base/num:divide_up",
+        "//sxt/execution/device:to_device_copier",
+        "//sxt/memory/management:managed_array",
     ],
 )
 

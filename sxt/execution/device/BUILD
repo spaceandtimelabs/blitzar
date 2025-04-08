@@ -14,25 +14,25 @@ sxt_cc_component(
 sxt_cc_component(
     name = "to_device_copier",
     impl_deps = [
-      ":synchronization",
+        ":synchronization",
         "//sxt/base/device:memory_utility",
         "//sxt/execution/async:coroutine",
     ],
+    test_deps = [
+        "//sxt/base/device:pinned_buffer_pool",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
     deps = [
         "//sxt/base/container:span",
-        "//sxt/base/error:assert",
         "//sxt/base/device:pinned_buffer",
         "//sxt/base/device:pinned_buffer2",
         "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
         "//sxt/execution/async:future",
-    ],
-    test_deps = [
-      "//sxt/base/device:synchronization",
-      "//sxt/base/device:pinned_buffer_pool",
-        "//sxt/base/test:unit_test",
-        "//sxt/memory/management:managed_array",
-        "//sxt/memory/resource:managed_device_resource",
-        "//sxt/execution/schedule:scheduler",
     ],
 )
 
