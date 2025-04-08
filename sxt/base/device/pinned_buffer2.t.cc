@@ -20,6 +20,14 @@ TEST_CASE("we can manage a buffer of pinned memory") {
     REQUIRE(*static_cast<std::byte*>(buf.data()) == data[0]);
   }
 
+  SECTION("we can reset a buffer") {
+    pinned_buffer2 buf;
+    std::vector<std::byte> data = {std::byte{123}};
+    buf.fill_from_host(data);
+    buf.reset();
+    REQUIRE(buf.empty());
+  }
+
   SECTION("we can move construct a buffer") {
     pinned_buffer2 buf;
     std::vector<std::byte> data = {static_cast<std::byte>(123)};
