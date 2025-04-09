@@ -19,7 +19,6 @@
 #include <optional>
 
 #include "sxt/base/container/span.h"
-#include "sxt/base/device/pinned_buffer.h"
 #include "sxt/base/device/pinned_buffer2.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/functional/function_ref.h"
