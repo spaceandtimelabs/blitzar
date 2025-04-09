@@ -42,7 +42,7 @@ xena::future<> strided_copy_host_to_device(std::byte* dst, const basdv::stream& 
       // clang-format on
   );
   to_device_copier copier{basct::span<std::byte>{dst, count * n}, stream};
-  for (size_t i=0; i<count; ++i) {
+  for (size_t i = 0; i < count; ++i) {
     co_await copier.copy(basct::cspan<std::byte>{src + i * stride, n});
   }
 }
