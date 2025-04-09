@@ -41,10 +41,10 @@ xena::future<> generate_to_device_one_sweep(basct::span<T> dst, const basdv::str
   SXT_RELEASE_ASSERT(
       // clang-format off
       basdv::is_active_device_pointer(dst.data()) &&
-      num_bytes <= basdv::pinned_buffer::size()
+      num_bytes <= basdv::pinned_buffer::capacity()
       // clang-format on
   );
-  basdv::pinned_buffer buffer;
+  basdv::pinned_buffer buffer(num_bytes);
   auto data = static_cast<T*>(buffer.data());
   f(basct::span<T>{data, n}, 0u);
   basdv::async_memcpy_host_to_device(static_cast<void*>(dst.data()), buffer.data(), num_bytes,
@@ -67,34 +67,27 @@ xena::future<> generate_to_device(basct::span<T> dst, const basdv::stream& strea
   SXT_RELEASE_ASSERT(
       // clang-format off
       basdv::is_active_device_pointer(dst.data()) &&
-      sizeof(T) < basdv::pinned_buffer::size()
+      sizeof(T) < basdv::pinned_buffer::capacity()
       // clang-format on
   );
   auto num_bytes = n * sizeof(T);
-  if (num_bytes <= basdv::pinned_buffer::size()) {
+  if (num_bytes <= basdv::pinned_buffer::capacity()) {
     co_return co_await generate_to_device_one_sweep(dst, stream, f);
   }
   std::byte* out = reinterpret_cast<std::byte*>(dst.data());
   size_t pos = 0;
 
   auto fill_buffer = [&](basdv::pinned_buffer& buffer) noexcept {
-    size_t remaining_size = buffer.size();
     auto data = static_cast<T*>(buffer.data());
-    while (remaining_size > 0 && pos < n) {
-      auto chunk_size = std::min(remaining_size / sizeof(T), n - pos);
-      if (chunk_size == 0) {
-        break;
-      }
-      f(basct::span<T>{data, chunk_size}, pos);
-      data += chunk_size;
-      remaining_size -= chunk_size * sizeof(T);
-      pos += chunk_size;
-    }
-    return buffer.size() - remaining_size;
+    auto count = std::min(buffer.size() / sizeof(T), n - pos);
+    f(basct::span<T>{data, count}, pos);
+    pos += count;
+    return count * sizeof(T);
   };
 
   // copy
-  basdv::pinned_buffer cur_buffer, alt_buffer;
+  basdv::pinned_buffer cur_buffer(basdv::pinned_buffer::capacity()),
+      alt_buffer(basdv::pinned_buffer::capacity());
   auto chunk_size = fill_buffer(cur_buffer);
   SXT_DEBUG_ASSERT(pos < n, "copy can't be done in a single sweep");
   while (pos < n) {

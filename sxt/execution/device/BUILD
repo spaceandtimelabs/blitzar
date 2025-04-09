@@ -12,6 +12,31 @@ sxt_cc_component(
 )
 
 sxt_cc_component(
+    name = "to_device_copier",
+    impl_deps = [
+        ":synchronization",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/functional:function_ref",
+        "//sxt/execution/async:coroutine",
+    ],
+    test_deps = [
+        "//sxt/base/device:pinned_buffer_pool",
+        "//sxt/base/device:synchronization",
+        "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:managed_device_resource",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/device:pinned_buffer",
+        "//sxt/base/device:stream",
+        "//sxt/base/error:assert",
+        "//sxt/execution/async:future",
+    ],
+)
+
+sxt_cc_component(
     name = "device_viewable",
     test_deps = [
         "//sxt/base/device:active_device_guard",
@@ -192,10 +217,7 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "generate",
-    impl_deps = [
-    ],
     test_deps = [
-        "//sxt/base/device:pinned_buffer",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
@@ -217,7 +239,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "copy",
     impl_deps = [
-        ":generate",
+        ":to_device_copier",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:stream",
         "//sxt/execution/async:coroutine",

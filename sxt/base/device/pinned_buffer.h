@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2025-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
  */
 #pragma once
 
+#include <cstddef>
+
+#include "sxt/base/container/span.h"
 #include "sxt/base/device/pinned_buffer_handle.h"
 
 namespace sxt::basdv {
@@ -24,26 +27,48 @@ namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 class pinned_buffer {
 public:
-  pinned_buffer() noexcept;
-  pinned_buffer(pinned_buffer&& ptr) noexcept;
+  pinned_buffer() noexcept = default;
+
+  explicit pinned_buffer(size_t size) noexcept;
+
   pinned_buffer(const pinned_buffer&) noexcept = delete;
+  pinned_buffer(pinned_buffer&& other) noexcept;
 
   ~pinned_buffer() noexcept;
 
-  pinned_buffer& operator=(pinned_buffer&& ptr) noexcept;
-  pinned_buffer& operator=(const pinned_buffer& ptr) noexcept = delete;
+  pinned_buffer& operator=(const pinned_buffer&) noexcept = delete;
+  pinned_buffer& operator=(pinned_buffer&& other) noexcept;
 
-  static size_t size() noexcept;
+  bool empty() const noexcept { return size_ == 0; }
 
-  void* data() noexcept { return handle_->ptr; }
+  bool full() const noexcept { return size_ == this->capacity(); }
 
-  const void* data() const noexcept { return handle_->ptr; }
+  size_t size() const noexcept { return size_; }
 
-  operator void*() noexcept { return handle_->ptr; }
+  static size_t capacity() noexcept;
 
-  operator const void*() const noexcept { return handle_->ptr; }
+  void* data() noexcept {
+    if (handle_ == nullptr) {
+      return nullptr;
+    }
+    return handle_->ptr;
+  }
+
+  const void* data() const noexcept {
+    if (handle_ == nullptr) {
+      return nullptr;
+    }
+    return handle_->ptr;
+  }
+
+  void resize(size_t size) noexcept;
+
+  basct::cspan<std::byte> fill_from_host(basct::cspan<std::byte> src) noexcept;
+
+  void reset() noexcept;
 
 private:
-  pinned_buffer_handle* handle_;
+  pinned_buffer_handle* handle_ = nullptr;
+  size_t size_ = 0;
 };
 } // namespace sxt::basdv
