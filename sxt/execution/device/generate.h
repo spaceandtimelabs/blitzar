@@ -28,33 +28,6 @@ namespace sxt::xendv {
 //--------------------------------------------------------------------------------------------------
 // generate_to_device_one_sweep
 //--------------------------------------------------------------------------------------------------
-#if 0
-template <class T, class F>
-  requires requires(basct::span<T> buf, F f, size_t i) {
-    { f(buf, i) } noexcept;
-  }
-xena::future<> generate_to_device_one_sweep(basct::span<T> dst, const basdv::stream& stream,
-                                            F f) noexcept {
-  if (dst.empty()) {
-    co_return;
-  }
-  auto n = dst.size();
-  auto num_bytes = n * sizeof(T);
-  SXT_RELEASE_ASSERT(
-      // clang-format off
-      basdv::is_active_device_pointer(dst.data()) &&
-      num_bytes <= basdv::pinned_buffer::size()
-      // clang-format on
-  );
-  basdv::pinned_buffer buffer;
-  auto data = static_cast<T*>(buffer.data());
-  f(basct::span<T>{data, n}, 0u);
-  basdv::async_memcpy_host_to_device(static_cast<void*>(dst.data()), buffer.data(), num_bytes,
-                                     stream);
-  co_await await_stream(stream);
-}
-#endif
-
 template <class T, class F>
   requires requires(basct::span<T> buf, F f, size_t i) {
     { f(buf, i) } noexcept;
@@ -99,30 +72,23 @@ xena::future<> generate_to_device(basct::span<T> dst, const basdv::stream& strea
       // clang-format on
   );
   auto num_bytes = n * sizeof(T);
-  if (num_bytes <= basdv::pinned_buffer::size()) {
+  if (num_bytes <= basdv::pinned_buffer2::capacity()) {
     co_return co_await generate_to_device_one_sweep(dst, stream, f);
   }
   std::byte* out = reinterpret_cast<std::byte*>(dst.data());
   size_t pos = 0;
 
-  auto fill_buffer = [&](basdv::pinned_buffer& buffer) noexcept {
-    size_t remaining_size = buffer.size();
+  auto fill_buffer = [&](basdv::pinned_buffer2& buffer) noexcept {
     auto data = static_cast<T*>(buffer.data());
-    while (remaining_size > 0 && pos < n) {
-      auto chunk_size = std::min(remaining_size / sizeof(T), n - pos);
-      if (chunk_size == 0) {
-        break;
-      }
-      f(basct::span<T>{data, chunk_size}, pos);
-      data += chunk_size;
-      remaining_size -= chunk_size * sizeof(T);
-      pos += chunk_size;
-    }
-    return buffer.size() - remaining_size;
+    auto count = std::min(buffer.size() / sizeof(T), n - pos);
+    f(basct::span<T>{data, count}, pos);
+    pos += count;
+    return count * sizeof(T);
   };
 
   // copy
-  basdv::pinned_buffer cur_buffer, alt_buffer;
+  basdv::pinned_buffer2 cur_buffer(basdv::pinned_buffer2::capacity()),
+      alt_buffer(basdv::pinned_buffer2::capacity());
   auto chunk_size = fill_buffer(cur_buffer);
   SXT_DEBUG_ASSERT(pos < n, "copy can't be done in a single sweep");
   while (pos < n) {
@@ -136,62 +102,5 @@ xena::future<> generate_to_device(basct::span<T> dst, const basdv::stream& strea
   basdv::async_memcpy_host_to_device(static_cast<void*>(out), cur_buffer.data(), chunk_size,
                                      stream);
   co_await await_stream(stream);
-}
-
-template <class T, class F>
-  requires requires(basct::span<T> buffer, F f, size_t i) {
-    { f(buffer, i) } noexcept;
-  }
-xena::future<> generate_to_device2(basct::span<T> dst, const basdv::stream& stream, F f) noexcept {
-  if (dst.empty()) {
-    co_return;
-  }
-  auto n = dst.size();
-  SXT_RELEASE_ASSERT(
-      // clang-format off
-      basdv::is_active_device_pointer(dst.data()) &&
-      sizeof(T) < basdv::pinned_buffer::size()
-      // clang-format on
-  );
-#if 0
-  auto num_bytes = n * sizeof(T);
-  if (num_bytes <= basdv::pinned_buffer::size()) {
-    co_return co_await generate_to_device_one_sweep(dst, stream, f);
-  }
-  std::byte* out = reinterpret_cast<std::byte*>(dst.data());
-  size_t pos = 0;
-
-  auto fill_buffer = [&](basdv::pinned_buffer& buffer) noexcept {
-    size_t remaining_size = buffer.size();
-    auto data = static_cast<T*>(buffer.data());
-    while (remaining_size > 0 && pos < n) {
-      auto chunk_size = std::min(remaining_size / sizeof(T), n - pos);
-      if (chunk_size == 0) {
-        break;
-      }
-      f(basct::span<T>{data, chunk_size}, pos);
-      data += chunk_size;
-      remaining_size -= chunk_size * sizeof(T);
-      pos += chunk_size;
-    }
-    return buffer.size() - remaining_size;
-  };
-
-  // copy
-  basdv::pinned_buffer cur_buffer, alt_buffer;
-  auto chunk_size = fill_buffer(cur_buffer);
-  SXT_DEBUG_ASSERT(pos < n, "copy can't be done in a single sweep");
-  while (pos < n) {
-    basdv::async_memcpy_host_to_device(static_cast<void*>(out), cur_buffer.data(), chunk_size,
-                                       stream);
-    out += chunk_size;
-    chunk_size = fill_buffer(alt_buffer);
-    co_await await_stream(stream);
-    std::swap(cur_buffer, alt_buffer);
-  }
-  basdv::async_memcpy_host_to_device(static_cast<void*>(out), cur_buffer.data(), chunk_size,
-                                     stream);
-  co_await await_stream(stream);
-#endif
 }
 } // namespace sxt::xendv
