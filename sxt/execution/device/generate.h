@@ -17,7 +17,6 @@
 #pragma once
 
 #include "sxt/base/device/memory_utility.h"
-#include "sxt/base/device/pinned_buffer.h"
 #include "sxt/base/device/pinned_buffer2.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
@@ -68,7 +67,7 @@ xena::future<> generate_to_device(basct::span<T> dst, const basdv::stream& strea
   SXT_RELEASE_ASSERT(
       // clang-format off
       basdv::is_active_device_pointer(dst.data()) &&
-      sizeof(T) < basdv::pinned_buffer::size()
+      sizeof(T) < basdv::pinned_buffer2::capacity()
       // clang-format on
   );
   auto num_bytes = n * sizeof(T);
