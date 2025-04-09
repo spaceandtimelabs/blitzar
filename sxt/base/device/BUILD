@@ -31,6 +31,7 @@ sxt_cc_component(
     name = "pinned_buffer2",
     impl_deps = [
         ":pinned_buffer_pool",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         ":pinned_buffer_pool",

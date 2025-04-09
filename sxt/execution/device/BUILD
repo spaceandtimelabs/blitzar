@@ -248,7 +248,7 @@ sxt_cc_component(
         "//sxt/execution/async:coroutine",
     ],
     test_deps = [
-        "//sxt/base/device:pinned_buffer",
+        "//sxt/base/device:pinned_buffer2",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",

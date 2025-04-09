@@ -17,13 +17,16 @@
 #include "sxt/base/device/pinned_buffer2.h"
 
 #include "sxt/base/device/pinned_buffer_pool.h"
+#include "sxt/base/error/assert.h"
 
 namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
 pinned_buffer2::pinned_buffer2(size_t size) noexcept
-    : handle_{get_pinned_buffer_pool()->acquire_handle()}, size_{size} {}
+    : handle_{get_pinned_buffer_pool()->acquire_handle()}, size_{size} {
+  SXT_RELEASE_ASSERT(size_ <= this->capacity());
+}
 
 pinned_buffer2::pinned_buffer2(pinned_buffer2&& other) noexcept
     : handle_{std::exchange(other.handle_, nullptr)}, size_{std::exchange(other.size_, 0)} {}
@@ -56,6 +59,7 @@ size_t pinned_buffer2::capacity() noexcept { return pinned_buffer_size; }
 // resize
 //--------------------------------------------------------------------------------------------------
 void pinned_buffer2::resize(size_t size) noexcept {
+  SXT_RELEASE_ASSERT(size <= this->capacity());
   if (handle_ == nullptr) {
     handle_ = get_pinned_buffer_pool()->acquire_handle();
   }

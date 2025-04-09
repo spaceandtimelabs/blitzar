@@ -20,7 +20,7 @@
 #include <numeric>
 #include <vector>
 
-#include "sxt/base/device/pinned_buffer.h"
+#include "sxt/base/device/pinned_buffer2.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
@@ -31,7 +31,7 @@ using namespace sxt;
 using namespace sxt::xendv;
 
 TEST_CASE("we can copy strided memory from host to device") {
-  const auto bufsize = basdv::pinned_buffer::size();
+  const auto bufsize = basdv::pinned_buffer2::capacity();
   std::vector<uint8_t> src;
   std::pmr::vector<uint8_t> dst{memr::get_managed_device_resource()};
 
