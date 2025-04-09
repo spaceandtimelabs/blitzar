@@ -19,7 +19,7 @@
 #include <optional>
 
 #include "sxt/base/container/span.h"
-#include "sxt/base/device/pinned_buffer2.h"
+#include "sxt/base/device/pinned_buffer.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/functional/function_ref.h"
 #include "sxt/execution/async/future.h"
@@ -52,7 +52,7 @@ public:
 private:
   basct::span<std::byte> dst_;
   const basdv::stream& stream_;
-  basdv::pinned_buffer2 active_buffer_;
-  basdv::pinned_buffer2 alt_buffer_;
+  basdv::pinned_buffer active_buffer_;
+  basdv::pinned_buffer alt_buffer_;
 };
 } // namespace sxt::xendv

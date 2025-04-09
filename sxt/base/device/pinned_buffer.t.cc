@@ -1,6 +1,6 @@
 /** Proofs GPU - Space and Time's cryptographic proof algorithms on the CPU and GPU.
  *
- * Copyright 2024-present Space and Time Labs, Inc.
+ * Copyright 2025-present Space and Time Labs, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,40 +16,64 @@
  */
 #include "sxt/base/device/pinned_buffer.h"
 
-#include "sxt/base/device/pinned_buffer_pool.h"
 #include "sxt/base/test/unit_test.h"
 
 using namespace sxt;
 using namespace sxt::basdv;
 
-TEST_CASE("we can manage pinned buffers") {
-  auto num_buffers = 5u;
-  auto pool = get_pinned_buffer_pool(num_buffers);
+TEST_CASE("we can manage a buffer of pinned memory") {
+  SECTION("we can construct and deconstruct a buffer") {
+    pinned_buffer buf;
+    REQUIRE(buf.size() == 0);
+    REQUIRE(buf.empty());
+  }
 
-  SECTION("we can acquire and release a pinned buffer") {
-    {
-      pinned_buffer buf;
-      REQUIRE(pool->size() == num_buffers - 1);
-      *reinterpret_cast<char*>(buf.data()) = 1u;
-      *(reinterpret_cast<char*>(buf.data()) + buf.size() - 1) = 2u;
-    }
-    REQUIRE(pool->size() == num_buffers);
+  SECTION("we can add a single byte to a buffer") {
+    pinned_buffer buf;
+    std::vector<std::byte> data = {std::byte{123}};
+    auto rest = buf.fill_from_host(data);
+    REQUIRE(rest.empty());
+    REQUIRE(buf.size() == 1);
+    REQUIRE(*static_cast<std::byte*>(buf.data()) == data[0]);
+  }
+
+  SECTION("we can reset a buffer") {
+    pinned_buffer buf;
+    std::vector<std::byte> data = {std::byte{123}};
+    buf.fill_from_host(data);
+    buf.reset();
+    REQUIRE(buf.empty());
   }
 
   SECTION("we can move construct a buffer") {
-    pinned_buffer buf1;
-    auto ptr = buf1.data();
-    pinned_buffer buf{std::move(buf1)};
-    REQUIRE(buf.data() == ptr);
-    REQUIRE(pool->size() == num_buffers - 1);
+    pinned_buffer buf;
+    std::vector<std::byte> data = {static_cast<std::byte>(123)};
+    buf.fill_from_host(data);
+    pinned_buffer buf_p{std::move(buf)};
+    REQUIRE(buf.empty());
+    REQUIRE(buf_p.size() == 1);
+    REQUIRE(*static_cast<std::byte*>(buf_p.data()) == data[0]);
   }
 
-  SECTION("we can move-assign a buffer") {
-    pinned_buffer buf1;
-    auto ptr = buf1.data();
+  SECTION("we can move assign a buffer") {
     pinned_buffer buf;
-    buf = std::move(buf1);
-    REQUIRE(buf.data() == ptr);
-    REQUIRE(pool->size() == num_buffers - 1);
+    std::vector<std::byte> data = {std::byte{123}};
+    buf.fill_from_host(data);
+
+    pinned_buffer buf_p;
+    data[0] = std::byte{3};
+    buf_p.fill_from_host(data);
+    buf_p = std::move(buf);
+    REQUIRE(buf.empty());
+    REQUIRE(*static_cast<std::byte*>(buf_p.data()) == std::byte{123});
+  }
+
+  SECTION("we can fill a buffer") {
+    pinned_buffer buf;
+    std::vector<std::byte> data(buf.capacity() + 1, std::byte{123});
+    auto rest = buf.fill_from_host(data);
+    REQUIRE(rest.size() == 1);
+    REQUIRE(buf.size() == buf.capacity());
+    REQUIRE(buf.full());
   }
 }

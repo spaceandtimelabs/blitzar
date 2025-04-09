@@ -29,7 +29,7 @@ sxt_cc_component(
     ],
     deps = [
         "//sxt/base/container:span",
-        "//sxt/base/device:pinned_buffer2",
+        "//sxt/base/device:pinned_buffer",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",
         "//sxt/execution/async:future",
@@ -228,7 +228,7 @@ sxt_cc_component(
         ":synchronization",
         "//sxt/base/container:span",
         "//sxt/base/device:memory_utility",
-        "//sxt/base/device:pinned_buffer2",
+        "//sxt/base/device:pinned_buffer",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",
         "//sxt/execution/async:coroutine",
@@ -245,7 +245,7 @@ sxt_cc_component(
         "//sxt/execution/async:coroutine",
     ],
     test_deps = [
-        "//sxt/base/device:pinned_buffer2",
+        "//sxt/base/device:pinned_buffer",
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
