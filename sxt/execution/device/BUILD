@@ -218,8 +218,6 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "generate",
-    impl_deps = [
-    ],
     test_deps = [
         "//sxt/base/device:pinned_buffer",
         "//sxt/base/device:stream",
@@ -233,6 +231,7 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:pinned_buffer",
+        "//sxt/base/device:pinned_buffer2",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",
         "//sxt/execution/async:coroutine",

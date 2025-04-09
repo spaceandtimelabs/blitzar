@@ -22,6 +22,9 @@ namespace sxt::basdv {
 //--------------------------------------------------------------------------------------------------
 // constructor
 //--------------------------------------------------------------------------------------------------
+pinned_buffer2::pinned_buffer2(size_t size) noexcept
+    : handle_{get_pinned_buffer_pool()->acquire_handle()}, size_{size} {}
+
 pinned_buffer2::pinned_buffer2(pinned_buffer2&& other) noexcept
     : handle_{std::exchange(other.handle_, nullptr)}, size_{std::exchange(other.size_, 0)} {}
 
@@ -48,6 +51,16 @@ pinned_buffer2& pinned_buffer2::operator=(pinned_buffer2&& other) noexcept {
 // capacity
 //--------------------------------------------------------------------------------------------------
 size_t pinned_buffer2::capacity() noexcept { return pinned_buffer_size; }
+
+//--------------------------------------------------------------------------------------------------
+// resize
+//--------------------------------------------------------------------------------------------------
+void pinned_buffer2::resize(size_t size) noexcept {
+  if (handle_ == nullptr) {
+    handle_ = get_pinned_buffer_pool()->acquire_handle();
+  }
+  size_ = size;
+}
 
 //--------------------------------------------------------------------------------------------------
 // fill

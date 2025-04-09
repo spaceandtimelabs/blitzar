@@ -28,6 +28,9 @@ namespace sxt::basdv {
 class pinned_buffer2 {
 public:
   pinned_buffer2() noexcept = default;
+
+  explicit pinned_buffer2(size_t size) noexcept;
+
   pinned_buffer2(const pinned_buffer2&) noexcept = delete;
   pinned_buffer2(pinned_buffer2&& other) noexcept;
 
@@ -57,6 +60,8 @@ public:
     }
     return handle_->ptr;
   }
+
+  void resize(size_t size) noexcept;
 
   basct::cspan<std::byte> fill_from_host(basct::cspan<std::byte> src) noexcept;
 
