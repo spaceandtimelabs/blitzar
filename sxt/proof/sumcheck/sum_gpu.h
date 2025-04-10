@@ -150,91 +150,6 @@ static xena::future<> partial_sum(basct::span<T> p, basdv::stream& stream, basct
 //--------------------------------------------------------------------------------------------------
 template <basfld::element T>
 xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
-                       const basit::split_options& options, basct::cspan<T> mles,
-                       unsigned n) noexcept {
-  auto num_variables = std::max(basn::ceil_log2(n), 1);
-  auto mid = 1u << (num_variables - 1u);
-  auto num_mles = mles.size() / n;
-  auto num_coefficients = p.size();
-
-  // split
-  auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, mid}, options);
-
-  // sum
-  size_t counter = 0;
-  co_await xendv::concurrent_for_each(
-      chunk_first, chunk_last, [&](basit::index_range rng) noexcept -> xena::future<> {
-        basdv::stream stream;
-        memr::async_device_resource resource{stream};
-
-        // copy partial mles to device
-        memmg::managed_array<T> partial_mles{&resource};
-        copy_partial_mles<T>(partial_mles, stream, mles, n, rng.a(), rng.b());
-        auto split = rng.b() - rng.a();
-        auto np = partial_mles.size() / num_mles;
-
-        // lookup problem descriptor
-        basct::cspan<std::pair<T, unsigned>> product_table;
-        basct::cspan<unsigned> product_terms;
-        cache.lookup(product_table, product_terms, stream);
-
-        // compute
-        memmg::managed_array<T> partial_p(num_coefficients);
-        co_await partial_sum<T>(partial_p, stream, partial_mles, product_table, product_terms,
-                                split, np);
-
-        // fill in the result
-        if (counter == 0) {
-          for (unsigned i = 0; i < num_coefficients; ++i) {
-            p[i] = partial_p[i];
-          }
-        } else {
-          for (unsigned i = 0; i < num_coefficients; ++i) {
-            add(p[i], p[i], partial_p[i]);
-          }
-        }
-        ++counter;
-      });
-}
-
-template <basfld::element T>
-xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache, basct::cspan<T> mles,
-                       unsigned n) noexcept {
-  basit::split_options options{
-      .min_chunk_size = 100'000u,
-      .max_chunk_size = 200'000u,
-      .split_factor = basdv::get_num_devices(),
-  };
-  co_await sum_gpu<T>(p, cache, options, mles, n);
-}
-
-template <basfld::element T>
-xena::future<> sum_gpu(basct::span<T> p, basct::cspan<T> mles,
-                       basct::cspan<std::pair<T, unsigned>> product_table,
-                       basct::cspan<unsigned> product_terms, unsigned n) noexcept {
-  auto num_variables = std::max(basn::ceil_log2(n), 1);
-  auto mid = 1u << (num_variables - 1u);
-  SXT_DEBUG_ASSERT(
-      // clang-format off
-      basdv::is_host_pointer(p.data()) &&
-      basdv::is_active_device_pointer(mles.data()) &&
-      basdv::is_active_device_pointer(product_table.data()) &&
-      basdv::is_active_device_pointer(product_terms.data())
-      // clang-format on
-  );
-  basdv::stream stream;
-  co_await partial_sum<T>(p, stream, mles, product_table, product_terms, mid, n);
-}
-
-//--------------------------------------------------------------------------------------------------
-// sum_gpu2
-//--------------------------------------------------------------------------------------------------
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-parameter"
-template <basfld::element T>
-xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
                         const basit::split_options& options, basct::cspan<T> mles,
                         unsigned n) noexcept {
   auto num_variables = std::max(basn::ceil_log2(n), 1);
@@ -287,10 +202,9 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache,
         ++counter;
       });
 }
-#pragma clang diagnostic pop
 
 template <basfld::element T>
-xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache, basct::cspan<T> mles,
+xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache, basct::cspan<T> mles,
                         unsigned n) noexcept {
   auto num_mles = mles.size() / n;
   auto options = basdv::plan_split(num_mles * sizeof(T));
@@ -298,11 +212,30 @@ xena::future<> sum_gpu2(basct::span<T> p, device_cache<T>& cache, basct::cspan<T
     std::println(stderr, "*********************** sum init");
   }
   auto t1 = std::chrono::steady_clock::now();
-  co_await sum_gpu2<T>(p, cache, options, mles, n);
+  co_await sum_gpu<T>(p, cache, options, mles, n);
   auto t2 = std::chrono::steady_clock::now();
   auto d = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
   if (n > 1000000) {
     std::println(stderr, "*********************** sum done: {}", d / 1.0e3);
   }
 }
+
+template <basfld::element T>
+xena::future<> sum_gpu(basct::span<T> p, basct::cspan<T> mles,
+                       basct::cspan<std::pair<T, unsigned>> product_table,
+                       basct::cspan<unsigned> product_terms, unsigned n) noexcept {
+  auto num_variables = std::max(basn::ceil_log2(n), 1);
+  auto mid = 1u << (num_variables - 1u);
+  SXT_DEBUG_ASSERT(
+      // clang-format off
+      basdv::is_host_pointer(p.data()) &&
+      basdv::is_active_device_pointer(mles.data()) &&
+      basdv::is_active_device_pointer(product_table.data()) &&
+      basdv::is_active_device_pointer(product_terms.data())
+      // clang-format on
+  );
+  basdv::stream stream;
+  co_await partial_sum<T>(p, stream, mles, product_table, product_terms, mid, n);
+}
+
 } // namespace sxt::prfsk

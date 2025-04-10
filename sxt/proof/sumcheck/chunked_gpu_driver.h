@@ -99,7 +99,7 @@ public:
       co_return co_await drv.sum(polynomial, *work.single_gpu_workspace);
     }
     /* co_await sum_gpu<T>(polynomial, work.cache, work.mles, work.n); */
-    co_await sum_gpu2<T>(polynomial, work.cache, work.mles, work.n);
+    co_await sum_gpu<T>(polynomial, work.cache, work.mles, work.n);
   }
 
   xena::future<> fold(workspace& ws, const T& r) const noexcept override {
