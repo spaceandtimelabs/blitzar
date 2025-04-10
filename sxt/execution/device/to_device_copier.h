@@ -34,8 +34,8 @@ public:
 
   template <class Cont>
     requires requires(Cont& dst) {
-      dst.data();
-      dst.size();
+      requires std::is_lvalue_reference_v<decltype(*dst.data())>;
+      { dst.size() } -> std::convertible_to<size_t>;
     }
   to_device_copier(Cont& dst, basdv::stream& stream) noexcept
       : to_device_copier{basct::span<std::byte>{reinterpret_cast<std::byte*>(dst.data()),
@@ -44,15 +44,20 @@ public:
 
   xena::future<> copy(basct::cspan<std::byte> src) noexcept;
 
-  template <class Cont> xena::future<> copy(const Cont& src) noexcept {
-    return this->copy(basct::cspan<std::byte>{reinterpret_cast<const std::byte*>(src.data()),
-                                              src.size() * sizeof(*src.data())});
-  }
-
 private:
   basct::span<std::byte> dst_;
   const basdv::stream& stream_;
   basdv::pinned_buffer active_buffer_;
   basdv::pinned_buffer alt_buffer_;
 };
+
+template <class Cont>
+  requires requires(const Cont& src) {
+    requires std::is_pointer_v<decltype(src.data())>;
+    { src.size() } -> std::convertible_to<size_t>;
+  }
+xena::future<> copy(to_device_copier& copier, const Cont& src) noexcept {
+  return copier.copy(basct::cspan<std::byte>{reinterpret_cast<const std::byte*>(src.data()),
+                                             src.size() * sizeof(*src.data())});
+}
 } // namespace sxt::xendv

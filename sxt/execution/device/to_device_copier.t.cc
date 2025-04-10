@@ -36,7 +36,7 @@ TEST_CASE("we can copy memory from host to device") {
 
   SECTION("we can copy an empty array") {
     to_device_copier copier{dev, stream};
-    auto fut = copier.copy(host);
+    auto fut = copy(copier, host);
     REQUIRE(fut.ready());
   }
 
@@ -45,7 +45,7 @@ TEST_CASE("we can copy memory from host to device") {
     to_device_copier copier{dev, stream};
 
     host = {123};
-    auto fut = copier.copy(host);
+    auto fut = copy(copier, host);
     REQUIRE(!fut.ready());
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
@@ -58,11 +58,11 @@ TEST_CASE("we can copy memory from host to device") {
     to_device_copier copier{dev, stream};
 
     host = {123};
-    auto fut = copier.copy(host);
+    auto fut = copy(copier, host);
     REQUIRE(fut.ready());
 
     host = {456};
-    fut = copier.copy(host);
+    fut = copy(copier, host);
     REQUIRE(!fut.ready());
 
     xens::get_scheduler().run();
@@ -77,7 +77,7 @@ TEST_CASE("we can copy memory from host to device") {
     to_device_copier copier{dev, stream};
     host.resize(dev.size());
     std::iota(host.begin(), host.end(), 0);
-    auto fut = copier.copy(host);
+    auto fut = copy(copier, host);
     REQUIRE(!fut.ready());
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
@@ -92,10 +92,10 @@ TEST_CASE("we can copy memory from host to device") {
     host.resize(sz);
     std::iota(host.begin(), host.end(), 0);
 
-    auto fut = copier.copy(basct::cspan<int>{host.data(), sz - 1});
+    auto fut = copy(copier, basct::cspan<int>{host.data(), sz - 1});
     REQUIRE(fut.ready());
 
-    fut = copier.copy(basct::cspan<int>{host.data() + sz - 1, 1});
+    fut = copy(copier, basct::cspan<int>{host.data() + sz - 1, 1});
     REQUIRE(!fut.ready());
 
     xens::get_scheduler().run();
@@ -111,11 +111,11 @@ TEST_CASE("we can copy memory from host to device") {
     host.resize(sz);
     std::iota(host.begin(), host.end(), 0);
 
-    auto fut = copier.copy(basct::cspan<int>{host.data(), sz - 1});
+    auto fut = copy(copier, basct::cspan<int>{host.data(), sz - 1});
     REQUIRE(!fut.ready());
     xens::get_scheduler().run();
 
-    fut = copier.copy(basct::cspan<int>{host.data() + sz - 1, 1});
+    fut = copy(copier, basct::cspan<int>{host.data() + sz - 1, 1});
     REQUIRE(!fut.ready());
 
     xens::get_scheduler().run();
@@ -131,7 +131,7 @@ TEST_CASE("we can copy memory from host to device") {
     host.resize(sz);
     std::iota(host.begin(), host.end(), 0);
 
-    auto fut = copier.copy(host);
+    auto fut = copy(copier, host);
     REQUIRE(!fut.ready());
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
