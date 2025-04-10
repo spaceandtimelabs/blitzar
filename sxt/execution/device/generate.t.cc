@@ -31,7 +31,7 @@ using namespace sxt;
 using namespace sxt::xendv;
 
 TEST_CASE("we can generate an array into device memory") {
-  const auto bufsize = basdv::pinned_buffer::size();
+  const auto bufsize = basdv::pinned_buffer::capacity();
   std::pmr::vector<uint8_t> dst{memr::get_managed_device_resource()};
 
   basdv::stream stream;
