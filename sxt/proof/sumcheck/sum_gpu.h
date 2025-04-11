@@ -17,7 +17,6 @@
 #pragma once
 
 #include <cstddef>
-#include <iostream>
 
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
@@ -165,7 +164,6 @@ xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
   co_await xendv::for_each_device(
       chunk_first, chunk_last,
       [&](const xendv::chunk_context& ctx, basit::index_range rng) noexcept -> xena::future<> {
-        std::println(stderr, "sum {}: {}-{}", ctx.device_index, rng.a(), rng.b());
         basdv::stream stream;
         memr::async_device_resource resource{stream};
 
@@ -184,10 +182,8 @@ xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
         // compute
         co_await ctx.alt_future.make_future();
         memmg::managed_array<T> partial_p(num_coefficients);
-        std::println("launch sum {}", ctx.device_index);
         co_await partial_sum<T>(partial_p, stream, partial_mles, product_table, product_terms,
                                 split, np);
-        std::println(stderr, "sum done {}", ctx.device_index);
 
         // fill in the result
         if (counter == 0) {
@@ -208,16 +204,10 @@ xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache, basct::cspan<T>
                        unsigned n) noexcept {
   auto num_mles = mles.size() / n;
   auto options = basdv::plan_split(num_mles * sizeof(T));
-  if (n > 1000000) {
-    std::println(stderr, "*********************** sum init");
-  }
   auto t1 = std::chrono::steady_clock::now();
   co_await sum_gpu<T>(p, cache, options, mles, n);
   auto t2 = std::chrono::steady_clock::now();
   auto d = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-  if (n > 1000000) {
-    std::println(stderr, "*********************** sum done: {}", d / 1.0e3);
-  }
 }
 
 template <basfld::element T>
