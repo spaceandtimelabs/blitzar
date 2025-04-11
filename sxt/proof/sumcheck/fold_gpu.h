@@ -106,7 +106,7 @@ xena::future<> fold_impl(basct::span<T> mles_p, basct::cspan<T> mles, unsigned n
 //--------------------------------------------------------------------------------------------------
 template <basfld::element T>
 xena::future<> fold_gpu(basct::span<T> mles_p, const basit::split_options& split_options,
-                         basct::cspan<T> mles, unsigned n, const T& r) noexcept {
+                        basct::cspan<T> mles, unsigned n, const T& r) noexcept {
   auto num_mles = mles.size() / n;
   auto num_variables = std::max(basn::ceil_log2(n), 1);
   auto mid = 1u << (num_variables - 1u);
@@ -131,7 +131,7 @@ xena::future<> fold_gpu(basct::span<T> mles_p, const basit::split_options& split
 
 template <basfld::element T>
 xena::future<> fold_gpu(basct::span<T> mles_p, basct::cspan<T> mles, unsigned n,
-                         const T& r) noexcept {
+                        const T& r) noexcept {
   auto num_mles = mles.size() / n;
   auto options = basdv::plan_split(num_mles * sizeof(T));
   co_await fold_gpu(mles_p, options, mles, n, r);

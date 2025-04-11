@@ -150,8 +150,8 @@ static xena::future<> partial_sum(basct::span<T> p, basdv::stream& stream, basct
 //--------------------------------------------------------------------------------------------------
 template <basfld::element T>
 xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
-                        const basit::split_options& options, basct::cspan<T> mles,
-                        unsigned n) noexcept {
+                       const basit::split_options& options, basct::cspan<T> mles,
+                       unsigned n) noexcept {
   auto num_variables = std::max(basn::ceil_log2(n), 1);
   auto mid = 1u << (num_variables - 1u);
   auto num_mles = mles.size() / n;
@@ -205,7 +205,7 @@ xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
 
 template <basfld::element T>
 xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache, basct::cspan<T> mles,
-                        unsigned n) noexcept {
+                       unsigned n) noexcept {
   auto num_mles = mles.size() / n;
   auto options = basdv::plan_split(num_mles * sizeof(T));
   if (n > 1000000) {

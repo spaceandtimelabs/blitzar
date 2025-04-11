@@ -38,8 +38,8 @@ namespace sxt::prfsk {
 //--------------------------------------------------------------------------------------------------
 template <basfld::element T>
 xena::future<> copy_partial_mles(memmg::managed_array<T>& partial_mles, basdv::stream& stream,
-                                  basct::cspan<T> mles, unsigned n, unsigned a,
-                                  unsigned b) noexcept {
+                                 basct::cspan<T> mles, unsigned n, unsigned a,
+                                 unsigned b) noexcept {
   auto num_variables = std::max(basn::ceil_log2(n), 1);
   auto mid = 1u << (num_variables - 1u);
   auto num_mles = mles.size() / n;
