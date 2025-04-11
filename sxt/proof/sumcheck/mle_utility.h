@@ -89,11 +89,11 @@ xena::future<> copy_partial_mles2(memmg::managed_array<T>& partial_mles, basdv::
   for (unsigned mle_index = 0; mle_index < num_mles; ++mle_index) {
     // first part
     auto src = mles.subspan(n * mle_index + a, part1_size);
-    co_await copier.copy(src);
+    co_await xendv::copy(copier, src);
 
     // second part
     src = mles.subspan(n * mle_index + ap, part2_size);
-    co_await copier.copy(src);
+    co_await xendv::copy(copier, src);
   }
 }
 
