@@ -28,6 +28,7 @@
 #include "sxt/base/field/element.h"
 #include "sxt/base/num/ceil_log2.h"
 #include "sxt/base/num/divide_up.h"
+#include "sxt/execution/async/coroutine.h"
 #include "sxt/execution/device/to_device_copier.h"
 #include "sxt/memory/management/managed_array.h"
 
