@@ -41,7 +41,7 @@ TEST_CASE("we can copy a slice of mles to device memory") {
 
   SECTION("we can copy an mle with a single element") {
     mles = {0x123_s25};
-    auto fut = copy_partial_mles2<T>(partial_mles, stream, mles, 1, 0, 1);
+    auto fut = copy_partial_mles<T>(partial_mles, stream, mles, 1, 0, 1);
     REQUIRE(!fut.ready());
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
@@ -52,7 +52,7 @@ TEST_CASE("we can copy a slice of mles to device memory") {
 
   SECTION("we can copy a slice of MLEs") {
     mles = {0x1_s25, 0x2_s25, 0x3_s25, 0x4_s25, 0x5_s25, 0x6_s25};
-    auto fut = copy_partial_mles2<T>(partial_mles, stream, mles, 3, 0, 1);
+    auto fut = copy_partial_mles<T>(partial_mles, stream, mles, 3, 0, 1);
     REQUIRE(!fut.ready());
     xens::get_scheduler().run();
     REQUIRE(fut.ready());
