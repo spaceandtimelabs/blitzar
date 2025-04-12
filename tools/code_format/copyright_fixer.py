@@ -4,7 +4,6 @@ import sys
 import re
 import argparse
 import pathlib
-import sys
 import datetime
 
 SXT_COPYRIGHT_KEY = "Copyright"
@@ -109,7 +108,7 @@ def fix_copyright_header(path):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Copyright notice.")
-    parser.add_argument("--path", type=str, help="Specify the path to the file")
+    parser.add_argument("--path", type=str, required=True, help="Specify the path to the file")
     parser.add_argument(
         "--rewrite", action="store_true", help="Rewrite file in-place"
     )
