@@ -169,7 +169,6 @@ xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
 
         // copy partial mles to device
         memmg::managed_array<T> partial_mles{&resource};
-        /* copy_partial_mles<T>(partial_mles, stream, mles, n, rng.a(), rng.b()); */
         co_await copy_partial_mles<T>(partial_mles, stream, mles, n, rng.a(), rng.b());
         auto split = rng.b() - rng.a();
         auto np = partial_mles.size() / num_mles;
