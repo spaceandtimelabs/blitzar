@@ -46,8 +46,6 @@ basit::split_options plan_split_impl(size_t bytes, size_t total_device_memory,
 // plan_split
 //--------------------------------------------------------------------------------------------------
 basit::split_options plan_split(size_t bytes) noexcept {
-  /* auto memory_target_low = 1.0 / 64.0; */
-  /* auto memory_target_high = 1.0 / 16.0; */
   auto memory_target_low = 1.0 / 256.0;
   auto memory_target_high = 1.0 / 64.0;
   auto total_device_memory = get_total_device_memory();

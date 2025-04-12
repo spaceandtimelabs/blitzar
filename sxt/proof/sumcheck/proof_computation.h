@@ -16,8 +16,6 @@
  */
 #pragma once
 
-#include <iostream>
-
 #include "sxt/base/error/assert.h"
 #include "sxt/base/field/element.h"
 #include "sxt/base/num/ceil_log2.h"
@@ -56,7 +54,6 @@ xena::future<> prove_sum(basct::span<T> polynomials, basct::span<T> evaluation_p
     auto polynomial = polynomials.subspan(round_index * polynomial_length, polynomial_length);
 
     // compute the round polynomial
-    std::println(stderr, "-------- sum");
     co_await drv.sum(polynomial, *ws);
 
     // draw the next random challenge
@@ -65,7 +62,6 @@ xena::future<> prove_sum(basct::span<T> polynomials, basct::span<T> evaluation_p
     evaluation_point[round_index] = r;
 
     // fold the polynomial
-    std::println(stderr, "-------- fold");
     if (round_index < num_variables - 1u) {
       co_await drv.fold(*ws, r);
     }

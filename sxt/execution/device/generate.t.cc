@@ -83,7 +83,6 @@ TEST_CASE("we can generate an array into device memory") {
     REQUIRE(fut.ready());
     basdv::synchronize_device();
     for (int i = 0; i < bufsize; ++i) {
-      /* std::println(stderr, "dst_p[{}] = {}", i, dst_p[i]); */
       REQUIRE(dst_p[i] == i);
     }
   }

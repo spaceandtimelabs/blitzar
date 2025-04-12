@@ -21,8 +21,7 @@
 namespace sxt::basdv {
 struct pinned_buffer_handle;
 
-/* constexpr unsigned pinned_buffer_size = 1024u * 1024u * 2u; // 2 megabytes */
-constexpr unsigned pinned_buffer_size = 1024u * 1024u * 4u; // 2 megabytes
+constexpr unsigned pinned_buffer_size = 1024u * 1024u * 2u; // 2 megabytes
 
 //--------------------------------------------------------------------------------------------------
 // pinned_buffer_pool
