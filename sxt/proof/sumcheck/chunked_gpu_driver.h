@@ -72,8 +72,6 @@ template <basfld::element T> class chunked_gpu_driver final : public driver<T> {
 public:
   explicit chunked_gpu_driver(double no_chunk_cutoff = 0.25) noexcept
       : no_chunk_cutoff_{no_chunk_cutoff} {}
-  /* explicit chunked_gpu_driver(double no_chunk_cutoff = 0.0) noexcept */
-  /*     : no_chunk_cutoff_{no_chunk_cutoff} {} */
 
   // driver
   xena::future<std::unique_ptr<workspace>>

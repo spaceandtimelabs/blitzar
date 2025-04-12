@@ -204,10 +204,7 @@ xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache, basct::cspan<T>
                        unsigned n) noexcept {
   auto num_mles = mles.size() / n;
   auto options = basdv::plan_split(num_mles * sizeof(T));
-  auto t1 = std::chrono::steady_clock::now();
   co_await sum_gpu<T>(p, cache, options, mles, n);
-  auto t2 = std::chrono::steady_clock::now();
-  auto d = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
 }
 
 template <basfld::element T>
