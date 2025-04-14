@@ -96,7 +96,6 @@ public:
       gpu_driver<T> drv;
       co_return co_await drv.sum(polynomial, *work.single_gpu_workspace);
     }
-    /* co_await sum_gpu<T>(polynomial, work.cache, work.mles, work.n); */
     co_await sum_gpu<T>(polynomial, work.cache, work.mles, work.n);
   }
 
@@ -120,7 +119,6 @@ public:
 
     // fold
     memmg::managed_array<T> mles_p(num_mles * mid);
-    /* co_await fold_gpu<T>(mles_p, work.mles, n, r); */
     co_await fold_gpu<T>(mles_p, work.mles, n, r);
 
     // update
