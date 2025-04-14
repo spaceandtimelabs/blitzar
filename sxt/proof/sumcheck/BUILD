@@ -100,6 +100,7 @@ sxt_cc_component(
         "//sxt/base/container:span",
         "//sxt/base/device:memory_utility",
         "//sxt/base/device:property",
+        "//sxt/base/device:split",
         "//sxt/base/device:stream",
         "//sxt/base/error:assert",
         "//sxt/base/field:element",
@@ -166,24 +167,27 @@ sxt_cc_component(
 
 sxt_cc_component(
     name = "mle_utility",
-    impl_deps = [
-        "//sxt/base/container:span_utility",
-        "//sxt/base/device:memory_utility",
-        "//sxt/base/device:property",
-        "//sxt/base/container:span",
-        "//sxt/base/field:element",
-        "//sxt/base/num:divide_up",
-        "//sxt/base/num:ceil_log2",
-        "//sxt/memory/management:managed_array",
-    ],
     test_deps = [
         "//sxt/base/device:stream",
         "//sxt/base/device:synchronization",
         "//sxt/base/test:unit_test",
+        "//sxt/execution/schedule:scheduler",
         "//sxt/memory/management:managed_array",
         "//sxt/memory/resource:managed_device_resource",
         "//sxt/scalar25/realization:field",
         "//sxt/scalar25/type:literal",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/container:span_utility",
+        "//sxt/base/device:memory_utility",
+        "//sxt/base/device:property",
+        "//sxt/base/field:element",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/base/num:divide_up",
+        "//sxt/execution/async:coroutine",
+        "//sxt/execution/device:to_device_copier",
+        "//sxt/memory/management:managed_array",
     ],
 )
 
@@ -342,6 +346,7 @@ sxt_cc_component(
         "//sxt/algorithm/reduction:kernel_fit",
         "//sxt/algorithm/reduction:thread_reduction",
         "//sxt/base/device:memory_utility",
+        "//sxt/base/device:split",
         "//sxt/base/device:stream",
         "//sxt/base/device:state",
         "//sxt/base/field:element",

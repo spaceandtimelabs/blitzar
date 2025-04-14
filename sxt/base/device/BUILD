@@ -18,12 +18,14 @@ sxt_cc_component(
     name = "pinned_buffer",
     impl_deps = [
         ":pinned_buffer_pool",
+        "//sxt/base/error:assert",
     ],
     test_deps = [
         ":pinned_buffer_pool",
         "//sxt/base/test:unit_test",
     ],
     deps = [
+        "//sxt/base/container:span",
     ],
 )
 
@@ -176,6 +178,20 @@ sxt_cc_component(
     ],
     deps = [
         ":device_map",
+    ],
+)
+
+sxt_cc_component(
+    name = "split",
+    impl_deps = [
+        ":property",
+    ],
+    test_deps = [
+        ":property",
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        "//sxt/base/iterator:split",
     ],
 )
 

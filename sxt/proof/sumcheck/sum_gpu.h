@@ -21,6 +21,7 @@
 #include "sxt/algorithm/reduction/kernel_fit.h"
 #include "sxt/algorithm/reduction/thread_reduction.h"
 #include "sxt/base/device/memory_utility.h"
+#include "sxt/base/device/split.h"
 #include "sxt/base/device/state.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/field/element.h"
@@ -160,14 +161,15 @@ xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
 
   // sum
   size_t counter = 0;
-  co_await xendv::concurrent_for_each(
-      chunk_first, chunk_last, [&](basit::index_range rng) noexcept -> xena::future<> {
+  co_await xendv::for_each_device(
+      chunk_first, chunk_last,
+      [&](const xendv::chunk_context& ctx, basit::index_range rng) noexcept -> xena::future<> {
         basdv::stream stream;
         memr::async_device_resource resource{stream};
 
         // copy partial mles to device
         memmg::managed_array<T> partial_mles{&resource};
-        copy_partial_mles<T>(partial_mles, stream, mles, n, rng.a(), rng.b());
+        co_await copy_partial_mles<T>(partial_mles, stream, mles, n, rng.a(), rng.b());
         auto split = rng.b() - rng.a();
         auto np = partial_mles.size() / num_mles;
 
@@ -177,6 +179,7 @@ xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
         cache.lookup(product_table, product_terms, stream);
 
         // compute
+        co_await ctx.alt_future;
         memmg::managed_array<T> partial_p(num_coefficients);
         co_await partial_sum<T>(partial_p, stream, partial_mles, product_table, product_terms,
                                 split, np);
@@ -198,11 +201,8 @@ xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache,
 template <basfld::element T>
 xena::future<> sum_gpu(basct::span<T> p, device_cache<T>& cache, basct::cspan<T> mles,
                        unsigned n) noexcept {
-  basit::split_options options{
-      .min_chunk_size = 100'000u,
-      .max_chunk_size = 200'000u,
-      .split_factor = basdv::get_num_devices(),
-  };
+  auto num_mles = mles.size() / n;
+  auto options = basdv::plan_split(num_mles * sizeof(T));
   co_await sum_gpu<T>(p, cache, options, mles, n);
 }
 

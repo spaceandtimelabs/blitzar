@@ -22,6 +22,7 @@
 #include "sxt/base/container/span.h"
 #include "sxt/base/device/memory_utility.h"
 #include "sxt/base/device/property.h"
+#include "sxt/base/device/split.h"
 #include "sxt/base/device/stream.h"
 #include "sxt/base/error/assert.h"
 #include "sxt/base/field/element.h"
@@ -86,7 +87,7 @@ xena::future<> fold_impl(basct::span<T> mles_p, basct::cspan<T> mles, unsigned n
   basdv::stream stream;
   memr::async_device_resource resource{stream};
   memmg::managed_array<T> mles_dev{&resource};
-  copy_partial_mles<T>(mles_dev, stream, mles, n, a, b);
+  co_await copy_partial_mles<T>(mles_dev, stream, mles, n, a, b);
 
   // fold
   auto np = mles_dev.size() / num_mles;
@@ -121,8 +122,9 @@ xena::future<> fold_gpu(basct::span<T> mles_p, const basit::split_options& split
   auto [chunk_first, chunk_last] = basit::split(basit::index_range{0, mid}, split_options);
 
   // fold
-  co_await xendv::concurrent_for_each(
-      chunk_first, chunk_last, [&](basit::index_range rng) noexcept -> xena::future<> {
+  co_await xendv::for_each_device(
+      chunk_first, chunk_last,
+      [&](const xendv::chunk_context& ctx, basit::index_range rng) noexcept -> xena::future<> {
         co_await fold_impl<T>(mles_p, mles, n, mid, rng.a(), rng.b(), r, one_m_r);
       });
 }
@@ -130,11 +132,8 @@ xena::future<> fold_gpu(basct::span<T> mles_p, const basit::split_options& split
 template <basfld::element T>
 xena::future<> fold_gpu(basct::span<T> mles_p, basct::cspan<T> mles, unsigned n,
                         const T& r) noexcept {
-  basit::split_options split_options{
-      .min_chunk_size = 1024u * 128u,
-      .max_chunk_size = 1024u * 256u,
-      .split_factor = basdv::get_num_devices(),
-  };
-  co_await fold_gpu(mles_p, split_options, mles, n, r);
+  auto num_mles = mles.size() / n;
+  auto options = basdv::plan_split(num_mles * sizeof(T));
+  co_await fold_gpu(mles_p, options, mles, n, r);
 }
 } // namespace sxt::prfsk
