@@ -16,8 +16,6 @@
  */
 #pragma once
 
-#include <optional>
-
 #include "sxt/base/container/span.h"
 #include "sxt/base/device/pinned_buffer.h"
 #include "sxt/base/device/stream.h"
@@ -51,6 +49,9 @@ private:
   basdv::pinned_buffer alt_buffer_;
 };
 
+//--------------------------------------------------------------------------------------------------
+// copy
+//--------------------------------------------------------------------------------------------------
 template <class Cont>
   requires requires(const Cont& src) {
     requires std::is_pointer_v<decltype(src.data())>;

@@ -21,6 +21,7 @@
 #include "sxt/base/device/stream.h"
 #include "sxt/base/device/synchronization.h"
 #include "sxt/base/test/unit_test.h"
+#include "sxt/execution/schedule/scheduler.h"
 #include "sxt/memory/management/managed_array.h"
 #include "sxt/memory/resource/managed_device_resource.h"
 #include "sxt/scalar25/realization/field.h"
@@ -40,7 +41,10 @@ TEST_CASE("we can copy a slice of mles to device memory") {
 
   SECTION("we can copy an mle with a single element") {
     mles = {0x123_s25};
-    copy_partial_mles<T>(partial_mles, stream, mles, 1, 0, 1);
+    auto fut = copy_partial_mles<T>(partial_mles, stream, mles, 1, 0, 1);
+    REQUIRE(!fut.ready());
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
     basdv::synchronize_stream(stream);
     memmg::managed_array<s25t::element> expected = {0x123_s25};
     REQUIRE(partial_mles == expected);
@@ -48,7 +52,10 @@ TEST_CASE("we can copy a slice of mles to device memory") {
 
   SECTION("we can copy a slice of MLEs") {
     mles = {0x1_s25, 0x2_s25, 0x3_s25, 0x4_s25, 0x5_s25, 0x6_s25};
-    copy_partial_mles<T>(partial_mles, stream, mles, 3, 0, 1);
+    auto fut = copy_partial_mles<T>(partial_mles, stream, mles, 3, 0, 1);
+    REQUIRE(!fut.ready());
+    xens::get_scheduler().run();
+    REQUIRE(fut.ready());
     basdv::synchronize_stream(stream);
     memmg::managed_array<s25t::element> expected = {0x1_s25, 0x3_s25, 0x4_s25, 0x6_s25};
     REQUIRE(partial_mles == expected);
