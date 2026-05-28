@@ -40,7 +40,7 @@
     </a>
 
   <a href="https://developer.nvidia.com/cuda-downloads">
-    <img alt="CUDA" src="https://img.shields.io/badge/CUDA-12.6-green?style=flat&logo=nvidia">
+    <img alt="CUDA" src="https://img.shields.io/badge/CUDA-12.8-green?style=flat&logo=nvidia">
     </a>
 
   <p align="center">
@@ -166,7 +166,7 @@ See the [example](./example) folder for some examples.
 Prerequisites:
 * `x86_64` Linux instance.
 * Nix with flake support (check out [The Determinate Nix Installer](https://github.com/DeterminateSystems/nix-installer)).
-* Nvidia GPU capable of running CUDA 12.6 code.
+* Nvidia GPU capable of running CUDA 12.8 code.
 
 From your terminal, run the following command in the root of the source directory to set
 up a build environment. 

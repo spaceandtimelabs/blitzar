@@ -7,8 +7,8 @@ with pkgs;
 pkgs.stdenvNoCC.mkDerivation {
   name = "cudatoolkit";
   src = fetchurl {
-    url = "https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.35.03_linux.run";
-    sha256 = "179fx44j0f6fm4m8afx5vhivv3ywyv7mv7shb7r2b5ji8drcxb3k";
+    url = "https://developer.download.nvidia.com/compute/cuda/12.8.1/local_installers/cuda_12.8.1_570.124.06_linux.run";
+    sha256 = "15wpl4k2yl14i84kgglysdg0wbf99y8k3x1r541qsqdpyp56p3r2";
   };
   patches = [
     # patch host_defines.h to work with libc++
