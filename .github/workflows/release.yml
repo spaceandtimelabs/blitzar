@@ -23,10 +23,15 @@ jobs:
 
       - run: git config --global --add safe.directory $(realpath .)
 
+      - name: Install nix
+        uses: cachix/install-nix-action@v31
+        with:
+          install_options: --no-daemon
+
       - name: Semantic release
         run: |
-          nix develop --command npm install semantic-release
-          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command npx semantic-release
+          nix develop --extra-experimental-features "nix-command flakes" --command npm install semantic-release
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --extra-experimental-features "nix-command flakes" --command npx semantic-release
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
