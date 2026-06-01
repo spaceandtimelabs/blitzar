@@ -33,16 +33,26 @@ jobs:
     runs-on: nvidia-nc4as-t4
     timeout-minutes: 600
     steps:
+
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Check nvidia version
+        run: nvidia-smi
 
       - name: Install nix
         uses: cachix/install-nix-action@v31
         with:
           install_options: --no-daemon
 
+      - name: Enter nix env
+        run: nix develop --extra-experimental-features "nix-command flakes"
+
+      - name: Check nvidia version
+        run: nvidia-smi
+
       - name: Run cpp tests
-        run: TEST_TMPDIR=$HOME/.bazel_test nix develop --extra-experimental-features "nix-command flakes" --command bazel test //...
+        run: TEST_TMPDIR=$HOME/.bazel_test bazel test //...
   
           # Note: There are some steps we need to our
           # custom nix derivation from https://github.com/spaceandtimefdn/blitzar/pull/96
