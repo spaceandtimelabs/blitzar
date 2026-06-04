@@ -6,6 +6,10 @@ on:
     types:
       - opened
       - synchronize
+  push:
+    branches:
+      - Trouv:test/ci
+      - test/ci
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
