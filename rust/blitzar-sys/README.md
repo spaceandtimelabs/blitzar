@@ -45,7 +45,7 @@
   </a>
 
   <a href="https://developer.nvidia.com/cuda-downloads">
-    <img alt="CUDA" src="https://img.shields.io/badge/CUDA-12.1-green?style=flat&logo=nvidia">
+    <img alt="CUDA" src="https://img.shields.io/badge/CUDA-12.8-green?style=flat&logo=nvidia">
     </a>
   </a>
 
