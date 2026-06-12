@@ -10,6 +10,10 @@ jobs:
     uses: ./.github/workflows/test-check-lint.yml
 
   release:
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     name: Build Publish Library - Linux-x86_64
     runs-on: public-blitzar-T4-gpu-vm
     timeout-minutes: 600
@@ -18,8 +22,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GH_TOKEN }}
 
       - run: git config --global --add safe.directory $(realpath .)
 
@@ -28,5 +30,5 @@ jobs:
           nix develop --command npm install semantic-release
           TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command npx semantic-release
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
