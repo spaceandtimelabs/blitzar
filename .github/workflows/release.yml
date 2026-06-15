@@ -15,7 +15,7 @@ jobs:
       issues: write
       pull-requests: write
     name: Build Publish Library - Linux-x86_64
-    runs-on: public-blitzar-T4-gpu-vm
+    runs-on: ubuntu-latest
     timeout-minutes: 600
     needs: [test-check-lint]
     environment: deploy #!! DO NOT CHANGE THIS LINE !! #
@@ -25,9 +25,12 @@ jobs:
 
       - run: git config --global --add safe.directory $(realpath .)
 
+      - name: Install nix
+        uses: cachix/install-nix-action@v31
+
       - name: Semantic release
         run: |
-          nix develop --command npm install semantic-release
+          nix develop --extra-experimental-features "nix-command flakes" --command npm install semantic-release
           TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
