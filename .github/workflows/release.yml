@@ -31,7 +31,7 @@ jobs:
       - name: Semantic release
         run: |
           nix develop --extra-experimental-features "nix-command flakes" --command npm install semantic-release
-          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --command npx semantic-release
+          TEST_TMPDIR=$HOME/.bazel_test_opt nix develop --extra-experimental-features "nix-command flakes" --command npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
